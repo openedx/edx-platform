@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 18:37+0000\n"
+"POT-Creation-Date: 2016-01-22 14:54+0000\n"
 "PO-Revision-Date: 2015-11-24 13:39+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -487,6 +487,10 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
@@ -2189,6 +2193,18 @@ msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
 "manage Custom Courses on edX. When false, Custom Courses cannot be created, "
 "but existing Custom Courses will be preserved."
+msgstr ""
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -8949,6 +8965,10 @@ msgstr "자세히 알아보기"
 msgid "Starts"
 msgstr "개강일"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "모든 강좌 보기"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -9283,10 +9303,6 @@ msgstr "Open edX가 설치된 기본 홈페이지입니다. 정상 동작중입�
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "강좌 찾기"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "모든 강좌 보기"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"

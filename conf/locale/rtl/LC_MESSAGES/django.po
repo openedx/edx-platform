@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-21 20:46+0000\n"
-"PO-Revision-Date: 2016-01-21 20:46:53.757815\n"
+"POT-Creation-Date: 2016-01-27 20:20+0000\n"
+"PO-Revision-Date: 2016-01-27 20:20:18.634310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1527,9 +1527,9 @@ msgstr "ثققخق"
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: common/templates/course_modes/choose.html lms/templates/login.html
-#: lms/templates/register-form.html
+#: common/lib/capa/capa/responsetypes.py lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "or"
 msgstr "خق"
 
@@ -8470,6 +8470,7 @@ msgstr "حقثدهثص"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -8483,6 +8484,7 @@ msgstr "صهنه حقثدهثص"
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
 msgstr "صهريخص خحثر"
 
@@ -8734,6 +8736,7 @@ msgstr ""
 #: lms/templates/courseware/courses.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Search"
 msgstr "سثشقذا"
 
@@ -8954,18 +8957,6 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr "يثشيمهرث بخق حعقذاشسهرل شري قثضعثسفهرل ذقثيهف."
 
 #: openedx/core/djangoapps/profile_images/images.py
-msgid "bytes"
-msgstr "زغفثس"
-
-#: openedx/core/djangoapps/profile_images/images.py
-msgid "KB"
-msgstr "نز"
-
-#: openedx/core/djangoapps/profile_images/images.py
-msgid "MB"
-msgstr "وز"
-
-#: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr "فاث بهمث وعسف زث سوشممثق فاشر {image_max_size} هر سهظث."
 
@@ -8992,6 +8983,18 @@ msgid ""
 msgstr ""
 "فاث بهمث رشوث ثطفثرسهخر بخق فاهس بهمث يخثس رخف وشفذا فاث بهمث يشفش. فاث بهمث"
 " وشغ زث ذخققعحفثي."
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "bytes"
+msgstr "زغفثس"
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "KB"
+msgstr "نز"
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "MB"
+msgstr "وز"
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
@@ -9042,6 +9045,10 @@ msgstr "ثرشزمث سفعيثرف يشسازخشقي يهسحمشغس"
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Studio Authoring Interface"
 msgstr "ثرشزمث سفعيهخ شعفاخقهرل هرفثقبشذث"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Program Certificate Generation"
+msgstr "ثرشزمث حقخلقشو ذثقفهبهذشفث لثرثقشفهخر"
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -9855,6 +9862,61 @@ msgstr "اثمح"
 msgid "Sign Out"
 msgstr "سهلر خعف"
 
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Looking for help with {studio_name}?"
+msgstr "مخخنهرل بخق اثمح صهفا {studio_name}?"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Hide {studio_name} Help"
+msgstr "اهيث {studio_name} اثمح"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "{studio_name} Documentation"
+msgstr "{studio_name} يخذعوثرفشفهخر"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Access documentation on http://docs.edx.org"
+msgstr "شذذثسس يخذعوثرفشفهخر خر اففح://يخذس.ثيط.خقل"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "edX Documentation"
+msgstr "ثيط يخذعوثرفشفهخر"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
+msgstr "ثرقخمم هر ثيط101: خدثقدهثص خب ذقثشفهرل شر ثيط ذخعقسث"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in edX101"
+msgstr "ثرقخمم هر ثيط101"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr "ثرقخمم هر سفعيهخط: ذقثشفهرل ش ذخعقسث صهفا ثيط سفعيهخ"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in StudioX"
+msgstr "ثرقخمم هر سفعيهخط"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Send an email to {email}"
+msgstr "سثري شر ثوشهم فخ {email}"
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr "ذخرفشذف عس"
+
 #: common/lib/capa/capa/templates/codeinput.html
 msgid "{programming_language} editor"
 msgstr "{programming_language} ثيهفخق"
@@ -9886,138 +9948,6 @@ msgstr "ذقثشفهدث ذخووخرس مهذثرسثي ذخرفثرف, صهف�
 #: common/templates/license.html
 msgid "Some Rights Reserved"
 msgstr "سخوث قهلافس قثسثقدثي"
-
-#: common/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
-msgstr "ثرقخمم هر {} | ذاخخسث غخعق فقشذن"
-
-#: common/templates/course_modes/choose.html
-msgid "Sorry, there was an error when trying to enroll you"
-msgstr "سخققغ, فاثقث صشس شر ثققخق صاثر فقغهرل فخ ثرقخمم غخع"
-
-#: common/templates/course_modes/choose.html
-msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr "ذخرلقشفعمشفهخرس!  غخع شقث رخص ثرقخممثي هر {course_name}"
-
-#: common/templates/course_modes/choose.html
-msgid "Pursue Academic Credit with a Verified Certificate"
-msgstr "حعقسعث شذشيثوهذ ذقثيهف صهفا ش دثقهبهثي ذثقفهبهذشفث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Become eligible for academic credit and highlight your new skills and "
-"knowledge with a verified certificate. Use this valuable credential to "
-"qualify for academic credit, advance your career, or strengthen your school "
-"applications."
-msgstr ""
-"زثذخوث ثمهلهزمث بخق شذشيثوهذ ذقثيهف شري اهلامهلاف غخعق رثص سنهممس شري "
-"نرخصمثيلث صهفا ش دثقهبهثي ذثقفهبهذشفث. عسث فاهس دشمعشزمث ذقثيثرفهشم فخ "
-"ضعشمهبغ بخق شذشيثوهذ ذقثيهف, شيدشرذث غخعق ذشقثثق, خق سفقثرلفاثر غخعق سذاخخم "
-"شححمهذشفهخرس."
-
-#: common/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
-msgstr "زثرثبهفس خب ش دثقهبهثي ذثقفهبهذشفث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Eligible for credit:{b_end} Receive academic credit after "
-"successfully completing the course"
-msgstr ""
-"{b_start}ثمهلهزمث بخق ذقثيهف:{b_end} قثذثهدث شذشيثوهذ ذقثيهف شبفثق "
-"سعذذثسسبعممغ ذخوحمثفهرل فاث ذخعقسث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
-"institution's logo"
-msgstr ""
-"{b_start}خببهذهشم:{b_end} قثذثهدث شر هرسفقعذفخق-سهلرثي ذثقفهبهذشفث صهفا فاث "
-"هرسفهفعفهخر'س مخلخ"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
-"or post it directly on LinkedIn"
-msgstr ""
-"{b_start}ثشسهمغ ساشقثشزمث:{b_end} شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
-"خق حخسف هف يهقثذفمغ خر مهرنثيهر"
-
-#: common/templates/course_modes/choose.html
-msgid "Pursue a Verified Certificate"
-msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Highlight your new knowledge and skills with a verified certificate. Use "
-"this valuable credential to improve your job prospects and advance your "
-"career, or highlight your certificate in school applications."
-msgstr ""
-"اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس صهفا ش دثقهبهثي ذثقفهبهذشفث. عسث "
-"فاهس دشمعشزمث ذقثيثرفهشم فخ هوحقخدث غخعق تخز حقخسحثذفس شري شيدشرذث غخعق "
-"ذشقثثق, خق اهلامهلاف غخعق ذثقفهبهذشفث هر سذاخخم شححمهذشفهخرس."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
-"institution's logo"
-msgstr ""
-"{b_start}خببهذهشم: {b_end}قثذثهدث شر هرسفقعذفخق-سهلرثي ذثقفهبهذشفث صهفا فاث "
-"هرسفهفعفهخر'س مخلخ"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
-"or post it directly on LinkedIn"
-msgstr ""
-"{b_start}ثشسهمغ ساشقثشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
-"خق حخسف هف يهقثذفمغ خر مهرنثيهر"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Motivating: {b_end}Give yourself an additional incentive to "
-"complete the course"
-msgstr ""
-"{b_start}وخفهدشفهرل: {b_end}لهدث غخعقسثمب شر شييهفهخرشم هرذثرفهدث فخ "
-"ذخوحمثفث فاث ذخعقسث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
-"certificates to help fund free education for everyone globally"
-msgstr ""
-"{b_start}سعححخقف خعق وهسسهخر: {b_end} ثيط, ش رخر-حقخبهف, قثمهثس خر دثقهبهثي "
-"ذثقفهبهذشفثس فخ اثمح بعري بقثث ثيعذشفهخر بخق ثدثقغخرث لمخزشممغ"
-
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "شعيهف فاهس ذخعقسث"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums."
-msgstr ""
-"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث ذخوحمثفث شذذثسس فخ شمم فاث ذخعقسث "
-"وشفثقهشم, شذفهدهفهثس, فثسفس, شري بخقعوس."
-
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course (No Certificate)"
-msgstr "شعيهف فاهس ذخعقسث (رخ ذثقفهبهذشفث)"
-
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums.  {b_start}Please note that this "
-"track does not offer a certificate for learners who earn a passing "
-"grade.{b_end}"
-msgstr ""
-"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث ذخوحمثفث شذذثسس فخ شمم فاث ذخعقسث "
-"وشفثقهشم, شذفهدهفهثس, فثسفس, شري بخقعوس.  {b_start}حمثشسث رخفث فاشف فاهس "
-"فقشذن يخثس رخف خببثق ش ذثقفهبهذشفث بخق مثشقرثقس صاخ ثشقر ش حشسسهرل "
-"لقشيث.{b_end}"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -10063,69 +9993,60 @@ msgid "View all Courses"
 msgstr "دهثص شمم ذخعقسثس"
 
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
 msgstr "يشسازخشقي"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "وغ ذخعقسثس"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
 msgstr "مخخنس مهنث غخع اشدثر'ف ثرقخممثي هر شرغ ذخعقسثس غثف."
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Find courses now!"
 msgstr "بهري ذخعقسثس رخص!"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "ذخعقسث-مخشيهرل ثققخقس"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Search Your Courses"
 msgstr "سثشقذا غخعق ذخعقسثس"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "ذمثشق سثشقذا"
 
-#: lms/templates/dashboard.html
-msgid ""
-"Check out our recently launched courses and what's new in your favorite "
-"subjects"
-msgstr ""
-"ذاثذن خعف خعق قثذثرفمغ مشعرذاثي ذخعقسثس شري صاشف'س رثص هر غخعق بشدخقهفث "
-"سعزتثذفس"
-
-#: lms/templates/dashboard.html
-msgid "Find New Courses"
-msgstr "بهري رثص ذخعقسثس"
-
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
 msgstr "شذذخعرف سفشفعس هربخ"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "ثوشهم سثففهرلس بخق {course_number}"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Receive course emails"
 msgstr "قثذثهدث ذخعقسث ثوشهمس"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Save Settings"
 msgstr "سشدث سثففهرلس"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
 msgstr "عرثرقخمم"
 
@@ -10193,16 +10114,7 @@ msgstr "يثزعل: "
 msgid "External Authentication failed"
 msgstr "ثطفثقرشم شعفاثرفهذشفهخر بشهمثي"
 
-#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
-msgid "Page Footer"
-msgstr "حشلث بخخفثق"
-
-#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
-msgid "About edX"
-msgstr "شزخعف ثيط"
-
-#: lms/templates/footer-edx-v3.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
+#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "مثلشم"
@@ -11947,6 +11859,148 @@ msgstr "مخشيهرل خقيثق يشفش..."
 msgid "Please wait while we retrieve your order details."
 msgstr "حمثشسث صشهف صاهمث صث قثفقهثدث غخعق خقيثق يثفشهمس."
 
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Enroll In {} | Choose Your Track"
+msgstr "ثرقخمم هر {} | ذاخخسث غخعق فقشذن"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Sorry, there was an error when trying to enroll you"
+msgstr "سخققغ, فاثقث صشس شر ثققخق صاثر فقغهرل فخ ثرقخمم غخع"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Congratulations!  You are now enrolled in {course_name}"
+msgstr "ذخرلقشفعمشفهخرس!  غخع شقث رخص ثرقخممثي هر {course_name}"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with a Verified Certificate"
+msgstr "حعقسعث شذشيثوهذ ذقثيهف صهفا ش دثقهبهثي ذثقفهبهذشفث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Become eligible for academic credit and highlight your new skills and "
+"knowledge with a verified certificate. Use this valuable credential to "
+"qualify for academic credit, advance your career, or strengthen your school "
+"applications."
+msgstr ""
+"زثذخوث ثمهلهزمث بخق شذشيثوهذ ذقثيهف شري اهلامهلاف غخعق رثص سنهممس شري "
+"نرخصمثيلث صهفا ش دثقهبهثي ذثقفهبهذشفث. عسث فاهس دشمعشزمث ذقثيثرفهشم فخ "
+"ضعشمهبغ بخق شذشيثوهذ ذقثيهف, شيدشرذث غخعق ذشقثثق, خق سفقثرلفاثر غخعق سذاخخم "
+"شححمهذشفهخرس."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
+msgstr "زثرثبهفس خب ش دثقهبهثي ذثقفهبهذشفث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Eligible for credit:{b_end} Receive academic credit after "
+"successfully completing the course"
+msgstr ""
+"{b_start}ثمهلهزمث بخق ذقثيهف:{b_end} قثذثهدث شذشيثوهذ ذقثيهف شبفثق "
+"سعذذثسسبعممغ ذخوحمثفهرل فاث ذخعقسث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
+"institution's logo"
+msgstr ""
+"{b_start}خببهذهشم:{b_end} قثذثهدث شر هرسفقعذفخق-سهلرثي ذثقفهبهذشفث صهفا فاث "
+"هرسفهفعفهخر'س مخلخ"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn"
+msgstr ""
+"{b_start}ثشسهمغ ساشقثشزمث:{b_end} شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"خق حخسف هف يهقثذفمغ خر مهرنثيهر"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Highlight your new knowledge and skills with a verified certificate. Use "
+"this valuable credential to improve your job prospects and advance your "
+"career, or highlight your certificate in school applications."
+msgstr ""
+"اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس صهفا ش دثقهبهثي ذثقفهبهذشفث. عسث "
+"فاهس دشمعشزمث ذقثيثرفهشم فخ هوحقخدث غخعق تخز حقخسحثذفس شري شيدشرذث غخعق "
+"ذشقثثق, خق اهلامهلاف غخعق ذثقفهبهذشفث هر سذاخخم شححمهذشفهخرس."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
+"institution's logo"
+msgstr ""
+"{b_start}خببهذهشم: {b_end}قثذثهدث شر هرسفقعذفخق-سهلرثي ذثقفهبهذشفث صهفا فاث "
+"هرسفهفعفهخر'س مخلخ"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn"
+msgstr ""
+"{b_start}ثشسهمغ ساشقثشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"خق حخسف هف يهقثذفمغ خر مهرنثيهر"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Motivating: {b_end}Give yourself an additional incentive to "
+"complete the course"
+msgstr ""
+"{b_start}وخفهدشفهرل: {b_end}لهدث غخعقسثمب شر شييهفهخرشم هرذثرفهدث فخ "
+"ذخوحمثفث فاث ذخعقسث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "شعيهف فاهس ذخعقسث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums."
+msgstr ""
+"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث ذخوحمثفث شذذثسس فخ شمم فاث ذخعقسث "
+"وشفثقهشم, شذفهدهفهثس, فثسفس, شري بخقعوس."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Audit This Course (No Certificate)"
+msgstr "شعيهف فاهس ذخعقسث (رخ ذثقفهبهذشفث)"
+
+#. Translators: b_start notes the beginning of a section of text bolded for
+#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums.  {b_start}Please note that this "
+"track does not offer a certificate for learners who earn a passing "
+"grade.{b_end}"
+msgstr ""
+"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث ذخوحمثفث شذذثسس فخ شمم فاث ذخعقسث "
+"وشفثقهشم, شذفهدهفهثس, فثسفس, شري بخقعوس.  {b_start}حمثشسث رخفث فاشف فاهس "
+"فقشذن يخثس رخف خببثق ش ذثقفهبهذشفث بخق مثشقرثقس صاخ ثشقر ش حشسسهرل "
+"لقشيث.{b_end}"
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "{chapter} ذعققثرف ذاشحفثق"
@@ -12449,7 +12503,6 @@ msgstr ""
 "{platform_name} ذخعقسثس!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فاث {platform_name} فثشو"
@@ -13179,42 +13232,6 @@ msgstr ""
 "ذاشرلث غخعق مهبث شري سفشقف مثشقرهرل فخيشغ زغ شذفهدشفهرل غخعق {platform_name}"
 " شذذخعرف. ذمهذن خر فاث مهرن زثمخص خق ذخحغ شري حشسفث هف هرفخ غخعق زقخصسثق'س "
 "شييقثسس زشق."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"After you activate your account, you can sign up for and take any of the "
-"hundreds of courses {platform_name} offers."
-msgstr ""
-"شبفثق غخع شذفهدشفث غخعق شذذخعرف, غخع ذشر سهلر عح بخق شري فشنث شرغ خب فاث "
-"اعريقثيس خب ذخعقسثس {platform_name} خببثقس."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"Once you have activated your account, edX will send you email from time to "
-"time about new courses or other information."
-msgstr ""
-"خرذث غخع اشدث شذفهدشفثي غخعق شذذخعرف, ثيط صهمم سثري غخع ثوشهم بقخو فهوث فخ "
-"فهوث شزخعف رثص ذخعقسثس خق خفاثق هربخقوشفهخر."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {contact_us_url}, email "
-"{info_email_address}, or write to {info_postal_address}."
-msgstr ""
-"هب غخع رثثي اثمح, حمثشسث عسث خعق صثز بخقو شف {contact_us_url}, ثوشهم "
-"{info_email_address}, خق صقهفث فخ {info_postal_address}."
-
-#: lms/templates/emails/activation_email.txt
-msgid "We hope you enjoy learning with {platform_name}!"
-msgstr "صث اخحث غخع ثرتخغ مثشقرهرل صهفا {platform_name}!"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email was automatically sent by {site_name} because someone attempted "
-"to create an {platform_name} account using this email address."
-msgstr ""
-"فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف زغ {site_name} زثذشعسث سخوثخرث شففثوحفثي "
-"فخ ذقثشفث شر {platform_name} شذذخعرف عسهرل فاهس ثوشهم شييقثسس."
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -16333,7 +16350,6 @@ msgstr ""
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
 #: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/copyright.html
 #: lms/templates/static_templates/donate.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/help.html
@@ -16350,10 +16366,6 @@ msgid ""
 msgstr ""
 "فاهس حشلث مثبف هرفثرفهخرشممغ زمشرن. هف هس رخف عسثي زغ ثيط.خقل زعف هس مثبف "
 "اثقث بخق حخسسهزمث عسث زغ هرسفشممشفهخرس خب خحثر ثيط."
-
-#: lms/templates/static_templates/copyright.html
-msgid "Copyright"
-msgstr "ذخحغقهلاف"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -16649,6 +16661,54 @@ msgstr "{span_start}شذفهدث{span_end}"
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "شيي شقفهذمث"
+
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid ""
+"Access Course Staff Support on the Partner Portal to submit or review "
+"support tickets"
+msgstr ""
+"شذذثسس ذخعقسث سفشبب سعححخقف خر فاث حشقفرثق حخقفشم فخ سعزوهف خق قثدهثص "
+"سعححخقف فهذنثفس"
+
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "edX Partner Portal"
+msgstr "ثيط حشقفرثق حخقفشم"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid ""
+"Check out our recently launched courses and what's new in your favorite "
+"subjects"
+msgstr ""
+"ذاثذن خعف خعق قثذثرفمغ مشعرذاثي ذخعقسثس شري صاشف'س رثص هر غخعق بشدخقهفث "
+"سعزتثذفس"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Find New Courses"
+msgstr "بهري رثص ذخعقسثس"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "Page Footer"
+msgstr "حشلث بخخفثق"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "About edX"
+msgstr "شزخعف ثيط"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid ""
+"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
+"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
+msgstr ""
+"© ثيط هرذ.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر ثيط شري فاث "
+"ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط هرذ."
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
+"certificates to help fund free education for everyone globally"
+msgstr ""
+"{b_start}سعححخقف خعق وهسسهخر: {b_end} ثيط, ش رخر-حقخبهف, قثمهثس خر دثقهبهثي "
+"ذثقفهبهذشفثس فخ اثمح بعري بقثث ثيعذشفهخر بخق ثدثقغخرث لمخزشممغ"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -20156,68 +20216,12 @@ msgid "Label"
 msgstr "مشزثم"
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for help with {studio_name}?"
-msgstr "مخخنهرل بخق اثمح صهفا {studio_name}?"
-
-#: cms/templates/widgets/sock.html
-msgid "Hide {studio_name} Help"
-msgstr "اهيث {studio_name} اثمح"
-
-#: cms/templates/widgets/sock.html
-msgid "{studio_name} Documentation"
-msgstr "{studio_name} يخذعوثرفشفهخر"
-
-#: cms/templates/widgets/sock.html
-msgid "Access documentation on http://docs.edx.org"
-msgstr "شذذثسس يخذعوثرفشفهخر خر اففح://يخذس.ثيط.خقل"
-
-#: cms/templates/widgets/sock.html
-msgid "edX Documentation"
-msgstr "ثيط يخذعوثرفشفهخر"
-
-#: cms/templates/widgets/sock.html
-msgid ""
-"Access Course Staff Support on the Partner Portal to submit or review "
-"support tickets"
-msgstr ""
-"شذذثسس ذخعقسث سفشبب سعححخقف خر فاث حشقفرثق حخقفشم فخ سعزوهف خق قثدهثص "
-"سعححخقف فهذنثفس"
-
-#: cms/templates/widgets/sock.html
-msgid "edX Partner Portal"
-msgstr "ثيط حشقفرثق حخقفشم"
-
-#: cms/templates/widgets/sock.html
 msgid "Access the Open edX Portal"
 msgstr "شذذثسس فاث خحثر ثيط حخقفشم"
 
 #: cms/templates/widgets/sock.html
 msgid "Open edX Portal"
 msgstr "خحثر ثيط حخقفشم"
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in edX101: Overview of Creating an edX Course"
-msgstr "ثرقخمم هر ثيط101: خدثقدهثص خب ذقثشفهرل شر ثيط ذخعقسث"
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in edX101"
-msgstr "ثرقخمم هر ثيط101"
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in StudioX: Creating a Course with edX Studio"
-msgstr "ثرقخمم هر سفعيهخط: ذقثشفهرل ش ذخعقسث صهفا ثيط سفعيهخ"
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in StudioX"
-msgstr "ثرقخمم هر سفعيهخط"
-
-#: cms/templates/widgets/sock.html
-msgid "Send an email to {email}"
-msgstr "سثري شر ثوشهم فخ {email}"
-
-#: cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "ذخرفشذف عس"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

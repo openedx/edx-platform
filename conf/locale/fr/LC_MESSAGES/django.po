@@ -186,7 +186,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 18:37+0000\n"
+"POT-Creation-Date: 2016-01-22 14:54+0000\n"
 "PO-Revision-Date: 2016-01-12 23:32+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -203,37 +203,46 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
 msgid "Discussion"
-msgstr ""
+msgstr "Discussion"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Problem"
-msgstr ""
+msgstr "Exercice"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr ""
+msgstr "Avancé"
 
-#: cms/templates/settings.html
+#: cms/djangoapps/contentstore/views/entrance_exam.py
+#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Examen d'entrée"
 
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "Section"
 
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/ccx/schedule.html
 msgid "Subsection"
 msgstr "Sous-section"
 
-#: lms/templates/seq_module.html lms/templates/ccx/schedule.html
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Unité"
 
-#: lms/templates/help_modal.html
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -244,8 +253,11 @@ msgstr "Nom"
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
-msgstr ""
+msgstr "Vidéo ID"
 
+#: cms/djangoapps/contentstore/views/videos.py
+#: common/djangoapps/config_models/admin.py
+#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "Statut"
@@ -272,7 +284,7 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
-msgstr ""
+msgstr "Mettre à jour"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
@@ -282,11 +294,11 @@ msgstr ""
 #. change:
 #: common/djangoapps/config_models/models.py
 msgid "Changed by"
-msgstr ""
+msgstr "Modifié par"
 
 #: common/djangoapps/config_models/models.py
 msgid "Enabled"
-msgstr ""
+msgstr "Activé"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
@@ -298,7 +310,7 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Mode"
-msgstr ""
+msgstr "Mode"
 
 #: common/djangoapps/course_modes/admin.py
 #: lms/djangoapps/courseware/date_summary.py
@@ -314,7 +326,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Your verification is pending"
-msgstr ""
+msgstr "Votre vérification est en attente."
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Verified: Pending Verification"
@@ -340,6 +352,8 @@ msgstr ""
 msgid "You're enrolled as an honor code student"
 msgstr ""
 
+#: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
 msgstr "Code d'honneur"
@@ -356,12 +370,25 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
-msgstr ""
+msgstr "Cours"
 
+#: common/djangoapps/course_modes/models.py
+#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Nom d'affichage"
 
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr "Prix"
@@ -583,6 +610,10 @@ msgstr ""
 msgid "Password: "
 msgstr ""
 
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
+msgstr ""
+
 #: common/djangoapps/student/middleware.py
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
@@ -595,11 +626,11 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr ""
+msgstr "Homme"
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr ""
+msgstr "Femme"
 
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py
@@ -2293,6 +2324,18 @@ msgid ""
 "but existing Custom Courses will be preserved."
 msgstr ""
 
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
 msgstr ""
@@ -3857,16 +3900,12 @@ msgid ""
 "Inc."
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated.
-#. See http://openedx.org for more information.
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
-#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: cms/templates/widgets/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
-msgstr ""
+msgstr "Site réalisé avec Open edX"
 
 #: lms/templates/static_templates/blog.html
 msgid "Blog"
@@ -9132,6 +9171,10 @@ msgstr "EN SAVOIR PLUS"
 msgid "Starts"
 msgstr "Commence"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "Voir tous les cours"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -9483,10 +9526,6 @@ msgstr ""
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "Rechercher un cours"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "Voir tous les cours"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -15774,7 +15813,7 @@ msgstr "En savoir plus à propos de la gestion de fichiers"
 
 #: cms/templates/asset_index.html
 msgid "close"
-msgstr ""
+msgstr "fermer"
 
 #: cms/templates/asset_index.html
 msgid "Max per-file size: {max_filesize}MB"
@@ -15798,11 +15837,11 @@ msgstr "fermez l'alerte"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
-msgstr ""
+msgstr "Certificats du cours"
 
 #: cms/templates/certificates.html
 msgid "This module is not enabled."
-msgstr ""
+msgstr "Ce module n'est pas activé."
 
 #: cms/templates/certificates.html
 msgid "This course does not use a mode that offers certificates."
