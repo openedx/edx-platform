@@ -221,8 +221,11 @@ define([
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
-    "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
+    "coffee/spec/views/course_info_spec",
+    "coffee/spec/views/metadata_edit_spec",
+    "coffee/spec/views/module_edit_spec",
+    "coffee/spec/views/textbook_spec",
+    "coffee/spec/views/upload_spec",
 
     "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
