@@ -26,6 +26,7 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
+from courseware.fields import UnsignedBigIntAutoField
 
 log = logging.getLogger("edx.courseware")
 
@@ -177,6 +178,50 @@ class StudentModuleHistory(models.Model):
         """
         if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
             history_entry = StudentModuleHistory(student_module=instance,
+                                                 version=None,
+                                                 created=instance.modified,
+                                                 state=instance.state,
+                                                 grade=instance.grade,
+                                                 max_grade=instance.max_grade)
+            history_entry.save()
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+class StudentModuleHistoryExtended(models.Model):
+    """Keeps a complete history of state changes for a given XModule for a given
+    Student. Right now, we restrict this to problems so that the table doesn't
+    explode in size.
+
+    This new extended CSMH has a larger primary key that won't run out of space
+    so quickly."""
+    objects = ChunkingManager()
+    HISTORY_SAVING_TYPES = {'problem'}
+
+    class Meta(object):
+        app_label = "courseware"
+        get_latest_by = "created"
+
+    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+
+    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False)
+    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    # This should be populated from the modified field in StudentModule
+    created = models.DateTimeField(db_index=True)
+    state = models.TextField(null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True)
+    max_grade = models.FloatField(null=True, blank=True)
+
+    @receiver(post_save, sender=StudentModule)
+    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+        """
+        Checks the instance's module_type, and creates & saves a
+        StudentModuleHistory entry if the module_type is one that
+        we save.
+        """
+        if instance.module_type in StudentModuleHistoryExtended.HISTORY_SAVING_TYPES:
+            history_entry = StudentModuleHistoryExtended(student_module=instance,
                                                  version=None,
                                                  created=instance.modified,
                                                  state=instance.state,
