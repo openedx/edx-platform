@@ -1,0 +1,272 @@
+/****************************************************************************************************
+*   Stanford Theming File
+*
+*   Contains all the theme color definitions for the Stanford Open Source MOOC Project
+*
+****************************************************************************************************/
+
+//-----------------
+//  Color variables (from Stanford palette unless noted)
+//-----------------
+
+//Main Color Variables
+$main-color: #f7691f;
+$dark-color: #ea281f; //Link Color
+$light-color: #f4e00c; //Selected Header BG Color, ie. calendar        ***Custom, not from palette***
+$bg-color: #f7fe81; //Selected Content BG Color, ie. calendar          ***Custom, not from palette***
+
+//Main BG Color Variables
+$main-bg: #822537;
+$main-bg-60: lighten($main-bg, 18.5%); //Main Border/HR Color
+$main-bg-25: lighten($main-bg, 25%); 
+
+//Secondary Color Variables
+$secondary: #b5a4b7;
+$secondary-50: lighten($secondary, 9%);
+$secondary-25: lighten($secondary, 20%); //Important Heading BG Color 
+
+//Gray Color Variables
+$gray: #3f3f3f; //Main Text Color
+$gray-75: lighten($gray, 18.25%); //Lighter Text Color
+
+$gray-3: #e9e9e9; //Block/Course BG Color
+$gray-2: #f2f2f2;
+$gray-1: #fbfbfb; //Main BG Color
+$white: $gray-1;
+
+$black: #2e2e2e;
+$black-80: #585858;
+
+
+
+//-----------------
+//  Font Assignment
+//-----------------
+
+$theme-sans-font: 'Source Sans';
+$sans-serif: $theme-sans-font, $sans-serif;
+$body-font-family: $sans-serif;
+
+$theme-serif-font: 'Crimson Text';
+$serif: $theme-serif-font, $serif;
+
+
+
+
+//-----------------
+//  Theme Element Assignments
+//-----------------
+
+$body-bg: $gray-1;
+$container-bg: $gray-1;
+$login-register-bg: $gray-1;
+$content-wrapper-bg: $gray-1;
+$header-image: none;
+$header-bg: transparentize(lighten($secondary, 18.5%), .25);
+$courseware-header-image: none;
+$courseware-header-bg: transparentize(lighten($secondary, 18.5%), .25);
+$footer-bg: $secondary-25;
+$courseware-footer-border: 1px solid $main-bg-60;
+$courseware-footer-shadow: box-shadow(2px 1px 0 rgba(0, 0, 0, .1));
+$courseware-footer-margin: 50px;
+
+$faded-hr-image-1: linear-gradient($main-bg-60 0%, $main-bg-60);
+$faded-hr-image-2: linear-gradient($main-bg-60 0%, $main-bg-60);
+$faded-hr-image-3: linear-gradient($main-bg-60 0%, $main-bg-60);
+$faded-hr-image-4: linear-gradient($main-bg-60 0%, $main-bg-60);
+$faded-hr-image-5: linear-gradient($main-bg-60 0%, $main-bg-60);
+$faded-hr-image-6: linear-gradient($main-bg-60 0%, $main-bg-60);
+
+$base-font-color: $black;
+$lighter-base-font-color: $black-80;
+$very-light-text: $gray-1;
+
+$link-color: $dark-color;
+$link-color-d1: $dark-color;
+$link-hover: $light-color;
+$site-status-color: $bg-color;
+
+$header-graphic-super-color: $dark-color;
+$header-graphic-sub-color: $lighter-base-font-color;
+
+$header-link-color: $dark-color;
+$header-link-hover: $light-color;
+
+$button-color: $main-color;
+$button-archive-color: $gray-3;
+
+$shadow-color: $gray;
+
+// actions
+$button-bg-image: none;
+$button-bg-color: $gray-3;
+$button-bg-hover-color: $gray-1;
+
+// actions - primary
+$action-primary-bg: $main-color;
+$action-primary-fg: $gray-2;
+$action-primary-shadow: none;
+
+// focused - hover/active pseudo states
+$action-primary-focused-bg: $dark-color;
+$action-primary-focused-fg: $gray-1;
+
+// current or active navigation item
+$action-primary-active-bg: $dark-color;
+$action-primary-active-fg: $gray-1;
+$action-primary-active-shadow: none;
+$action-primary-active-focused-fg: $gray-2;
+$action-primary-active-focused-shadow: none;
+
+// disabled
+$action-primary-disabled-bg: $gray-75;
+$action-prmary-disabled-fg: $gray-1;
+
+
+
+// actions - secondary
+$action-secondary-bg: $secondary;
+$action-secondary-fg: $gray;
+$action-secondary-shadow: none;
+
+// focused - hover/active pseudo states
+$action-secondary-focused-bg: $secondary-50;
+$action-secondary-focused-fg: $gray;
+
+// current or active navigation item
+$action-secondary-active-bg: $secondary-50;
+$action-secondary-active-fg: $gray;
+$action-secondary-active-shadow: none;
+$action-secondary-active-focused-fg: $gray-75;
+$action-secondary-active-focused-shadow: none;
+
+// disabled
+$action-secondary-disabled-bg: $gray-3;
+$action-secondary-disabled-fg: $gray;
+
+//
+
+$border-color-1: $main-bg-60;
+$border-color-2: $main-bg-60;
+$border-color-3: $main-bg-60;
+$outer-border-color: $main-bg-60;
+
+$sidebar-color: $gray-1;
+
+$homepage__header--gradient__color--alpha: $secondary-25;
+$homepage__header--gradient__color--bravo: $secondary-25;
+$homepage__header--background: $secondary-25;
+$dashboard-profile-header-image: none;
+$dashboard-profile-header-color: $secondary-25;
+$dashboard-profile-color: $gray-3;
+$dot-color: $main-bg-60;
+
+$course-bg-color: $gray-3;
+$course-bg-image: none;
+$account-content-wrapper-bg: $gray-1;
+
+$course-profile-bg: $gray-1;
+$course-header-bg: transparentize($gray-1, .1);
+
+$sidebar-chapter-bg-top: transparentize($gray-1, .3);
+$sidebar-chapter-bg-bottom: transparentize($gray-1, .9);
+$sidebar-chapter-bg: $gray-2;
+$sidebar-active-image: $gray-3;
+
+$form-bg-color: $gray-1;
+$modal-bg-color: $gray-1;
+
+//TOP HEADER IMAGE MARGIN
+$header_image_margin: -77px;
+
+//FOOTER MARGIN
+$footer_margin: ($baseline/4) 0;
+
+//-----------------
+//  CSS BG Images
+//-----------------
+$homepage-bg-image: url('../themes/default/images/sunrise.jpg');
+
+$login-banner-image: none;
+$register-banner-image: none;
+
+$video-thumb-url: '../themes/default/images/edx.png';
+
+//-----------------
+//  Mixin Styles
+//-----------------
+@mixin login_register_h1_style {
+    clip: auto !important;
+    height: 50px;
+    width: 550px;
+    top: 0;
+}
+
+@mixin footer_references_style {
+    margin: 0 !important;
+    text-align: right;
+}
+
+
+//-----------------
+// Override CSS
+//-----------------
+html {
+    background-color: $secondary-25 !important;
+}
+
+//-----------------
+// Header Styling
+//-----------------
+.home>header {
+    height: 500px;
+
+    .outer-wrapper {
+        padding: 120px 0 !important;
+    }
+}
+
+//-----------------
+// Footer Styling
+//-----------------
+.wrapper-footer {
+    box-shadow: none !important;
+    
+    footer {
+        max-width: 1180px;
+        margin: 0 auto;
+
+        .colophon {
+            width: 80%;
+            float: left;
+
+            .nav-colophon li {
+                display: inline-block;
+                height: 35px;
+                float: left;
+                margin: 0 20px 20px 0;
+            }
+        }
+
+        .references {
+            width: 15%;
+            float: right;
+        }
+    }
+
+    .copyright {
+        clear: both;
+    }
+}
+
+//-----------------
+// TOS Styling
+//-----------------
+section.tos {
+    box-sizing: border-box;
+    padding: 0 50px;
+
+    .print {
+        margin: 50px 0;
+    }
+}
