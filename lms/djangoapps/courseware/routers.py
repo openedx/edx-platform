@@ -45,7 +45,7 @@ class StudentModuleHistoryRouter(object):
             return False
         return None
 
-    def allow_syncdb(self, db, model):  # pylint: disable=unused-argument
+    def allow_migrate(self, db, model):  # pylint: disable=unused-argument
         """
         Only sync StudentModuleHistory to StudentModuleHistoryRouter.DATABASE_Name
         """
