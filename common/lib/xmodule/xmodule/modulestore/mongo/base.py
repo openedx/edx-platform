@@ -1234,7 +1234,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return modules
 
-    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, emit_signals=True, **kwargs):
         """
         Creates and returns the course.
 
@@ -1264,7 +1264,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if courses.count() > 0:
             raise DuplicateCourseError(course_id, courses[0]['_id'])
 
-        with self.bulk_operations(course_id):
+        with self.bulk_operations(course_id, emit_signals=emit_signals):
             xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
             # create any other necessary things as a side effect
