@@ -292,7 +292,7 @@ class UserProfile(models.Model):
         year_of_birth = self.year_of_birth
         year = datetime.now(UTC).year
         if year_of_birth is not None:
-            return year - year_of_birth
+            return self._calculate_age(year, year_of_birth)
 
     @property
     def level_of_education_display(self):
@@ -364,13 +364,24 @@ class UserProfile(models.Model):
         if date is None:
             age = self.age
         else:
-            age = date.year - year_of_birth
+            age = self._calculate_age(date.year, year_of_birth)
 
-        return age <= age_limit
+        return age < age_limit
 
     def __enumerable_to_display(self, enumerables, enum_value):
         """ Get the human readable value from an enumerable list of key-value pairs. """
         return dict(enumerables)[enum_value]
+
+    def _calculate_age(self, year, year_of_birth):
+        """Calculate the youngest age for a user with a given year of birth.
+
+        :param year: year
+        :param year_of_birth: year of birth
+        :return: youngest age a user could be for the given year
+        """
+        # There are legal implications regarding how we can contact users and what information we can make public
+        # based on their age, so we must take the most conservative estimate.
+        return year - year_of_birth - 1
 
     @classmethod
     def country_cache_key_name(cls, user_id):
