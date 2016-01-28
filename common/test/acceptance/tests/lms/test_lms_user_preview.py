@@ -2,7 +2,7 @@
 """
 Tests the "preview" selector in the LMS that allows changing between Staff, Student, and Content Groups.
 """
-
+import uuid
 
 from nose.plugins.attrib import attr
 
@@ -23,7 +23,6 @@ class StaffViewTest(UniqueCourseTest):
     Tests that verify the staff view.
     """
     USERNAME = "STAFF_TESTER"
-    EMAIL = "johndoe@example.com"
 
     def setUp(self):
         super(StaffViewTest, self).setUp()
@@ -40,9 +39,12 @@ class StaffViewTest(UniqueCourseTest):
 
         self.course_fixture.install()
 
+        # Generating unique email address
+        self.EMAIL = "{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30])
+
         # Auto-auth register for the course.
         # Do this as global staff so that you will see the Staff View
-        AutoAuthPage(self.browser, username=self.USERNAME,
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=True).visit()
 
     def _goto_staff_page(self):

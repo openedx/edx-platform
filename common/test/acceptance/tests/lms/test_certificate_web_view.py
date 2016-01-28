@@ -57,7 +57,6 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         AutoAuthPage(
             self.browser,
             username="testcert",
-            email="cert@example.com",
             password="testuser",
             course_id=self.course_id
         ).visit()
