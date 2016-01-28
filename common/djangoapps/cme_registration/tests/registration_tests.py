@@ -223,6 +223,16 @@ class TestCmeRegistration(UrlResetMixin, TestCase):
 
     @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
+    def test_affiliation_required(self):
+
+        self.post_vars['affiliation'] = ''
+        url = reverse('create_account')
+        response = self.client.post(url, self.post_vars)
+
+        self.assertContains(response, '{"field": "affiliation", "value": "Choose your affiliation", "success": false}')
+
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+                     dedent("""Skipping Test because the url is not in CMS"""))
     def test_sub_affiliation_field(self):
 
         self.post_vars['affiliation'] = 'Packard Children\'s Health Alliance'
