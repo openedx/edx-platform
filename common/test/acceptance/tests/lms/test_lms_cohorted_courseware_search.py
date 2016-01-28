@@ -59,23 +59,18 @@ class CoursewareSearchCohortTest(ContainerBase):
         self.cohort_a_student_username = "cohort_a_" + str(uuid.uuid4().hex)[:12]
         self.cohort_a_student_email = self.cohort_a_student_username + "@example.com"
         StudioAutoAuthPage(
-            self.browser, username=self.cohort_a_student_username, email=self.cohort_a_student_email, no_login=True
+            self.browser, username=self.cohort_a_student_username, no_login=True
         ).visit()
 
         # Create a student who will be in "Cohort B"
         self.cohort_b_student_username = "cohort_b_" + str(uuid.uuid4().hex)[:12]
         self.cohort_b_student_email = self.cohort_b_student_username + "@example.com"
-        StudioAutoAuthPage(
-            self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
-        ).visit()
+        StudioAutoAuthPage(self.browser, username=self.cohort_b_student_username, no_login=True).visit()
 
         # Create a student who will end up in the default cohort group
         self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
-        StudioAutoAuthPage(
-            self.browser, username=self.cohort_default_student_username,
-            email=self.cohort_default_student_email, no_login=True
-        ).visit()
+        StudioAutoAuthPage(self.browser, username=self.cohort_default_student_username, no_login=True).visit()
 
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
 
@@ -93,7 +88,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        StudioAutoAuthPage(self.browser, username=username, email=email,
+        StudioAutoAuthPage(self.browser, username=username,
                            course_id=self.course_id, staff=staff).visit()
 
     def _studio_reindex(self):
