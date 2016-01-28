@@ -22,12 +22,12 @@ define([
         clear: function () {
             SearchResultsView.prototype.clear.call(this);
             $(this.coursewareResultsWrapperElement).hide();
-            this.$contentElement.css('display', 'table-cell');
+            this.$contentElement.css('display', 'none');
         },
 
         showResults: function () {
             SearchResultsView.prototype.showResults.call(this);
-            $(this.coursewareResultsWrapperElement).css('display', 'table-cell');
+            $(this.coursewareResultsWrapperElement).css('display', 'block');
         }
 
     });

@@ -30,7 +30,7 @@ var edx = edx || {},
             checkForCurrent: function() {
                 var button = navigation.getActiveIndex();
 
-                navigation.closeAccordions();
+                // navigation.closeAccordions();
 
                 if (button !== null) {
                     navigation.setupCurrentAccordionSection(button);
@@ -97,7 +97,7 @@ var edx = edx || {},
 
             openAccordion: function(button, section) {
                 var sectionEl = $(section),
-                    firstLink = sectionEl.find('.menu-item').first(),
+                    firstLink = sectionEl.parent(),
                     buttonEl = $(button);
 
                 buttonEl

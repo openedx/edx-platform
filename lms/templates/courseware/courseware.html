@@ -133,15 +133,14 @@ ${fragment.foot_html()}
 <div class="container">
   <div class="course-wrapper" role="presentation">
 
-% if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index">
+    <div class="wrapper-course-modes">
 
-      <div class="wrapper-course-modes">
-
-          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
-              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
-                  ${_('Bookmarks')}
+          <div class="courseware-content-menu">
+              <button type="button" class="content-menu-button list-button is-inactive" aria-pressed="false">
               </button>
+              <div class="breadcrumb-label">
+              Introduction > Demo Course Overview > Introduction: Video and Sequences
+              </div>
           </div>
 
           % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
@@ -161,7 +160,15 @@ ${fragment.foot_html()}
             </div>
           % endif
 
+          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
+              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+                  ${_('Bookmarks')}
+              </button>
+          </div>
       </div>
+
+% if disable_accordion is UNDEFINED or not disable_accordion:
+    <div class="course-index" style="display:none;">
 
       <div class="accordion">
         <nav class="course-navigation" aria-label="${_('Course')}">

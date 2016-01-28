@@ -1,25 +1,13 @@
-// Rules for placing bookmarks and search button side by side
-.wrapper-course-modes {
-  border-bottom: 1px solid $gray-l3;
-  padding: ($baseline/4);
-
-  > div {
-    @include box-sizing(border-box);
-    display: inline-block;
-  }
-}
-
-
 // Rules for Bookmarks Button
 .courseware-bookmarks-button {
-  width: flex-grid(5);
+  width: 120px;
   vertical-align: top;
 
   .bookmarks-list-button {
     @extend %ui-clear-button;
 
     // set styles
-    @extend %btn-pl-default-base;
+    @extend %btn-pl-secondary-base;
     @include font-size(13);
     width: 100%;
     padding: ($baseline/4) ($baseline/2);
@@ -133,16 +121,16 @@
 .course-content {
 
    .bookmark-icon.bookmarked {
+    @include left($baseline/4);
     top: -3px;
     position: absolute;
-    left: ($baseline/4);
   }
 
 
   // Rules for bookmark button's different styles
   .bookmark-button-wrapper {
-    text-align: right;
-    margin-bottom: 10px;
+    @include text-align(right);
+    margin: ($baseline/2) 0;
   }
 
   .bookmark-button {

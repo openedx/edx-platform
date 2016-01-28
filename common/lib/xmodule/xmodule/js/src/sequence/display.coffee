@@ -119,7 +119,10 @@ class @Sequence
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
 
-      @el.find('.path').text(@el.find('.nav-item.active').data('path'))
+      #TO-DO: Update path label to be in the header instead of the sequence XBlock?  Does Sequence XBlock have to contain the header?
+      #@el.find('.path').text(@el.find('.nav-item.active').data('path'))
+
+      @el.find('.breadcrumb-label').text(@el.find('.nav-item.active').data('path'))
 
       @sr_container.focus();
       # @$("a.active").blur()

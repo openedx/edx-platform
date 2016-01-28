@@ -97,7 +97,7 @@
             hideBookmarks: function () {
                 this.$el.hide();
                 $(this.coursewareResultsWrapperEl).hide();
-                $(this.coursewareContentEl).css( 'display', 'table-cell');
+                $(this.coursewareContentEl).css( 'display', 'none');
             },
 
             showBookmarksContainer: function () {
@@ -105,7 +105,7 @@
                 // Empty el if it's not empty to get the clean state.
                 this.$el.html('');
                 this.$el.show();
-                $(this.coursewareResultsWrapperEl).css('display', 'table-cell');
+                $(this.coursewareResultsWrapperEl).css('display', 'block');
             },
 
             showLoadingMessage: function () {

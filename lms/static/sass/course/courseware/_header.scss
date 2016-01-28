@@ -1,8 +1,53 @@
+.wrapper-course-modes {
+  border-bottom: 3px solid $gray-l5;
+  padding: ($baseline/2);
+
+
+  .courseware-bookmarks-button,
+  .courseware-search-bar {
+    @include float(right);
+    @include margin-left($baseline);
+  }
+
+  .courseware-content-menu,
+  .courseware-bookmarks-button,
+  .courseware-search-bar {
+    @include box-sizing(border-box);
+    display: inline-block;
+  }
+
+  .content-menu-button {
+    @extend %ui-clear-button;
+
+    // set styles
+    @extend %btn-pl-secondary-base;
+    @include font-size(13);
+    display: inline-block;
+    padding: ($baseline/4) ($baseline/2);
+
+    &:before {
+      content: "\f0c9";
+      font-family: FontAwesome;
+    }
+
+    &.is-active {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+    }
+  }
+
+  .breadcrumb-label {
+    @extend %t-title7;
+    @include margin-left($baseline/2);
+    display: inline-block;  
+  }
+}
+
 .course-index {
     @include transition( all .2s $ease-in-out-quad 0s);
     @include border-right(1px solid $border-color-2);
     @include border-radius(3px, 0, 0, 3px);
-    display: table-cell; // needed to extend the sidebar the full height of the area
+    width: 100%;
 
     // provides sufficient contrast for all screen reader-only elements
     .sr {
@@ -21,49 +66,24 @@
 
         .course-navigation {
 
+            .wrapper-chapter {
+                padding: $baseline;
+                box-sizing: border-box;
+                vertical-align: top;
+            }
+
             .button-chapter {
                 @include transition(all $tmg-s3 ease-in-out);
                 @include box-sizing(border-box);
-                @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
-                @include transition(background-color .1s linear 0s);
+                @extend %t-title6;
+                margin: ($baseline/2) 0;
                 display: block;
                 width: 100%;
                 border: 0;
                 border-radius: 0;
                 padding: 0;
-                box-shadow: 0 1px 0 $white inset, 0 -1px 0 $shadow-l1 inset;
-                background-color: $sidebar-chapter-bg;
                 color: $link-color;
                 -webkit-font-smoothing: subpixel-antialiased; // this brings back our nice, dark blue
-
-                .group-heading {
-                    @extend %t-title6;
-                    position: relative;
-                    display: block;
-                    padding: ($baseline*.75) $baseline ($baseline*.75) ($baseline*2);
-                    @include text-align(left);
-
-                    .icon {
-                        position: absolute;
-                        @include left($baseline);
-                        top: $baseline;
-                        font-size: $body-font-size;
-                        color: $gray-l3;
-                    }
-                }
-
-                &.is-open {
-                    background: $white;
-                    box-shadow: none;
-                }
-
-                &.active {
-
-                    .group-heading {
-                        @extend %t-strong;
-                        color: $base-font-color;
-                    }
-                }
 
                 &:hover,
                 &:focus {
@@ -78,28 +98,22 @@
             .chapter-content-container {
                 background: $white;
 
-                &.is-open {
-                    border-bottom: 1px solid $shadow-l1;
-                }
-
                 .chapter-menu {
-                    display: none;
-                    padding: 0 14px;
                     overflow: hidden;
 
                     .menu-item {
                         @extend %t-strong;
-                        margin: ($baseline/5) 0;
+                        margin-top: ($baseline/2);
                         background: inherit;
 
                         a {
                             @extend %t-action3;
                             @extend %t-strong;
+                            @include padding($baseline/2);
+                            border: 2px solid $gray-l5;
                             position: relative;
                             display: block;
-                            @include padding(($baseline/4) ($baseline/2));
-                            border-radius: ($baseline/4);
-                            font-family: $sans-serif;
+                            border-radius: ($baseline/5);
                             color: $base-font-color;
 
                             p {
@@ -134,7 +148,7 @@
                             &:hover,
                             &:focus {
                                 color: $base-font-color;
-                                background: $gray-l5;
+                                background: $gray-l6;
 
                                 .subtitle {
                                     color: $gray-d1;
@@ -156,12 +170,12 @@
 
                             a {
                                 @extend %t-ultrastrong;
-                                background: $gray-l4;
+                                border: 2px solid $blue-d1;
                             }
                         }
 
-                        &:last-of-type {
-                            padding-bottom: ($baseline/2);
+                        &:first {
+                            margin-top: 0;
                         }
                     }
                 }

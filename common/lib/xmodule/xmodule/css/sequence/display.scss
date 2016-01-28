@@ -1,5 +1,29 @@
 $sequence--border-color: #C8C8C8;
 $link-color: rgb(26, 161, 222) !default;
+
+// xmodule shame styling
+// We've not resolved XModule inability to import fro mexternal sources, so these styles must be duplicated here for them to be used. 
+%button-reset {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  background-image: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+@mixin clearfix {
+  &:after {
+    content:"";
+    display:table;
+    clear:both;
+  }
+}
+
+
+
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   border-left: 1px solid lighten($sequence--border-color, 10%);
@@ -36,7 +60,8 @@ $link-color: rgb(26, 161, 222) !default;
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 $baseline;
+  @include clearfix();
+  margin: 0 (-$baseline*1.75);
   position: relative;
   border-bottom: none;
   z-index: 0;
@@ -47,7 +72,6 @@ $link-color: rgb(26, 161, 222) !default;
 
   .left-shadow {
     @extend %ui-depth4;
-    @include linear-gradient(left, $shadow, $transparent);
     position: absolute;
     top: 0;
     left: 0;
@@ -59,7 +83,6 @@ $link-color: rgb(26, 161, 222) !default;
 
   .right-shadow {
     @extend %ui-depth4;
-    @include linear-gradient(right, $shadow, $transparent);
     position: absolute;
     top: 0;
     right: 0;
@@ -69,25 +92,21 @@ $link-color: rgb(26, 161, 222) !default;
     pointer-events: none;
   }
 
-  .sequence-list-wrapper {
+
+
+  .wrapper-list-sequence {
     @extend %ui-depth2;
-    @include linear-gradient(top, #ddd, #eee);
     position: relative;
-    border: 1px solid $gray-l3;
+    border-bottom: 1px solid $gray-l5;
     height: 44px;
     margin: 0 ($baseline*2);
-    box-shadow: 0 1px 3px $shadow-l1 inset;
   }
 
-  ol {
-    position: absolute;
-    top: 0;
-    left: 0;
+  .list-sequence {
     @include box-sizing(border-box);
     display: table;
     height: 100%;
     margin: 0;
-    padding: 0 ($baseline/2);
     width: 100%;
 
     a {
@@ -95,10 +114,10 @@ $link-color: rgb(26, 161, 222) !default;
     }
 
     li {
-      display: table-cell;
       min-width: 20px;
+      display: table-cell;
 
-      a {
+      .sequence-link {
         @extend %ui-fake-link;
         @include transition(none);
         width: 100%;
@@ -106,6 +125,7 @@ $link-color: rgb(26, 161, 222) !default;
         margin: 0;
         background-position: center 14px;
         background-repeat: no-repeat;
+        background-color: $gray-l6;
         border: 1px solid transparent;
         display: block;
         padding: 0;
@@ -127,6 +147,12 @@ $link-color: rgb(26, 161, 222) !default;
 
           .icon {
             color: rgb(90, 90, 90);
+          }
+
+          &:hover, &:focus {
+            .icon {
+              color: $white;
+            }
           }
         }
 
@@ -154,9 +180,13 @@ $link-color: rgb(26, 161, 222) !default;
         }
 
         &:hover, &:focus {
-          background-color: $white;
+          background-color: $action-primary-bg;
           background-repeat: no-repeat;
           background-position: center 14px;
+
+          .icon {
+            color: $white;
+          }
         }
 
         //video
@@ -252,31 +282,41 @@ $link-color: rgb(26, 161, 222) !default;
 
 .sequence-nav-button {
   @extend %ui-depth3;
-  @include transition(all .2s $ease-in-out-quad 0s);
+  @extend %button-reset;
   position: absolute;
   display: block;
   top: 0;
   width: ($baseline*2);
-  height: 46px;
+  height: 45px;
   padding: 0;
+  background-color: $gray-l6;
+  border-bottom: 1px solid $gray-l5;
 
   &.button-previous {
-    @include border-radius(35px, 0, 0, 35px);
     @include left(0);
+    @include border-right(1px solid $gray-l5);
   }
 
   &.button-next {
-    @include border-radius(0, 35px, 35px, 0);
     @include right(0);
+    @include border-left(1px solid $gray-l5);
   }
 
   &:hover,
   &:active {
+    background-color: $action-primary-bg;
+    background-repeat: no-repeat;
+    background-position: center 14px;
 
+    .icon, .label-sequence-button {
+      color: $white;
+    }
   }
 
   &.disabled {
     cursor: normal;
+    color: $gray-l4;
+    background-color: $white;
   }
 }
 
@@ -285,14 +325,35 @@ $link-color: rgb(26, 161, 222) !default;
 }
 
 nav.sequence-bottom {
+  @include clearfix();
+  display: inline-block;
   position: relative;
-  width: 79px;
-  height: 1px;
-  margin: lh(2) auto;
+  width: 100%;
+  height: 19px;
   text-align: center;
 
   @media print {
     display: none;
+  }
+
+  .sequence-nav-button {
+    margin: 0 (-$baseline*1.75);
+    width: calc(50% + ($baseline*1.75));
+    border: none;
+
+    &.disabled {
+      cursor: normal;
+      color: $gray-l4;
+      background-color: $white;
+    }
+
+    .label-sequence-button-previous {
+      @include margin-left($baseline/2);
+    }
+
+    .label-sequence-button-next {
+      @include margin-right($baseline/2);
+    }
   }
 }
 
