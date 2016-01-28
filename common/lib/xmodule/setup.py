@@ -46,7 +46,7 @@ XBLOCKS = [
 
 setup(
     name="XModule",
-    version="0.1",
+    version="0.1.1",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         'setuptools',
@@ -54,7 +54,7 @@ setup(
         'capa',
         'path.py',
         'webob',
-        'opaque-keys',
+        'edx-opaque-keys>=0.2.1,<1.0.0',
     ],
     package_data={
         'xmodule': ['js/module/*'],
