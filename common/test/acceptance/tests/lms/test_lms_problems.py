@@ -48,7 +48,7 @@ class ProblemsTest(UniqueCourseTest):
         AutoAuthPage(
             self.browser,
             username=self.username,
-            email= self.email,
+            email=self.email,
             password=self.password,
             course_id=self.course_id,
             staff=False

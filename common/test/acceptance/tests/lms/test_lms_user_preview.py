@@ -23,6 +23,7 @@ class StaffViewTest(UniqueCourseTest):
     Tests that verify the staff view.
     """
     USERNAME = "STAFF_TESTER"
+    EMAIL = ""
 
     def setUp(self):
         super(StaffViewTest, self).setUp()
