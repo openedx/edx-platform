@@ -1,6 +1,7 @@
 """
 Acceptance tests for course in studio
 """
+import uuid
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
@@ -17,11 +18,11 @@ class CourseTeamPageTest(StudioCourseTest):
         """ Registers user and returns user representation dictionary as expected by `log_in` function """
         user = {
             'username': username,
-            'email': username + "@example.com",
+            'email': "other_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
             'password': username + '123'
         }
         AutoAuthPage(
-            self.browser, no_login=True,
+            self.browser, no_login=True, email=user.get('email'),
             username=user.get('username'), password=user.get('password')
         ).visit()
         return user
