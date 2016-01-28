@@ -52,7 +52,7 @@
              <header>
                <h2 class="title title-2"><%= gettext("Certificate Signatories") %></h2>
              </header>
-             <p class="instructions">It is strongly recommended that you include four or fewer signatories. If you include additional signatories, preview the certificate in Print View to ensure the certificate will print correctly on one page.</p>
+             <p class="instructions"><%= gettext("It is strongly recommended that you include four or fewer signatories. If you include additional signatories, preview the certificate in Print View to ensure the certificate will print correctly on one page.") %></p>
              <div class="signatory-details-list"></div>
         </section>
     <% } %>

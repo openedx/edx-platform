@@ -99,6 +99,37 @@
       &:last-child {
         margin-bottom: 0;
       }
+      .settings-tab {
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l3;
+
+        li.settings-section {
+          display: inline-block;
+          margin-right: $baseline;
+
+          .general-settings-button,
+          .advanced-settings-button {
+            @extend %t-copy-sub1;
+            @extend %t-regular;
+            background-image: none;
+            background-color: $white;
+            color: $mediumGrey;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+            padding: ($baseline/4) ($baseline/2);
+            text-transform: uppercase;
+            &:hover {
+              background-color: $white;
+              color: $blue;
+            }
+            &.active {
+              border-bottom: 4px solid $blue-d2;
+              color: $offBlack;
+            }
+          }
+        }
+      }
     }
 
     .modal-section-title {
@@ -528,7 +559,8 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-    .exam-time-list-fields {
+    .exam-time-list-fields,
+    .exam-review-rules-list-fields {
       margin: 0 0 ($baseline/2) ($baseline/2);
     }
     .list-fields {

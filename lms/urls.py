@@ -89,6 +89,9 @@ urlpatterns = (
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
+    # Bookmarks API endpoints
+    url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
+
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 
@@ -98,6 +101,7 @@ urlpatterns = (
 
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
+    url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -182,10 +186,8 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
             {'template': 'press.html'}, name="press"),
         url(r'^media-kit$', 'static_template_view.views.render',
             {'template': 'media-kit.html'}, name="media-kit"),
-
-        # TODO: (bridger) The copyright has been removed until it is updated for edX
-        # url(r'^copyright$', 'static_template_view.views.render',
-        #     {'template': 'copyright.html'}, name="copyright"),
+        url(r'^copyright$', 'static_template_view.views.render',
+            {'template': 'copyright.html'}, name="copyright"),
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
@@ -202,9 +204,12 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
     if key == "ROOT" or key == "COURSES":
         continue
 
-    # Make the assumptions that the templates are all in the same dir
-    # and that they all match the name of the key (plus extension)
-    template = "%s.html" % key.lower()
+    # The MKTG_URL_LINK_MAP key specifies the template filename
+    template = key.lower()
+    if '.' not in template:
+        # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
+        # no file extension was specified in the key
+        template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
 
     # To allow theme templates to inherit from default templates,
     # prepend a standard prefix
@@ -547,7 +552,6 @@ urlpatterns += (
         ),
         include(COURSE_URLS)
     ),
-    # see ENABLE_INSTRUCTOR_LEGACY_DASHBOARD section for legacy dash urls
 
     # Cohorts management
     url(
@@ -753,13 +757,6 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
         ),
     )
 
-
-if settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
-    urlpatterns += (
-        url(r'^courses/{}/legacy_instructor_dash$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_legacy"),
-    )
-
 if settings.FEATURES.get('CLASS_DASHBOARD'):
     urlpatterns += (
         url(r'^class_dashboard/', include('class_dashboard.urls')),
@@ -938,6 +935,7 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
     urlpatterns += (
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('ccx.urls')),
+        url(r'^api/ccx/', include('lms.djangoapps.ccx.api.urls', namespace='ccx_api')),
     )
 
 # Access to courseware as an LTI provider

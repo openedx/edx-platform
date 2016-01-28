@@ -18,6 +18,21 @@ Longer TODO:
    just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
+
+When refering to XBlocks, we use the entry-point name. For example,
+|   setup(
+|       name='xblock-foobar',
+|       version='0.1',
+|       packages=[
+|           'foobar_xblock',
+|       ],
+|       entry_points={
+|           'xblock.v1': [
+|               'foobar-block = foobar_xblock:FoobarBlock',
+|           #    ^^^^^^^^^^^^ This is the one you want.
+|           ]
+|       },
+|   )
 """
 
 # We intentionally define lots of variables that aren't used, and
@@ -32,7 +47,7 @@ import lms.envs.common
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
-    PARENTAL_CONSENT_AGE_LIMIT, COMPREHENSIVE_THEME_DIR,
+    PARENTAL_CONSENT_AGE_LIMIT, COMPREHENSIVE_THEME_DIR, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -41,6 +56,7 @@ from lms.envs.common import (
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
+    DEFAULT_COURSE_ABOUT_IMAGE_URL,
 
     # Django REST framework configuration
     REST_FRAMEWORK,
@@ -92,10 +108,6 @@ FEATURES = {
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
 
-    # If set to True, Studio won't restrict the set of advanced components
-    # to just those pre-approved by edX
-    'ALLOW_ALL_ADVANCED_COMPONENTS': False,
-
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
@@ -123,12 +135,6 @@ FEATURES = {
 
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
-
-
-    # Is this an edX-owned domain? (edx.org)
-    # for consistency in user-experience, keep the value of this feature flag
-    # in sync with the one in lms/envs/common.py
-    'IS_EDX_DOMAIN': False,
 
     # let students save and manage their annotations
     # for consistency in user-experience, keep the value of this feature flag
@@ -300,10 +306,15 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'clean_headers.middleware.CleanHeadersMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Instead of SessionMiddleware, we use a more secure version
+    # 'django.contrib.sessions.middleware.SessionMiddleware',
+    'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
+
     'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
@@ -357,9 +368,6 @@ XBLOCK_MIXINS = (
     AuthoringMixin,
 )
 
-# Allow any XBlock in Studio
-# You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
-# xblocks can be added via advanced settings
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ Modulestore Configuration ################################
@@ -528,6 +536,12 @@ PIPELINE_CSS = {
             'css/studio-main-rtl.css',
         ],
         'output_filename': 'css/studio-main-rtl.css',
+    },
+    'style-edx-icons': {
+        'source_filenames': [
+            'css/edx-icons.css',
+        ],
+        'output_filename': 'css/edx-icons.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -740,6 +754,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'contentserver',
     'course_creators',
     'external_auth',
     'student',  # misleading name due to sharing with lms
@@ -803,6 +818,9 @@ INSTALLED_APPS = (
     # edX Proctoring
     'edx_proctoring',
 
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
+
     # programs support
     'openedx.core.djangoapps.programs',
 
@@ -818,6 +836,12 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
+
+    # Microsite configuration application
+    'microsite_configuration',
+
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
 )
 
 
@@ -969,76 +993,6 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 ### Default language for a new course
 DEFAULT_COURSE_LANGUAGE = "en"
 
-
-################ ADVANCED_COMPONENT_TYPES ###############
-
-# These strings are entry-point names from the setup.py of the XBlock.
-# For example:
-#
-#   setup(
-#       name='xblock-foobar',
-#       version='0.1',
-#       packages=[
-#           'foobar_xblock',
-#       ],
-#       entry_points={
-#           'xblock.v1': [
-#               'foobar-block = foobar_xblock:FoobarBlock',
-#           #    ^^^^^^^^^^^^ This is the one you want.
-#           ]
-#       },
-#   )
-#
-# To use this block, add 'foobar-block' to the ADVANCED_COMPONENT_TYPES list.
-
-ADVANCED_COMPONENT_TYPES = [
-    'annotatable',
-    'textannotation',  # module for annotating text (with annotation table)
-    'videoannotation',  # module for annotating video (with annotation table)
-    'imageannotation',  # module for annotating image (with annotation table)
-    'word_cloud',
-    'graphical_slider_tool',
-    'lti',
-    'lti_consumer',
-    'library_content',
-    'edx_sga',
-    'problem-builder',
-    'pb-dashboard',
-    'poll',
-    'survey',
-    'activetable',
-    'vectordraw',
-    # Some of the XBlocks from pmitros repos are sometimes prototypes.
-    # Use with caution.
-    'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
-    'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
-    'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-    'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
-    'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
-    'rate',  # Allows up-down voting of course content. See https://github.com/pmitros/RateXBlock
-
-    'split_test',
-    'notes',
-    'schoolyourself_review',
-    'schoolyourself_lesson',
-    # Office Mix
-    'officemix',
-
-    # Google Drive embedded components. These XBlocks allow one to
-    # embed public google drive documents and calendars within edX units
-    'google-document',
-    'google-calendar',
-
-    # Oppia block
-    'oppia',
-
-    # In-course reverification checkpoint
-    'edx-reverification-block',
-
-    # Peer instruction tool
-    'ubcpi',
-]
-
 # Adding components in this list will disable the creation of new problem for
 # those components in Studio. Existing problems will work fine and one can edit
 # them in Studio.
@@ -1046,9 +1000,7 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 # Specify XBlocks that should be treated as advanced problems. Each entry is a
 # dict:
-#       'component': the entry-point name of the XBlock. See the comment for
-#               ADVANCED_COMPONENT_TYPES for details of where to find this
-#               name.
+#       'component': the entry-point name of the XBlock.
 #       'boilerplate_name': an optional YAML template to be used.  Specify as
 #               None to omit.
 #
@@ -1115,7 +1067,26 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
 ################################ Deprecated Blocks Info ################################
 
-DEPRECATED_BLOCK_TYPES = ['peergrading', 'combinedopenended']
+DEPRECATED_BLOCK_TYPES = [
+    'peergrading',
+    'combinedopenended',
+    'graphical_slider_tool',
+]
+
+
+################################ Settings for Microsites ################################
+
+### Select an implementation for the microsite backend
+# for MICROSITE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
+MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
+# for MICROSITE_TEMPLATE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
+MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
+# TTL for microsite database template cache
+MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
 #### PROCTORING CONFIGURATION DEFAULTS
 
@@ -1130,3 +1101,6 @@ PROCTORING_SETTINGS = {}
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
 OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
+
+# 5 minute expiration time for JWT id tokens issued for external API requests.
+OAUTH_ID_TOKEN_EXPIRATION = 5 * 60

@@ -43,7 +43,10 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if browser is showing correct page.
         """
-        return self.q(css='body.view-profile .account-settings-container').present
+        return all([
+            self.q(css='body.view-profile .account-settings-container').present,
+            not self.q(css='ui-loading-indicator').visible
+        ])
 
     @property
     def privacy(self):

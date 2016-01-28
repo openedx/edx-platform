@@ -5,7 +5,7 @@ from contentstore.views.helpers import xblock_studio_url, xblock_type_display_na
 from django.utils.translation import ugettext as _
 from openedx.core.lib.js_utils import escape_json_dumps
 %>
-<%block name="title">${context_library.display_name_with_default} ${xblock_type_display_name(context_library)}</%block>
+<%block name="title">${context_library.display_name_with_default_escaped} ${xblock_type_display_name(context_library)}</%block>
 <%block name="bodyclass">is-signedin course container view-container view-library</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -45,7 +45,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
             <small class="subtitle">${_("Content Library")}</small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${context_library.display_name_with_default}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${context_library.display_name_with_default_escaped}</span></h1>
             </div>
         </div>
 

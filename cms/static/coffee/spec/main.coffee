@@ -7,7 +7,7 @@ requirejs.config({
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
-        "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal.min",
+        "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
         "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
@@ -221,8 +221,11 @@ define([
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
-    "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
+    "coffee/spec/views/course_info_spec",
+    "coffee/spec/views/metadata_edit_spec",
+    "coffee/spec/views/module_edit_spec",
+    "coffee/spec/views/textbook_spec",
+    "coffee/spec/views/upload_spec",
 
     "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
@@ -253,6 +256,7 @@ define([
     "js/spec/views/xblock_validation_spec",
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
+    "js/spec/views/login_studio_spec",
 
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",

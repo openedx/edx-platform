@@ -395,6 +395,16 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings
     )
+    ccx_connector = String(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        display_name=_("CCX Connector URL"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        help=_(
+            "URL for CCX Connector application for managing creation of CCXs. (optional)."
+            " Ignored unless 'Enable CCX' is set to 'true'."
+        ),
+        scope=Scope.settings, default=""
+    )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
         help=_("Enter true or false. If true, students can create discussion posts that are anonymous to all users."),
@@ -693,11 +703,17 @@ class CourseFields(object):
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
         help=_(
-            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
-            "topics is a list of topics."
+            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
+            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
+            'with a comma after the closing curly brace for each topic, and another comma after the '
+            'closing square brackets. '
+            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
+            '2 topics, enter the configuration in this format: '
+            '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
+            '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}. '
+            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
         ),
         scope=Scope.settings,
-        deprecated=True,  # Deprecated until the teams feature is made generally available
     )
 
     enable_proctored_exams = Boolean(
@@ -1367,3 +1383,56 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
           bool: False if the course has already started, True otherwise.
         """
         return datetime.now(UTC()) <= self.start
+
+
+class CourseSummary(object):
+    """
+    A lightweight course summary class, which constructs split/mongo course summary without loading
+    the course. It is used at cms for listing courses to global staff user.
+    """
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+
+    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None):
+        """
+        Initialize and construct course summary
+
+        Arguments:
+        course_locator (CourseLocator):  CourseLocator object of the course.
+
+        display_name (unicode): display name of the course. When you create a course from console, display_name
+        isn't set (course block has no key `display_name`). "Empty" name is returned when we load the course.
+        If `display_name` isn't present in the course block, use the `Empty` as default display name.
+        We can set None as a display_name in Course Advance Settings; Do not use "Empty" when display_name is
+        set to None.
+
+        display_coursenumber (unicode|None): Course number that is specified & appears in the courseware
+
+        display_organization (unicode|None): Course organization that is specified & appears in the courseware
+
+        """
+        self.display_coursenumber = display_coursenumber
+        self.display_organization = display_organization
+        self.display_name = display_name
+
+        self.id = course_locator  # pylint: disable=invalid-name
+        self.location = course_locator.make_usage_key('course', 'course')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Return a display organization if it has been specified, otherwise return the 'org' that
+        is in the location
+        """
+        if self.display_organization:
+            return self.display_organization
+        return self.location.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Return a display course number if it has been specified, otherwise return the 'course' that
+        is in the location
+        """
+        if self.display_coursenumber:
+            return self.display_coursenumber
+        return self.location.course

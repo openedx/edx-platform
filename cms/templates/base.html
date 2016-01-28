@@ -16,9 +16,9 @@ from openedx.core.lib.js_utils import (
         <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name_with_default | h} |
+        ${context_course.display_name_with_default_escaped | h} |
         % elif context_library:
-        ${context_library.display_name_with_default | h} |
+        ${context_library.display_name_with_default_escaped | h} |
         % endif
         ${settings.STUDIO_NAME}
     </title>
@@ -81,11 +81,11 @@ from openedx.core.lib.js_utils import (
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
                       id: "${escape_js_string(context_course.id) | n}",
-                      name: "${context_course.display_name_with_default | h}",
+                      name: "${context_course.display_name_with_default_escaped | h}",
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_number_with_default)}",
+                      display_course_number: "${_(context_course.display_coursenumber) if context_course.display_coursenumber else ''}",
                       revision: "${context_course.location.revision | h}",
                       self_paced: ${escape_json_dumps(context_course.self_paced) | n}
                   });

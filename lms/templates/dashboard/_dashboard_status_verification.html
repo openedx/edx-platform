@@ -39,7 +39,7 @@ from django.core.urlresolvers import reverse
 
 %if verification_status in ['must_reverify', 'expired']:
 <li class="status status-verification is-denied">
-<span class="title status-title">${_("{platform_name} Verification Status").format(platform_name=settings.PLATFORM_NAME)}</span>
+<span class="title status-title">${_("{platform_name} Verification Status").format(platform_name=static.get_platform_name())}</span>
 
   <div class="status-data">
     <span class="status-data-message">${verification_msg}</span>

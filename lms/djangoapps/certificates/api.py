@@ -26,9 +26,10 @@ from certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate,
     CertificateTemplate,
+    CertificateTemplateAsset,
 )
 from certificates.queue import XQueueCertInterface
-
+from branding import api as branding_api
 
 log = logging.getLogger("edx.certificate")
 
@@ -77,7 +78,7 @@ def get_certificates_for_user(username):
                 else None
             ),
         }
-        for cert in GeneratedCertificate.objects.filter(user__username=username).order_by("course_id")
+        for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id")
     ]
 
 
@@ -108,11 +109,14 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     if insecure:
         xqueue.use_https = False
     generate_pdf = not has_html_certificates_enabled(course_key, course)
-    status, cert = xqueue.add_cert(student, course_key,
-                                   course=course,
-                                   generate_pdf=generate_pdf,
-                                   forced_grade=forced_grade)
-    if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+    cert = xqueue.add_cert(
+        student,
+        course_key,
+        course=course,
+        generate_pdf=generate_pdf,
+        forced_grade=forced_grade
+    )
+    if cert.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': unicode(course_key),
@@ -120,7 +124,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
             'enrollment_mode': cert.mode,
             'generation_mode': generation_mode
         })
-    return status
+    return cert.status
 
 
 def regenerate_user_certificates(student, course_key, course=None,
@@ -384,7 +388,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None):
                 )
                 return url
         try:
-            user_certificate = GeneratedCertificate.objects.get(
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
                 user=user_id,
                 course_id=course_id
             )
@@ -477,3 +481,54 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
 
     with tracker.get_tracker().context(event_name, context):
         tracker.emit(event_name, event_data)
+
+
+def get_asset_url_by_slug(asset_slug):
+    """
+    Returns certificate template asset url for given asset_slug.
+    """
+    asset_url = ''
+    try:
+        template_asset = CertificateTemplateAsset.objects.get(asset_slug=asset_slug)
+        asset_url = template_asset.asset.url
+    except CertificateTemplateAsset.DoesNotExist:
+        pass
+    return asset_url
+
+
+def get_certificate_header_context(is_secure=True):
+    """
+    Return data to be used in Certificate Header,
+    data returned should be customized according to the microsite settings
+    """
+    data = dict(
+        logo_src=branding_api.get_logo_url(),
+        logo_url=branding_api.get_base_url(is_secure),
+    )
+
+    return data
+
+
+def get_certificate_footer_context():
+    """
+    Return data to be used in Certificate Footer,
+    data returned should be customized according to the microsite settings
+    """
+    data = dict()
+
+    # get Terms of Service and Honor Code page url
+    terms_of_service_and_honor_code = branding_api.get_tos_and_honor_code_url()
+    if terms_of_service_and_honor_code != branding_api.EMPTY_URL:
+        data.update({'company_tos_url': terms_of_service_and_honor_code})
+
+    # get Privacy Policy page url
+    privacy_policy = branding_api.get_privacy_url()
+    if privacy_policy != branding_api.EMPTY_URL:
+        data.update({'company_privacy_url': privacy_policy})
+
+    # get About page url
+    about = branding_api.get_about_url()
+    if about != branding_api.EMPTY_URL:
+        data.update({'company_about_url': about})
+
+    return data

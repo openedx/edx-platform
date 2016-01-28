@@ -9,6 +9,7 @@ from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.annotation_component import AnnotationComponentPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 from textwrap import dedent
+from ..tests.helpers import disable_animations
 
 
 def _correctness(choice, target):
@@ -124,6 +125,8 @@ class AnnotatableProblemTest(UniqueCourseTest):
         """
 
         annotation_component_page = self._goto_annotation_component_page()
+        # This will avoid scrolling related problems on different browsers and instead directly jump on the problem
+        disable_animations(annotation_component_page)
 
         for i in xrange(self.annotation_count):
             annotation_component_page.click_reply_annotation(i)

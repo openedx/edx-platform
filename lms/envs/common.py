@@ -29,9 +29,10 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+import datetime
+import imp
 import sys
 import os
-import imp
 
 from path import Path as path
 from warnings import simplefilter
@@ -72,31 +73,6 @@ FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
-
-    # When True, will only publicly list courses by the subdomain.
-    'SUBDOMAIN_COURSE_LISTINGS': False,
-    # Expects you to define COURSE_LISTINGS, a dictionary mapping
-    # subdomains to lists of course_ids
-    # COURSE_LISTINGS = {
-    #     'default': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #         'HarvardX/CS50x/2012',
-    #         'MITx/3.091x/2012_Fall',
-    #     ],
-    #     'openedx': [
-    #         'BerkeleyX/CS169.1x/2012_Fall',
-    #     ],
-    # }
-    # To see it in action, add the following to your /etc/hosts file:
-    #     127.0.0.1 openedx.dev
-
-    # When True, will override certain branding with university specific values
-    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
-    # university to use for branding purposes
-    'SUBDOMAIN_BRANDING': False,
-
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
-                                       # set to None to do no university selection
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
@@ -204,12 +180,6 @@ FEATURES = {
 
     # Enable Custom Courses for EdX
     'CUSTOM_COURSES_EDX': False,
-
-    # Enable legacy instructor dashboard
-    'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': False,
-
-    # Is this an edX-owned domain? (used for edX specific messaging and images)
-    'IS_EDX_DOMAIN': False,
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
@@ -472,6 +442,9 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
+OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
+OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
@@ -523,9 +496,6 @@ TEMPLATES = [
 
                 # Hack to get required link URLs to password reset templates
                 'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.open_source_footer_context_processor',
 
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',
@@ -602,6 +572,7 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
@@ -697,7 +668,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-SUBDOMAIN_BRANDING = {}
 VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########
@@ -820,6 +790,10 @@ BUGS_EMAIL = 'bugs@example.com'
 UNIVERSITY_EMAIL = 'university@example.com'
 PRESS_EMAIL = 'press@example.com'
 FINANCE_EMAIL = ''
+
+# Platform mailing address
+CONTACT_MAILING_ADDRESS = ''
+
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -1098,14 +1072,19 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'clean_headers.middleware.CleanHeadersMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # Instead of SessionMiddleware, we use a more secure version
+    # 'django.contrib.sessions.middleware.SessionMiddleware',
+    'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
@@ -1257,7 +1236,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
     'js/vendor/afontgarde/afontgarde.js',
-    'js/vendor/afontgarde/edx-icons.js',
+    'js/vendor/afontgarde/edx-icons.js'
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1782,6 +1761,9 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
 
+    # For content serving
+    'contentserver',
+
     # Theming
     'openedx.core.djangoapps.theming',
 
@@ -1884,6 +1866,9 @@ INSTALLED_APPS = (
     # Microsite configuration
     'microsite_configuration',
 
+    # RSS Proxy
+    'rss_proxy',
+
     # Student Identity Reverification
     'reverification',
 
@@ -1935,6 +1920,9 @@ INSTALLED_APPS = (
 
     'xblock_django',
 
+    # Bookmarks
+    'openedx.core.djangoapps.bookmarks',
+
     # programs support
     'openedx.core.djangoapps.programs',
 
@@ -1942,6 +1930,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
+
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -1982,10 +1973,13 @@ MKTG_URL_LINK_MAP = {
     'PRESS': 'press',
     'BLOG': 'blog',
     'DONATE': 'donate',
+    'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
+
+STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
 
@@ -2014,6 +2008,18 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "google_plus",
     "reddit",
 ]
+
+# JWT Settings
+JWT_AUTH = {
+    'JWT_SECRET_KEY': None,
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_ISSUER': None,
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
+    'JWT_AUDIENCE': None,
+    'JWT_LEEWAY': 1,
+    'JWT_DECODE_HANDLER': 'openedx.core.lib.api.jwt_decode_handler.decode',
+}
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
@@ -2153,6 +2159,10 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+# Optional setting to restrict registration / account creation to only emails
+# that match a regex in this list. Set to None to allow any email (default).
+REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
@@ -2659,6 +2669,25 @@ JWT_ISSUER = None
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
 
+
+################################ Settings for Microsites ################################
+
+### Select an implementation for the microsite backend
+# for MICROSITE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
+MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
+# for MICROSITE_TEMPLATE_BACKEND possible choices are
+# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
+# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
+MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
+# TTL for microsite database template cache
+MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
+
+################################ Settings for rss_proxy ################################
+
+RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from remote URLs in seconds
+
 #### PROCTORING CONFIGURATION DEFAULTS
 
 PROCTORING_BACKEND_PROVIDER = {
@@ -2680,3 +2709,22 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 # financial assistance form
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
+
+# Course Content Bookmarks Settings
+MAX_BOOKMARKS_PER_COURSE = 100
+
+#### Registration form extension. ####
+# Only used if combined login/registration is enabled.
+# This can be used to add fields to the registration page.
+# It must be a path to a valid form, in dot-separated syntax.
+# IE: custom_form_app.forms.RegistrationExtensionForm
+# Note: If you want to use a model to store the results of the form, you will
+# need to add the model's app to the ADDL_INSTALLED_APPS array in your
+# lms.env.json file.
+
+REGISTRATION_EXTENSION_FORM = None
+
+# Identifier included in the User Agent from open edX mobile apps.
+MOBILE_APP_USER_AGENT_REGEXES = [
+    r'edX/org.edx.mobile',
+]

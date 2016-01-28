@@ -44,6 +44,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -491,7 +492,7 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_is_edx_domain(True)
     def test_dashboard_header_nav_has_find_courses(self):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))
@@ -898,6 +899,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
 
+# TODO: Clean up these tests so that they use the ProgramsDataMixin.
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
@@ -928,8 +930,11 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
     def _create_program_data(self, data):
         """Dry method to create testing programs data."""
         programs = {}
+        _id = 0
+
         for course, program_status in data:
             programs[unicode(course)] = {
+                'id': _id,
                 'category': self.category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
@@ -955,6 +960,8 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 'name': self.program_name
             }
 
+            _id += 1
+
         return programs
 
     @ddt.data(
@@ -969,6 +976,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = {
                 u'edx/demox/Run_1': {
+                    'id': 0,
                     'category': self.category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
@@ -990,6 +998,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 self.assertEqual(
                     {
                         u'edx/demox/Run_1': {
+                            'program_id': 0,
                             'category': 'xseries',
                             'course_count': len(course_codes),
                             'display_name': self.program_name,
@@ -1026,7 +1035,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_2.id, mode=course_mode)
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
@@ -1059,7 +1068,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch(
             'student.views.get_programs_for_dashboard',
@@ -1089,7 +1098,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_3.id, mode='honor')
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
@@ -1110,7 +1119,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
 
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         program_data = self._create_program_data([(self.course_1.id, 'active')])
         if key_remove and key_remove in program_data[unicode(self.course_1.id)]:

@@ -8,6 +8,10 @@ import json
         CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}", "${generate_bulk_certificate_exceptions_url}");
 </%static:require_module>
 
+<%static:require_module module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
+        CertificateInvalidationFactory('${json.dumps(certificate_invalidations)}', '${certificate_invalidation_view_url}');
+</%static:require_module>
+
 <%page args="section_data"/>
 <div class="certificates-wrapper">
 
@@ -165,10 +169,25 @@ import json
         <div class="certificate-exception-section">
             <div id="certificate-white-list-editor"></div>
             <div class="bulk-white-list-exception"></div>
-            <div class="white-listed-students" id="white-listed-students"></div>
+            <div class="white-listed-students" id="white-listed-students">
+                <div class="ui-loading">
+                    <span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_('Loading')}</span>
+                </div>
+            </div>
             <br/>
         </div>
         <div class="no-pending-tasks-message"></div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <div class="certificate-invalidation-container">
+        <h2> ${_("Invalidate Certificates")} </h2>
+        <div id="certificate-invalidation">
+            <div class="ui-loading">
+                <span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_('Loading')}</span>
+            </div>
+        </div>
     </div>
 
 </div>

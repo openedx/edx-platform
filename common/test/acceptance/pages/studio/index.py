@@ -4,6 +4,7 @@ Studio Home page
 
 from bok_choy.page_object import PageObject
 from . import BASE_URL
+from selenium.webdriver import ActionChains
 
 
 class DashboardPage(PageObject):
@@ -28,18 +29,24 @@ class DashboardPage(PageObject):
     def has_processing_courses(self):
         return self.q(css='.courses-processing').present
 
-    def create_rerun(self, display_name):
+    def create_rerun(self, course_key):
         """
-        Clicks the create rerun link of the course specified by display_name.
+        Clicks the create rerun link of the course specified by course_key
+        'Re-run course' link doesn't show up until you mouse over that course in the course listing
         """
-        name = self.q(css='.course-title').filter(lambda el: el.text == display_name)[0]
-        name.find_elements_by_xpath('../..')[0].find_elements_by_class_name('rerun-button')[0].click()
+        actions = ActionChains(self.browser)
+        button_name = self.browser.find_element_by_css_selector('.rerun-button[href$="' + course_key + '"]')
+        actions.move_to_element(button_name)
+        actions.click(button_name)
+        actions.perform()
 
     def click_course_run(self, run):
         """
         Clicks on the course with run given by run.
         """
         self.q(css='.course-run .value').filter(lambda el: el.text == run)[0].click()
+        # Clicking on course with run will trigger an ajax event
+        self.wait_for_ajax()
 
     def has_new_library_button(self):
         """

@@ -101,6 +101,24 @@
   }
 }
 
+// light button reset
+%ui-clear-button  {
+  background: none;
+  border-radius: ($baseline/4);
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    background-image: none;
+    box-shadow: none;
+  }
+
+  &:focus,
+  &:active {
+    box-shadow: none;
+  }
+}
+
 // removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %ui-no-list {
   list-style: none;

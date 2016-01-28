@@ -130,10 +130,13 @@ $sm-btn-linkedin: #0077b5;
     .toggle-form {
         @include box-sizing(border-box);
         max-width: 650px;
-        min-width: 400px;
+        min-width: 250px;
         margin: 0 auto;
-        padding-left: $baseline; // Don't want to override any top or bottom (CR)
-        padding-right: $baseline // Don't want to override any top or bottom (CR)
+        padding: {
+            left: $baseline; // Don't want to override any top or bottom (CR)
+            right: $baseline; // Don't want to override any top or bottom (CR)
+            bottom: ($baseline/2);
+        }
     }
 
     .toggle-form {
@@ -147,7 +150,6 @@ $sm-btn-linkedin: #0077b5;
         color: $m-gray-l1;
         text-align: center;
     }
-
 
     /** The forms **/
     .form-wrapper {

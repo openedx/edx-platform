@@ -1,0 +1,43 @@
+<div id="my-bookmarks" class="sr-is-focusable" tabindex="-1"></div>
+<h2 class="bookmarks-results-header"><%= gettext("My Bookmarks") %></h2>
+
+<% if (bookmarksCollection.length) { %>
+
+    <div class="paging-header"></div>
+
+    <div class='bookmarks-results-list'>
+        <% bookmarksCollection.each(function(bookmark, index) { %>
+             <a class="bookmarks-results-list-item" href="<%= bookmark.blockUrl() %>" aria-labelledby="bookmark-link-<%= index %>" data-bookmark-id="<%= bookmark.get('id') %>" data-component-type="<%= bookmark.get('block_type') %>" data-usage-id="<%= bookmark.get('usage_id') %>" aria-describedby="bookmark-type-<%= index %> bookmark-date-<%= index %>">
+                <div class="list-item-content">
+                    <div class="list-item-left-section">
+                        <h3 id="bookmark-link-<%= index %>" class="list-item-breadcrumbtrail"> <%= _.map(_.pluck(bookmark.get('path'), 'display_name'), _.escape).concat([_.escape(bookmark.get('display_name'))]).join(' <i class="icon fa fa-caret-right" aria-hidden="true"></i><span class="sr">-</span> ') %> </h3>
+                        <p id="bookmark-date-<%= index %>" class="list-item-date"> <%= gettext("Bookmarked on") %> <%= humanFriendlyDate(bookmark.get('created')) %> </p>
+                    </div>
+
+                    <p id="bookmark-type-<%= index %>" class="list-item-right-section">
+                        <span aria-hidden="true"><%= gettext("View") %></span>
+                        <i class="icon fa fa-arrow-right" aria-hidden="true"></i>
+                    </p>
+                </div>
+            </a>
+        <% }); %>
+    </div>
+
+    <div class="paging-footer"></div>
+
+<% } else {%>
+
+    <div class="bookmarks-empty" tabindex="0">
+        <div class="bookmarks-empty-header">
+            <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon" aria-hidden="true"></i>
+            <%= gettext("You have not bookmarked any courseware pages yet.") %>
+            <br>
+        </div>
+        <div  class="bookmarks-empty-detail">
+            <span class="bookmarks-empty-detail-title">
+                <%= gettext("Use bookmarks to help you easily return to courseware pages. To bookmark a page, select Bookmark in the upper right corner of that page. To see a list of all your bookmarks, select Bookmarks in the upper left corner of any courseware page.") %>
+            </span>
+        </div>
+    </div>
+
+<% } %>

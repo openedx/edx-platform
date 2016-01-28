@@ -33,7 +33,7 @@ from rest_framework import status
 import newrelic.agent
 
 from courseware import grades
-from courseware.access import has_access, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
 from courseware.courses import (
@@ -54,6 +54,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
@@ -96,12 +97,20 @@ from util.views import ensure_valid_course_key
 from eventtracking import tracker
 import analytics
 from courseware.url_helpers import get_redirect_url
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+
+from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+
 
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
+# Only display the requirements on learner dashboard for
+# credit and verified modes.
+REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 
 
 def user_groups(user):
@@ -136,7 +145,7 @@ def courses(request):
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user, request.META.get('HTTP_HOST'))
+        courses_list = get_courses(request.user)
 
         if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -399,6 +408,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if survey.utils.must_answer_survey(course, user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
+    bookmarks_api_url = reverse('bookmarks')
+
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
@@ -413,10 +424,14 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
+        language_preference = get_user_preference(request.user, LANGUAGE_KEY)
+        if not language_preference:
+            language_preference = settings.LANGUAGE_CODE
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
-            'COURSE_TITLE': course.display_name_with_default,
+            'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
             'fragment': Fragment(),
@@ -424,6 +439,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'studio_url': studio_url,
             'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
+            'bookmarks_api_url': bookmarks_api_url,
+            'language_preference': language_preference,
+            'disable_optimizely': True,
         }
 
         now = datetime.now(UTC())
@@ -526,7 +544,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             save_child_position(chapter_module, section)
             section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
             context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
-            context['section_title'] = section_descriptor.display_name_with_default
+            context['section_title'] = section_descriptor.display_name_with_default_escaped
         else:
             # section is none, so display a message
             studio_url = get_studio_url(course, 'course')
@@ -669,6 +687,14 @@ def course_info(request, course_id):
         staff_access = has_access(request.user, 'staff', course)
         masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
+        # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
+        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
+        if show_enroll_banner and hasattr(course_key, 'ccx'):
+            # if course is CCX and user is not enrolled/registered then do not let him open course direct via link for
+            # self registration. Because only CCX coach can register/enroll a student. If un-enrolled user try
+            # to access CCX redirect him to dashboard.
+            return redirect(reverse('dashboard'))
+
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
         if user_must_complete_entrance_exam(request, user, course):
@@ -687,10 +713,9 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(user, course.id)
-
         context = {
             'request': request,
+            'masquerade_user': user,
             'course_id': course_key.to_deprecated_string(),
             'cache': None,
             'course': course,
@@ -805,6 +830,13 @@ def course_about(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
+    if hasattr(course_key, 'ccx'):
+        # if un-enrolled/non-registered user try to access CCX (direct for registration)
+        # then do not show him about page to avoid self registration.
+        # Note: About page will only be shown to user who is not register. So that he can register. But for
+        # CCX only CCX coach can enroll students.
+        return redirect(reverse('dashboard'))
+
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
         course = get_course_with_access(request.user, permission, course_key)
@@ -866,6 +898,9 @@ def course_about(request, course_id):
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
+        # Overview
+        overview = CourseOverview.get_from_id(course.id)
+
         return render_to_response('courseware/course_about.html', {
             'course': course,
             'staff_access': staff_access,
@@ -887,7 +922,8 @@ def course_about(request, course_id):
             'disable_courseware_header': True,
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart.views.show_cart'),
-            'pre_requisite_courses': pre_requisite_courses
+            'pre_requisite_courses': pre_requisite_courses,
+            'course_image_urls': overview.image_urls,
         })
 
 
@@ -898,7 +934,7 @@ def course_about(request, course_id):
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
@@ -920,13 +956,19 @@ def _progress(request, course_key, student_id):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     staff_access = bool(has_access(request.user, 'staff', course))
+    try:
+        coach_access = has_ccx_coach_role(request.user, course_key)
+    except CCXLocatorValidationException:
+        coach_access = False
+
+    has_access_on_students_profiles = staff_access or coach_access
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
         # Requesting access to a different student's profile
-        if not staff_access:
+        if not has_access_on_students_profiles:
             raise Http404
         try:
             student = User.objects.get(id=student_id)
@@ -1002,13 +1044,21 @@ def _credit_course_requirements(course_key, student):
         course_key (CourseKey): Identifier for the course.
         student (User): Currently logged in user.
 
-    Returns: dict
+    Returns: dict if the credit eligibility enabled and it is a credit course
+    and the user is enrolled in either verified or credit mode, and None otherwise.
 
     """
     # If credit eligibility is not enabled or this is not a credit course,
     # short-circuit and return `None`.  This indicates that credit requirements
     # should NOT be displayed on the progress page.
     if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
+        return None
+
+    # If student is enrolled not enrolled in verified or credit mode,
+    # short-circuit and return None. This indicates that
+    # credit requirements should NOT be displayed on the progress page.
+    enrollment = CourseEnrollment.get_enrollment(student, course_key)
+    if enrollment.mode not in REQUIREMENTS_DISPLAY_MODES:
         return None
 
     # Credit requirement statuses for which user does not remain eligible to get credit.

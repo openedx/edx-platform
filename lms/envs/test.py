@@ -26,10 +26,11 @@ from warnings import filterwarnings, simplefilter
 
 from openedx.core.lib.tempdir import mkdtemp_clean
 
-# This patch disabes the commit_on_success decorator during tests
+# This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase
+from util.testing import patch_testcase, patch_sessions
 patch_testcase()
+patch_sessions()
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
@@ -61,8 +62,6 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
 
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
@@ -354,6 +353,7 @@ MKTG_URL_LINK_MAP = {
     'PRESS': 'press',
     'BLOG': 'blog',
     'DONATE': 'donate',
+    'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
@@ -424,6 +424,8 @@ PLATFORM_NAME = "edX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
+FEATURES['USE_MICROSITES'] = True
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
 MICROSITE_CONFIGURATION = {
     "test_microsite": {
         "domain_prefix": "testmicrosite",
@@ -448,6 +450,11 @@ MICROSITE_CONFIGURATION = {
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "urls": {
+            'ABOUT': 'testmicrosite/about',
+            'PRIVACY': 'testmicrosite/privacy',
+            'TOS_AND_HONOR': 'testmicrosite/tos-and-honor',
+        },
     },
     "microsite_with_logistration": {
         "domain_prefix": "logistration",
@@ -479,15 +486,14 @@ MICROSITE_CONFIGURATION = {
         "domain_prefix": "www",
     }
 }
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
-FEATURES['USE_MICROSITES'] = True
-
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
-    COMMON_ROOT / 'test' / 'templates'
+    COMMON_ROOT / 'test' / 'templates',
+    COMMON_ROOT / 'test' / 'test_microsites'
 ])
 
 
@@ -530,7 +536,7 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
 
 ######### custom courses #########
-INSTALLED_APPS += ('lms.djangoapps.ccx',)
+INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
@@ -557,3 +563,9 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'test-secret',
+    'JWT_ISSUER': 'https://test-provider/oauth2',
+    'JWT_AUDIENCE': 'test-key',
+})

@@ -70,14 +70,17 @@ class Command(BaseCommand):
         enrolled_total = User.objects.filter(
             courseenrollment__course_id=course_id
         )
-        verified_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='verified'
+        verified_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='verified'
         )
-        honor_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='honor'
+        honor_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='honor'
         )
-        audit_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='audit'
+        audit_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='audit'
         )
 
         cert_data[course_id] = {
@@ -88,7 +91,7 @@ class Command(BaseCommand):
             'audit_enrolled': audit_enrolled.count()
         }
 
-        status_tally = GeneratedCertificate.objects.filter(
+        status_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id
         ).values('status').annotate(
             dcount=Count('status')
@@ -100,7 +103,7 @@ class Command(BaseCommand):
             }
         )
 
-        mode_tally = GeneratedCertificate.objects.filter(
+        mode_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id,
             status__exact='downloadable'
         ).values('mode').annotate(

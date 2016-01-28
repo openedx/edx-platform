@@ -81,7 +81,7 @@ class Command(BaseCommand):
         # Retrieve the IDs of generated certificates with
         # error status in the set of courses we're considering.
         queryset = (
-            GeneratedCertificate.objects.select_related('user')
+            GeneratedCertificate.objects.select_related('user')  # pylint: disable=no-member
         ).filter(status=CertificateStatuses.error)
         if only_course_keys:
             queryset = queryset.filter(course_id__in=only_course_keys)

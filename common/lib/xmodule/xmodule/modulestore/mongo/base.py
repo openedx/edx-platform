@@ -39,6 +39,7 @@ from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceVa
 from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
+from xmodule.course_module import CourseSummary
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
@@ -50,6 +51,7 @@ from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.services import SettingsService
 
 log = logging.getLogger(__name__)
@@ -75,8 +77,6 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
 
 # at module level, cache one instance of OSFS per filesystem root.
 _OSFS_INSTANCE = {}
-
-_DETACHED_CATEGORIES = [name for name, __ in XBlock.load_tagged_classes("detached")]
 
 
 class MongoRevisionKey(object):
@@ -268,8 +268,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     )
                     if parent_url:
                         parent = self._convert_reference_to_key(parent_url)
-                if not parent and category != 'course':
-                    # try looking it up just-in-time (but not if we're working with a root node (course).
+
+                if not parent and category not in DETACHED_XBLOCK_TYPES.union(['course']):
+                    # try looking it up just-in-time (but not if we're working with a detached block).
                     parent = self.modulestore.get_parent_location(
                         as_published(location),
                         ModuleStoreEnum.RevisionOption.published_only if location.revision is None
@@ -964,9 +965,43 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         of inherited metadata onto the item
         """
         category = item['location']['category']
-        apply_cached_metadata = category not in _DETACHED_CATEGORIES and \
+        apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and \
             not (category == 'course' and depth == 0)
         return apply_cached_metadata
+
+    @autoretry_read()
+    def get_course_summaries(self, **kwargs):
+        """
+        Returns a list of `CourseSummary`. This accepts an optional parameter of 'org' which
+        will apply an efficient filter to only get courses with the specified ORG
+        """
+        def extract_course_summary(course):
+            """
+            Extract course information from the course block for mongo.
+            """
+            return {
+                field: course['metadata'][field]
+                for field in CourseSummary.course_info_fields
+                if field in course['metadata']
+            }
+
+        course_org_filter = kwargs.get('org')
+        query = {'_id.category': 'course'}
+
+        if course_org_filter:
+            query['_id.org'] = course_org_filter
+
+        course_records = self.collection.find(query, {'metadata': True})
+
+        courses_summaries = []
+        for course in course_records:
+            if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
+                locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
+                course_summary = extract_course_summary(course)
+                courses_summaries.append(
+                    CourseSummary(locator, **course_summary)
+                )
+        return courses_summaries
 
     @autoretry_read()
     def get_courses(self, **kwargs):

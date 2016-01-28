@@ -242,7 +242,7 @@ def get_course_about_section(request, course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section_module(request, course, section_key):
+def get_course_info_section_module(request, user, course, section_key):
     """
     This returns the course info module for a given section_key.
 
@@ -255,10 +255,10 @@ def get_course_info_section_module(request, course, section_key):
     usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
-    field_data_cache = FieldDataCache([], course.id, request.user)
+    field_data_cache = FieldDataCache([], course.id, user)
 
     return get_module(
-        request.user,
+        user,
         request,
         usage_key,
         field_data_cache,
@@ -269,7 +269,7 @@ def get_course_info_section_module(request, course, section_key):
     )
 
 
-def get_course_info_section(request, course, section_key):
+def get_course_info_section(request, user, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -280,7 +280,7 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    info_module = get_course_info_section_module(request, course, section_key)
+    info_module = get_course_info_section_module(request, user, course, section_key)
 
     html = ''
     if info_module is not None:
@@ -373,11 +373,12 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses(user, domain=None):
-    '''
-    Returns a list of courses available, sorted by course.number
-    '''
-    courses = branding.get_visible_courses()
+def get_courses(user, org=None, filter_=None):
+    """
+    Returns a list of courses available, sorted by course.number and optionally
+    filtered by org code (case-insensitive).
+    """
+    courses = branding.get_visible_courses(org=org, filter_=filter_)
 
     permission_name = microsite.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
@@ -385,8 +386,6 @@ def get_courses(user, domain=None):
     )
 
     courses = [c for c in courses if has_access(user, permission_name, c)]
-
-    courses = sorted(courses, key=lambda course: course.number)
 
     return courses
 

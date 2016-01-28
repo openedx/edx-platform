@@ -11,6 +11,7 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/pagination';
 @import 'elements/navigation'; // all archetypes of navigation
 
 // course - base
@@ -49,7 +50,6 @@
 @import "views/teams";
 
 // course - instructor-only views
-@import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
 @import "xmodule/descriptors/css/module-styles.scss";

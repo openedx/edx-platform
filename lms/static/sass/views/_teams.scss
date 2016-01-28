@@ -177,21 +177,7 @@
   }
 
   .listing-tools {
-    @extend %t-copy-sub1;
     margin: ($baseline/10) $baseline;
-    color: $gray-d1;
-
-    label { // override
-      color: inherit;
-      font-size: inherit;
-      cursor: auto;
-    }
-
-    .listing-sort-select {
-      @extend %t-copy-sub1;
-      @extend %t-regular;
-      border: 0;
-    }
   }
 
   // reset general ul styles

@@ -1,7 +1,7 @@
-define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/xblock", "js/models/xblock_info",
-    "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, AjaxHelpers, URI, XBlockView, XBlockInfo) {
-
+define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils",
+        "js/views/xblock", "js/models/xblock_info", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+    function ($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
+        "use strict";
         describe("XBlockView", function() {
             var model, xblockView, mockXBlockHtml;
 
@@ -89,11 +89,11 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/xbloc
 
                 it('aborts rendering when a dependent script fails to load', function() {
                     var requests = AjaxHelpers.requests(this),
-                        mockJavaScriptUrl = "mock.js",
+                        missingJavaScriptUrl = "no_such_file.js",
                         promise;
-                    spyOn($, 'getScript').andReturn($.Deferred().reject().promise());
+                    spyOn(ViewUtils, 'loadJavaScript').andReturn($.Deferred().reject().promise());
                     promise = postXBlockRequest(requests, [
-                        ["hash5", { mimetype: "application/javascript", kind: "url", data: mockJavaScriptUrl }]
+                        ["hash5", { mimetype: "application/javascript", kind: "url", data: missingJavaScriptUrl }]
                     ]);
                     expect(promise.isRejected()).toBe(true);
                 });
@@ -104,7 +104,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/xbloc
                     postXBlockRequest(AjaxHelpers.requests(this), []);
                     xblockView.$el.find(".notification-action-button").click();
                     expect(notifySpy).toHaveBeenCalledWith("add-missing-groups", model.get("id"));
-                })
+                });
             });
         });
     });

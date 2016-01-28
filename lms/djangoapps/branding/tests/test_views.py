@@ -1,6 +1,5 @@
 # encoding: utf-8
 """Tests of Branding API views. """
-import contextlib
 import json
 import urllib
 from django.test import TestCase
@@ -11,6 +10,7 @@ import mock
 import ddt
 from config_models.models import cache
 from branding.models import BrandingApiConfig
+from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
@@ -42,7 +42,7 @@ class TestFooter(TestCase):
     @ddt.unpack
     def test_footer_content_types(self, is_edx_domain, accepts, content_type, content):
         self._set_feature_flag(True)
-        with self._set_is_edx_domain(is_edx_domain):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer(accepts=accepts)
 
         self.assertEqual(resp.status_code, 200)
@@ -53,7 +53,7 @@ class TestFooter(TestCase):
     @ddt.data(True, False)
     def test_footer_json(self, is_edx_domain):
         self._set_feature_flag(True)
-        with self._set_is_edx_domain(is_edx_domain):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
@@ -153,7 +153,7 @@ class TestFooter(TestCase):
     def test_language_rtl(self, is_edx_domain, language, static_path):
         self._set_feature_flag(True)
 
-        with self._set_is_edx_domain(is_edx_domain):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer(accepts="text/html", params={'language': language})
 
         self.assertEqual(resp.status_code, 200)
@@ -172,7 +172,7 @@ class TestFooter(TestCase):
     def test_show_openedx_logo(self, is_edx_domain, show_logo):
         self._set_feature_flag(True)
 
-        with self._set_is_edx_domain(is_edx_domain):
+        with with_edx_domain_context(is_edx_domain):
             params = {'show-openedx-logo': 1} if show_logo else {}
             resp = self._get_footer(accepts="text/html", params=params)
 
@@ -195,7 +195,7 @@ class TestFooter(TestCase):
     @ddt.unpack
     def test_include_dependencies(self, is_edx_domain, include_dependencies):
         self._set_feature_flag(True)
-        with self._set_is_edx_domain(is_edx_domain):
+        with with_edx_domain_context(is_edx_domain):
             params = {'include-dependencies': 1} if include_dependencies else {}
             resp = self._get_footer(accepts="text/html", params=params)
 
@@ -227,9 +227,3 @@ class TestFooter(TestCase):
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)
-
-    @contextlib.contextmanager
-    def _set_is_edx_domain(self, is_edx_domain):
-        """Configure whether this an EdX-controlled domain. """
-        with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
-            yield

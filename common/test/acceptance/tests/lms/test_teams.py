@@ -298,6 +298,7 @@ class TeamsTabTest(TeamsTabBase):
                     team_id=team['id']
                 ))
         )
+        self.teams_page.wait_for_page()
         self.teams_page.wait_for_ajax()
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
@@ -812,7 +813,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @flaky  # TODO: fix flaky test. See TNL-3489
     def test_search(self):
         """
         Scenario: User should be able to search for a team

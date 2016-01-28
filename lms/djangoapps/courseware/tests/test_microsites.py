@@ -142,6 +142,26 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
 
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_microsite_anonymous_copyright_content(self):
+        """
+        Verify that the copyright, when accessed via a Microsite domain, returns
+        the expected 200 response
+        """
+
+        resp = self.client.get('/copyright', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertContains(resp, 'This is a copyright page for an Open edX microsite.')
+
+    def test_not_microsite_anonymous_copyright_content(self):
+        """
+        Verify that the copyright page does not exist if we are not in a microsite
+        """
+
+        resp = self.client.get('/copyright')
+        self.assertEqual(resp.status_code, 404)
+
     def test_no_redirect_on_homepage_when_no_enrollments(self):
         """
         Verify that a user going to homepage will not redirect if he/she has no course enrollments

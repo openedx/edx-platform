@@ -277,6 +277,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def submit_comment_edit(self, comment_id, new_comment_body):
         """Click the submit button on the comment editor"""
         self._find_within("#comment_{} .post-update".format(comment_id)).first.click()
+        self.wait_for_ajax()
         EmptyPromise(
             lambda: (
                 not self.is_comment_editor_visible(comment_id) and

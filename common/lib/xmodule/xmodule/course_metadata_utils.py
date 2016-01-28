@@ -57,15 +57,51 @@ def display_name_with_default(course):
     like to just pass course.display_name and course.url_name as arguments to
     this function, we can't do so without breaking those tests.
 
+    Note: This method no longer escapes as it once did, so the caller must
+    ensure it is properly escaped where necessary.
+
     Arguments:
         course (CourseDescriptor|CourseOverview): descriptor or overview of
             said course.
     """
-    # TODO: Consider changing this to use something like xml.sax.saxutils.escape
     return (
         course.display_name if course.display_name is not None
         else course.url_name.replace('_', ' ')
-    ).replace('<', '&lt;').replace('>', '&gt;')
+    )
+
+
+def display_name_with_default_escaped(course):
+    """
+    DEPRECATED: use display_name_with_default
+
+    Calculates the display name for a course with some HTML escaping.
+    This follows the same logic as display_name_with_default, with
+    the addition of the escaping.
+
+    Here is an example of how to move away from this method in Mako html:
+        Before:
+        <span class="course-name">${course.display_name_with_default_escaped}</span>
+
+        After:
+        <span class="course-name">${course.display_name_with_default | h}</span>
+    If the context is Javascript in Mako, you'll need to follow other best practices.
+
+    Note: Switch to display_name_with_default, and ensure the caller
+    properly escapes where necessary.
+
+    Note: This newly introduced method should not be used.  It was only
+    introduced to enable a quick search/replace and the ability to slowly
+    migrate and test switching to display_name_with_default, which is no
+    longer escaped.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): descriptor or overview of
+            said course.
+    """
+    # This escaping is incomplete.  However, rather than switching this to use
+    # markupsafe.escape() and fixing issues, better to put that energy toward
+    # migrating away from this method altogether.
+    return course.display_name_with_default.replace('<', '&lt;').replace('>', '&gt;')
 
 
 def number_for_course_location(location):

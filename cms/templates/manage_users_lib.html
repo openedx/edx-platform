@@ -107,7 +107,7 @@ from openedx.core.lib.js_utils import escape_json_dumps
 <%block name="requirejs">
   require(["js/factories/manage_users_lib"], function(ManageLibraryUsersFactory) {
       ManageLibraryUsersFactory(
-        "${context_library.display_name_with_default | h}",
+        "${context_library.display_name_with_default_escaped | h}",
         ${escape_json_dumps(users) | n},
         "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'})}",
         ${ request.user.id },

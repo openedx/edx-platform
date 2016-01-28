@@ -53,10 +53,12 @@ def i_click_on_error_dialog(step):
 
     problem_string = unicode(world.scenario_dict['COURSE'].id.make_usage_key("problem", 'ignore'))
     problem_string = u"Problem {}".format(problem_string[:problem_string.rfind('ignore')])
+    css_selector = "span.inline-error"
+    world.wait_for_visible(css_selector)
     assert_true(
-        world.css_html("span.inline-error").startswith(problem_string),
+        world.css_html(css_selector).startswith(problem_string),
         u"{} does not start with {}".format(
-            world.css_html("span.inline-error"), problem_string
+            world.css_html(css_selector), problem_string
         ))
     # we don't know the actual ID of the vertical. So just check that we did go to a
     # vertical page in the course (there should only be one).

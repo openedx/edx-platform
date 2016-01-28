@@ -6,7 +6,6 @@ Group Configuration Tests.
 import json
 from mock import patch
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.course_group_config import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
@@ -229,8 +228,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         ]
         self.save_course()
 
-        if SPLIT_TEST_COMPONENT_TYPE not in self.course.advanced_modules:
-            self.course.advanced_modules.append(SPLIT_TEST_COMPONENT_TYPE)
+        if 'split_test' not in self.course.advanced_modules:
+            self.course.advanced_modules.append('split_test')
             self.store.update_item(self.course, self.user.id)
 
         response = self.client.get(self._url())

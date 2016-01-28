@@ -1,11 +1,8 @@
 """Helper functions for working with Programs."""
 import logging
 
-from django.core.cache import cache
-from edx_rest_api_client.client import EdxRestApiClient
-
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
 log = logging.getLogger(__name__)
@@ -13,7 +10,6 @@ log = logging.getLogger(__name__)
 
 def get_programs(user):
     """Given a user, get programs from the Programs service.
-
     Returned value is cached depending on user permissions. Staff users making requests
     against Programs will receive unpublished programs, while regular users will only receive
     published programs.
@@ -25,39 +21,12 @@ def get_programs(user):
         list of dict, representing programs returned by the Programs service.
     """
     programs_config = ProgramsApiConfig.current()
-    no_programs = []
 
-    # Bypass caching for staff users, who may be creating Programs and want to see them displayed immediately.
-    use_cache = programs_config.is_cache_enabled and not user.is_staff
+    # Bypass caching for staff users, who may be creating Programs and want
+    # to see them displayed immediately.
+    cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
 
-    if not programs_config.enabled:
-        log.warning('Programs configuration is disabled.')
-        return no_programs
-
-    if use_cache:
-        cached = cache.get(programs_config.CACHE_KEY)
-        if cached is not None:
-            return cached
-
-    try:
-        jwt = get_id_token(user, programs_config.OAUTH2_CLIENT_NAME)
-        api = EdxRestApiClient(programs_config.internal_api_url, jwt=jwt)
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to initialize the Programs API client.')
-        return no_programs
-
-    try:
-        response = api.programs.get()
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Failed to retrieve programs from the Programs API.')
-        return no_programs
-
-    results = response.get('results', no_programs)
-
-    if use_cache:
-        cache.set(programs_config.CACHE_KEY, results, programs_config.cache_ttl)
-
-    return results
+    return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 
 
 def get_programs_for_dashboard(user, course_keys):
@@ -105,3 +74,31 @@ def get_programs_for_dashboard(user, course_keys):
             log.exception('Unable to parse Programs API response: %r', program)
 
     return course_programs
+
+
+def get_programs_for_credentials(user, programs_credentials):
+    """ Given a user and an iterable of credentials, get corresponding programs
+    data and return it as a list of dictionaries.
+
+    Arguments:
+        user (User): The user to authenticate as for requesting programs.
+        programs_credentials (list): List of credentials awarded to the user
+            for completion of a program.
+
+    Returns:
+        list, containing programs dictionaries.
+    """
+    certificate_programs = []
+
+    programs = get_programs(user)
+    if not programs:
+        log.debug('No programs for user %d.', user.id)
+        return certificate_programs
+
+    for program in programs:
+        for credential in programs_credentials:
+            if program['id'] == credential['credential']['program_id']:
+                program['credential_url'] = credential['certificate_url']
+                certificate_programs.append(program)
+
+    return certificate_programs

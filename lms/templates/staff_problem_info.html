@@ -6,7 +6,7 @@ from django.template.defaultfilters import escapejs
 
 ## The JS for this is defined in xqa_interface.html
 ${block_content}
-%if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool', 'library_content']:
+%if 'detached' not in tags:
 %  if edit_link:
   <div>
       <a href="${edit_link}">Edit</a>
@@ -21,7 +21,7 @@ ${block_content}
   </div>
 %  endif
 %  if not disable_staff_debug_info:
-<div class="wrap-instructor-info" aria-hidden="true">
+<div class="wrap-instructor-info">
   <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \

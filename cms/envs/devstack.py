@@ -46,10 +46,14 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-############################# ADVANCED COMPONENTS #############################
+############################ PYFS XBLOCKS SERVICE #############################
+# Set configuration for Django pyfilesystem
 
-# Make it easier to test advanced components in local dev
-FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'cms/static/djpyfs',
+    'url_root': '/static/djpyfs',
+}
 
 ################################# CELERY ######################################
 

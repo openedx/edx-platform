@@ -39,7 +39,7 @@ from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_4')
+@attr('shard_8')
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -59,7 +59,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertTrue(self.reset_password_page.is_form_visible())
 
 
-@attr('shard_4')
+@attr('shard_8')
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -229,7 +229,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_4')
+@attr('shard_8')
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -262,6 +262,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             username=username,
             full_name="Test User",
             country="US",
+            favorite_movie="Mad Max: Fury Road",
             terms_of_service=True
         )
 
@@ -276,6 +277,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Enter a blank for the username field, which is required
         # Don't agree to the terms of service / honor code.
         # Don't specify a country code, which is required.
+        # Don't specify a favorite movie.
         username = "test_{uuid}".format(uuid=self.unique_id[0:6])
         email = "{user}@example.com".format(user=username)
         self.register_page.register(
@@ -291,6 +293,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertIn(u'Please enter your Public username.', errors)
         self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
         self.assertIn(u'Please select your Country.', errors)
+        self.assertIn(u'Please tell us your favorite movie.', errors)
 
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
@@ -317,7 +320,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertIn("Galactica1", self.register_page.username_value)
 
         # Set country, accept the terms, and submit the form:
-        self.register_page.register(country="US", terms_of_service=True)
+        self.register_page.register(country="US", favorite_movie="Battlestar Galactica", terms_of_service=True)
 
         # Expect that we reach the dashboard and we're auto-enrolled in the course
         course_names = self.dashboard_page.wait_for_page().available_courses
@@ -341,7 +344,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
-@attr('shard_4')
+@attr('shard_8')
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -568,7 +571,7 @@ class HighLevelTabTest(UniqueCourseTest):
         course_fix.add_handout('demoPDF.pdf')
 
         course_fix.add_children(
-            XBlockFixtureDesc('static_tab', 'Test Static Tab'),
+            XBlockFixtureDesc('static_tab', 'Test Static Tab', data=r"static tab data with mathjax \(E=mc^2\)"),
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
@@ -628,6 +631,18 @@ class HighLevelTabTest(UniqueCourseTest):
         self.tab_nav.go_to_tab('Test Static Tab')
         self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
 
+    def test_static_tab_with_mathjax(self):
+        """
+        Navigate to a static tab (course content)
+        """
+        # From the course info page, navigate to the static tab
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Test Static Tab')
+        self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
+
+        # Verify that Mathjax has rendered
+        self.tab_nav.mathjax_has_rendered()
+
     def test_wiki_tab_first_time(self):
         """
         Navigate to the course wiki tab. When the wiki is accessed for
@@ -679,6 +694,7 @@ class HighLevelTabTest(UniqueCourseTest):
             self.assertIn(expected, actual_items)
 
 
+@attr('shard_1')
 class PDFTextBooksTabTest(UniqueCourseTest):
     """
     Tests that verify each of the textbook tabs available within a course.

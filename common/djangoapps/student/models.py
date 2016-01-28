@@ -292,7 +292,7 @@ class UserProfile(models.Model):
         year_of_birth = self.year_of_birth
         year = datetime.now(UTC).year
         if year_of_birth is not None:
-            return year - year_of_birth
+            return self._calculate_age(year, year_of_birth)
 
     @property
     def level_of_education_display(self):
@@ -364,13 +364,24 @@ class UserProfile(models.Model):
         if date is None:
             age = self.age
         else:
-            age = date.year - year_of_birth
+            age = self._calculate_age(date.year, year_of_birth)
 
-        return age <= age_limit
+        return age < age_limit
 
     def __enumerable_to_display(self, enumerables, enum_value):
         """ Get the human readable value from an enumerable list of key-value pairs. """
         return dict(enumerables)[enum_value]
+
+    def _calculate_age(self, year, year_of_birth):
+        """Calculate the youngest age for a user with a given year of birth.
+
+        :param year: year
+        :param year_of_birth: year of birth
+        :return: youngest age a user could be for the given year
+        """
+        # There are legal implications regarding how we can contact users and what information we can make public
+        # based on their age, so we must take the most conservative estimate.
+        return year - year_of_birth - 1
 
     @classmethod
     def country_cache_key_name(cls, user_id):
@@ -504,7 +515,28 @@ class Registration(models.Model):
 
     def activate(self):
         self.user.is_active = True
+        self._track_activation()
         self.user.save()
+
+    def _track_activation(self):
+        """ Update the isActive flag in mailchimp for activated users."""
+        has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
+        has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
+        if has_segment_key and has_mailchimp_id:
+            identity_args = [
+                self.user.id,  # pylint: disable=no-member
+                {
+                    'email': self.user.email,
+                    'username': self.user.username,
+                    'activated': 1,
+                },
+                {
+                    "MailChimp": {
+                        "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                    }
+                }
+            ]
+            analytics.identify(*identity_args)
 
 
 class PendingNameChange(models.Model):
@@ -1489,7 +1521,7 @@ class ManualEnrollmentAudit(models.Model):
         """
         saves the student manual enrollment information
         """
-        cls.objects.create(
+        return cls.objects.create(
             enrolled_by=user,
             enrolled_email=email,
             state_transition=state_transition,
@@ -1726,10 +1758,11 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
 @receiver(user_logged_out)
 def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
-    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
-    else:
-        AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+    if hasattr(request, 'user'):
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))  # pylint: disable=logging-format-interpolation
+        else:
+            AUDIT_LOG.info(u"Logout - {0}".format(request.user))  # pylint: disable=logging-format-interpolation
 
 
 @receiver(user_logged_in)
