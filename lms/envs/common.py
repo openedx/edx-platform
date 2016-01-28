@@ -1930,6 +1930,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
+
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2005,6 +2008,18 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "google_plus",
     "reddit",
 ]
+
+# JWT Settings
+JWT_AUTH = {
+    'JWT_SECRET_KEY': None,
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_ISSUER': None,
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
+    'JWT_AUDIENCE': None,
+    'JWT_LEEWAY': 1,
+    'JWT_DECODE_HANDLER': 'openedx.core.lib.api.jwt_decode_handler.decode',
+}
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.

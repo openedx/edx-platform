@@ -1035,7 +1035,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_2.id, mode=course_mode)
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
@@ -1068,7 +1068,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch(
             'student.views.get_programs_for_dashboard',
@@ -1098,7 +1098,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_3.id, mode='honor')
 
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
@@ -1119,7 +1119,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
 
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        self.create_config()
+        self.create_programs_config()
 
         program_data = self._create_program_data([(self.course_1.id, 'active')])
         if key_remove and key_remove in program_data[unicode(self.course_1.id)]:
