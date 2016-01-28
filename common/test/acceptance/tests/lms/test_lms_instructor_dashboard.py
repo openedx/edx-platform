@@ -6,6 +6,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 import time
 
 from flaky import flaky
+import uuid
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -125,9 +126,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
     """
 
-    USERNAME = "STUDENT_TESTER"
-    EMAIL = "student101@example.com"
-
     def setUp(self):
         super(ProctoredExamsTest, self).setUp()
 
@@ -170,7 +168,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         ).visit()
 
         # Auto-auth register for the course.
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self._auto_auth(
+            "STUDENT_TESTER",
+            "student_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
+            False
+        )
 
     def _auto_auth(self, username, email, staff):
         """
@@ -184,7 +186,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         login as a verififed user
         """
 
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self._auto_auth(
+            "STUDENT_TESTER",
+            "student_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
+            False
+        )
 
         # the track selection page cannot be visited. see the other tests to see if any prereq is there.
         # Navigate to the track selection page
@@ -206,7 +212,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self._auto_auth(
+            "STAFF_TESTER",
+            "staff_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
+            True
+        )
         self.course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
@@ -232,7 +242,11 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self._auto_auth(
+            "STAFF_TESTER",
+            "staff_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
+            True
+        )
         self.course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
@@ -306,7 +320,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         super(EntranceExamGradeTest, self).setUp()
         self.course_info.update({"settings": {"entrance_exam_enabled": "true"}})
         CourseFixture(**self.course_info).install()
-        self.student_identifier = "johndoe_saee@example.com"
+        self.student_identifier = "{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30])
         # Create the user (automatically logs us in)
         AutoAuthPage(
             self.browser,
@@ -872,13 +886,11 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         # we have created a user with this id in fixture, and created a generated certificate for it.
         self.student_id = "99"
         self.student_name = "testcert"
-        self.student_email = "cert@example.com"
 
         # Enroll above test user in the course
         AutoAuthPage(
             self.browser,
             username=self.student_name,
-            email=self.student_email,
             course_id=self.course_id,
         ).visit()
 

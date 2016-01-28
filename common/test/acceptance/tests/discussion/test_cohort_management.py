@@ -724,7 +724,7 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         # login as an instructor
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
-            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            self.browser, username=self.instructor_name,
             course_id=self.course_id, staff=True
         ).visit().get_user_id()
 
@@ -1016,8 +1016,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         # login as an instructor
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
-            self.browser, username=self.instructor_name, email="instructor_user@example.com",
-            course_id=self.course_id, staff=True
+            self.browser, username=self.instructor_name, course_id=self.course_id, staff=True
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard

@@ -510,7 +510,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         super(LibraryUsersPageTest, self).setUp()
 
         # Create a second user for use in these tests:
-        AutoAuthPage(self.browser, username="second", no_login=True).visit()
+        AutoAuthPage(self.browser, username="second", email="second@example.com", no_login=True).visit()
 
         self.page = LibraryUsersPage(self.browser, self.library_key)
         self.page.visit()
