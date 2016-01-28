@@ -67,6 +67,7 @@ class CommentsServiceMockMixin(object):
                 "collection": threads,
                 "page": page,
                 "num_pages": num_pages,
+                "thread_count": len(threads),
             }),
             status=200
         )
@@ -81,6 +82,7 @@ class CommentsServiceMockMixin(object):
                 "page": 1,
                 "num_pages": num_pages,
                 "corrected_text": rewrite,
+                "thread_count": len(threads),
             }),
             status=200
         )
@@ -200,6 +202,7 @@ class CommentsServiceMockMixin(object):
                 "collection": threads,
                 "page": page,
                 "num_pages": num_pages,
+                "thread_count": len(threads),
             }),
             status=200
         )
