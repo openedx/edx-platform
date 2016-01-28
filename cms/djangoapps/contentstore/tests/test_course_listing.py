@@ -13,7 +13,7 @@ from xmodule.course_module import CourseSummary
 
 from contentstore.views.course import (_accessible_courses_list, _accessible_courses_list_from_groups,
                                        AccessListFallback, get_courses_accessible_to_user,
-                                       _staff_accessible_course_list)
+                                       _accessible_courses_summary_list)
 from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
@@ -83,9 +83,13 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list, __ = _accessible_courses_list(self.request)
         self.assertEqual(len(courses_list), 1)
 
+        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
+        self.assertEqual(len(courses_summary_list), 1)
+
         # get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list_by_groups), 1)
+
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
 
@@ -145,7 +149,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Now count the db queries for staff
         with check_mongo_calls(mongo_calls):
-            _staff_accessible_course_list(self.request)
+            _accessible_courses_summary_list(self.request)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
@@ -189,10 +193,18 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list, __ = _accessible_courses_list(self.request)
         self.assertEqual(len(courses_list), 1)
 
+        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
+
+        # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
+        # is returned
+        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
+        self.assertEqual(len(courses_summary_list), 1)
+
         # get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list_by_groups), 1)
-        # check both course lists have same courses
+
+        # check course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now delete this course and re-add user to instructor group of this course
@@ -200,9 +212,20 @@ class TestCourseListing(ModuleStoreTestCase):
 
         CourseInstructorRole(course_key).add_users(self.user)
 
-        # test that get courses through iterating all courses now returns no course
+        # Get courses through iterating all courses
         courses_list, __ = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), 0)
+
+        # Get course summaries by iterating all courses
+        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
+
+        # Get courses by reversing group name formats
+        courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
+
+        # Test that course list returns no course
+        self.assertEqual(
+            [len(courses_list), len(courses_list_by_groups), len(courses_summary_list)],
+            [0, 0, 0]
+        )
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 150, 505),
@@ -308,8 +331,12 @@ class TestCourseListing(ModuleStoreTestCase):
 
         with self.assertRaises(AccessListFallback):
             _accessible_courses_list_from_groups(self.request)
-        courses_list, __ = _accessible_courses_list(self.request)
+        courses_list, __ = get_courses_accessible_to_user(self.request)
+
+        # Verify fetched accessible courses list is a list of CourseSummery instances and test expacted
+        # course count is returned
         self.assertEqual(len(courses_list), 2)
+        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list))
 
     def test_course_listing_with_actions_in_progress(self):
         sourse_course_key = CourseLocator('source-Org', 'source-Course', 'source-Run')
