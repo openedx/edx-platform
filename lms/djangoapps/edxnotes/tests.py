@@ -33,6 +33,16 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 NOTES_API_EMPTY_RESPONSE = {
+    "total": 0,
+    "rows": [],
+    "current_page": 1,
+    "start": 0,
+    "next": None,
+    "previous": None,
+    "num_pages": 0,
+}
+
+NOTES_VIEW_EMPTY_RESPONSE = {
     "count": 0,
     "results": [],
     "current_page": 1,
@@ -297,13 +307,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_get.return_value.content = json.dumps(
             {
-                "count": 2,
+                "total": 2,
                 "current_page": 1,
                 "start": 0,
                 "next": None,
                 "previous": None,
                 "num_pages": 1,
-                "results": [
+                "rows": [
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
@@ -404,13 +414,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests the result if correct data is received.
         """
         mock_get.return_value.content = json.dumps({
-            "count": 2,
+            "total": 2,
             "current_page": 1,
             "start": 0,
             "next": None,
             "previous": None,
             "num_pages": 1,
-            "results": [
+            "rows": [
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
@@ -511,45 +521,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
         self.assertItemsEqual(
-            NOTES_API_EMPTY_RESPONSE,
+            NOTES_VIEW_EMPTY_RESPONSE,
             json.loads(helpers.get_notes(self.request, self.course))
-        )
-
-    def test_preprocess_collection_escaping(self):
-        """
-        Tests the result if appropriate module is not found.
-        """
-        initial_collection = [{
-            u"quote": u"test <script>alert('test')</script>",
-            u"text": u"text \"<>&'",
-            u"usage_id": unicode(self.html_module_1.location),
-            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
-        }]
-
-        self.assertItemsEqual(
-            [{
-                u"quote": u"test &lt;script&gt;alert('test')&lt;/script&gt;",
-                u"text": u'text "&lt;&gt;&amp;\'',
-                u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
-                    u"index": 0,
-                    u"location": unicode(self.chapter.location),
-                    u"children": [unicode(self.sequential.location)]
-                },
-                u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
-                    u"location": unicode(self.sequential.location),
-                    u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
-                },
-                u"unit": {
-                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
-                    u"location": unicode(self.vertical.location),
-                },
-                u"usage_id": unicode(self.html_module_1.location),
-                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
-            }],
-            helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
     def test_preprocess_collection_no_item(self):
@@ -664,6 +637,59 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
+    @override_settings(NOTES_DISABLED_TABS=['course_structure', 'tags'])
+    def test_preprocess_collection_with_disabled_tabs(self, ):
+        """
+        Tests that preprocess collection returns correct data if `course_structure` and `tags` are disabled.
+        """
+        initial_collection = [
+            {
+                u"quote": u"quote text1",
+                u"text": u"text1",
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2016, 01, 26, 8, 5, 16, 00000).isoformat(),
+            },
+            {
+                u"quote": u"quote text2",
+                u"text": u"text2",
+                u"usage_id": unicode(self.html_module_2.location),
+                u"updated": datetime(2016, 01, 26, 9, 6, 17, 00000).isoformat(),
+            },
+        ]
+
+        self.assertItemsEqual(
+            [
+                {
+
+                    'section': {},
+                    'chapter': {},
+                    "unit": {
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
+                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"location": unicode(self.vertical.location),
+                    },
+                    u'text': u'text1',
+                    u'quote': u'quote text1',
+                    u'usage_id': unicode(self.html_module_1.location),
+                    u'updated': datetime(2016, 01, 26, 8, 5, 16)
+                },
+                {
+                    'section': {},
+                    'chapter': {},
+                    "unit": {
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
+                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"location": unicode(self.vertical.location),
+                    },
+                    u'text': u'text2',
+                    u'quote': u'quote text2',
+                    u'usage_id': unicode(self.html_module_2.location),
+                    u'updated': datetime(2016, 01, 26, 9, 6, 17)
+                }
+            ],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
     def test_get_parent_unit(self):
         """
         Tests `get_parent_unit` method for the successful result.
@@ -756,8 +782,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "course_id": unicode(self.course.id),
                 "text": "text",
                 "highlight": True,
-                "highlight_tag": "span",
-                "highlight_class": "note-highlight",
                 'page': 1,
                 'page_size': 10,
             }
@@ -1006,19 +1030,17 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         Tests that search notes successfully respond if EdxNotes feature is enabled.
         """
-        mock_search.return_value = json.dumps(NOTES_API_EMPTY_RESPONSE)
+        mock_search.return_value = json.dumps(NOTES_VIEW_EMPTY_RESPONSE)
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content), NOTES_API_EMPTY_RESPONSE)
+        self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
-    @patch("edxnotes.views.get_notes", autospec=True)
-    def test_search_notes_is_disabled(self, mock_search):
+    def test_search_notes_is_disabled(self):
         """
         Tests that 404 status code is received if EdxNotes feature is disabled.
         """
-        mock_search.return_value = json.dumps(NOTES_API_EMPTY_RESPONSE)
         response = self.client.get(self.notes_url, {"text": "test"})
         self.assertEqual(response.status_code, 404)
 

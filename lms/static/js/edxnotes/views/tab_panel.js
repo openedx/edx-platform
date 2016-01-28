@@ -1,7 +1,8 @@
 ;(function (define, undefined) {
 'use strict';
-define(['gettext', 'underscore', 'backbone', 'js/edxnotes/views/note_item'],
-function (gettext, _, Backbone, NoteItemView) {
+define(['gettext', 'underscore', 'backbone', 'js/edxnotes/views/note_item',
+    'common/js/components/views/paging_header', 'common/js/components/views/paging_footer'],
+function (gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView) {
     var TabPanelView = Backbone.View.extend({
         tagName: 'section',
         className: 'tab-panel',
@@ -13,12 +14,28 @@ function (gettext, _, Backbone, NoteItemView) {
 
         initialize: function () {
             this.children = [];
+            if (this.options.createHeaderFooter) {
+                this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
+                this.pagingFooterView = new PagingFooterView({collection: this.collection, hideWhenOnePage: true});
+            }
+            if (this.hasOwnProperty('collection')) {
+                this.listenTo(this.collection, 'page_changed', this.render);
+            }
         },
 
         render: function () {
             this.$el.html(this.getTitle());
+            this.renderView(this.pagingHeaderView);
             this.renderContent();
+            this.renderView(this.pagingFooterView);
             return this;
+        },
+
+        renderView: function(view) {
+            if (this.options.createHeaderFooter && this.collection.models.length) {
+                this.$el.append(view.render().el);
+                view.delegateEvents();
+            }
         },
 
         renderContent: function () {

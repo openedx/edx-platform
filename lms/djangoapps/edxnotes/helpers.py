@@ -20,7 +20,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from capa.util import sanitize_html
 from courseware.views import get_current_child
 from courseware.access import has_access
 from openedx.core.lib.token_utils import get_id_token
@@ -31,8 +30,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 log = logging.getLogger(__name__)
-HIGHLIGHT_TAG = "span"
-HIGHLIGHT_CLASS = "note-highlight"
 # OAuth2 Client name for edxnotes
 CLIENT_NAME = "edx-notes"
 DEFAULT_PAGE = 1
@@ -92,9 +89,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     if text:
         params.update({
             "text": text,
-            "highlight": True,
-            "highlight_tag": HIGHLIGHT_TAG,
-            "highlight_class": HIGHLIGHT_CLASS,
+            "highlight": True
         })
 
     try:
@@ -106,6 +101,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
             params=params
         )
     except RequestException:
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -141,15 +137,13 @@ def preprocess_collection(user, course, collection):
     store = modulestore()
     filtered_collection = list()
     cache = {}
+    include_path_info = ('course_structure' not in settings.NOTES_DISABLED_TABS)
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
-                u"text": sanitize_html(model["text"]),
-                u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
             }
-            if "tags" in model:
-                update[u"tags"] = [sanitize_html(tag) for tag in model["tags"]]
+
             model.update(update)
             usage_id = model["usage_id"]
             if usage_id in cache:
@@ -176,42 +170,46 @@ def preprocess_collection(user, course, collection):
                 log.debug("Unit not found: %s", usage_key)
                 continue
 
-            section = unit.get_parent()
-            if not section:
-                log.debug("Section not found: %s", usage_key)
-                continue
-            if section in cache:
-                usage_context = cache[section]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = usage_context
-                filtered_collection.append(model)
-                continue
+            if include_path_info:
+                section = unit.get_parent()
+                if not section:
+                    log.debug("Section not found: %s", usage_key)
+                    continue
+                if section in cache:
+                    usage_context = cache[section]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
-            chapter = section.get_parent()
-            if not chapter:
-                log.debug("Chapter not found: %s", usage_key)
-                continue
-            if chapter in cache:
-                usage_context = cache[chapter]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                    "section": get_module_context(course, section),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = cache[section] = usage_context
-                filtered_collection.append(model)
-                continue
+                chapter = section.get_parent()
+                if not chapter:
+                    log.debug("Chapter not found: %s", usage_key)
+                    continue
+                if chapter in cache:
+                    usage_context = cache[chapter]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                        "section": get_module_context(course, section),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = cache[section] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
             usage_context = {
                 "unit": get_module_context(course, unit),
-                "section": get_module_context(course, section),
-                "chapter": get_module_context(course, chapter),
+                "section": get_module_context(course, section) if include_path_info else {},
+                "chapter": get_module_context(course, chapter) if include_path_info else {},
             }
             model.update(usage_context)
-            cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
+            if include_path_info:
+                cache[section] = cache[chapter] = usage_context
+
+            cache[usage_id] = cache[unit] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
@@ -319,16 +317,24 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     try:
         collection = json.loads(response.content)
     except ValueError:
-        raise EdxNotesParseError(_("Invalid response received from notes api."))
+        log.error("Invalid JSON response received from notes api: response_content=%s", response.content)
+        raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
 
     # Verify response dict structure
-    expected_keys = ['count', 'results', 'num_pages', 'start', 'next', 'previous', 'current_page']
+    expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
     keys = collection.keys()
     if not keys or not all(key in expected_keys for key in keys):
-        raise EdxNotesParseError(_("Invalid response received from notes api."))
+        log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
+        raise EdxNotesParseError(_("Incorrect data received from notes api."))
 
-    filtered_results = preprocess_collection(request.user, course, collection['results'])
+    filtered_results = preprocess_collection(request.user, course, collection['rows'])
+    # Notes API is called from:
+    # 1. The annotatorjs in courseware. It expects these attributes to be named "total" and "rows".
+    # 2. The Notes tab Javascript proxied through LMS. It expects these attributes to be called "count" and "results".
+    collection['count'] = collection['total']
+    del collection['total']
     collection['results'] = filtered_results
+    del collection['rows']
 
     collection['next'], collection['previous'] = construct_pagination_urls(
         request,
