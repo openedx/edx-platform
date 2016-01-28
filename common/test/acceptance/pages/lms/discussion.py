@@ -195,17 +195,58 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Replace the contents of the response editor"""
         self._find_within(".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
 
+    def verify_link_editor_error_messages_shown(self):
+        """
+        Confirm that the error messages are displayed in the editor.
+        """
+        def errors_visible():
+            """
+            Returns True if both errors are visible, False otherwise.
+            """
+            return (
+                self.q(css="#new-url-input-field-message.has-error").visible and
+                self.q(css="#new-url-desc-input-field-message.has-error").visible
+            )
+
+        self.wait_for(errors_visible, "Form errors should be visible.")
+
+    def add_content_via_editor_button(self, content_type, response_id, url, description, is_decorative=False):
+        """Replace the contents of the response editor"""
+        self._find_within(
+            "#wmd-{}-button-edit-post-body-{}".format(
+                content_type,
+                response_id,
+            )
+        ).click()
+        self.q(css='#new-url-input').fill(url)
+        self.q(css='#new-url-desc-input').fill(description)
+
+        if is_decorative:
+            self.q(css='#img-is-decorative').click()
+
+        self.q(css='input[value="OK"]').click()
+
     def submit_response_edit(self, response_id, new_response_body):
         """Click the submit button on the response editor"""
-        self._find_within(".response_{} .discussion-response .post-update".format(response_id)).first.click()
-        EmptyPromise(
-            lambda: (
+
+        def submit_response_check_func():
+            """
+            Tries to click "Update post" and returns True if the post
+            was successfully updated, False otherwise.
+            """
+            self._find_within(
+                ".response_{} .discussion-response .post-update".format(
+                    response_id
+                )
+            ).first.click()
+
+            return (
                 not self.is_response_editor_visible(response_id) and
                 self.is_response_visible(response_id) and
                 self.get_response_body(response_id) == new_response_body
-            ),
-            "Comment edit succeeded"
-        ).fulfill()
+            )
+
+        self.wait_for(submit_response_check_func, "Comment edit succeeded")
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
