@@ -24,6 +24,7 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
 # Jiadong Zhang <fighting-dong@qq.com>, 2015
+# Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
@@ -136,6 +137,7 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
@@ -273,7 +275,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 18:37+0000\n"
+"POT-Creation-Date: 2016-01-22 14:54+0000\n"
 "PO-Revision-Date: 2015-12-13 04:46+0000\n"
 "Last-Translator: riceball <snowyu.lee@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -671,6 +673,10 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
@@ -2376,6 +2382,18 @@ msgid ""
 "but existing Custom Courses will be preserved."
 msgstr ""
 "允许课程的主讲老师指派CCX指导角色，并允许指导们在edX上管理自定义课程。当值为“false”时，将不能创建自定义课程，但已有的自定义课程将会保留。"
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
@@ -9163,6 +9181,10 @@ msgstr "了解更多"
 msgid "Starts"
 msgstr "开始"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "浏览所有课程"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -9494,10 +9516,6 @@ msgstr "成功了！这是一个 Open edX 实例的默认主页。"
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "查找课程"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "浏览所有课程"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
