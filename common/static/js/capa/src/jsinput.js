@@ -43,7 +43,6 @@ var JSInput = (function ($, undefined) {
             sectionAttr = function (e) { return $(section).attr(e); },
             iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
             cWindow = iframe.contentWindow,
-            path = window.location.origin,
             // Get the hidden input field to pass to customresponse
             inputField = $(elem).parent().find('input[id^="input_"]'),
             // Get the grade function name
@@ -66,7 +65,7 @@ var JSInput = (function ($, undefined) {
         if (!sop) {
             channel = Channel.build({
                 window: cWindow,
-                origin: path,
+                origin: '*',
                 scope: "JSInput"
             });
          }   
