@@ -60,6 +60,8 @@ from lms.envs.common import (
 
     # Django REST framework configuration
     REST_FRAMEWORK,
+
+    STATICI18N_OUTPUT_DIR
 )
 from path import Path as path
 from warnings import simplefilter
@@ -466,8 +468,6 @@ USE_I18N = True
 USE_L10N = True
 
 STATICI18N_ROOT = PROJECT_ROOT / "static"
-
-STATICI18N_OUTPUT_DIR = lms.envs.common.STATICI18N_OUTPUT_DIR
 
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
