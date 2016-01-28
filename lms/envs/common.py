@@ -420,7 +420,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
-    'courseware.routers.StudentModuleHistoryRouter',
+    'courseware.routers.StudentModuleHistoryExtendedRouter',
 ]
 
 ############################ OpenID Provider  ##################################
