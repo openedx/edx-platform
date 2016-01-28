@@ -153,7 +153,9 @@ LETTUCE_APPS = ('courseware', 'instructor')
 # This causes some pretty cryptic errors as lettuce tries
 # to parse files in `instructor_task` as features.
 # As a quick workaround, explicitly exclude the `instructor_task` app.
-LETTUCE_AVOID_APPS = ('instructor_task',)
+# The coursewarehistoryextended app also falls prey to this fuzzy
+# for the courseware app.
+LETTUCE_AVOID_APPS = ('instructor_task', 'coursewarehistoryextended')
 
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

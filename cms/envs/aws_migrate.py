@@ -26,5 +26,5 @@ if DB_OVERRIDES['PASSWORD'] is None:
     raise ImproperlyConfigured("No database password was provided for running "
                                "migrations.  This is fatal.")
 
-for override, value in DB_OVERRIDES.iteritems():
-    DATABASES['default'][override] = value
+DATABASES['default'].update(DB_OVERRIDES)
+DATABASES['student_module_history'].update(DB_OVERRIDES)

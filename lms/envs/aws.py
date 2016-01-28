@@ -771,3 +771,7 @@ if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# The extended StudentModule history table
+if FEATURES.get('ENABLE_CSMH_EXTENDED'):
+    INSTALLED_APPS += ('coursewarehistoryextended',)
