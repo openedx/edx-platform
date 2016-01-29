@@ -149,8 +149,9 @@ def course_handler(request, course_key_string=None):
 @authentication_classes((SessionAuthentication, TokenAuthentication))
 @permission_classes((IsAuthenticated,))
 def coach_list_handler(reuqest):
-    coach_list = ({
-        'full_name': ccx.coach.get_full_name(),
-        'email': ccx.coach.email,
-    } for ccx in CustomCourseForEdX.objects.all())
-    return Response(coach_list)
+    coaches = set(ccx.coach for ccx in CustomCourseForEdX.objects.all())
+    coaches_info = ({
+        'full_name': coach.get_full_name(),
+        'email': coach.email,
+    } for coach in coaches)
+    return Response(coaches_info)
