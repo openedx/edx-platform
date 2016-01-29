@@ -10,7 +10,6 @@ import contextlib
 from mock import patch
 
 from django.conf import settings
-from django.template import Engine
 from django.test.utils import override_settings
 
 import edxmako
@@ -39,14 +38,11 @@ def with_comprehensive_theme(theme_dir):
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
             with override_settings(COMPREHENSIVE_THEME_DIR=theme_dir, **changes['settings']):
-                default_engine = Engine.get_default()
-                dirs = default_engine.dirs[:]
                 with edxmako.save_lookups():
-                    for template_dir in changes['template_paths']:
+                    for template_dir in changes['mako_paths']:
                         edxmako.paths.add_lookup('main', template_dir, prepend=True)
-                        dirs.insert(0, template_dir)
-                    with patch.object(default_engine, 'dirs', dirs):
-                        return func(*args, **kwargs)
+
+                    return func(*args, **kwargs)
         return _decorated
     return _decorator
 
