@@ -382,85 +382,64 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
                 # TODO This block is causing extra savepoints to be fired that are empty because no queries are executed
                 # during the loop. When refactoring this code please keep this outer_atomic call in mind and ensure we
                 # are not making unnecessary database queries.
-                should_grade_section = any(
-                    descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
-                )
-
-                # If there are no problems that always have to be regraded, check to
-                # see if any of our locations are in the scores from the submissions
-                # API. If scores exist, we have to calculate grades for this section.
-                if not should_grade_section:
-                    should_grade_section = any(
-                        descriptor.location.to_deprecated_string() in submissions_scores
-                        for descriptor in section['xmoduledescriptors']
-                    )
-
-                if not should_grade_section:
-                    should_grade_section = any(
-                        descriptor.location in scores_client
-                        for descriptor in section['xmoduledescriptors']
-                    )
 
                 # If we haven't seen a single problem in the section, we don't have
                 # to grade it at all! We can assume 0%
-                if should_grade_section:
-                    scores = []
+                scores = []
 
-                    def create_module(descriptor):
-                        '''creates an XModule instance given a descriptor'''
-                        # TODO: We need the request to pass into here. If we could forego that, our arguments
-                        # would be simpler
-                        return get_module_for_descriptor(
-                            student, request, descriptor, field_data_cache, course.id, course=course
+                def create_module(descriptor):
+                    """creates an XModule instance given a descriptor"""
+                    # TODO: We need the request to pass into here. If we could forego that, our arguments
+                    # would be simpler
+                    return get_module_for_descriptor(
+                        student, request, descriptor, field_data_cache, course.id, course=course
+                    )
+
+                descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
+                for module_descriptor in descendants:
+                    user_access = has_access(
+                        student, 'load', module_descriptor, module_descriptor.location.course_key
+                    )
+                    if not user_access:
+                        continue
+
+                    (correct, total) = get_score(
+                        student,
+                        module_descriptor,
+                        create_module,
+                        scores_client,
+                        submissions_scores,
+                        max_scores_cache,
+                    )
+                    if correct is None and total is None:
+                        continue
+
+                    if settings.GENERATE_PROFILE_SCORES:    # for debugging!
+                        if total > 1:
+                            correct = random.randrange(max(total - 2, 1), total + 1)
+                        else:
+                            correct = total
+
+                    graded = module_descriptor.graded
+                    if not total > 0:
+                        # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        graded = False
+
+                    scores.append(
+                        Score(
+                            correct,
+                            total,
+                            graded,
+                            module_descriptor.display_name_with_default,
+                            module_descriptor.location
                         )
+                    )
 
-                    descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
-                    for module_descriptor in descendants:
-                        user_access = has_access(
-                            student, 'load', module_descriptor, module_descriptor.location.course_key
-                        )
-                        if not user_access:
-                            continue
+                __, graded_total = graders.aggregate_scores(scores, section_name)
+                if keep_raw_scores:
+                    raw_scores += scores
 
-                        (correct, total) = get_score(
-                            student,
-                            module_descriptor,
-                            create_module,
-                            scores_client,
-                            submissions_scores,
-                            max_scores_cache,
-                        )
-                        if correct is None and total is None:
-                            continue
-
-                        if settings.GENERATE_PROFILE_SCORES:    # for debugging!
-                            if total > 1:
-                                correct = random.randrange(max(total - 2, 1), total + 1)
-                            else:
-                                correct = total
-
-                        graded = module_descriptor.graded
-                        if not total > 0:
-                            # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
-                            graded = False
-
-                        scores.append(
-                            Score(
-                                correct,
-                                total,
-                                graded,
-                                module_descriptor.display_name_with_default,
-                                module_descriptor.location
-                            )
-                        )
-
-                    __, graded_total = graders.aggregate_scores(scores, section_name)
-                    if keep_raw_scores:
-                        raw_scores += scores
-                else:
-                    graded_total = Score(0.0, 1.0, True, section_name, None)
-
-                #Add the graded total to totaled_scores
+                # Add the graded total to totaled_scores
                 if graded_total.possible > 0:
                     format_scores.append(graded_total)
                 else:

@@ -240,7 +240,9 @@ function goto( mode)
     <br/>
     <br/>
     </li>
-    <li>${_("Assignment name:")} <input type="text" name="assignment_name" size=40 >
+    <li>${_("Assignment name:")} <input type="text" name="assignment_name" size=40 > <input
+        type="checkbox" name="normalize_grades" id="normalize_grades" checked="checked" /> <label style="display:inline"
+              for="normalize_grades">${_("Normalize Grades")}</label>
     <br/>
     <br/>
     <input type="submit" name="action" value="Display grades for assignment">

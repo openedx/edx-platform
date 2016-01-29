@@ -238,6 +238,7 @@ def instructor_dashboard(request, course_id):
     elif action in ['Display grades for assignment', 'Export grades for assignment to remote gradebook',
                     'Export CSV file of grades for assignment']:
 
+        normalize_grades_enable = 1 if request.POST.get('normalize_grades', None) else 0
         log.debug(action)
         datatable = {}
         aname = request.POST.get('assignment_name', '')
@@ -249,7 +250,7 @@ def instructor_dashboard(request, course_id):
                 course,
                 get_grades=True,
                 use_offline=use_offline,
-                get_score_max=True
+                get_score_max=False if normalize_grades_enable == 1 else True
             )
             if aname not in allgrades['assignments']:
                 msg += "<font color='red'>{text}</font>".format(
@@ -257,15 +258,18 @@ def instructor_dashboard(request, course_id):
                 )
             else:
                 aidx = allgrades['assignments'].index(aname)
-                datatable = {'header': [_('External email'), aname, _('max_pts')]}
+                datatable = {'header': [_('External email'), aname, _('max_pts'), _('normalize')]}
                 ddata = []
                 # do one by one in case there is a student who has only partial grades
                 for student in allgrades['students']:
                     if len(student.grades) >= aidx and student.grades[aidx] is not None:
                         ddata.append(
-                            [student.email,
-                             student.grades[aidx][0],
-                             student.grades[aidx][1]]
+                            [
+                                student.email,
+                                student.grades[aidx][0],
+                                student.grades[aidx][1],
+                                normalize_grades_enable
+                            ],
                         )
                     else:
                         log.debug(u'No grade for assignment %(idx)s (%(name)s) for student %(email)s', {
@@ -745,7 +749,7 @@ def get_student_grade_summary_data(
                         if get_score_max is True:
                             add_grade(score.section, score.earned, score.possible)
                         else:
-                            add_grade(score.section, score.earned)
+                            add_grade(score.section, (score.earned / score.possible), 1)
                 else:
                     category_cnts = Counter()
                     for grade_item in gradeset['section_breakdown']:
@@ -753,7 +757,10 @@ def get_student_grade_summary_data(
                         try:
                             earned = gradeset['totaled_scores'][category][category_cnts[category]].earned
                             possible = gradeset['totaled_scores'][category][category_cnts[category]].possible
-                            add_grade(grade_item['label'], earned, possible=possible)
+                            if get_score_max is True:
+                                add_grade(grade_item['label'], earned, possible=possible)
+                            else:
+                                add_grade(grade_item['label'], grade_item['percent'], possible=1)
                         except (IndexError, KeyError):
                             add_grade(grade_item['label'], grade_item['percent'])
                         category_cnts[category] += 1
