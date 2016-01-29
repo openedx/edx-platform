@@ -14,7 +14,6 @@ from path import Path as path
 from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
-from openedx.core.lib.gating import api as gating_api
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.exceptions import UndefinedContext
@@ -1394,18 +1393,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
           bool: False if the course has already started, True otherwise.
         """
         return datetime.now(UTC()) <= self.start
-
-    @property
-    def gating_prerequisites(self):
-        """
-        Course content that can be used to gate other course content within this course.
-
-        Returns:
-            list: Returns a list of dicts containing the gating milestone data
-        """
-        if not self._gating_prerequisites:
-            self._gating_prerequisites = gating_api.get_prerequisites(self.id)
-        return self._gating_prerequisites
 
 
 class CourseSummary(object):

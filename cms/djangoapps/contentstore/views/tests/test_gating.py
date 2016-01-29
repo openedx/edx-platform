@@ -108,7 +108,7 @@ class TestSubsectionGating(CourseTestCase):
             ''
         )
 
-    @patch('xmodule.course_module.gating_api.get_prerequisites')
+    @patch('contentstore.views.item.gating_api.get_prerequisites')
     @patch('contentstore.views.item.gating_api.get_required_content')
     @patch('contentstore.views.item.gating_api.is_prerequisite')
     def test_get_prerequisite(self, mock_is_prereq, mock_get_required_content, mock_get_prereqs):
