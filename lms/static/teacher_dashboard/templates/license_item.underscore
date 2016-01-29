@@ -1,6 +1,6 @@
 <div class="license-info">
   <div class="row">
-    <div class="col-xs-12 col-md-7 license-item-code">
+    <div class="col-xs-12 col-md-5 col-lg-7 license-item-code">
       <% if (is_expanded) { %>
         <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
       <% } else { %>
@@ -15,43 +15,28 @@
         <span class="visible-xs-inline visible-sm-inline text-warning"><%- expiration_message %></span>
     </div>
     <% } %>
-    <div class="col-xs-4 col-sm-2 col-md-1 license-item-students is-metric hide">
-      <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-      <%- students_count %>
-      <span class="hint">Number of students</span>
+    <div class="col-xs-12 col-sm-3 col-md-2 col-lg-1 <% if (!display_expiration_message) { print('col-md-offset-1') } %> license-item-students is-metric">
+      <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+      <%- simulations_count %>
+      <span class="hint hidden-xs hidden-sm">Number of Simulations</span>
     </div>
-    <div class="col-xs-4 col-sm-2 col-md-1 license-item-score is-metric hide">
-      <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-      <%- score %>
-      <span class="hint">Average score</span>
-    </div>
-    <div class="col-xs-4 col-sm-2 col-md-1 license-item-total is-metric hide">
-      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-      <%- questions_answered %>
-      <span class="hint">Progress</span>
+    <div class="col-xs-12 col-sm-5 col-md-4 col-lg-3 license-item-dates is-metric">
+      <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+      <%= valid_from %> - <%= valid_to %>
+      <span class="hint hidden-xs hidden-sm">License expiration dates</span>
     </div>
   </div>
 </div>
 <% if (is_expanded) { %>
+  <% if (display_expiration_message) { %>
   <div class="license-additional-info">
     <div class="row">
-      <% if (display_expiration_message) { %>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8 hidden-xs hidden-sm license-item-warning is-metric"
+      <div class="col-xs-12 hidden-xs hidden-sm license-item-warning is-metric"
         data-tooltip title="<%- expiration_message %>">
           <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
           <span class="text-warning"><%- expiration_message %></span>
       </div>
-      <% } %>
-      <div class="col-sm-3 col-md-2 col-lg-1 <% if (!display_expiration_message) {print('col-md-offset-6 col-lg-offset-8')} %>  is-metric">
-        <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
-        <%- simulations_count %>
-        <span class="hint hidden-xs hidden-sm">Number of Simulations</span>
-      </div>
-      <div class="col-sm-5 col-md-4 col-lg-3 is-metric">
-        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-        <%= valid_from %> - <%= valid_to %>
-        <span class="hint hidden-xs hidden-sm">License expiration dates</span>
-      </div>
     </div>
   </div>
+  <% } %>
 <% } %>
