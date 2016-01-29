@@ -84,7 +84,7 @@ def with_edx_domain_context(is_edx_domain):
         changes = comprehensive_theme_changes(EDX_THEME_DIR)
         with override_settings(COMPREHENSIVE_THEME_DIR=EDX_THEME_DIR, **changes['settings']):
             with edxmako.save_lookups():
-                for template_dir in changes['mako_paths']:
+                for template_dir in changes['template_paths']:
                     edxmako.paths.add_lookup('main', template_dir, prepend=True)
 
                 yield
