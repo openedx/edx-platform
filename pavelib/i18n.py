@@ -193,15 +193,10 @@ def i18n_ltr():
     "pavelib.i18n.i18n_dummy",
     "pavelib.i18n.i18n_generate_strict",
 )
-@cmdopts([
-    ("settings=", "s", "Django settings"),
-])
-def i18n_robot_pull(options):
+def i18n_robot_pull():
     """
     Pull source strings, generate po and mo files, and validate
     """
-
-    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
 
     # sh('paver test_i18n')
     # Tests were removed from repo, but there should still be tests covering the translations
@@ -214,7 +209,7 @@ def i18n_robot_pull(options):
 
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:
-        sh(django_cmd(system, settings, 'compilejsi18n'))
+        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
 
     con = raw_input("Continue with committing these translations (y/n)? ")
 

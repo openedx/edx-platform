@@ -11,23 +11,12 @@
         window.MathJax = {
             menuSettings: {CHTMLpreview: false}
         };
-        // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
-        // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
-        // Note that when the optimizer executes this code, window will not be defined.
-        var defineDependency = function (globalVariable, name, noShim) {
-            if (window[globalVariable]) {
-                if (noShim) {
-                    define(name, {});
-                }
-                else {
-                    define(name, [], function() {return window[globalVariable];});
-                }
-            }
-            else {
-                console.error("Expected library to be included on page, but not found on window object: " + name);
-            }
-        };
-        defineDependency("gettext", "gettext");
+        // Since we are serving the gettext catalog as static files,
+        // the URL for the gettext file will vary depending on which locale
+        // needs to be served. To handle this, we load the correct file in the
+        // rendered template and then use this to ensure that RequireJS knows 
+        // how to find it.
+        define("gettext", function () { return window.gettext; });
     }
 
     require.config({
@@ -35,7 +24,6 @@
         waitSeconds: 60,
         paths: {
             "domReady": "js/vendor/domReady",
-            "gettext": "/i18n",
             "mustache": "js/vendor/mustache",
             "codemirror": "js/vendor/codemirror-compressed",
             "codemirror/stex": "js/vendor/CodeMirror/stex",
@@ -211,17 +199,17 @@
             "mathjax": {
                 exports: "MathJax",
                 init: function() {
-                window.MathJax.Hub.Config({
-                    tex2jax: {
-                    inlineMath: [
-                        ["\\(","\\)"],
-                        ['[mathjaxinline]','[/mathjaxinline]']
-                    ],
-                    displayMath: [
-                        ["\\[","\\]"],
-                        ['[mathjax]','[/mathjax]']
-                    ]
-                    }
+                    window.MathJax.Hub.Config({
+                        tex2jax: {
+                            inlineMath: [
+                                ["\\(","\\)"],
+                                ['[mathjaxinline]','[/mathjaxinline]']
+                            ],
+                            displayMath: [
+                                ["\\[","\\]"],
+                                ['[mathjax]','[/mathjax]']
+                            ]
+                        }
                 });
                 // In order to eliminate all flashing during interactive
                 // preview, it is necessary to set processSectionDelay to 0
@@ -312,4 +300,4 @@
             // end of annotation tool files
         }
     });
-}).call(this, require || RequireJS.require, define || RequireJS.define);
+}).call(this, require, define);
