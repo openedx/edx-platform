@@ -5,6 +5,8 @@ from path import Path
 
 from django.conf import settings
 
+import edxmako
+
 
 def comprehensive_theme_changes(theme_dir):
     """
@@ -18,14 +20,14 @@ def comprehensive_theme_changes(theme_dir):
 
             * 'settings': a dictionary of settings names and their new values.
 
-            * 'template_paths': a list of directories to prepend to template
-                lookup path.
+            * 'mako_paths': a list of directories to prepend to the edxmako
+                template lookup path.
 
     """
 
     changes = {
         'settings': {},
-        'template_paths': [],
+        'mako_paths': [],
     }
     root = Path(settings.PROJECT_ROOT)
     if root.name == "":
@@ -35,7 +37,8 @@ def comprehensive_theme_changes(theme_dir):
 
     templates_dir = component_dir / "templates"
     if templates_dir.isdir():
-        changes['template_paths'].append(templates_dir)
+        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+        changes['mako_paths'].append(templates_dir)
 
     staticfiles_dir = component_dir / "static"
     if staticfiles_dir.isdir():
@@ -61,6 +64,5 @@ def enable_comprehensive_theme(theme_dir):
     # Use the changes
     for name, value in changes['settings'].iteritems():
         setattr(settings, name, value)
-    for template_dir in changes['template_paths']:
-        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, template_dir)
-        settings.MAKO_TEMPLATES['main'].insert(0, template_dir)
+    for template_dir in changes['mako_paths']:
+        edxmako.paths.add_lookup('main', template_dir, prepend=True)
