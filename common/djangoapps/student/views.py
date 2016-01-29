@@ -1899,7 +1899,7 @@ def auto_auth(request):
     # the new user object.
     try:
         user, profile, reg = _do_create_account(form)
-    except AccountValidationError:
+    except (AccountValidationError, ValidationError):
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
