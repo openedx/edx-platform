@@ -44,7 +44,11 @@ class RefundTests(ModuleStoreTestCase):
             username='student',
             email='student+refund@edx.org'
         )
-        self.course_mode = CourseMode.objects.get_or_create(course_id=self.course_id, mode_slug='verified')[0]
+        self.course_mode = CourseMode.objects.get_or_create(
+            course_id=self.course_id,
+            mode_slug='verified',
+            min_price=1
+        )[0]
 
         self.order = None
         self.form_pars = {'course_id': str(self.course_id), 'user': self.student.email}
