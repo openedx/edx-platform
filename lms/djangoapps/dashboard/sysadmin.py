@@ -253,6 +253,7 @@ class Users(SysadminDashboardView):
                     error=str(err)
                 )
                 return msg
+        [pref.delete() for pref in user.preferences.all()]
         user.delete()
         return _('Deleted user {username}').format(username=uname)
 
