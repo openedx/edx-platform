@@ -146,12 +146,14 @@ define([
         it('can clear search results if tab is closed', function () {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
+            spyOn(view.searchBox, 'clearInput').andCallThrough();
 
             submitForm(view.searchBox, 'test_query');
             Helpers.respondToRequest(requests, responseJson, true);
             expect(view.searchResults).toBeDefined();
             this.tabsCollection.at(0).destroy();
             expect(view.searchResults).toBeNull();
+            expect(view.searchBox.clearInput).toHaveBeenCalled();
         });
 
         it('can correctly show/hide error messages', function () {
