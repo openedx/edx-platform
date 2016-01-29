@@ -90,12 +90,14 @@ class SignalHandler(object):
     course_published = django.dispatch.Signal(providing_args=["course_key"])
     course_deleted = django.dispatch.Signal(providing_args=["course_key"])
     library_updated = django.dispatch.Signal(providing_args=["library_key"])
+    item_deleted = django.dispatch.Signal(providing_args=["usage_key", "user_id"])
 
     _mapping = {
         "pre_publish": pre_publish,
         "course_published": course_published,
         "course_deleted": course_deleted,
         "library_updated": library_updated,
+        "item_deleted": item_deleted,
     }
 
     def __init__(self, modulestore_class):

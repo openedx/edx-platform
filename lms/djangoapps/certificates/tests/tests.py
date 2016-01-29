@@ -21,13 +21,13 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from util.milestones_helpers import (
     set_prerequisite_courses,
     milestones_achieved_by_user,
-    seed_milestone_relationship_types,
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 
 @attr('shard_1')
 @ddt
-class CertificatesModelTest(ModuleStoreTestCase):
+class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the GeneratedCertificate model
     """
@@ -92,7 +92,6 @@ class CertificatesModelTest(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_milestone_collected(self):
-        seed_milestone_relationship_types()
         student = UserFactory()
         course = CourseFactory.create(org='edx', number='998', display_name='Test Course')
         pre_requisite_course = CourseFactory.create(org='edx', number='999', display_name='Pre requisite Course')

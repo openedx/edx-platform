@@ -31,8 +31,8 @@ from util.milestones_helpers import (
     generate_milestone_namespace,
     add_course_content_milestone,
     get_milestone_relationship_types,
-    seed_milestone_relationship_types,
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -40,7 +40,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
-class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Check that content is properly gated.
 
@@ -134,7 +134,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_name="Exam Problem - Problem 2"
         )
 
-        seed_milestone_relationship_types()
         add_entrance_exam_milestone(self.course, self.entrance_exam)
 
         self.course.entrance_exam_enabled = True

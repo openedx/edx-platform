@@ -339,6 +339,20 @@ $outline-indent-width: $baseline;
     }
   }
 
+  // CASE: has gated content
+  &.is-gated {
+
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+
+      .status-message .icon {
+        color: $color-gated;
+      }
+    }
+  }
+
   // CASE: has unpublished content
   &.has-warnings {
 
@@ -419,6 +433,11 @@ $outline-indent-width: $baseline;
       // CASE: has staff-only content
       &.is-staff-only {
         border-left-color: $color-staff-only;
+      }
+
+      // CASE: has gated content
+      &.is-gated {
+        border-left-color: $color-gated;
       }
 
       // CASE: has unpublished content
@@ -503,6 +522,11 @@ $outline-indent-width: $baseline;
     // CASE: is presented for staff only
     &.is-staff-only {
       border-left-color: $color-staff-only;
+    }
+
+    // CASE: is presented for gated
+    &.is-gated {
+      border-left-color: $color-gated;
     }
 
     // CASE: has unpublished content
@@ -697,4 +721,3 @@ $outline-indent-width: $baseline;
     }
   }
 }
-

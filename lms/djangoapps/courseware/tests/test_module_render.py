@@ -40,6 +40,7 @@ from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.gating import api as gating_api
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE,
@@ -65,6 +66,8 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
+
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -1022,6 +1025,83 @@ class TestProctoringRendering(ModuleStoreTestCase):
             return self._find_url_name(chapter['sections'], section_url_name)
 
         return None
+
+
+@attr('shard_1')
+class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the toc for a course is rendered correctly when there is gated content
+    """
+    def setUp(self):
+        """
+        Set up the initial test data
+        """
+        super(TestGatedSubsectionRendering, self).setUp()
+
+        self.course = CourseFactory.create()
+        self.course.enable_subsection_gating = True
+        self.course.save()
+        self.store.update_item(self.course, 0)
+        self.chapter = ItemFactory.create(
+            parent=self.course,
+            category="chapter",
+            display_name="Chapter"
+        )
+        self.open_seq = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Open Sequential"
+        )
+        self.gated_seq = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Gated Sequential"
+        )
+        self.request = RequestFactory().get('%s/%s/%s' % ('/courses', self.course.id, self.chapter.display_name))
+        self.request.user = UserFactory()
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.request.user, self.course, depth=2
+        )
+        gating_api.add_prerequisite(self.course.id, self.open_seq.location)
+        gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
+
+    def _find_url_name(self, toc, url_name):
+        """
+        Helper to return the TOC section associated with url_name
+        """
+
+        for entry in toc:
+            if entry['url_name'] == url_name:
+                return entry
+
+        return None
+
+    def _find_sequential(self, toc, chapter_url_name, sequential_url_name):
+        """
+        Helper to return the sequential associated with sequential_url_name
+        """
+
+        chapter = self._find_url_name(toc, chapter_url_name)
+        if chapter:
+            return self._find_url_name(chapter['sections'], sequential_url_name)
+
+        return None
+
+    def test_toc_with_gated_sequential(self):
+        """
+        Test generation of TOC for a course with a gated subsection
+        """
+        actual = render.toc_for_course(
+            self.request.user,
+            self.request,
+            self.course,
+            self.chapter.display_name,
+            self.open_seq.display_name,
+            self.field_data_cache
+        )
+        self.assertIsNotNone(self._find_sequential(actual, 'Chapter', 'Open_Sequential'))
+        self.assertIsNone(self._find_sequential(actual, 'Chapter', 'Gated_Sequential'))
+        self.assertIsNone(self._find_sequential(actual, 'Non-existant_Chapter', 'Non-existant_Sequential'))
 
 
 @attr('shard_1')
