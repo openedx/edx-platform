@@ -2,18 +2,18 @@
   <div class="col-sm-8 simulation-list-info-title">Simulations:</div>
   <div class="col-sm-1 is-metric hidden-xs">
     <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-    <span class="hint hidden-sm">Attempts used</span>
+    <span class="hint hidden-sm">Number of Attempts</span>
   </div>
   <div class="col-sm-1 is-metric hidden-xs">
     <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-    <span class="hint hidden-sm">Time used</span>
+    <span class="hint hidden-sm">Time taken</span>
   </div>
   <div class="col-sm-1 is-metric hidden-xs">
     <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-    <span class="hint hidden-sm">Best score</span>
+    <span class="hint hidden-sm">Score in %</span>
   </div>
   <div class="col-sm-1 is-metric hidden-xs">
     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-    <span class="hint hidden-sm">Progress</span>
+    <span class="hint hidden-sm">Completion %</span>
   </div>
 </div>
