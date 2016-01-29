@@ -19,7 +19,7 @@ from courseware.grades import (
     get_module_score
 )
 from courseware.module_render import get_module
-from courseware.model_data import FieldDataCache
+from courseware.model_data import FieldDataCache, set_score
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
     get_request_for_user
@@ -431,6 +431,29 @@ class TestGetModuleScore(LoginEnrollmentTestCase, ModuleStoreTestCase):
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
         self.assertEqual(score, .5)
+
+    def test_get_module_score_with_empty_score(self):
+        """
+        Test test_get_module_score_with_empty_score
+        """
+        set_score(self.request.user.id, self.problem1.location, None, None)  # pylint: disable=no-member
+        set_score(self.request.user.id, self.problem2.location, None, None)  # pylint: disable=no-member
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 0)
+
+        answer_problem(self.course, self.request, self.problem1)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 0.5)
+
+        answer_problem(self.course, self.request, self.problem2)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 1.0)
 
     def test_get_module_score_with_randomize(self):
         """
