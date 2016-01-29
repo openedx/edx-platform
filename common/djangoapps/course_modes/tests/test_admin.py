@@ -16,6 +16,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from course_modes.models import CourseMode
 from course_modes.admin import CourseModeForm
+from course_modes.tests.factories import CourseModeFactory
 
 # Technically, we shouldn't be importing verify_student, since it's
 # defined in the LMS and course_modes is in common.  However, the benefits
@@ -178,7 +179,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
 
     def _configure(self, mode, upgrade_deadline=None, verification_deadline=None):
         """Configure course modes and deadlines. """
-        course_mode = CourseMode.objects.create(
+        course_mode = CourseModeFactory.create(
             mode_slug=mode,
             mode_display_name=mode,
         )
@@ -193,7 +194,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
 
     def _admin_form(self, mode, upgrade_deadline=None):
         """Load the course mode admin form. """
-        course_mode = CourseMode.objects.create(
+        course_mode = CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug=mode,
         )
