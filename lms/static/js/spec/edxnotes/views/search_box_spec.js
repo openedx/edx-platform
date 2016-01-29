@@ -164,5 +164,11 @@ define([
                 '   '
             );
         });
+
+        it('can clear its input box', function () {
+            this.searchBox.$('.search-notes-input').val('search me');
+            this.searchBox.clearInput();
+            expect(this.searchBox.$('#search-notes-input').val()).toEqual('');
+        });
     });
 });

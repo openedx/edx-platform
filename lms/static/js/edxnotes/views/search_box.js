@@ -32,6 +32,11 @@ define([
             this.logger.log('initialized');
         },
 
+        clearInput: function() {
+            // clear the search input box
+            this.$("#search-notes-input").val('');
+        },
+
         submitHandler: function (event) {
             event.preventDefault();
             this.search();
