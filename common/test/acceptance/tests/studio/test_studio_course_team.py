@@ -18,12 +18,13 @@ class CourseTeamPageTest(StudioCourseTest):
         """ Registers user and returns user representation dictionary as expected by `log_in` function """
         user = {
             'username': username,
-            'email': "other_{unique_code}@example.com".format(unique_code=uuid.uuid4().hex[0:30]),
+            'email': username+"@example.com",
             'password': username + '123'
         }
+
         AutoAuthPage(
-            self.browser, no_login=True, email=user.get('email'),
-            username=user.get('username'), password=user.get('password')
+            self.browser, no_login=True, username=user.get('username'), email=user.get('email'),
+            password=user.get('password')
         ).visit()
         return user
 
