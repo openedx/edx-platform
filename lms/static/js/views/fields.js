@@ -114,7 +114,7 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
-                    document.location.reload();
+                    location.reload(true);
                 }
 
                 var view = this;
