@@ -243,6 +243,12 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError(
+                _(
+                    "It looks like {email} belongs to an existing account. Try again with a different email address."
+                ).format(email=email)
+            )
         return email
 
     def clean_year_of_birth(self):
