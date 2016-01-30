@@ -105,7 +105,7 @@ class DashboardSearchTest(WebAppTest):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, username=username, email=email, staff=staff).visit()
+        AutoAuthPage(self.browser, username=username, staff=staff).visit()
 
     def _studio_add_content(self, course_outline, html_content):
         """
@@ -162,7 +162,6 @@ class DashboardSearchTest(WebAppTest):
             AutoAuthPage(
                 self.browser,
                 username=self.USERNAME,
-                email=self.EMAIL,
                 course_id=course_key
             ).visit()
 

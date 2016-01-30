@@ -76,7 +76,7 @@ class CoursewareTest(UniqueCourseTest):
         """
         Logout and login with given credentials.
         """
-        AutoAuthPage(self.browser, username=username, email=email,
+        AutoAuthPage(self.browser, username=username,
                      course_id=self.course_id, staff=staff).visit()
 
     def test_courseware(self):
@@ -183,7 +183,7 @@ class ProctoredExamTest(UniqueCourseTest):
         """
         Logout and login with given credentials.
         """
-        AutoAuthPage(self.browser, username=username, email=email,
+        AutoAuthPage(self.browser, username=username,
                      course_id=self.course_id, staff=staff).visit()
 
     def _login_as_a_verified_user(self):
@@ -431,7 +431,7 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         ).install()
 
         # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+        AutoAuthPage(self.browser, username=self.USERNAME,
                      course_id=self.course_id, staff=False).visit()
         self.courseware_page.visit()
         self.course_nav = CourseNavPage(self.browser)

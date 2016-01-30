@@ -231,7 +231,7 @@ class AccountCreationForm(forms.Form):
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
-        email = self.cleaned_data["email"]
+        email = self.cleaned_data.get("email")
         if settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED is not None:
             # This Open edX instance has restrictions on what email addresses are allowed.
             allowed_patterns = settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED

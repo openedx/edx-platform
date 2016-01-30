@@ -105,7 +105,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         ).install()
 
         # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+        AutoAuthPage(self.browser, username=self.USERNAME,
                      course_id=self.course_id, staff=False).visit()
 
     def _goto_annotation_component_page(self):

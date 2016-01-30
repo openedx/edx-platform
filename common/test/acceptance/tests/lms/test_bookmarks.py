@@ -99,7 +99,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.create_course_fixture(num_chapters)
 
         # Auto-auth register for the course.
-        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, course_id=self.course_id).visit()
 
         self.courseware_page.visit()
 
@@ -162,7 +162,7 @@ class BookmarksTest(BookmarksTestMixin):
         # Logout and login as staff
         LogoutPage(self.browser).visit()
         StudioAutoAuthPage(
-            self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id, staff=True
+            self.browser, username=self.USERNAME, course_id=self.course_id, staff=True
         ).visit()
 
         # Visit course outline page in studio.
@@ -173,7 +173,7 @@ class BookmarksTest(BookmarksTestMixin):
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
-        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, course_id=self.course_id).visit()
 
         # Visit courseware as a student.
         self.courseware_page.visit()
@@ -360,7 +360,6 @@ class BookmarksTest(BookmarksTestMixin):
         LmsAutoAuthPage(
             self.browser,
             username=self.USERNAME,
-            email=self.EMAIL,
             course_id=self.course_id,
             staff=True
         ).visit()
@@ -369,7 +368,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.update_and_publish_block_display_name(modified_name)
 
         LogoutPage(self.browser).visit()
-        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, course_id=self.course_id).visit()
         self.courseware_page.visit()
 
         self._navigate_to_bookmarks_list()

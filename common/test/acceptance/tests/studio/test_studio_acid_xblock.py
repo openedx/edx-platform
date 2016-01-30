@@ -45,7 +45,6 @@ class XBlockAcidBase(WebAppTest):
             self.browser,
             staff=False,
             username=self.user.get('username'),
-            email=self.user.get('email'),
             password=self.user.get('password')
         )
         self.auth_page.visit()

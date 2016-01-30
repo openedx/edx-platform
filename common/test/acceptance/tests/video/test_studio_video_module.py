@@ -105,7 +105,6 @@ class CMSVideoBaseTest(UniqueCourseTest):
             self.browser,
             staff=False,
             username=self.course_fixture.user.get('username'),
-            email=self.course_fixture.user.get('email'),
             password=self.course_fixture.user.get('password')
         ).visit()
 

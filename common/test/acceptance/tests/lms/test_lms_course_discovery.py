@@ -48,7 +48,7 @@ class CourseDiscoveryTest(WebAppTest):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, username=username, email=email, staff=staff).visit()
+        AutoAuthPage(self.browser, username=username, staff=staff).visit()
 
     def test_page_existence(self):
         """
