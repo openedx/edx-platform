@@ -104,7 +104,10 @@ class BokChoyTestSuite(TestSuite):
         print msg
 
         # Clean up data we created in the databases
-        sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+        if not self.testsonly:
+            # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
+            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+
         bokchoy_utils.clear_mongo()
 
     def verbosity_processes_string(self):
