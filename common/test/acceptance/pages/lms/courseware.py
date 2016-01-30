@@ -84,8 +84,10 @@ class CoursewarePage(CoursePage):
         """
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
-            if not self.q(css='#tab_{index} > p'.format(index=index)).visible:
-                return False
+            self.wait_for_element_visibility(
+                '#tab_{index} > p'.format(index=index),
+                'Tab {index} should appear'.format(index=index)
+            )
 
         return True
 
