@@ -23,6 +23,7 @@ django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-oauth-plus==2.2.8
+django-oauth-toolkit==0.10.0
 django-sekizai==0.8.2
 django-ses==0.7.0
 django-simple-history==1.6.3

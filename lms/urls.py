@@ -820,9 +820,10 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
 
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
+        url(r'^oauth2/', include('lms.djangoapps.oauth_dispatch.urls')),
         url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
+        url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     )
-
 
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
@@ -892,8 +893,8 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         urlpatterns += (
             url(
                 r'^oauth2/exchange_access_token/(?P<backend>[^/]+)/$',
-                auth_exchange.views.AccessTokenExchangeView.as_view(),
-                name="exchange_access_token"
+                auth_exchange.views.DOPAccessTokenExchangeView.as_view(),
+                name="exchange_access_token_old"
             ),
         )
     urlpatterns += (

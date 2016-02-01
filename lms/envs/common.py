@@ -1830,6 +1830,9 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'edx_oauth2_provider',
 
+    # Django OAuth Toolkit
+    'oauth2_provider',
+
     'third_party_auth',
 
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
