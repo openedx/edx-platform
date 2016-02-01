@@ -49,7 +49,7 @@ from django.core.urlresolvers import reverse
             'href': 'mailto:{email}'.format(email=partner_email),
             'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
             'text': _('Contact Us'),
-            'condition': 'PARTNER_SUPPORT_EMAIL' in settings.FEATURES
+            'condition': bool(partner_email)
         }]
         %>
 
