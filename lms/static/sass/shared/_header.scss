@@ -119,7 +119,10 @@ header.global {
     margin: 0;
 
     .settings-language-form {
-      margin-top: 4px;
+      margin: 4px;
+      .language-selector {
+        width: 120px;
+      }
     }
 
     > .primary {

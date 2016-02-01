@@ -14,7 +14,6 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
-from lang_pref.api import released_languages
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -38,7 +37,6 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
-
   <header id="global-navigation" class="global ${"slim" if course else ""}" >
     <nav class="nav-wrapper" aria-label="${_('Global')}">
     <h1 class="logo">
@@ -79,28 +77,6 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
     <ol class="user">
-        % if static.show_language_selector():
-        <% languages = released_languages() %>
-        % if len(languages) > 1:
-            <li class="primary">
-              <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
-                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                <input title="preference api" type="hidden" id="preference-api-url" value="${reverse('preferences_api', kwargs={'username': user.username})}">
-                <label><span class="sr">${_("Choose Language")}</span>
-                    <select class="input select" id="settings-language-value" name="language">
-                      % for language in languages:
-                        % if language[0] == LANGUAGE_CODE:
-                          <option value="${language[0]}" selected="selected">${language[1]}</option>
-                        % else:
-                          <option value="${language[0]}" >${language[1]}</option>
-                        % endif
-                      % endfor
-                    </select>
-                </label>
-              </form>
-            </li>
-        % endif
-        % endif
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>
@@ -186,7 +162,35 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
     % endif
-  </nav>
+    % if static.show_language_selector():
+     <% languages = static.get_released_languages() %>
+      % if len(languages) > 1:
+      <ol class="user">
+        <li class="primary">
+          <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % if user.is_authenticated():
+            <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+            % else:
+            <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+            % endif
+            <label><span class="sr">${_("Choose Language")}</span>
+                <select class="input select language-selector" id="settings-language-value" name="language">
+                  % for language in languages:
+                    % if language[0] == LANGUAGE_CODE:
+                      <option value="${language[0]}" selected="selected">${language[1]}</option>
+                    % else:
+                      <option value="${language[0]}" >${language[1]}</option>
+                    % endif
+                  % endfor
+                </select>
+            </label>
+          </form>
+        </li>
+      </ol>
+      % endif
+      % endif
+    </nav>
 </header>
 % if course:
 <!--[if lte IE 9]>
