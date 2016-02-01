@@ -75,18 +75,18 @@ define([
         },
 
         getOutlineAnchorMessage: function () {
-            var message = gettext(
+            var message = _.escape(gettext(
                     /*
                         Translators: 'outlineAnchor' is an anchor pointing to
                         the course outline page.
                     */
                     'This content group is not in use. Add a content group to any unit from the %(outlineAnchor)s.'
-                ),
+                )),
                 anchor = str.sprintf(
                     '<a href="%(url)s" title="%(text)s">%(text)s</a>',
                     {
                             url: this.model.collection.parents[0].outlineUrl,
-                            text: gettext('Course Outline')
+                            text: _.escape(gettext('Course Outline'))
                     }
                 );
 

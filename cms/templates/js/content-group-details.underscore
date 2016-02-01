@@ -45,7 +45,7 @@
       <ol class="usage group-configuration-usage">
         <% _.each(usage, function(unit) { %>
           <li class="usage-unit group-configuration-usage-unit">
-            <p><a href=<%= unit.url %> ><%- unit.label %></a></p>
+            <p><a href=<%- unit.url %> ><%- unit.label %></a></p>
           </li>
         <% }) %>
       </ol>
