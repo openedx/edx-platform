@@ -482,7 +482,7 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        default=""
     )
     issue_badges = Boolean(
         display_name=_("Issue Open Badges"),

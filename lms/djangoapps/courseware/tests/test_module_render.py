@@ -1208,6 +1208,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.assertIn('href="/static/toy_course_dir', result_fragment.content)
 
     def test_course_image(self):
+        self.course.course_image = "course_has_image.jpg"
         url = course_image_url(self.course)
         self.assertTrue(url.startswith('/c4x/'))
 

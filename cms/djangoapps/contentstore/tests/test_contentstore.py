@@ -1719,7 +1719,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         course = courses[0]
 
         # Make sure the course image is set to the right place
-        self.assertEqual(course.course_image, 'images_course_image.jpg')
+        self.assertEqual(course.course_image, '')
 
         # Ensure that the imported course image is present -- this shouldn't raise an exception
         asset_key = course.id.make_asset_key('asset', course.course_image)

@@ -188,9 +188,14 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
 
-    def test_get_image_url(self):
+    def test_get_no_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create(org='edX', course='999')
+        self.assertEquals(course_image_url(course), '/static/images/pencils.jpg')
+
+    def test_get_has_image_url(self):
+        """Test image URL formatting."""
+        course = CourseFactory.create(org='edX', course='999', course_image=u'test_course_image.jpg')
         self.assertEquals(course_image_url(course), '/c4x/edX/999/asset/{0}'.format(course.course_image))
 
     def test_non_ascii_image_name(self):
