@@ -820,9 +820,18 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
 
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
+        # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
+        # Developers should use these routes, to maintain compatibility for existing client code
+        url(r'^oauth2/', include('lms.djangoapps.oauth_dispatch.urls')),
+        # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
+        # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
+        # also to maintain support for views that have not yet been wrapped in dispatch views.
         url(r'^oauth2/', include('edx_oauth2_provider.urls', namespace='oauth2')),
+        # The /_o/ prefix exists to provide a target for code in django-oauth-toolkit that
+        # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
+        # views directly, but should rather use the wrapped views at /oauth2/
+        url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     )
-
 
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
@@ -888,14 +897,6 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
 # OAuth token exchange
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-        urlpatterns += (
-            url(
-                r'^oauth2/exchange_access_token/(?P<backend>[^/]+)/$',
-                auth_exchange.views.AccessTokenExchangeView.as_view(),
-                name="exchange_access_token"
-            ),
-        )
     urlpatterns += (
         url(
             r'^oauth2/login/$',
