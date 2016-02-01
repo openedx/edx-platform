@@ -1825,10 +1825,13 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
     'edx_oauth2_provider',
+
+    # django-oauth-toolkit
+    'oauth2_provider',
 
     'third_party_auth',
 

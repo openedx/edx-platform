@@ -2,7 +2,7 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 import mock
-from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from student.tests.factories import UserFactory
