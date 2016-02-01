@@ -3,7 +3,7 @@ Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 from django.contrib.auth.models import User
 from django.forms import CharField
-from oauth2_provider.constants import SCOPE_NAMES
+from edx_oauth2_provider.constants import SCOPE_NAMES
 import provider.constants
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin

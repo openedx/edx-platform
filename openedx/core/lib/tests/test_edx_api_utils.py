@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.test import TestCase
 import httpretty
 import mock
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 from testfixtures import LogCapture
 
