@@ -842,7 +842,9 @@ def _calculate_score_for_modules(user_id, course, modules):
         if module.category not in ignore_categories and (module.graded or module.has_score):
             module_score = scores_client.get(locations[index])
             if module_score:
-                module_percentages.append(module_score.correct / module_score.total)
+                correct = module_score.correct or 0
+                total = module_score.total or 1
+                module_percentages.append(correct / total)
 
     return sum(module_percentages) / float(len(module_percentages)) if module_percentages else 0
 
