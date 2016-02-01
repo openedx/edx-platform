@@ -780,6 +780,10 @@ def _get_gating_info(course, xblock):
     """
     info = {}
     if xblock.category == 'sequential' and course.enable_subsection_gating:
+        if not hasattr(course, 'gating_prerequisites'):
+            # Cache gating prerequisites on course module so that we are not
+            # hitting the database for every xblock in the course
+            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))  # pylint: disable=literal-used-as-attribute
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
             p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
