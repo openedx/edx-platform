@@ -1143,6 +1143,7 @@ CREATE TABLE `course_overviews_courseoverview` (
   `end` datetime(6) DEFAULT NULL,
   `advertised_start` longtext,
   `course_image_url` longtext NOT NULL,
+  `facebook_url` longtext,
   `social_sharing_url` longtext,
   `end_of_course_survey_url` longtext,
   `certificates_display_behavior` longtext,
@@ -1167,7 +1168,6 @@ CREATE TABLE `course_overviews_courseoverview` (
   `effort` longtext,
   `short_description` longtext,
   `org` longtext NOT NULL,
-  `facebook_url` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1658,7 +1658,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=119 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

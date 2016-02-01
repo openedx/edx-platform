@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
