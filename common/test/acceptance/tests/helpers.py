@@ -90,6 +90,13 @@ def is_youtube_available():
     return True
 
 
+def is_focused_on_element(browser, selector):
+    """
+    Check if the focus is on the element that matches the selector.
+    """
+    return browser.execute_script("return $('{}').is(':focus')".format(selector))
+
+
 def load_data_str(rel_path):
     """
     Load a file from the "data" directory as a string.

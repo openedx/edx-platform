@@ -4,6 +4,8 @@ from bok_choy.javascript import wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
+from common.test.acceptance.tests.helpers import is_focused_on_element
+
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
@@ -441,12 +443,6 @@ class DiscussionTabSingleThreadPage(CoursePage):
         with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
             self._find_within(".thread-main-wrapper .action-close").first.click()
 
-    def is_focused_on_element(self, selector):
-        """
-        Check if the focus is on element
-        """
-        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
-
     def _thread_is_rendered_successfully(self, thread_id):
         return self.q(css=".discussion-article[data-id='{}']".format(thread_id)).visible
 
@@ -467,15 +463,6 @@ class DiscussionTabSingleThreadPage(CoursePage):
         Count the number of threads available on page.
         """
         return len(self.q(css=".forum-nav-thread").results) == thread_count
-
-    def check_focus_is_set(self, selector):
-        """
-        Check focus is set
-        """
-        EmptyPromise(
-            lambda: self.is_focused_on_element(selector),
-            "Focus is on other element"
-        ).fulfill()
 
 
 class InlineDiscussionPage(PageObject):
@@ -574,7 +561,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
         """
         Check if selector is focused
         """
-        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
+        return is_focused_on_element(self.browser, selector)
 
 
 class DiscussionUserProfilePage(CoursePage):
