@@ -286,3 +286,23 @@ class CoursewareSequentialTabPage(CoursePage):
         return the body of the sequential currently selected
         """
         return self.q(css='#seq_content .xblock').text[0]
+
+
+class AboutPage(CoursePage):
+    """
+    Course about.
+    """
+
+    url_path = "about/"
+
+    def is_browser_on_page(self):
+        return self.q(css='.intro').present
+
+
+    @property
+    def is_register_button_present(self):
+        """
+        Returns True if the timed/proctored exam timer bar is visible on the courseware.
+        """
+        from nose.tools import set_trace; set_trace()
+        return self.q(css=".register").is_present()

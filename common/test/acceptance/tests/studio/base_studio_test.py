@@ -11,6 +11,7 @@ from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.utils import verify_ordering
 
 
+
 class StudioCourseTest(UniqueCourseTest):
     """
     Base class for all Studio course tests.

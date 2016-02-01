@@ -5,6 +5,7 @@ Studio Home page
 from bok_choy.page_object import PageObject
 from . import BASE_URL
 from selenium.webdriver import ActionChains
+from ..common.utils import click_css
 
 
 class DashboardPage(PageObject):
@@ -12,10 +13,23 @@ class DashboardPage(PageObject):
     Studio Home page
     """
 
+    def __init__(self, browser):
+        """
+        Initialize the page.
+        """
+        super(DashboardPage, self).__init__(browser)
     url = BASE_URL + "/course/"
+
 
     def is_browser_on_page(self):
         return self.q(css='.content-primary').visible
+
+    def mouse_hover(self, element):
+        """
+        Mouse over on given element.
+        """
+        mouse_hover_action = ActionChains(self.browser).move_to_element(element)
+        mouse_hover_action.perform()
 
     @property
     def course_runs(self):
@@ -47,6 +61,16 @@ class DashboardPage(PageObject):
         self.q(css='.course-run .value').filter(lambda el: el.text == run)[0].click()
         # Clicking on course with run will trigger an ajax event
         self.wait_for_ajax()
+
+
+    def view_live(self, element):
+        """
+        Clicks the "View Live" link and switches to the new tab
+        """
+        self.mouse_hover(self.browser.find_element_by_css_selector('.view-button'))
+        click_css(self, '.view-button', require_notification=False)
+        self.browser.switch_to_window(self.browser.window_handles[-1])
+        click_css(self, element, require_notification=False)
 
     def has_new_library_button(self):
         """

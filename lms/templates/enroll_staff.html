@@ -1,0 +1,37 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_course_info_section, get_course_date_summary
+
+
+%>
+
+<%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
+<div class="login-register">
+    <section class="form-type">
+        <section role="main" class="content">
+            <div id="unenroll_error" class="modal-form-error"></div>
+            <div id="${course.id.to_deprecated_string()}" >
+                <h3> ${_("You should Register before trying to access and Unit")}</h3>
+                <form role="form" id="enroll_staff_form" method="post" action="">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }"/>
+                    <div class="submit ">
+                        <input name="enroll" type="submit" value="${_(" Enroll")}" />
+                        <input name="continue" type="submit" value="${_(" Continue")}" />
+                    </div>
+                </form>
+            </div>
+        </section>
+    </section>
+
+</div>
+
+

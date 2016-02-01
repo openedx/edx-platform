@@ -1449,6 +1449,14 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(1), 'html')
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
+    def test_unenroll_course(self):
+        from nose.tools import set_trace; set_trace()
+        self.course_outline_page.visit()
+        self.course_outline_page.view_live()
+        courseware = CoursewarePage(self.browser, self.course_id)
+        courseware.wait_for_page()
+        self.assertEqual(courseware.num_xblock_components, 3)
+
 
 @attr('shard_3')
 class UnitNavigationTest(CourseOutlineTest):
