@@ -756,9 +756,11 @@ class CourseFields(object):
     )
 
     enable_subsection_gating = Boolean(
-        display_name=_("Enable Subsection Gating"),
+        display_name=_("Enable Subsection Prerequisites"),
         help=_(
-            "Enter true or false. If this value is true, subsection gating is enabled in your course."
+            "Enter true or false. If this value is true, you can hide a "
+            "subsection until learners earn a minimum score in another, "
+            "prerequisite subsection."
         ),
         default=False,
         scope=Scope.settings
