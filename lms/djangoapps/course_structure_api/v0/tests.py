@@ -9,7 +9,7 @@ from mock import patch, Mock
 from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
