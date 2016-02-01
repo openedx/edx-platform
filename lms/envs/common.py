@@ -922,6 +922,9 @@ LANGUAGE_DICT = dict(LANGUAGES)
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_ROOT = PROJECT_ROOT / "static"
+STATICI18N_OUTPUT_DIR = "js/i18n"
+
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
@@ -1943,6 +1946,9 @@ INSTALLED_APPS = (
 
     # Gating of course content
     'gating.apps.GatingConfig',
+
+    # Static i18n support
+    'statici18n',
 )
 
 # Migrations which are not in the standard module "migrations"
