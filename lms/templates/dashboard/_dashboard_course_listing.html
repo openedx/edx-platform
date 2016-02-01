@@ -178,11 +178,14 @@ from student.helpers import (
               % endif
             % endif
             <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
-              <a href="#actions-dropdown-${dashboard_index}" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default_escaped | h}" data-dashboard-index="${dashboard_index}">
-                <span class="sr">${_('Course options dropdown')}</span>
+              <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default_escaped | h}" data-dashboard-index="${dashboard_index}">
+                <span class="sr">${_('Course options for')}</span>
+                <span class="sr">&nbsp;
+                  ${course_overview.display_name_with_default_escaped}
+                </span>
                 <i class="fa fa-cog" aria-hidden="true"></i>
-              </a>
-              <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" aria-label="${_('Additional Actions Menu')}">
+              </button>
+              <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" aria-label="${_('Additional Actions Menu')}" tabindex="-1">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                   % if can_unenroll:
                     <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">

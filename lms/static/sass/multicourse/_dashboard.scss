@@ -474,6 +474,16 @@
           position: relative;
           @include float(right);
 
+          .action-more {
+            @include font-size(14);
+            box-shadow: none;
+            background: $white;
+            background-image: none;
+            color: $gray;
+            line-height: 16px;
+            text-shadow: none;
+          }
+
           .actions-dropdown {
             @extend %ui-no-list;
             @extend %ui-depth1;

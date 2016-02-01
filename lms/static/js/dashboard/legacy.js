@@ -37,8 +37,6 @@
             notifications.focus();
         }
 
-        $('.action-more').bind('click', toggleCourseActionsDropdown);
-
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before
         // `track` had time to execute; `trackLink` inserts a small timeout to give the `track`
@@ -79,33 +77,6 @@
             return properties;
         }
 
-        function toggleCourseActionsDropdownInternal(element) {
-            var dashboard_index = element.data('dashboard-index');
-
-            // Toggle the visibility control for the selected element and set the focus
-            var dropdown_selector = 'div#actions-dropdown-' + dashboard_index;
-            var dropdown = $(dropdown_selector);
-            dropdown.toggleClass('is-visible');
-            if (dropdown.hasClass('is-visible')) {
-                dropdown.attr('tabindex', -1);
-            } else {
-                dropdown.removeAttr('tabindex');
-            }
-
-            // Inform the ARIA framework that the dropdown has been expanded
-            var anchor_selector = 'a#actions-dropdown-link-' + dashboard_index;
-            var anchor = $(anchor_selector);
-            var aria_expanded_state = (anchor.attr('aria-expanded') === 'true');
-            anchor.attr('aria-expanded', !aria_expanded_state);
-        }
-
-        function toggleCourseActionsDropdown(event) {
-            toggleCourseActionsDropdownInternal($(this));
-
-            // Suppress the actual click event from the browser
-            event.preventDefault();
-        }
-
         $("#failed-verification-button-dismiss").click(function() {
             $.ajax({
                 url: urls.verifyToggleBannerFailedOff,
@@ -128,7 +99,7 @@
             if($(event.target).data("optout") === "False") {
                 $("#receive_emails").prop('checked', true);
             }
-            toggleCourseActionsDropdownInternal(element);
+            edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
         });
 
         $(".action-unenroll").click(function(event) {
@@ -144,7 +115,7 @@
             }, true));
             $('#refund-info').html( element.data("refund-info") );
             $("#unenroll_course_id").val( element.data("course-id") );
-            toggleCourseActionsDropdownInternal(element);
+            edx.dashboard.dropdown.toggleCourseActionsDropdownMenu(event);
         });
 
         $('#unenroll_form').on('ajax:complete', function(event, xhr) {
@@ -178,7 +149,6 @@
             });
             return false;
         });
-
 
         $(".action-email-settings").each(function(index){
             $(this).attr("id", "email-settings-" + index);

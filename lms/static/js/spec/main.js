@@ -317,6 +317,10 @@
                 exports: 'js/dashboard/donation',
                 deps: ['jquery', 'underscore', 'gettext']
             },
+            'js/dashboard/dropdown.js': {
+                exports: 'js/dashboard/dropdown',
+                deps: ['jquery']
+            },
             'js/shoppingcart/shoppingcart.js': {
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
@@ -649,6 +653,7 @@
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/dashboard/dropdown_spec.js',
         'lms/include/js/spec/dashboard/track_events_spec.js',
         'lms/include/js/spec/groups/views/cohorts_spec.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
