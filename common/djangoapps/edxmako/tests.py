@@ -17,7 +17,6 @@ from edxmako.shortcuts import (
     is_marketing_link_set,
     is_any_marketing_link_set,
     render_to_string,
-    open_source_footer_context_processor
 )
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
@@ -68,15 +67,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertTrue(is_any_marketing_link_set(['ABOUT']))
             self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
             self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
-
-    @ddt.data((True, None), (False, None))
-    @ddt.unpack
-    def test_edx_footer(self, expected_result, _):
-        with patch.dict('django.conf.settings.FEATURES', {
-            'IS_EDX_DOMAIN': expected_result
-        }):
-            result = open_source_footer_context_processor({})
-            self.assertEquals(expected_result, result.get('IS_EDX_DOMAIN'))
 
 
 class AddLookupTests(TestCase):

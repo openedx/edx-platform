@@ -102,6 +102,7 @@ urlpatterns = (
     url(r'^api/commerce/', include('commerce.api.urls', namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
     url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
+    url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -186,10 +187,8 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
             {'template': 'press.html'}, name="press"),
         url(r'^media-kit$', 'static_template_view.views.render',
             {'template': 'media-kit.html'}, name="media-kit"),
-
-        # TODO: (bridger) The copyright has been removed until it is updated for edX
-        # url(r'^copyright$', 'static_template_view.views.render',
-        #     {'template': 'copyright.html'}, name="copyright"),
+        url(r'^copyright$', 'static_template_view.views.render',
+            {'template': 'copyright.html'}, name="copyright"),
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
@@ -937,6 +936,7 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
     urlpatterns += (
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
             include('ccx.urls')),
+        url(r'^api/ccx/', include('lms.djangoapps.ccx.api.urls', namespace='ccx_api')),
     )
 
 # Access to courseware as an LTI provider

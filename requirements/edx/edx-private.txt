@@ -1,4 +1,10 @@
 # Requirements for edx.org that aren't necessarily needed for Open edX.
+#
+# ***                                                                   ***
+# *** PLEASE READ THE INSTRUCTIONS in github.txt about how to properly  ***
+# *** write these references. Thanks.                                   ***
+# ***                                                                   ***
+
 
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring

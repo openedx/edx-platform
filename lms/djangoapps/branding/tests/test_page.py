@@ -24,10 +24,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
-from util.milestones_helpers import (
-    seed_milestone_relationship_types,
-    set_prerequisite_courses,
-)
+from util.milestones_helpers import set_prerequisite_courses
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -119,17 +117,11 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def setUp(self):
-        super(PreRequisiteCourseCatalog, self).setUp()
-
-        seed_milestone_relationship_types()
-
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_with_prereq(self):
         """

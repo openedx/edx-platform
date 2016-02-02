@@ -6,14 +6,12 @@ Does not include any access control, be sure to check access before calling.
 import datetime
 import logging
 import pytz
-
 from contextlib import contextmanager
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from django.core.validators import validate_email
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
@@ -24,6 +22,7 @@ from instructor.enrollment import (
 )
 from instructor.access import allow_access
 from instructor.views.tools import get_student_from_identifier
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
@@ -250,3 +249,14 @@ def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
             # assign user role coach on ccx
             with ccx_course(ccx_locator) as course:
                 allow_access(course, user, "ccx_coach", send_email=False)
+
+
+def is_email(identifier):
+    """
+    Checks if an `identifier` string is a valid email
+    """
+    try:
+        validate_email(identifier)
+    except ValidationError:
+        return False
+    return True

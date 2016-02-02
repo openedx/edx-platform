@@ -1,28 +1,28 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+import json
 import logging
 from cStringIO import StringIO
+from datetime import datetime
+
+import requests
+from django.utils.timezone import UTC
+from lazy import lazy
 from lxml import etree
 from path import Path as path
-import requests
-from datetime import datetime
-from lazy import lazy
+from xblock.core import XBlock
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
+from openedx.core.lib.gating import api as gating_api
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.exceptions import UndefinedContext
-from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
-from xmodule.tabs import CourseTabList, InvalidTabsException
 from xmodule.mixin import LicenseMixin
-import json
-
-from xblock.core import XBlock
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
-from django.utils.timezone import UTC
-
 
 log = logging.getLogger(__name__)
 
@@ -756,6 +756,15 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    enable_subsection_gating = Boolean(
+        display_name=_("Enable Subsection Gating"),
+        help=_(
+            "Enter true or false. If this value is true, subsection gating is enabled in your course."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -777,6 +786,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
+
+        self._gating_prerequisites = None
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -1383,6 +1394,18 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
           bool: False if the course has already started, True otherwise.
         """
         return datetime.now(UTC()) <= self.start
+
+    @property
+    def gating_prerequisites(self):
+        """
+        Course content that can be used to gate other course content within this course.
+
+        Returns:
+            list: Returns a list of dicts containing the gating milestone data
+        """
+        if not self._gating_prerequisites:
+            self._gating_prerequisites = gating_api.get_prerequisites(self.id)
+        return self._gating_prerequisites
 
 
 class CourseSummary(object):

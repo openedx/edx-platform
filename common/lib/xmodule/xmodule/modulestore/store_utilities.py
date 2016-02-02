@@ -3,6 +3,9 @@ import logging
 from collections import namedtuple
 
 import uuid
+from xblock.core import XBlock
+
+DETACHED_XBLOCK_TYPES = set(name for name, __ in XBlock.load_tagged_classes("detached"))
 
 
 def _prefix_only_url_replace_regex(pattern):

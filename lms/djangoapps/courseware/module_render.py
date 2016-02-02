@@ -5,14 +5,12 @@ Module rendering
 import hashlib
 import json
 import logging
-
-import static_replace
-
 from collections import OrderedDict
 from functools import partial
-from requests.auth import HTTPBasicAuth
-import dogstats_wrapper as dog_stats_api
 
+import dogstats_wrapper as dog_stats_api
+import newrelic.agent
+from capa.xqueue_interface import XQueueInterface
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -22,11 +20,25 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
+from edx_proctoring.services import ProctoringService
+from eventtracking import tracker
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from requests.auth import HTTPBasicAuth
+from xblock.core import XBlock
+from xblock.django.request import django_to_webob_request, webob_to_django_response
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
+from xblock.reference.plugins import FSService
 
-import newrelic.agent
-
-from capa.xqueue_interface import XQueueInterface
+import static_replace
+from openedx.core.lib.gating import api as gating_api
 from courseware.access import has_access, get_user_role
+from courseware.entrance_exams import (
+    get_entrance_exam_score,
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
+)
 from courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
@@ -35,20 +47,13 @@ from courseware.masquerade import (
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
 from courseware.models import SCORE_CHANGED
-from courseware.entrance_exams import (
-    get_entrance_exam_score,
-    user_must_complete_entrance_exam,
-    user_has_passed_entrance_exam
-)
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
+from lms.djangoapps.verify_student.services import ReverificationService
+from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -59,29 +64,20 @@ from openedx.core.lib.xblock_utils import (
 )
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
-from xblock.core import XBlock
-from xblock.django.request import django_to_webob_request, webob_to_django_response
-from xblock_django.user_service import DjangoXBlockUserService
-from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
-from xblock.reference.plugins import FSService
-from xblock.runtime import KvsFieldData
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.lti_module import LTIModule
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import XModuleDescriptor
-from xmodule.mixin import wrap_with_license
+from util import milestones_helpers
 from util.json_request import JsonResponse
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from util import milestones_helpers
-from lms.djangoapps.verify_student.services import ReverificationService
-
-from edx_proctoring.services import ProctoringService
-from openedx.core.djangoapps.credit.services import CreditService
-
+from xblock.runtime import KvsFieldData
+from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.lti_module import LTIModule
+from xmodule.mixin import wrap_with_license
+from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.x_module import XModuleDescriptor
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
@@ -156,8 +152,12 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         toc_chapters = list()
         chapters = course_module.get_display_items()
 
-        # See if the course is gated by one or more content milestones
+        # Check for content which needs to be completed
+        # before the rest of the content is made available
         required_content = milestones_helpers.get_required_content(course, user)
+
+        # Check for gated content
+        gated_content = gating_api.get_gated_content(course, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
         if not user_must_complete_entrance_exam(request, user, course):
@@ -181,6 +181,10 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                 active = (chapter.url_name == active_chapter and
                           section.url_name == active_section)
+
+                # Skip the current section if it is gated
+                if gated_content and unicode(section.location) in gated_content:
+                    continue
 
                 if not section.hide_from_toc:
                     section_context = {

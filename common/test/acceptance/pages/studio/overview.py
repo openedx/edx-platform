@@ -454,7 +454,11 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     BOTTOM_ADD_SECTION_BUTTON = '.outline > .add-section .button-new'
 
     def is_browser_on_page(self):
-        return self.q(css='body.view-outline').present and self.q(css='div.ui-loading.is-hidden').present
+        return all([
+            self.q(css='body.view-outline').present,
+            self.q(css='.content-primary').present,
+            self.q(css='div.ui-loading.is-hidden').present
+        ])
 
     def view_live(self):
         """
@@ -544,11 +548,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.reindex_button.click()
 
-    def open_exam_settings_dialog(self):
+    def open_subsection_settings_dialog(self, index=0):
         """
         clicks on the settings button of subsection.
         """
-        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css=".subsection-header-actions .configure-button").nth(index).click()
+        self.wait_for_element_presence('.course-outline-modal', 'Subsection settings modal is present.')
 
     def change_problem_release_date_in_studio(self):
         """
@@ -559,12 +564,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def select_advanced_settings_tab(self):
+    def select_advanced_tab(self):
         """
         Select the advanced settings tab
         """
-        self.q(css=".advanced-settings-button").first.click()
-        self.wait_for_element_presence('#id_not_timed', 'Advanced settings fields not present.')
+        self.q(css=".settings-tab-button[data-tab='advanced']").first.click()
+        self.wait_for_element_presence('#id_not_timed', 'Special exam settings fields not present.')
 
     def make_exam_proctored(self):
         """
@@ -640,6 +645,63 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             return False
 
         return True
+
+    def select_access_tab(self):
+        """
+        Select the access settings tab.
+        """
+        self.q(css=".settings-tab-button[data-tab='access']").first.click()
+        self.wait_for_element_visibility('#is_prereq', 'Gating settings fields are present.')
+
+    def make_gating_prerequisite(self):
+        """
+        Makes a subsection a gating prerequisite.
+        """
+        if not self.q(css="#is_prereq")[0].is_selected():
+            self.q(css='label[for="is_prereq"]').click()
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def add_prerequisite_to_subsection(self, min_score):
+        """
+        Adds a prerequisite to a subsection.
+        """
+        Select(self.q(css="#prereq")[0]).select_by_index(1)
+        self.q(css="#prereq_min_score").fill(min_score)
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
+    def gating_prerequisite_checkbox_is_visible(self):
+        """
+        Returns True if the gating prerequisite checkbox is visible.
+        """
+
+        # The Prerequisite checkbox is visible
+        return self.q(css="#is_prereq").visible
+
+    def gating_prerequisite_checkbox_is_checked(self):
+        """
+        Returns True if the gating prerequisite checkbox is checked.
+        """
+
+        # The Prerequisite checkbox is checked
+        return self.q(css="#is_prereq:checked").present
+
+    def gating_prerequisites_dropdown_is_visible(self):
+        """
+        Returns True if the gating prerequisites dropdown is visible.
+        """
+
+        # The Prerequisites dropdown is visible
+        return self.q(css="#prereq").visible
+
+    def gating_prerequisite_min_score_is_visible(self):
+        """
+        Returns True if the gating prerequisite minimum score input is visible.
+        """
+
+        # The Prerequisites dropdown is visible
+        return self.q(css="#prereq_min_score").visible
 
     @property
     def bottom_add_section_button(self):

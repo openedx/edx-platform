@@ -2917,6 +2917,11 @@ def remove_certificate_exception(course_key, student):
             course_id=course_key
         )
         generated_certificate.invalidate()
+        log.info(
+            u'Certificate invalidated for %s in course %s when removed from certificate exception list',
+            student.username,
+            course_key
+        )
     except ObjectDoesNotExist:
         # Certificate has not been generated yet, so just remove the certificate exception from white list
         pass

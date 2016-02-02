@@ -4,9 +4,10 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from lang_pref.middleware import LanguagePreferenceMiddleware
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference
 from lang_pref import LANGUAGE_KEY
 from student.tests.factories import UserFactory
+import mock
 
 
 class TestUserPreferenceMiddleware(TestCase):
@@ -21,6 +22,7 @@ class TestUserPreferenceMiddleware(TestCase):
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/somewhere')
         self.request.user = self.user
+        self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'  # pylint: disable=no-member
         self.session_middleware.process_request(self.request)
 
     def test_no_language_set_in_session_or_prefs(self):
@@ -46,3 +48,21 @@ class TestUserPreferenceMiddleware(TestCase):
         self.middleware.process_request(self.request)
 
         self.assertEquals(self.request.session[LANGUAGE_SESSION_KEY], 'eo')
+
+    @mock.patch('lang_pref.middleware.released_languages',
+                mock.Mock(return_value=[('eo', 'dummy Esperanto'), ('ar', 'arabic')]))
+    def test_supported_browser_language_in_session(self):
+        """
+        test: browser language should be set in user preferences if it is supported by system.
+        """
+        self.assertEquals(get_user_preference(self.request.user, LANGUAGE_KEY), None)
+        self.middleware.process_request(self.request)
+        self.assertEqual(self.request.session[LANGUAGE_SESSION_KEY], 'ar')   # pylint: disable=no-member
+
+    @mock.patch('lang_pref.middleware.released_languages', mock.Mock(return_value=[('en', 'english')]))
+    def test_browser_language_not_be_in_session(self):
+        """
+        test: browser language should not be set in user preferences if it is not supported by system.
+        """
+        self.middleware.process_request(self.request)
+        self.assertNotEqual(self.request.session.get(LANGUAGE_SESSION_KEY), 'ar')   # pylint: disable=no-member

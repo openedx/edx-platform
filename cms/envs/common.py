@@ -136,12 +136,6 @@ FEATURES = {
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
-
-    # Is this an edX-owned domain? (edx.org)
-    # for consistency in user-experience, keep the value of this feature flag
-    # in sync with the one in lms/envs/common.py
-    'IS_EDX_DOMAIN': False,
-
     # let students save and manage their annotations
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
@@ -312,6 +306,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'clean_headers.middleware.CleanHeadersMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -759,6 +754,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'contentserver',
     'course_creators',
     'external_auth',
     'student',  # misleading name due to sharing with lms
@@ -844,6 +840,11 @@ INSTALLED_APPS = (
     # Microsite configuration application
     'microsite_configuration',
 
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
+
+    # edx-milestones service
+    'milestones',
 )
 
 
@@ -949,9 +950,6 @@ OPTIONAL_APPS = (
 
     # edxval
     'edxval',
-
-    # milestones
-    'milestones',
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',

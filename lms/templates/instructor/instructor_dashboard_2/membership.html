@@ -1,8 +1,8 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page args="section_data"/>
 <%!
 from django.utils.translation import ugettext as _
 from courseware.courses import get_studio_url
-from microsite_configuration import microsite
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 %>
 
@@ -83,7 +83,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
   <div class="request-response-error"></div>
 </div>
 
-%if microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+%if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
   <hr class="divider" />
 
   <div class="auto_enroll auto_enroll_csv">

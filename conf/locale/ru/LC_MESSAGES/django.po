@@ -92,7 +92,7 @@
 # Gubin Pavel <pashkun73@gmail.com>, 2013
 # Ihor Polyakov <ihor.polyakov@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # KhJulia <lnujulia@ukr.net>, 2014
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
@@ -191,7 +191,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 18:37+0000\n"
+"POT-Creation-Date: 2016-01-22 14:54+0000\n"
 "PO-Revision-Date: 2015-12-02 23:55+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -645,6 +645,10 @@ msgstr "Имя пользователя и пароль не должны сов
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Пароль:"
+
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
+msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -2564,6 +2568,18 @@ msgstr ""
 "право заведовать индивидуальными курсами в системе edX. Если указать "
 "значение false, это не повлияет на уже сформированные индивидуальные курсы, "
 "но создавать новые будет нельзя."
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
@@ -10301,6 +10317,10 @@ msgstr "ПОДРОБНЕЕ"
 msgid "Starts"
 msgstr "Начало"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "Посмотреть все курсы"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -10650,10 +10670,6 @@ msgstr "Работает!  Перед Вами образец домашней �
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "Поиск курсов"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "Посмотреть все курсы"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -12373,7 +12389,7 @@ msgstr "Просмотр курса в качестве:"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Specific student"
-msgstr "Определённый студент"
+msgstr "определённый студент"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Student in {content_group}"

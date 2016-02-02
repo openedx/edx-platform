@@ -5,10 +5,10 @@ For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 from django.db import transaction
-from rest_framework.views import APIView
+from rest_framework import status, permissions
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
+from rest_framework.views import APIView
 
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
@@ -137,7 +137,9 @@ class AccountView(APIView):
 
             If the update is successful, updated user account data is returned.
     """
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (
+        OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JSONWebTokenAuthentication
+    )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 

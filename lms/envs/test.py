@@ -450,6 +450,8 @@ MICROSITE_CONFIGURATION = {
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "LINKEDIN_COMPANY_ID": "test",
+        "FACEBOOK_APP_ID": "12345678908",
         "urls": {
             'ABOUT': 'testmicrosite/about',
             'PRIVACY': 'testmicrosite/privacy',
@@ -563,3 +565,9 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'test-secret',
+    'JWT_ISSUER': 'https://test-provider/oauth2',
+    'JWT_AUDIENCE': 'test-key',
+})

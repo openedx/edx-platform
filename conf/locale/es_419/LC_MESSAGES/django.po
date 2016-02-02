@@ -182,7 +182,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-15 18:37+0000\n"
+"POT-Creation-Date: 2016-01-22 14:54+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -388,7 +388,7 @@ msgstr "Curso"
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
-msgstr "Nombre para mostrar"
+msgstr "Nombre visualizado"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
@@ -644,6 +644,10 @@ msgstr "Los campos de usuario y contraseña no concuerdan"
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Contraseña:"
+
+#: common/djangoapps/student/forms.py
+msgid "Unauthorized email address."
+msgstr "Dirección de correo electrónico no autorizada"
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -2563,6 +2567,20 @@ msgstr ""
 "tutores manejar sus cursos CCX personalizados. Si se configura en falso, no "
 "se podrán crear cursos personalizados CCX, pero los cursos existentes serán "
 "preservados."
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr "URL del Conector de CCX"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
+"URL de la aplicación del Conector de CCX que administra la creación de los "
+"CCX. (opcional). Ignorado a menos que 'Habilitar CCX' figure como 'cierto'."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
@@ -10429,6 +10447,10 @@ msgstr "Aprender más"
 msgid "Starts"
 msgstr "Empieza"
 
+#: lms/templates/courses_list.html
+msgid "View all Courses"
+msgstr "Ver todos los cursos"
+
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
@@ -10784,10 +10806,6 @@ msgstr ""
 #: lms/templates/index.html lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "Buscar curso"
-
-#: lms/templates/index.html
-msgid "View all Courses"
-msgstr "Ver todos los cursos"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"

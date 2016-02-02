@@ -29,9 +29,10 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+import datetime
+import imp
 import sys
 import os
-import imp
 
 from path import Path as path
 from warnings import simplefilter
@@ -179,9 +180,6 @@ FEATURES = {
 
     # Enable Custom Courses for EdX
     'CUSTOM_COURSES_EDX': False,
-
-    # Is this an edX-owned domain? (used for edX specific messaging and images)
-    'IS_EDX_DOMAIN': False,
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
@@ -369,6 +367,9 @@ FEATURES = {
 
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
+
+    # Show LMS Language selector
+    'SHOW_LANGUAGE_SELECTOR': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -444,6 +445,9 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
     'oauth2_handler.UserInfoHandler'
 )
 
+OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
+OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
@@ -495,9 +499,6 @@ TEMPLATES = [
 
                 # Hack to get required link URLs to password reset templates
                 'edxmako.shortcuts.marketing_link_context_processor',
-
-                # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.open_source_footer_context_processor',
 
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',
@@ -1074,6 +1075,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'clean_headers.middleware.CleanHeadersMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -1250,6 +1252,7 @@ base_application_js = [
     'js/src/ie_shim.js',
     'js/src/accessibility_tools.js',
     'js/toggle_login_modal.js',
+    'js/src/lang_edx.js',
 ]
 
 dashboard_js = (
@@ -1762,6 +1765,9 @@ INSTALLED_APPS = (
     'pipeline',
     'static_replace',
 
+    # For content serving
+    'contentserver',
+
     # Theming
     'openedx.core.djangoapps.theming',
 
@@ -1928,6 +1934,15 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
+
+    # Credentials support
+    'openedx.core.djangoapps.credentials',
+
+    # edx-milestones service
+    'milestones',
+
+    # Gating of course content
+    'gating.apps.GatingConfig',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2003,6 +2018,18 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "google_plus",
     "reddit",
 ]
+
+# JWT Settings
+JWT_AUTH = {
+    'JWT_SECRET_KEY': None,
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_ISSUER': None,
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
+    'JWT_AUDIENCE': None,
+    'JWT_LEEWAY': 1,
+    'JWT_DECODE_HANDLER': 'openedx.core.lib.api.jwt_decode_handler.decode',
+}
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
@@ -2409,9 +2436,6 @@ OPTIONAL_APPS = (
 
     # edxval
     'edxval',
-
-    # milestones
-    'milestones',
 
     # edX Proctoring
     'edx_proctoring',

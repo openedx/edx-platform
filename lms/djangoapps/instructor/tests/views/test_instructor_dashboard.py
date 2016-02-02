@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
-from ccx.tests.test_views import setup_students_and_grades
+from lms.djangoapps.ccx.tests.test_views import setup_students_and_grades
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase

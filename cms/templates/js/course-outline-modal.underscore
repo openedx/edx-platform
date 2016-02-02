@@ -1,14 +1,6 @@
-<%
-var enable_proctored_exams = enable_proctored_exams;
-var enable_timed_exams = enable_timed_exams;
-%>
-
 <div class="xblock-editor" data-locator="<%= xblockInfo.get('id') %>" data-course-key="<%= xblockInfo.get('courseKey') %>">
-    <% if (!( enable_proctored_exams || enable_timed_exams )) { %>
-        <div class="message modal-introduction">
-            <p><%- introductionMessage %></p>
-        </div>
-    <% } %>
+    <div class="message modal-introduction">
+        <p><%- introductionMessage %></p>
+    </div>
     <div class="modal-section"></div>
 </div>
-
