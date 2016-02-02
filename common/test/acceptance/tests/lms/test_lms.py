@@ -864,7 +864,7 @@ class TooltipTest(UniqueCourseTest):
         self.course_info_page.visit()
         self.tab_nav.go_to_tab('Courseware')
 
-        self.assertTrue(self.courseware_page.tooltips_displayed())
+        self.courseware_page.verify_tooltips_displayed()
 
 
 @attr('shard_1')
