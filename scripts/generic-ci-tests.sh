@@ -94,7 +94,10 @@ END
                 paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p"
+                ;;
+            "3")
+                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False' --with-flaky" --cov_args="-p"
                 ;;
             *)
                 paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"

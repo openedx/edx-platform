@@ -4,11 +4,12 @@ import unittest
 
 from django.conf import settings
 from django.test import TestCase
-
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@attr('shard_2')
 class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
     """Tests covering the CredentialsApiConfig model."""
     def test_url_construction(self):

@@ -5,6 +5,7 @@ Tests for CourseDetails
 import datetime
 import ddt
 from django.utils.timezone import UTC
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -14,6 +15,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
+@attr('shard_2')
 @ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
     """

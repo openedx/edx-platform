@@ -2,6 +2,7 @@
 Tests for transformers.py
 """
 from mock import MagicMock, patch
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..block_structure import BlockStructureModulestoreData
@@ -12,6 +13,7 @@ from .helpers import (
 )
 
 
+@attr('shard_2')
 class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     """
     Test class for testing BlockStructureTransformers

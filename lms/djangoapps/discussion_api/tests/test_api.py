@@ -9,6 +9,7 @@ from urllib import urlencode
 import ddt
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.core.exceptions import ValidationError
@@ -82,6 +83,7 @@ def _discussion_disabled_course_for(user):
     return course_with_disabled_forums
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
@@ -155,6 +157,7 @@ class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.assertEqual(result["blackouts"], [])
 
 
+@attr('shard_2')
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
@@ -481,6 +484,7 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(staff_actual, staff_expected)
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
@@ -930,6 +934,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         })
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
@@ -1353,6 +1358,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_created')
 @disable_signal(api, 'thread_voted')
@@ -1604,6 +1610,7 @@ class CreateThreadTest(
             create_thread(self.request, data)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
@@ -1870,6 +1877,7 @@ class CreateCommentTest(
             create_comment(self.request, data)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_edited')
 @disable_signal(api, 'thread_voted')
@@ -2278,6 +2286,7 @@ class UpdateThreadTest(
         )
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @disable_signal(api, 'comment_voted')
@@ -2681,6 +2690,7 @@ class UpdateCommentTest(
             )
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2820,6 +2830,7 @@ class DeleteThreadTest(
             self.assertTrue(expected_error)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2978,6 +2989,7 @@ class DeleteCommentTest(
             self.assertTrue(expected_error)
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetrieveThreadTest(

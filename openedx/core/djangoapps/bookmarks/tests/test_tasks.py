@@ -2,6 +2,7 @@
 Tests for tasks.
 """
 import ddt
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
@@ -11,6 +12,7 @@ from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
+@attr('shard_2')
 @ddt.ddt
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """

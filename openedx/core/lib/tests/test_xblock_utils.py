@@ -4,6 +4,7 @@ Tests for xblock_utils.py
 from __future__ import unicode_literals, absolute_import
 
 import ddt
+from nose.plugins.attrib import attr
 import uuid
 
 from django.test.client import RequestFactory
@@ -27,6 +28,7 @@ from openedx.core.lib.xblock_utils import (
 )
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """

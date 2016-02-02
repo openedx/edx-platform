@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import csv
 from collections import defaultdict
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 import ddt
@@ -21,6 +22,7 @@ from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmailOptInListTest(ModuleStoreTestCase):

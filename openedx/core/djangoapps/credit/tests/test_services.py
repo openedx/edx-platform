@@ -2,6 +2,8 @@
 Tests for the Credit xBlock service
 """
 
+from nose.plugins.attrib import attr
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -12,6 +14,7 @@ from openedx.core.djangoapps.credit.api.eligibility import set_credit_requiremen
 from student.models import CourseEnrollment, UserProfile
 
 
+@attr('shard_2')
 class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
