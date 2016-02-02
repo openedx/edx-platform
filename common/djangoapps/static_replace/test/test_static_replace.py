@@ -98,11 +98,13 @@ def test_storage_url_not_exists(mock_storage):
 @patch('static_replace.StaticContent', autospec=True)
 @patch('static_replace.modulestore', autospec=True)
 @patch('static_replace.AssetBaseUrlConfig.get_base_url')
-def test_mongo_filestore(mock_get_base_url, mock_modulestore, mock_static_content):
+@patch('static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
+def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
     mock_static_content.get_canonicalized_asset_path.return_value = "c4x://mock_url"
     mock_get_base_url.return_value = u''
+    mock_get_excluded_extensions.return_value = ['foobar']
 
     # No namespace => no change to path
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
@@ -113,7 +115,7 @@ def test_mongo_filestore(mock_get_base_url, mock_modulestore, mock_static_conten
         replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_KEY)
     )
 
-    mock_static_content.get_canonicalized_asset_path.assert_called_once_with(COURSE_KEY, 'file.png', u'')
+    mock_static_content.get_canonicalized_asset_path.assert_called_once_with(COURSE_KEY, 'file.png', u'', ['foobar'])
 
 
 @patch('static_replace.settings', autospec=True)
@@ -217,6 +219,13 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
                 # Create an unlocked image with funky characters in the name.
                 cls.create_image(prefix, (1, 1), 'black', 'weird {}_unlock.png')
+                cls.create_image(prefix, (1, 1), 'black', 'special/weird {}_unlock.png')
+
+                # Create an HTML file to test extension exclusion, and create a control file.
+                cls.create_arbitrary_content(prefix, '{}_not_excluded.htm')
+                cls.create_arbitrary_content(prefix, '{}_excluded.html')
+                cls.create_arbitrary_content(prefix, 'special/{}_not_excluded.htm')
+                cls.create_arbitrary_content(prefix, 'special/{}_excluded.html')
 
     @classmethod
     def create_image(cls, prefix, dimensions, color, name, locked=False):
@@ -244,86 +253,199 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         return new_content
 
+    @classmethod
+    def create_arbitrary_content(cls, prefix, name, locked=False):
+        """
+        Creates an arbitrary piece of content with a fixed body, for when content doesn't matter.
+
+        Args:
+            prefix: the prefix to use e.g. split vs mongo
+            name: the name of the content; can be a format string
+            locked: whether or not the asset should be locked
+
+        Returns:
+            StaticContent: the StaticContent object for the created content
+
+        """
+        new_buf = StringIO('testingggggggggggg')
+        new_name = name.format(prefix)
+        new_key = StaticContent.compute_location(cls.courses[prefix].id, new_name)
+        new_content = StaticContent(new_key, new_name, 'application/octet-stream', new_buf.getvalue(), locked=locked)
+        contentstore().save(new_content)
+
+        return new_content
+
     @ddt.data(
         # No leading slash.
-        (u'', u'{prefix}_unlock.png', u'/{asset_key}@{prefix}_unlock.png', 1),
-        (u'', u'{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'', u'weird {prefix}_unlock.png', u'/{asset_key}@weird_{prefix}_unlock.png', 1),
-        (u'dev', u'{prefix}_unlock.png', u'//dev/{asset_key}@{prefix}_unlock.png', 1),
-        (u'dev', u'{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'dev', u'weird {prefix}_unlock.png', u'//dev/{asset_key}@weird_{prefix}_unlock.png', 1),
+        (u'', u'{prfx}_unlock.png', u'/{asset}@{prfx}_unlock.png', 1),
+        (u'', u'{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'', u'weird {prfx}_unlock.png', u'/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'', u'{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'', u'{prfx}_not_excluded.htm', u'/{asset}@{prfx}_not_excluded.htm', 1),
+        (u'dev', u'{prfx}_unlock.png', u'//dev/{asset}@{prfx}_unlock.png', 1),
+        (u'dev', u'{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'dev', u'weird {prfx}_unlock.png', u'//dev/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'dev', u'{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'dev', u'{prfx}_not_excluded.htm', u'//dev/{asset}@{prfx}_not_excluded.htm', 1),
         # No leading slash with subdirectory.  This ensures we properly substitute slashes.
-        (u'', u'special/{prefix}_unlock.png', u'/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'', u'special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
-        (u'dev', u'special/{prefix}_unlock.png', u'//dev/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'dev', u'special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
+        (u'', u'special/{prfx}_unlock.png', u'/{asset}@special_{prfx}_unlock.png', 1),
+        (u'', u'special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'', u'special/weird {prfx}_unlock.png', u'/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'', u'special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'', u'special/{prfx}_not_excluded.htm', u'/{asset}@special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'special/{prfx}_unlock.png', u'//dev/{asset}@special_{prfx}_unlock.png', 1),
+        (u'dev', u'special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'dev', u'special/weird {prfx}_unlock.png', u'//dev/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'dev', u'special/{prfx}_not_excluded.htm', u'//dev/{asset}@special_{prfx}_not_excluded.htm', 1),
         # Leading slash.
-        (u'', u'/{prefix}_unlock.png', u'/{asset_key}@{prefix}_unlock.png', 1),
-        (u'', u'/{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'dev', u'/{prefix}_unlock.png', u'//dev/{asset_key}@{prefix}_unlock.png', 1),
-        (u'dev', u'/{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
+        (u'', u'/{prfx}_unlock.png', u'/{asset}@{prfx}_unlock.png', 1),
+        (u'', u'/{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'', u'/weird {prfx}_unlock.png', u'/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'', u'/{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'', u'/{prfx}_not_excluded.htm', u'/{asset}@{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/{prfx}_unlock.png', u'//dev/{asset}@{prfx}_unlock.png', 1),
+        (u'dev', u'/{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'dev', u'/weird {prfx}_unlock.png', u'//dev/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'dev', u'/{prfx}_not_excluded.htm', u'//dev/{asset}@{prfx}_not_excluded.htm', 1),
         # Leading slash with subdirectory.  This ensures we properly substitute slashes.
-        (u'', u'/special/{prefix}_unlock.png', u'/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'', u'/special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
-        (u'dev', u'/special/{prefix}_unlock.png', u'//dev/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'dev', u'/special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
+        (u'', u'/special/{prfx}_unlock.png', u'/{asset}@special_{prfx}_unlock.png', 1),
+        (u'', u'/special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'', u'/special/weird {prfx}_unlock.png', u'/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'', u'/special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'', u'/special/{prfx}_not_excluded.htm', u'/{asset}@special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/special/{prfx}_unlock.png', u'//dev/{asset}@special_{prfx}_unlock.png', 1),
+        (u'dev', u'/special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'dev', u'/special/weird {prfx}_unlock.png', u'//dev/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'dev', u'/special/{prfx}_not_excluded.htm', u'//dev/{asset}@special_{prfx}_not_excluded.htm', 1),
         # Static path.
-        (u'', u'/static/{prefix}_unlock.png', u'/{asset_key}@{prefix}_unlock.png', 1),
-        (u'', u'/static/{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'', u'/static/weird {prefix}_unlock.png', u'/{asset_key}@weird_{prefix}_unlock.png', 1),
-        (u'dev', u'/static/{prefix}_unlock.png', u'//dev/{asset_key}@{prefix}_unlock.png', 1),
-        (u'dev', u'/static/{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'dev', u'/static/weird {prefix}_unlock.png', u'//dev/{asset_key}@weird_{prefix}_unlock.png', 1),
+        (u'', u'/static/{prfx}_unlock.png', u'/{asset}@{prfx}_unlock.png', 1),
+        (u'', u'/static/{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'', u'/static/weird {prfx}_unlock.png', u'/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'', u'/static/{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'', u'/static/{prfx}_not_excluded.htm', u'/{asset}@{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/static/{prfx}_unlock.png', u'//dev/{asset}@{prfx}_unlock.png', 1),
+        (u'dev', u'/static/{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'dev', u'/static/weird {prfx}_unlock.png', u'//dev/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'dev', u'/static/{prfx}_not_excluded.htm', u'//dev/{asset}@{prfx}_not_excluded.htm', 1),
         # Static path with subdirectory.  This ensures we properly substitute slashes.
-        (u'', u'/static/special/{prefix}_unlock.png', u'/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'', u'/static/special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
-        (u'dev', u'/static/special/{prefix}_unlock.png', u'//dev/{asset_key}@special_{prefix}_unlock.png', 1),
-        (u'dev', u'/static/special/{prefix}_lock.png', u'/{asset_key}@special_{prefix}_lock.png', 1),
+        (u'', u'/static/special/{prfx}_unlock.png', u'/{asset}@special_{prfx}_unlock.png', 1),
+        (u'', u'/static/special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'', u'/static/special/weird {prfx}_unlock.png', u'/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'', u'/static/special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'', u'/static/special/{prfx}_not_excluded.htm', u'/{asset}@special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/static/special/{prfx}_unlock.png', u'//dev/{asset}@special_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/special/{prfx}_lock.png', u'/{asset}@special_{prfx}_lock.png', 1),
+        (u'dev', u'/static/special/weird {prfx}_unlock.png', u'//dev/{asset}@special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/special/{prfx}_excluded.html', u'/{asset}@special_{prfx}_excluded.html', 1),
+        (u'dev', u'/static/special/{prfx}_not_excluded.htm', u'//dev/{asset}@special_{prfx}_not_excluded.htm', 1),
         # Static path with query parameter.
         (
             u'',
-            u'/static/{prefix}_unlock.png?foo=/static/{prefix}_lock.png',
-            u'/{asset_key}@{prefix}_unlock.png?foo={encoded_asset_key}{prefix}_lock.png',
+            u'/static/{prfx}_unlock.png?foo=/static/{prfx}_lock.png',
+            u'/{asset}@{prfx}_unlock.png?foo={encoded_asset}{prfx}_lock.png',
             2
         ),
         (
             u'',
-            u'/static/{prefix}_lock.png?foo=/static/{prefix}_unlock.png',
-            u'/{asset_key}@{prefix}_lock.png?foo={encoded_asset_key}{prefix}_unlock.png',
+            u'/static/{prfx}_lock.png?foo=/static/{prfx}_unlock.png',
+            u'/{asset}@{prfx}_lock.png?foo={encoded_asset}{prfx}_unlock.png',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
+            u'/{asset}@{prfx}_excluded.html?foo={encoded_asset}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
+            u'/{asset}@{prfx}_excluded.html?foo={encoded_asset}{prfx}_not_excluded.htm',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
+            u'/{asset}@{prfx}_not_excluded.htm?foo={encoded_asset}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
+            u'/{asset}@{prfx}_not_excluded.htm?foo={encoded_asset}{prfx}_not_excluded.htm',
             2
         ),
         (
             u'dev',
-            u'/static/{prefix}_unlock.png?foo=/static/{prefix}_lock.png',
-            u'//dev/{asset_key}@{prefix}_unlock.png?foo={encoded_asset_key}{prefix}_lock.png',
+            u'/static/{prfx}_unlock.png?foo=/static/{prfx}_lock.png',
+            u'//dev/{asset}@{prfx}_unlock.png?foo={encoded_asset}{prfx}_lock.png',
             2
         ),
         (
             u'dev',
-            u'/static/{prefix}_lock.png?foo=/static/{prefix}_unlock.png',
-            u'/{asset_key}@{prefix}_lock.png?foo={encoded_base_url}{encoded_asset_key}{prefix}_unlock.png',
+            u'/static/{prfx}_lock.png?foo=/static/{prfx}_unlock.png',
+            u'/{asset}@{prfx}_lock.png?foo={encoded_base_url}{encoded_asset}{prfx}_unlock.png',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
+            u'/{asset}@{prfx}_excluded.html?foo={encoded_asset}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
+            u'/{asset}@{prfx}_excluded.html?foo={encoded_base_url}{encoded_asset}{prfx}_not_excluded.htm',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
+            u'//dev/{asset}@{prfx}_not_excluded.htm?foo={encoded_asset}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
+            u'//dev/{asset}@{prfx}_not_excluded.htm?foo={encoded_base_url}{encoded_asset}{prfx}_not_excluded.htm',
             2
         ),
         # Already asset key.
-        (u'', u'/{asset_key}@{prefix}_unlock.png', u'/{asset_key}@{prefix}_unlock.png', 1),
-        (u'', u'/{asset_key}@{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
-        (u'dev', u'/{asset_key}@{prefix}_unlock.png', u'//dev/{asset_key}@{prefix}_unlock.png', 1),
-        (u'dev', u'/{asset_key}@{prefix}_lock.png', u'/{asset_key}@{prefix}_lock.png', 1),
+        (u'', u'/{asset}@{prfx}_unlock.png', u'/{asset}@{prfx}_unlock.png', 1),
+        (u'', u'/{asset}@{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'', u'/{asset}@weird_{prfx}_unlock.png', u'/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'', u'/{asset}@{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'', u'/{asset}@{prfx}_not_excluded.htm', u'/{asset}@{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/{asset}@{prfx}_unlock.png', u'//dev/{asset}@{prfx}_unlock.png', 1),
+        (u'dev', u'/{asset}@{prfx}_lock.png', u'/{asset}@{prfx}_lock.png', 1),
+        (u'dev', u'/{asset}@weird_{prfx}_unlock.png', u'//dev/{asset}@weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/{asset}@{prfx}_excluded.html', u'/{asset}@{prfx}_excluded.html', 1),
+        (u'dev', u'/{asset}@{prfx}_not_excluded.htm', u'//dev/{asset}@{prfx}_not_excluded.htm', 1),
         # Old, c4x-style path.
-        (u'', u'/{c4x}/{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'', u'/{c4x}/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'', u'/{c4x}/weird_{prefix}_lock.png', u'/{c4x}/weird_{prefix}_lock.png', 1),
-        (u'dev', u'/{c4x}/{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'dev', u'/{c4x}/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'dev', u'/{c4x}/weird_{prefix}_unlock.png', u'/{c4x}/weird_{prefix}_unlock.png', 1),
+        (u'', u'/{c4x}/{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'', u'/{c4x}/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'', u'/{c4x}/weird_{prfx}_lock.png', u'/{c4x}/weird_{prfx}_lock.png', 1),
+        (u'', u'/{c4x}/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'', u'/{c4x}/{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/{c4x}/{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'dev', u'/{c4x}/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'dev', u'/{c4x}/weird_{prfx}_unlock.png', u'/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/{c4x}/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'dev', u'/{c4x}/{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
         # Thumbnails.
-        (u'', u'/{th_key}@{prefix}_unlock-{th_ext}', u'/{th_key}@{prefix}_unlock-{th_ext}', 1),
-        (u'', u'/{th_key}@{prefix}_lock-{th_ext}', u'/{th_key}@{prefix}_lock-{th_ext}', 1),
-        (u'dev', u'/{th_key}@{prefix}_unlock-{th_ext}', u'//dev/{th_key}@{prefix}_unlock-{th_ext}', 1),
-        (u'dev', u'/{th_key}@{prefix}_lock-{th_ext}', u'//dev/{th_key}@{prefix}_lock-{th_ext}', 1),
+        (u'', u'/{th_key}@{prfx}_unlock-{th_ext}', u'/{th_key}@{prfx}_unlock-{th_ext}', 1),
+        (u'', u'/{th_key}@{prfx}_lock-{th_ext}', u'/{th_key}@{prfx}_lock-{th_ext}', 1),
+        (u'dev', u'/{th_key}@{prfx}_unlock-{th_ext}', u'//dev/{th_key}@{prfx}_unlock-{th_ext}', 1),
+        (u'dev', u'/{th_key}@{prfx}_lock-{th_ext}', u'//dev/{th_key}@{prfx}_lock-{th_ext}', 1),
     )
     @ddt.unpack
     def test_canonical_asset_path_with_new_style_assets(self, base_url, start, expected, mongo_calls):
+        exts = ['.html', '.tm']
         prefix = 'split'
         encoded_base_url = quote_plus('//' + base_url)
         c4x = 'c4x/a/b/asset'
@@ -333,116 +455,201 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
         th_ext = 'png-16x16.jpg'
 
         start = start.format(
-            prefix=prefix,
+            prfx=prefix,
             c4x=c4x,
-            asset_key=asset_key,
+            asset=asset_key,
             encoded_base_url=encoded_base_url,
-            encoded_asset_key=encoded_asset_key,
+            encoded_asset=encoded_asset_key,
             th_key=th_key,
             th_ext=th_ext
         )
         expected = expected.format(
-            prefix=prefix,
+            prfx=prefix,
             c4x=c4x,
-            asset_key=asset_key,
+            asset=asset_key,
             encoded_base_url=encoded_base_url,
-            encoded_asset_key=encoded_asset_key,
+            encoded_asset=encoded_asset_key,
             th_key=th_key,
             th_ext=th_ext
         )
 
         with check_mongo_calls(mongo_calls):
-            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url)
+            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
             self.assertEqual(asset_path, expected)
 
     @ddt.data(
         # No leading slash.
-        (u'', u'{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'', u'{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'', u'weird {prefix}_unlock.png', u'/{c4x}/weird_{prefix}_unlock.png', 1),
-        (u'dev', u'{prefix}_unlock.png', u'//dev/{c4x}/{prefix}_unlock.png', 1),
-        (u'dev', u'{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'dev', u'weird {prefix}_unlock.png', u'//dev/{c4x}/weird_{prefix}_unlock.png', 1),
+        (u'', u'{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'', u'{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'', u'weird {prfx}_unlock.png', u'/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'', u'{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'', u'{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
+        (u'dev', u'{prfx}_unlock.png', u'//dev/{c4x}/{prfx}_unlock.png', 1),
+        (u'dev', u'{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'dev', u'weird {prfx}_unlock.png', u'//dev/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'dev', u'{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'dev', u'{prfx}_not_excluded.htm', u'//dev/{c4x}/{prfx}_not_excluded.htm', 1),
         # No leading slash with subdirectory.  This ensures we probably substitute slashes.
-        (u'', u'special/{prefix}_unlock.png', u'/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'', u'special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
-        (u'dev', u'special/{prefix}_unlock.png', u'//dev/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'dev', u'special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
+        (u'', u'special/{prfx}_unlock.png', u'/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'', u'special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'', u'special/weird {prfx}_unlock.png', u'/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'', u'special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'', u'special/{prfx}_not_excluded.htm', u'/{c4x}/special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'special/{prfx}_unlock.png', u'//dev/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'dev', u'special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'dev', u'special/weird {prfx}_unlock.png', u'//dev/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'dev', u'special/{prfx}_not_excluded.htm', u'//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
         # Leading slash.
-        (u'', u'/{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'', u'/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'dev', u'/{prefix}_unlock.png', u'//dev/{c4x}/{prefix}_unlock.png', 1),
-        (u'dev', u'/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
+        (u'', u'/{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'', u'/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'', u'/weird {prfx}_unlock.png', u'/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'', u'/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'', u'/{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/{prfx}_unlock.png', u'//dev/{c4x}/{prfx}_unlock.png', 1),
+        (u'dev', u'/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'dev', u'/weird {prfx}_unlock.png', u'//dev/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'dev', u'/{prfx}_not_excluded.htm', u'//dev/{c4x}/{prfx}_not_excluded.htm', 1),
         # Leading slash with subdirectory. This ensures we properly substitute slashes.
-        (u'', u'/special/{prefix}_unlock.png', u'/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'', u'/special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
-        (u'dev', u'/special/{prefix}_unlock.png', u'//dev/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'dev', u'/special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
+        (u'', u'/special/{prfx}_unlock.png', u'/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'', u'/special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'', u'/special/weird {prfx}_unlock.png', u'/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'', u'/special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'', u'/special/{prfx}_not_excluded.htm', u'/{c4x}/special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/special/{prfx}_unlock.png', u'//dev/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'dev', u'/special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'dev', u'/special/weird {prfx}_unlock.png', u'//dev/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'dev', u'/special/{prfx}_not_excluded.htm', u'//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
         # Static path.
-        (u'', u'/static/{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'', u'/static/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'', u'/static/weird {prefix}_unlock.png', u'/{c4x}/weird_{prefix}_unlock.png', 1),
-        (u'dev', u'/static/{prefix}_unlock.png', u'//dev/{c4x}/{prefix}_unlock.png', 1),
-        (u'dev', u'/static/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'dev', u'/static/weird {prefix}_unlock.png', u'//dev/{c4x}/weird_{prefix}_unlock.png', 1),
+        (u'', u'/static/{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'', u'/static/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'', u'/static/weird {prfx}_unlock.png', u'/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'', u'/static/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'', u'/static/{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/static/{prfx}_unlock.png', u'//dev/{c4x}/{prfx}_unlock.png', 1),
+        (u'dev', u'/static/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'dev', u'/static/weird {prfx}_unlock.png', u'//dev/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'dev', u'/static/{prfx}_not_excluded.htm', u'//dev/{c4x}/{prfx}_not_excluded.htm', 1),
         # Static path with subdirectory.  This ensures we properly substitute slashes.
-        (u'', u'/static/special/{prefix}_unlock.png', u'/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'', u'/static/special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
-        (u'dev', u'/static/special/{prefix}_unlock.png', u'//dev/{c4x}/special_{prefix}_unlock.png', 1),
-        (u'dev', u'/static/special/{prefix}_lock.png', u'/{c4x}/special_{prefix}_lock.png', 1),
+        (u'', u'/static/special/{prfx}_unlock.png', u'/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'', u'/static/special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'', u'/static/special/weird {prfx}_unlock.png', u'/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'', u'/static/special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'', u'/static/special/{prfx}_not_excluded.htm', u'/{c4x}/special_{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/static/special/{prfx}_unlock.png', u'//dev/{c4x}/special_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/special/{prfx}_lock.png', u'/{c4x}/special_{prfx}_lock.png', 1),
+        (u'dev', u'/static/special/weird {prfx}_unlock.png', u'//dev/{c4x}/special_weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/static/special/{prfx}_excluded.html', u'/{c4x}/special_{prfx}_excluded.html', 1),
+        (u'dev', u'/static/special/{prfx}_not_excluded.htm', u'//dev/{c4x}/special_{prfx}_not_excluded.htm', 1),
         # Static path with query parameter.
         (
             u'',
-            u'/static/{prefix}_unlock.png?foo=/static/{prefix}_lock.png',
-            u'/{c4x}/{prefix}_unlock.png?foo={encoded_c4x}{prefix}_lock.png',
+            u'/static/{prfx}_unlock.png?foo=/static/{prfx}_lock.png',
+            u'/{c4x}/{prfx}_unlock.png?foo={encoded_c4x}{prfx}_lock.png',
             2
         ),
         (
             u'',
-            u'/static/{prefix}_lock.png?foo=/static/{prefix}_unlock.png',
-            u'/{c4x}/{prefix}_lock.png?foo={encoded_c4x}{prefix}_unlock.png',
+            u'/static/{prfx}_lock.png?foo=/static/{prfx}_unlock.png',
+            u'/{c4x}/{prfx}_lock.png?foo={encoded_c4x}{prfx}_unlock.png',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
+            u'/{c4x}/{prfx}_excluded.html?foo={encoded_c4x}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
+            u'/{c4x}/{prfx}_excluded.html?foo={encoded_c4x}{prfx}_not_excluded.htm',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
+            u'/{c4x}/{prfx}_not_excluded.htm?foo={encoded_c4x}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
+            u'/{c4x}/{prfx}_not_excluded.htm?foo={encoded_c4x}{prfx}_not_excluded.htm',
             2
         ),
         (
             u'dev',
-            u'/static/{prefix}_unlock.png?foo=/static/{prefix}_lock.png',
-            u'//dev/{c4x}/{prefix}_unlock.png?foo={encoded_c4x}{prefix}_lock.png',
+            u'/static/{prfx}_unlock.png?foo=/static/{prfx}_lock.png',
+            u'//dev/{c4x}/{prfx}_unlock.png?foo={encoded_c4x}{prfx}_lock.png',
             2
         ),
         (
             u'dev',
-            u'/static/{prefix}_lock.png?foo=/static/{prefix}_unlock.png',
-            u'/{c4x}/{prefix}_lock.png?foo={encoded_base_url}{encoded_c4x}{prefix}_unlock.png',
+            u'/static/{prfx}_lock.png?foo=/static/{prfx}_unlock.png',
+            u'/{c4x}/{prfx}_lock.png?foo={encoded_base_url}{encoded_c4x}{prfx}_unlock.png',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_excluded.html',
+            u'/{c4x}/{prfx}_excluded.html?foo={encoded_c4x}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_excluded.html?foo=/static/{prfx}_not_excluded.htm',
+            u'/{c4x}/{prfx}_excluded.html?foo={encoded_base_url}{encoded_c4x}{prfx}_not_excluded.htm',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_excluded.html',
+            u'//dev/{c4x}/{prfx}_not_excluded.htm?foo={encoded_c4x}{prfx}_excluded.html',
+            2
+        ),
+        (
+            u'dev',
+            u'/static/{prfx}_not_excluded.htm?foo=/static/{prfx}_not_excluded.htm',
+            u'//dev/{c4x}/{prfx}_not_excluded.htm?foo={encoded_base_url}{encoded_c4x}{prfx}_not_excluded.htm',
             2
         ),
         # Old, c4x-style path.
-        (u'', u'/{c4x}/{prefix}_unlock.png', u'/{c4x}/{prefix}_unlock.png', 1),
-        (u'', u'/{c4x}/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'', u'/{c4x}/weird_{prefix}_unlock.png', u'/{c4x}/weird_{prefix}_unlock.png', 1),
-        (u'dev', u'/{c4x}/{prefix}_unlock.png', u'//dev/{c4x}/{prefix}_unlock.png', 1),
-        (u'dev', u'/{c4x}/{prefix}_lock.png', u'/{c4x}/{prefix}_lock.png', 1),
-        (u'dev', u'/{c4x}/weird_{prefix}_unlock.png', u'//dev/{c4x}/weird_{prefix}_unlock.png', 1),
+        (u'', u'/{c4x}/{prfx}_unlock.png', u'/{c4x}/{prfx}_unlock.png', 1),
+        (u'', u'/{c4x}/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'', u'/{c4x}/weird_{prfx}_lock.png', u'/{c4x}/weird_{prfx}_lock.png', 1),
+        (u'', u'/{c4x}/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'', u'/{c4x}/{prfx}_not_excluded.htm', u'/{c4x}/{prfx}_not_excluded.htm', 1),
+        (u'dev', u'/{c4x}/{prfx}_unlock.png', u'//dev/{c4x}/{prfx}_unlock.png', 1),
+        (u'dev', u'/{c4x}/{prfx}_lock.png', u'/{c4x}/{prfx}_lock.png', 1),
+        (u'dev', u'/{c4x}/weird_{prfx}_unlock.png', u'//dev/{c4x}/weird_{prfx}_unlock.png', 1),
+        (u'dev', u'/{c4x}/{prfx}_excluded.html', u'/{c4x}/{prfx}_excluded.html', 1),
+        (u'dev', u'/{c4x}/{prfx}_not_excluded.htm', u'//dev/{c4x}/{prfx}_not_excluded.htm', 1),
     )
     @ddt.unpack
     def test_canonical_asset_path_with_c4x_style_assets(self, base_url, start, expected, mongo_calls):
+        exts = ['.html', '.tm']
         prefix = 'old'
         c4x_block = 'c4x/a/b/asset'
         encoded_c4x_block = quote_plus('/' + c4x_block + '/')
         encoded_base_url = quote_plus('//' + base_url)
 
         start = start.format(
-            prefix=prefix,
+            prfx=prefix,
             encoded_base_url=encoded_base_url,
             c4x=c4x_block,
             encoded_c4x=encoded_c4x_block
         )
         expected = expected.format(
-            prefix=prefix,
+            prfx=prefix,
             encoded_base_url=encoded_base_url,
             c4x=c4x_block,
             encoded_c4x=encoded_c4x_block
         )
 
         with check_mongo_calls(mongo_calls):
-            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url)
+            asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
             self.assertEqual(asset_path, expected)
