@@ -2766,3 +2766,9 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
+
+STUDENT_RESPONSES_REPORT_SUPPORTED_TYPES = set([
+    'problem',
+    'submit-and-compare',
+    'freetextresponse',
+])
