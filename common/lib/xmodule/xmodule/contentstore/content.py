@@ -201,10 +201,8 @@ class StaticContent(object):
 
         # See if this is an allowed file extension to serve.  Some files aren't served through the
         # CDN in order to avoid same-origin policy/CORS-related issues.
-        for excluded_ext in excluded_exts:
-            if relative_path.lower().endswith(excluded_ext.lower()):
-                serve_from_cdn = False
-                break
+        if any(relative_path.lower().endswith(excluded_ext.lower()) for excluded_ext in excluded_exts):
+            serve_from_cdn = False
 
         # Update any query parameter values that have asset paths in them. This is for assets that
         # require their own after-the-fact values, like a Flash file that needs the path of a config
