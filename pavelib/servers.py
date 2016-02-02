@@ -239,12 +239,16 @@ def run_all_servers(options):
 ])
 def update_db(options):
     """
-    Runs syncdb and then migrate.
+    Migrates the lms and cms across all databases
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
-        sh(django_cmd(system, settings, 'migrate', fake, '--traceback', '--pythonpath=.'))
+        # pylint: disable=line-too-long
+        sh("NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
+            settings=settings,
+            system=system,
+            fake=fake))
 
 
 @task
