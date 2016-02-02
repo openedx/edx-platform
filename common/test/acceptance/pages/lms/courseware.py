@@ -78,9 +78,11 @@ class CoursewarePage(CoursePage):
         else:
             return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
 
-    def tooltips_displayed(self):
+    def verify_tooltips_displayed(self):
         """
-        Verify if sequence navigation bar tooltips are being displayed upon mouse hover.
+        Verify that all sequence navigation bar tooltips are being displayed upon mouse hover.
+
+        If a tooltip does not appear, raise a BrokenPromise.
         """
         for index, tab in enumerate(self.q(css='#sequence-list > li')):
             ActionChains(self.browser).move_to_element(tab).perform()
@@ -88,8 +90,6 @@ class CoursewarePage(CoursePage):
                 '#tab_{index} > p'.format(index=index),
                 'Tab {index} should appear'.format(index=index)
             )
-
-        return True
 
     @property
     def course_license(self):
