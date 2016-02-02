@@ -34,7 +34,6 @@ codekit-config.json
 *.po
 *.prob
 *.dup
-!django.po
 !django.mo
 !djangojs.po
 !djangojs.mo
@@ -43,6 +42,7 @@ conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
 conf/locale/messages.mo
+!django.po
 
 ### Testing artifacts
 .testids/
