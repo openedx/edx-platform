@@ -73,15 +73,16 @@ class TestCourseListing(ModuleStoreTestCase):
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location)
 
-        # get dashboard
-        courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 1)
-        self.assertEqual(courses_list[0].course_id, course_location)
+        with self.assertNumQueries(2):
+            courses_list = list(get_course_enrollments(self.student, None, []))
+            self.assertEqual(len(courses_list), 1)
+            self.assertEqual(courses_list[0].course_id, course_location)
 
         CourseEnrollment.unenroll(self.student, course_location)
-        # get dashboard
-        courses_list = list(get_course_enrollments(self.student, None, []))
-        self.assertEqual(len(courses_list), 0)
+
+        with self.assertNumQueries(1):
+            courses_list = list(get_course_enrollments(self.student, None, []))
+            self.assertEqual(len(courses_list), 0)
 
     def test_errored_course_regular_access(self):
         """
@@ -99,7 +100,7 @@ class TestCourseListing(ModuleStoreTestCase):
             CourseOverview.objects.filter(id=course_key).delete()
 
             courses_list = list(get_course_enrollments(self.student, None, []))
-            self.assertEqual(courses_list, [])
+            self.assertEqual(len(courses_list), 0)
 
     def test_course_listing_errored_deleted_courses(self):
         """

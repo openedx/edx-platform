@@ -270,8 +270,8 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
         generator[CourseEnrollment]: a sequence of enrollments to be displayed
         on the user's dashboard.
     """
-    for enrollment in CourseEnrollment.enrollments_for_user(user):
-
+    enrollments = CourseEnrollment.enrollments_for_user(user).prefetch_related('batch_course_overview')
+    for enrollment in enrollments:
         # If the course is missing or broken, log an error and skip it.
         course_overview = enrollment.course_overview
         if not course_overview:
