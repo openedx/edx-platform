@@ -100,15 +100,16 @@ class BokChoyTestSuite(TestSuite):
     def __exit__(self, exc_type, exc_value, traceback):
         super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
 
-        msg = colorize('green', "Cleaning up databases...")
-        print msg
-
-        # Clean up data we created in the databases
-        if not self.testsonly:
-            # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
+        # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
+        if self.testsonly:
+            msg = colorize('green', 'Running in testsonly mode... SKIPPING database cleanup.')
+            print msg
+        else:
+            # Clean up data we created in the databases
+            msg = colorize('green', "Cleaning up databases...")
+            print msg
             sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-
-        bokchoy_utils.clear_mongo()
+            bokchoy_utils.clear_mongo()
 
     def verbosity_processes_string(self):
         """
