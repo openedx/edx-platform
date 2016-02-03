@@ -2,7 +2,6 @@
 Acceptance tests for Studio.
 """
 
-from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
 from ...pages.studio.asset_index import AssetIndexPage
@@ -95,7 +94,6 @@ class CoursePagesTest(StudioCourseTest):
         self.dashboard_page.visit()
         self.assertEqual(self.browser.current_url.strip('/').rsplit('/')[-1], 'home')
 
-    @skip('Intermittently failing with Page not found error for Assets. TE-418')
     def test_page_existence(self):
         """
         Make sure that all these pages are accessible once you have a course.
