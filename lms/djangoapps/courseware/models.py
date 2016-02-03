@@ -169,24 +169,13 @@ class StudentModuleHistory(models.Model):
     grade = models.FloatField(null=True, blank=True)
     max_grade = models.FloatField(null=True, blank=True)
 
-    @receiver(post_save, sender=StudentModule)
-    def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
-        """
-        Checks the instance's module_type, and creates & saves a
-        StudentModuleHistory entry if the module_type is one that
-        we save.
-        """
-        if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
-            history_entry = StudentModuleHistory(student_module=instance,
-                                                 version=None,
-                                                 created=instance.modified,
-                                                 state=instance.state,
-                                                 grade=instance.grade,
-                                                 max_grade=instance.max_grade)
-            history_entry.save()
-
     def __unicode__(self):
         return unicode(repr(self))
+
+    @property
+    def csm(self):
+        return StudentModule.objects.get(pk=self.student_module_id)
+
 
 class StudentModuleHistoryExtended(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
@@ -217,20 +206,24 @@ class StudentModuleHistoryExtended(models.Model):
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
         Checks the instance's module_type, and creates & saves a
-        StudentModuleHistory entry if the module_type is one that
+        StudentModuleHistoryExtended entry if the module_type is one that
         we save.
         """
         if instance.module_type in StudentModuleHistoryExtended.HISTORY_SAVING_TYPES:
             history_entry = StudentModuleHistoryExtended(student_module=instance,
-                                                 version=None,
-                                                 created=instance.modified,
-                                                 state=instance.state,
-                                                 grade=instance.grade,
-                                                 max_grade=instance.max_grade)
+                                                         version=None,
+                                                         created=instance.modified,
+                                                         state=instance.state,
+                                                         grade=instance.grade,
+                                                         max_grade=instance.max_grade)
             history_entry.save()
 
     def __unicode__(self):
         return unicode(repr(self))
+
+    @property
+    def csm(self):
+        return StudentModule.objects.filter(pk=self.student_module_id).first()
 
 
 class XBlockFieldBase(models.Model):
