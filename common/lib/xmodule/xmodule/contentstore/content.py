@@ -168,7 +168,7 @@ class StaticContent(object):
             return StaticContent.compute_location(course_key, path)
 
     @staticmethod
-    def get_canonicalized_asset_path(course_key, path, base_url):
+    def get_canonicalized_asset_path(course_key, path, base_url, excluded_exts):
         """
         Returns a fully-qualified path to a piece of static content.
 
@@ -199,17 +199,22 @@ class StaticContent(object):
             # If we can't find the item, just treat it as if it's locked.
             serve_from_cdn = False
 
+        # See if this is an allowed file extension to serve.  Some files aren't served through the
+        # CDN in order to avoid same-origin policy/CORS-related issues.
+        if any(relative_path.lower().endswith(excluded_ext.lower()) for excluded_ext in excluded_exts):
+            serve_from_cdn = False
+
         # Update any query parameter values that have asset paths in them. This is for assets that
         # require their own after-the-fact values, like a Flash file that needs the path of a config
         # file passed to it e.g. /static/visualization.swf?configFile=/static/visualization.xml
         query_params = parse_qsl(query_string)
         updated_query_params = []
-        for query_name, query_value in query_params:
-            if query_value.startswith("/static/"):
-                new_query_value = StaticContent.get_canonicalized_asset_path(course_key, query_value, base_url)
-                updated_query_params.append((query_name, new_query_value))
+        for query_name, query_val in query_params:
+            if query_val.startswith("/static/"):
+                new_val = StaticContent.get_canonicalized_asset_path(course_key, query_val, base_url, excluded_exts)
+                updated_query_params.append((query_name, new_val))
             else:
-                updated_query_params.append((query_name, query_value))
+                updated_query_params.append((query_name, query_val))
 
         serialized_asset_key = StaticContent.serialize_asset_key_with_slash(asset_key)
         base_url = base_url if serve_from_cdn else ''
