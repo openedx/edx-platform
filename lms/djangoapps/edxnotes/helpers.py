@@ -20,6 +20,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
+from edxnotes.plugins import EdxNotesTab
 from courseware.views import get_current_child
 from courseware.access import has_access
 from openedx.core.lib.token_utils import get_id_token
@@ -426,26 +427,6 @@ def generate_uid():
 
 def is_feature_enabled(course):
     """
-    Returns True if Student Notes feature is enabled for the course,
-    False otherwise.
-
-    In order for the application to be enabled it must be:
-        1) enabled globally via FEATURES.
-        2) present in the course tab configuration.
-        3) Harvard Annotation Tool must be disabled for the course.
+    Returns True if Student Notes feature is enabled for the course, False otherwise.
     """
-    return (settings.FEATURES.get("ENABLE_EDXNOTES")
-            and [t for t in course.tabs if t["type"] == "edxnotes"]  # tab found
-            and not is_harvard_notes_enabled(course))
-
-
-def is_harvard_notes_enabled(course):
-    """
-    Returns True if Harvard Annotation Tool is enabled for the course,
-    False otherwise.
-
-    Checks for 'textannotation', 'imageannotation', 'videoannotation' in the list
-    of advanced modules of the course.
-    """
-    modules = set(['textannotation', 'imageannotation', 'videoannotation'])
-    return bool(modules.intersection(course.advanced_modules))
+    return EdxNotesTab.is_enabled(course)
