@@ -13,14 +13,21 @@
     padding: ($baseline/4);
     border-bottom-color: #a5aaaf;
 
-    a {
-      display: block;
+    button {
+      display: inline-block;
       @include float(left);
-      padding: 3px ($baseline/2) 7px;
+      padding: 3px ($baseline/2) 5px;
       margin-left: 7px;
+      border: 0;
       border-radius: 2px;
+      background: transparent;
 
-      &:hover, &:focus {
+      .icon {
+          height: 21px;
+      }
+
+      &:hover,
+      &:focus {
         background: rgba(255, 255, 255, .5);
       }
     }
