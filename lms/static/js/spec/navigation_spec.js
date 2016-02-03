@@ -2,7 +2,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
     'use strict';
 
     describe('Course Navigation Accordion', function() {
-        var accordion, button, heading, chapterContent, chapterMenu;
+        var accordion, chapterMenu;
 
         function keyPressEvent(key) {
             return $.Event('keydown', { which: key });
@@ -12,10 +12,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
             loadFixtures('js/fixtures/accordion.html');
 
             accordion = $('.accordion');
-            button = accordion.children('.button-chapter');
-            heading = button.children('.group-heading');
-            chapterContent = accordion.children('.chapter-content-container');
-            chapterMenu = chapterContent.children('.chapter-menu');
+            chapterMenu = accordion.children('.chapter-content-container').children('.chapter-menu');
 
             this.KEY = $.ui.keyCode;
             spyOn($.fn, 'focus').andCallThrough();
@@ -31,13 +28,8 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 });
 
                 it('ensures aria attributes are present', function() {
-                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
-                        'aria-expanded': 'true'
-                    });
-
-                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
-                        'aria-expanded': 'false'
-                    });
+                    expect(accordion.find('.button-chapter').first()).toHaveAttr('aria-expanded', 'true');
+                    expect(accordion.find('.button-chapter').last()).toHaveAttr('aria-expanded', 'false');
                 });
 
                 it('ensures only one active item', function() {
@@ -58,19 +50,17 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 });
 
                 it('ensure proper aria and attrs', function() {
-                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
-                        'aria-expanded': 'false'
-                    });
-                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
-                        'aria-expanded': 'true'
-                    });
+                    accordion.find('.button-chapter').last().trigger('click');
+
+                    expect(accordion.find('.button-chapter').first()).toHaveAttr('aria-expanded', 'false');
+                    expect(accordion.find('.button-chapter').last()).toHaveAttr('aria-expanded', 'true');
                 });
             });
 
             describe('open section with spacebar', function() {
 
                 it('ensures new section is opened and previous section is closed', function() {
-                    accordion.find('.button-chapter').last().focus().trigger(keyPressEvent(this.KEY.SPACE)); // Spacebar
+                    accordion.find('.button-chapter').last().focus().trigger(keyPressEvent(this.KEY.SPACE));
 
                     expect(accordion.find('.chapter-content-container').first()).not.toHaveClass('is-open');
                     expect(accordion.find('.chapter-content-container').last()).toHaveClass('is-open');
@@ -80,12 +70,10 @@ define(['jquery', 'js/utils/navigation'], function($) {
                 });
 
                 it('ensure proper aria and attrs', function() {
-                    expect(accordion.find('.chapter-content-container').first()).toHaveAttr({
-                        'aria-expanded': 'false'
-                    });
-                    expect(accordion.find('.chapter-content-container').last()).toHaveAttr({
-                        'aria-expanded': 'true'
-                    });
+                    accordion.find('.button-chapter').last().focus().trigger(keyPressEvent(this.KEY.SPACE));
+
+                    expect(accordion.find('.button-chapter').first()).toHaveAttr('aria-expanded', 'false');
+                    expect(accordion.find('.button-chapter').last()).toHaveAttr('aria-expanded', 'true');
                 });
             });
         });
