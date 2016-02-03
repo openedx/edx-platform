@@ -72,6 +72,7 @@ from openedx.core.djangoapps.credit.api import (
 )
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
@@ -549,8 +550,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
             context['section_title'] = section_descriptor.display_name_with_default_escaped
         else:
-            # section is none, so display a message
-            studio_url = get_studio_url(course, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user.
@@ -559,22 +558,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 course_module.position = None
                 course_module.save()
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
-            prev_section_url = reverse('courseware_section', kwargs={
-                'course_id': course_key.to_deprecated_string(),
-                'chapter': chapter_descriptor.url_name,
-                'section': prev_section.url_name
-            })
-            context['fragment'] = Fragment(content=render_to_string(
-                'courseware/welcome-back.html',
-                {
-                    'course': course,
-                    'studio_url': studio_url,
-                    'chapter_module': chapter_module,
-                    'prev_section': prev_section,
-                    'prev_section_url': prev_section_url
-                }
-            ))
-
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
 
@@ -729,6 +712,11 @@ def course_info(request, course_id):
             'url_to_enroll': url_to_enroll,
         }
 
+        # Get the URL of the user's last position in order to display the 'where you were last' message
+        context['last_accessed_courseware_url'] = None
+        if SelfPacedConfiguration.current().enable_course_home_improvements:
+            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request)
+
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
         if not in_preview_mode() and staff_access and now < effective_start:
@@ -737,6 +725,30 @@ def course_info(request, course_id):
             context['disable_student_access'] = True
 
         return render_to_response('courseware/info.html', context)
+
+
+def get_last_accessed_courseware(course, request):
+    """
+    Return the URL the courseware module that this request's user last
+    accessed, or None if it cannot be found.
+    """
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+    chapter_module = get_current_child(course_module)
+    if chapter_module is not None:
+        section_module = get_current_child(chapter_module)
+        if section_module is not None:
+            url = reverse('courseware_section', kwargs={
+                'course_id': unicode(course.id),
+                'chapter': chapter_module.url_name,
+                'section': section_module.url_name
+            })
+            return url
+    return None
 
 
 @ensure_csrf_cookie
