@@ -48,9 +48,8 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         # Ensure the introduction video element is not shown
         self.assertFalse(self.page.intro_video_element.visible)
 
-        # @fghaas: The below presence check can now be modified along with your changeset
         # Still need to figure out how to swap platform settings in the context of a bok choy test
         # but we can at least prevent accidental exposure with these validations going forward
         # Note: 'present' is a DOM check, whereas 'visible' is an actual browser/screen check
-        self.assertTrue(self.page.video_modal_element.present)
+        self.assertFalse(self.page.video_modal_element.present)
         self.assertFalse(self.page.video_modal_element.visible)
