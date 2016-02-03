@@ -72,6 +72,7 @@ from openedx.core.djangoapps.credit.api import (
 )
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
+
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
