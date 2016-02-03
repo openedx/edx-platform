@@ -2,6 +2,7 @@
 Base classes used by studio tests.
 """
 from bok_choy.web_app_test import WebAppTest
+from bok_choy.page_object import XSS_INJECTION
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...fixtures.course import CourseFixture
 from ...fixtures.library import LibraryFixture
@@ -30,8 +31,17 @@ class StudioCourseTest(UniqueCourseTest):
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run'],
-            self.course_info['display_name']
+            self.course_info['display_name'],
         )
+        test_improper_escaping = {u"value": XSS_INJECTION}
+        self.course_fixture.add_advanced_settings({
+            "advertised_start": test_improper_escaping,
+            "info_sidebar_name": test_improper_escaping,
+            "cert_name_short": test_improper_escaping,
+            "cert_name_long": test_improper_escaping,
+            "display_organization": test_improper_escaping,
+            "display_coursenumber": test_improper_escaping,
+        })
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
         self.user = self.course_fixture.user
