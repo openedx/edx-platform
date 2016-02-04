@@ -323,9 +323,11 @@ class XQueueCertInterface(object):
 
         # If this user's enrollment is not eligible to receive a
         # certificate, mark it as such for reporting and
-        # analytics. Only do this if the certificate is new -- we
-        # don't want to mark existing audit certs as ineligible.
-        if created and not is_eligible_for_certificate:
+        # analytics. Only do this if the certificate is new, or
+        # already marked as ineligible -- we don't want to mark
+        # existing audit certs as ineligible.
+        if (created or cert.status in (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)) \
+           and not is_eligible_for_certificate:
             cert.status = CertificateStatuses.audit_passing if passing else CertificateStatuses.audit_notpassing
             cert.save()
             LOGGER.info(
