@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
 from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+from pipeline_mako import render_require_js_path_overrides
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -14,6 +15,11 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 </%def>
 
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+
+<%block name="js_overrides">
+${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+</%block>
+
 <%block name="title"><title>
     % if section_title:
 ${static.get_page_title_breadcrumbs(section_title, course_name())}
