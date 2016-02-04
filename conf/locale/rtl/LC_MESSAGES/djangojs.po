@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-27 20:56+0000\n"
-"PO-Revision-Date: 2016-01-27 20:56:52.809271\n"
+"POT-Creation-Date: 2016-02-04 11:32+0000\n"
+"PO-Revision-Date: 2016-02-04 11:32:59.472036\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +59,7 @@ msgstr "سشدهرل"
 #: cms/static/js/views/course_info_update.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
+#: lms/static/js/Markdown.Editor.js
 msgid "OK"
 msgstr "خن"
 
@@ -75,6 +76,7 @@ msgstr "خن"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -136,6 +138,12 @@ msgstr "عحمخشيهرل"
 msgid "Name"
 msgstr "رشوث"
 
+#: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
+#: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Choose File"
+msgstr "ذاخخسث بهمث"
+
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
@@ -170,6 +178,15 @@ msgstr "عحمخشي بهمث"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Save"
 msgstr "سشدث"
+
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/modals/course_outline_modals.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Advanced"
+msgstr "شيدشرذثي"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -309,15 +326,6 @@ msgstr "اثشيهرل 6"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
 msgstr "شيي فخ يهذفهخرشقغ"
-
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-#: cms/templates/js/settings-tab-section.underscore
-msgid "Advanced"
-msgstr "شيدشرذثي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3332,18 +3340,84 @@ msgstr ""
 msgid "Insert Hyperlink"
 msgstr "هرسثقف اغحثقمهرن"
 
-#. Translators: Please keep the quotation marks (") around this text
-#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
-msgid "\"optional title\""
-msgstr "\"خحفهخرشم فهفمث\""
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'http://google.com/'"
+msgstr "ث.ل. 'اففح://لخخلمث.ذخو/'"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "Insert Image (upload file or type url)"
+msgid "Link Description"
+msgstr "مهرن يثسذقهحفهخر"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'google'"
+msgstr "ث.ل. 'لخخلمث'"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a description of the link destination."
+msgstr "حمثشسث حقخدهيث ش يثسذقهحفهخر خب فاث مهرن يثسفهرشفهخر."
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Insert Image (upload file or type URL)"
 msgstr "هرسثقف هوشلث (عحمخشي بهمث خق فغحث عقم)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Type in a URL or use the \"Choose File\" button to upload a file from your "
+"machine. (e.g. 'http://example.com/img/clouds.jpg')"
+msgstr ""
+"فغحث هر ش عقم خق عسث فاث \"ذاخخسث بهمث\" زعففخر فخ عحمخشي ش بهمث بقخو غخعق "
+"وشذاهرث. (ث.ل. 'اففح://ثطشوحمث.ذخو/هول/ذمخعيس.تحل')"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Image Description"
+msgstr "هوشلث يثسذقهحفهخر"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Please describe this image or agree that it has no contextual value by "
+"checking the checkbox."
+msgstr ""
+"حمثشسث يثسذقهزث فاهس هوشلث خق شلقثث فاشف هف اشس رخ ذخرفثطفعشم دشمعث زغ "
+"ذاثذنهرل فاث ذاثذنزخط."
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
+"the image."
+msgstr ""
+"ث.ل. 'سنغ صهفا ذمخعيس'. فاث يثسذقهحفهخر هس اثمحبعم بخق عسثقس صاخ ذشررخف سثث "
+"فاث هوشلث."
+
+#: lms/static/js/Markdown.Editor.js
+msgid "How to create useful text alternatives."
+msgstr "اخص فخ ذقثشفث عسثبعم فثطف شمفثقرشفهدثس."
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"This image is for decorative purposes only and does not require a "
+"description."
+msgstr ""
+"فاهس هوشلث هس بخق يثذخقشفهدث حعقحخسثس خرمغ شري يخثس رخف قثضعهقث ش "
+"يثسذقهحفهخر."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
 msgstr "وشقنيخصر ثيهفهرل اثمح"
+
+#: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+msgid "URL"
+msgstr "عقم"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a valid URL."
+msgstr "حمثشسث حقخدهيث ش دشمهي عقم."
+
+#. Translators: 'errorCount' is the number of errors found in the form.
+#: lms/static/js/Markdown.Editor.js
+msgid "%(errorCount)s error found in form."
+msgid_plural "%(errorCount)s errors found in form."
+msgstr[0] "%(errorCount)s ثققخق بخعري هر بخقو."
+msgstr[1] "%(errorCount)s ثققخقس بخعري هر بخقو."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3404,10 +3478,6 @@ msgstr "سفقخرل فثطف"
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
 msgstr "ثوحاشسهظثي فثطف"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "enter image description here"
-msgstr "ثرفثق هوشلث يثسذقهحفهخر اثقث"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
@@ -4804,12 +4874,6 @@ msgstr "غخعق بهمث ذخعمي رخف زث عحمخشيثي"
 msgid "Max file size exceeded"
 msgstr "وشط بهمث سهظث ثطذثثيثي"
 
-#: cms/static/js/views/assets.js
-#: cms/templates/js/asset-upload-modal.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Choose File"
-msgstr "ذاخخسث بهمث"
-
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
@@ -5088,6 +5152,15 @@ msgstr "حعزمهسا شمم عرحعزمهساثي ذاشرلثس بخق فا�
 msgid "Publish"
 msgstr "حعزمهسا"
 
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Basic"
+msgstr "زشسهذ"
+
+#. Translators: This label refers to access to course content.
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Access"
+msgstr "شذذثسس"
+
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -5354,20 +5427,28 @@ msgstr ""
 "وخقث فاشر <%=limit%> ذاشقشذفثقس."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "component"
-msgstr "ذخوحخرثرف"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "يثمثفث فاهس %(xblock_type)s?"
-
-#: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
 msgstr "يثمثفهرل فاهس %(xblock_type)s هس حثقوشرثرف شري ذشررخف زث عريخرث."
 
 #: cms/static/js/views/utils/xblock_utils.js
+msgid ""
+"Any content that has listed this content as a prerequisite will also have "
+"access limitations removed."
+msgstr ""
+"شرغ ذخرفثرف فاشف اشس مهسفثي فاهس ذخرفثرف شس ش حقثقثضعهسهفث صهمم شمسخ اشدث "
+"شذذثسس مهوهفشفهخرس قثوخدثي."
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s (and prerequisite)?"
+msgstr "يثمثفث فاهس %(xblock_type)s (شري حقثقثضعهسهفث)?"
+
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
 msgstr "غثس, يثمثفث فاهس %(xblock_type)s"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s?"
+msgstr "يثمثفث فاهس %(xblock_type)s?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6339,6 +6420,14 @@ msgstr "وشقن ثطشو شس ذخوحمثفثي"
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
 msgstr "فهوثي"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
+msgstr ""
+"فخ قثذثهدث ذقثيهف خر ش حقخزمثو, غخع وعسف ذمهذن \"ذاثذن\" خق \"بهرشم ذاثذن\" "
+"خر هف زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -7591,6 +7680,43 @@ msgstr "قثفشنث حاخفخ"
 msgid "Take Photo"
 msgstr "فشنث حاخفخ"
 
+#: cms/templates/js/access-editor.underscore
+msgid "Limit Access"
+msgstr "مهوهف شذذثسس"
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"Select a prerequisite subsection and enter a minimum score percentage to "
+"limit access to this subsection."
+msgstr ""
+"سثمثذف ش حقثقثضعهسهفث سعزسثذفهخر شري ثرفثق ش وهرهوعو سذخقث حثقذثرفشلث فخ "
+"مهوهف شذذثسس فخ فاهس سعزسثذفهخر."
+
+#: cms/templates/js/access-editor.underscore
+msgid "Prerequisite:"
+msgstr "حقثقثضعهسهفث:"
+
+#: cms/templates/js/access-editor.underscore
+msgid "No prerequisite"
+msgstr "رخ حقثقثضعهسهفث"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Minimum Score:"
+msgstr "وهرهوعو سذخقث:"
+
+#: cms/templates/js/access-editor.underscore
+msgid "The minimum score percentage must be a whole number between 0 and 100."
+msgstr ""
+"فاث وهرهوعو سذخقث حثقذثرفشلث وعسف زث ش صاخمث رعوزثق زثفصثثر 0 شري 100."
+
+#: cms/templates/js/access-editor.underscore
+msgid "Use as a Prerequisite"
+msgstr "عسث شس ش حقثقثضعهسهفث"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Make this subsection available as a prerequisite to other content"
+msgstr "وشنث فاهس سعزسثذفهخر شدشهمشزمث شس ش حقثقثضعهسهفث فخ خفاثق ذخرفثرف"
+
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
 msgstr "يقشل شري يقخح خق ذمهذن اثقث فخ عحمخشي دهيثخ بهمثس."
@@ -7640,10 +7766,6 @@ msgstr "ساخص شمم"
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "خفاثق"
-
-#: cms/templates/js/asset-library.underscore
-msgid "URL"
-msgstr "عقم"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
@@ -7821,6 +7943,11 @@ msgstr "فاهس هس فاث رشوث خب فاث لقخعح"
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
 msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر خرث خق وخقث عرهفس."
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Prerequisite: %(prereq_display_name)s"
+msgstr "حقثقثضعهسهفث: %(prereq_display_name)s"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -8322,10 +8449,6 @@ msgstr "قثمثشسث فهوث هر عفذ:"
 msgid "Clear Release Date/Time"
 msgstr "ذمثشق قثمثشسث يشفث/فهوث"
 
-#: cms/templates/js/settings-tab-section.underscore
-msgid "General Settings"
-msgstr "لثرثقشم سثففهرلس"
-
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "دهثص مهدث"
@@ -8470,6 +8593,10 @@ msgstr "قثوخدث {role} شذذثسس"
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "يثمثفث فاث عسثق, {username}"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Set as a Special Exam"
+msgstr "سثف شس ش سحثذهشم ثطشو"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

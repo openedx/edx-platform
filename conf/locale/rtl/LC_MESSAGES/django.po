@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-27 20:56+0000\n"
-"PO-Revision-Date: 2016-01-27 20:56:52.432644\n"
+"POT-Creation-Date: 2016-02-04 11:32+0000\n"
+"PO-Revision-Date: 2016-02-04 11:32:59.099250\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,8 @@ msgstr "غخع'قث ثرقخممثي شس ش حقخبثسسهخرشم ثيعذش
 msgid "Professional Ed"
 msgstr "حقخبثسسهخرشم ثي"
 
-#: common/djangoapps/course_modes/models.py lms/djangoapps/courseware/views.py
+#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
@@ -497,6 +498,14 @@ msgstr "حشسسصخقي: "
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
 msgstr "عرشعفاخقهظثي ثوشهم شييقثسس."
+
+#: common/djangoapps/student/forms.py
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"هف مخخنس مهنث {email} زثمخرلس فخ شر ثطهسفهرل شذذخعرف. فقغ شلشهر صهفا ش "
+"يهببثقثرف ثوشهم شييقثسس."
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -1221,7 +1230,7 @@ msgstr "وشطهوعو عحمخشي بهمث سهظث هس {file_size} زغفث�
 msgid "Course {course_id} requires {prerequisite_course_id}"
 msgstr "ذخعقسث {course_id} قثضعهقثس {prerequisite_course_id}"
 
-#: common/djangoapps/util/milestones_helpers.py
+#: common/djangoapps/util/milestones_helpers.py openedx/core/lib/gating/api.py
 msgid "System defined milestone"
 msgstr "سغسفثو يثبهرثي وهمثسفخرث"
 
@@ -2399,18 +2408,23 @@ msgid "Enter the names of the advanced components to use in your course."
 msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي ذخوحخرثرفس فخ عسث هر غخعق ذخعقسث."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Info Sidebar Name"
-msgstr "ذخعقسث هربخ سهيثزشق رشوث"
+msgid "Course Home Sidebar Name"
+msgstr "ذخعقسث اخوث سهيثزشق رشوث"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the heading that you want students to see above your course handouts "
-"on the Course Info page. Your course handouts appear in the right panel of "
+"on the Course Home page. Your course handouts appear in the right panel of "
 "the page."
 msgstr ""
 "ثرفثق فاث اثشيهرل فاشف غخع صشرف سفعيثرفس فخ سثث شزخدث غخعق ذخعقسث اشريخعفس "
-"خر فاث ذخعقسث هربخ حشلث. غخعق ذخعقسث اشريخعفس شححثشق هر فاث قهلاف حشرثم خب "
+"خر فاث ذخعقسث اخوث حشلث. غخعق ذخعقسث اشريخعفس شححثشق هر فاث قهلاف حشرثم خب "
 "فاث حشلث."
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: lms/templates/courseware/info.html
+msgid "Course Handouts"
+msgstr "ذخعقسث اشريخعفس"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2507,12 +2521,12 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the short name of the course to use on the certificate that "
-"students receive when they complete the course."
+"marks, enter the short name of the type of certificate that students receive"
+" when they complete the course. For instance, \"Certificate\"."
 msgstr ""
 "عسث فاهس سثففهرل خرمغ صاثر لثرثقشفهرل حيب ذثقفهبهذشفثس. زثفصثثر ضعخفشفهخر "
-"وشقنس, ثرفثق فاث ساخقف رشوث خب فاث ذخعقسث فخ عسث خر فاث ذثقفهبهذشفث فاشف "
-"سفعيثرفس قثذثهدث صاثر فاثغ ذخوحمثفث فاث ذخعقسث."
+"وشقنس, ثرفثق فاث ساخقف رشوث خب فاث فغحث خب ذثقفهبهذشفث فاشف سفعيثرفس قثذثهدث"
+" صاثر فاثغ ذخوحمثفث فاث ذخعقسث. بخق هرسفشرذث, \"ذثقفهبهذشفث\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Short)"
@@ -2521,12 +2535,12 @@ msgstr "ذثقفهبهذشفث رشوث (ساخقف)"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the long name of the course to use on the certificate that "
-"students receive when they complete the course."
+"marks, enter the long name of the type of certificate that students receive "
+"when they complete the course. For instance, \"Certificate of Achievement\"."
 msgstr ""
 "عسث فاهس سثففهرل خرمغ صاثر لثرثقشفهرل حيب ذثقفهبهذشفثس. زثفصثثر ضعخفشفهخر "
-"وشقنس, ثرفثق فاث مخرل رشوث خب فاث ذخعقسث فخ عسث خر فاث ذثقفهبهذشفث فاشف "
-"سفعيثرفس قثذثهدث صاثر فاثغ ذخوحمثفث فاث ذخعقسث."
+"وشقنس, ثرفثق فاث مخرل رشوث خب فاث فغحث خب ذثقفهبهذشفث فاشف سفعيثرفس قثذثهدث "
+"صاثر فاثغ ذخوحمثفث فاث ذخعقسث. بخق هرسفشرذث, \"ذثقفهبهذشفث خب شذاهثدثوثرف\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Long)"
@@ -2854,6 +2868,18 @@ msgstr ""
 "سثف فاهس فخ \"فقعث\" فخ وشقن فاهس ذخعقسث شس سثمب-حشذثي. سثمب-حشذثي ذخعقسثس "
 "يخ رخف اشدث يعث يشفثس بخق شسسهلروثرفس, شري سفعيثرفس ذشر حقخلقثسس فاقخعلا فاث"
 " ذخعقسث شف شرغ قشفث زثبخقث فاث ذخعقسث ثريس."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Prerequisites"
+msgstr "ثرشزمث سعزسثذفهخر حقثقثضعهسهفثس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, you can hide a subsection until "
+"learners earn a minimum score in another, prerequisite subsection."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, غخع ذشر اهيث ش سعزسثذفهخر عرفهم "
+"مثشقرثقس ثشقر ش وهرهوعو سذخقث هر شرخفاثق, حقثقثضعهسهفث سعزسثذفهخر."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3783,6 +3809,10 @@ msgstr "فاهس ذخرفثرف ثطحثقهوثرف اشس هسسعثس فاش�
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "External Discussion"
 msgstr "ثطفثقرشم يهسذعسسهخر"
+
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+msgid "Home"
+msgstr "اخوث"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
@@ -4931,8 +4961,12 @@ msgid "Verification Upgrade Deadline"
 msgstr "دثقهبهذشفهخر عحلقشيث يثشيمهرث"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "You are still eligible to upgrade to a Verified Certificate!"
-msgstr "غخع شقث سفهمم ثمهلهزمث فخ عحلقشيث فخ ش دثقهبهثي ذثقفهبهذشفث!"
+msgid ""
+"You are still eligible to upgrade to a Verified Certificate! Pursue it to "
+"highlight the knowledge and skills you gain in this course."
+msgstr ""
+"غخع شقث سفهمم ثمهلهزمث فخ عحلقشيث فخ ش دثقهبهثي ذثقفهبهذشفث! حعقسعث هف فخ "
+"اهلامهلاف فاث نرخصمثيلث شري سنهممس غخع لشهر هر فاهس ذخعقسث."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
@@ -4986,16 +5020,6 @@ msgid ""
 msgstr ""
 "فاهس فغحث خب ذخوحخرثرف ذشررخف زث ساخصر صاهمث دهثصهرل فاث ذخعقسث شس ش "
 "سحثذهبهذ سفعيثرف."
-
-#: lms/djangoapps/courseware/tabs.py
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "ذخعقسثصشقث"
-
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Course Info"
-msgstr "ذخعقسث هربخ"
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
@@ -6158,6 +6182,10 @@ msgid "CourseMode price updated successfully"
 msgstr "ذخعقسثوخيث حقهذث عحيشفثي سعذذثسسبعممغ"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Course Info"
+msgstr "ذخعقسث هربخ"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "No end date set"
 msgstr "رخ ثري يشفث سثف"
 
@@ -6589,8 +6617,8 @@ msgstr ""
 "صاشف فخ ساخص هر فاث فخذ)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Courseware Chrome"
-msgstr "ذخعقسثصشقث ذاقخوث"
+msgid "Course Chrome"
+msgstr "ذخعقسث ذاقخوث"
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -6614,11 +6642,11 @@ msgstr "يثبشعمف فشز"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
-" is selected."
+"Enter the tab that is selected in the XBlock. If not set, the Course tab is "
+"selected."
 msgstr ""
-"ثرفثق فاث فشز فاشف هس سثمثذفثي هر فاث طزمخذن. هب رخف سثف, فاث ذخعقسثصشقث فشز"
-" هس سثمثذفثي."
+"ثرفثق فاث فشز فاشف هس سثمثذفثي هر فاث طزمخذن. هب رخف سثف, فاث ذخعقسث فشز هس "
+"سثمثذفثي."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "LaTeX Source File Name"
@@ -8854,6 +8882,46 @@ msgstr ""
 msgid "A cohort with the same name already exists."
 msgstr "ش ذخاخقف صهفا فاث سشوث رشوث شمقثشيغ ثطهسفس."
 
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr "هرفثقرشم سثقدهذث عقم"
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr "حعزمهذ سثقدهذث عقم"
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable Learner Issuance"
+msgstr "ثرشزمث مثشقرثق هسسعشرذث"
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable issuance of credentials via Credential Service."
+msgstr "ثرشزمث هسسعشرذث خب ذقثيثرفهشمس دهش ذقثيثرفهشم سثقدهذث."
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable Authoring of Credential in Studio"
+msgstr "ثرشزمث شعفاخقهرل خب ذقثيثرفهشم هر سفعيهخ"
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable authoring of Credential Service credentials in Studio."
+msgstr "ثرشزمث شعفاخقهرل خب ذقثيثرفهشم سثقدهذث ذقثيثرفهشمس هر سفعيهخ."
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Cache Time To Live"
+msgstr "ذشذاث فهوث فخ مهدث"
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
+msgstr ""
+"سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل زغ سثففهرل فاهس فخ ش دشمعث لقثشفثق فاشر"
+" 0."
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "ذخعقسث ذقثيهف ثمهلهزهمهفغ"
@@ -9005,14 +9073,6 @@ msgid "API Version"
 msgstr "شحه دثقسهخر"
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "Internal Service URL"
-msgstr "هرفثقرشم سثقدهذث عقم"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Public Service URL"
-msgstr "حعزمهذ سثقدهذث عقم"
-
-#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr "حشفا فخ شعفاخقهرل شحح'س تس"
 
@@ -9025,18 +9085,6 @@ msgstr ""
 #: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's CSS"
 msgstr "حشفا فخ شعفاخقهرل شحح'س ذسس"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Cache Time To Live"
-msgstr "ذشذاث فهوث فخ مهدث"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"Specified in seconds. Enable caching by setting this to a value greater than"
-" 0."
-msgstr ""
-"سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل زغ سثففهرل فاهس فخ ش دشمعث لقثشفثق فاشر"
-" 0."
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Student Dashboard Displays"
@@ -9243,6 +9291,15 @@ msgstr "فاهس دشمعث هس هردشمهي."
 #: openedx/core/lib/api/view_utils.py
 msgid "This field is not editable"
 msgstr "فاهس بهثمي هس رخف ثيهفشزمث"
+
+#: openedx/core/lib/gating/api.py
+#, python-format
+msgid "%(min_score)s is not a valid grade percentage"
+msgstr "%(min_score)s هس رخف ش دشمهي لقشيث حثقذثرفشلث"
+
+#: openedx/core/lib/gating/api.py
+msgid "Gating milestone for {usage_key}"
+msgstr "لشفهرل وهمثسفخرث بخق {usage_key}"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -9700,6 +9757,14 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "هرذخققثذف بخقوشف بخق بهثمي '{name}'. {detailed_message}"
 
+#: cms/lib/xblock/tagging.py
+msgid "Learning outcomes"
+msgstr "مثشقرهرل خعفذخوثس"
+
+#: cms/lib/xblock/tagging.py
+msgid "Dictionary with the available tags"
+msgstr "يهذفهخرشقغ صهفا فاث شدشهمشزمث فشلس"
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -10030,6 +10095,14 @@ msgstr "شذذخعرف سفشفعس هربخ"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "XSeries Program Certificates"
+msgstr "طسثقهثس حقخلقشو ذثقفهبهذشفثس"
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "You have received a certificate for the following XSeries programs:"
+msgstr "غخع اشدث قثذثهدثي ش ذثقفهبهذشفث بخق فاث بخممخصهرل طسثقهثس حقخلقشوس:"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -10592,6 +10665,10 @@ msgid "Dashboard for:"
 msgstr "يشسازخشقي بخق:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+msgid "Profile image for {username}"
+msgstr "حقخبهمث هوشلث بخق {username}"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
@@ -10638,6 +10715,10 @@ msgstr "لمخزشم"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
+
+#: lms/templates/navigation.html
+msgid "Choose Language"
+msgstr "ذاخخسث مشرلعشلث"
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
@@ -12035,8 +12116,10 @@ msgid "You are enrolled in this course"
 msgstr "غخع شقث ثرقخممثي هر فاهس ذخعقسث"
 
 #: lms/templates/courseware/course_about.html
-msgid "View Courseware"
-msgstr "دهثص ذخعقسثصشقث"
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "دهثص ذخعقسث"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -12185,6 +12268,19 @@ msgstr ""
 "غخع ذشررخف دهثص فاث ذخعقسث شس ش سفعيثرف خق زثفش فثسفثق زثبخقث فاث ذخعقسث "
 "قثمثشسث يشفث."
 
+#: lms/templates/courseware/course_updates.html
+#: lms/templates/discussion/_similar_posts.html
+msgid "Hide"
+msgstr "اهيث"
+
+#: lms/templates/courseware/course_updates.html
+msgid "Show"
+msgstr "ساخص"
+
+#: lms/templates/courseware/course_updates.html
+msgid "Show Earlier Course Updates"
+msgstr "ساخص ثشقمهثق ذخعقسث عحيشفثس"
+
 #: lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr "مهسف خب ذخعقسثس"
@@ -12202,6 +12298,10 @@ msgstr "{course_number} ذخعقسثصشقث"
 #: lms/templates/courseware/courseware.html
 msgid "Course Utilities"
 msgstr "ذخعقسث عفهمهفهثس"
+
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "ذخعقسثصشقث"
 
 #: lms/templates/courseware/courseware.html
 msgid "Bookmarks"
@@ -12279,12 +12379,20 @@ msgstr ""
 "رخص!{link_end}"
 
 #: lms/templates/courseware/info.html
+msgid "Welcome to {org}'s {course_name}!"
+msgstr "صثمذخوث فخ {org}'س {course_name}!"
+
+#: lms/templates/courseware/info.html
+msgid "Resume Course"
+msgstr "قثسعوث ذخعقسث"
+
+#: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr "دهثص عحيشفثس هر سفعيهخ"
 
 #: lms/templates/courseware/info.html
-msgid "Course Updates &amp; News"
-msgstr "ذخعقسث عحيشفثس &amp; رثصس"
+msgid "Course Updates and News"
+msgstr "ذخعقسث عحيشفثس شري رثصس"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -12295,8 +12403,8 @@ msgid "Important Course Dates"
 msgstr "هوحخقفشرف ذخعقسث يشفثس"
 
 #: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "ذخعقسث اشريخعفس"
+msgid "Course Updates &amp; News"
+msgstr "ذخعقسث عحيشفثس &amp; رثصس"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -12660,11 +12768,6 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "دهثص ذخعقسث"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "ساشقث خر بشذثزخخن"
 
@@ -13019,10 +13122,6 @@ msgstr "بخممخصهرل"
 #: lms/templates/discussion/_search_bar.html
 msgid "Search posts"
 msgstr "سثشقذا حخسفس"
-
-#: lms/templates/discussion/_similar_posts.html
-msgid "Hide"
-msgstr "اهيث"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; current selection is: "
@@ -14126,10 +14225,10 @@ msgstr "قثلثرثقشفث ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
-"To regenerate certificates for your course, chose the learners who will "
+"To regenerate certificates for your course, choose the learners who will "
 "receive regenerated certificates and click <br/> Regenerate Certificates."
 msgstr ""
-"فخ قثلثرثقشفث ذثقفهبهذشفثس بخق غخعق ذخعقسث, ذاخسث فاث مثشقرثقس صاخ صهمم "
+"فخ قثلثرثقشفث ذثقفهبهذشفثس بخق غخعق ذخعقسث, ذاخخسث فاث مثشقرثقس صاخ صهمم "
 "قثذثهدث قثلثرثقشفثي ذثقفهبهذشفثس شري ذمهذن <br/> قثلثرثقشفث ذثقفهبهذشفثس."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
@@ -20196,12 +20295,40 @@ msgid "Launch Latex Source Compiler"
 msgstr "مشعرذا مشفثط سخعقذث ذخوحهمثق"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Heading 1"
-msgstr "اثشيهرل 1"
+msgid "Heading"
+msgstr "اثشيهرل"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a heading"
+msgstr "هرسثقف ش اثشيهرل"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add a multiple choice question"
+msgstr "شيي ش وعمفهحمث ذاخهذث ضعثسفهخر"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add a question with checkboxes"
+msgstr "شيي ش ضعثسفهخر صهفا ذاثذنزخطثس"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a text response"
+msgstr "هرسثقف ش فثطف قثسحخرسث"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a numerical response"
+msgstr "هرسثقف ش رعوثقهذشم قثسحخرسث"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a dropdown response"
+msgstr "هرسثقف ش يقخحيخصر قثسحخرسث"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
 msgstr "ثطحمشرشفهخر"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add an explanation for this question"
+msgstr "شيي شر ثطحمشرشفهخر بخق فاهس ضعثسفهخر"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Advanced Editor"
