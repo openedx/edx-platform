@@ -186,7 +186,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-22 14:54+0000\n"
+"POT-Creation-Date: 2016-01-27 21:06+0000\n"
 "PO-Revision-Date: 2016-01-12 23:32+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -1586,8 +1586,9 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/templates/course_modes/choose.html lms/templates/login.html
-#: lms/templates/register-form.html
+#: lms/templates/login.html lms/templates/register-form.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "or"
 msgstr "ou"
 
@@ -7659,6 +7660,7 @@ msgstr "Aperçu"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Close"
 msgstr "Fermer"
 
@@ -7672,6 +7674,7 @@ msgstr "Aperçu du wiki"
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/modal/_modal-settings-language.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "window open"
 msgstr "fenêtre ouverte"
 
@@ -7925,6 +7928,7 @@ msgstr ""
 #: lms/templates/courseware/courses.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Search"
 msgstr "Recherche"
 
@@ -8122,18 +8126,6 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
-msgid "bytes"
-msgstr ""
-
-#: openedx/core/djangoapps/profile_images/images.py
-msgid "KB"
-msgstr ""
-
-#: openedx/core/djangoapps/profile_images/images.py
-msgid "MB"
-msgstr ""
-
-#: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr ""
 
@@ -8155,6 +8147,18 @@ msgstr ""
 msgid ""
 "The file name extension for this file does not match the file data. The file"
 " may be corrupted."
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "bytes"
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "KB"
+msgstr ""
+
+#: openedx/core/djangoapps/profile_images/images.py
+msgid "MB"
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/views.py
@@ -8202,6 +8206,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Studio Authoring Interface"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Enable Program Certificate Generation"
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -8994,6 +9002,61 @@ msgstr "Aide"
 msgid "Sign Out"
 msgstr "Se déconnecter"
 
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Looking for help with {studio_name}?"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Hide {studio_name} Help"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "{studio_name} Documentation"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Access documentation on http://docs.edx.org"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "edX Documentation"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in edX101"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Enroll in StudioX"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Send an email to {email}"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "Contact Us"
+msgstr ""
+
 #: common/lib/capa/capa/templates/codeinput.html
 msgid "{programming_language} editor"
 msgstr ""
@@ -9026,111 +9089,6 @@ msgstr ""
 #: common/templates/license.html
 msgid "Some Rights Reserved"
 msgstr "Quelques droits réservés"
-
-#: common/templates/course_modes/choose.html
-msgid "Enroll In {} | Choose Your Track"
-msgstr "Inscrit dans {} | Choisissez votre parcours"
-
-#: common/templates/course_modes/choose.html
-msgid "Sorry, there was an error when trying to enroll you"
-msgstr "Désolé, une erreur s'est produite en tentant de vous inscrire."
-
-#: common/templates/course_modes/choose.html
-msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr "Félicitations! Vous êtes maintenant inscrit à {course_name}"
-
-#: common/templates/course_modes/choose.html
-msgid "Pursue Academic Credit with a Verified Certificate"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Become eligible for academic credit and highlight your new skills and "
-"knowledge with a verified certificate. Use this valuable credential to "
-"qualify for academic credit, advance your career, or strengthen your school "
-"applications."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Eligible for credit:{b_end} Receive academic credit after "
-"successfully completing the course"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
-"institution's logo"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
-"or post it directly on LinkedIn"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Pursue a Verified Certificate"
-msgstr "Poursuivre Certificat Vérifié"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Highlight your new knowledge and skills with a verified certificate. Use "
-"this valuable credential to improve your job prospects and advance your "
-"career, or highlight your certificate in school applications."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
-"institution's logo"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
-"or post it directly on LinkedIn"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Motivating: {b_end}Give yourself an additional incentive to "
-"complete the course"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
-"certificates to help fund free education for everyone globally"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "Suivre ce Cours"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course (No Certificate)"
-msgstr ""
-
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums.  {b_start}Please note that this "
-"track does not offer a certificate for learners who earn a passing "
-"grade.{b_end}"
-msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -9176,67 +9134,60 @@ msgid "View all Courses"
 msgstr "Voir tous les cours"
 
 #: lms/templates/dashboard.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr ""
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
 msgstr "Apparemment, vous n'êtes inscrit à aucun cours."
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Find courses now!"
 msgstr "Découvrir nos cours"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "Erreurs de chargement du cours"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Search Your Courses"
 msgstr "Rechercher vos cours"
 
 #: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: lms/templates/dashboard.html
-msgid ""
-"Check out our recently launched courses and what's new in your favorite "
-"subjects"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid "Find New Courses"
-msgstr ""
-
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
 msgstr ""
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "Historique des commandes"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "Paramètres de messagerie pour {course_number}"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Receive course emails"
 msgstr "Recevoir les e-mails du cours"
 
-#: lms/templates/dashboard.html
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Save Settings"
 msgstr "Enregistrer les paramètres"
 
 #: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Unenroll"
 msgstr "Se Désinscrire"
 
@@ -9305,16 +9256,7 @@ msgstr "Debogage :"
 msgid "External Authentication failed"
 msgstr "Échec de l'authentification externe"
 
-#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
-msgid "Page Footer"
-msgstr "Bas de page"
-
-#: lms/templates/footer-edx-v3.html themes/edx.org/lms/templates/footer.html
-msgid "About edX"
-msgstr "A propos d'edX"
-
-#: lms/templates/footer-edx-v3.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
+#: lms/templates/footer.html themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Légal"
@@ -11053,6 +10995,123 @@ msgstr ""
 msgid "Please wait while we retrieve your order details."
 msgstr ""
 
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Enroll In {} | Choose Your Track"
+msgstr "Inscrit dans {} | Choisissez votre parcours"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Sorry, there was an error when trying to enroll you"
+msgstr "Désolé, une erreur s'est produite en tentant de vous inscrire."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Congratulations!  You are now enrolled in {course_name}"
+msgstr "Félicitations! Vous êtes maintenant inscrit à {course_name}"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with a Verified Certificate"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Become eligible for academic credit and highlight your new skills and "
+"knowledge with a verified certificate. Use this valuable credential to "
+"qualify for academic credit, advance your career, or strengthen your school "
+"applications."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Eligible for credit:{b_end} Receive academic credit after "
+"successfully completing the course"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
+"institution's logo"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr "Poursuivre Certificat Vérifié"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Highlight your new knowledge and skills with a verified certificate. Use "
+"this valuable credential to improve your job prospects and advance your "
+"career, or highlight your certificate in school applications."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
+"institution's logo"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Motivating: {b_end}Give yourself an additional incentive to "
+"complete the course"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "Suivre ce Cours"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Audit This Course (No Certificate)"
+msgstr ""
+
+#. Translators: b_start notes the beginning of a section of text bolded for
+#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums.  {b_start}Please note that this "
+"track does not offer a certificate for learners who earn a passing "
+"grade.{b_end}"
+msgstr ""
+
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr ""
@@ -11535,7 +11594,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
-#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "L'équipe de  {platform_name}"
@@ -12235,34 +12293,6 @@ msgstr ""
 "Pour commencer, activer votre compte  {platform_name} en cliquant sur le "
 "lien ci-dessous ou copier coller le lien dans la barre d'adresse de votre "
 "navigateur."
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"After you activate your account, you can sign up for and take any of the "
-"hundreds of courses {platform_name} offers."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"Once you have activated your account, edX will send you email from time to "
-"time about new courses or other information."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {contact_us_url}, email "
-"{info_email_address}, or write to {info_postal_address}."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-msgid "We hope you enjoy learning with {platform_name}!"
-msgstr "Nous espérons que vous appréciez d'apprendre avec {platform_name} !"
-
-#: lms/templates/emails/activation_email.txt
-msgid ""
-"This email was automatically sent by {site_name} because someone attempted "
-"to create an {platform_name} account using this email address."
-msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -15301,7 +15331,6 @@ msgstr ""
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
 #: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/copyright.html
 #: lms/templates/static_templates/donate.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/help.html
@@ -15318,10 +15347,6 @@ msgid ""
 msgstr ""
 "Cette page est laissée vide. Elle n'est pas utilisée par edx.org, mais est "
 "laissée ici pour une éventuelle utilisation par l'installation d'Open edX."
-
-#: lms/templates/static_templates/copyright.html
-msgid "Copyright"
-msgstr "Copyright"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -15608,6 +15633,46 @@ msgstr "{span_start}actif{span_end}"
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "Ajouter un article"
+
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid ""
+"Access Course Staff Support on the Partner Portal to submit or review "
+"support tickets"
+msgstr ""
+
+#: themes/edx.org/cms/templates/widgets/sock.html
+msgid "edX Partner Portal"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid ""
+"Check out our recently launched courses and what's new in your favorite "
+"subjects"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Find New Courses"
+msgstr ""
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "Page Footer"
+msgstr "Bas de page"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "About edX"
+msgstr "A propos d'edX"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid ""
+"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
+"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
+"certificates to help fund free education for everyone globally"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -18886,66 +18951,12 @@ msgid "Label"
 msgstr "Label"
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for help with {studio_name}?"
-msgstr "Besoin d'aide sur {studio_name}?"
-
-#: cms/templates/widgets/sock.html
-msgid "Hide {studio_name} Help"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "{studio_name} Documentation"
-msgstr "{studio_name} Documentation"
-
-#: cms/templates/widgets/sock.html
-msgid "Access documentation on http://docs.edx.org"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "edX Documentation"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid ""
-"Access Course Staff Support on the Partner Portal to submit or review "
-"support tickets"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "edX Partner Portal"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
 msgid "Access the Open edX Portal"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid "Open edX Portal"
 msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in edX101: Overview of Creating an edX Course"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in edX101"
-msgstr "S'inscrire à edX101"
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in StudioX: Creating a Course with edX Studio"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "Enroll in StudioX"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "Send an email to {email}"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-msgid "Contact Us"
-msgstr "Nous contacter"
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
