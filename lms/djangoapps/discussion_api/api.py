@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 import itertools
+from lms.djangoapps.django_comment_client.base.views import track_voted_event
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -496,7 +497,7 @@ def _check_editable_fields(cc_content, data, context):
     )
 
 
-def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
+def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context, request):
     """
     Perform any necessary additional actions related to content creation or
     update that require a separate comments service request.
@@ -524,6 +525,7 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 else:
                     context["cc_requester"].unvote(cc_content)
                     api_content["vote_count"] -= 1
+                track_voted_event(request, context["course"], cc_content, "up", False if form_value else True)
 
 
 def create_thread(request, thread_data):
@@ -568,7 +570,7 @@ def create_thread(request, thread_data):
     cc_thread = serializer.instance
     thread_created.send(sender=None, user=user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
@@ -609,7 +611,7 @@ def create_comment(request, comment_data):
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
+    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context, request)
 
     track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
 
@@ -646,7 +648,7 @@ def update_thread(request, thread_id, update_data):
         # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context, request)
     return api_thread
 
 
@@ -690,7 +692,7 @@ def update_comment(request, comment_id, update_data):
         serializer.save()
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context, request)
     return api_comment
 
 

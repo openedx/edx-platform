@@ -358,6 +358,7 @@ def make_minimal_cs_comment(overrides=None):
     ret = {
         "type": "comment",
         "id": "dummy",
+        "commentable_id": "dummy",
         "thread_id": "dummy",
         "parent_id": None,
         "user_id": "0",
