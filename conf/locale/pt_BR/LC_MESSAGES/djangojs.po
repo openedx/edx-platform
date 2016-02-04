@@ -42,6 +42,7 @@
 # Mariana Baroni <maribaroni@gmail.com>, 2014
 # Matheus Andrade <matheusflkandrade@hotmail.com>, 2014
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
+# Ned Batchelder <ned@edx.org>, 2016
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # Paulo Castro, 2013
@@ -3947,7 +3948,7 @@ msgid ""
 "The {cohortGroupName} cohort has been created. You can manually add students"
 " to this cohort below."
 msgstr ""
-"O grupo {NomeDoGrupo}  foi criado.Você pode adicionar manualmente os "
+"O grupo {cohortGroupName}  foi criado.Você pode adicionar manualmente os "
 "estudantes para o curso abaixo."
 
 #: lms/static/js/groups/views/cohorts.js
@@ -4227,8 +4228,8 @@ msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
 msgstr ""
-"Nós enviamos uma mensagem de confirmação para {new-mail_address}. Clique no "
-"link da mensagem para atualizar o teu endereço de e-mail."
+"Nós enviamos uma mensagem de confirmação para {new_email_address}. Clique no"
+" link da mensagem para atualizar o teu endereço de e-mail."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4241,8 +4242,8 @@ msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset your password."
 msgstr ""
-"Nós mandamos uma mensagem para {endereço de e-mail}. Clique no link na "
-"mensagem para redefinir tua senha"
+"Nós mandamos uma mensagem para {email_address}. Clique no link na mensagem "
+"para redefinir tua senha"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink"

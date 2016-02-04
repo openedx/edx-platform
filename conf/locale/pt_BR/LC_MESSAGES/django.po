@@ -4825,7 +4825,7 @@ msgid ""
 "required tasks for this course under its guidelines."
 msgstr ""
 "Um {cert_type} certificado significa que um aluno concordou em cumprir o "
-"código de honra estabelecido pela {plattform_name} e completou todas as "
+"código de honra estabelecido pela {platform_name} e completou todas as "
 "tarefas exigidas para o curso sob suas diretrizes."
 
 #. Translators:  This text describes the 'ID Verified' course certificate
@@ -4841,7 +4841,7 @@ msgid ""
 " and is valid."
 msgstr ""
 "Um {cert_type} certificado significa que um aluno concordou em cumprir o "
-"código de honra estabelecido por {plattform_name} e completou todas as "
+"código de honra estabelecido por {platform_name} e completou todas as "
 "tarefas exigidas para este curso sob suas diretrizes. Um certificado "
 "{cert_type}  também indica que a identidade do aluno foi verificada e é "
 "válida."
@@ -4869,8 +4869,8 @@ msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
 "participated in {partner_short_name} {course_number}"
 msgstr ""
-"Este é um certificado válido {plattform_name} para {use_name} que participou"
-" no {partne_short_name} {course_number}"
+"Este é um certificado válido {platform_name} para {user_name} que participou"
+" no {partner_short_name} {course_number}"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
@@ -4888,7 +4888,7 @@ msgid ""
 "{platform_name} {certificate_type} Certificate of Completion in "
 msgstr ""
 "completou com sucesso, recebeu uma nota de aprovação, e foi concedido "
-"{plattform_name} {certificate_type} este Certificado de Conclusão em"
+"{platform_name} {certificate_type} este Certificado de Conclusão em"
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -5795,7 +5795,7 @@ msgstr "Anotações"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
-msgstr "{nome_da_plataforma} Equipe"
+msgstr "{platform_name} Equipe"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
@@ -7049,7 +7049,7 @@ msgid ""
 "{course_name_list}"
 msgstr ""
 "Confirmação e Códigos de inscrição para os seguintes cursos: "
-"{couse_name_list}"
+"{course_name_list}"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
@@ -8158,8 +8158,8 @@ msgstr "Este código de inscrição ({enrollment_code}) não é válido."
 msgid ""
 "Code '{registration_code}' is not valid for any course in the shopping cart."
 msgstr ""
-"O código '{0}' não é valido para qualquer um dos cursos no seu carrinho de "
-"compras."
+"O código '{registration_code}' não é valido para qualquer um dos cursos no "
+"seu carrinho de compras."
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid ""

@@ -26,7 +26,7 @@
 # mchalyk <mchalyk@gmail.com>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
 # Natalia Vavilina <nfgenius@gmail.com>, 2015
-# Ned Batchelder <ned@edx.org>, 2015
+# Ned Batchelder <ned@edx.org>, 2015-2016
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikita V. Ignatchenko <n.v.ignatchenko@urfu.ru>, 2014
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014-2015
@@ -1882,7 +1882,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
-msgstr "Пустая задача — расширенный XML-редактор"
+msgstr "Пустая задача: XML-редактор"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Number of attempts taken by the student on this problem"
@@ -9290,7 +9290,7 @@ msgstr "Крайний срок подачи заявки и оформлени�
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
-msgstr "Размер файла не должен превышать {image_min_size}."
+msgstr "Размер файла не должен превышать {image_max_size}."
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be at least {image_min_size} in size."
