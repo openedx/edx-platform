@@ -70,7 +70,7 @@ from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
 from student.roles import (
@@ -324,10 +324,10 @@ def course_search_index_handler(request, course_key_string):
         try:
             reindex_course_and_check_access(course_key, request.user)
         except SearchIndexingError as search_err:
-            return HttpResponse(escape_json_dumps({
+            return HttpResponse(dump_js_escaped_json({
                 "user_message": search_err.error_list
             }), content_type=content_type, status=500)
-        return HttpResponse(escape_json_dumps({
+        return HttpResponse(dump_js_escaped_json({
             "user_message": _("Course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
