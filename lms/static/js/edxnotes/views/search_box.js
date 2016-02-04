@@ -29,12 +29,13 @@ define([
             this.logger = NotesLogger.getLogger('search_box', this.options.debug);
             this.$el.removeClass('is-hidden');
             this.isDisabled = false;
+            this.searchInput = this.$el.find("#search-notes-input");
             this.logger.log('initialized');
         },
 
         clearInput: function() {
             // clear the search input box
-            this.$("#search-notes-input").val('');
+            this.searchInput.val("");
         },
 
         submitHandler: function (event) {
