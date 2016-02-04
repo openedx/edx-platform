@@ -47,7 +47,8 @@ from lms.envs.common import (
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
-    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
+    ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
+    DEFAULT_COURSE_ABOUT_IMAGE_URL,
 )
 from path import path
 from warnings import simplefilter
