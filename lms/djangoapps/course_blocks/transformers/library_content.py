@@ -3,7 +3,7 @@ Content Library Transformer.
 """
 import json
 from courseware.models import StudentModule
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker

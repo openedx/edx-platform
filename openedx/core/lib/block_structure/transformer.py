@@ -14,7 +14,7 @@ class BlockStructureTransformer(object):
     # attribute.  While the value for the base class is set to 0,
     # the value for each concrete transformer should be 1 or higher.
     #
-    # A transformer's version attribute is used by the block_cache
+    # A transformer's version attribute is used by the block_structure
     # framework in order to determine whether any collected data for a
     # transformer is outdated.  When a transformer's data is collected
     # and cached, it's version number at the time of collection is
@@ -115,7 +115,7 @@ class BlockStructureTransformer(object):
 
         Arguments:
             usage_info (any negotiated type) - A usage-specific object
-                that is passed to the block_cache and forwarded to all
+                that is passed to the block_structure and forwarded to all
                 requested Transformers in order to apply a
                 usage-specific transform. For example, an instance of
                 usage_info would contain a user object for which the

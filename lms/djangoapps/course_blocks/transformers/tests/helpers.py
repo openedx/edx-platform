@@ -1,8 +1,11 @@
 """
 Test helpers for testing course block transformers.
 """
+from mock import patch
 from course_modes.models import CourseMode
+from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -11,7 +14,25 @@ from lms.djangoapps.courseware.access import has_access
 from ...api import get_course_blocks
 
 
-class CourseStructureTestCase(ModuleStoreTestCase):
+class TransformerRegistryTestMixin(object):
+    """
+    Mixin that overrides the TransformerRegistry so that it returns
+    TRANSFORMER_CLASS_TO_TEST as a registered transformer.
+    """
+    def setUp(self):
+        super(TransformerRegistryTestMixin, self).setUp()
+        self.patcher = patch(
+            'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+        )
+        mock_registry = self.patcher.start()
+        mock_registry.return_value = {self.TRANSFORMER_CLASS_TO_TEST}
+        self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST()])
+
+    def tearDown(self):
+        self.patcher.stop()
+
+
+class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
     """
     Helper for test cases that need to build course structures.
     """
@@ -157,6 +178,8 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         for block_hierarchy in course_hierarchy:
             self.add_parents(block_hierarchy, block_map)
 
+        publish_course(block_map['course'])
+
         return block_map
 
     def get_block_key_set(self, blocks, *refs):
@@ -170,7 +193,7 @@ class CourseStructureTestCase(ModuleStoreTestCase):
         return set([xblock.location for xblock in xblocks])
 
 
-class BlockParentsMapTestCase(ModuleStoreTestCase):
+class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
     """
     Test helper class for creating a test course of
     a graph of vertical blocks based on a parents_map.
@@ -203,7 +226,6 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
             if i == 0:
                 continue  # course already created
 
-            # create the block as a vertical
             self.xblock_keys.append(
                 ItemFactory.create(
                     parent=self.get_block(parents_index[0]),
@@ -252,66 +274,23 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
                 transformers result and the current implementation of
                 has_access.
 
-            transformers (BlockStructureTransformer): An optional list
-                of transformer that are to be executed.  If not
+            transformers (BlockStructureTransformers): An optional collection
+                of transformers that are to be executed.  If not
                 provided, the default value used by get_course_blocks
                 is used.
         """
-        def check_results(user, expected_accessible_blocks, blocks_with_differing_access):
-            """
-            Verifies the results of transforming the blocks in the
-            course for the given user.
-            """
-
-            self.client.login(username=user.username, password=self.password)
-            block_structure = get_course_blocks(user, self.course.location, transformers=transformers)
-
-            # Enumerate through all the blocks that were created in the
-            # course
-            for i, xblock_key in enumerate(self.xblock_keys):
-
-                # verify existence of the block
-                block_structure_result = block_structure.has_block(xblock_key)
-                has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
-
-                # compare with expected value
-                self.assertEquals(
-                    block_structure_result,
-                    i in expected_accessible_blocks,
-                    "block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
-                        block_structure_result, i, user.username
-                    )
-                )
-
-                # compare with has_access result
-                if i in blocks_with_differing_access:
-                    self.assertNotEqual(
-                        block_structure_result,
-                        has_access_result,
-                        "block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
-                            block_structure_result, has_access_result, i, user.username
-                        )
-                    )
-                else:
-                    self.assertEquals(
-                        block_structure_result,
-                        has_access_result,
-                        "block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
-                            block_structure_result, has_access_result, i, user.username
-                        )
-                    )
-
-            self.client.logout()
+        publish_course(self.course)
 
         # verify given test user has access to expected blocks
-        check_results(
+        self._check_results(
             test_user,
             expected_user_accessible_blocks,
-            blocks_with_differing_access
+            blocks_with_differing_access,
+            transformers,
         )
 
         # verify staff has access to all blocks
-        check_results(self.staff, set(range(len(self.parents_map))), {})
+        self._check_results(self.staff, set(range(len(self.parents_map))), {}, transformers)
 
     def get_block(self, block_index):
         """
@@ -320,12 +299,65 @@ class BlockParentsMapTestCase(ModuleStoreTestCase):
         """
         return modulestore().get_item(self.xblock_keys[block_index])
 
+    def _check_results(self, user, expected_accessible_blocks, blocks_with_differing_access, transformers):
+        """
+        Verifies the results of transforming the blocks in the
+        course for the given user.
+        """
+
+        self.client.login(username=user.username, password=self.password)
+        block_structure = get_course_blocks(user, self.course.location, transformers)
+
+        for i, xblock_key in enumerate(self.xblock_keys):
+
+            # compute access results of the block
+            block_structure_result = block_structure.has_block(xblock_key)
+            has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
+
+            # compare with expected value
+            self.assertEquals(
+                block_structure_result,
+                i in expected_accessible_blocks,
+                "block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
+                    block_structure_result, i, user.username
+                )
+            )
+
+            # compare with has_access_result
+            if i in blocks_with_differing_access:
+                self.assertNotEqual(
+                    block_structure_result,
+                    has_access_result,
+                    "block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
+                        block_structure_result, has_access_result, i, user.username
+                    )
+                )
+            else:
+                self.assertEquals(
+                    block_structure_result,
+                    has_access_result,
+                    "block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
+                        block_structure_result, has_access_result, i, user.username
+                    )
+                )
+
+        self.client.logout()
+
 
 def update_block(block):
     """
     Helper method to update the block in the modulestore
     """
-    return modulestore().update_item(block, 'test_user')
+    return modulestore().update_item(block, ModuleStoreEnum.UserID.test)
+
+
+def publish_course(course):
+    """
+    Helper method to publish the course (from draft to publish branch)
+    """
+    store = modulestore()
+    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+        store.publish(course.location, ModuleStoreEnum.UserID.test)
 
 
 def create_location(org, course, run, block_type, block_id):

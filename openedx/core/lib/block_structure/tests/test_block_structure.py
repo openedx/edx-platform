@@ -10,9 +10,9 @@ from unittest import TestCase
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 
-from ..block_structure import BlockStructure, BlockStructureModulestoreData, BlockStructureBlockData
+from ..block_structure import BlockStructure, BlockStructureModulestoreData
 from ..exceptions import TransformerException
-from .test_utils import MockXBlock, MockTransformer, ChildrenMapTestMixin
+from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 
 
 @ddt.ddt
@@ -27,7 +27,7 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         ChildrenMapTestMixin.DAG_CHILDREN_MAP,
     )
     def test_relations(self, children_map):
-        block_structure = self.create_block_structure(BlockStructure, children_map)
+        block_structure = self.create_block_structure(children_map, BlockStructure)
 
         # get_children
         for parent, children in enumerate(children_map):
@@ -167,7 +167,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             return
 
         ### create structure
-        block_structure = self.create_block_structure(BlockStructureBlockData, children_map)
+        block_structure = self.create_block_structure(children_map)
         parents_map = self.get_parents_map(children_map)
 
         ### verify blocks pre-exist
@@ -213,6 +213,6 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         self.assert_block_structure(block_structure, pruned_children_map, missing_blocks)
 
     def test_remove_block_if(self):
-        block_structure = self.create_block_structure(BlockStructureBlockData, ChildrenMapTestMixin.LINEAR_CHILDREN_MAP)
+        block_structure = self.create_block_structure(ChildrenMapTestMixin.LINEAR_CHILDREN_MAP)
         block_structure.remove_block_if(lambda block: block == 2)
         self.assert_block_structure(block_structure, [[1], [], [], []], missing_blocks=[2])
