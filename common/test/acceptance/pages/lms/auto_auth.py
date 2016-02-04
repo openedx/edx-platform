@@ -4,7 +4,7 @@ Auto-auth page (used to automatically log in during testing).
 
 import re
 import urllib
-from bok_choy.page_object import PageObject, unguarded
+from bok_choy.page_object import PageObject, unguarded, XSS_INJECTION
 from . import AUTH_BASE_URL
 
 
@@ -41,6 +41,8 @@ class AutoAuthPage(PageObject):
 
         if username is not None:
             self._params['username'] = username
+
+        self._params['full_name'] = XSS_INJECTION
 
         if email is not None:
             self._params['email'] = email

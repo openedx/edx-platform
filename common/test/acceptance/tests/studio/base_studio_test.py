@@ -33,15 +33,15 @@ class StudioCourseTest(UniqueCourseTest):
             self.course_info['run'],
             self.course_info['display_name'],
         )
-        test_improper_escaping = {u"value": XSS_INJECTION}
-        self.course_fixture.add_advanced_settings({
-            "advertised_start": test_improper_escaping,
-            "info_sidebar_name": test_improper_escaping,
-            "cert_name_short": test_improper_escaping,
-            "cert_name_long": test_improper_escaping,
-            "display_organization": test_improper_escaping,
-            "display_coursenumber": test_improper_escaping,
-        })
+        # test_improper_escaping = {u"value": XSS_INJECTION}
+        # self.course_fixture.add_advanced_settings({
+        #     "advertised_start": test_improper_escaping,
+        #     "info_sidebar_name": test_improper_escaping,
+        #     "cert_name_short": test_improper_escaping,
+        #     "cert_name_long": test_improper_escaping,
+        #     "display_organization": test_improper_escaping,
+        #     "display_coursenumber": test_improper_escaping,
+        # })
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
         self.user = self.course_fixture.user
