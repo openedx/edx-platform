@@ -19,7 +19,7 @@ class CertificatesTest(StudioCourseTest):
     Tests for settings/certificates Page.
     """
     def setUp(self):  # pylint: disable=arguments-differ
-        super(CertificatesTest, self).setUp(is_staff=True)
+        super(CertificatesTest, self).setUp(is_staff=True, test_xss=False)
         self.certificates_page = CertificatesPage(
             self.browser,
             self.course_info['org'],
