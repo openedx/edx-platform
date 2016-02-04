@@ -8,7 +8,6 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-import django.contrib.auth.views
 from microsite_configuration import microsite
 import auth_exchange.views
 
@@ -103,6 +102,11 @@ urlpatterns = (
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls', app_name="credit", namespace='credit')),
     url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
+
+    # Multiple course modes and identity verification
+    # TODO Namespace these!
+    url(r'^course_modes/', include('course_modes.urls')),
+    url(r'^verify_student/', include('verify_student.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -124,13 +128,6 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
-
-# if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
-urlpatterns += (
-    # TODO Namespace these!
-    url(r'^verify_student/', include('verify_student.urls')),
-    url(r'^course_modes/', include('course_modes.urls')),
-)
 
 js_info_dict = {
     'domain': 'djangojs',

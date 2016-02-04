@@ -190,9 +190,6 @@ FEATURES = {
     # for load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
-    # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES': False,
-
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
 
