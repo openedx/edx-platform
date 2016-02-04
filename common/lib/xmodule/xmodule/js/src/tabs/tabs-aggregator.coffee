@@ -2,7 +2,7 @@ class @TabsEditingDescriptor
   @isInactiveClass : "is-inactive"
 
   constructor: (element) ->
-    @element = element;
+    @element = $(element)
     ###
     Not tested on syncing of multiple editors of same type in tabs
     (Like many CodeMirrors).

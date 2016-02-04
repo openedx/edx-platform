@@ -26,7 +26,7 @@ class @HTMLEditingDescriptor
     CUSTOM_FONTS + STANDARD_FONTS
 
   constructor: (element) ->
-    @element = element
+    @element = $(element)
     @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
     @editor_choice = @element.find("#editor-tab").data('editor')
     if @base_asset_url == undefined
