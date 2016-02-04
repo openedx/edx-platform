@@ -31,6 +31,8 @@ from contentstore.utils import (
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
 from contentstore.views.preview import get_preview_fragment
+from contentstore.utils import is_self_paced
+
 from openedx.core.lib.gating import api as gating_api
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -855,7 +857,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     release_date = _get_release_date(xblock, user)
 
     if xblock.category != 'course':
-        visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
+        visibility_state = _compute_visibility_state(
+            xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
+        )
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
@@ -1017,7 +1021,7 @@ class VisibilityState(object):
     gated = 'gated'
 
 
-def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_course_self_paced):
     """
     Returns the current publish state for the specified xblock and its children
     """
@@ -1027,10 +1031,10 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
         return VisibilityState.needs_attention
+
     is_unscheduled = xblock.start == DEFAULT_START_DATE
-    is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info.get('children', [])
-    if children and len(children) > 0:
+    is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
+    if child_info and child_info.get('children', []):
         all_staff_only = True
         all_unscheduled = True
         all_live = True

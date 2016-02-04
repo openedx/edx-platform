@@ -13,6 +13,8 @@ from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -455,3 +457,16 @@ def get_visibility_partition_info(xblock):
         "has_selected_groups": has_selected_groups,
         "selected_verified_partition_id": selected_verified_partition_id,
     }
+
+
+def is_self_paced(course):
+    """
+    Returns True if course is self-paced, False otherwise.
+    """
+    if course:
+        try:
+            return course.self_paced and SelfPacedConfiguration.current().enabled
+        except AttributeError:
+            # if course object has no self_paced attribute
+            pass
+    return False

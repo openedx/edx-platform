@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
@@ -2169,3 +2170,29 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
+
+    def test_self_paced_item_visibility_state(self):
+        """
+        Test that in self-paced course, item has `live` visibility state.
+        Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
+        now in self-paced course, item should have `live` visibility state.
+        """
+        SelfPacedConfiguration(enabled=True).save()
+
+        # Create chapter and setup future release date to make chapter in scheduled state
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+
+        # Check that has scheduled state
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self.assertFalse(self.course.self_paced)
+
+        # Change course pacing to self paced
+        self.course.self_paced = True
+        self.store.update_item(self.course, self.user.id)
+        self.assertTrue(self.course.self_paced)
+
+        # Check that in self paced course content has live state now
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
