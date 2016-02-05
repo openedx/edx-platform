@@ -8,6 +8,8 @@ import os
 from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf, skip
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.tab_nav import TabNavPage
@@ -1187,6 +1189,42 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.click_player_button('quality')
 
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
+
+
+@attr('shard_4')
+class DragAndDropTest(VideoBaseTest):
+    """
+    Tests draggability of closed captions within videos.
+    """
+    def setUp(self):
+        super(DragAndDropTest, self).setUp()
+
+    def test_if_captions_are_draggable(self):
+        """
+        Loads transcripts so that closed-captioning is available.
+        Ensures they are draggable by checking start and dropped location.
+        """
+        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+        data = {'sub': '3_yD_cEKoCk'}
+
+        self.metadata = self.metadata_for_mode('html5', additional_data=data)
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('html5'))
+        self.video.show_closed_captions()
+        self.video.wait_for_closed_captions()
+        self.assertTrue(self.video.is_closed_captions_visible)
+
+        action = ActionChains(self.browser)
+        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
+
+        captions_start = captions.location
+        action.drag_and_drop_by_offset(captions, 0, -15).perform()
+        captions_end = captions.location
+        self.assertEqual(
+            captions_end.get('y') + 15,
+            captions_start.get('y'),
+            'Closed captions did not get dragged.'
+        )
 
 
 @attr('a11y')

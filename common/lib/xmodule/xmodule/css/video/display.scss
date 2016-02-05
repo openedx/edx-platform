@@ -10,54 +10,54 @@
 // --------
 
 // the html target is necessary for xblocks and xmodules, but works across the board
-html:not('.afontgarde') .icon-fallback-img {
+.icon-fallback-img {
 
   .fa-play {
-    background: url('#{$static-path}/images/fontawesome/play.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/play.svg') center center no-repeat;
   }
 
   .fa-pause {
-    background: url('#{$static-path}/images/fontawesome/pause.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/pause.svg') center center no-repeat;
   }
 
   .fa-step-forward {
-    background: url('#{$static-path}/images/fontawesome/step-forward.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/fast-forward.svg') center center no-repeat;
   }
 
   .fa-arrows-alt {
-    background: url('#{$static-path}/images/fontawesome/arrows-alt.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/fullscreen.svg') center center no-repeat;
   }
 
   .fa-caret-right {
-    background: url('#{$static-path}/images/fontawesome/caret-right.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-right.svg') center center no-repeat;
   }
 
   .fa-caret-left {
-    background: url('#{$static-path}/images/fontawesome/caret-left.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-left.svg') center center no-repeat;
   }
 
   .fa-caret-up {
-    background: url('#{$static-path}/images/fontawesome/caret-up.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/caret-up.svg') center center no-repeat;
   }
 
   .fa-compress {
-    background: url('#{$static-path}/images/fontawesome/compress.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/exit-fullscreen.svg') center center no-repeat;
   }
 
   .fa-quote-left {
-    background: url('#{$static-path}/images/fontawesome/quote-left.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/quote-left.svg') center center no-repeat;
   }
 
   .fa-volume-up {
-    background: url('#{$static-path}/images/fontawesome/volume-up.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-up.svg') center center no-repeat;
   }
 
   .fa-volume-down {
-    background: url('#{$static-path}/images/fontawesome/volume-down.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-down.svg') center center no-repeat;
   }
 
   .fa-volume-off {
-    background: url('#{$static-path}/images/fontawesome/volume-off.svg') center center no-repeat;
+    background: url('#{$static-path}/edx-pattern-library/fonts/edx-icons/fallback-img/volume-off.svg') center center no-repeat;
   }
 }
 
@@ -261,6 +261,28 @@ html:not('.afontgarde') .icon-fallback-img {
       padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
       background: rgba(0, 0, 0, .75);
       color: $yellow;
+
+        &:before {
+            position: absolute;
+            display: inline-block;
+            top: 50%;
+            @include left($baseline);
+            margin-top: -.6em;
+            font-family: 'FontAwesome';
+            content: "\f142";
+            color: $white;
+            opacity: 0.5;
+        }
+
+        &:hover,
+        &.is-dragging {
+            background: rgba(0, 0, 0, 1.0);
+            cursor: move;
+
+            &:before {
+                opacity: 1.0;
+            }
+        }
     }
 
     .video-player {
@@ -289,7 +311,7 @@ html:not('.afontgarde') .icon-fallback-img {
         width: 100%;
       }
 
-      h3 {
+      h4 {
         text-align: center;
         color: white;
 

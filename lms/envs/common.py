@@ -1261,7 +1261,8 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'js/vendor/backbone-min.js'
+    'js/vendor/backbone-min.js',
+    'edx-pattern-library/js/modernizr-custom.js',
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -1269,9 +1270,6 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
-    'js/vendor/afontgarde/afontgarde.js',
-    'js/vendor/afontgarde/edx-icons.js'
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1670,7 +1668,10 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/bookmarks/bookmarks_factory': 'js/bookmarks/bookmarks_factory.js',
-    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js'
+    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
+    'afontgarde': 'edx-pattern-library/js/afontgarde.js',
+    'edxicons': 'edx-pattern-library/js/edx-icons.js',
+    'draggabilly': 'js/vendor/draggabilly.js'
 }
 ################################# CELERY ######################################
 

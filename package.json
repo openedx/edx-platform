@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "coffee-script": "1.6.1",
-    "edx-pattern-library": "~0.12.1",
+    "edx-pattern-library": "~0.12.4",
     "edx-ui-toolkit": "~0.9.1",
     "requirejs": "~2.1.22",
     "uglify-js": "2.4.24",
