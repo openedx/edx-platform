@@ -11,55 +11,59 @@ from django.test.utils import override_settings
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
-class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    def setUp(self):
-        super(TestNavigation, self).setUp()
-        self.test_course = CourseFactory.create()
-        self.course = CourseFactory.create()
-        self.chapter0 = ItemFactory.create(parent=self.course,
+    @classmethod
+    def setUpClass(cls):
+        super(TestNavigation, cls).setUpClass()
+        cls.test_course = CourseFactory.create()
+        cls.course = CourseFactory.create()
+        cls.chapter0 = ItemFactory.create(parent=cls.course,
                                            display_name='Overview')
-        self.chapter9 = ItemFactory.create(parent=self.course,
+        cls.chapter9 = ItemFactory.create(parent=cls.course,
                                            display_name='factory_chapter')
-        self.section0 = ItemFactory.create(parent=self.chapter0,
+        cls.section0 = ItemFactory.create(parent=cls.chapter0,
                                            display_name='Welcome')
-        self.section9 = ItemFactory.create(parent=self.chapter9,
+        cls.section9 = ItemFactory.create(parent=cls.chapter9,
                                            display_name='factory_section')
-        self.unit0 = ItemFactory.create(parent=self.section0,
+        cls.unit0 = ItemFactory.create(parent=cls.section0,
                                         display_name='New Unit')
 
-        self.chapterchrome = ItemFactory.create(parent=self.course,
+        cls.chapterchrome = ItemFactory.create(parent=cls.course,
                                                 display_name='Chrome')
-        self.chromelesssection = ItemFactory.create(parent=self.chapterchrome,
+        cls.chromelesssection = ItemFactory.create(parent=cls.chapterchrome,
                                                     display_name='chromeless',
                                                     chrome='none')
-        self.accordionsection = ItemFactory.create(parent=self.chapterchrome,
+        cls.accordionsection = ItemFactory.create(parent=cls.chapterchrome,
                                                    display_name='accordion',
                                                    chrome='accordion')
-        self.tabssection = ItemFactory.create(parent=self.chapterchrome,
+        cls.tabssection = ItemFactory.create(parent=cls.chapterchrome,
                                               display_name='tabs',
                                               chrome='tabs')
-        self.defaultchromesection = ItemFactory.create(
-            parent=self.chapterchrome,
+        cls.defaultchromesection = ItemFactory.create(
+            parent=cls.chapterchrome,
             display_name='defaultchrome',
         )
-        self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
+        cls.fullchromesection = ItemFactory.create(parent=cls.chapterchrome,
                                                     display_name='fullchrome',
                                                     chrome='accordion,tabs')
-        self.tabtest = ItemFactory.create(parent=self.chapterchrome,
+        cls.tabtest = ItemFactory.create(parent=cls.chapterchrome,
                                           display_name='progress_tab',
                                           default_tab='progress')
+
+    def setUp(self):
+        super(TestNavigation, self).setUp()
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):

@@ -11,51 +11,42 @@ from course_modes.models import CourseMode
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 
 
 @attr('shard_1')
-class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestMicrosites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    def setUp(self):
-        super(TestMicrosites, self).setUp()
-
-        # use a different hostname to test Microsites since they are
-        # triggered on subdomain mappings
-        #
-        # NOTE: The Microsite Configuration is in lms/envs/test.py. The content for the Test Microsite is in
-        # test_microsites/test_microsite.
-        #
-        # IMPORTANT: For these tests to work, this domain must be defined via
-        # DNS configuration (either local or published)
-
-        self.course = CourseFactory.create(
+    @classmethod
+    def setUpClass(cls):
+        super(TestMicrosites, cls).setUpClass()
+        cls.course = CourseFactory.create(
             display_name='Robot_Super_Course',
             org='TestMicrositeX',
             emit_signals=True,
         )
-        self.chapter0 = ItemFactory.create(parent_location=self.course.location,
+        cls.chapter0 = ItemFactory.create(parent_location=cls.course.location,
                                            display_name='Overview')
-        self.chapter9 = ItemFactory.create(parent_location=self.course.location,
+        cls.chapter9 = ItemFactory.create(parent_location=cls.course.location,
                                            display_name='factory_chapter')
-        self.section0 = ItemFactory.create(parent_location=self.chapter0.location,
+        cls.section0 = ItemFactory.create(parent_location=cls.chapter0.location,
                                            display_name='Welcome')
-        self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
+        cls.section9 = ItemFactory.create(parent_location=cls.chapter9.location,
                                            display_name='factory_section')
 
-        self.course_outside_microsite = CourseFactory.create(
+        cls.course_outside_microsite = CourseFactory.create(
             display_name='Robot_Course_Outside_Microsite',
             org='FooX',
             emit_signals=True,
         )
 
         # have a course which explicitly sets visibility in catalog to False
-        self.course_hidden_visibility = CourseFactory.create(
+        cls.course_hidden_visibility = CourseFactory.create(
             display_name='Hidden_course',
             org='TestMicrositeX',
             catalog_visibility=CATALOG_VISIBILITY_NONE,
@@ -63,13 +54,16 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # have a course which explicitly sets visibility in catalog and about to true
-        self.course_with_visibility = CourseFactory.create(
+        cls.course_with_visibility = CourseFactory.create(
             display_name='visible_course',
             org='TestMicrositeX',
             course="foo",
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
             emit_signals=True,
         )
+
+    def setUp(self):
+        super(TestMicrosites, self).setUp()
 
     def setup_users(self):
         # Create student accounts and activate them.

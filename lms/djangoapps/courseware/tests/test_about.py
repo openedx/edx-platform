@@ -41,29 +41,34 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @attr('shard_1')
-class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
+class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
     """
-    def setUp(self):
-        super(AboutTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course.location,
+
+    @classmethod
+    def setUpClass(cls):
+        super(AboutTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.course_without_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_NONE)
+        cls.course_with_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_ABOUT)
+        cls.purchase_course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
-        self.course_without_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_NONE)
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course_without_about.location,
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course_without_about.location,
             data="WITHOUT ABOUT", display_name="overview"
         )
-        self.course_with_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_ABOUT)
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course_with_about.location,
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course_with_about.location,
             data="WITH ABOUT", display_name="overview"
         )
 
-        self.purchase_course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
+    def setUp(self):
+        super(AboutTestCase, self).setUp()
+
         self.course_mode = CourseMode(
             course_id=self.purchase_course.id,
             mode_slug=CourseMode.DEFAULT_MODE_SLUG,
@@ -152,7 +157,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
     def test_about_page_unfulfilled_prereqs(self):
         pre_requisite_course = CourseFactory.create(
             org='edX',
-            course='900',
+            course='901',
             display_name='pre requisite course',
         )
 
@@ -222,21 +227,24 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
     """
+    @classmethod
+    def setUpClass(cls):
+        super(AboutWithCappedEnrollmentsTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create(metadata={"max_student_enrollments_allowed": 1})
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course.location,
+            data="OOGIE BLOOGIE", display_name="overview"
+        )
+
     def setUp(self):
         """
         Set up the tests
         """
         super(AboutWithCappedEnrollmentsTestCase, self).setUp()
-        self.course = CourseFactory.create(metadata={"max_student_enrollments_allowed": 1})
-
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course.location,
-            data="OOGIE BLOOGIE", display_name="overview"
-        )
 
     def test_enrollment_cap(self):
         """
@@ -272,19 +280,21 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
 
 
 @attr('shard_1')
-class AboutWithInvitationOnly(ModuleStoreTestCase):
+class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
     """
-    def setUp(self):
-        super(AboutWithInvitationOnly, self).setUp()
-
-        self.course = CourseFactory.create(metadata={"invitation_only": True})
-
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course.location,
+    @classmethod
+    def setUpClass(cls):
+        super(AboutWithInvitationOnly, cls).setUpClass()
+        cls.course = CourseFactory.create(metadata={"invitation_only": True})
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course.location,
             display_name="overview"
         )
+
+    def setUp(self):
+        super(AboutWithInvitationOnly, self).setUp()
 
     def test_invitation_only(self):
         """
@@ -320,18 +330,21 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
-class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
     """
-    def setUp(self):
-        super(AboutTestCaseShibCourse, self).setUp()
-        self.course = CourseFactory.create(enrollment_domain="shib:https://idp.stanford.edu/")
-
-        self.about = ItemFactory.create(
-            category="about", parent_location=self.course.location,
+    @classmethod
+    def setUpClass(cls):
+        super(AboutTestCaseShibCourse, cls).setUpClass()
+        cls.course = CourseFactory.create(enrollment_domain="shib:https://idp.stanford.edu/")
+        cls.about = ItemFactory.create(
+            category="about", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
+
+    def setUp(self):
+        super(AboutTestCaseShibCourse, self).setUp()
 
     def test_logged_in_shib_course(self):
         """
@@ -366,8 +379,8 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
     set but it is currently outside of that period.
     """
     def setUp(self):
-
         super(AboutWithClosedEnrollment, self).setUp()
+
         self.course = CourseFactory.create(metadata={"invitation_only": False})
 
         # Setup enrollment period to be in future
@@ -385,7 +398,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         )
 
     def test_closed_enrollmement(self):
-
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -406,15 +418,32 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test class runs through a suite of verifications regarding
     purchaseable courses
     """
+    @classmethod
+    def setUpClass(cls):
+        super(AboutPurchaseCourseTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
+
+        now = datetime.datetime.now(pytz.UTC)
+        tomorrow = now + datetime.timedelta(days=1)
+        nextday = tomorrow + datetime.timedelta(days=1)
+
+        cls.closed_course = CourseFactory.create(
+            org='MITx',
+            number='closed',
+            display_name='Closed Course To Buy',
+            enrollment_start = tomorrow,
+            enrollment_end = nextday
+        )
+
     def setUp(self):
         super(AboutPurchaseCourseTestCase, self).setUp()
-        self.course = CourseFactory.create(org='MITx', number='buyme', display_name='Course To Buy')
         self._set_ecomm(self.course)
+        self._set_ecomm(self.closed_course)
 
     def _set_ecomm(self, course):
         """
@@ -487,19 +516,12 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         window
         """
         self.setup_user()
-        now = datetime.datetime.now(pytz.UTC)
-        tomorrow = now + datetime.timedelta(days=1)
-        nextday = tomorrow + datetime.timedelta(days=1)
 
-        self.course.enrollment_start = tomorrow
-        self.course.enrollment_end = nextday
-        self.course = self.update_course(self.course, self.user.id)
-
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[self.closed_course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment is Closed", resp.content)
-        self.assertNotIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
+        self.assertNotIn("Add closed to Cart <span>($10 USD)</span>", resp.content)
 
         # course price is visible ihe course_about page when the course
         # mode is set to honor and it's price is set

@@ -25,40 +25,36 @@ from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 
-class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
-    def setUp(self):
-        super(MasqueradeTestCase, self).setUp()
-
-        # By default, tests run with DISABLE_START_DATES=True. To test that masquerading as a student is
-        # working properly, we must use start dates and set a start date in the past (otherwise the access
-        # checks exist prematurely).
-        self.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
-        # Creates info page and puts random data in it for specific student info page test
-        self.info_page = ItemFactory.create(
-            category="course_info", parent_location=self.course.location,
+    @classmethod
+    def setUpClass(cls):
+        super(MasqueradeTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
+        cls.info_page = ItemFactory.create(
+            category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
         )
-        self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
+        cls.chapter = ItemFactory.create(
+            parent_location=cls.course.location,
             category="chapter",
             display_name="Test Section",
         )
-        self.sequential_display_name = "Test Masquerade Subsection"
-        self.sequential = ItemFactory.create(
-            parent_location=self.chapter.location,
+        cls.sequential_display_name = "Test Masquerade Subsection"
+        cls.sequential = ItemFactory.create(
+            parent_location=cls.chapter.location,
             category="sequential",
-            display_name=self.sequential_display_name,
+            display_name=cls.sequential_display_name,
         )
-        self.vertical = ItemFactory.create(
-            parent_location=self.sequential.location,
+        cls.vertical = ItemFactory.create(
+            parent_location=cls.sequential.location,
             category="vertical",
             display_name="Test Unit",
         )
@@ -69,13 +65,17 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             options=['Correct', 'Incorrect'],
             correct_option='Correct'
         )
-        self.problem_display_name = "TestMasqueradeProblem"
-        self.problem = ItemFactory.create(
-            parent_location=self.vertical.location,
+        cls.problem_display_name = "TestMasqueradeProblem"
+        cls.problem = ItemFactory.create(
+            parent_location=cls.vertical.location,
             category='problem',
             data=problem_xml,
-            display_name=self.problem_display_name
+            display_name=cls.problem_display_name
         )
+
+    def setUp(self):
+        super(MasqueradeTestCase, self).setUp()
+
         self.test_user = self.create_user()
         self.login(self.test_user.email, 'test')
         self.enroll(self.course, True)
