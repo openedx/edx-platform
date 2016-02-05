@@ -393,7 +393,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         group.
         """
         self.course.cohort_config = {'cohorted': True}
-        self.update_course(self.course, self.test_user.id)
+        modulestore().update_item(self.course, self.test_user.id)
         cohort = CohortFactory.create(course_id=self.course.id, users=[self.test_user])
         CourseUserGroupPartitionGroup(
             course_user_group=cohort,

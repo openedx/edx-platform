@@ -17,53 +17,50 @@ from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
-class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestNavigation, cls).setUpClass()
-        cls.test_course = CourseFactory.create()
-        cls.course = CourseFactory.create()
-        cls.chapter0 = ItemFactory.create(parent=cls.course,
-                                           display_name='Overview')
-        cls.chapter9 = ItemFactory.create(parent=cls.course,
-                                           display_name='factory_chapter')
-        cls.section0 = ItemFactory.create(parent=cls.chapter0,
-                                           display_name='Welcome')
-        cls.section9 = ItemFactory.create(parent=cls.chapter9,
-                                           display_name='factory_section')
-        cls.unit0 = ItemFactory.create(parent=cls.section0,
-                                        display_name='New Unit')
-
-        cls.chapterchrome = ItemFactory.create(parent=cls.course,
-                                                display_name='Chrome')
-        cls.chromelesssection = ItemFactory.create(parent=cls.chapterchrome,
-                                                    display_name='chromeless',
-                                                    chrome='none')
-        cls.accordionsection = ItemFactory.create(parent=cls.chapterchrome,
-                                                   display_name='accordion',
-                                                   chrome='accordion')
-        cls.tabssection = ItemFactory.create(parent=cls.chapterchrome,
-                                              display_name='tabs',
-                                              chrome='tabs')
-        cls.defaultchromesection = ItemFactory.create(
-            parent=cls.chapterchrome,
-            display_name='defaultchrome',
-        )
-        cls.fullchromesection = ItemFactory.create(parent=cls.chapterchrome,
-                                                    display_name='fullchrome',
-                                                    chrome='accordion,tabs')
-        cls.tabtest = ItemFactory.create(parent=cls.chapterchrome,
-                                          display_name='progress_tab',
-                                          default_tab='progress')
-
     def setUp(self):
         super(TestNavigation, self).setUp()
+
+        self.test_course = CourseFactory.create()
+        self.course = CourseFactory.create()
+        self.chapter0 = ItemFactory.create(parent=self.course,
+                                           display_name='Overview')
+        self.chapter9 = ItemFactory.create(parent=self.course,
+                                           display_name='factory_chapter')
+        self.section0 = ItemFactory.create(parent=self.chapter0,
+                                           display_name='Welcome')
+        self.section9 = ItemFactory.create(parent=self.chapter9,
+                                           display_name='factory_section')
+        self.unit0 = ItemFactory.create(parent=self.section0,
+                                        display_name='New Unit')
+
+        self.chapterchrome = ItemFactory.create(parent=self.course,
+                                                display_name='Chrome')
+        self.chromelesssection = ItemFactory.create(parent=self.chapterchrome,
+                                                    display_name='chromeless',
+                                                    chrome='none')
+        self.accordionsection = ItemFactory.create(parent=self.chapterchrome,
+                                                   display_name='accordion',
+                                                   chrome='accordion')
+        self.tabssection = ItemFactory.create(parent=self.chapterchrome,
+                                              display_name='tabs',
+                                              chrome='tabs')
+        self.defaultchromesection = ItemFactory.create(
+            parent=self.chapterchrome,
+            display_name='defaultchrome',
+        )
+        self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
+                                                    display_name='fullchrome',
+                                                    chrome='accordion,tabs')
+        self.tabtest = ItemFactory.create(parent=self.chapterchrome,
+                                          display_name='progress_tab',
+                                          default_tab='progress')
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
