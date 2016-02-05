@@ -1,6 +1,6 @@
 machine:
   python:
-    version: 2.7.3
+    version: 2.7.10
 
 general:
   artifacts:
@@ -20,7 +20,7 @@ dependencies:
     # cache the virtualenv at that state, so that
     # the next build will not need to install them
     # from scratch again.
-    - pip install --exists-action w -r requirements/edx/pre.txt 
+    - pip install --exists-action w -r requirements/edx/pre.txt
     - pip install --exists-action w -r requirements/edx/github.txt
     - pip install --exists-action w -r requirements/edx/local.txt
 
@@ -33,6 +33,10 @@ dependencies:
     - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
     - pip install coveralls==1.0
+
+    # Output the installed python packages to the console to help
+    # with troubleshooting any issues with python requirements.
+    - pip freeze
 
 test:
   override:
