@@ -563,6 +563,20 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'style-uxpl': {
+        # this is unnecessary and can be removed
+        'source_filenames': [
+            'css/edx-pattern-library-ltr.css',
+        ],
+        'output_filename': 'css/edx-pattern-library-ltr.css',
+    },
+    'style-uxpl-rtl': {
+        # this is unnecessary and can be removed
+        'source_filenames': [
+            'css/edx-pattern-library-rtl.css',
+        ],
+        'output_filename': 'css/edx-pattern-library-rtl.css',
+    },
 }
 
 # test_order: Determines the position of this chunk of javascript on
