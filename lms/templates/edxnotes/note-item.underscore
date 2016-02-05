@@ -1,7 +1,7 @@
 <div class="wrapper-note-excerpts">
     <% if (message) { %>
     <div class="note-excerpt" role="region" aria-label="<%- gettext('Highlighted text') %>">
-        <p class="note-excerpt-p"><%= message %>
+        <p class="note-excerpt-p"><%- message %>
           <% if (show_link) { %>
           <% if (is_expanded) { %>
               <a href="#" class="note-excerpt-more-link"><%- gettext('Less') %></a>
@@ -17,7 +17,12 @@
     <ol class="note-comments" role="region" aria-label="<%- gettext('Note') %>">
         <li class="note-comment">
             <p class="note-comment-title"><%- gettext("You commented...") %></p>
-            <p class="note-comment-p"><%= text %></p>
+            <p class="note-comment-p">
+                <%= interpolate_text(_.escape(text), {
+                    elasticsearch_highlight_start: '<span class="note-highlight">',
+                    elasticsearch_highlight_end: '</span>'
+                })%>
+            </p>
         </li>
     </ol>
     <% } %>
@@ -38,7 +43,12 @@
         <% if (tags.length > 0) { %>
             <p class="reference-title"><%- gettext("Tags:") %></p>
             <% for (var i = 0; i < tags.length; i++) { %>
-                <a class="reference-meta reference-tags" href="#"><%= tags[i] %></a>
+                <span class="reference-meta reference-tags">
+                    <%= interpolate_text(_.escape(tags[i]), {
+                        elasticsearch_highlight_start: '<span class="note-highlight">',
+                        elasticsearch_highlight_end: '</span>'
+                    })%>
+                </span>
             <% } %>
         <% } %>
     </div>

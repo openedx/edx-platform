@@ -2513,6 +2513,9 @@ ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
 
+# These tabs are currently disabled
+NOTES_DISABLED_TABS = ['course_structure', 'tags']
+
 # Configuration used for generating PDF Receipts/Invoices
 PDF_RECEIPT_TAX_ID = 'add here'
 PDF_RECEIPT_FOOTER_TEXT = 'add your own specific footer text here'
