@@ -44,6 +44,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
+git+https://github.com/Bachmann1234/diff-cover.git@f3505a2d8006d7c1358801de53734f1dd4bf0b62#egg=diff-cover==0.8.6
 -e git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline
 git+https://github.com/edx/django-wiki.git@v0.0.5#egg=django-wiki==0.0.5
 -e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-6a#egg=django-oauth2-provider==0.2.7-fork-edx-6
