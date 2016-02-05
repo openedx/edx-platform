@@ -571,3 +571,6 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'https://test-provider/oauth2',
     'JWT_AUDIENCE': 'test-key',
 })
+
+# Use the speedy_tests helpers.
+INSTALLED_APPS += ('speedy_tests',)
