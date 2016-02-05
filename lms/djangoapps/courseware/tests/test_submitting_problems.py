@@ -19,7 +19,7 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
 )
 from courseware import grades
-from courseware.models import StudentModule, StudentModuleHistory
+from courseware.models import StudentModule, StudentModuleHistoryExtended
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
@@ -121,6 +121,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     Check that a course gets graded properly.
     """
 
+    multi_db = True
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
@@ -319,6 +320,8 @@ class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
     """
+    multi_db = True
+
     def basic_setup(self, late=False, reset=False, showanswer=False):
         """
         Set up a simple course for testing basic grading functionality.
@@ -456,7 +459,7 @@ class TestCourseGrader(TestSubmittingProblems):
             student=self.student_user
         )
         # count how many state history entries there are
-        baseline = StudentModuleHistory.objects.filter(
+        baseline = StudentModuleHistoryExtended.objects.filter(
             student_module=student_module
         )
         baseline_count = baseline.count()
@@ -466,7 +469,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.show_question_answer('p1')
 
         # check that we don't have more state history entries
-        csmh = StudentModuleHistory.objects.filter(
+        csmh = StudentModuleHistoryExtended.objects.filter(
             student_module=student_module
         )
         current_count = csmh.count()
@@ -713,6 +716,7 @@ class TestCourseGrader(TestSubmittingProblems):
 @attr('shard_1')
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
+    multi_db = True
 
     def setUp(self):
         super(ProblemWithUploadedFilesTest, self).setUp()
@@ -768,6 +772,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
     """
+    multi_db = True
 
     SCHEMATIC_SCRIPT = dedent("""
         # for a schematic response, submission[i] is the json representation

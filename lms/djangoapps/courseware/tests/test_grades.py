@@ -240,6 +240,8 @@ class TestProgressSummary(TestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
+    multi_db = True
+
     def setUp(self):
         super(TestProgressSummary, self).setUp()
         self.course_key = CourseLocator(
