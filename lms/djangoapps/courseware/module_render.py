@@ -786,12 +786,15 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         course=course
     )
 
+    from injectx.fielddata import FieldDataInjector
+
     descriptor.bind_for_student(
         system,
         user.id,
         [
             partial(OverrideFieldData.wrap, user, course),
             partial(LmsFieldData, student_data=student_data),
+            FieldDataInjector,
         ],
     )
 
