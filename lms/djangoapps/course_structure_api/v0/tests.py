@@ -520,7 +520,7 @@ class CourseBlocksOrNavigationTestMixin(CourseDetailTestMixin, CourseViewTestsMi
         return 'course_structure_api:v0:' + self.block_navigation_view_type
 
     def test_get(self):
-        with check_mongo_calls(3):
+        with check_mongo_calls(4):
             response = super(CourseBlocksOrNavigationTestMixin, self).test_get()
 
         # verify root element
