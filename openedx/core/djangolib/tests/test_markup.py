@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Tests for util.markup
+Tests for openedx.core.djangolib.markup
 """
 
 import unittest
 
 import ddt
+from mako.template import Template
 
-from edxmako.template import Template
-from util.markup import escape, HTML, ugettext as _, ungettext
+from openedx.core.djangolib.markup import escape, HTML, ugettext as _, ungettext
 
 
 @ddt.ddt
@@ -54,12 +54,12 @@ class FormatHtmlTest(unittest.TestCase):
         # The default_filters used here have to match the ones in edxmako.
         template = Template(
             """
-                <%! from util.markup import HTML, ugettext as _ %>
+                <%! from openedx.core.djangolib.markup import HTML, ugettext as _ %>
                 ${_(u"A & {BC}").format(BC=HTML("B & C"))}
             """,
             default_filters=['decode.utf8', 'h'],
         )
-        out = template.render({})
+        out = template.render()
         self.assertEqual(out.strip(), u"A &amp; B & C")
 
     def test_ungettext(self):

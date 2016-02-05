@@ -16,12 +16,12 @@ def ugettext(text):
 
     Use like this in Mako::
 
-        <% from util.markup import ugettext as _ %>
+        <% from openedx.core.djangolib.markup import ugettext as _ %>
         <p>${_("Hello, world!")}</p>
 
     Or with formatting::
 
-        <% from util.markup import HTML, ugettext as _ %>
+        <% from openedx.core.djangolib.markup import HTML, ugettext as _ %>
         ${_("Write & send {start}email{end}").format(
             start=HTML("<a href='mailto:ned@edx.org'>"),
             end=HTML("</a>"),
@@ -41,7 +41,7 @@ def HTML(html):                                 # pylint: disable=invalid-name
 
     Use this when formatting HTML into other strings::
 
-        <% from util.markup import HTML, ugettext as _ %>
+        <% from openedx.core.djangolib.markup import HTML, ugettext as _ %>
         ${_("Write & send {start}email{end}").format(
             start=HTML("<a href='mailto:ned@edx.org'>"),
             end=HTML("</a>"),
