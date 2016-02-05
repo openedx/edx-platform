@@ -9,7 +9,7 @@ from xblock.field_data import DictFieldData
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-)
+    SharedModuleStoreTestCase)
 
 from ..field_overrides import (
     disable_overrides,

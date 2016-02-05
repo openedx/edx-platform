@@ -28,7 +28,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 
 
 def _grade_with_errors(student, request, course, keep_raw_scores=False):
@@ -46,12 +46,20 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
 
 
 @attr('shard_1')
-class TestGradeIteration(ModuleStoreTestCase):
+class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student gradesets.
     """
     COURSE_NUM = "1000"
     COURSE_NAME = "grading_test_course"
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGradeIteration, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            display_name=cls.COURSE_NAME,
+            number=cls.COURSE_NUM
+        )
 
     def setUp(self):
         """
@@ -59,10 +67,6 @@ class TestGradeIteration(ModuleStoreTestCase):
         """
         super(TestGradeIteration, self).setUp()
 
-        self.course = CourseFactory.create(
-            display_name=self.COURSE_NAME,
-            number=self.COURSE_NUM
-        )
         self.students = [
             UserFactory.create(username='student1'),
             UserFactory.create(username='student2'),
@@ -142,19 +146,24 @@ class TestGradeIteration(ModuleStoreTestCase):
         return students_to_gradesets, students_to_errors
 
 
-class TestMaxScoresCache(ModuleStoreTestCase):
+class TestMaxScoresCache(SharedModuleStoreTestCase):
     """
     Tests for the MaxScoresCache
     """
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestMaxScoresCache, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.problems = []
+        for _ in xrange(3):
+            cls.problems.append(
+                ItemFactory.create(category='problem', parent=cls.course)
+            )
+
     def setUp(self):
         super(TestMaxScoresCache, self).setUp()
         self.student = UserFactory.create()
-        self.course = CourseFactory.create()
-        self.problems = []
-        for _ in xrange(3):
-            self.problems.append(
-                ItemFactory.create(category='problem', parent=self.course)
-            )
 
         CourseEnrollment.enroll(self.student, self.course.id)
         self.request = RequestFactory().get('/')
@@ -183,22 +192,26 @@ class TestMaxScoresCache(ModuleStoreTestCase):
         self.assertEqual(max_scores_cache.num_cached_from_remote(), 1)
 
 
-class TestFieldDataCacheScorableLocations(ModuleStoreTestCase):
+class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
     """
     Make sure we can filter the locations we pull back student state for via
     the FieldDataCache.
     """
-    def setUp(self):
-        super(TestFieldDataCacheScorableLocations, self).setUp()
-        self.student = UserFactory.create()
-        self.course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent=self.course)
+    @classmethod
+    def setUpClass(cls):
+        super(TestFieldDataCacheScorableLocations, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent=cls.course)
         sequential = ItemFactory.create(category='sequential', parent=chapter)
         vertical = ItemFactory.create(category='vertical', parent=sequential)
         ItemFactory.create(category='video', parent=vertical)
         ItemFactory.create(category='html', parent=vertical)
         ItemFactory.create(category='discussion', parent=vertical)
         ItemFactory.create(category='problem', parent=vertical)
+
+    def setUp(self):
+        super(TestFieldDataCacheScorableLocations, self).setUp()
+        self.student = UserFactory.create()
 
         CourseEnrollment.enroll(self.student, self.course.id)
 
@@ -334,45 +347,43 @@ class TestProgressSummary(TestCase):
         self.assertEqual(possible, 0)
 
 
-class TestGetModuleScore(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Test get_module_score
     """
-    def setUp(self):
-        """
-        Set up test course
-        """
-        super(TestGetModuleScore, self).setUp()
-        self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(
-            parent=self.course,
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetModuleScore, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.chapter = ItemFactory.create(
+            parent=cls.course,
             category="chapter",
             display_name="Test Chapter"
         )
-        self.seq1 = ItemFactory.create(
-            parent=self.chapter,
+        cls.seq1 = ItemFactory.create(
+            parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential",
             graded=True
         )
-        self.seq2 = ItemFactory.create(
-            parent=self.chapter,
+        cls.seq2 = ItemFactory.create(
+            parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential",
             graded=True
         )
-        self.vert1 = ItemFactory.create(
-            parent=self.seq1,
+        cls.vert1 = ItemFactory.create(
+            parent=cls.seq1,
             category='vertical',
             display_name='Test Vertical 1'
         )
-        self.vert2 = ItemFactory.create(
-            parent=self.seq2,
+        cls.vert2 = ItemFactory.create(
+            parent=cls.seq2,
             category='vertical',
             display_name='Test Vertical 2'
         )
-        self.randomize = ItemFactory.create(
-            parent=self.vert2,
+        cls.randomize = ItemFactory.create(
+            parent=cls.vert2,
             category='randomize',
             display_name='Test Randomize'
         )
@@ -381,30 +392,36 @@ class TestGetModuleScore(LoginEnrollmentTestCase, ModuleStoreTestCase):
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        self.problem1 = ItemFactory.create(
-            parent=self.vert1,
+        cls.problem1 = ItemFactory.create(
+            parent=cls.vert1,
             category="problem",
             display_name="Test Problem 1",
             data=problem_xml
         )
-        self.problem2 = ItemFactory.create(
-            parent=self.vert1,
+        cls.problem2 = ItemFactory.create(
+            parent=cls.vert1,
             category="problem",
             display_name="Test Problem 2",
             data=problem_xml
         )
-        self.problem3 = ItemFactory.create(
-            parent=self.randomize,
+        cls.problem3 = ItemFactory.create(
+            parent=cls.randomize,
             category="problem",
             display_name="Test Problem 3",
             data=problem_xml
         )
-        self.problem4 = ItemFactory.create(
-            parent=self.randomize,
+        cls.problem4 = ItemFactory.create(
+            parent=cls.randomize,
             category="problem",
             display_name="Test Problem 4",
             data=problem_xml
         )
+
+    def setUp(self):
+        """
+        Set up test course
+        """
+        super(TestGetModuleScore, self).setUp()
 
         self.request = get_request_for_user(UserFactory())
         self.client.login(username=self.request.user.username, password="test")

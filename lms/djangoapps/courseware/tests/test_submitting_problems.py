@@ -24,7 +24,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.credit.api import (
@@ -126,13 +126,10 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     COURSE_NAME = "test_course"
 
     def setUp(self):
-
-        super(TestSubmittingProblems, self).setUp(create_user=False)
-        # Create course
-        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
+        super(TestSubmittingProblems, self).setUp()
 
         # create a test student
+        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.student = 'view@test.com'
         self.password = 'foo'
         self.create_account('u1', self.student, self.password)
