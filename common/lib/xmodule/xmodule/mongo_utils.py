@@ -3,6 +3,10 @@ Common MongoDB connection functions.
 """
 import pymongo
 from mongodb_proxy import MongoProxy
+import logging
+
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 # pylint: disable=bad-continuation
@@ -51,3 +55,33 @@ def connect_to_mongodb(
         mongo_conn.authenticate(user, password)
 
     return mongo_conn
+
+
+def create_collection_index(
+    collection, keys,
+    ignore_created=True, ignore_created_opts=True, **kwargs
+):
+    """
+    Create a MongoDB index in a collection. Optionally,
+    ignore errors related to the index already existing.
+    """
+    # For an explanation of the error codes:
+    # https://github.com/mongodb/mongo/blob/v3.0/src/mongo/db/catalog/index_catalog.cpp#L542-L583
+    # https://github.com/mongodb/mongo/blob/v3.0/src/mongo/base/error_codes.err#L70-L87
+    # pylint: disable=invalid-name
+    INDEX_ALREADY_EXISTS = 68
+    INDEX_OPTIONS_CONFLICT = 85
+    try:
+        collection.create_index(keys, **kwargs)
+    except pymongo.errors.OperationFailure as exc:
+        errors_to_ignore = []
+        if ignore_created:
+            errors_to_ignore.append(INDEX_ALREADY_EXISTS)
+        if ignore_created_opts:
+            errors_to_ignore.append(INDEX_OPTIONS_CONFLICT)
+        if exc.code in errors_to_ignore:
+            logger.warning("Existing index in collection '{}' remained unchanged!: {}".format(
+                collection.full_name, exc.details['errmsg'])
+            )
+        else:
+            raise exc
