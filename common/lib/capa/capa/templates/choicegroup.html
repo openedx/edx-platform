@@ -54,7 +54,6 @@
             </span>
         % endif
     </div>
-    ## TODO:FUNK % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     % if show_correctness == "never" and value and status != "unsubmitted":
     <div class="capa_alert">${submitted_message}</div>
     %endif
