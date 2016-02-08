@@ -190,7 +190,7 @@ def award_program_certificates(self, username):
         # awarded, if any.
         existing_program_ids = get_awarded_certificate_programs(student)
 
-    except Exception, exc:  # pylint: disable=broad-except
+    except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
         raise self.retry(exc=exc)
 
@@ -205,7 +205,7 @@ def award_program_certificates(self, username):
                 CredentialsApiConfig.current(),
                 User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)  # pylint: disable=no-member
             )
-        except Exception, exc:  # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
             LOGGER.exception('Failed to create a credentials API client to award program certificates')
             # Retry because a misconfiguration could be fixed
             raise self.retry(exc=exc)
