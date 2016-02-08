@@ -137,25 +137,29 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     else:
         context['event_source'] = event_source
 
+    # Ignore event types that are unsupported
+    segment_event_type = full_segment_event.get('type')
+    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
+    if (
+        not segment_event_type or
+        (segment_event_type.lower() not in allowed_types)
+    ):
+        raise EventValidationError(WARNING_IGNORED_TYPE)
+
     if 'name' not in segment_properties:
         raise EventValidationError(ERROR_MISSING_NAME)
 
-    if 'data' not in segment_properties:
-        raise EventValidationError(ERROR_MISSING_DATA)
-
-    # Ignore event types and names that are unsupported
-    segment_event_type = full_segment_event.get('type')
+    # Ignore event names that are unsupported
     segment_event_name = segment_properties['name']
-    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
     disallowed_substring_names = [
         a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES', [])
     ]
-    if (
-        not segment_event_type or
-        (segment_event_type.lower() not in allowed_types) or
-        any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names)
-    ):
+
+    if any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names):
         raise EventValidationError(WARNING_IGNORED_TYPE)
+
+    if 'data' not in segment_properties:
+        raise EventValidationError(ERROR_MISSING_DATA)
 
     # create and populate application field if it doesn't exist
     app_context = segment_properties.get('context', {})
