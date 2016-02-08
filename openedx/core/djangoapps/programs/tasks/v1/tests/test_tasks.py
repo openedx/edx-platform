@@ -3,6 +3,7 @@ Tests for programs celery tasks.
 """
 
 import ddt
+from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import override_settings, TestCase
 from edx_rest_api_client.client import EdxRestApiClient
@@ -250,7 +251,7 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         ('credentials', 'enable_learner_issuance'),
     )
     @ddt.unpack
-    def test_abort_if_config_disabled(
+    def test_retry_if_config_disabled(
             self,
             disabled_config_type,
             disabled_config_attribute,
@@ -262,7 +263,8 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         """
         getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            tasks.award_program_certificates.delay(self.student.username).get()
+            with self.assertRaises(MaxRetriesExceededError):
+                tasks.award_program_certificates.delay(self.student.username).get()
             self.assertTrue(mock_warning.called)
         for mock_helper in mock_helpers:
             self.assertFalse(mock_helper.called)

@@ -147,13 +147,13 @@ def award_program_certificates(self, username):
         LOGGER.warning(
             'Task award_program_certificates cannot be executed when program certification is disabled in API config',
         )
-        return
+        raise self.retry(countdown=countdown, max_retries=config.max_retries)
 
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         LOGGER.warning(
             'Task award_program_certificates cannot be executed when credentials issuance is disabled in API config',
         )
-        return
+        raise self.retry(countdown=countdown, max_retries=config.max_retries)
 
     try:
         try:
