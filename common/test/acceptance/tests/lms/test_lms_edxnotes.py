@@ -513,7 +513,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         """
         Add, search and verify notes.
         """
-        self._add_default_notes(extra_notes=7)
+        self._add_default_notes(extra_notes=22)
         self.notes_page.visit()
         # Run the search
         self.notes_page.search("note")
@@ -1075,12 +1075,12 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         And I should see disabled previous button
         And I should also see enabled next button
         """
-        self._add_default_notes(extra_notes=6)
+        self._add_default_notes(extra_notes=21)
         self.notes_page.visit()
 
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 11 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1099,7 +1099,6 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         """
         self._add_default_notes()
         self.notes_page.visit()
-
         self._verify_pagination_info(
             notes_count_on_current_page=5,
             header_text='Showing 1-5 out of 5 total',
@@ -1114,33 +1113,33 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         Scenario: Next & Previous buttons are working as expected for notes list pagination
 
         Given that I am a registered user
-        And I have a course with 12 notes
+        And I have a course with 26 notes
         When I open Notes page
-        Then I can see notes list contains 10 items
+        Then I can see notes list contains 25 items
         And I should see paging header and footer with correct data
         And I should see disabled previous button
         And I should see enabled next button
 
         When I click on next page button in footer
         Then I should be navigated to second page
-        And I should see a list with 2 items
+        And I should see a list with 1 item
         And I should see paging header and footer with correct info
         And I should see enabled previous button
         And I should also see disabled next button
 
         When I click on previous page button in footer
         Then I should be navigated to first page
-        And I should see a list with 10 items
+        And I should see a list with 25 items
         And I should see paging header and footer with correct info
         And I should see disabled previous button
         And I should also see enabled next button
         """
-        self._add_default_notes(extra_notes=7)
+        self._add_default_notes(extra_notes=21)
         self.notes_page.visit()
 
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 12 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1149,8 +1148,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.notes_page.press_next_page_button()
         self._verify_pagination_info(
-            notes_count_on_current_page=2,
-            header_text='Showing 11-12 out of 12 total',
+            notes_count_on_current_page=1,
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
@@ -1158,8 +1157,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
         self.notes_page.press_previous_page_button()
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 12 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1171,9 +1170,9 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         Scenario: Notes list pagination works as expected for valid & invalid page number
 
         Given that I am a registered user
-        And I have a course with 11 notes
+        And I have a course with 26 notes
         When I open Notes page
-        Then I can see notes list contains 10 items
+        Then I can see notes list contains 25 items
         And I should see paging header and footer with correct data
         And I should see total page value is 2
         When I enter 2 in the page number input
@@ -1182,7 +1181,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         When I enter 3 in the page number input
         Then I should not be navigated away from page 2
         """
-        self._add_default_notes(extra_notes=6)
+        self._add_default_notes(extra_notes=21)
         self.notes_page.visit()
 
         self.assertEqual(self.notes_page.get_total_pages, 2)
@@ -1191,7 +1190,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.go_to_page(2)
         self._verify_pagination_info(
             notes_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
@@ -1202,7 +1201,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.go_to_page(3)
         self._verify_pagination_info(
             notes_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
@@ -1214,20 +1213,22 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         Scenario: Searching behaves correctly with pagination.
 
         Given that I am a registered user
-        And I have a course with 12 notes
+        And I have a course with 27 notes
         When I open Notes page
-        Then I can see notes list contains 10 items
+        Then I can see notes list with 25 items
+        And I should see paging header and footer with correct data
+        And previous button is disabled
+        And next button is enabled
         When I run the search with "note" query
         Then I see no error message
-        And I see that "Search Results" tab appears with 11 notes found
+        And I see that "Search Results" tab appears with 26 notes found
         And an event has fired indicating that the Search Results view was selected
         And an event has fired recording the search that was performed
         """
         self.search_and_verify()
-
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 11 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1235,22 +1236,22 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
 
         self.assert_viewed_event('Search Results')
-        self.assert_search_event('note', 11)
+        self.assert_search_event('note', 26)
 
     def test_search_with_next_and_prev_page_button(self):
         """
         Scenario: Next & Previous buttons are working as expected for search
 
         Given that I am a registered user
-        And I have a course with 12 notes
+        And I have a course with 27 notes
         When I open Notes page
-        Then I can see notes list with 10 items
+        Then I can see notes list with 25 items
         And I should see paging header and footer with correct data
         And previous button is disabled
         And next button is enabled
 
         When I run the search with "note" query
-        Then I see that "Search Results" tab appears with 11 notes found
+        Then I see that "Search Results" tab appears with 26 notes found
         And an event has fired indicating that the Search Results view was selected
         And an event has fired recording the search that was performed
 
@@ -1263,7 +1264,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         When I click on previous page button in footer
         Then I should be navigated to first page
-        And I should see a list with 10 items
+        And I should see a list with 25 items
         And I should see paging header and footer with correct info
         And I should see disabled previous button
         And I should also see enabled next button
@@ -1271,8 +1272,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.search_and_verify()
 
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 11 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1280,12 +1281,12 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
 
         self.assert_viewed_event('Search Results')
-        self.assert_search_event('note', 11)
+        self.assert_search_event('note', 26)
 
         self.notes_page.press_next_page_button()
         self._verify_pagination_info(
             notes_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
@@ -1293,8 +1294,8 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
         self.notes_page.press_previous_page_button()
         self._verify_pagination_info(
-            notes_count_on_current_page=10,
-            header_text='Showing 1-10 out of 11 total',
+            notes_count_on_current_page=25,
+            header_text='Showing 1-25 out of 26 total',
             previous_button_enabled=False,
             next_button_enabled=True,
             current_page_number=1,
@@ -1306,14 +1307,14 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         Scenario: Notes list pagination works as expected for valid & invalid page number
 
         Given that I am a registered user
-        And I have a course with 12 notes
+        And I have a course with 27 notes
         When I open Notes page
-        Then I can see notes list contains 10 items
+        Then I can see notes list contains 25 items
         And I should see paging header and footer with correct data
         And I should see total page value is 2
 
         When I run the search with "note" query
-        Then I see that "Search Results" tab appears with 11 notes found
+        Then I see that "Search Results" tab appears with 26 notes found
         And an event has fired indicating that the Search Results view was selected
         And an event has fired recording the search that was performed
 
@@ -1329,7 +1330,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.go_to_page(2)
         self._verify_pagination_info(
             notes_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
@@ -1340,7 +1341,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.notes_page.go_to_page(3)
         self._verify_pagination_info(
             notes_count_on_current_page=1,
-            header_text='Showing 11-11 out of 11 total',
+            header_text='Showing 26-26 out of 26 total',
             previous_button_enabled=True,
             next_button_enabled=False,
             current_page_number=2,
