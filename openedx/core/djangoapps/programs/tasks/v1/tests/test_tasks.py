@@ -331,9 +331,10 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
 
         """
         def side_effect(*_a):  # pylint: disable=missing-docstring
-            exc = side_effects.pop(0)
-            if exc:
-                raise exc
+            if side_effects:
+                exc = side_effects.pop(0)
+                if exc:
+                    raise exc
             return mock.DEFAULT
         return side_effect
 
@@ -351,16 +352,17 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         that arise are logged also.
         """
         mock_get_completed_programs.return_value = [1, 2]
-        mock_get_awarded_certificate_programs.return_value = []
+        mock_get_awarded_certificate_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
         with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
                 mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 2)
+        self.assertEqual(mock_award_program_certificate.call_count, 3)
         mock_exception.assert_called_once_with(mock.ANY, 1, self.student.username)
-        mock_info.assert_called_with(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
+        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
 
     def test_retry_on_certificates_api_errors(
             self,

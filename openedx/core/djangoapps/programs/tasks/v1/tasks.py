@@ -200,6 +200,8 @@ def award_program_certificates(self, username):
     # For each completed program for which the student doesn't already have a
     # certificate, award one now.
     #
+    # This logic is important, because we will retry the whole task if awarding any particular program cert fails.
+    #
     # N.B. the list is sorted to facilitate deterministic ordering, e.g. for tests.
     new_program_ids = sorted(list(set(program_ids) - set(existing_program_ids)))
     if new_program_ids:
@@ -213,10 +215,17 @@ def award_program_certificates(self, username):
             # Retry because a misconfiguration could be fixed
             raise self.retry(exc=exc, countdown=countdown, max_retries=config.max_retries)
 
+        retry = False
         for program_id in new_program_ids:
             try:
                 award_program_certificate(credentials_client, username, program_id)
                 LOGGER.info('Awarded certificate for program %s to user %s', program_id, username)
             except Exception:  # pylint: disable=broad-except
-                # keep trying to award other certs.
+                # keep trying to award other certs, but retry the whole task to fix any missing entries
                 LOGGER.exception('Failed to award certificate for program %s to user %s', program_id, username)
+                retry = True
+
+        if retry:
+            # N.B. This logic assumes that this task is idempotent
+            LOGGER.info('Retrying task to award failed certificates to user %s', username)
+            raise self.retry(countdown=countdown, max_retries=config.max_retries)
