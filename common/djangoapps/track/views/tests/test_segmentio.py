@@ -96,14 +96,14 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         return request
 
     @data('identify', 'Group', 'Alias', 'Page', 'identify', 'screen')
-    @expect_failure_with_message(segmentio.WARNING_IGNORED_TYPE)
     def test_segmentio_ignore_actions(self, action):
         self.post_segmentio_event(action=action)
+        self.assert_no_events_emitted()
 
     @data('edx.bi.some_name', 'EDX.BI.CAPITAL_NAME')
-    @expect_failure_with_message(segmentio.WARNING_IGNORED_TYPE)
     def test_segmentio_ignore_names(self, name):
         self.post_segmentio_event(name=name)
+        self.assert_no_events_emitted()
 
     def post_segmentio_event(self, **kwargs):
         """Post a fake Segment event to the view that processes it"""
@@ -161,9 +161,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         """Return a json string containing a fake Segment event"""
         return json.dumps(self.create_segmentio_event(**kwargs))
 
-    @expect_failure_with_message(segmentio.WARNING_IGNORED_SOURCE)
     def test_segmentio_ignore_unknown_libraries(self):
         self.post_segmentio_event(library_name='foo')
+        self.assert_no_events_emitted()
 
     @expect_failure_with_message(segmentio.ERROR_USER_NOT_EXIST)
     def test_no_user_for_user_id(self):
