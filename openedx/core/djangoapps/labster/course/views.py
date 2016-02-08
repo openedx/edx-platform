@@ -18,7 +18,6 @@ from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from cms.djangoapps.contentstore.utils import add_instructor, remove_all_instructors
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.roles import CourseCcxCoachRole
 
 
@@ -153,7 +152,7 @@ def coach_list_handler(reuqest):
     """
     Returns a list of dicts with information about CCX coaches (full name, email).
     """
-    coaches = User.objects.filter(courseaccessrole__role=CourseCcxCoachRole.ROLE)
+    coaches = User.objects.filter(courseaccessrole__role=CourseCcxCoachRole.ROLE).distinct()
     coaches_info = ({
         'full_name': coach.get_full_name(),
         'email': coach.email,
