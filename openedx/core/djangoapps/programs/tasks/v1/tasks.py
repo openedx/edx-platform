@@ -136,11 +136,14 @@ def award_program_certificates(self, username):
     """
     LOGGER.info('Running task award_program_certificates for username %s', username)
 
+    config = ProgramsApiConfig.current()
+    countdown = 2 ** self.request.retries
+
     # If either programs or credentials config models are disabled for this
     # feature, this task should not have been invoked in the first place, and
     # an error somewhere is likely (though a race condition is also possible).
     # In either case, the task should not be executed nor should it be retried.
-    if not ProgramsApiConfig.current().is_certification_enabled:
+    if not config.is_certification_enabled:
         LOGGER.warning(
             'Task award_program_certificates cannot be executed when program certification is disabled in API config',
         )
@@ -179,7 +182,7 @@ def award_program_certificates(self, username):
 
         # Invoke the Programs API completion check endpoint to identify any
         # programs that are satisfied by these course completions.
-        programs_client = get_api_client(ProgramsApiConfig.current(), student)
+        programs_client = get_api_client(config, student)
         program_ids = get_completed_programs(programs_client, course_certs)
         if not program_ids:
             # Again, no reason to continue beyond this point unless/until this
@@ -192,7 +195,7 @@ def award_program_certificates(self, username):
 
     except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc, countdown=countdown, max_retries=config.max_retries)
 
     # For each completed program for which the student doesn't already have a
     # certificate, award one now.
@@ -208,7 +211,7 @@ def award_program_certificates(self, username):
         except Exception as exc:  # pylint: disable=broad-except
             LOGGER.exception('Failed to create a credentials API client to award program certificates')
             # Retry because a misconfiguration could be fixed
-            raise self.retry(exc=exc)
+            raise self.retry(exc=exc, countdown=countdown, max_retries=config.max_retries)
 
         for program_id in new_program_ids:
             try:
