@@ -481,7 +481,7 @@ def student_responses(course):
                     ])
                 elif 'student_answer' in state_dict:
                     raw_answer = state_dict['student_answer']
-                    pretty_answers = u"{problem}={answer}".format(problem=problem_component.location, answer=raw_answer)
+                    pretty_answers = u"{answer}".format(answer=raw_answer)
                 else:
                     raw_answers = {}
                     pretty_answers = None
