@@ -2763,6 +2763,10 @@ MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# Offset for courseware.StudentModuleHistoryExtended which is used to
+# calculate the starting primary key for the underlying table.
+STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
+
 # Deprecated xblock types
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
