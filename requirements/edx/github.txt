@@ -81,4 +81,4 @@ git+https://github.com/edx/edx-proctoring.git@0.6.2#egg=edx-proctoring==0.6.2
 
 # Stanford XBlocks
 -e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@653400485196f8bb05b859c9d89de378a22e0503#egg=xblock-qualtrics-survey
--e git+https://github.com/Stanford-Online/xblock-free-text-response@01cb026337f4fdd97e89b017142be06506e56afa#egg=xblock-free-text-response
+-e git+https://github.com/Stanford-Online/xblock-free-text-response@46e082437246a058dc80c10570316f3a3a3bcc2b#egg=xblock-free-text-response
