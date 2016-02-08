@@ -109,7 +109,7 @@ class GetCompletedProgramsTestCase(TestCase):
             {'course_id': 'test-course-2', 'mode': 'prof-ed'},
         ]
         result = tasks.get_completed_programs(test_client, payload)
-        self.assertEqual(httpretty.last_request().body, json.dumps({'completed_courses': payload}))
+        self.assertEqual(json.loads(httpretty.last_request().body), {'completed_courses': payload})
         self.assertEqual(result, [1, 2, 3])
 
 
@@ -165,12 +165,20 @@ class AwardProgramCertificateTestCase(TestCase):
         """
         test_username = 'test-username'
         test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+
         httpretty.register_uri(
             httpretty.POST,
             'http://test-server/user_credentials/',
         )
+
         tasks.award_program_certificate(test_client, test_username, 123)
-        self.assertEqual(httpretty.last_request().body, json.dumps({'program_id': 123, 'username': test_username}))
+
+        expected_body = {
+            'username': test_username,
+            'credential': {'program_id': 123},
+            'attributes': []
+        }
+        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
 
 
 @ddt.ddt
