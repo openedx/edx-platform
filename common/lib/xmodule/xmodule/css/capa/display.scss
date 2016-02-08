@@ -470,6 +470,11 @@ div.problem {
           border: 1px solid #e3e3e3;
           border-radius: 4px;
           background: #f1f1f1;
+
+          & span {
+            // Needed to fix mathjax rendering bug in chrome (TNL-4080)
+            border-left-style: none !important;
+          }
         }
       }
     }
