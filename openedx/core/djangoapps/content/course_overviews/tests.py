@@ -348,7 +348,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 5, 5), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
