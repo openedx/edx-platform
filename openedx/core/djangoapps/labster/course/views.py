@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from cms.djangoapps.contentstore.utils import add_instructor, remove_all_instructors
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from student.roles import CourseCcxCoachRole
 
 
 log = logging.getLogger(__name__)
@@ -149,8 +150,12 @@ def course_handler(request, course_key_string=None):
 @authentication_classes((SessionAuthentication, TokenAuthentication))
 @permission_classes((IsAuthenticated,))
 def coach_list_handler(reuqest):
-    coach_list = ({
-        'full_name': ccx.coach.get_full_name(),
-        'email': ccx.coach.email,
-    } for ccx in CustomCourseForEdX.objects.all())
-    return Response(coach_list)
+    """
+    Returns a list of dicts with information about CCX coaches (full name, email).
+    """
+    coaches = User.objects.filter(courseaccessrole__role=CourseCcxCoachRole.ROLE)
+    coaches_info = ({
+        'full_name': coach.get_full_name(),
+        'email': coach.email,
+    } for coach in coaches)
+    return Response(coaches_info)
