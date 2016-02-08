@@ -416,6 +416,7 @@ html.video-fullscreen {
     }
 
     div#seq_content {
+      h1,
       h3 {
         background: none;
         margin-bottom: lh();
@@ -445,11 +446,13 @@ html.video-fullscreen {
           margin-bottom: -16px;
           border-bottom: 0;
 
+          h1, // for backwards-compatibility
           h3 {
             margin: 0;
             font-size: 1em;
           }
 
+          h2, // for backwards-compatibility
           h4 {
             float: right;
             margin: 12px 0 0;
