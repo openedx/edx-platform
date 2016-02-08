@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResp
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 import social
-from social.apps.django_app.views import complete
+from social.apps.django_app.views import auth, complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
 from .models import SAMLConfiguration
@@ -59,6 +59,16 @@ def lti_login_and_complete_view(request, backend, *args, **kwargs):
 
     request.backend.start()
     return complete(request, backend, *args, **kwargs)
+
+
+def login(*args, **kwargs):
+    """
+    Wraps the python social auth login view to return a 404 if third party
+    auth is disabled.
+    """
+    if not SAMLConfiguration.is_enabled():
+        raise Http404
+    return auth(*args, **kwargs)
 
 
 def post_to_custom_auth_form(request):
