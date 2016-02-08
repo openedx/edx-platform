@@ -1067,6 +1067,7 @@ DEPRECATED_BLOCK_TYPES = [
     'combinedopenended',
     'graphical_slider_tool',
     'randomize',
+    'lti',
 ]
 
 # Adding components in this list will disable the creation of new problems for

@@ -317,7 +317,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             self.db_connection.update_course_index(updated_index_entry, course_context=course_key)
 
-    def get_structure(self, course_key, version_guid):
+    def get_structure(self, course_key, version_guid, deprecated_block_exits=False):
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             structure = bulk_write_record.structures.get(version_guid)
@@ -333,7 +333,12 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             # cast string to ObjectId if necessary
             version_guid = course_key.as_object_id(version_guid)
-            return self.db_connection.get_structure(version_guid, course_key)
+            structure = self.db_connection.get_structure(
+                version_guid,
+                course_key,
+                deprecated_block_exits=deprecated_block_exits
+            )
+            return structure
 
     def update_structure(self, course_key, structure):
         """
@@ -1863,6 +1868,23 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             search_targets, root_category, root_block_id, **kwargs
         )
 
+    def _is_lti_module_exist(self, structure):
+        for block_key, block in structure['blocks'].iteritems():
+            if block_key.type == 'lti':
+                return True
+        return False
+
+    def get_updated_structure(self, course_key):
+        if course_key.org and course_key.course and course_key.run:
+            # use the course id
+            index = self.get_course_index(course_key)
+            version_guid = index['versions'][course_key.branch]
+        else:
+            version_guid = course_key.version_guid
+
+        entry = self.get_structure(course_key, version_guid, deprecated_block_exits=True)
+        return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
+
     def _create_courselike(
         self, locator, user_id, master_branch, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
@@ -1907,7 +1929,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # just get the draft_version structure
             draft_version = CourseLocator(version_guid=versions_dict[master_branch])
             draft_structure = self._lookup_course(draft_version).structure
+            if self._is_lti_module_exist(draft_structure):
+                draft_structure = self.get_updated_structure(draft_version).structure
             draft_structure = self.version_structure(locator, draft_structure, user_id)
+
+            # BlockUsageLocator(course_key=locator.id,block_type="lti",block_id='c55461a8016845b9957ef3fa8ff92b1f')
+            #
+            # bkl = BlockUsageLocator(course_key=locator, block_type="lti", block_id='c55461a8016845b9957ef3fa8ff92b1f')
+            # bk = BlockKey.from_usage_key(bkl)
+            # lti_block = draft_structure['blocks'][bk]
+
             new_id = draft_structure['_id']
             root_block = draft_structure['blocks'][draft_structure['root']]
             if block_fields is not None:
