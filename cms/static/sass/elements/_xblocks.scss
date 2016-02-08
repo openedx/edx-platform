@@ -187,17 +187,38 @@
     }
   }
 
-  //UI: default internal xblock content styles
+  // UI: default internal xblock content styles
   // ====================
-  // TO-DO: clean-up / remove this reset
-  // internal headings for problems and video components
-  h2 {
-    @extend %t-title5;
-    margin: ($baseline*1.5) ($baseline*2) ($baseline*1.5) 0;
-    color: $gray;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+    h1 {
+        // unused as of ac-313, ac-328
+    }
+
+    h2 {
+        // unused as of ac-313, ac-328
+    }
+
+    h3 {
+        // formerly h2
+        @extend %t-title5;
+        @extend %t-regular;
+        margin: ($baseline*1.5) ($baseline*2) ($baseline*1.5) 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    h4 {
+        // formerly h3
+        @extend %t-title5;
+    }
+
+    h5 {
+        // h4 and h5
+        @extend %t-title5;
+    }
+
+    h6 {
+        @extend %t-title6;
+    }
 
 
   // ====================
