@@ -1,2 +1,2 @@
 def ugettext(self):
-    return "XBLOCK_TRANSLATION.UGETTEXT"
+    return "XBLOCK_UGETTEXT_ALTERNATE"
