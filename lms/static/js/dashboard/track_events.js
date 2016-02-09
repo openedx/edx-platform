@@ -40,6 +40,10 @@ var edx = edx || {};
             $findCoursesBtn = $('.btn-find-courses'),
             $xseriesBtn = $('.xseries-action .btn');
 
+        if (!window.analytics) {
+            return;
+        }
+
         // Emit an event when the 'course title link' is clicked.
         window.analytics.trackLink(
             $courseTitleLink,
@@ -94,6 +98,10 @@ var edx = edx || {};
     };
 
     edx.dashboard.xseriesTrackMessages = function() {
+        if (!window.analytics) {
+            return;
+        }
+
         $('.xseries-action .btn').each(function(i, element) {
             var data = edx.dashboard.generateProgramProperties($(element));
 
