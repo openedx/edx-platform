@@ -1007,22 +1007,6 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
-    @ddt.unpack
-    @ddt.data(
-        {'side_effect': EdxNotesServiceUnavailable},
-        {'side_effect': EdxNotesServiceUnavailable},
-    )
-    def test_edxnotes_view_500_error(self, side_effect):
-        """
-        Tests that 500 status code is received for EdxNotesServiceUnavailable or EdxNotesServiceUnavailable exceptions.
-        """
-        with patch("edxnotes.views.get_notes", autospec=True) as mock_get_notes:
-            mock_get_notes.side_effect = side_effect
-            enable_edxnotes_for_the_course(self.course, self.user.id)
-            response = self.client.get(self.notes_page_url)
-            self.assertEqual(response.status_code, 500)
-
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("edxnotes.views.get_notes", autospec=True)
     def test_search_notes_successfully_respond(self, mock_search):
         """
