@@ -41,11 +41,7 @@ def comprehensive_theme_changes(themes_dir):
     for theme_dir in os.listdir(themes_dir):
         staticfiles_dir = os.path.join(themes_dir, theme_dir, root_name, "static")
         if staticfiles_dir.isdir():
-            changes['settings']['STATICFILES_DIRS'] = [staticfiles_dir] + settings.STATICFILES_DIRS
-
-            favicon = os.path.join(staticfiles_dir, "images", "favicon.ico")
-            if favicon.isfile():
-                changes['settings']['FAVICON_PATH'] = str(favicon)
+            changes['settings']['STATICFILES_DIRS'] = settings.STATICFILES_DIRS + [staticfiles_dir]
 
         locale_dir = os.path.join(themes_dir, theme_dir, root_name, "conf", "locale")
         if locale_dir.isdir():
