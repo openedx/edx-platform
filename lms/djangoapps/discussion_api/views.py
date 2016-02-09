@@ -261,19 +261,17 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         form = ThreadListGetForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
-        return Response(
-            get_thread_list(
-                request,
-                form.cleaned_data["course_id"],
-                form.cleaned_data["page"],
-                form.cleaned_data["page_size"],
-                form.cleaned_data["topic_id"],
-                form.cleaned_data["text_search"],
-                form.cleaned_data["following"],
-                form.cleaned_data["view"],
-                form.cleaned_data["order_by"],
-                form.cleaned_data["order_direction"],
-            )
+        return get_thread_list(
+            request,
+            form.cleaned_data["course_id"],
+            form.cleaned_data["page"],
+            form.cleaned_data["page_size"],
+            form.cleaned_data["topic_id"],
+            form.cleaned_data["text_search"],
+            form.cleaned_data["following"],
+            form.cleaned_data["view"],
+            form.cleaned_data["order_by"],
+            form.cleaned_data["order_direction"],
         )
 
     def retrieve(self, request, thread_id=None):
@@ -443,14 +441,12 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         form = CommentListGetForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
-        return Response(
-            get_comment_list(
-                request,
-                form.cleaned_data["thread_id"],
-                form.cleaned_data["endorsed"],
-                form.cleaned_data["page"],
-                form.cleaned_data["page_size"]
-            )
+        return get_comment_list(
+            request,
+            form.cleaned_data["thread_id"],
+            form.cleaned_data["endorsed"],
+            form.cleaned_data["page"],
+            form.cleaned_data["page_size"]
         )
 
     def retrieve(self, request, comment_id=None):
@@ -460,13 +456,11 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         form = _PaginationForm(request.GET)
         if not form.is_valid():
             raise ValidationError(form.errors)
-        return Response(
-            get_response_comments(
-                request,
-                comment_id,
-                form.cleaned_data["page"],
-                form.cleaned_data["page_size"]
-            )
+        return get_response_comments(
+            request,
+            comment_id,
+            form.cleaned_data["page"],
+            form.cleaned_data["page_size"]
         )
 
     def create(self, request):
