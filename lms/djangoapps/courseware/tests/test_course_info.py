@@ -127,6 +127,45 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         content = pq(info_page_response.content)
         self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
 
+    def test_info_title(self):
+        """
+        Test the info page on a course without any display_* settings against
+        one that does.
+        """
+        url = reverse('info', args=(unicode(self.course.id),))
+        response = self.client.get(url)
+        content = pq(response.content)
+        expected_title = "Welcome to {org}'s {course_name}!".format(
+            org=self.course.display_org_with_default,
+            course_name=self.course.display_number_with_default
+        )
+        display_course = CourseFactory.create(
+            org="HogwartZ",
+            number="Potions_3",
+            display_organization="HogwartsX",
+            display_coursenumber="Potions",
+            display_name="Introduction_to_Potions"
+        )
+        display_url = reverse('info', args=(unicode(display_course.id),))
+        display_response = self.client.get(display_url)
+        display_content = pq(display_response.content)
+        expected_display_title = "Welcome to {org}'s {course_name}!".format(
+            org=display_course.display_org_with_default,
+            course_name=display_course.display_number_with_default
+        )
+        self.assertIn(
+            expected_title,
+            content('h1.page-title').contents()
+        )
+        self.assertIn(
+            expected_display_title,
+            display_content('h1.page-title').contents()
+        )
+        self.assertIn(
+            display_course.display_name_with_default,
+            display_content('h2.page-subtitle').contents()
+        )
+
 
 class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
