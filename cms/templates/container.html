@@ -12,7 +12,7 @@ from contentstore.views.helpers import xblock_studio_url, xblock_type_display_na
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-from util.markup import HTML, ugettext as _
+from openedx.core.djangolib.markup import HTML, ugettext as _
 %>
 <%block name="title">${xblock.display_name_with_default_escaped} ${xblock_type_display_name(xblock) | h}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>

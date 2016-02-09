@@ -33,6 +33,7 @@
                 invalidateCertificate: function() {
                     var user = this.$("#certificate-invalidation-user").val();
                     var notes = this.$("#certificate-invalidation-notes").val();
+                    var message = "";
 
                     var certificate_invalidation = new CertificateInvalidationModel({
                         url: this.collection.url,
@@ -41,10 +42,8 @@
                     });
 
                     if (this.collection.findWhere({user: user})) {
-                        this.showMessage(
-                            gettext("Certificate of ") + user +
-                            gettext(" has already been invalidated. Please check your spelling and retry."
-                            ));
+                        message = gettext("Certificate of <%= user %> has already been invalidated. Please check your spelling and retry."); // jshint ignore:line
+                        this.escapeAndShowMessage(_.template(message, {user: user}));
                     }
                     else if (certificate_invalidation.isValid()) {
                         var self = this;
@@ -53,25 +52,26 @@
 
                             success: function(model) {
                                 self.collection.add(model);
-                                self.showMessage(
-                                    gettext('Certificate has been successfully invalidated for ') + user + '.'
-                                );
+                                message = gettext('Certificate has been successfully invalidated for <%= user %>.');
+                                self.escapeAndShowMessage(_.template(message, {user: user}));
                             },
 
                             error: function(model, response) {
                                 try {
                                     var response_data = JSON.parse(response.responseText);
-                                    self.showMessage(response_data.message);
+                                    self.escapeAndShowMessage(response_data.message);
                                 }
                                 catch(exception) {
-                                    self.showMessage(gettext("Server Error, Please refresh the page and try again."));
+                                    self.escapeAndShowMessage(
+                                        gettext("Server Error, Please refresh the page and try again.")
+                                    );
                                 }
                             }
                         });
 
                     }
                     else {
-                        this.showMessage(certificate_invalidation.validationError);
+                        this.escapeAndShowMessage(certificate_invalidation.validationError);
                     }
                 },
 
@@ -83,16 +83,19 @@
                     if (model) {
                         model.destroy({
                             success: function() {
-                                self.showMessage(gettext('The certificate for this learner has been re-validated and ' +
-                                    'the system is re-running the grade for this learner.'));
+                                self.escapeAndShowMessage(
+                                    gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.') // jshint ignore:line
+                                );
                             },
                             error: function(model, response) {
                                 try {
                                     var response_data = JSON.parse(response.responseText);
-                                    self.showMessage(response_data.message);
+                                    self.escapeAndShowMessage(response_data.message);
                                 }
                                 catch(exception) {
-                                    self.showMessage(gettext("Server Error, Please refresh the page and try again."));
+                                    self.escapeAndShowMessage(
+                                        gettext("Server Error, Please refresh the page and try again.")
+                                    );
                                 }
                             },
                             wait: true,
@@ -100,8 +103,9 @@
                         });
                     }
                     else {
-                        self.showMessage(gettext('Could not find Certificate Invalidation in the list. ' +
-                            'Please refresh the page and try again'));
+                        self.escapeAndShowMessage(
+                            gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again') // jshint ignore:line
+                        );
                     }
                 },
 
@@ -110,9 +114,9 @@
                     return re.test(email);
                 },
 
-                showMessage: function(message) {
+                escapeAndShowMessage: function(message) {
                     $(this.messages +  ">p" ).remove();
-                    this.$(this.messages).removeClass('hidden').append("<p>"+ gettext(message) + "</p>");
+                    this.$(this.messages).removeClass('hidden').append("<p>"+ _.escape(message) + "</p>");
                 }
 
             });

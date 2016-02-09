@@ -355,7 +355,6 @@ def watch_assets(options):
 
 @task
 @needs(
-    'pavelib.prereqs.install_ruby_prereqs',
     'pavelib.prereqs.install_node_prereqs',
 )
 @consume_args

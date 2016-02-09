@@ -22,15 +22,25 @@
 }
 
 .forum-nav-browse {
-  @include box-sizing(border-box);
-  display: table-cell;
-  vertical-align: middle;
-  width: 50%;
-  padding: ($baseline/4);
+    @include box-sizing(border-box);
+    display: table-cell;
+    vertical-align: middle;
+    width: auto;
+    padding: 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 
-  &:hover, &:focus, &.is-active {
-    background-color: $gray-l5;
-  }
+    &:hover,
+    &:focus,
+    &.is-active {
+        // converted to button from a;
+        // need importants to overwrite later button styles
+        box-shadow: none !important;
+        background-image: none !important;
+        background-color: $gray-l5 !important;
+    }
 
   .icon {
     @include font-size(14);
@@ -93,6 +103,33 @@
   width: 100%;
 }
 
+.forum-nav-browse-title {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid $gray-l3;
+    padding: ($baseline/2) ($baseline/2);
+    background: transparent;
+    box-shadow: none;
+    background-image: none;
+    color: $link-color;
+    text-align: left;
+
+    &:hover,
+    &:focus {
+        // switched from a to button;
+        // need to override button styles
+        background-image: none !important;
+        box-shadow: none !important;
+        background: $forum-color-active-thread !important;
+    }
+}
+
+.forum-nav-browse-title .icon {
+  @include margin-right($baseline/2);
+}
+
 .forum-nav-browse-menu {
   @include font-size(14);
   overflow-y: scroll;
@@ -100,22 +137,15 @@
 }
 
 .forum-nav-browse-submenu {
-  padding-left: $baseline;
-  list-style: none;
-}
+    list-style: none;
+    padding: 0;
 
-.forum-nav-browse-title {
-  display: block;
-  border-bottom: 1px solid $gray-l3;
-  padding: ($baseline/2) ($baseline/2);
+    li {
 
-  &:hover, &:focus {
-    background: $forum-color-active-thread;
-  }
-}
-
-.forum-nav-browse-title .icon {
-  @include margin-right($baseline/2);
+        .forum-nav-browse-title {
+            padding-left: $baseline;
+        }
+    }
 }
 
 // -------------------

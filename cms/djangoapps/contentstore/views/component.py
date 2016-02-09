@@ -29,6 +29,7 @@ from opaque_keys.edx.keys import UsageKey
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
+from xblock_django.models import XBlockDisableConfig
 
 __all__ = [
     'container_handler',
@@ -57,7 +58,8 @@ def _advanced_component_types():
     """
     Return advanced component types which can be created.
     """
-    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES]
+    disabled_create_block_types = XBlockDisableConfig.disabled_create_block_types()
+    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in disabled_create_block_types]
 
 
 def _load_mixed_class(category):

@@ -27,7 +27,7 @@ from mongodb_proxy import autoretry_read
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.mongo_connection import connect_to_mongodb
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 
 new_contract('BlockData', BlockData)
@@ -546,7 +546,8 @@ class MongoConnection(object):
         This method is intended for use by tests and administrative commands, and not
         to be run during server startup.
         """
-        self.course_index.create_index(
+        create_collection_index(
+            self.course_index,
             [
                 ('org', pymongo.ASCENDING),
                 ('course', pymongo.ASCENDING),

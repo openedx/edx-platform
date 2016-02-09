@@ -1,4 +1,5 @@
-from .utils import merge_dict, perform_request, CommentClientRequestError
+""" User model wrapper for comment service"""
+from .utils import merge_dict, perform_request, CommentClientRequestError, CommentClientPaginatedResult
 
 import models
 import settings
@@ -113,7 +114,12 @@ class User(models.Model):
             metric_tags=self._metric_tags,
             paged_results=True
         )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+        return CommentClientPaginatedResult(
+            collection=response.get('collection', []),
+            page=response.get('page', 1),
+            num_pages=response.get('num_pages', 1),
+            thread_count=response.get('thread_count', 0)
+        )
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)

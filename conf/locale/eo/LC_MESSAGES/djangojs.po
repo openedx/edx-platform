@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-27 20:56+0000\n"
-"PO-Revision-Date: 2016-01-27 20:56:52.809271\n"
+"POT-Creation-Date: 2016-02-04 15:34+0000\n"
+"PO-Revision-Date: 2016-02-04 15:35:28.172537\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +59,7 @@ msgstr "Sävïng Ⱡ'σяєм ιρѕυ#"
 #: cms/static/js/views/course_info_update.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
+#: lms/static/js/Markdown.Editor.js
 msgid "OK"
 msgstr "ÖK Ⱡ'σя#"
 
@@ -75,6 +76,7 @@ msgstr "ÖK Ⱡ'σя#"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -136,6 +138,12 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм ι#"
 
+#: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
+#: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Choose File"
+msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
@@ -170,6 +178,15 @@ msgstr "Ûplöäd Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Save"
 msgstr "Sävé Ⱡ'σяєм ι#"
+
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/modals/course_outline_modals.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Advanced"
+msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -310,15 +327,6 @@ msgstr "Héädïng 6 Ⱡ'σяєм ιρѕυм ∂σł#"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
 msgstr "Àdd tö Dïçtïönärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-#: cms/templates/js/settings-tab-section.underscore
-msgid "Advanced"
-msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3646,20 +3654,92 @@ msgstr ""
 msgid "Insert Hyperlink"
 msgstr "Ìnsért Hýpérlïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#. Translators: Please keep the quotation marks (") around this text
-#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
-msgid "\"optional title\""
-msgstr "\"öptïönäl tïtlé\" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'http://google.com/'"
+msgstr "é.g. 'http://gööglé.çöm/' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "Insert Image (upload file or type url)"
+msgid "Link Description"
+msgstr "Lïnk Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'google'"
+msgstr "é.g. 'gööglé' Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a description of the link destination."
 msgstr ""
-"Ìnsért Ìmägé (üplöäd fïlé ör týpé ürl) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Pléäsé prövïdé ä désçrïptïön öf thé lïnk déstïnätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Insert Image (upload file or type URL)"
+msgstr ""
+"Ìnsért Ìmägé (üplöäd fïlé ör týpé ÛRL) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Type in a URL or use the \"Choose File\" button to upload a file from your "
+"machine. (e.g. 'http://example.com/img/clouds.jpg')"
+msgstr ""
+"Týpé ïn ä ÛRL ör üsé thé \"Çhöösé Fïlé\" ßüttön tö üplöäd ä fïlé fröm ýöür "
+"mäçhïné. (é.g. 'http://éxämplé.çöm/ïmg/çlöüds.jpg') Ⱡ'σяєм ι#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Image Description"
+msgstr "Ìmägé Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Please describe this image or agree that it has no contextual value by "
+"checking the checkbox."
+msgstr ""
+"Pléäsé désçrïßé thïs ïmägé ör ägréé thät ït häs nö çöntéxtüäl välüé ßý "
+"çhéçkïng thé çhéçkßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
+"the image."
+msgstr ""
+"é.g. 'Ský wïth çlöüds'. Thé désçrïptïön ïs hélpfül för üsérs whö çännöt séé "
+"thé ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "How to create useful text alternatives."
+msgstr ""
+"Höw tö çréäté üséfül téxt ältérnätïvés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"This image is for decorative purposes only and does not require a "
+"description."
+msgstr ""
+"Thïs ïmägé ïs för déçörätïvé pürpösés önlý änd döés nöt réqüïré ä "
+"désçrïptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
 msgstr "Märkdöwn Édïtïng Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+msgid "URL"
+msgstr "ÛRL Ⱡ'σяєм#"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a valid URL."
+msgstr "Pléäsé prövïdé ä välïd ÛRL. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#. Translators: 'errorCount' is the number of errors found in the form.
+#: lms/static/js/Markdown.Editor.js
+msgid "%(errorCount)s error found in form."
+msgid_plural "%(errorCount)s errors found in form."
+msgstr[0] ""
+"%(errorCount)s érrör föünd ïn förm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgstr[1] ""
+"%(errorCount)s érrörs föünd ïn förm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3720,10 +3800,6 @@ msgstr "ströng téxt Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
 msgstr "émphäsïzéd téxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "enter image description here"
-msgstr "éntér ïmägé désçrïptïön héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
@@ -5380,12 +5456,6 @@ msgstr "Ýöür fïlé çöüld nöt ßé üplöädéd Ⱡ'σяєм ιρѕυм �
 msgid "Max file size exceeded"
 msgstr "Mäx fïlé sïzé éxçéédéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: cms/static/js/views/assets.js
-#: cms/templates/js/asset-upload-modal.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Choose File"
-msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
@@ -5710,6 +5780,15 @@ msgstr ""
 msgid "Publish"
 msgstr "Püßlïsh Ⱡ'σяєм ιρѕυм #"
 
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Basic"
+msgstr "Bäsïç Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This label refers to access to course content.
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Access"
+msgstr "Àççéss Ⱡ'σяєм ιρѕυ#"
+
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -6007,22 +6086,32 @@ msgstr ""
 "möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "component"
-msgstr "çömpönént Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "Délété thïs %(xblock_type)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
 msgstr ""
 "Délétïng thïs %(xblock_type)s ïs pérmänént änd çännöt ßé ündöné. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/utils/xblock_utils.js
+msgid ""
+"Any content that has listed this content as a prerequisite will also have "
+"access limitations removed."
+msgstr ""
+"Àný çöntént thät häs lïstéd thïs çöntént äs ä préréqüïsïté wïll älsö hävé "
+"äççéss lïmïtätïöns rémövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s (and prerequisite)?"
+msgstr ""
+"Délété thïs %(xblock_type)s (änd préréqüïsïté)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєт#"
+
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
 msgstr "Ýés, délété thïs %(xblock_type)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s?"
+msgstr "Délété thïs %(xblock_type)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -7049,6 +7138,14 @@ msgstr "Märk Éxäm Às Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
 msgstr "tïméd Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
+msgstr ""
+"Tö réçéïvé çrédït ön ä prößlém, ýöü müst çlïçk \"Çhéçk\" ör \"Fïnäl Çhéçk\" "
+"ön ït ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -8472,6 +8569,46 @@ msgstr "Rétäké Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Take Photo"
 msgstr "Täké Phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: cms/templates/js/access-editor.underscore
+msgid "Limit Access"
+msgstr "Lïmït Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"Select a prerequisite subsection and enter a minimum score percentage to "
+"limit access to this subsection."
+msgstr ""
+"Séléçt ä préréqüïsïté süßséçtïön änd éntér ä mïnïmüm sçöré pérçéntägé tö "
+"lïmït äççéss tö thïs süßséçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Prerequisite:"
+msgstr "Préréqüïsïté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/js/access-editor.underscore
+msgid "No prerequisite"
+msgstr "Nö préréqüïsïté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Minimum Score:"
+msgstr "Mïnïmüm Sçöré: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/access-editor.underscore
+msgid "The minimum score percentage must be a whole number between 0 and 100."
+msgstr ""
+"Thé mïnïmüm sçöré pérçéntägé müst ßé ä whölé nümßér ßétwéén 0 änd 100. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Use as a Prerequisite"
+msgstr "Ûsé äs ä Préréqüïsïté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Make this subsection available as a prerequisite to other content"
+msgstr ""
+"Mäké thïs süßséçtïön äväïläßlé äs ä préréqüïsïté tö öthér çöntént Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
 msgstr ""
@@ -8525,10 +8662,6 @@ msgstr "Shöw Àll Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "Öthér Ⱡ'σяєм ιρѕ#"
-
-#: cms/templates/js/asset-library.underscore
-msgid "URL"
-msgstr "ÛRL Ⱡ'σяєм#"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
@@ -8717,6 +8850,11 @@ msgid "This content group is used in one or more units."
 msgstr ""
 "Thïs çöntént gröüp ïs üséd ïn öné ör möré ünïts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Prerequisite: %(prereq_display_name)s"
+msgstr "Préréqüïsïté: %(prereq_display_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -9265,10 +9403,6 @@ msgstr "Réléäsé Tïmé ïn ÛTÇ: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid "Clear Release Date/Time"
 msgstr "Çléär Réléäsé Däté/Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: cms/templates/js/settings-tab-section.underscore
-msgid "General Settings"
-msgstr "Généräl Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -9429,6 +9563,10 @@ msgstr "Rémövé {role} Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
 msgstr "Délété thé üsér, {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Set as a Special Exam"
+msgstr "Sét äs ä Spéçïäl Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

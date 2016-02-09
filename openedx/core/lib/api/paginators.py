@@ -39,6 +39,18 @@ class NamespacedPageNumberPagination(pagination.PageNumberPagination):
 
     page_size_query_param = "page_size"
 
+    def get_result_count(self):
+        """
+        Returns total number of results
+        """
+        return self.page.paginator.count
+
+    def get_num_pages(self):
+        """
+        Returns total number of pages the results are divided into
+        """
+        return self.page.paginator.num_pages
+
     def get_paginated_response(self, data):
         """
         Annotate the response with pagination information
@@ -46,8 +58,8 @@ class NamespacedPageNumberPagination(pagination.PageNumberPagination):
         metadata = {
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'num_pages': self.page.paginator.num_pages,
+            'count': self.get_result_count(),
+            'num_pages': self.get_num_pages(),
         }
         if isinstance(data, dict):
             if 'results' not in data:
