@@ -484,6 +484,8 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
+
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
     COMMON_ROOT / 'test' / 'templates',
