@@ -23,8 +23,8 @@ def send_login_to_AMC(sender, instance, update_fields, **kwargs):
         logger.info("old last login: {}".format(old_last))
         if not old_last:
             # ping AMC
-            url_base = settings.FEATURES.get('APPSEMBLER_AMC_API_BASE', '')
-            url_suffix = settings.FEATURES.get('APPSEMBLER_FIRST_LOGIN_API', '')
+            url_base = settings.APPSEMBLER_AMC_API_BASE
+            url_suffix = settings.APPSEMBLER_FIRST_LOGIN_API
             if not url_base:
                 logger.warning("APPSEMBLER_AMC_API_BASE is not set")
             if not url_suffix:
@@ -34,7 +34,7 @@ def send_login_to_AMC(sender, instance, update_fields, **kwargs):
             payload = {
                 'email':instance.email,
                 'first_logged_into_edx': datetime_to_send,
-                'secret_key': settings.FEATURES['APPSEMBLER_SECRET_KEY']
+                'secret_key': settings.APPSEMBLER_SECRET_KEY
             }
             try:
                 response = requests.post(url, data=payload)

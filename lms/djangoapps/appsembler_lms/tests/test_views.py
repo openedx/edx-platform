@@ -4,7 +4,6 @@
 
 import ddt
 import mock
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -24,7 +23,6 @@ class TestUserSignup(TestCase):
     def setUp(self):
         self.url = reverse('user_signup_endpoint')
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_only_responds_to_post(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -39,7 +37,6 @@ class TestUserSignup(TestCase):
         ('John Doe', "john@doe.com", "password", "acme", "ACME Inc", "wrong_secret_key", status.HTTP_403_FORBIDDEN),  # wrong secret key
     )
     @ddt.unpack
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_fail_without_required_data(self, name, email, password, org, org_name, secret_key, status_code):
         payload = {'name': name,
                    'email': email,
@@ -50,7 +47,6 @@ class TestUserSignup(TestCase):
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status_code)
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_user_without_enrollment(self):
         payload = {'name': 'John Doe',
                    'email': 'john@doe.com',
@@ -77,7 +73,6 @@ class TestUserSignup(TestCase):
         # make sure user creation follows django 1.8 usage where last_login = None
         self.assertEqual(User.objects.get(email="john@doe.com").last_login, None)
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_unique_username_if_already_exists(self):
         User.objects.create(
             username="JohnDoe",
@@ -102,7 +97,6 @@ class TestUserSignup(TestCase):
         self.assertIn('password', mail.outbox[0].body)
         self.assertIn('John Doe', mail.outbox[0].body)
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_uses_existing_org(self):
         Organization.objects.create(key="acme", display_name="ACME Inc")
         self.assertEqual(Organization.objects.filter(key='acme').count(), 1)
@@ -129,7 +123,6 @@ class TestUserEnroll(ModuleStoreTestCase):
         self.course_key = ToyCourseFactory.create().id
         self.url = reverse('user_signup_endpoint')
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_enrolled_user(self):
         payload = {'name': 'John Doe',
                    'email': 'john@doe.com',

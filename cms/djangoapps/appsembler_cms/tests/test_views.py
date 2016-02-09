@@ -19,12 +19,10 @@ class TestUserSignup(ModuleStoreTestCase):
         super(TestUserSignup, self).setUp()
         self.url = reverse('create_course_endpoint')
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_only_responds_to_post(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_fails_for_nonexisting_user(self):
         org = Organization.objects.create(key="acme")
         payload = {
@@ -36,7 +34,6 @@ class TestUserSignup(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('User does not exist in academy.appsembler.com', response.content)
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_creates_course_for_existing_user(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
         org = Organization.objects.create(key="acme")
@@ -52,7 +49,6 @@ class TestUserSignup(ModuleStoreTestCase):
         self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
 
 
-    @mock.patch.dict(settings.FEATURES, {'APPSEMBLER_SECRET_KEY': 'secret_key'})
     def test_fails_for_nonexisting_organization(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
         payload = {
