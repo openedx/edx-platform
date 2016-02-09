@@ -47,11 +47,11 @@
                 <span class="sr">
                     %for choice_id, choice_description in choices:
                         % if choice_id in value:
-                            ${choice_description}, 
+                            ${choice_description},
                         %endif
                     %endfor
                     -
-                    ${status.display_name}
+                    ${status.display_tooltip}
                 </span>
             </span>
         % endif
