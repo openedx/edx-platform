@@ -450,6 +450,7 @@ header.global-new {
 
   .user {
     @include float(right);
+    margin-top: 0;
 
     > .primary {
       display: block;
@@ -487,7 +488,7 @@ header.global-new {
       letter-spacing: 0;
 
       .user-image-frame {
-        max-width: ($baseline/2);
+        max-width: ($baseline*2);
         border-radius: 10%;
       }
 
@@ -507,7 +508,7 @@ header.global-new {
 
     .dropdown {
       font-size: $body-font-size;
-      padding: 0 ($baseline/2);
+      padding: ($baseline/5) ($baseline/2);
       color: $base-font-color;
       border: none;
       background: $white;

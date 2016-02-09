@@ -91,7 +91,7 @@
 
             .upload-button-input {
                 position: absolute;
-                top: -($profile-image-dimension);
+                top: -($profile-image-dimension * 2);
                 @include left(0);
                 width: $profile-image-dimension;
                 height: 100%;
