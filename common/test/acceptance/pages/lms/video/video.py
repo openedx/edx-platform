@@ -14,7 +14,7 @@ import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {
-    'transcript': '.lang',
+    'transcript': '.language-menu',
     'transcript_button': '.toggle-transcript',
     'cc_button': '.toggle-captions',
     'volume': '.volume',
@@ -35,14 +35,14 @@ CSS_CLASS_NAMES = {
     'captions_text': '.subtitles li',
     'captions_text_getter': '.subtitles li[role="link"][data-index="1"]',
     'closed_captions': '.closed-captions',
-    'error_message': '.video .video-player h3',
+    'error_message': '.video .video-player .video-error',
     'video_container': '.video',
     'video_sources': '.video-player video source',
     'video_spinner': '.video-wrapper .spinner',
     'video_xmodule': '.xmodule_VideoModule',
     'video_init': '.is-initialized',
     'video_time': '.vidtime',
-    'video_display_name': '.vert h2',
+    'video_display_name': '.vert h3',
     'captions_lang_list': '.langs-list li',
     'video_speed': '.speeds .value',
     'poster': '.poster',
@@ -631,7 +631,6 @@ class VideoPage(PageObject):
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
-
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
 

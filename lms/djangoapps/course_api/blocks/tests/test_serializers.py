@@ -3,6 +3,8 @@ Tests for Course Blocks serializers
 """
 from mock import MagicMock
 
+from course_blocks.tests.helpers import EnableTransformerRegistryMixin
+from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -10,10 +12,10 @@ from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACC
 
 from ..transformers.blocks_api import BlocksAPITransformer
 from ..serializers import BlockSerializer, BlockDictSerializer
-from .test_utils import deserialize_usage_key
+from .helpers import deserialize_usage_key
 
 
-class TestBlockSerializerBase(SharedModuleStoreTestCase):
+class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
     Base class for testing BlockSerializer and BlockDictSerializer
     """
@@ -33,8 +35,8 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         )
         self.block_structure = get_course_blocks(
             self.user,
-            root_block_usage_key=self.course.location,
-            transformers=COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer],
+            self.course.location,
+            BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS + [blocks_api_transformer]),
         )
         self.serializer_context = {
             'request': MagicMock(),

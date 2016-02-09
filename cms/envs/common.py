@@ -60,6 +60,8 @@ from lms.envs.common import (
 
     # Django REST framework configuration
     REST_FRAMEWORK,
+
+    STATICI18N_OUTPUT_DIR
 )
 from path import Path as path
 from warnings import simplefilter
@@ -465,6 +467,8 @@ LANGUAGE_DICT = dict(LANGUAGES)
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_ROOT = PROJECT_ROOT / "static"
+
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 
@@ -483,7 +487,6 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -845,6 +848,9 @@ INSTALLED_APPS = (
 
     # edx-milestones service
     'milestones',
+
+    # Static i18n support
+    'statici18n',
 )
 
 
@@ -1104,3 +1110,6 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
+
+# Partner support link for CMS footer
+PARTNER_SUPPORT_EMAIL = ''

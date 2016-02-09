@@ -42,6 +42,7 @@
 # Mariana Baroni <maribaroni@gmail.com>, 2014
 # Matheus Andrade <matheusflkandrade@hotmail.com>, 2014
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
+# Ned Batchelder <ned@edx.org>, 2016
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # Paulo Castro, 2013
@@ -165,7 +166,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-22 14:53+0000\n"
+"POT-Creation-Date: 2016-01-27 21:06+0000\n"
 "PO-Revision-Date: 2016-01-26 16:31+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -753,7 +754,7 @@ msgstr "Dimensões"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
-msgstr ""
+msgstr "Disc"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -794,7 +795,7 @@ msgstr "Editar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
-msgstr ""
+msgstr "Embutir"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2494,11 +2495,11 @@ msgstr "Assistente de aula"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Please specify a reason."
-msgstr ""
+msgstr "Por favor, especificar um motivo"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
-msgstr ""
+msgstr "Algo deu errado ao mudar esta matrícula. Por favor, tente novamente."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2506,7 +2507,7 @@ msgstr "Última atividade"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "open slots"
-msgstr ""
+msgstr "Slots abertos"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
@@ -2578,7 +2579,7 @@ msgstr "Ocorreu um erro. Tente novamente."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Check the highlighted fields below and try again."
-msgstr ""
+msgstr "Confira o campo em destaque antes e tente novamente."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Enter team name."
@@ -2878,11 +2879,13 @@ msgstr "Carregando os dados..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting issued certificates list."
-msgstr ""
+msgstr "Erro ao obter lista de certificados emitidos."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
+"Erro ao obter resultado dos exames supervisionados. Por favor, tente "
+"novamente."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
@@ -3126,6 +3129,8 @@ msgid ""
 "There are invalid keywords in your email. Please check the following "
 "keywords and try again:"
 msgstr ""
+"Existem palavras-chave inválidas no seu email. Por favor, verifique as "
+"palavras a seguir e tente novamente:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
@@ -3274,12 +3279,16 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr ""
+"Zerando número de tentativas de Exame de Admissão para o aluno "
+"'{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
 msgstr ""
+"Erro ao zerar o número de tentativas do Exame de Admissão para o aluno "
+"'{student_id}'. Tenha certeza que a identificação do aluno está correta."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3287,6 +3296,9 @@ msgid ""
 "'Show Background Task History for Student' button to see the status of the "
 "task."
 msgstr ""
+"Iniciada tarefa para reavaliação do Exame de Admissão do aluno "
+"'{student_id}'. Clique no botão 'Mostrar Histórico de Tarefas do Aluno' para"
+" checar o estado da tarefa."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3294,6 +3306,9 @@ msgid ""
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
 msgstr ""
+"Erro ao iniciar uma tarefa pra reavaliar o Exame de Admissão do aluno "
+"'{student_id}'. Tenha certeza de que o Exame de Admissão tenha questões nele"
+" e que o identificador do aluno seja correto."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Enter a student's username or email address."
@@ -3324,12 +3339,16 @@ msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
 msgstr ""
+"Erro ao excluir status do Exame de Admissão do aluno '{student_id}'. Tenha "
+"certeza que a identificação do aluno está correta."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
 msgstr ""
+"Erro ao obter o histórico de tarefas de Exame de Admissão para o aluno  "
+"'{student_id}'. Tenha certeza que a identificação do aluno está correta."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -3443,6 +3462,8 @@ msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr ""
+"Houve um erro ao tentarmos recuperar seu e-mail. Tente de novo mais tarde e "
+"entre em contato com a equipe de suporte técnico se o problema continuar."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject"
@@ -3474,7 +3495,7 @@ msgstr "Enviado por:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent:"
-msgstr ""
+msgstr "Enviado em:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent To:"
@@ -3609,15 +3630,15 @@ msgstr "Ocorreu um erro. Tente novamente."
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
-msgstr ""
+msgstr "Clique para adicionar"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
-msgstr ""
+msgstr "Clique para remover"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
-msgstr ""
+msgstr "Todas as subseções"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All units"
@@ -3656,74 +3677,78 @@ msgstr "Informe a data e o horário de início"
 #: lms/static/js/certificates/models/certificate_invalidation.js
 msgid "Student username/email field is required and can not be empty. "
 msgstr ""
+"Campo de nome do usuário/e-mail do estudante é obrigatório e não pode ficar "
+"vazio."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr ""
+msgstr "Atualizado os arquivos enviados. Clique em \"+\" para visualizar."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr ""
+msgstr "alunos são adicionados com sucesso na lista de exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr ""
+msgstr "aluno é adicionado com sucesso na lista de exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to"
-msgstr ""
+msgstr "registros não estão no formato correto e não constam adicionados a"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " record is not in correct format and not added to the exception"
 msgstr ""
+"registro não está no formato correto e não consta adicionado como exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS and not added to the"
-msgstr ""
+msgstr "aluno não existe no LMS e não está adicionado ao "
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS and not added to the exception list"
-msgstr ""
+msgstr "aluno não existe no LMS e não está adicionado na lista de exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed and not added to"
-msgstr ""
+msgstr "alunos já estão inscritos no curso e não constam adicionados em "
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is already white listed and not added to the exception "
-msgstr ""
+msgstr "aluno já está matriculado no curso e não consta adicionado na exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are not enrolled in course and not added to"
-msgstr ""
+msgstr "alunos não estão inscritos no curso e não constam adicionados em "
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception"
 msgstr ""
+"aluno não está matriculado no curso e não consta adicionado como exceção"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate of "
-msgstr ""
+msgstr "Certificado de"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid " has already been invalidated. Please check your spelling and retry."
-msgstr ""
+msgstr "já foi invalidado. Por favor, verifique a grafia e tente novamente"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate has been successfully invalidated for "
-msgstr ""
+msgstr "O Certificado foi invalidado com sucesso por"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Server Error, Please refresh the page and try again."
-msgstr ""
+msgstr "Erro no servidor, por favor, recarregue a página e tente novamente"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "The certificate for this learner has been re-validated and "
-msgstr ""
+msgstr "O Certificado para esse aluno foi revalidado e "
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Could not find Certificate Invalidation in the list. "
-msgstr ""
+msgstr "Não pode encontrar a Invalidação do Certificado na lista"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3766,7 +3791,7 @@ msgstr "Ocorreu um erro, tente realizar a busca novamente."
 
 #: lms/static/js/edxnotes/plugins/accessibility.js
 msgid "Focus grabber"
-msgstr ""
+msgstr "Centro de atenção"
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -3847,7 +3872,7 @@ msgstr "Aba selecionada"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Saved cohort"
-msgstr ""
+msgstr "Integrantes salvos"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Error adding students."
@@ -3860,8 +3885,8 @@ msgstr "Insira um nome de usuário ou e-mail"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} student has been added to this cohort"
 msgid_plural "{numUsersAdded} students have been added to this cohort"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numUsersAdded} aluno foi adicionado ao grupo"
+msgstr[1] "{numUsersAdded} alunos foram adicionados ao grupo"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} student was removed from {oldCohort}"
@@ -3882,8 +3907,8 @@ msgstr "Usuário desconhecido: {user}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add students:"
 msgid_plural "There were {numErrors} errors when trying to add students:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Houve um erro ao tentar adicionar alunos:"
+msgstr[1] "Ocorreram {numErrors} erros ao tentar adicionar alunos: "
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -3899,7 +3924,7 @@ msgstr "Você não selecionou nenhum grupo de conteúdo."
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "The selected content group does not exist"
-msgstr ""
+msgstr "O grupo de conteúdo selecionado não existe"
 
 #: lms/static/js/groups/views/cohort_form.js
 msgid "The cohort cannot be saved"
@@ -3923,6 +3948,8 @@ msgid ""
 "The {cohortGroupName} cohort has been created. You can manually add students"
 " to this cohort below."
 msgstr ""
+"O grupo {cohortGroupName}  foi criado.Você pode adicionar manualmente os "
+"estudantes para o curso abaixo."
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "Assign students to cohorts by uploading a CSV file."
@@ -3953,11 +3980,11 @@ msgstr "Agrupamento habilitado"
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
-msgstr ""
+msgstr "Agrupamento desabilitado"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
-msgstr ""
+msgstr "Permitir que os estudantes possam gerar certificados deste curso?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Prevent students from generating certificates in this course?"
@@ -3966,24 +3993,28 @@ msgstr "Evitar que os estudantes possam gerar certificados deste curso?"
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start generating certificates for all students in this course?"
 msgstr ""
+"Iniciar a geração de certificados para todos os estudantes deste curso?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while generating certificates. Please try again."
-msgstr ""
+msgstr "Erro durante a geração de certificados. Por favor, tente novamente."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start regenerating certificates for students in this course?"
 msgstr ""
+"Iniciar a recuperação dos certificados para os estudantes deste curso?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while regenerating certificates. Please try again."
-msgstr ""
+msgstr "Erro ao tentar recuperar os certificados. Por favor. tente novamente."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
 " to try again."
 msgstr ""
+"Tivemos um problema ao criar o relatório. Selecione \"Criar Sumário "
+"Executivo\" para tentar novamente."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -3991,15 +4022,15 @@ msgstr "Insira o código de matrícula."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Cancel enrollment code"
-msgstr ""
+msgstr "Cancelar código de matrícula"
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Restore enrollment code"
-msgstr ""
+msgstr "Restaurar código de matrícula"
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Mark enrollment code as unused"
-msgstr ""
+msgstr "Marcar código de matrícula como não usado"
 
 #: lms/static/js/search/base/views/search_results_view.js
 #, c-format
@@ -4053,14 +4084,16 @@ msgid ""
 "Password reset email sent. Follow the link in the email to change your "
 "password."
 msgstr ""
+"Email de recuperação de senha enviado. Siga o link no email para mudar sua "
+"senha"
 
 #: lms/static/js/student_account/account.js
 msgid "We weren't able to send you a password reset email."
-msgstr ""
+msgstr "Não foi possível enviar um e-mail para redefinição de sua senha."
 
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
-msgstr ""
+msgstr "Por favor verifique seu email para confirmar a alteração"
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Saving your email preference"
@@ -4083,6 +4116,8 @@ msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
+"Ocorreu um erro. Tente recarregar a página ou verifique sua conexão de "
+"internet."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information (required)"
@@ -4093,6 +4128,8 @@ msgid ""
 "The name that identifies you throughout {platform_name}. You cannot change "
 "your username."
 msgstr ""
+"O nome que lhe identifica dentro da plataforma {platform_name}. Você não "
+"poder alterá-lo."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Full Name"
@@ -4105,6 +4142,11 @@ msgid ""
 "exactly as it appears on your government-issued photo ID, including any non-"
 "Roman characters."
 msgstr ""
+"O nome que é usado para verificação de ID e que aparece nos teus "
+"certificados. Outros alunos nunca veem teus nomes completos. Tenha certeza "
+"de entrar com teu nome exatamente como aparece na tua Identificação com foto"
+" emitida pelo governo, incluindo quaisquer caracteres que não estejam na "
+"fonte Roman"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -4145,6 +4187,8 @@ msgid ""
 "The language used throughout this site. This site is currently available in "
 "a limited number of languages."
 msgstr ""
+"O idioma usado neste site. Este site atualmente suporta um número limitado "
+"de idiomas."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Country or Region"
@@ -4184,17 +4228,22 @@ msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
 msgstr ""
+"Nós enviamos uma mensagem de confirmação para {new_email_address}. Clique no"
+" link da mensagem para atualizar o teu endereço de e-mail."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "You must sign out and sign back in before your language changes take effect."
 msgstr ""
+"Você deve sair e entrar antes que as mudanças de idioma tenham efeito."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset your password."
 msgstr ""
+"Nós mandamos uma mensagem para {email_address}. Clique no link na mensagem "
+"para redefinir tua senha"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink"
@@ -4303,7 +4352,7 @@ msgstr "Certificado verificado de profissional de educação"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education"
-msgstr ""
+msgstr "Educação Profissional"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
@@ -4792,7 +4841,7 @@ msgstr "O nome do capítulo é obrigatório"
 
 #: cms/static/js/models/chapter.js
 msgid "asset_path is required"
-msgstr ""
+msgstr "variável_ativa é obrigatória"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
@@ -5166,7 +5215,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
-msgstr ""
+msgstr "Parte Igual"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -6200,7 +6249,7 @@ msgstr "Modo de matrícula"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Verified mode price"
-msgstr ""
+msgstr "Preço de modo verificado"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Reason"
@@ -7309,6 +7358,8 @@ msgid ""
 "When your face is in position, use the camera button %(icon)s below to take "
 "your photo."
 msgstr ""
+"Quando seu rosto estiver posicionado, use o %(icon)s do botão da câmera "
+"abaixo para tirar sua foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -7400,12 +7451,17 @@ msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
 msgstr ""
+"Use a webcam para tirar uma foto do seu documento. Nós vamos conferir esta "
+"foto com a foto do seu rosto e o nome na sua conta."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
 msgstr ""
+"Você precisa de um documento com o seu nome e foto. Uma carteira de "
+"motorista, passaporte ou outro documento emitido pelo governo são "
+"aceitáveis."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7415,6 +7471,7 @@ msgstr "Dicas para tirar uma boa foto"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
 msgstr ""
+"Certifique-se que tanto a foto como o nome estejam nítidos e identificáveis"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
@@ -7431,6 +7488,7 @@ msgstr ""
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
 msgstr ""
+"Se a sua foto não lhe agradou utilize o botão de tirar a foto novamente."
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -7439,25 +7497,31 @@ msgstr "Pré-visualização da imagem enviada"
 #: lms/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr ""
+"Envie uma imagem ou capture uma, com sua webcam ou com a câmera de seu "
+"telefone celular."
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
 msgstr ""
+"Use a webcam para tirar uma foto do seu rosto. Nós vamos conferir essa foto "
+"com a do seu documento de identidade."
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
-msgstr ""
+msgstr "Certifique-se que o seu rosto esteja bem iluminado"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
-msgstr ""
+msgstr "Certifique-se que o seu rosto todo esteja dentro dos limites da borda"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Once in position, use the camera button %(icon)s to capture your photo"
 msgstr ""
+"Quando estiver na posição, use o botão da câmera %(icon)s para capturar a "
+"sua foto"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -7478,6 +7542,9 @@ msgid ""
 "your inbox for an activation email. After you complete activation you can "
 "return and refresh this page."
 msgstr ""
+"Você precisa ativar a sua conta antes de matricular-se nos cursos. Confira "
+"se o e-mail de ativação está na sua caixa de entrada. Depois de completar a "
+"ativação, você pode voltar e atualizar esta página."
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -7501,6 +7568,8 @@ msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
 msgstr ""
+"Uma carteira de motorista, um passaporte ou outro documento de identidade "
+"oficial com o seu nome e foto"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #, python-format
@@ -7516,6 +7585,8 @@ msgstr "Você está atualizando sua matrícula para: %(courseName)s"
 msgid ""
 "You can now enter your payment information and complete your enrollment."
 msgstr ""
+"Você pode preencher agora as informações sobre o pagamento e completar a sua"
+" matrícula"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #, python-format
@@ -7524,12 +7595,18 @@ msgid ""
 "you will need to have these by %(date)s to qualify to earn a Verified "
 "Certificate."
 msgstr ""
+"Você pode pagar agora, mesmo que não tenha nenhum dos seguintes itens "
+"disponíveis, mas você terá que tê-los até %(date)s para se qualificar para "
+"um Certificado Verificado."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
 msgstr ""
+"Você pode pagar agora, mesmo não tendo nenhum dos seguintes itens "
+"disponíveis, mas você terá que tê-los para se qualificar para um Certificado"
+" Verificado."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
@@ -7539,12 +7616,16 @@ msgstr "Foto de um documento de identidade oficial"
 msgid ""
 "ID-Verification is not required for this Professional Education course."
 msgstr ""
+"A verificação do ID não é necessária para esse curso de Educação "
+"Profissional"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "All professional education courses are fee-based, and require payment to "
 "complete the enrollment process."
 msgstr ""
+"Todos os cursos de educação profissional possuem uma taxa, e requerem o "
+"pagamento desta para completar o processo de inscrição."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "You have already verified your ID!"

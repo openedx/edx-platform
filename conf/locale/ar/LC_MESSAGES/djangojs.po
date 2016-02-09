@@ -31,7 +31,7 @@
 # omarithawi <oithawi@qrf.org>, 2015
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # SiddigSami <siddigsami@live.com>, 2014-2015
-# Soha Assali <soha+transifex@qordoba.com>, 2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # Tariq Hamid <ou63@outlook.com>, 2015
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -52,7 +52,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # RaghadG <raghad_g@yahoo.com>, 2014
-# Soha Assali <soha+transifex@qordoba.com>, 2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -71,7 +71,7 @@
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # omarithawi <oithawi@qrf.org>, 2015
-# Soha Assali <soha+transifex@qordoba.com>, 2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -87,14 +87,14 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # omarithawi <oithawi@qrf.org>, 2015
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
-# Soha Assali <soha+transifex@qordoba.com>, 2015
+# Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-22 14:53+0000\n"
-"PO-Revision-Date: 2016-01-15 18:46+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-01-27 21:06+0000\n"
+"PO-Revision-Date: 2016-02-04 08:50+0000\n"
+"Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1655,7 +1655,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid "Bookmarked"
-msgstr ""
+msgstr "جرى وضع علامة"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
@@ -2464,23 +2464,23 @@ msgstr "نأسف لحدوث خطأ غير متوقَّع. يُرجى إعادة 
 
 #: lms/djangoapps/support/static/support/js/views/enrollment.js
 msgid "Financial Assistance"
-msgstr ""
+msgstr "دعم مالي"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment.js
 msgid "Upset Learner"
-msgstr ""
+msgstr "متعلّم غير راضي"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment.js
 msgid "Teaching Assistant"
-msgstr ""
+msgstr "مساعد مدرّس"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Please specify a reason."
-msgstr ""
+msgstr "يُرجى تحديد سبب"
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
-msgstr ""
+msgstr "حدث خطأ أثناء تغيير عملية التسجيل هذه. يُرجى إعادة المحاولة."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -3604,11 +3604,11 @@ msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
-msgstr ""
+msgstr "اضغط للإضافة"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
-msgstr ""
+msgstr "اضغط للإزالة"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -3700,27 +3700,27 @@ msgstr "لم يُسجّل المتعلّمون في المساق ولم تجري
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate of "
-msgstr ""
+msgstr "الشهادة"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid " has already been invalidated. Please check your spelling and retry."
-msgstr ""
+msgstr "جرى إلغاؤها. يٌرجى التأكّد من التهجئة وإعادة المحاولة."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate has been successfully invalidated for "
-msgstr ""
+msgstr "جرى إلغاء الشهادة بنجاح لـ"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Server Error, Please refresh the page and try again."
-msgstr ""
+msgstr "خطأ في المخدّم، يُرجى تحديث الصفحة وإعادة المحاولة."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "The certificate for this learner has been re-validated and "
-msgstr ""
+msgstr "جرت إعادة توثيق الشهادة لهذا المتعلّم و"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Could not find Certificate Invalidation in the list. "
-msgstr ""
+msgstr "تعذّر إيجاد إلغاء الشهادة في اللائحة."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -4134,6 +4134,9 @@ msgid ""
 "exactly as it appears on your government-issued photo ID, including any non-"
 "Roman characters."
 msgstr ""
+"الاسم المستخدم للتأكّد من الهوية والذي سيظهر على الشهادات. لن يرى المتعلّمون"
+" الآخرون اسمك الكامل نهائيًّا. تأكّد من إدخال اسمك بشكل مطابق للاسم الظاهر "
+"على هويّتك الرسميّة التي تحمل صورة، بما فيه أي حروف غير لاتينية."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -4822,15 +4825,15 @@ msgstr "عذرًا، لم ينجح التحميل."
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name and asset_path are both required"
-msgstr ""
+msgstr "كل من الحقلين ’اسم الفصل‘ و ’مسار المادّة الموجودة‘ مطلوب."
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name is required"
-msgstr ""
+msgstr "اسم الفصل مطلوب"
 
 #: cms/static/js/models/chapter.js
 msgid "asset_path is required"
-msgstr ""
+msgstr "مسار المادة الموجودة مطلوب"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
@@ -4924,15 +4927,15 @@ msgstr "لم يمكن تحديد درجة النجاح عند أقلّ من %(mi
 
 #: cms/static/js/models/textbook.js
 msgid "Textbook name is required"
-msgstr ""
+msgstr "اسم الكتاب مطلوب"
 
 #: cms/static/js/models/textbook.js
 msgid "Please add at least one chapter"
-msgstr ""
+msgstr "يٌرجى إضافة فصل واحد على الأقل"
 
 #: cms/static/js/models/textbook.js
 msgid "All chapters must have a name and asset"
-msgstr ""
+msgstr "يجب أن يتوفّر اسم ومادّة لجميع الفصول."
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -6129,7 +6132,7 @@ msgstr "اسم المستخدم أو البريد الإلكتروني:"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "course id"
-msgstr ""
+msgstr "رقم تعريف المساق "
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
@@ -6175,7 +6178,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Generate the user's certificate"
-msgstr ""
+msgstr "إنشاء شهادة المستخدم"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Current enrollment mode:"
@@ -6191,7 +6194,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Choose One"
-msgstr ""
+msgstr "اختر واحدًا"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 msgid "Explain if other."
@@ -6204,7 +6207,7 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Username or email address"
-msgstr ""
+msgstr "اسم المستخدم أو البريد الإلكتروني"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
@@ -6212,7 +6215,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course Start"
-msgstr ""
+msgstr "تاريخ ابتداء المساق"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course End"
@@ -8553,7 +8556,7 @@ msgstr "المؤسّسة"
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"
-msgstr "صورة الموقِّع"
+msgstr "صورة التوقيع"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Certificate Signatory Configuration"
@@ -8603,7 +8606,7 @@ msgstr "المؤسّسة التي ينتمي إليها هذا الموقِّع�
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Path to Signature Image"
-msgstr "مسار موقع صورة الموقِّع"
+msgstr "مسار موقع صورة التوقيع"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Image must be in PNG format"
@@ -8611,7 +8614,7 @@ msgstr "يجب أن تكون الصورة بصيغة PNG."
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Upload Signature Image"
-msgstr ""
+msgstr "تحميل صورة التوقيع"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"
@@ -8725,7 +8728,7 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Review Rules"
-msgstr ""
+msgstr "قواعد المراجعة"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""

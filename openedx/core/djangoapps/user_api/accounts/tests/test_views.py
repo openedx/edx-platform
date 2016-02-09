@@ -538,6 +538,11 @@ class TestAccountAPI(UserAPITestCase):
         verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)
         verify_change_info(name_change_info[1], "Mickey Mouse", self.user.username, "Donald Duck")
 
+    @patch.dict(
+        'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+        {'full': 50, 'medium': 30, 'small': 10},
+        clear=True
+    )
     def test_patch_email(self):
         """
         Test that the user can request an email change through the accounts API.

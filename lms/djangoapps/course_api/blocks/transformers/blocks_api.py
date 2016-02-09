@@ -1,7 +1,7 @@
 """
 Blocks API Transformer
 """
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from .block_counts import BlockCountsTransformer
 from .block_depth import BlockDepthTransformer
 from .navigation import BlockNavigationTransformer

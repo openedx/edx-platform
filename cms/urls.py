@@ -122,12 +122,6 @@ JS_INFO_DICT = {
     'packages': ('openassessment',),
 }
 
-urlpatterns += patterns(
-    '',
-    # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', JS_INFO_DICT),
-)
-
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
     urlpatterns += (
         url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),

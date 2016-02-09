@@ -9,8 +9,10 @@ else:
 </%def>
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from openedx.core.lib.js_utils import escape_json_dumps
-from util.markup import HTML, ugettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from openedx.core.djangolib.markup import HTML, ugettext as _
 %>
 <%block name="title">${xblock.display_name_with_default_escaped} ${xblock_type_display_name(xblock) | h}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
@@ -32,11 +34,11 @@ from util.markup import HTML, ugettext as _
 <%block name="requirejs">
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
-            ${ escape_json_dumps(component_templates) | n },
-            ${ escape_json_dumps(xblock_info) | n },
-            "${action | h}",
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
+            "${action | n, js_escaped_string}",
             {
-                isUnitPage: ${ escape_json_dumps(is_unit_page) | n },
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true
             }
         );

@@ -271,6 +271,18 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then I can add Allowance to that exam for a student
         self.assertTrue(allowance_section.is_add_allowance_button_visible)
 
+        # When I click the Add Allowance button
+        allowance_section.click_add_allowance_button()
+
+        # Then popup should be visible
+        self.assertTrue(allowance_section.is_add_allowance_popup_visible)
+
+        # When I fill and submit the allowance form
+        allowance_section.submit_allowance_form('10', self.USERNAME)
+
+        # Then, the added record should be visible
+        self.assertTrue(allowance_section.is_allowance_record_visible)
+
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.

@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
 
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
 from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
@@ -186,7 +186,7 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
     try:
         exam_descriptor = modulestore().get_item(exam_key)
         return HttpResponse(
-            escape_json_dumps({'locator': unicode(exam_descriptor.location)}),
+            dump_js_escaped_json({'locator': unicode(exam_descriptor.location)}),
             status=200, content_type='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)

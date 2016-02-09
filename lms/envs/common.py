@@ -190,9 +190,6 @@ FEATURES = {
     # for load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
-    # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES': False,
-
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
 
@@ -922,6 +919,9 @@ LANGUAGE_DICT = dict(LANGUAGES)
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_ROOT = PROJECT_ROOT / "static"
+STATICI18N_OUTPUT_DIR = "js/i18n"
+
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
@@ -1160,7 +1160,6 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1610,7 +1609,20 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
-
+# In production, the Django pipeline appends a file hash to JavaScript file names.
+# This makes it difficult for RequireJS to load its requirements, since module names
+# specified in JavaScript code do not include the hash.
+# For this reason, we calculate the actual path including the hash on the server
+# when rendering the page.  We then override the default paths provided to RequireJS
+# so it can resolve the module name to the correct URL.
+#
+# If you want to load JavaScript dependencies using RequireJS
+# but you don't want to include those dependencies in the JS bundle for the page,
+# then you need to add the js urls in this list.
+REQUIRE_JS_PATH_OVERRIDES = [
+    'js/bookmarks/views/bookmark_button.js',
+    'js/views/message_banner.js'
+]
 ################################# CELERY ######################################
 
 # Message configuration
@@ -1943,6 +1955,9 @@ INSTALLED_APPS = (
 
     # Gating of course content
     'gating.apps.GatingConfig',
+
+    # Static i18n support
+    'statici18n',
 )
 
 # Migrations which are not in the standard module "migrations"

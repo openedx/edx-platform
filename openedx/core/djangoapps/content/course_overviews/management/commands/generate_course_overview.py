@@ -34,7 +34,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if options['all']:
-            course_keys = [course.id for course in modulestore().get_courses()]
+            course_keys = [course.id for course in modulestore().get_course_summaries()]
         else:
             if len(args) < 1:
                 raise CommandError('At least one course or --all must be specified.')

@@ -3,6 +3,8 @@ Tests for Blocks api.py
 """
 
 from django.test.client import RequestFactory
+
+from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -11,7 +13,7 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory
 from ..api import get_blocks
 
 
-class TestGetBlocks(SharedModuleStoreTestCase):
+class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
     """

@@ -14,7 +14,6 @@ from path import Path as path
 from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
-from openedx.core.lib.gating import api as gating_api
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.exceptions import UndefinedContext
@@ -425,12 +424,12 @@ class CourseFields(object):
     )
     has_children = True
     info_sidebar_name = String(
-        display_name=_("Course Info Sidebar Name"),
+        display_name=_("Course Home Sidebar Name"),
         help=_(
-            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        scope=Scope.settings, default='Course Handouts')
+        scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
             "True if timezones should be shown on dates in the courseware. "
@@ -496,9 +495,9 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the short name of the course to use on the certificate that "
-            "students receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the short name of the type of certificate that '
+            'students receive when they complete the course. For instance, "Certificate".'
         ),
         display_name=_("Certificate Name (Short)"),
         scope=Scope.settings,
@@ -506,9 +505,9 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the long name of the course to use on the certificate that students "
-            "receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the long name of the type of certificate that students '
+            'receive when they complete the course. For instance, "Certificate of Achievement".'
         ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
@@ -702,16 +701,22 @@ class CourseFields(object):
 
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
+        # Translators: please don't translate "id".
         help=_(
             'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
             'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
             'with a comma after the closing curly brace for each topic, and another comma after the '
             'closing square brackets. '
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
-            '2 topics, enter the configuration in this format: '
-            '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
-            '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}. '
+            '2 topics, enter the configuration in this format: {example_format}. '
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+        ).format(
+            # Put the sample JSON into a format variable so that translators
+            # don't muck with it.
+            example_format=(
+                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
+                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
+            ),
         ),
         scope=Scope.settings,
     )
@@ -757,9 +762,11 @@ class CourseFields(object):
     )
 
     enable_subsection_gating = Boolean(
-        display_name=_("Enable Subsection Gating"),
+        display_name=_("Enable Subsection Prerequisites"),
         help=_(
-            "Enter true or false. If this value is true, subsection gating is enabled in your course."
+            "Enter true or false. If this value is true, you can hide a "
+            "subsection until learners earn a minimum score in another, "
+            "prerequisite subsection."
         ),
         default=False,
         scope=Scope.settings
@@ -1394,18 +1401,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
           bool: False if the course has already started, True otherwise.
         """
         return datetime.now(UTC()) <= self.start
-
-    @property
-    def gating_prerequisites(self):
-        """
-        Course content that can be used to gate other course content within this course.
-
-        Returns:
-            list: Returns a list of dicts containing the gating milestone data
-        """
-        if not self._gating_prerequisites:
-            self._gating_prerequisites = gating_api.get_prerequisites(self.id)
-        return self._gating_prerequisites
 
 
 class CourseSummary(object):

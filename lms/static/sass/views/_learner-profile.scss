@@ -43,6 +43,7 @@
             position: relative;
 
             .image-frame {
+                display: block;
                 position: relative;
                 width: $profile-image-dimension;
                 height: $profile-image-dimension;
@@ -50,19 +51,27 @@
             }
 
             .u-field-upload-button {
-                width: $profile-image-dimension;
-                height: $profile-image-dimension;
                 position: absolute;
                 top: 0;
-                opacity: 0;
+                width: $profile-image-dimension;
+                height: $profile-image-dimension;
+                border-radius: ($baseline/4);
+                border: 2px dashed transparent;
+                background: rgba(229,241,247, .8);
+                color: $link-color;
+                text-shadow: none;
                 @include transition(all $tmg-f1 ease-in-out 0s);
+                opacity: 0;
+                z-index: 6;
 
                 i {
-                    color: $white;
+                    color: $link-color;
                 }
 
-                &:focus {
+                &:focus,
+                &:hover {
                     @include show-hover-state();
+                    border-color: $link-color;
                 }
             }
 
@@ -70,50 +79,34 @@
                 @include show-hover-state();
             }
 
-            .upload-button-icon, .upload-button-title {
-                text-align: center;
-                transform: translateY(35px);
-                -webkit-transform: translateY(35px);
+            .upload-button-icon,
+            .upload-button-title {
                 display: block;
-                color: $white;
                 margin-bottom: ($baseline/4);
+                @include transform(translateY(35px));
                 line-height: 1.3em;
+                text-align: center;
+                z-index: 7;
             }
 
             .upload-button-input {
+                position: absolute;
+                top: -($profile-image-dimension * 2);
+                @include left(0);
                 width: $profile-image-dimension;
                 height: 100%;
-                position: absolute;
-                top: 0;
-                @include left(0);
-                opacity: 0;
                 cursor: pointer;
+                z-index: 5;
+                outline: 0;
             }
 
             .u-field-remove-button {
-                width: $profile-image-dimension;
-                height: $baseline;
-                opacity: 0;
                 position: relative;
-                margin-top: 2px;
+                display: block;
+                width: $profile-image-dimension;
+                margin-top: ($baseline / 4);
+                padding: ($baseline / 5);
                 text-align: center;
-
-                &:active {
-                    box-shadow: none;
-                    outline: 0;
-                }
-                &:focus {
-                    @include show-hover-state();
-                    box-shadow: none;
-                    outline: 0;
-                    border: 2px dashed $link-color !important;
-                }
-            }
-
-            &:hover, &:focus {
-                .u-field-upload-button, .u-field-remove-button {
-                    @include show-hover-state();
-                }
             }
         }
     }

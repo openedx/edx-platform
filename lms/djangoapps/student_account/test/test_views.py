@@ -20,7 +20,7 @@ from django.http import HttpRequest
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -387,7 +387,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             "finishAuthUrl": finish_auth_url,
             "errorMessage": None,
         }
-        auth_info = escape_json_dumps(auth_info)
+        auth_info = dump_js_escaped_json(auth_info)
 
         expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
