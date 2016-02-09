@@ -35,10 +35,11 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         parameter before getting the URL to which we must redirect in order to
         authenticate the user.
 
-        raise Http404 if SAML is disabled
+        raise Http404 if SAML authentication is disabled.
         raise AuthMissingParameter if the 'idp' parameter is missing.
         """
         if not self._config.enabled:
+            log.error('SAML authentication is not enabled')
             raise Http404
         # TODO: remove this check once the fix is merged upstream:
         # https://github.com/omab/python-social-auth/pull/821
