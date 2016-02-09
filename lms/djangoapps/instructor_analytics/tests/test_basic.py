@@ -563,13 +563,9 @@ class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
             state=u'{"answer": {"problem_id": "123"}}',
         )
 
-#         datarows = list(student_response_rows(self.course))
-#         self.assertEqual(datarows[1][-1], u'problem_id=student response1')
-#         self.assertEqual(datarows[2][-1], u'i4x://edX/graded/problem/H1P3=student response2')
-
         datarows = list(student_responses(self.course))
         self.assertEqual(datarows[0][-1], u'problem_id=student response1')
-        self.assertEqual(datarows[1][-1], u'i4x://edX/graded/problem/H1P3=student response2')
+        self.assertEqual(datarows[1][-1], u'student response2')
 
     def test_problem_with_no_answer(self):
         self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
