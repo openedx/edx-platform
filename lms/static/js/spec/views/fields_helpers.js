@@ -144,18 +144,19 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             switch (fieldClass) {
                 case FieldViews.TextFieldView:
-                    valueInputSelector = '.u-field-value > input';
+                    valueInputSelector = '.u-field-value input';
                     break;
                 case FieldViews.DropdownFieldView:
-                    valueInputSelector = '.u-field-value > select';
+                    valueInputSelector = '.u-field-value select';
                     _.extend(fieldData, {validValue: SELECT_OPTIONS[0][0]});
                     break;
                 case FieldViews.TextareaFieldView:
-                    valueInputSelector = '.u-field-value > textarea';
+                    valueInputSelector = '.u-field-value textarea';
                     break;
             }
 
-            view.$(valueInputSelector).val(fieldData.validValue).change();
+            view.$(valueInputSelector).val(fieldData.validValue);
+            $(view.el).find('.button-save').click();
             expect(view.fieldValue()).toBe(fieldData.validValue);
             expectMessageContains(view, view.helpMessage);
             AjaxHelpers.expectNoRequests(requests);
@@ -179,7 +180,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect(view.fieldValue()).not.toContain(data.validValue);
             }
 
-            view.$(data.valueInputSelector).val(data.validValue).change();
+            view.$(data.valueInputSelector).val(data.validValue);
+            $(view.el).find('.button-save').click();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
@@ -198,7 +200,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expectMessageContains(view, view.indicators.success);
             }
 
-            view.$(data.valueInputSelector).val(data.invalidValue1).change();
+            view.$(data.valueInputSelector).val(data.invalidValue1);
+            $(view.el).find('.button-save').click();
             request_data[data.valueAttribute] = data.invalidValue1;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -209,7 +212,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, view.messages.error);
             expect(view.el).toHaveClass('mode-edit');
 
-            view.$(data.valueInputSelector).val(data.invalidValue2).change();
+            view.$(data.valueInputSelector).val(data.invalidValue2);
+            $(view.el).find('.button-save').click();
             request_data[data.valueAttribute] = data.invalidValue2;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -220,7 +224,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, data.validationError);
             expect(view.el).toHaveClass('mode-edit');
 
-            view.$(data.valueInputSelector).val('').change();
+            view.$(data.valueInputSelector).val('');
+            $(view.el).find('.button-save').click();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.defaultValue);
             request_data[data.valueAttribute] = data.defaultValue;
@@ -239,7 +244,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyTextField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > input'
+                    valueInputSelector: '.u-field-value input'
                 }, data
             ), requests);
         };
@@ -247,7 +252,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         var verifyDropDownField = function (view, data, requests) {
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
-                    valueInputSelector: '.u-field-value > select'
+                    valueInputSelector: '.u-field-value select'
                 }, data
             ), requests);
         };

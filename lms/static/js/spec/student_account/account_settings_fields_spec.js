@@ -51,7 +51,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
 
                 var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
-                view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).val(data[fieldData.valueAttribute]);
+                $(view.el).find('.button-save').click();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -65,7 +66,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 FieldViewsSpecHelpers.expectMessageContains(view, "Your changes have been saved.");
 
                 data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
-                view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).val(data[fieldData.valueAttribute]);
+                $(view.el).find('.button-save').click();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -98,7 +100,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect(view.modelValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
                 var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
-                view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
+                view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]);
+                $(view.el).find('.button-save').click();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
             });

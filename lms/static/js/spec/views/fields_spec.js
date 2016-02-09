@@ -100,7 +100,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
             it("correctly renders, updates and persists changes to TextFieldView when editable == always", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.TextFieldView, {
@@ -124,7 +123,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
             it("correctly renders and updates DropdownFieldView when editable == never", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
@@ -163,7 +161,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
             it("correctly renders, updates and persists changes to DropdownFieldView when editable == always", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
@@ -187,7 +184,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             });
 
             it("correctly renders, updates and persists changes to DropdownFieldView when editable == toggle", function() {
-
                 requests = AjaxHelpers.requests(this);
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.DropdownFieldView, {
@@ -235,7 +231,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         view.showEditMode(true);
                     }
                     expect(view.$(dropdownSelectClass).length).toBe(1);
-                    view.$(dropdownSelectClass).val(FieldViewsSpecHelpers.SELECT_OPTIONS[0]).change();
+                    view.$(dropdownSelectClass).val(FieldViewsSpecHelpers.SELECT_OPTIONS[0]);
+                    $(view.el).find('.button-save').click();
                     expect(view.fieldValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
                     AjaxHelpers.respondWithNoContent(requests);
@@ -301,7 +298,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 view.$('.wrapper-u-field').click();
                 expect(view.el).toHaveClass('mode-edit');
-                view.$(valueInputSelector).val(BIO).focusout();
+                view.$(valueInputSelector).val(BIO);
+                $(view.el).find('.button-save').click();
                 expect(view.fieldValue()).toBe(BIO);
                 expect(view.$(textareaLinkClass).length).toBe(0);
                 AjaxHelpers.expectJsonRequest(
@@ -312,7 +310,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expect(view.$(textareaLinkClass).length).toBe(1);
 
                 view.$('.wrapper-u-field').click();
-                view.$(valueInputSelector).val('').focusout();
+                view.$(valueInputSelector).val('');
+                $(view.el).find('.button-save').click();
                 AjaxHelpers.respondWithNoContent(requests);
                 expect(view.el).toHaveClass('mode-placeholder');
                 expect(view.fieldValue()).toBe(fieldData.placeholderValue);

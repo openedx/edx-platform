@@ -104,6 +104,46 @@
     }
 }
 
+.u-field-save {
+    display: inline-block;
+    width: flex-grid(1, 12);
+
+    .button-save {
+        display: none;
+        vertical-align: top;
+    }
+}
+
+.u-field-dropdown {
+
+    .u-field-save {
+
+        .button-save {
+            margin-top: -($baseline / 4);
+        }
+    }
+}
+
+.editable-always {
+
+    .u-field-save {
+
+        .button-save {
+            display: block !important;
+        }
+    }
+}
+
+.team-edit-fields {
+
+    .editable-always {
+
+        .u-field-save {
+            display: none;
+        }
+    }
+}
+
 .u-field-message {
     @extend %t-copy-sub1;
     @include padding-left($baseline/2);
