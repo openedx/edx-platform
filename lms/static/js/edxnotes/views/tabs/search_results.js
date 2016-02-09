@@ -105,6 +105,7 @@ define([
 
         onClose: function () {
             this.searchResults = null;
+            this.searchBox.clearInput();
         },
 
         onBeforeSearchStart: function () {
