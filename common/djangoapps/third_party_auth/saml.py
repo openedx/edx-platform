@@ -3,6 +3,7 @@ Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
 from django.http import Http404
+from django.utils.functional import cached_property
 from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
 from social.exceptions import AuthForbidden, AuthMissingParameter
 
@@ -23,9 +24,6 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
     def setting(self, name, default=None):
         """ Get a setting, from SAMLConfiguration """
-        if not hasattr(self, '_config'):
-            from .models import SAMLConfiguration
-            self._config = SAMLConfiguration.current()  # pylint: disable=attribute-defined-outside-init
         try:
             return self._config.get_setting(name)
         except KeyError:
@@ -62,3 +60,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
                     log.warning(
                         "SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
                     raise AuthForbidden(self)
+
+    @cached_property
+    def _config(self):
+        from .models import SAMLConfiguration
+        return SAMLConfiguration.current()
