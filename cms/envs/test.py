@@ -124,7 +124,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "cms.db",
+        'NAME': "cms.db",
+        'TEST_NAME': TEST_ROOT / "db" / "cms.db",
         'ATOMIC_REQUESTS': True,
     },
 }
