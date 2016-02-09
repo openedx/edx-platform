@@ -39,12 +39,11 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
         raise Http404 if SAML is disabled
         raise AuthMissingParameter if the 'idp' parameter is missing.
-
-        TODO: remove this method once the fix is merged upstream:
-        https://github.com/omab/python-social-auth/pull/821
         """
         if not self._config.enabled:
             raise Http404
+        # TODO: remove this check once the fix is merged upstream:
+        # https://github.com/omab/python-social-auth/pull/821
         if 'idp' not in self.strategy.request_data():
             raise AuthMissingParameter(self, 'idp')
         return super(SAMLAuthBackend, self).auth_url()
