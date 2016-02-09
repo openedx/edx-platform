@@ -607,6 +607,7 @@ class LibraryImportManager(ImportManager):
                     org=self.target_id.org,
                     library=self.target_id.library,
                     user_id=self.user_id,
+                    fields={"display_name": ""},
                 )
                 runtime = library.runtime
             except DuplicateCourseError:
