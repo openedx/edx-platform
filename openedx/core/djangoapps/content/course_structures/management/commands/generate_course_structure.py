@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 # TODO Future improvement: Use .delay(), add return value to ResultSet, and wait for execution of
                 # all tasks using ResultSet.join(). I (clintonb) am opting not to make this improvement right now
                 # as I do not have time to test it fully.
-                update_course_structure.apply(unicode(course_key))
+                update_course_structure.apply(args=[unicode(course_key)])
             except Exception as ex:
                 log.exception('An error occurred while generating course structure for %s: %s',
                               unicode(course_key), ex.message)
