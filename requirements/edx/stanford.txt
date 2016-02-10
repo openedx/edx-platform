@@ -1,0 +1,10 @@
+xblock-image-modal >=0.2.0, <1.0.0
+-e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
+-e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@653400485196f8bb05b859c9d89de378a22e0503#egg=xblock-qualtrics-survey
+-e git+https://github.com/Stanford-Online/xblock-free-text-response@46e082437246a058dc80c10570316f3a3a3bcc2b#egg=xblock-free-text-response
+-e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
+-e git+https://github.com/Stanford-Online/DoneXBlock.git@0a38297377c262313b4677ec44deb9fac4db5afb#egg=done-xblock
+-e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@2d5d0f7156ab35abe4bb3a51927cc447511b8d98#egg=xblock-submit-and-compare
+-e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
+-e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@1b8260ce8dd6edb999fffc46b09f77c83f87e1f9#egg=edx-analytics-data-api-client
