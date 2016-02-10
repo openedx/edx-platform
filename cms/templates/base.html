@@ -82,24 +82,24 @@ from openedx.core.djangolib.js_utils import (
     <script type="text/javascript">
       require(['common/js/common_libraries'], function () {
           require(['js/factories/base'], function () {
-            % if context_course:
-              require(['js/factories/course'], function(CourseFactory) {
-                  CourseFactory({
-                      id: "${context_course.id | n, js_escaped_string}",
-                      name: "${context_course.display_name_with_default_escaped | h}",
-                      url_name: "${context_course.location.name | h}",
-                      org: "${context_course.location.org | h}",
-                      num: "${context_course.location.course | h}",
-                      display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
-                      revision: "${context_course.location.revision | h}",
-                      self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
-                  });
-              });
-            % endif
-            % if user.is_authenticated():
-                require(['js/sock']);
-            % endif
-            <%block name='requirejs'></%block>
+               require(['js/models/course'], function(Course) {
+                   % if context_course:
+                       window.course = new Course({
+                           id: "${context_course.id | n, js_escaped_string}",
+                           name: "${context_course.display_name_with_default_escaped | h}",
+                           url_name: "${context_course.location.name | h}",
+                           org: "${context_course.location.org | h}",
+                           num: "${context_course.location.course | h}",
+                           display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
+                           revision: "${context_course.location.revision | h}",
+                           self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
+                       });
+                   % endif
+                   % if user.is_authenticated():
+                       require(['js/sock']);
+                   % endif
+                   <%block name='requirejs'></%block>
+               });
           });
       });
     </script>
