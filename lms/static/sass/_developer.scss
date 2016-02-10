@@ -288,7 +288,8 @@
 }
 
 //mehrozezahid - TNL-1437
-// problem content in problem.html
+//copied from /lms/static/sass/course/instructor/_instructor_2.scss#L118
+// for problem content in problem.html
 div.problem .action {
   .copy-error {
     @include font-size(14);
