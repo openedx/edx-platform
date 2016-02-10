@@ -462,26 +462,16 @@ div.problem {
 
       span {
         margin-bottom: 0;
+        display: inline-block;
 
-        &.math {
-          display: inline-block;
+        &.MathJax_CHTML, &.MathJax, &.MathJax_SVG {
           padding: 6px;
           min-width: 30px;
           border: 1px solid #e3e3e3;
           border-radius: 4px;
           background: #f1f1f1;
-
-          & span {
-            // Needed to fix mathjax rendering bug in chrome (TNL-4080)
-            border-left-style: none !important;
-          }
         }
       }
-    }
-
-    // Fix for formulaequationinput, overriding MathJax_Display default style to allow "loading" image to sit next to it
-    section.formulaequationinput div.equation .MathJax_Display {
-      display: inline-block !important;
     }
 
     // Hides equation previews in symbolic response problems when printing
