@@ -49,7 +49,7 @@ def get_completed_courses(student):
     """
     all_certs = get_certificates_for_user(student.username)
     return [
-        {'course_id': cert['course_key'], 'mode': cert['type']}
+        {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
         for cert in all_certs
         if is_passing_status(cert['status'])
     ]
@@ -108,7 +108,11 @@ def award_program_certificate(client, username, program_id):
         None
 
     """
-    client.user_credentials.post({'program_id': program_id, 'username': username})
+    client.user_credentials.post({
+        'username': username,
+        'credential': {'program_id': program_id},
+        'attributes': []
+    })
 
 
 @task(bind=True, ignore_result=True)

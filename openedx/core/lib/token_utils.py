@@ -41,13 +41,18 @@ def get_id_token(user, client_name):
     except Client.DoesNotExist:
         raise ImproperlyConfigured('OAuth2 Client with name [%s] does not exist' % client_name)
 
-    user_profile = UserProfile.objects.get(user=user)
+    try:
+        # Service users may not have user profiles.
+        full_name = UserProfile.objects.get(user=user).name
+    except UserProfile.DoesNotExist:
+        full_name = None
+
     now = datetime.datetime.utcnow()
     expires_in = getattr(settings, 'OAUTH_ID_TOKEN_EXPIRATION', 30)
 
     payload = {
         'preferred_username': user.username,
-        'name': user_profile.name,
+        'name': full_name,
         'email': user.email,
         'administrator': user.is_staff,
         'iss': settings.OAUTH_OIDC_ISSUER,
