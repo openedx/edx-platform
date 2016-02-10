@@ -505,7 +505,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
+          var selectString = '<solution>\n<div class="detailed-solution">\n' + gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
 
           return selectString;
       });
