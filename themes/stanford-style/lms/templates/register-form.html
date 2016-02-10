@@ -239,18 +239,15 @@ from student.models import UserProfile
       % endif
 
       % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
-      ## check if we have an Honor Code link in our marketing map
-      % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
       <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
         <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
         <%
-          honor_code_path = marketing_link('HONOR')
+          honor_code_path = marketing_link('TOS') + "#honor"
         %>
         <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
           link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
           link_end='</a>')}</label>
       </div>
-      % endif
       % endif
     </li>
   </ol>

@@ -4,7 +4,7 @@
 
 ${_("We are sorry. Our course staff did not approve your request to change "
   "your name from {old_name} to {new_name}. If you need further "
-  "assistance, please e-mail the course staff at {email}."
+  "assistance, please e-mail the tech support at {email}"
 ).format(
   old_name=old_name,
   new_name=new_name,

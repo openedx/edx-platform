@@ -12,7 +12,8 @@ ${_("Change your life and start learning today by activating your "
 % else:
   http://${ site }/activate/${ key }
 % endif
+
 ${_("If you didn't request this, you don't need to do anything; you won't "
       "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the help section of the "
-      "{platform_name} website.").format(platform_name=settings.PLATFORM_NAME)}
+      "if you require assistance, check the about section of the "
+      "{platform_name} Courses web site.").format(platform_name=settings.PLATFORM_NAME)}

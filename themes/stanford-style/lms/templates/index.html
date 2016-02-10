@@ -1,8 +1,6 @@
 <%inherit file="main.html" />
-<%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 %>
 
 <section class="home">
@@ -13,10 +11,8 @@ from django.core.urlresolvers import reverse
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
-              ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
-              <h1>${_("Welcome to Open edX!")}</h1>
-              ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
-              <h2>${_("It works! This is the default homepage for this Open edX instance.")}</h2>
+            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+            <h2>${_("For anyone, anywhere, anytime")}</h2>
           % endif
         </hgroup>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
@@ -48,13 +44,11 @@ from django.core.urlresolvers import reverse
 
 </section>
 
-% if show_homepage_promo_video:
-  <section id="video-modal" class="modal home-page-video-modal video-modal">
-    <div class="inner-wrapper">
-      <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${homepage_promo_video_youtube_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
-    </div>
-  </section>
-% endif
+<section id="video-modal" class="modal home-page-video-modal video-modal">
+  <div class="inner-wrapper">
+    <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${homepage_promo_video_youtube_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
+  </div>
+</section>
 
 <%block name="js_extra">
    <script type="text/javascript">
