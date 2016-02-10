@@ -3,13 +3,14 @@ Tests for programs celery tasks.
 """
 
 import ddt
+import httpretty
+import json
+import mock
+
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import override_settings, TestCase
 from edx_rest_api_client.client import EdxRestApiClient
-import httpretty
-import json
-import mock
 
 from oauth2_provider.tests.factories import ClientFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
