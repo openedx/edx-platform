@@ -23,6 +23,7 @@ import os
 from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
+from util.db import NoOpMigrationModules
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -42,7 +43,7 @@ MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 THIS_UUID = uuid4().hex[:5]
 
 # Nose Test Runner
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
 
 _SYSTEM = 'cms'
 
@@ -129,9 +130,10 @@ DATABASES = {
     },
 }
 
-# This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+if os.environ.get('DISABLE_MIGRATIONS'):
+    # Create tables directly from apps' models. This can be removed once we upgrade
+    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
+    MIGRATION_MODULES = NoOpMigrationModules()
 
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview"
