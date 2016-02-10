@@ -9,7 +9,7 @@
 }
 
 // Older Course Extends - to review/remove with LMS cleanup
-h1.top-header {
+.top-header {
   border-bottom: 1px solid $border-color-2;
   @include text-align(left);
   font-size: em(24);

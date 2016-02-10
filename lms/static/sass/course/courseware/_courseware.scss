@@ -440,7 +440,7 @@ html.video-fullscreen {
         }
 
         header {
-          @extend h1.top-header;
+          @extend .top-header;
           border-radius: 0 4px 0 0;
           margin-bottom: -16px;
           border-bottom: 0;
@@ -661,5 +661,3 @@ section.self-assessment {
     font-weight: bold;
   }
 }
-
-

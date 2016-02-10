@@ -10,7 +10,8 @@ h1 {
     margin: 0 0 1.416em 0;
   }
 
-h2 {
+h2, // backwards-compatibility
+h3 {
   color: #646464;
   font: normal 1.2em/1.2em $sans-serif;
   letter-spacing: 1px;
@@ -22,14 +23,6 @@ h2 {
 h3, h4, h5, h6 {
   margin: 0 0 ($baseline/2) 0;
   font-weight: 600;
-}
-
-h3 {
-  font-size: 1.2em;
-}
-
-h4 {
-  font-size: 1em;
 }
 
 h5 {
@@ -152,7 +145,7 @@ th {
 
 // modal - image zoom, fill window
 .wrapper-modal-image {
-  
+
   .modal-ui-icon {
     @extend %ui-fake-link;
     position: absolute;
@@ -163,32 +156,32 @@ th {
     background: $white;
     color: $black;
     border: 2px solid $black;
-    
+
     .label {
       font-weight: bold;
     }
-    
+
     i {
       font-style: normal;
     }
   }
-  
+
   .image-link {
     @extend %ui-fake-link;
     position: relative;
     display: block;
-    
+
     .action-fullscreen {
       display: none;
       top: 10px;
       left: 10px;
     }
-    
+
     &:hover .action-fullscreen {
       display: block;
     }
   }
-  
+
   .image-modal {
     @extend %ui-fake-link;
     @extend %ui-depth5;
@@ -199,7 +192,7 @@ th {
     height: 100%;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-  
+
     .image-content {
       position: relative;
       top: 2.5%;
@@ -208,10 +201,10 @@ th {
       width: 95%;
       margin: auto;
       overflow: hidden;
-      
+
       .image-wrapper {
         position: relative;
-        
+
         img {
           position: relative;
           display: block;
@@ -221,12 +214,12 @@ th {
           cursor: default;
         }
       }
-      
+
       .action-close {
         top: 10px;
         right: 10px;
       }
-      
+
       .image-controls {
         position: absolute;
         right: 10px;
@@ -234,16 +227,16 @@ th {
         margin: 0;
         padding: 0;
         list-style: none;
-          
+
         .image-control {
           position: relative;
           display: inline-block;
           margin: 0;
           padding: 0;
-          
+
           .modal-ui-icon {
             position: relative;
-            
+
             &.action-zoom-in {
               margin-right: ($baseline/4);
             }
@@ -258,17 +251,17 @@ th {
         }
       }
     }
-    
+
     &.image-is-fit-to-screen {
       display: block;
-      
+
       // !important used here to override jQuery.
       .image-content .image-wrapper {
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        
+
         img {
           top: 0 !important;
           left: 0 !important;
@@ -277,9 +270,9 @@ th {
     }
     &.image-is-zoomed {
       display: block;
-      
+
       .image-content .image-wrapper {
-        
+
         img {
           max-width: none;
           max-height: none;
