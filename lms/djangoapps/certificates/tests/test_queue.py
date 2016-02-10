@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 import ddt
 import json
 from mock import patch, Mock
@@ -8,6 +9,8 @@ from nose.plugins.attrib import attr
 
 from django.test import TestCase
 from django.test.utils import override_settings
+import freezegun
+import pytz
 
 from course_modes.models import CourseMode
 from opaque_keys.edx.locator import CourseLocator
@@ -81,6 +84,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         self.assertIsNotNone(certificate.verify_uuid)
 
     @ddt.data('honor', 'audit')
+    @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
     def test_add_cert_with_honor_certificates(self, mode):
         """Test certificates generations for honor and audit modes."""
         template_name = 'certificate-template-{id.org}-{id.course}.pdf'.format(
@@ -206,13 +210,45 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.assertFalse(mock_send.called)
 
     @ddt.data(
-        (CertificateStatuses.downloadable, 'Pass', CertificateStatuses.generating),
-        (CertificateStatuses.audit_passing, 'Pass', CertificateStatuses.audit_passing),
-        (CertificateStatuses.audit_notpassing, 'Pass', CertificateStatuses.audit_passing),
-        (CertificateStatuses.audit_notpassing, None, CertificateStatuses.audit_notpassing),
+        # Eligible and should stay that way
+        (
+            CertificateStatuses.downloadable,
+            datetime.now(pytz.UTC) - timedelta(days=2),
+            'Pass',
+            CertificateStatuses.generating
+        ),
+        # Ensure that certs in the wrong state can be fixed by regeneration
+        (
+            CertificateStatuses.downloadable,
+            datetime.now(pytz.UTC) - timedelta(hours=1),
+            'Pass',
+            CertificateStatuses.audit_passing
+        ),
+        # Ineligible and should stay that way
+        (
+            CertificateStatuses.audit_passing,
+            datetime.now(pytz.UTC) - timedelta(hours=1),
+            'Pass',
+            CertificateStatuses.audit_passing
+        ),
+        # As above
+        (
+            CertificateStatuses.audit_notpassing,
+            datetime.now(pytz.UTC) - timedelta(hours=1),
+            'Pass',
+            CertificateStatuses.audit_passing
+        ),
+        # As above
+        (
+            CertificateStatuses.audit_notpassing,
+            datetime.now(pytz.UTC) - timedelta(hours=1),
+            None,
+            CertificateStatuses.audit_notpassing
+        ),
     )
     @ddt.unpack
-    def test_regen_audit_certs_eligibility(self, status, grade, expected_status):
+    @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
+    def test_regen_audit_certs_eligibility(self, status, created_date, grade, expected_status):
         """
         Test that existing audit certificates remain eligible even if cert
         generation is re-run.
@@ -224,13 +260,14 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             is_active=True,
             mode=CourseMode.AUDIT,
         )
-        GeneratedCertificateFactory(
-            user=self.user_2,
-            course_id=self.course.id,
-            grade='1.0',
-            status=status,
-            mode=GeneratedCertificate.MODES.audit,
-        )
+        with freezegun.freeze_time(created_date):
+            GeneratedCertificateFactory(
+                user=self.user_2,
+                course_id=self.course.id,
+                grade='1.0',
+                status=status,
+                mode=GeneratedCertificate.MODES.audit,
+            )
 
         # Run grading/cert generation again
         with patch('courseware.grades.grade', Mock(return_value={'grade': grade, 'percent': 0.75})):

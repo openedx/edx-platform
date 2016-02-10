@@ -2679,3 +2679,10 @@ CCX_MAX_STUDENTS_ALLOWED = 200
 # financial assistance form
 FINANCIAL_ASSISTANCE_MIN_LENGTH = 800
 FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
+
+# Deprecated xblock types
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+
+# Cutoff date for granting audit certificates
+
+AUDIT_CERT_CUTOFF_DATE = None
