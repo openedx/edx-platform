@@ -290,9 +290,8 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
         in non-mako templates must be loaded before the django startup
         """
         microsites_root = settings.MICROSITE_ROOT_DIR
-        microsite_config_dict = settings.MICROSITE_CONFIGURATION
 
-        if microsite_config_dict:
+        if self.has_configuration_set():
             settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
 
 

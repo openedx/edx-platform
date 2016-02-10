@@ -1,11 +1,19 @@
 """
 Test Microsite base backends.
 """
+import logging
+
+from mock import patch
+from django.conf import settings
 from django.test import TestCase
 
+from microsite_configuration import microsite
 from microsite_configuration.backends.base import (
     AbstractBaseMicrositeBackend,
+    BaseMicrositeBackend
 )
+
+log = logging.getLogger(__name__)
 
 
 class NullBackend(AbstractBaseMicrositeBackend):
@@ -130,3 +138,36 @@ class AbstractBaseMicrositeBackendTests(TestCase):
 
         with self.assertRaises(NotImplementedError):
             backend.get_all_orgs()
+
+
+@patch(
+    'microsite_configuration.microsite.BACKEND',
+    microsite.get_backend(
+        'microsite_configuration.backends.base.BaseMicrositeBackend', BaseMicrositeBackend
+    )
+)
+class BaseMicrositeBackendTests(TestCase):
+    """
+    Go through and test the BaseMicrositeBackend class for behavior which is not
+    overriden in subclasses
+    """
+    def test_enable_microsites_pre_startup(self):
+        """
+        Tests microsite.test_enable_microsites_pre_startup works as expected.
+        """
+        # remove microsite root directory paths first
+        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'] = [
+            path for path in settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+            if path != settings.MICROSITE_ROOT_DIR
+        ]
+
+        with patch('microsite_configuration.backends.base.BaseMicrositeBackend.has_configuration_set',
+                   return_value=False):
+            microsite.enable_microsites_pre_startup(log)
+            self.assertNotIn(settings.MICROSITE_ROOT_DIR,
+                             settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+        with patch('microsite_configuration.backends.base.BaseMicrositeBackend.has_configuration_set',
+                   return_value=True):
+            microsite.enable_microsites_pre_startup(log)
+            self.assertIn(settings.MICROSITE_ROOT_DIR,
+                          settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
