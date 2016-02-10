@@ -781,7 +781,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "text": "text",
                 "highlight": True,
                 'page': 1,
-                'page_size': 10,
+                'page_size': 25,
             }
         )
 
@@ -797,7 +797,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_get_id_token.return_value = "test_token"
         mock_anonymous_id_for_user.return_value = "anonymous_id"
         helpers.send_request(
-            self.user, self.course.id, path="test", page=1, page_size=10
+            self.user, self.course.id, path="test", page=1, page_size=25
         )
         mock_get.assert_called_with(
             "http://example.com/test/",

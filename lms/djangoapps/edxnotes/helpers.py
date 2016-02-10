@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 # OAuth2 Client name for edxnotes
 CLIENT_NAME = "edx-notes"
 DEFAULT_PAGE = 1
-DEFAULT_PAGE_SIZE = 10
+DEFAULT_PAGE_SIZE = 25
 
 
 class NoteJSONEncoder(JSONEncoder):
