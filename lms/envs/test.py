@@ -189,8 +189,13 @@ DATABASES = {
 }
 
 # This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+from django.db.migrations import loader
+class MigrationLoader(loader.MigrationLoader):
+    @classmethod
+    def migrations_module(cls, app_label):
+        return "{}.nomigrations".format(app_label)
+
+loader.MigrationLoader = MigrationLoader
 
 CACHES = {
     # This is the cache used for most things.
