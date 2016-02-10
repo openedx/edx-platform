@@ -33,16 +33,15 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         """
         Create course at provided location
         """
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DEFAULT_STORE_FOR_NEW_COURSE": None}):
-            resp = self.client.ajax_post(
-                reverse_url('course_handler'),
-                {
-                    'org': course_key.org,
-                    'number': course_key.course,
-                    'display_name': 'test course',
-                    'run': course_key.run,
-                }
-            )
+        resp = self.client.ajax_post(
+            reverse_url('course_handler'),
+            {
+                'org': course_key.org,
+                'number': course_key.course,
+                'display_name': 'test course',
+                'run': course_key.run,
+            }
+        )
         return resp
 
     def tearDown(self):
