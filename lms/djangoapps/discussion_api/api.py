@@ -506,26 +506,42 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
         if field in request_fields and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
-                if form_value:
-                    context["cc_requester"].follow(cc_content)
-                else:
-                    context["cc_requester"].unfollow(cc_content)
+                _handle_following_field(form_value, context["cc_requester"], cc_content)
             elif field == "abuse_flagged":
-                if form_value:
-                    cc_content.flagAbuse(context["cc_requester"], cc_content)
-                else:
-                    cc_content.unFlagAbuse(context["cc_requester"], cc_content, removeAll=False)
-            else:
-                assert field == "voted"
-                signal = thread_voted if cc_content.type == 'thread' else comment_voted
-                signal.send(sender=None, user=context["request"].user, post=cc_content)
-                if form_value:
-                    context["cc_requester"].vote(cc_content, "up")
-                    api_content["vote_count"] += 1
-                else:
-                    context["cc_requester"].unvote(cc_content)
-                    api_content["vote_count"] -= 1
-                track_voted_event(request, context["course"], cc_content, "up", False if form_value else True)
+                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
+            elif field == "voted":
+                _handle_voted_field(form_value, cc_content, api_content, request, context)
+
+
+def _handle_following_field(form_value, user, cc_content):
+    """follow/unfollow thread for the user"""
+    if form_value:
+        user.follow(cc_content)
+    else:
+        user.unfollow(cc_content)
+
+
+def _handle_abuse_flagged_field(form_value, user, cc_content):
+    """mark or unmark thread/comment as abused"""
+    if form_value:
+        cc_content.flagAbuse(user, cc_content)
+    else:
+        cc_content.unFlagAbuse(user, cc_content, removeAll=False)
+
+
+def _handle_voted_field(form_value, cc_content, api_content, request, context):
+    """vote or undo vote on thread/comment"""
+    signal = thread_voted if cc_content.type == 'thread' else comment_voted
+    signal.send(sender=None, user=context["request"].user, post=cc_content)
+    if form_value:
+        context["cc_requester"].vote(cc_content, "up")
+        api_content["vote_count"] += 1
+    else:
+        context["cc_requester"].unvote(cc_content)
+        api_content["vote_count"] -= 1
+    track_voted_event(
+        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True
+    )
 
 
 def create_thread(request, thread_data):
