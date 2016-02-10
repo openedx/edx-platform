@@ -14,6 +14,7 @@ from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
+from edxnotes.plugins import EdxNotesTab
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
@@ -31,6 +32,8 @@ from courseware.module_render import get_module_for_descriptor
 from courseware.tabs import get_course_tab_list
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
+
+FEATURES = settings.FEATURES.copy()
 
 NOTES_API_EMPTY_RESPONSE = {
     "total": 0,
@@ -140,6 +143,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         Tests that get_html is wrapped when feature flag is on, but edxnotes are
         disabled for the course.
         """
+        self.course.edxnotes = False
         self.assertEqual("original_get_html", self.problem.get_html())
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
@@ -227,14 +231,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             'position': position,
         })
 
-    def test_edxnotes_not_enabled(self):
-        """
-        Tests that edxnotes are disabled when the course tab configuration does NOT
-        contain a tab with type "edxnotes."
-        """
-        self.course.tabs = []
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
     def test_edxnotes_harvard_notes_enabled(self):
         """
         Tests that edxnotes are disabled when Harvard Annotation Tool is enabled.
@@ -251,15 +247,17 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.course.advanced_modules = ["textannotation", "videoannotation", "imageannotation"]
         self.assertFalse(helpers.is_feature_enabled(self.course))
 
-    def test_edxnotes_enabled(self):
+    @ddt.unpack
+    @ddt.data(
+        {'_edxnotes': True},
+        {'_edxnotes': False}
+    )
+    def test_is_feature_enabled(self, _edxnotes):
         """
-        Tests that edxnotes are enabled when the course tab configuration contains
-        a tab with type "edxnotes."
+        Tests that is_feature_enabled shows correct behavior.
         """
-        self.course.tabs = [{"type": "foo"},
-                            {"name": "Notes", "type": "edxnotes"},
-                            {"type": "bar"}]
-        self.assertTrue(helpers.is_feature_enabled(self.course))
+        self.course.edxnotes = _edxnotes
+        self.assertEqual(helpers.is_feature_enabled(self.course), _edxnotes)
 
     @ddt.data(
         helpers.get_public_endpoint,
@@ -1135,3 +1133,50 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
+
+
+@skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
+@ddt.ddt
+class EdxNotesPluginTest(ModuleStoreTestCase):
+    """
+    EdxNotesTab tests.
+    """
+
+    def setUp(self):
+        super(EdxNotesPluginTest, self).setUp()
+        self.course = CourseFactory.create(edxnotes=True)
+        self.user = UserFactory.create(username="ma", email="ma@ma.info", password="edx")
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def test_edxnotes_tab_with_unauthorized_user(self):
+        """
+        Verify EdxNotesTab visibility when user is unauthroized.
+        """
+        user = UserFactory.create(username="ma1", email="ma1@ma1.info", password="edx")
+        self.assertFalse(EdxNotesTab.is_enabled(self.course, user=user))
+
+    @ddt.unpack
+    @ddt.data(
+        {'enable_edxnotes': False},
+        {'enable_edxnotes': True}
+    )
+    def test_edxnotes_tab_with_feature_flag(self, enable_edxnotes):
+        """
+        Verify EdxNotesTab visibility when ENABLE_EDXNOTES feature flag is enabled/disabled.
+        """
+        FEATURES['ENABLE_EDXNOTES'] = enable_edxnotes
+        with override_settings(FEATURES=FEATURES):
+            self.assertEqual(EdxNotesTab.is_enabled(self.course), enable_edxnotes)
+
+    @ddt.unpack
+    @ddt.data(
+        {'harvard_notes_enabled': False},
+        {'harvard_notes_enabled': True}
+    )
+    def test_edxnotes_tab_with_harvard_notes(self, harvard_notes_enabled):
+        """
+        Verify EdxNotesTab visibility when harvard notes feature is enabled/disabled.
+        """
+        with patch("edxnotes.plugins.is_harvard_notes_enabled") as mock_harvard_notes_enabled:
+            mock_harvard_notes_enabled.return_value = harvard_notes_enabled
+            self.assertEqual(EdxNotesTab.is_enabled(self.course), not harvard_notes_enabled)
