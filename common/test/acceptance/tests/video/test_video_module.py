@@ -679,14 +679,17 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # select the "2.0" speed on video "A"
         self.course_nav.go_to_sequential('A')
+        self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
         self.course_nav.go_to_sequential('B')
+        self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
         self.course_nav.go_to_sequential('C')
+        self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
         # because a playback speed has never explicitly been set for it. However, this video
