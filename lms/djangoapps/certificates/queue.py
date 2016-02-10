@@ -326,8 +326,8 @@ class XQueueCertInterface(object):
         # analytics. Only do this if the certificate is new, or
         # already marked as ineligible -- we don't want to mark
         # existing audit certs as ineligible.
-        if (created or cert.status in (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)) \
-           and not is_eligible_for_certificate:
+        cutoff = settings.AUDIT_CERT_CUTOFF_DATE
+        if (cutoff and cert.created_date >= cutoff) and not is_eligible_for_certificate:
             cert.status = CertificateStatuses.audit_passing if passing else CertificateStatuses.audit_notpassing
             cert.save()
             LOGGER.info(
