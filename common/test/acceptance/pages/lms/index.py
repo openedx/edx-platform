@@ -51,3 +51,8 @@ class IndexPage(PageObject):
         Returns a browser query object representing the video modal element
         """
         return self.q(css=VIDEO_MODAL_SELECTOR)
+
+    @property
+    def footer_links(self):
+        """Return a list of the text of the links in the page footer."""
+        return self.q(css='.nav-colophon a').attrs('text')
