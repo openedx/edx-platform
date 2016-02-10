@@ -46,10 +46,7 @@ def edxnotes(request, course_id):
     if not is_feature_enabled(course):
         raise Http404
 
-    try:
-        notes_info = get_notes(request, course)
-    except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
-        return JsonResponseBadRequest({"error": err.message}, status=500)
+    notes_info = get_notes(request, course)
 
     context = {
         "course": course,
