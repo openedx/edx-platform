@@ -2755,6 +2755,10 @@ MOBILE_APP_USER_AGENT_REGEXES = [
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 
+# Cutoff date for granting audit certificates
+
+AUDIT_CERT_CUTOFF_DATE = None
+
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
