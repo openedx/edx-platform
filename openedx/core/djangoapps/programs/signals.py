@@ -6,7 +6,6 @@ import logging
 from django.dispatch import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
 LOGGER = logging.getLogger(__name__)
@@ -35,6 +34,10 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
         None
 
     """
+    # Import here instead of top of file since this module gets imported before
+    # the programs app is loaded, resulting in a Django deprecation warning.
+    from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+
     if not ProgramsApiConfig.current().is_certification_enabled:
         return
 
