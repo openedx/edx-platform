@@ -18,7 +18,7 @@ import itertools
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
 from model_utils.models import TimeStampedModel
@@ -193,7 +193,7 @@ class StudentModuleHistoryExtended(models.Model):
 
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
 
-    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False)
+    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
     version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
 
     # This should be populated from the modified field in StudentModule
@@ -217,6 +217,14 @@ class StudentModuleHistoryExtended(models.Model):
                                                          grade=instance.grade,
                                                          max_grade=instance.max_grade)
             history_entry.save()
+
+    @receiver(post_delete, sender=StudentModule)
+    def delete_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
+        """
+        Django can't cascade delete across databases, so we tell it at the model level to
+        on_delete=DO_NOTHING and then listen for post_delete so we can clean up the CSMHE rows.
+        """
+        StudentModuleHistoryExtended.objects.filter(student_module=instance).all().delete()
 
     def __unicode__(self):
         return unicode(repr(self))
