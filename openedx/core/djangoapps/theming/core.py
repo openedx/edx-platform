@@ -45,10 +45,6 @@ def comprehensive_theme_changes(theme_dir):
     if locale_dir.isdir():
         changes['settings']['LOCALE_PATHS'] = [locale_dir] + settings.LOCALE_PATHS
 
-    favicon = component_dir / "static" / "images" / "favicon.ico"
-    if favicon.isfile():
-        changes['settings']['FAVICON_PATH'] = str(favicon)
-
     return changes
 
 
