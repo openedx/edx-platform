@@ -630,10 +630,11 @@ class YouTubeVideoTest(VideoBaseTest):
         """
         Scenario: Multiple videos in sequentials all load and work, switching between sequentials
         Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
-        And videos "E,F" in "Youtube" mode in position "2" of sequential
+        And videos "C,D" in "Youtube" mode in position "2" of sequential
         """
         self.verticals = [
-            [{'display_name': 'A'}, {'display_name': 'B'}], [{'display_name': 'C'}, {'display_name': 'D'}]
+            [{'display_name': 'A'}, {'display_name': 'B'}],
+            [{'display_name': 'C'}, {'display_name': 'D'}]
         ]
 
         tab1_video_names = ['A', 'B']
@@ -651,15 +652,16 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # go to video
         self.navigate_to_video()
-
         execute_video_steps(tab1_video_names)
 
         # go to second sequential position
+        # import ipdb; ipdb.set_trace()
         self.go_to_sequential_position(2)
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
+        # import ipdb; ipdb.set_trace()
         self.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 

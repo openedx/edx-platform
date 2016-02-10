@@ -710,7 +710,7 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
         <p>Not a header</p>
-        <h3 class="problem-header">A header</h3>
+        <h3 class="hd hd-2 problem-header">A header</h3>
 
         <p>Multiple choice w/ parentheticals</p>
         <multiplechoiceresponse>
