@@ -365,7 +365,7 @@ FEATURES = {
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
 
-    # Show LMS Language selector
+    # Show Language selector.
     'SHOW_LANGUAGE_SELECTOR': False,
 }
 

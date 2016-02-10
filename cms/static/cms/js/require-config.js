@@ -87,6 +87,7 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "lang_edx": "js/src/lang_edx",
             // end of Annotation tool files
 
             // externally hosted files
@@ -195,6 +196,9 @@
             },
             "tinymce": {
                 exports: "tinymce"
+            },
+            "lang_edx": {
+                deps: ["jquery"]
             },
             "mathjax": {
                 exports: "MathJax",

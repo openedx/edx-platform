@@ -10,6 +10,11 @@ from ...fixtures.programs import ProgramsFixture
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.index import DashboardPage, DashboardPageWithPrograms
+from ...pages.lms.account_settings import AccountSettingsPage
+from ..helpers import (
+    select_option_by_text,
+    get_selected_option_text
+)
 
 
 class CreateLibraryTest(WebAppTest):
@@ -139,3 +144,37 @@ class DashboardProgramsTabTest(WebAppTest):
         self.dashboard_page.visit()
         self.assertFalse(self.dashboard_page.is_programs_tab_present())
         self.assertFalse(self.dashboard_page.is_new_program_button_present())
+
+
+class StudioLanguageTest(WebAppTest):
+    """ Test suite for the Studio Language """
+    def setUp(self):
+        super(StudioLanguageTest, self).setUp()
+        self.dashboard_page = DashboardPage(self.browser)
+        self.account_settings = AccountSettingsPage(self.browser)
+        AutoAuthPage(self.browser).visit()
+
+    def test_studio_language_change(self):
+        """
+        Scenario: Ensure that language selection is working fine.
+        First I go to the user dashboard page in studio. I can see 'English' is selected by default.
+        Then I choose 'Dummy Language' from drop down (at top of the page).
+        Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
+        in both drop downs.
+        """
+        dummy_language = u'Dummy Language (Esperanto)'
+        self.dashboard_page.visit()
+        language_selector = self.dashboard_page.language_selector
+        self.assertEqual(
+            get_selected_option_text(language_selector),
+            u'English'
+        )
+
+        select_option_by_text(language_selector, dummy_language)
+        self.dashboard_page.wait_for_ajax()
+        self.account_settings.visit()
+        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), dummy_language)
+        self.assertEqual(
+            get_selected_option_text(language_selector),
+            u'Dummy Language (Esperanto)'
+        )
