@@ -720,10 +720,12 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # - 2 queries: Get-or-create the credit request.
         # - 1 query: Retrieve user account and profile information from the user API.
         # - 1 query: Look up the user's final grade from the credit requirements table.
+        # - 1 query: Look up the user's enrollment date in the course.
+        # - 2 query: Look up the user's completion date in the course.
         # - 1 query: Update the request.
         # - 2 queries: Update the history table for the request.
         # - 4 Django savepoints
-        with self.assertNumQueries(13):
+        with self.assertNumQueries(16):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
         # - 2 queries: Retrieve and update the request
