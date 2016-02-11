@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from django.conf import settings
 import django.db.models.deletion
 import coursewarehistoryextended.fields
+from django.conf import settings
 
 def bump_pk_start(apps, schema_editor):
     if not schema_editor.connection.alias == 'student_module_history':
-                return
+        return
     StudentModuleHistory = apps.get_model("courseware", "StudentModuleHistory")
     biggest_id = StudentModuleHistory.objects.all().order_by('-id').first()
     initial_id = settings.STUDENTMODULEHISTORYEXTENDED_OFFSET
