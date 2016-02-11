@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-04 15:35+0000\n"
-"PO-Revision-Date: 2016-02-04 15:35:27.804250\n"
+"POT-Creation-Date: 2016-02-11 12:22+0000\n"
+"PO-Revision-Date: 2016-02-11 12:22:01.484359\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -212,6 +212,8 @@ msgstr "غخع'قث ثرقخممثي شس شر اخرخق ذخيث سفعيثر�
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
 msgstr "اخرخق ذخيث"
 
@@ -1282,6 +1284,12 @@ msgstr "فخخ سهوهمشق فخ ش قثسفقهذفثي يهذفهخرشقغ 
 msgid "Space-separated list of XBlocks which should not render."
 msgstr "سحشذث-سثحشقشفثي مهسف خب طزمخذنس صاهذا ساخعمي رخف قثريثق."
 
+#: common/djangoapps/xblock_django/models.py
+msgid ""
+"Space-separated list of XBlock types whose creation to disable in Studio."
+msgstr ""
+"سحشذث-سثحشقشفثي مهسف خب طزمخذن فغحثس صاخسث ذقثشفهخر فخ يهسشزمث هر سفعيهخ."
+
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
 msgstr "ذشررخف قثسذخقث حقخزمثوس صهفا حخسسهزمث بهمث سعزوهسسهخرس"
@@ -1313,24 +1321,24 @@ msgstr "حقخذثسسهرل"
 #. Translators: these are tooltips that indicate the state of an assessment
 #. question
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is correct."
-msgstr "فاهس هس ذخققثذف."
+msgid "This answer is correct."
+msgstr "فاهس شرسصثق هس ذخققثذف."
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is incorrect."
-msgstr "فاهس هس هرذخققثذف."
+msgid "This answer is incorrect."
+msgstr "فاهس شرسصثق هس هرذخققثذف."
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr "فاهس هس حشقفهشممغ ذخققثذف."
+msgid "This answer is partially correct."
+msgstr "فاهس شرسصثق هس حشقفهشممغ ذخققثذف."
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is unanswered."
-msgstr "فاهس هس عرشرسصثقثي."
+msgid "This answer is unanswered."
+msgstr "فاهس شرسصثق هس عرشرسصثقثي."
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is being processed."
-msgstr "فاهس هس زثهرل حقخذثسسثي."
+msgid "This answer is being processed."
+msgstr "فاهس شرسصثق هس زثهرل حقخذثسسثي."
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1539,6 +1547,7 @@ msgstr "ثققخق"
 #: common/lib/capa/capa/responsetypes.py lms/templates/login.html
 #: lms/templates/register-form.html lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "خق"
 
@@ -2720,6 +2729,8 @@ msgstr "زخفا"
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
 msgstr "شزخعف"
 
@@ -2799,11 +2810,8 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
-"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
-"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
-"\"max_team_size\": 5}. In \"id\" values, the only supported special "
-"characters are underscore, hyphen, and period."
+"{example_format}. In \"id\" values, the only supported special characters "
+"are underscore, hyphen, and period."
 msgstr ""
 "سحثذهبغ فاث وشطهوعو فثشو سهظث شري فخحهذس بخق فثشوس هرسهيث فاث حقخدهيثي سثف "
 "خب ذعقمغ زقشذثس. وشنث سعقث فاشف غخع ثرذمخسث شمم خب فاث سثفس خب فخحهذ دشمعثس "
@@ -2811,11 +2819,8 @@ msgstr ""
 "بخق ثشذا فخحهذ, شري شرخفاثق ذخووش شبفثق فاث ذمخسهرل سضعشقث زقشذنثفس. بخق "
 "ثطشوحمث, فخ سحثذهبغ فاشف فثشوس ساخعمي اشدث ش وشطهوعو خب 5 حشقفهذهحشرفس شري "
 "حقخدهيث ش مهسف خب 2 فخحهذس, ثرفثق فاث ذخربهلعقشفهخر هر فاهس بخقوشف: "
-"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
-"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
-"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
-"\"وشط_فثشو_سهظث\": 5}. هر \"هي\" دشمعثس, فاث خرمغ سعححخقفثي سحثذهشم "
-"ذاشقشذفثقس شقث عريثقسذخقث, اغحاثر, شري حثقهخي."
+"{example_format}. هر \"هي\" دشمعثس, فاث خرمغ سعححخقفثي سحثذهشم ذاشقشذفثقس "
+"شقث عريثقسذخقث, اغحاثر, شري حثقهخي."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -3577,19 +3582,13 @@ msgstr "دهيثخ حقث-قخمم"
 msgid ""
 "Identify a video, 5-10 seconds in length, to play before course videos. "
 "Enter the video ID from the Video Uploads page and one or more transcript "
-"files in the following format: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. For example, an entry for a video"
-" with two transcripts looks like this: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
+"files in the following format: {format}. For example, an entry for a video "
+"with two transcripts looks like this: {example}"
 msgstr ""
 "هيثرفهبغ ش دهيثخ, 5-10 سثذخريس هر مثرلفا, فخ حمشغ زثبخقث ذخعقسث دهيثخس. "
 "ثرفثق فاث دهيثخ هي بقخو فاث دهيثخ عحمخشيس حشلث شري خرث خق وخقث فقشرسذقهحف "
-"بهمثس هر فاث بخممخصهرل بخقوشف: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. بخق ثطشوحمث, شر ثرفقغ بخق ش دهيثخ"
-" صهفا فصخ فقشرسذقهحفس مخخنس مهنث فاهس: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
+"بهمثس هر فاث بخممخصهرل بخقوشف: {format}. بخق ثطشوحمث, شر ثرفقغ بخق ش دهيثخ "
+"صهفا فصخ فقشرسذقهحفس مخخنس مهنث فاهس: {example}"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
@@ -4263,10 +4262,14 @@ msgstr "اثمح ذثرفثق"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
 msgstr "ذخرفشذف"
 
 #: lms/djangoapps/branding/api.py
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "ذشقثثقس"
 
@@ -4289,6 +4292,8 @@ msgstr "فثقوس خب سثقدهذث & اخرخق ذخيث"
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
 msgstr "حقهدشذغ حخمهذغ"
 
@@ -4302,6 +4307,8 @@ msgstr "شذذثسسهزهمهفغ حخمهذغ"
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "فثقوس خب سثقدهذث"
 
@@ -4922,9 +4929,18 @@ msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث"
 msgid "You do not have access to this course on a mobile device"
 msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس ذخعقسث خر ش وخزهمث يثدهذث"
 
+#. Translators: 'absolute' is a date such as "Jan 01,
+#. 2020". 'relative' is a fuzzy description of the time until
+#. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
+#. and if today were December 5th, 2020, 'relative' would be "1
+#. month".
 #: lms/djangoapps/courseware/date_summary.py
-msgid "in {relative_date} - {absolute_date}"
-msgstr "هر {relative_date} - {absolute_date}"
+msgid "{relative} ago - {absolute}"
+msgstr "{relative} شلخ - {absolute}"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "in {relative} - {absolute}"
+msgstr "هر {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
@@ -5667,6 +5683,7 @@ msgstr "زهقفا غثشق"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "لثريثق"
 
@@ -5678,6 +5695,7 @@ msgstr "مثدثم خب ثيعذشفهخر"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "وشهمهرل شييقثسس"
 
@@ -6303,6 +6321,8 @@ msgstr "رخ يعث يشفث ثطفثرسهخر هس سثف بخق فاشف سف
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
 msgstr "بعمم رشوث"
 
@@ -6399,6 +6419,7 @@ msgstr "فهفمث"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
 
@@ -6409,6 +6430,7 @@ msgstr "غثشق خب زهقفا"
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "ذهفغ"
 
@@ -6419,6 +6441,7 @@ msgstr "ذهفغ"
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "ذخعرفقغ"
 
@@ -8279,6 +8302,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Required Information"
 msgstr "قثضعهقثي هربخقوشفهخر"
 
@@ -8315,6 +8340,7 @@ msgstr "حشسسصخقي قثسثف اثمح"
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "رثثي اثمح?"
 
@@ -8761,10 +8787,9 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search"
 msgstr "سثشقذا"
 
@@ -9162,6 +9187,7 @@ msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق �
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "حشسسصخقي"
 
@@ -9206,6 +9232,7 @@ msgstr "تشرث يخث"
 #. immediately
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr "غخعق مثلشم رشوث, عسثي بخق شرغ ذثقفهبهذشفثس غخع ثشقر."
 
@@ -9835,6 +9862,8 @@ msgstr "ذخعقسثس"
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
 msgstr "ث-وشهم"
 
@@ -9845,6 +9874,8 @@ msgstr "ث-وشهم"
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "ثطشوحمث: عسثقرشوث@يخوشهر.ذخو"
 
@@ -9856,11 +9887,14 @@ msgstr "بخقلخف حشسسصخقي?"
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "ثطشوحمث: تشرث يخث"
 
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
 msgstr "حعزمهذ عسثقرشوث"
 
@@ -9868,6 +9902,8 @@ msgstr "حعزمهذ عسثقرشوث"
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "ثطشوحمث: تشرثيخث"
 
@@ -9910,6 +9946,10 @@ msgstr "فاهس شذذخعرف اشس شمقثشيغ زثثر شذفهدشفث�
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr "دهسهف غخعق {link_start}يشسازخشقي{link_end} فخ سثث غخعق ذخعقسثس."
+
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+msgid "Choose Language"
+msgstr "ذاخخسث مشرلعشلث"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -9979,6 +10019,7 @@ msgstr "سثري شر ثوشهم فخ {email}"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "ذخرفشذف عس"
 
@@ -10290,6 +10331,7 @@ msgstr "هرذمعيث ثققخق وثسسشلثس, سفثحس صاهذا مثش
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "سعزوهف"
 
@@ -10369,14 +10411,6 @@ msgstr "حمثشسث فقغ شلشهر مشفثق."
 msgid "Note: only instructors may annotate."
 msgstr "رخفث: خرمغ هرسفقعذفخقس وشغ شررخفشفث."
 
-#: lms/templates/index.html
-msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "بقثث ذخعقسثس بقخو <strong>{university_name}</strong>"
-
-#: lms/templates/index.html
-msgid "For anyone, anywhere, anytime"
-msgstr "بخق شرغخرث, شرغصاثقث, شرغفهوث"
-
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: lms/templates/index.html
@@ -10390,6 +10424,7 @@ msgid "It works! This is the default homepage for this Open edX instance."
 msgstr "هف صخقنس! فاهس هس فاث يثبشعمف اخوثحشلث بخق فاهس خحثر ثيط هرسفشرذث."
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr "سثشقذا بخق ش ذخعقسث"
 
@@ -10481,6 +10516,7 @@ msgstr "شذذثسس وغ ذخعقسثس"
 
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Processing your account information"
 msgstr "حقخذثسسهرل غخعق شذذخعرف هربخقوشفهخر"
 
@@ -10665,6 +10701,7 @@ msgid "Dashboard for:"
 msgstr "يشسازخشقي بخق:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr "حقخبهمث هوشلث بخق {username}"
 
@@ -10694,6 +10731,7 @@ msgstr "سهلر هر"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "قثلهسفثق"
 
@@ -10715,10 +10753,6 @@ msgstr "لمخزشم"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
-
-#: lms/templates/navigation.html
-msgid "Choose Language"
-msgstr "ذاخخسث مشرلعشلث"
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
@@ -10774,6 +10808,8 @@ msgid "Return To %s"
 msgstr "قثفعقر فخ %s"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "We're sorry, but this version of your browser is not supported. Try again "
 "using a different browser or a newer version of your browser."
@@ -10782,20 +10818,26 @@ msgstr ""
 "عسهرل ش يهببثقثرف زقخصسثق خق ش رثصثق دثقسهخر خب غخعق زقخصسثق."
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "The following errors occurred while processing your registration:"
 msgstr "فاث بخممخصهرل ثققخقس خذذعققثي صاهمث حقخذثسسهرل غخعق قثلهسفقشفهخر:"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
 msgstr "سهلر عح صهفا {provider_name}"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create your own {platform_name} account below"
 msgstr "ذقثشفث غخعق خصر {platform_name} شذذخعرف زثمخص"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -10806,10 +10848,12 @@ msgstr ""
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "You've successfully signed in with {selected_provider}."
 msgstr "غخع'دث سعذذثسسبعممغ سهلرثي هر صهفا {selected_provider}."
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "We just need a little more information before you start learning with "
 "{platform_name}."
@@ -10818,93 +10862,119 @@ msgstr ""
 "{platform_name}."
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please complete the following fields to register for an account. "
 msgstr "حمثشسث ذخوحمثفث فاث بخممخصهرل بهثميس فخ قثلهسفثق بخق شر شذذخعرف. "
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr "صهمم زث ساخصر هر شرغ يهسذعسسهخرس خق بخقعوس غخع حشقفهذهحشفث هر"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "cannot be changed later"
 msgstr "ذشررخف زث ذاشرلثي مشفثق"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Welcome {username}"
 msgstr "صثمذخوث {username}"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Enter a Public Display Name:"
 msgstr "ثرفثق ش حعزمهذ يهسحمشغ رشوث:"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Public Display Name"
 msgstr "حعزمهذ يهسحمشغ رشوث"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Additional Personal Information"
 msgstr "شييهفهخرشم حثقسخرشم هربخقوشفهخر"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: New York"
 msgstr "ثطشوحمث: رثص غخقن"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Highest Level of Education Completed"
 msgstr "اهلاثسف مثدثم خب ثيعذشفهخر ذخوحمثفثي"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 "حمثشسث ساشقث صهفا عس غخعق قثشسخرس بخق قثلهسفثقهرل صهفا {platform_name}"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Account Acknowledgements"
 msgstr "شذذخعرف شذنرخصمثيلثوثرفس"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr "ه شلقثث فخ فاث {link_start}فثقوس خب سثقدهذث{link_end}"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "ه شلقثث فخ فاث {link_start}اخرخق ذخيث{link_end}"
 
 #: lms/templates/register-form.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create My Account"
 msgstr "ذقثشفث وغ شذذخعرف"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
 msgstr "حقثبثقثرذثس بخق {platform_name}"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
 msgstr "عحيشفث وغ {platform_name} شذذخعرف"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "صثمذخوث {username}!  حمثشسث سثف غخعق حقثبثقثرذثس زثمخص"
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Enter a public username:"
 msgstr "ثرفثق ش حعزمهذ عسثقرشوث:"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
 msgstr "عحيشفث وغ شذذخعرف"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Registration Help"
 msgstr "قثلهسفقشفهخر اثمح"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "شمقثشيغ قثلهسفثقثي?"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "مخل هر"
 
@@ -10923,20 +10993,9 @@ msgstr ""
 "غخع خر خعق وشهمهرل مهسف - صث صهمم عحيشفث غخع شس ذخعقسثس شقث شييثي."
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Next Steps"
 msgstr "رثطف سفثحس"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You will receive an activation email.  You must click on the activation link"
-" to complete the process.  Don't see the email?  Check your spam folder and "
-"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
-"able to receive email from your courses."
-msgstr ""
-"غخع صهمم قثذثهدث شر شذفهدشفهخر ثوشهم.  غخع وعسف ذمهذن خر فاث شذفهدشفهخر مهرن"
-" فخ ذخوحمثفث فاث حقخذثسس.  يخر'ف سثث فاث ثوشهم?  ذاثذن غخعق سحشو بخميثق شري "
-"وشقن ثوشهمس بقخو ذمشسس.سفشربخقي.ثيع شس 'رخف سحشو', سهرذث غخع'مم صشرف فخ زث "
-"شزمث فخ قثذثهدث ثوشهم بقخو غخعق ذخعقسثس."
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -10951,14 +11010,17 @@ msgstr ""
 "سحشو'.  شف {platform_name}, صث ذخووعرهذشفث وخسفمغ فاقخعلا ثوشهم."
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr "رثثي اثمح هر قثلهسفثقهرل صهفا {platform_name}?"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
 msgstr "دهثص خعق بشضس بخق شرسصثقس فخ ذخووخرمغ شسنثي ضعثسفهخرس."
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
@@ -12158,34 +12220,6 @@ msgid "Overview"
 msgstr "خدثقدهثص"
 
 #: lms/templates/courseware/course_about.html
-msgid "Share with friends and family!"
-msgstr "ساشقث صهفا بقهثريس شري بشوهمغ!"
-
-#: lms/templates/courseware/course_about.html
-msgid "Tweet that you've enrolled in this course"
-msgstr "فصثثف فاشف غخع'دث ثرقخممثي هر فاهس ذخعقسث"
-
-#: lms/templates/courseware/course_about.html
-msgid "Email someone to say you've enrolled in this course"
-msgstr "ثوشهم سخوثخرث فخ سشغ غخع'دث ثرقخممثي هر فاهس ذخعقسث"
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {account}: {url}"
-
-#: lms/templates/courseware/course_about.html
-msgid "Take a course with {platform} online"
-msgstr "فشنث ش ذخعقسث صهفا {platform} خرمهرث"
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {platform} {url}"
-msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {platform} {url}"
-
-#: lms/templates/courseware/course_about.html
-msgid "Post a Facebook message to say you've enrolled in this course"
-msgstr "حخسف ش بشذثزخخن وثسسشلث فخ سشغ غخع'دث ثرقخممثي هر فاهس ذخعقسث"
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "ذمشسسثس سفشقف"
 
@@ -12217,6 +12251,37 @@ msgstr "شييهفهخرشم قثسخعقذثس"
 #: lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "ثرقخمم"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Share with friends and family!"
+msgstr "ساشقث صهفا بقهثريس شري بشوهمغ!"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {account}: {url}"
+msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {account}: {url}"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr "فشنث ش ذخعقسث صهفا {platform} خرمهرث"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {platform} {url}"
+msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {platform} {url}"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Tweet that you've enrolled in this course"
+msgstr "فصثثف فاشف غخع'دث ثرقخممثي هر فاهس ذخعقسث"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Post a Facebook message to say you've enrolled in this course"
+msgstr "حخسف ش بشذثزخخن وثسسشلث فخ سشغ غخع'دث ثرقخممثي هر فاهس ذخعقسث"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Email someone to say you've enrolled in this course"
+msgstr "ثوشهم سخوثخرث فخ سشغ غخع'دث ثرقخممثي هر فاهس ذخعقسث"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course View"
@@ -13124,8 +13189,8 @@ msgid "Search posts"
 msgstr "سثشقذا حخسفس"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; current selection is: "
-msgstr "يهسذعسسهخر فخحهذس; ذعققثرف سثمثذفهخر هس: "
+msgid "Discussion topics; currently listing: "
+msgstr "يهسذعسسهخر فخحهذس; ذعققثرفمغ مهسفهرل: "
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
@@ -13331,17 +13396,6 @@ msgstr ""
 "ذاشرلث غخعق مهبث شري سفشقف مثشقرهرل فخيشغ زغ شذفهدشفهرل غخعق {platform_name}"
 " شذذخعرف. ذمهذن خر فاث مهرن زثمخص خق ذخحغ شري حشسفث هف هرفخ غخعق زقخصسثق'س "
 "شييقثسس زشق."
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/email_change.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the about section of the {platform_name} Courses web site."
-msgstr ""
-"هب غخع يهير'ف قثضعثسف فاهس, غخع يخر'ف رثثي فخ يخ شرغفاهرل; غخع صخر'ف قثذثهدث"
-" شرغ وخقث ثوشهم بقخو عس. حمثشسث يخ رخف قثحمغ فخ فاهس ث-وشهم; هب غخع قثضعهقث "
-"شسسهسفشرذث, ذاثذن فاث شزخعف سثذفهخر خب فاث {platform_name} ذخعقسثس صثز سهفث."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -13565,16 +13619,6 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr "<p>سهرذثقثمغ,</p><p>[[غخعق سهلرشفعقث]]</p>"
-
-#: lms/templates/emails/confirm_email_change.txt
-msgid ""
-"This is to confirm that you changed the e-mail associated with "
-"{platform_name} from {old_email} to {new_email}. If you did not make this "
-"request, please contact us at"
-msgstr ""
-"فاهس هس فخ ذخربهقو فاشف غخع ذاشرلثي فاث ث-وشهم شسسخذهشفثي صهفا "
-"{platform_name} بقخو {old_email} فخ {new_email}. هب غخع يهي رخف وشنث فاهس "
-"قثضعثسف, حمثشسث ذخرفشذف عس شف"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -13867,16 +13911,6 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "For payment questions, contact {contact_email}"
 msgstr "بخق حشغوثرف ضعثسفهخرس, ذخرفشذف {contact_email}"
-
-#: lms/templates/emails/reject_name_change.txt
-msgid ""
-"We are sorry. Our course staff did not approve your request to change your "
-"name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the tech support at {email}"
-msgstr ""
-"صث شقث سخققغ. خعق ذخعقسث سفشبب يهي رخف شححقخدث غخعق قثضعثسف فخ ذاشرلث غخعق "
-"رشوث بقخو {old_name} فخ {new_name}. هب غخع رثثي بعقفاثق شسسهسفشرذث, حمثشسث "
-"ث-وشهم فاث فثذا سعححخقف شف {email}"
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -16834,6 +16868,51 @@ msgstr "وغ حقخبهمث"
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr "قثلهسفثق رخص"
+
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Copyright"
+msgstr "ذخحغقهلاف"
+
+#: themes/stanford-style/lms/templates/footer.html
+msgid "Copyright {year}. All rights reserved."
+msgstr "ذخحغقهلاف {year}. شمم قهلافس قثسثقدثي."
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "Free courses from <strong>{university_name}</strong>"
+msgstr "بقثث ذخعقسثس بقخو <strong>{university_name}</strong>"
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "For anyone, anywhere, anytime"
+msgstr "بخق شرغخرث, شرغصاثقث, شرغفهوث"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid ""
+"You will receive an activation email.  You must click on the activation link"
+" to complete the process.  Don't see the email?  Check your spam folder and "
+"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
+"able to receive email from your courses."
+msgstr ""
+"غخع صهمم قثذثهدث شر شذفهدشفهخر ثوشهم.  غخع وعسف ذمهذن خر فاث شذفهدشفهخر مهرن"
+" فخ ذخوحمثفث فاث حقخذثسس.  يخر'ف سثث فاث ثوشهم?  ذاثذن غخعق سحشو بخميثق شري "
+"وشقن ثوشهمس بقخو ذمشسس.سفشربخقي.ثيع شس 'رخف سحشو', سهرذث غخع'مم صشرف فخ زث "
+"شزمث فخ قثذثهدث ثوشهم بقخو غخعق ذخعقسثس."
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Terms of Service here!"
+msgstr "حعف غخعق فثقوس خب سثقدهذث اثقث!"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Privacy Policy here!"
+msgstr "حعف غخعق حقهدشذغ حخمهذغ اثقث!"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Honor Code here!"
+msgstr "حعف غخعق اخرخق ذخيث اثقث!"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Copyright Text here!"
+msgstr "حعف غخعق ذخحغقهلاف فثطف اثقث!"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

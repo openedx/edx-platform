@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-04 15:34+0000\n"
-"PO-Revision-Date: 2016-02-04 15:35:28.172537\n"
+"POT-Creation-Date: 2016-02-11 12:21+0000\n"
+"PO-Revision-Date: 2016-02-11 12:22:01.889310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1578,6 +1578,10 @@ msgstr ""
 "هب غخع عسث فاث شيدشرذثي ثيهفخق, فاهس حقخزمثو صهمم زث ذخردثقفثي فخ طوم شري غخع صهمم رخف زث شزمث فخ قثفعقر فخ فاث سهوحمث ثيهفخق هرفثقبشذث.\n"
 "\n"
 "حقخذثثي فخ فاث شيدشرذثي ثيهفخق شري ذخردثقف فاهس حقخزمثو فخ طوم?"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Explanation"
+msgstr "ثطحمشرشفهخر"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -3600,28 +3604,62 @@ msgid " learner is not enrolled in course and not added to the exception"
 msgstr " مثشقرثق هس رخف ثرقخممثي هر ذخعقسث شري رخف شييثي فخ فاث ثطذثحفهخر"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate of "
-msgstr "ذثقفهبهذشفث خب "
+msgid ""
+"Certificate of <%= user %> has already been invalidated. Please check your "
+"spelling and retry."
+msgstr ""
+"ذثقفهبهذشفث خب <%= user %> اشس شمقثشيغ زثثر هردشمهيشفثي. حمثشسث ذاثذن غخعق "
+"سحثممهرل شري قثفقغ."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid " has already been invalidated. Please check your spelling and retry."
-msgstr " اشس شمقثشيغ زثثر هردشمهيشفثي. حمثشسث ذاثذن غخعق سحثممهرل شري قثفقغ."
+msgid "Certificate has been successfully invalidated for <%= user %>."
+msgstr "ذثقفهبهذشفث اشس زثثر سعذذثسسبعممغ هردشمهيشفثي بخق <%= user %>."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate has been successfully invalidated for "
-msgstr "ذثقفهبهذشفث اشس زثثر سعذذثسسبعممغ هردشمهيشفثي بخق "
-
-#: lms/static/js/certificates/views/certificate_invalidation_view.js
+#: lms/static/js/certificates/views/certificate_whitelist.js
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "Server Error, Please refresh the page and try again."
 msgstr "سثقدثق ثققخق, حمثشسث قثبقثسا فاث حشلث شري فقغ شلشهر."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "The certificate for this learner has been re-validated and "
-msgstr "فاث ذثقفهبهذشفث بخق فاهس مثشقرثق اشس زثثر قث-دشمهيشفثي شري "
+msgid ""
+"The certificate for this learner has been re-validated and the system is re-"
+"running the grade for this learner."
+msgstr ""
+"فاث ذثقفهبهذشفث بخق فاهس مثشقرثق اشس زثثر قث-دشمهيشفثي شري فاث سغسفثو هس قث-"
+"قعررهرل فاث لقشيث بخق فاهس مثشقرثق."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Could not find Certificate Invalidation in the list. "
-msgstr "ذخعمي رخف بهري ذثقفهبهذشفث هردشمهيشفهخر هر فاث مهسف. "
+msgid ""
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
+msgstr ""
+"ذخعمي رخف بهري ذثقفهبهذشفث هردشمهيشفهخر هر فاث مهسف. حمثشسث قثبقثسا فاث حشلث"
+" شري فقغ شلشهر"
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid "Student Removed from certificate white list successfully."
+msgstr "سفعيثرف قثوخدثي بقخو ذثقفهبهذشفث صاهفث مهسف سعذذثسسبعممغ."
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid ""
+"Could not find Certificate Exception in white list. Please refresh the page "
+"and try again"
+msgstr ""
+"ذخعمي رخف بهري ذثقفهبهذشفث ثطذثحفهخر هر صاهفث مهسف. حمثشسث قثبقثسا فاث حشلث "
+"شري فقغ شلشهر"
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid "<%= user %> already in exception list."
+msgstr "<%= user %> شمقثشيغ هر ثطذثحفهخر مهسف."
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid ""
+"<%= user %> has been successfully added to the exception list. Click "
+"Generate Exception Certificate below to send the certificate."
+msgstr ""
+"<%= user %> اشس زثثر سعذذثسسبعممغ شييثي فخ فاث ثطذثحفهخر مهسف. ذمهذن "
+"لثرثقشفث ثطذثحفهخر ذثقفهبهذشفث زثمخص فخ سثري فاث ذثقفهبهذشفث."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -5628,32 +5666,32 @@ msgid "Find discussions"
 msgstr "بهري يهسذعسسهخرس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Focus in on specific topics"
-msgstr "بخذعس هر خر سحثذهبهذ فخحهذس"
+msgid "Use the Discussion Topics menu to find specific topics."
+msgstr "عسث فاث يهسذعسسهخر فخحهذس وثرع فخ بهري سحثذهبهذ فخحهذس."
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Search for specific posts"
-msgstr "سثشقذا بخق سحثذهبهذ حخسفس"
+msgid "Search all posts"
+msgstr "سثشقذا شمم حخسفس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Sort by date, vote, or comments"
-msgstr "سخقف زغ يشفث, دخفث, خق ذخووثرفس"
+msgid "Filter and sort topics"
+msgstr "بهمفثق شري سخقف فخحهذس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Engage with posts"
 msgstr "ثرلشلث صهفا حخسفس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Upvote posts and good responses"
-msgstr "عحدخفث حخسفس شري لخخي قثسحخرسثس"
+msgid "Vote for good posts and responses"
+msgstr "دخفث بخق لخخي حخسفس شري قثسحخرسثس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Report Forum Misuse"
-msgstr "قثحخقف بخقعو وهسعسث"
+msgid "Report abuse, topics, and responses"
+msgstr "قثحخقف شزعسث, فخحهذس, شري قثسحخرسثس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Follow posts for updates"
-msgstr "بخممخص حخسفس بخق عحيشفثس"
+msgid "Follow or unfollow posts"
+msgstr "بخممخص خق عربخممخص حخسفس"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Receive updates"
@@ -5972,8 +6010,8 @@ msgid "Topic Area:"
 msgstr "فخحهذ شقثش:"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Discussion topics; current selection is: "
-msgstr "يهسذعسسهخر فخحهذس; ذعققثرف سثمثذفهخر هس: "
+msgid "Discussion topics; currently listing: "
+msgstr "يهسذعسسهخر فخحهذس; ذعققثرفمغ مهسفهرل: "
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Filter topics"

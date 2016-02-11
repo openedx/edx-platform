@@ -19,7 +19,6 @@
   /* gettext library */
 
   django.catalog = {
-    "\"optional title\"": "\"titre optionnel\"", 
     "#Replies": "#R\u00e9ponses", 
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)", 
     "%(display_name)s Settings": "%(display_name)s Param\u00e8tres", 
@@ -476,7 +475,6 @@
     "Inline": "Int\u00e9gr\u00e9", 
     "Insert": "Ins\u00e9rer", 
     "Insert Hyperlink": "Ins\u00e9rer un hyperlien", 
-    "Insert Image (upload file or type url)": "Ins\u00e9rer une image (envoyer un fichier ou taper l'adresse URL)", 
     "Insert column after": "Ins\u00e9rer une colonne apr\u00e8s", 
     "Insert column before": "Ins\u00e9rer une colonne avant", 
     "Insert date/time": "Ins\u00e9rer date/heure", 
@@ -1061,7 +1059,6 @@
     "bytes": "bytes", 
     "certificate": "certificat", 
     "close": "fermer", 
-    "component": "composant", 
     "content group": "groupe de contenu", 
     "correct": "correct", 
     "dragging": "d\u00e9placement", 
@@ -1071,7 +1068,6 @@
     "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com": "ex: johndoe@example.com, JaneDoe, joeydoe@example.com", 
     "emphasized text": "texte en italique", 
     "enter code here": "saisir du code ici", 
-    "enter image description here": "saisir une description de l\u2019image ici", 
     "enter link description here": "saisir une description du lien ici", 
     "group configuration": "configuration des groupes", 
     "incorrect": "incorrect", 
