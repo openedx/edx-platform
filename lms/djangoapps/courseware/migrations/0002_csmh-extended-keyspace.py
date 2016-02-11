@@ -2,15 +2,19 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.db.models.deletion
 import courseware.fields
 from django.conf import settings
 
 
 def bump_pk_start(apps, schema_editor):
     if not schema_editor.connection.alias == 'student_module_history':
-                return
+        return
     StudentModuleHistory = apps.get_model("courseware", "StudentModuleHistory")
-    initial_id = settings.STUDENTMODULEHISTORYEXTENDED_OFFSET + StudentModuleHistory.objects.all().latest('id').id
+    biggest_id = StudentModuleHistory.objects.all().order_by('-id').first()
+    initial_id = settings.STUDENTMODULEHISTORYEXTENDED_OFFSET
+    if biggest_id is not None:
+        initial_id += biggest_id
 
     if schema_editor.connection.vendor == 'mysql':
         schema_editor.execute('ALTER TABLE courseware_studentmodulehistoryextended AUTO_INCREMENT=%s', [initial_id])
