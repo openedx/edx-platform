@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-04 15:35+0000\n"
-"PO-Revision-Date: 2016-02-04 15:35:27.804250\n"
+"POT-Creation-Date: 2016-02-11 12:22+0000\n"
+"PO-Revision-Date: 2016-02-11 12:22:01.484359\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -225,6 +225,8 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
 msgstr "Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -1448,6 +1450,13 @@ msgstr ""
 "Späçé-sépärätéd lïst öf XBlöçks whïçh shöüld nöt réndér. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: common/djangoapps/xblock_django/models.py
+msgid ""
+"Space-separated list of XBlock types whose creation to disable in Studio."
+msgstr ""
+"Späçé-sépärätéd lïst öf XBlöçk týpés whösé çréätïön tö dïsäßlé ïn Stüdïö. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
@@ -1481,24 +1490,25 @@ msgstr "pröçéssïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: these are tooltips that indicate the state of an assessment
 #. question
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is correct."
-msgstr "Thïs ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "This answer is correct."
+msgstr "Thïs änswér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is incorrect."
-msgstr "Thïs ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "This answer is incorrect."
+msgstr "Thïs änswér ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
-msgstr "Thïs ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "This answer is partially correct."
+msgstr ""
+"Thïs änswér ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is unanswered."
-msgstr "Thïs ïs ünänswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "This answer is unanswered."
+msgstr "Thïs änswér ïs ünänswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is being processed."
-msgstr "Thïs ïs ßéïng pröçésséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "This answer is being processed."
+msgstr "Thïs änswér ïs ßéïng pröçésséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1739,6 +1749,7 @@ msgstr "érrör Ⱡ'σяєм ιρѕ#"
 #: common/lib/capa/capa/responsetypes.py lms/templates/login.html
 #: lms/templates/register-form.html lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "ör Ⱡ'σя#"
 
@@ -3128,6 +3139,8 @@ msgstr "Böth Ⱡ'σяєм ι#"
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
 msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
 
@@ -3225,11 +3238,8 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
-"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
-"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
-"\"max_team_size\": 5}. In \"id\" values, the only supported special "
-"characters are underscore, hyphen, and period."
+"{example_format}. In \"id\" values, the only supported special characters "
+"are underscore, hyphen, and period."
 msgstr ""
 "Spéçïfý thé mäxïmüm téäm sïzé änd töpïçs för téäms ïnsïdé thé prövïdéd sét "
 "öf çürlý ßräçés. Mäké süré thät ýöü énçlösé äll öf thé séts öf töpïç välüés "
@@ -3237,11 +3247,8 @@ msgstr ""
 "för éäçh töpïç, änd änöthér çömmä äftér thé çlösïng sqüäré ßräçkéts. För "
 "éxämplé, tö spéçïfý thät téäms shöüld hävé ä mäxïmüm öf 5 pärtïçïpänts änd "
 "prövïdé ä lïst öf 2 töpïçs, éntér thé çönfïgürätïön ïn thïs förmät: "
-"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
-"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
-"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
-"\"mäx_téäm_sïzé\": 5}. Ìn \"ïd\" välüés, thé önlý süppörtéd spéçïäl "
-"çhäräçtérs äré ündérsçöré, hýphén, änd pérïöd.#"
+"{example_format}. Ìn \"ïd\" välüés, thé önlý süppörtéd spéçïäl çhäräçtérs "
+"äré ündérsçöré, hýphén, änd pérïöd.#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -4142,23 +4149,17 @@ msgstr "Vïdéö Pré-Röll Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid ""
 "Identify a video, 5-10 seconds in length, to play before course videos. "
 "Enter the video ID from the Video Uploads page and one or more transcript "
-"files in the following format: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. For example, an entry for a video"
-" with two transcripts looks like this: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
+"files in the following format: {format}. For example, an entry for a video "
+"with two transcripts looks like this: {example}"
 msgstr ""
 "Ìdéntïfý ä vïdéö, 5-10 séçönds ïn léngth, tö pläý ßéföré çöürsé vïdéös. "
 "Éntér thé vïdéö ÌD fröm thé Vïdéö Ûplöäds pägé änd öné ör möré tränsçrïpt "
-"fïlés ïn thé föllöwïng förmät: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. För éxämplé, än éntrý för ä vïdéö"
-" wïth twö tränsçrïpts lööks lïké thïs: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"fïlés ïn thé föllöwïng förmät: {format}. För éxämplé, än éntrý för ä vïdéö "
+"wïth twö tränsçrïpts lööks lïké thïs: {example} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт"
+" ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ι#"
+"∂σłσя ιη я#"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
@@ -4950,10 +4951,14 @@ msgstr "Hélp Çéntér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
 msgstr "Çöntäçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/branding/api.py
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "Çäréérs Ⱡ'σяєм ιρѕυм #"
 
@@ -4976,6 +4981,8 @@ msgstr "Térms öf Sérvïçé & Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σł
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
 msgstr "Prïväçý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -4989,6 +4996,8 @@ msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -5738,9 +5747,18 @@ msgstr ""
 "Ýöü dö nöt hävé äççéss tö thïs çöürsé ön ä mößïlé dévïçé Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#. Translators: 'absolute' is a date such as "Jan 01,
+#. 2020". 'relative' is a fuzzy description of the time until
+#. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
+#. and if today were December 5th, 2020, 'relative' would be "1
+#. month".
 #: lms/djangoapps/courseware/date_summary.py
-msgid "in {relative_date} - {absolute_date}"
-msgstr "ïn {relative_date} - {absolute_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "{relative} ago - {absolute}"
+msgstr "{relative} ägö - {absolute} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "in {relative} - {absolute}"
+msgstr "ïn {relative} - {absolute} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
@@ -6573,6 +6591,7 @@ msgstr "Bïrth Ýéär Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Géndér Ⱡ'σяєм ιρѕυ#"
 
@@ -6584,6 +6603,7 @@ msgstr "Lévél öf Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Mäïlïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -7357,6 +7377,8 @@ msgstr ""
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
 msgstr "Füll Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -7459,6 +7481,7 @@ msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -7469,6 +7492,7 @@ msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "Çïtý Ⱡ'σяєм ι#"
 
@@ -7479,6 +7503,7 @@ msgstr "Çïtý Ⱡ'σяєм ι#"
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "Çöüntrý Ⱡ'σяєм ιρѕυм #"
 
@@ -9574,6 +9599,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Required Information"
 msgstr "Réqüïréd Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -9612,6 +9639,7 @@ msgstr "Pässwörd Rését Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "Nééd Hélp? Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -10090,10 +10118,9 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 
@@ -10593,6 +10620,7 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -10637,6 +10665,7 @@ msgstr "Jäné Döé Ⱡ'σяєм ιρѕυм ∂#"
 #. immediately
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
 "Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -11338,6 +11367,8 @@ msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
 msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 
@@ -11348,6 +11379,8 @@ msgstr "É-mäïl Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
@@ -11359,11 +11392,14 @@ msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "éxämplé: Jäné Döé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -11371,6 +11407,8 @@ msgstr "Püßlïç Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "éxämplé: JänéDöé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -11418,6 +11456,10 @@ msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 "Vïsït ýöür {link_start}däshßöärd{link_end} tö séé ýöür çöürsés. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+msgid "Choose Language"
+msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -11494,6 +11536,7 @@ msgstr "Sénd än émäïl tö {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -11828,6 +11871,7 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
@@ -11922,16 +11966,6 @@ msgstr ""
 "Nöté: önlý ïnstrüçtörs mäý ännötäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: lms/templates/index.html
-msgid "Free courses from <strong>{university_name}</strong>"
-msgstr ""
-"Fréé çöürsés fröm <strong>{university_name}</strong> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє#"
-
-#: lms/templates/index.html
-msgid "For anyone, anywhere, anytime"
-msgstr "För änýöné, änýwhéré, änýtïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: lms/templates/index.html
@@ -11947,6 +11981,7 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr "Séärçh för ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -12062,6 +12097,7 @@ msgstr "Àççéss Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Processing your account information"
 msgstr ""
 "Pröçéssïng ýöür äççöünt ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
@@ -12272,6 +12308,7 @@ msgid "Dashboard for:"
 msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr "Pröfïlé ïmägé för {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -12301,6 +12338,7 @@ msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "Régïstér Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -12323,10 +12361,6 @@ msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "Sýsädmïn Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/navigation.html
-msgid "Choose Language"
-msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
@@ -12390,6 +12424,8 @@ msgid "Return To %s"
 msgstr "Rétürn Tö %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "We're sorry, but this version of your browser is not supported. Try again "
 "using a different browser or a newer version of your browser."
@@ -12404,6 +12440,8 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "The following errors occurred while processing your registration:"
 msgstr ""
 "Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
@@ -12412,16 +12450,20 @@ msgstr ""
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
 msgstr "Sïgn üp wïth {provider_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create your own {platform_name} account below"
 msgstr ""
 "Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -12432,12 +12474,14 @@ msgstr ""
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "You've successfully signed in with {selected_provider}."
 msgstr ""
 "Ýöü'vé süççéssfüllý sïgnéd ïn wïth {selected_provider}. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "We just need a little more information before you start learning with "
 "{platform_name}."
@@ -12446,59 +12490,74 @@ msgstr ""
 "{platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please complete the following fields to register for an account. "
 msgstr ""
 "Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr ""
 "Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "cannot be changed later"
 msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Welcome {username}"
 msgstr "Wélçömé {username} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Enter a Public Display Name:"
 msgstr "Éntér ä Püßlïç Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Public Display Name"
 msgstr "Püßlïç Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Additional Personal Information"
 msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: New York"
 msgstr "éxämplé: Néw Ýörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Highest Level of Education Completed"
 msgstr ""
 "Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 "Pléäsé shäré wïth üs ýöür réäsöns för régïstérïng wïth {platform_name} "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Account Acknowledgements"
 msgstr "Àççöünt Àçknöwlédgéménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr ""
 "Ì ägréé tö thé {link_start}Térms öf Sérvïçé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
@@ -12506,46 +12565,57 @@ msgstr ""
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr ""
 "Ì ägréé tö thé {link_start}Hönör Çödé{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢т#"
 
 #: lms/templates/register-form.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create My Account"
 msgstr "Çréäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
 msgstr "Préférénçés för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
 msgstr "Ûpdäté mý {platform_name} Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
 "Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Enter a public username:"
 msgstr "Éntér ä püßlïç üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
 msgstr "Ûpdäté Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Registration Help"
 msgstr "Régïsträtïön Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "Àlréädý régïstéréd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "Lög ïn Ⱡ'σяєм ιρѕυ#"
 
@@ -12569,23 +12639,9 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт #"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Next Steps"
 msgstr "Néxt Stéps Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You will receive an activation email.  You must click on the activation link"
-" to complete the process.  Don't see the email?  Check your spam folder and "
-"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
-"able to receive email from your courses."
-msgstr ""
-"Ýöü wïll réçéïvé än äçtïvätïön émäïl.  Ýöü müst çlïçk ön thé äçtïvätïön lïnk"
-" tö çömplété thé pröçéss.  Dön't séé thé émäïl?  Çhéçk ýöür späm földér änd "
-"märk émäïls fröm çläss.stänförd.édü äs 'nöt späm', sïnçé ýöü'll wänt tö ßé "
-"äßlé tö réçéïvé émäïl fröm ýöür çöürsés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυ#"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -12604,18 +12660,21 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єя#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr ""
 "Nééd hélp ïn régïstérïng wïth {platform_name}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
 msgstr ""
 "Vïéw öür FÀQs för änswérs tö çömmönlý äskéd qüéstïöns. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
@@ -13957,45 +14016,6 @@ msgid "Overview"
 msgstr "Övérvïéw Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/courseware/course_about.html
-msgid "Share with friends and family!"
-msgstr "Shäré wïth frïénds änd fämïlý! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/courseware/course_about.html
-msgid "Tweet that you've enrolled in this course"
-msgstr ""
-"Twéét thät ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/courseware/course_about.html
-msgid "Email someone to say you've enrolled in this course"
-msgstr ""
-"Émäïl söméöné tö säý ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr ""
-"Ì jüst énrölléd ïn {number} {title} thröügh {account}: {url} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/courseware/course_about.html
-msgid "Take a course with {platform} online"
-msgstr ""
-"Täké ä çöürsé wïth {platform} önlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {platform} {url}"
-msgstr ""
-"Ì jüst énrölléd ïn {number} {title} thröügh {platform} {url} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/courseware/course_about.html
-msgid "Post a Facebook message to say you've enrolled in this course"
-msgstr ""
-"Pöst ä Fäçéßöök méssägé tö säý ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "Çlässés Stärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -14027,6 +14047,48 @@ msgstr "Àddïtïönäl Résöürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "énröll Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Share with friends and family!"
+msgstr "Shäré wïth frïénds änd fämïlý! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {account}: {url}"
+msgstr ""
+"Ì jüst énrölléd ïn {number} {title} thröügh {account}: {url} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr ""
+"Täké ä çöürsé wïth {platform} önlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {platform} {url}"
+msgstr ""
+"Ì jüst énrölléd ïn {number} {title} thröügh {platform} {url} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Tweet that you've enrolled in this course"
+msgstr ""
+"Twéét thät ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Post a Facebook message to say you've enrolled in this course"
+msgstr ""
+"Pöst ä Fäçéßöök méssägé tö säý ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Email someone to say you've enrolled in this course"
+msgstr ""
+"Émäïl söméöné tö säý ýöü'vé énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course View"
@@ -15060,10 +15122,10 @@ msgid "Search posts"
 msgstr "Séärçh pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; current selection is: "
+msgid "Discussion topics; currently listing: "
 msgstr ""
-"Dïsçüssïön töpïçs; çürrént séléçtïön ïs:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Dïsçüssïön töpïçs; çürréntlý lïstïng:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
@@ -15285,22 +15347,6 @@ msgstr ""
 "єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
 "νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт α#"
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/email_change.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the about section of the {platform_name} Courses web site."
-msgstr ""
-"Ìf ýöü dïdn't réqüést thïs, ýöü dön't nééd tö dö änýthïng; ýöü wön't réçéïvé"
-" äný möré émäïl fröm üs. Pléäsé dö nöt réplý tö thïs é-mäïl; ïf ýöü réqüïré "
-"ässïstänçé, çhéçk thé äßöüt séçtïön öf thé {platform_name} Çöürsés wéß sïté."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυ#"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -15559,22 +15605,6 @@ msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr ""
 "<p>Sïnçérélý,</p><p>[[Ýöür Sïgnätüré]]</p> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: lms/templates/emails/confirm_email_change.txt
-msgid ""
-"This is to confirm that you changed the e-mail associated with "
-"{platform_name} from {old_email} to {new_email}. If you did not make this "
-"request, please contact us at"
-msgstr ""
-"Thïs ïs tö çönfïrm thät ýöü çhängéd thé é-mäïl ässöçïätéd wïth "
-"{platform_name} fröm {old_email} tö {new_email}. Ìf ýöü dïd nöt mäké thïs "
-"réqüést, pléäsé çöntäçt üs ät Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαв#"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -15925,22 +15955,6 @@ msgid "For payment questions, contact {contact_email}"
 msgstr ""
 "För päýmént qüéstïöns, çöntäçt {contact_email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
-
-#: lms/templates/emails/reject_name_change.txt
-msgid ""
-"We are sorry. Our course staff did not approve your request to change your "
-"name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the tech support at {email}"
-msgstr ""
-"Wé äré sörrý. Öür çöürsé stäff dïd nöt äpprövé ýöür réqüést tö çhängé ýöür "
-"nämé fröm {old_name} tö {new_name}. Ìf ýöü nééd fürthér ässïstänçé, pléäsé "
-"é-mäïl thé téçh süppört ät {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ι#"
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -19390,6 +19404,58 @@ msgstr "Mý Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr "Régïstér Nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Copyright"
+msgstr "Çöpýrïght Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: themes/stanford-style/lms/templates/footer.html
+msgid "Copyright {year}. All rights reserved."
+msgstr ""
+"Çöpýrïght {year}. Àll rïghts résérvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "Free courses from <strong>{university_name}</strong>"
+msgstr ""
+"Fréé çöürsés fröm <strong>{university_name}</strong> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє#"
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "For anyone, anywhere, anytime"
+msgstr "För änýöné, änýwhéré, änýtïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid ""
+"You will receive an activation email.  You must click on the activation link"
+" to complete the process.  Don't see the email?  Check your spam folder and "
+"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
+"able to receive email from your courses."
+msgstr ""
+"Ýöü wïll réçéïvé än äçtïvätïön émäïl.  Ýöü müst çlïçk ön thé äçtïvätïön lïnk"
+" tö çömplété thé pröçéss.  Dön't séé thé émäïl?  Çhéçk ýöür späm földér änd "
+"märk émäïls fröm çläss.stänförd.édü äs 'nöt späm', sïnçé ýöü'll wänt tö ßé "
+"äßlé tö réçéïvé émäïl fröm ýöür çöürsés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυ#"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Terms of Service here!"
+msgstr "Püt ýöür Térms öf Sérvïçé héré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Privacy Policy here!"
+msgstr "Püt ýöür Prïväçý Pölïçý héré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Honor Code here!"
+msgstr "Püt ýöür Hönör Çödé héré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Copyright Text here!"
+msgstr "Püt ýöür Çöpýrïght Téxt héré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
