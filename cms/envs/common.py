@@ -849,9 +849,6 @@ INSTALLED_APPS = (
     # Microsite configuration application
     'microsite_configuration',
 
-    # Credentials support
-    'openedx.core.djangoapps.credentials',
-
     # edx-milestones service
     'milestones',
 
@@ -1129,8 +1126,3 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
-
-
-################################ Settings for Credentials Service ################################
-
-CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
