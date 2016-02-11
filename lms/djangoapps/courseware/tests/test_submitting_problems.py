@@ -24,7 +24,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.credit.api import (

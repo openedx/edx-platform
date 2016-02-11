@@ -436,8 +436,8 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
             org='MITx',
             number='closed',
             display_name='Closed Course To Buy',
-            enrollment_start = tomorrow,
-            enrollment_end = nextday
+            enrollment_start=tomorrow,
+            enrollment_end=nextday
         )
 
     def setUp(self):

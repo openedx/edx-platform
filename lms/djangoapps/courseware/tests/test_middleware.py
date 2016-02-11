@@ -10,7 +10,7 @@ from nose.plugins.attrib import attr
 
 import courseware.courses as courses
 from courseware.middleware import RedirectUnenrolledMiddleware
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

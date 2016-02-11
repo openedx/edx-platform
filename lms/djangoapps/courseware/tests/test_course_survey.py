@@ -13,7 +13,7 @@ from survey.models import SurveyForm, SurveyAnswer
 
 from common.test.utils import XssTestMixin
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 

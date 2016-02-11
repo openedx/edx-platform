@@ -11,7 +11,7 @@ from pytz import UTC
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT

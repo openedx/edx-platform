@@ -28,7 +28,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 def _grade_with_errors(student, request, course, keep_raw_scores=False):
