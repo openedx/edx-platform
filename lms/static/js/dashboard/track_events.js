@@ -21,7 +21,6 @@ var edx = edx || {};
     };
 
     edx.dashboard.TrackEvents = function() {
-
          var course_title_link = $(".course-title > a"),
             course_image_link = $(".cover"),
             enter_course_link = $(".enter-course"),
@@ -29,43 +28,48 @@ var edx = edx || {};
             course_learn_verified = $(".verified-info"),
             find_courses_btn = $(".btn-find-courses");
 
+        var trackLink = window.analytics ? window.analytics.trackLink : null;
+        if (!trackLink) {
+            return;
+        }
+
         // Emit an event when the "course title link" is clicked.
-        window.analytics.trackLink(
+        trackLink(
             course_title_link,
             "edx.bi.dashboard.course_title.clicked",
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event  when the "course image" is clicked.
-        window.analytics.trackLink(
+        trackLink(
             course_image_link,
             "edx.bi.dashboard.course_image.clicked",
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event  when the "View Course" button is clicked.
-        window.analytics.trackLink(
+        trackLink(
             enter_course_link,
             "edx.bi.dashboard.enter_course.clicked",
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event when the options dropdown is engaged.
-        window.analytics.trackLink(
+        trackLink(
             options_dropdown,
             "edx.bi.dashboard.course_options_dropdown.clicked",
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event  when the "Learn about verified" link is clicked.
-        window.analytics.trackLink(
+        trackLink(
             course_learn_verified,
             "edx.bi.dashboard.verified_info_link.clicked",
             edx.dashboard.generateTrackProperties
         );
 
         // Emit an event  when the "Find Courses" button is clicked.
-        window.analytics.trackLink(
+        trackLink && trackLink(
             find_courses_btn,
             "edx.bi.dashboard.find_courses_button.clicked",
             {

@@ -697,6 +697,7 @@
         'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/store_error_handler_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
         'lms/include/js/spec/navigation_spec.js',
