@@ -926,6 +926,15 @@ div.problem .action {
     display: inline;
   }
 
+  .copy-error {
+    @include font-size(14);
+    color: $error-color;
+
+    i {
+      font-style: inherit;
+    }
+  }
+
   .submission_feedback {
     // background: #F3F3F3;
     // border: 1px solid #ddd;
