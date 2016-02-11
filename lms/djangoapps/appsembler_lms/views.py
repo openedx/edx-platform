@@ -88,13 +88,16 @@ class UserSignupAPIView(GenericAPIView):
                 return HttpResponse(status=status.HTTP_403_FORBIDDEN)
             # create_comments_service_user(user)  # TODO: do we need this? if so, fix it
 
-            # if the organization does not exist yet, create it
-            try:
-                organization = Organization.objects.get(key=data.get('org'))
-            except Organization.DoesNotExist:
-                organization = Organization(key=data.get('org'),
-                                            display_name=data.get('org_name'))
-                organization.save()
+            # if the organization exists, we don't want to let this new user see that org.
+            # we'll soon be giving users the ability to add people to their organization in AMC
+            org_key = data.get('org')
+            i = 1
+            while Organization.objects.filter(key=org_key):
+                org_key = org_key + str(i)
+                i += 1
+            organization = Organization(key=org_key,
+                                        display_name=data.get('org_name'))
+            organization.save()
 
             organization.users.add(user)
 
