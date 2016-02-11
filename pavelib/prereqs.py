@@ -195,7 +195,7 @@ def uninstall_python_packages():
             uninstalled = True
 
         # Uninstall django-oauth2-provider
-        if any("django-oauth2-provider==" in line for line in frozen):
+        if any(line.startswith("django-oauth2-provider==") for line in frozen):
             sh("pip uninstall --disable-pip-version-check -y django-oauth2-provider")
             uninstalled = True
 
