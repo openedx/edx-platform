@@ -8,7 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-COURSE_REGEX = re.compile(r'^.*?/courses/{}'.format(settings.COURSE_ID_PATTERN))
+COURSE_REGEX = re.compile(r'^.*?/(api/courses/v1/)?courses/{}'.format(settings.COURSE_ID_PATTERN))
 
 
 def safe_get_host(request):
