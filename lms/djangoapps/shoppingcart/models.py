@@ -1987,11 +1987,7 @@ class CertificateItem(OrderItem):
 
     def additional_instruction_text(self):
         verification_reminder = ""
-        refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 14 days after the course "
-                                "start date. ")
-        is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()
-        is_professional_mode_verified = self.course_enrollment.is_professional_enrollment()
-
+        is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()  # pylint: disable=E1101
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
             path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})

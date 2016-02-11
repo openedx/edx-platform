@@ -97,7 +97,7 @@ class PaymentFakeView(View):
 
         # Calculate the public signature
         hash_val = ",".join([
-            "{0}={1}".format(key, post_params[key])
+            u"{0}={1}".format(key, post_params[key])
             for key in signed_fields
         ])
         public_sig = processor_hash(hash_val)

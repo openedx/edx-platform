@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
@@ -49,7 +49,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
@@ -79,7 +79,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Assyass Mahmoud <mahmoud.assyass@edu.uiz.ac.ma>, 2015
 # bekairi tahar <tahar48omar@gmail.com>, 2014
@@ -100,7 +100,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Daniel Le Berre, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
@@ -4277,7 +4277,7 @@ msgstr "Formation professionnelle"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
-msgstr ""
+msgstr "Passer à un certificat vérifié"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
@@ -4295,7 +4295,7 @@ msgstr "Payer avec PayPal"
 #. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout with {processor}"
-msgstr "Payer avec {processor}"
+msgstr "Payer"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "All payment options are currently unavailable."
@@ -7143,7 +7143,7 @@ msgstr "Vous vous inscrivez à : %(courseName)s"
 #: lms/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid "You are upgrading your enrollment for: %(courseName)s"
-msgstr ""
+msgstr "Mise à niveau de votre inscription à : %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -7159,16 +7159,25 @@ msgid ""
 "you will need to have these by %(date)s to qualify to earn a Verified "
 "Certificate."
 msgstr ""
+"Vous pouvez payer même si vous ne disposez pas encore des éléments suivants, "
+"mais vous en aurez besoin avant le %(date)s afin d'avoir le droit d'obtenir "
+"un certificat vérifié."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
 msgstr ""
+"Vous pouvez payer même si vous ne disposez pas encore des éléments suivants, "
+"mais vous en aurez besoin afin d'avoir le droit d'obtenir un certificat vérifié."
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "I accept the terms of service of the proctoring service described <a href='{url}' target='_blank'>here</a>."
+msgstr "J'accepte les conditions générales d'utilisation du service d'examen surveillé à distance décrites <a href='{url}' target='_blank'>ici</a>."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
-msgstr "Photo d'identité officielle"
+msgstr "Pièce d'identité officielle"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -7195,6 +7204,30 @@ msgstr "Votre vérification est valable jusqu'au %(verificationGoodUntil)s."
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "prix"
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Once payment has been processed, you commit to taking a remotely proctored exam following the protocol defined for this course. Please check that your equipment is compatible with the proctoring system of our ProctorU provider by clicking <a href='http://www.proctoru.com/testitout/' target='_blank'>this link</a>."
+msgstr "Une fois le paiement effectué vous vous engagez à passer un examen surveillé à distance selon les protocoles définis pour ce cours. Veuillez vérifier que votre équipement est compatible avec le système de surveillance de notre fournisseur ProctorU en <a href='http://www.proctoru.com/testitout/index_fr.php' target='_blank'>cliquant ici</a>."
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "According to Article L 121 21 of the Consumer Code, you may unenroll and obtain a refund within 14 calendar days. After this period, unenrollment will not trigger any reimbursement."
+msgstr "Conformément à l'article L 121 21 du code de la consommation, vous pouvez vous désinscrire et obtenir un remboursement dans un délai de 14 jours calendaires. A l’issue de ce délai, toute désinscription ne donnera plus lieu à remboursement."
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "I wish to take an exam to validate this course and obtain a certificate"
+msgstr "Je désire passer un examen pour valider mon cours et obtenir un certificat"
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "I can schedule the remote exam at the dates defined for this course"
+msgstr "Je peux passer mon examen à distance selon les dates définies pour ce cours "
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "I have verified that my computer equipment and internet connection are compatible with the exam proctoring tools"
+msgstr "J'ai vérifié que mon matériel informatique et ma connexion internet sont compatibles avec les outils de surveillance d'examen à distance"
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "I have checked that I can schedule the remote exam at the dates defined for this course and that my equipment is compatible with the exam proctoring tools"
+msgstr "J'ai vérifié que je peux passer mon examen à distance selon les dates des examens définies pour ce cours et je possède un matériel compatible avec les outils de surveillance d'examen à distance"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8389,4 +8422,12 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
-msgstr ""
+msgstr "Utiliser la transcription courante"
+
+#: lms/templates/verify_student/make_payment_step.underscore:90
+msgid "Please read and accept terms and conditions"
+msgstr "Veuillez lire et accepter les conditions d'utilisation"
+
+#: lms/templates/verify_student/make_payment_step.underscore:98
+msgid "Accept"
+msgstr "J'accepte"

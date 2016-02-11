@@ -77,8 +77,30 @@
           <% } %>
         <% } %>
       </ul>
+
     </div>
     <% } %>
+
+
+    <p><%= gettext("Once payment has been processed, you commit to taking a remotely proctored exam following the protocol defined for this course. Please check that your equipment is compatible with the proctoring system of our ProctorU provider by clicking <a href='http://www.proctoru.com/testitout/' target='_blank'>this link</a>.") %></p>
+    <p><%= gettext("According to Article L 121 21 of the Consumer Code, you may unenroll and obtain a refund within 14 calendar days. After this period, unenrollment will not trigger any reimbursement.") %></p>
+
+    <div class="display-fun-payment-terms">
+      <div class="display-fun-payment-terms-header">
+        Veuillez lire et accepter les conditions d'utilisation
+      </div>
+
+      <div class="display-fun-payment-terms-text">
+      </div>
+
+      <div class="display-fun-payment-terms-footer">
+        <span id="validate-terms" class="btn-terms">
+          J'accepte
+        </span>
+      </div>
+
+    </div>
+
 
     <% if ( courseModeSlug === 'no-id-professional') { %>
     <div class="container register is-verified">
@@ -87,13 +109,6 @@
     </div>
     <% } else if ( alreadyVerified && verificationGoodUntil ) { %>
     <div class="container register is-verified">
-      <h3 class="title"><%- gettext( "You have already verified your ID!" ) %></h3>
-      <p>
-        <%= _.sprintf(
-        gettext( "Your verification status is good until %(verificationGoodUntil)s." ),
-         { verificationGoodUntil: verificationGoodUntil }
-        ) %>
-      </p>
     </div>
     <% } %>
 
@@ -102,7 +117,9 @@
     <input type="hidden" name="contribution" value="<%- minPrice %>" />
     <input type="hidden" name="sku" value="<%- sku %>" />
     <div class="purchase">
-      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">€<%- minPrice %></span></p>
+
     </div>
     <div class="pay-options">
       <%

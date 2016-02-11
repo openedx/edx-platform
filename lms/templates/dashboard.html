@@ -179,10 +179,11 @@ import json
         <a href="${reverse('payment:list-receipts')}" class="edit-name">
             ${_("Order History")}
         </a>
-## END FUN
-      </ul>
 
-      <%include file='dashboard/_dashboard_status_verification.html' />
+      </ul>
+      ## We remove the identity verification status display, because this process is entrusted to proctorU
+      ## <%include file='dashboard/_dashboard_status_verification.html' />
+## END FUN
 
     </section>
   </section>

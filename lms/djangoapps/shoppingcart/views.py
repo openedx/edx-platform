@@ -175,7 +175,6 @@ def show_cart(request):
         for expired_item in expired_cart_items:
             Order.remove_cart_item_from_order(expired_item, request.user)
         cart.update_order_type()
-
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )

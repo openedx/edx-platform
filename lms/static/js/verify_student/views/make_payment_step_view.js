@@ -21,13 +21,15 @@ var edx = edx || {};
            }
         },
 
+        terms_and_conditions: null,
+
         defaultContext: function() {
             return {
                 isActive: true,
                 suggestedPrices: [],
                 minPrice: 0,
                 sku: '',
-                currency: 'usd',
+                currency: 'eur',
                 upgrade: false,
                 verificationDeadline: '',
                 courseName: '',
@@ -64,7 +66,7 @@ var edx = edx || {};
             } else {
                 // This is mainly for testing as no other processors are supported right now.
                 // Translators: 'processor' is the name of a third-party payment processing vendor (example: "PayPal")
-                return interpolate_text(gettext('Checkout with {processor}'), {processor: processorName});
+                return 'Payer';
             }
         },
 
@@ -132,8 +134,46 @@ var edx = edx || {};
 
             // Handle payment submission
             $( '.payment-button' ).on( 'click', _.bind( this.createOrder, this ) );
+
+            // The former call to checkPaymentEnabled does not disable the
+            // payment button because it hadn't been introduced in the DOM,
+            // yet. So we need to make another call after
+            // _getPaymentButtonHtml.
+            this.checkPaymentEnabled();
         },
 
+        checkPaymentEnabled: function() {
+            var that = this;
+            var callback = function(data) {
+                if (data.version) {   // an empty json is returned if no terms to validate
+                    that.terms_and_conditions = data;
+                }
+                if (that.terms_and_conditions) {
+                    $('.display-fun-payment-terms-text').html(that.terms_and_conditions.text);
+                    that.setPaymentEnabled(false);
+                    $('#validate-terms').click(function(){
+                        $.post("/payment/terms/accept/",
+                            function(data) {
+                                $('.display-fun-payment-terms').fadeOut()
+                                that.setPaymentEnabled(true);
+                            }
+                        );
+                    });
+                } else {
+                    $('.display-fun-payment-terms').hide();
+                    that.setPaymentEnabled(true);
+                }
+            }
+            this.getTerms(callback);
+        },
+        getTerms: function(callback) {
+            if (!this.terms_and_conditions) {
+                $.get("/payment/terms/get/",
+                    {'always': true},  // show terms at each certified course enrollment, event if already accepted
+                    callback
+                );
+            }
+        },
         setPaymentEnabled: function( isEnabled ) {
             if ( _.isUndefined( isEnabled ) ) {
                 isEnabled = true;
@@ -192,14 +232,26 @@ var edx = edx || {};
             form.attr( 'action', paymentData.payment_page_url );
             form.attr( 'method', 'POST' );
 
-            _.each( paymentData.payment_form_data, function( value, key ) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: key,
-                    value: value
-                }).appendTo(form);
-            });
+            var payment_form_data = [];
 
+            for(var key in paymentData.payment_form_data) {
+                payment_form_data.push([key, paymentData.payment_form_data[key]])
+            }
+            // FUN/PAYBOX: we alphabeticaly order POSTed fields to ensure order is always the same when signing
+            payment_form_data = payment_form_data.sort(function(a, b){
+                if (a[0] < b[0])
+                  return -1;
+                if (a[0] > b[0])
+                  return 1;
+                return 0;
+            });
+            _.each( payment_form_data, function( value ) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: value[0],
+                        value: value[1]
+                    }).appendTo(form);
+            });
             // Marketing needs a way to tell the difference between users
             // leaving for the payment processor and users dropping off on
             // this page. A virtual pageview can be used to do this.
@@ -222,7 +274,7 @@ var edx = edx || {};
             });
 
             // Re-enable the button so the user can re-try
-            this.setPaymentEnabled( true );
+            this.setPaymentEnabled();
 
             $( '.payment-button' ).toggleClass( 'is-selected', false );
         },

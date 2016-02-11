@@ -228,9 +228,13 @@ from student.helpers import (
                       % endif
                     % elif show_refund_option:
                       % if not is_course_blocked:
-                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}" data-cert-name-long="${cert_name_long | h}"
-                         data-track-info="${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?") | h}"
-                         data-refund-info="${_("You will be refunded the amount you paid.") | h}">
+
+                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" data-dashboard-index="${dashboard_index}"
+                         onclick="set_unenroll_message(
+                            '${_(u"Are you sure you want to unenroll from the certified course <strong>{course}</strong><br><br>?").format(course=course.display_name)}',
+                            '${_(u"In this case, click <strong>Unsubscribe</strong> and to request a refund please contact our support at the following address: <a href=mailto:{billing_email}>{billing_email}</a>").format(billing_email=billing_email)}'
+                            )">
+
                         ${_('Unenroll')}
                       </a>
                       % else:
@@ -281,40 +285,17 @@ from student.helpers import (
 
       % if credit_status is not None:
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
-      % endif 
+      % endif
 
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">
-          % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
-            <div class="verification-reminder">
-              % if verification_status['days_until_deadline'] is not None:
-                <h4 class="message-title">${_('Verification not yet complete.')}</h4>
-                <p class="message-copy">${ungettext(
-                  'You only have {days} day left to verify for this course.',
-                  'You only have {days} days left to verify for this course.',
-                  verification_status['days_until_deadline']
-                ).format(days=verification_status['days_until_deadline'])}</p>
-              % else:
-                <h4 class="message-title">${_('Almost there!')}</h4>
-                <p class="message-copy">${_('You still need to verify for this course.')}</p>
-              % endif
-            </div>
-            <div class="verification-cta">
-              <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="cta" data-course-id="${course_overview.id | h}">${_('Verify Now')}</a>
-            </div>
-          % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
-            <p class="message-copy">${_('Thanks for your patience as we process your request.')}</p>
-          % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
-            % if verification_status.get('verification_good_until') is not None:
-              <p class="message-copy">${_('Your verification status is good until {date}.').format(date=verification_status['verification_good_until'])}
-            % endif
-          % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
-            <h4 class="message-title">${_('Your verification will expire soon!')}</h4>
-            ## Translators: start_link and end_link will be replaced with HTML tags;
-            ## please do not translate these.
-            <p class="message-copy">${_('Your current verification will expire before the verification deadline for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued ID.').format(start_link='<a href="{href}">'.format(href=reverse('verify_student_reverify')), end_link='</a>')}</p>
+
+          ## FUN: We remove the verify identity reminder as Paybox can be quit long
+          ## to confirm transaction success and we do not need this step which is entrusted to ProctorU.
+          % if verification_status['status'] == VERIFY_STATUS_APPROVED:
+
+           <h4 class="message-title">${_(u"You subscribed to a certified exam for this course")}</h4>
+
           % endif
         </div>
         % endif
@@ -322,22 +303,37 @@ from student.helpers import (
         % if course_mode_info['show_upsell'] and not is_course_blocked:
           <div class="message message-upsell has-actions is-shown">
 
+            <div class="wrapper-tip">
+              <h4 class="message-title">
+                <span class="value">${_("Challenge Yourself!")}</span>
+              </h4>
+              <p class="message-copy">${_("Take this course to obtain a certificate.")}</p>
+            </div>
+
             <div class="wrapper-extended">
-                <p class="message-copy" align="justify">
-                  <b class="message-copy-bold">
-                    ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
-                  </b><br>
-                    ${_("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}" class="verified-info" data-course-key="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT'), enrollment.course_id), link_end="</a>", cert_name_long=cert_name_long)}
+                <p class="message-copy">
+                    ${_(u"Celebrate your achievement through a certificate. This document will help you to demonstrate the skills you have acquired in this MOOC, boost your CV and your career or prepare for further professional development.")}<br>
+                    <br>
+                    ${_(u"The benefits of a certificate:")}
                 </p>
-                <div class="action-upgrade-container">
-                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
-                      <i class="action-upgrade-icon"></i>
+                <p class="message-copy">
+                    * ${_(u"Get a certificate from the institution who created the MOOC.")}<br>
+                    * ${_(u"Add this certificate to your resume, your cover letter or share it directly on social networks")}
+                </p>
+                <p class="message-copy">
+                    ${_(u"Once you have paid, you agree to take a remote-proctored exam according to procedures and rules defined for this course.")}
+                </p>
+
+              <ul class="actions message-actions">
+                <li class="action-item">
+                <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
+                    <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="${_("ID Verified Ribbon/Badge")}">
                     <span class="wrapper-copy">
-                      <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified")}</span>
+                      <span class="copy" id="upgrade-to-verified">${_("Register to take a certification exam")}</span>
                     </span>
                   </a>
-                </div>
-            </div>
+                </li>
+              </dul>
           </div>
         %endif
 

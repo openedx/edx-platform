@@ -12789,6 +12789,12 @@ msgid ""
 "Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
 "this course."
 msgstr ""
+msgid "Challenge Yourself!"
+msgstr "Fixez-vous un défi !"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Take this course to obtain a certificate."
+msgstr "Suivez ce cours en vue d'obtenir un certificat."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
