@@ -65,6 +65,15 @@ class ProgramsApiConfig(ConfigurationModel):
         default=False
     )
 
+    max_retries = models.PositiveIntegerField(
+        verbose_name=_("Maximum Certification Retries"),
+        default=11,  # This gives about 30 minutes wait before the final attempt
+        help_text=_(
+            "When making requests to award certificates, make at most this many attempts "
+            "to retry a failing request."
+        )
+    )
+
     @property
     def internal_api_url(self):
         """

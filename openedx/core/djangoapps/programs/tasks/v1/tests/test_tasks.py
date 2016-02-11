@@ -3,12 +3,14 @@ Tests for programs celery tasks.
 """
 
 import ddt
-from django.conf import settings
-from django.test import override_settings, TestCase
-from edx_rest_api_client.client import EdxRestApiClient
 import httpretty
 import json
 import mock
+
+from celery.exceptions import MaxRetriesExceededError
+from django.conf import settings
+from django.test import override_settings, TestCase
+from edx_rest_api_client.client import EdxRestApiClient
 
 from oauth2_provider.tests.factories import ClientFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -258,7 +260,7 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         ('credentials', 'enable_learner_issuance'),
     )
     @ddt.unpack
-    def test_abort_if_config_disabled(
+    def test_retry_if_config_disabled(
             self,
             disabled_config_type,
             disabled_config_attribute,
@@ -270,7 +272,8 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         """
         getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            tasks.award_program_certificates.delay(self.student.username).get()
+            with self.assertRaises(MaxRetriesExceededError):
+                tasks.award_program_certificates.delay(self.student.username).get()
             self.assertTrue(mock_warning.called)
         for mock_helper in mock_helpers:
             self.assertFalse(mock_helper.called)
@@ -337,9 +340,10 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
 
         """
         def side_effect(*_a):  # pylint: disable=missing-docstring
-            exc = side_effects.pop(0)
-            if exc:
-                raise exc
+            if side_effects:
+                exc = side_effects.pop(0)
+                if exc:
+                    raise exc
             return mock.DEFAULT
         return side_effect
 
@@ -357,16 +361,17 @@ class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, Credent
         that arise are logged also.
         """
         mock_get_completed_programs.return_value = [1, 2]
-        mock_get_awarded_certificate_programs.return_value = []
+        mock_get_awarded_certificate_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
         with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
                 mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 2)
+        self.assertEqual(mock_award_program_certificate.call_count, 3)
         mock_exception.assert_called_once_with(mock.ANY, 1, self.student.username)
-        mock_info.assert_called_with(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
+        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
 
     def test_retry_on_certificates_api_errors(
             self,
