@@ -54,6 +54,9 @@ class RoleCache(object):
             for access_role in self._roles
         )
 
+    def add_role(self, role):
+        self._roles.add(role)
+
 
 class AccessRole(object):
     """
@@ -157,7 +160,8 @@ class RoleBase(AccessRole):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
-                    del user._roles
+                #    del user._roles
+                    user._roles.add_role(entry)
 
     def remove_users(self, *users):
         """
