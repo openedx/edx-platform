@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 import itertools
-from lms.djangoapps.django_comment_client.base.views import track_voted_event
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -26,7 +25,11 @@ from discussion_api.permissions import (
     get_initializable_thread_fields,
 )
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from django_comment_client.base.views import track_comment_created_event, track_thread_created_event
+from django_comment_client.base.views import (
+    track_comment_created_event,
+    track_thread_created_event,
+    track_voted_event,
+)
 from django_comment_common.signals import (
     thread_created,
     thread_edited,
@@ -511,6 +514,8 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
             elif field == "voted":
                 _handle_voted_field(form_value, cc_content, api_content, request, context)
+            else:
+                raise ValidationError({field: ["Invalid Key"]})
 
 
 def _handle_following_field(form_value, user, cc_content):

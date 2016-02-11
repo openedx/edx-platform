@@ -2107,7 +2107,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, current_vote_status, new_vote_status):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
         """
         Test attempts to edit the "voted" field.
 
@@ -2143,6 +2144,22 @@ class UpdateThreadTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, "edx.forum.thread.voted")
+            self.assertEqual(
+                event_data,
+                {
+                    'undo_vote': not new_vote_status,
+                    'url': '',
+                    'target_username': self.user.username,
+                    'vote_value': 'up',
+                    'user_forums_roles': [FORUM_ROLE_STUDENT],
+                    'user_course_roles': [],
+                    'commentable_id': 'original_topic',
+                    'id': 'test_thread'
+                }
+            )
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -2499,7 +2516,8 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, current_vote_status, new_vote_status):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
         """
         Test attempts to edit the "voted" field.
 
@@ -2538,6 +2556,23 @@ class UpdateCommentTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, "edx.forum.response.voted")
+
+            self.assertEqual(
+                event_data,
+                {
+                    'undo_vote': not new_vote_status,
+                    'url': '',
+                    'target_username': self.user.username,
+                    'vote_value': 'up',
+                    'user_forums_roles': [FORUM_ROLE_STUDENT],
+                    'user_course_roles': [],
+                    'commentable_id': 'dummy',
+                    'id': 'test_comment'
+                }
+            )
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
