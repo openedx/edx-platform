@@ -31,7 +31,9 @@ define([
         });
 
         afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('should log edx.course.student_notes.viewed event properly', function() {

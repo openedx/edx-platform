@@ -21,7 +21,7 @@
             },
 
             render: function () {
-                this.$el.html(_.template(this.template, {
+                this.$el.html(_.template(this.template)({
                     enrollment: this.enrollment,
                     modes: this.modes,
                     reasons: this.reasons,

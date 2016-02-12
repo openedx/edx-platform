@@ -21,7 +21,7 @@
             },
 
             render: function () {
-                this.$el.html(_.template(learnerProfileTemplate, {
+                this.$el.html(_.template(learnerProfileTemplate)({
                     username: this.options.accountSettingsModel.get('username'),
                     ownProfile: this.options.ownProfile,
                     showFullProfile: this.showFullProfile()

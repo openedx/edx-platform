@@ -79,6 +79,9 @@
              * underlying server API.
              */
             getPage: function () {
+                // TODO: this.currentPage is currently returning a function sometimes when it is called.
+                // It is possible it always did this, but we either need to investigate more, or just wait until
+                // we replace this code with the pattern library.
                 return this.currentPage + (this.isZeroIndexed ? 1 : 0);
             },
 

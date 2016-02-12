@@ -6,7 +6,7 @@
     "edx-pattern-library": "0.10.4",
     "requirejs": "~2.1.22",
     "uglify-js": "2.4.24",
-    "underscore": "1.4.4"
+    "underscore": "~1.8.3"
   },
   "devDependencies": {
     "jshint": "^2.7.0",

@@ -515,12 +515,6 @@
                 ],
                 exports: 'Discussion'
             },
-            'xmodule_js/common_static/coffee/src/discussion/discussion_filter': {
-                deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
-                ],
-                exports: 'DiscussionFilter'
-            },
             'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings': {
                 deps: [
                     'xmodule_js/common_static/coffee/src/discussion/utils'
@@ -614,7 +608,6 @@
                     'URI',
                     'xmodule_js/common_static/coffee/src/discussion/content',
                     'xmodule_js/common_static/coffee/src/discussion/discussion',
-                    'xmodule_js/common_static/coffee/src/discussion/discussion_filter',
                     'xmodule_js/common_static/coffee/src/discussion/utils',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',
