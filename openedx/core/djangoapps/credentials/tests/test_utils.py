@@ -1,4 +1,7 @@
 """Tests covering Credentials utilities."""
+import unittest
+
+from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
@@ -15,6 +18,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from student.tests.factories import UserFactory
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, TestCase):
     """ Tests covering the retrieval of user credentials from the Credentials

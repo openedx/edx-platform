@@ -6,6 +6,7 @@ import ddt
 import httpretty
 import json
 import mock
+import unittest
 
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
@@ -22,6 +23,7 @@ from student.tests.factories import UserFactory
 TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
     """
     Test the get_api_client function
@@ -46,6 +48,7 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
         self.assertEqual(api_client._store['session'].auth.token, 'test-token')  # pylint: disable=protected-access
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetCompletedCoursesTestCase(TestCase):
     """
     Test the get_completed_courses function
@@ -89,6 +92,7 @@ class GetCompletedCoursesTestCase(TestCase):
         ])
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetCompletedProgramsTestCase(TestCase):
     """
     Test the get_completed_programs function
@@ -115,6 +119,7 @@ class GetCompletedProgramsTestCase(TestCase):
         self.assertEqual(result, [1, 2, 3])
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetAwardedCertificateProgramsTestCase(TestCase):
     """
     Test the get_awarded_certificate_programs function
@@ -155,6 +160,7 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         self.assertEqual(result, [1])
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class AwardProgramCertificateTestCase(TestCase):
     """
     Test the award_program_certificate function
@@ -183,6 +189,7 @@ class AwardProgramCertificateTestCase(TestCase):
         self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 @mock.patch(TASKS_MODULE + '.award_program_certificate')
 @mock.patch(TASKS_MODULE + '.get_awarded_certificate_programs')

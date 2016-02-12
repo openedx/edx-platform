@@ -762,3 +762,7 @@ MAX_BOOKMARKS_PER_COURSE = ENV_TOKENS.get('MAX_BOOKMARKS_PER_COURSE', MAX_BOOKMA
 # Cutoff date for granting audit certificates
 if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
     AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE

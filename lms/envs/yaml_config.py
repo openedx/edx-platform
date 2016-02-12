@@ -313,3 +313,7 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
     INSTALLED_APPS += ('lti_provider',)
     AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
