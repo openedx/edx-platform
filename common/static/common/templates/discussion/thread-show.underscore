@@ -30,7 +30,7 @@
             <div class="post-header-actions post-extended-content">
                 <%=
                 _.template(
-                    $('#forum-actions').html(),
+                    $('#forum-actions').html())(
                     {
                         contentId: cid,
                         contentType: 'post',

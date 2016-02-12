@@ -51,7 +51,7 @@
                                     'span_end': '</a>'
                                 }
                             );
-                            self.$el.append(_.template(teamActionsTemplate, {message: message}));
+                            self.$el.append(_.template(teamActionsTemplate)({message: message}));
                         }
                     });
                     return this;

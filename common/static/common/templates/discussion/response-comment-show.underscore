@@ -2,7 +2,7 @@
   <div class="response-body"><%- body %></div>
   <%=
       _.template(
-          $('#forum-actions').html(),
+          $('#forum-actions').html())(
           {
               contentId: cid,
               contentType: 'comment',

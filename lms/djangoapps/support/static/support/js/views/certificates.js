@@ -44,7 +44,7 @@
                     certificates: this.certificates
                 };
 
-                this.setResults(_.template(resultsTpl, context));
+                this.setResults(_.template(resultsTpl)(context));
             },
 
             renderError: function(error) {

@@ -13,7 +13,7 @@ var setupFullScreenModal = function() {
         "largeALT": smallImageObject.attr('alt'),
         "largeSRC": largeImageSRC
       };
-      var html = _.template($("#image-modal-tpl").text(), data);
+      var html = _.template($("#image-modal-tpl").text())(data);
       $(this).replaceWith(html);
     }
   });

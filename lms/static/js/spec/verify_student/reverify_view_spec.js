@@ -8,7 +8,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
         describe( 'edx.verify_student.ReverifyView', function() {
 
             var TEMPLATES = [
-                "reverify",
                 "webcam_photo",
                 "image_input",
                 "error",
