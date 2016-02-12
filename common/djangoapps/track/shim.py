@@ -177,7 +177,10 @@ class GoogleAnalyticsProcessor(object):
         context = event.get('context', {})
         course_id = context.get('course_id')
 
+        copied_event = event.copy()
         if course_id is not None:
-            event['label'] = course_id
+            copied_event['label'] = course_id
 
-        event['nonInteraction'] = 1
+        copied_event['nonInteraction'] = 1
+
+        return copied_event
