@@ -76,7 +76,7 @@
                         fields: html || '',
                     });
 
-                    this.$el.html(_.template(this.tpl, data));
+                    this.$el.html(_.template(this.tpl)(data));
 
                     this.postRender();
                     this.validateCountry();
@@ -85,7 +85,7 @@
                 },
 
                 renderSuccess: function() {
-                    this.$el.html(_.template(successTpl, {
+                    this.$el.html(_.template(successTpl)({
                         course: this.model.get('course'),
                         dashboard_url: this.context.dashboard_url
                     }));

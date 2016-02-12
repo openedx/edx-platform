@@ -18,7 +18,9 @@ function($, Backbone, _, Utils) {
         uploadTpl: '#file-upload',
 
         initialize: function () {
-            _.bindAll(this);
+            _.bindAll(this,
+                'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler'
+            );
 
             this.file = false;
             this.render();

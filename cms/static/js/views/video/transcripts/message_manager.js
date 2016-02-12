@@ -29,7 +29,9 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         },
 
         initialize: function () {
-            _.bindAll(this);
+            _.bindAll(this,
+                'importHandler', 'replaceHandler', 'chooseHandler', 'useExistingHandler', 'showError', 'hideError'
+            );
 
             this.component_locator = this.$el.closest('[data-locator]').data('locator');
 

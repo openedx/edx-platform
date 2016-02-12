@@ -43,7 +43,7 @@ var edx = edx || {};
                 courseKey: this.courseKey
             });
 
-            this.$el.html(_.template(templateHtml, context));
+            this.$el.html(_.template(templateHtml)(context));
 
             this.trackLinks();
 
@@ -69,7 +69,7 @@ var edx = edx || {};
             context.course_key = this.courseKey;
             context.username = this.username;
             context.platformName = this.$el.data('platform-name');
-            providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
+            providerDiv.html(_.template(templateHtml)(context)).removeClass('hidden');
         },
 
         renderError: function () {
