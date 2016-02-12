@@ -56,7 +56,7 @@
                     if(this.collection.findWhere(model)){
                         message = gettext("<%= user %> already in exception list.");
                         this.escapeAndShowMessage(
-                            _.template(message, {user: (user_name || user_email)})
+                            _.template(message)({user: (user_name || user_email)})
                         );
                     }
                     else if(certificate_exception.isValid()){
@@ -67,7 +67,7 @@
                                 success: this.showSuccess(
                                     this,
                                     true,
-                                    _.template(message, {user: (user_name || user_email)})
+                                    _.template(message)({user: (user_name || user_email)})
                                 ),
                                 error: this.showError(this)
                             }

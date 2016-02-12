@@ -43,7 +43,7 @@
 
                     if (this.collection.findWhere({user: user})) {
                         message = gettext("Certificate of <%= user %> has already been invalidated. Please check your spelling and retry."); // jshint ignore:line
-                        this.escapeAndShowMessage(_.template(message, {user: user}));
+                        this.escapeAndShowMessage(_.template(message)({user: user}));
                     }
                     else if (certificate_invalidation.isValid()) {
                         var self = this;
@@ -53,7 +53,7 @@
                             success: function(model) {
                                 self.collection.add(model);
                                 message = gettext('Certificate has been successfully invalidated for <%= user %>.');
-                                self.escapeAndShowMessage(_.template(message, {user: user}));
+                                self.escapeAndShowMessage(_.template(message)({user: user}));
                             },
 
                             error: function(model, response) {

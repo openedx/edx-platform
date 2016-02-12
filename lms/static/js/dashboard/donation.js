@@ -97,7 +97,7 @@ var edx = edx || {};
             * @returns {DonationView}
             */
             render: function() {
-                var html = _.template($("#donation-tpl").html(), {});
+                var html = _.template($("#donation-tpl").html())({});
                 this.$el.html(html);
                 this.$amount = $("input[name=\"amount\"]", this.$el);
                 this.$submit = $(".action-donate", this.$el);
