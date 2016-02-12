@@ -508,12 +508,6 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css='{} .section-name .save-button'.format(parent_css)).first.click()
         self.wait_for_ajax()
 
-    def click_release_date(self):
-        """
-        Open release date edit modal of first section in course outline
-        """
-        self.q(css='div.section-published-date a.edit-release-date').first.click()
-
     def sections(self):
         """
         Returns the sections of this course outline page.

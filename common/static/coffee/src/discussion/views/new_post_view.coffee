@@ -17,7 +17,7 @@ if Backbone?
               mode: @mode,
               form_id: @mode + (if @topicId then "-" + @topicId else "")
           })
-          @$el.html(_.template($("#new-post-template").html(), context))
+          @$el.html(_.template($("#new-post-template").html())(context))
           threadTypeTemplate = _.template($("#thread-type-template").html());
           if $('.js-group-select').is(':disabled')
               $('.group-selector-wrapper').addClass('disabled')

@@ -35,7 +35,7 @@
 
             render: function () {
                 var user = this.enrollments.user;
-                this.$el.html(_.template(enrollmentTemplate, {
+                this.$el.html(_.template(enrollmentTemplate)({
                     user: user,
                     enrollments: this.enrollments,
                     formatDate: function (date) {
