@@ -864,6 +864,31 @@ class CourseEnrollmentManager(models.Manager):
 
         return enrollment_number
 
+    def num_enrolled_in_ccx_exclude_admin(self, course_id):
+        """
+        Returns the count of active enrollments in a course excluding ccx coach, admins and staff.
+
+        'course_id' is the course_id to return enrollments
+        """
+        # To avoid circular imports.
+        from roles import (CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole)
+        course_locator = course_id
+        if getattr(course_id, 'ccx', None):
+            course_locator = course_id.to_course_locator()
+
+        staff = CourseStaffRole(course_locator).users_with_role()
+        admins = CourseInstructorRole(course_locator).users_with_role()
+        coaches = CourseCcxCoachRole(course_locator).users_with_role()
+
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
+            course_id=course_id,
+            is_active=1,
+        ).exclude(user__in=staff
+        ).exclude(user__in=admins
+        ).exclude(user__in=coaches).count()
+
+        return enrollment_number
+
     def is_course_full(self, course):
         """
         Returns a boolean value regarding whether a course has already reached it's max enrollment
@@ -871,7 +896,12 @@ class CourseEnrollmentManager(models.Manager):
         """
         is_course_full = False
         if course.max_student_enrollments_allowed is not None:
-            is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
+            if getattr(course.id, 'ccx', None):
+                is_course_full = (
+                    self.num_enrolled_in_ccx_exclude_admin(course.id) >= course.max_student_enrollments_allowed
+                )
+            else:
+                is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
         return is_course_full
 
     def users_enrolled_in(self, course_id):
