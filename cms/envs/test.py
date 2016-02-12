@@ -129,9 +129,25 @@ DATABASES = {
     },
 }
 
-# This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+# Set this env variable to summarily disable all migrations, regardless of how
+# apps get installed/imported.  This speeds up local testing significantly.
+if os.getenv('DISABLE_MIGRATIONS'):
+
+    class DisableMigrations(object):  # pylint: disable=missing-docstring
+
+        def __contains__(self, item):
+            return True
+
+        def __getitem__(self, item):
+            return "notmigrations"
+
+    MIGRATION_MODULES = DisableMigrations()
+else:
+    # By default, fall back to an earlier optimization which disables *some*
+    # migrations, but not all.  A number of tests are written against this
+    # optimization and require that migrations have been skipped in order
+    # to pass.
+    MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
 
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview"
