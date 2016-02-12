@@ -22,9 +22,7 @@ define(["underscore", "backbone", "gettext", "text!templates/paging-header.under
                     currentPage = collection.currentPage,
                     lastPage = collection.totalPages - 1,
                     messageHtml = this.messageHtml();
-                this.$el.html(_.template(paging_header_template, {
-                    messageHtml: messageHtml
-                }));
+                this.$el.html(_.template(paging_header_template)({ messageHtml: messageHtml}));
                 this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);
                 this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
                 return this;

@@ -89,7 +89,7 @@
             },
 
             render: function() {
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html( _.template(this.tpl)({
                     mode: this.activeForm
                 }));
 

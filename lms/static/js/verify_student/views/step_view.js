@@ -20,9 +20,14 @@
 
             /* Mix non-conflicting functions from underscore.string
              * (all but include, contains, and reverse) into the
-             * Underscore namespace
+             * Underscore namespace.
+             *
+             * TODO: when running unit tests, _s is not defined. My first attempt at upgrading
+             * underscore.string did not solve this issue.
              */
-            _.mixin( _s.exports() );
+            if (_s) {
+                _.mixin(_s.exports());
+            }
         },
 
         render: function() {
@@ -33,7 +38,7 @@
             this.updateContext( this.templateContext() ).done(
                 function( templateContext ) {
                     // Render the template into the DOM
-                    $( this.el ).html( _.template( templateHtml, templateContext ) );
+                    $( this.el ).html( _.template( templateHtml)( templateContext ) );
 
                     // Allow subclasses to install custom event handlers
                     this.postRender();

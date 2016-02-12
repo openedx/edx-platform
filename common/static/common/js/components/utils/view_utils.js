@@ -244,7 +244,7 @@
                 if (!validateTotalKeyLength(key_field_selectors)) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
                     $(selectors.errorMessage).html(
-                        '<p>' + _.template(message_tpl, {limit: MAX_SUM_KEY_LENGTH}) + '</p>'
+                        '<p>' + _.template(message_tpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
                     );
                     $(selectors.save).addClass(classes.disabled);
                 } else {

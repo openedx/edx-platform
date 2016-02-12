@@ -11,7 +11,7 @@
             },
 
             render: function () {
-                this.$el.html(_.template(accountSettingsTemplate, {
+                this.$el.html(_.template(accountSettingsTemplate)({
                     sections: this.options.sectionsData
                 }));
                 return this;

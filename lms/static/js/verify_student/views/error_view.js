@@ -21,8 +21,7 @@
         },
 
         render: function() {
-            var renderedHtml = _.template(
-                $( '#error-tpl' ).html(),
+            var renderedHtml = _.template($( '#error-tpl' ).html())(
                 {
                     errorTitle: this.model.get( 'errorTitle' ),
                     errorMsg: this.model.get( 'errorMsg' )

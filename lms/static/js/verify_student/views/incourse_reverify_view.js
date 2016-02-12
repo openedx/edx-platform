@@ -40,8 +40,7 @@
         },
 
         render: function() {
-            var renderedTemplate = _.template(
-                $( this.templateId ).html(),
+            var renderedTemplate = _.template($( this.templateId ).html())(
                 {
                     courseKey: this.courseKey,
                     platformName: this.platformName
