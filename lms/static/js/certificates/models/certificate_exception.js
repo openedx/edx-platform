@@ -12,6 +12,7 @@
         ],
 
         function(_, str, Backbone, gettext){
+            str = str || _.str;
 
             return Backbone.Model.extend({
                 idAttribute: 'id',
@@ -30,7 +31,7 @@
                 },
 
                 validate: function(attrs){
-                    if (!_.str.trim(attrs.user_name) && !_.str.trim(attrs.user_email)) {
+                    if (!str.trim(attrs.user_name) && !str.trim(attrs.user_email)) {
                         return gettext('Student username/email field is required and can not be empty. ' +
                             'Kindly fill in username/email and then press "Add to Exception List" button.');
                     }

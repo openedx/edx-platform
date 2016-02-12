@@ -33,7 +33,7 @@
                         context, true
                     );
                 }
-                this.$el.html(_.template(headerTemplate, {
+                this.$el.html(_.template(headerTemplate)({
                     message: message,
                     srInfo: this.srInfo,
                     sortableFields: this.collection.sortableFields,

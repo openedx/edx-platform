@@ -254,13 +254,13 @@ from xmodule.tabs import CourseTabList
             htmlStr = "${_('An error has occurred.')}";
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             htmlStr += " " + _.template(
-              "${_('Please {link_start}send us e-mail{link_end}.')}",
-              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
-              {interpolate: /\{(.+?)\}/g})
+              "${_('Please {link_start}send us e-mail{link_end}.')}", {interpolate: /\{(.+?)\}/g})(
+                {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'}
+              );
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += "${_('Please try again later.')}";
+            htmlStr += " " + "${_('Please try again later.')}";
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:

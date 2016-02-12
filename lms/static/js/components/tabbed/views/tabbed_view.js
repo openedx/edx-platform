@@ -71,7 +71,7 @@
                        var self = this;
                        this.$el.html(this.template({}));
                        _.each(this.tabs, function(tabInfo, index) {
-                           var tabEl = $(_.template(tabTemplate, {
+                           var tabEl = $(_.template(tabTemplate)({
                                    index: index,
                                    title: tabInfo.title,
                                    url: tabInfo.url,
