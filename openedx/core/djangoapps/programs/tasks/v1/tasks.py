@@ -17,6 +17,8 @@ from openedx.core.lib.token_utils import get_id_token
 
 
 LOGGER = get_task_logger(__name__)
+# Under cms the following setting is not defined, leading to errors during tests.
+ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 
 
 def get_api_client(api_config, student):
@@ -115,7 +117,7 @@ def award_program_certificate(client, username, program_id):
     })
 
 
-@task(bind=True, ignore_result=True)
+@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
