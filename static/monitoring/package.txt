@@ -101,7 +101,6 @@
         "tinymce": "4.0.20",
         "tinymce.jquery": "4.0.20",
         // many tinymce plugins...
-        "underscore": "1.4.4",
         "URI": "1.11.2",
         "url": "1.8.4",
         // "urlify": "unknown",
