@@ -182,7 +182,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db',
+        'NAME': 'edx.db',
+        'TEST_NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
 
