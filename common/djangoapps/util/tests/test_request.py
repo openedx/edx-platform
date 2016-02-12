@@ -50,8 +50,26 @@ class ResponseTestCase(unittest.TestCase):
         self.assertIsNone(course_id_from_url('/login'))
         self.assertIsNone(course_id_from_url('/course/edX/maths/2020'))
         self.assertIsNone(course_id_from_url('/courses/edX/maths/'))
+        self.assertIsNone(course_id_from_url('/api/courses/v1/blocks/edX/maths/2020'))
+        self.assertIsNone(course_id_from_url('/api/courses/v1/blocks/course-v1:edX+maths+2020'))
 
         course_id = course_id_from_url('/courses/edX/maths/2020')
         self.assertEqual(course_id.org, 'edX')
         self.assertEqual(course_id.course, 'maths')
         self.assertEqual(course_id.run, '2020')
+
+        course_id = course_id_from_url('/courses/course-v1:edX+maths+2020')
+        self.assertEqual(course_id.org, 'edX')
+        self.assertEqual(course_id.course, 'maths')
+        self.assertEqual(course_id.run, '2020')
+
+        course_id = course_id_from_url('/api/courses/v1/courses/course-v1:edX+maths+2020')
+        self.assertEqual(course_id.org, 'edX')
+        self.assertEqual(course_id.course, 'maths')
+        self.assertEqual(course_id.run, '2020')
+
+        course_id = course_id_from_url('/api/courses/v1/courses/edX/maths/2020')
+        self.assertEqual(course_id.org, 'edX')
+        self.assertEqual(course_id.course, 'maths')
+        self.assertEqual(course_id.run, '2020')
+

@@ -7,8 +7,8 @@ from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-
-COURSE_REGEX = re.compile(r'^.*?/(api/courses/v1/)?courses/{}'.format(settings.COURSE_ID_PATTERN))
+# accommodates course api urls, excluding /blocks routes.
+COURSE_REGEX = re.compile(r'^(.*?/courses/)+(?!v[0-9]+/blocks){}'.format(settings.COURSE_ID_PATTERN))
 
 
 def safe_get_host(request):
