@@ -463,10 +463,4 @@ def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
     """
-    if course:
-        try:
-            return course.self_paced and SelfPacedConfiguration.current().enabled
-        except AttributeError:
-            # if course object has no self_paced attribute
-            pass
-    return False
+    return course.self_paced and SelfPacedConfiguration.current().enabled if course else False
