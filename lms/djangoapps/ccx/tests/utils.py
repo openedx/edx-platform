@@ -6,15 +6,13 @@ import pytz
 
 from django.conf import settings
 
-from lms.djangoapps.ccx.overrides import override_field_for_ccx
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from student.roles import (
     CourseCcxCoachRole,
     CourseInstructorRole,
     CourseStaffRole
 )
 from student.tests.factories import (
-    UserFactory,
+    UserFactory
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -25,6 +23,9 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
 )
+
+from lms.djangoapps.ccx.overrides import override_field_for_ccx
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 class CcxTestCase(SharedModuleStoreTestCase):
@@ -78,7 +79,6 @@ class CcxTestCase(SharedModuleStoreTestCase):
         Set up tests
         """
         super(CcxTestCase, self).setUp()
-
         # Create instructor account
         self.coach = UserFactory.create()
         # create an instance of modulestore
