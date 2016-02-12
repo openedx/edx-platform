@@ -25,7 +25,11 @@ from discussion_api.permissions import (
     get_initializable_thread_fields,
 )
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from django_comment_client.base.views import track_comment_created_event, track_thread_created_event
+from django_comment_client.base.views import (
+    track_comment_created_event,
+    track_thread_created_event,
+    track_voted_event,
+)
 from django_comment_common.signals import (
     thread_created,
     thread_edited,
@@ -496,7 +500,7 @@ def _check_editable_fields(cc_content, data, context):
     )
 
 
-def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context):
+def _do_extra_actions(api_content, cc_content, request_fields, actions_form, context, request):
     """
     Perform any necessary additional actions related to content creation or
     update that require a separate comments service request.
@@ -505,25 +509,44 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
         if field in request_fields and form_value != api_content[field]:
             api_content[field] = form_value
             if field == "following":
-                if form_value:
-                    context["cc_requester"].follow(cc_content)
-                else:
-                    context["cc_requester"].unfollow(cc_content)
+                _handle_following_field(form_value, context["cc_requester"], cc_content)
             elif field == "abuse_flagged":
-                if form_value:
-                    cc_content.flagAbuse(context["cc_requester"], cc_content)
-                else:
-                    cc_content.unFlagAbuse(context["cc_requester"], cc_content, removeAll=False)
+                _handle_abuse_flagged_field(form_value, context["cc_requester"], cc_content)
+            elif field == "voted":
+                _handle_voted_field(form_value, cc_content, api_content, request, context)
             else:
-                assert field == "voted"
-                signal = thread_voted if cc_content.type == 'thread' else comment_voted
-                signal.send(sender=None, user=context["request"].user, post=cc_content)
-                if form_value:
-                    context["cc_requester"].vote(cc_content, "up")
-                    api_content["vote_count"] += 1
-                else:
-                    context["cc_requester"].unvote(cc_content)
-                    api_content["vote_count"] -= 1
+                raise ValidationError({field: ["Invalid Key"]})
+
+
+def _handle_following_field(form_value, user, cc_content):
+    """follow/unfollow thread for the user"""
+    if form_value:
+        user.follow(cc_content)
+    else:
+        user.unfollow(cc_content)
+
+
+def _handle_abuse_flagged_field(form_value, user, cc_content):
+    """mark or unmark thread/comment as abused"""
+    if form_value:
+        cc_content.flagAbuse(user, cc_content)
+    else:
+        cc_content.unFlagAbuse(user, cc_content, removeAll=False)
+
+
+def _handle_voted_field(form_value, cc_content, api_content, request, context):
+    """vote or undo vote on thread/comment"""
+    signal = thread_voted if cc_content.type == 'thread' else comment_voted
+    signal.send(sender=None, user=context["request"].user, post=cc_content)
+    if form_value:
+        context["cc_requester"].vote(cc_content, "up")
+        api_content["vote_count"] += 1
+    else:
+        context["cc_requester"].unvote(cc_content)
+        api_content["vote_count"] -= 1
+    track_voted_event(
+        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True
+    )
 
 
 def create_thread(request, thread_data):
@@ -568,7 +591,7 @@ def create_thread(request, thread_data):
     cc_thread = serializer.instance
     thread_created.send(sender=None, user=user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
@@ -609,7 +632,7 @@ def create_comment(request, comment_data):
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
+    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context, request)
 
     track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
 
@@ -646,7 +669,7 @@ def update_thread(request, thread_id, update_data):
         # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context, request)
     return api_thread
 
 
@@ -690,7 +713,7 @@ def update_comment(request, comment_id, update_data):
         serializer.save()
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
+    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context, request)
     return api_comment
 
 
