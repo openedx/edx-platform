@@ -30,7 +30,7 @@ __test__ = False  # do not collect
 ])
 def test_acceptance(options):
     """
-    Run the acceptance tests for the either lms or cms
+    Run the acceptance tests for either lms or cms
     """
     opts = {
         'fasttest': getattr(options, 'fasttest', False),

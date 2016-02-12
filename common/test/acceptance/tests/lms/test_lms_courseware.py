@@ -66,7 +66,7 @@ class CoursewareTest(UniqueCourseTest):
         """
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
-        self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 1')
+        self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
     def _create_breadcrumb(self, index):
         """ Create breadcrumb """
@@ -103,8 +103,8 @@ class CoursewareTest(UniqueCourseTest):
 
         # Visit courseware as a student.
         self.courseware_page.visit()
-        # Problem name should be "TEST PROBLEM 2".
-        self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
+        # Problem name should be "Test Problem 2".
+        self.assertEqual(self.problem_page.problem_name, 'Test Problem 2')
 
     def test_course_tree_breadcrumb(self):
         """
@@ -217,7 +217,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.course_outline.proctoring_items_are_displayed())
 
     def test_proctored_exam_flow(self):
@@ -232,9 +232,9 @@ class ProctoredExamTest(UniqueCourseTest):
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.select_advanced_tab()
         self.course_outline.make_exam_proctored()
 
         LogoutPage(self.browser).visit()
@@ -256,9 +256,9 @@ class ProctoredExamTest(UniqueCourseTest):
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.select_advanced_tab()
         self.course_outline.make_exam_timed()
 
         LogoutPage(self.browser).visit()
@@ -281,8 +281,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_none_exam()
         self.assertFalse(self.course_outline.time_allotted_field_visible())
@@ -300,8 +300,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_timed_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
@@ -319,8 +319,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
@@ -338,8 +338,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.exam_review_rules_field_visible())
@@ -361,8 +361,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_timed_exam()
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
@@ -386,8 +386,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_practice_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())

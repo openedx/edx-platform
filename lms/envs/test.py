@@ -226,14 +226,6 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
-    'block_cache': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_block_cache',
-    },
-    'lms.course_blocks': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_course_blocks',
-    },
 }
 
 # Dummy secret key for dev
@@ -450,6 +442,8 @@ MICROSITE_CONFIGURATION = {
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
         "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "LINKEDIN_COMPANY_ID": "test",
+        "FACEBOOK_APP_ID": "12345678908",
         "urls": {
             'ABOUT': 'testmicrosite/about',
             'PRIVACY': 'testmicrosite/privacy',
@@ -493,7 +487,8 @@ MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
     COMMON_ROOT / 'test' / 'templates',
-    COMMON_ROOT / 'test' / 'test_microsites'
+    COMMON_ROOT / 'test' / 'test_microsites',
+    REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',
 ])
 
 
@@ -569,3 +564,8 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'https://test-provider/oauth2',
     'JWT_AUDIENCE': 'test-key',
 })
+
+# Disable the use of the plugin manager in the transformer registry for
+# better performant unit tests.
+from openedx.core.lib.block_structure.transformer_registry import TransformerRegistry
+TransformerRegistry.USE_PLUGIN_MANAGER = False

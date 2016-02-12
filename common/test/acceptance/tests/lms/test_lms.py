@@ -16,7 +16,9 @@ from ..helpers import (
     load_data_str,
     generate_course_key,
     select_option_by_value,
-    element_has_text
+    element_has_text,
+    select_option_by_text,
+    get_selected_option_text
 )
 from ...pages.lms import BASE_URL
 from ...pages.lms.account_settings import AccountSettingsPage
@@ -49,7 +51,17 @@ class ForgotPasswordPageTest(UniqueCourseTest):
     def setUp(self):
         """ Initialize the page object """
         super(ForgotPasswordPageTest, self).setUp()
+        self.user_info = self._create_user()
         self.reset_password_page = ResetPasswordPage(self.browser)
+
+    def _create_user(self):
+        """
+        Create a unique user
+        """
+        auto_auth = AutoAuthPage(self.browser).visit()
+        user_info = auto_auth.user_info
+        LogoutPage(self.browser).visit()
+        return user_info
 
     def test_reset_password_form_visibility(self):
         # Navigate to the password reset page
@@ -57,6 +69,18 @@ class ForgotPasswordPageTest(UniqueCourseTest):
 
         # Expect that reset password form is visible on the page
         self.assertTrue(self.reset_password_page.is_form_visible())
+
+    def test_reset_password_confirmation_box_visibility(self):
+        # Navigate to the password reset page
+        self.reset_password_page.visit()
+
+        # Navigate to the password reset form and try to submit it
+        self.reset_password_page.fill_password_reset_form(self.user_info['email'])
+
+        self.reset_password_page.is_success_visible(".submission-success")
+
+        # Expect that we're shown a success message
+        self.assertIn("Password Reset Email Sent", self.reset_password_page.get_success_message())
 
 
 @attr('shard_8')
@@ -595,7 +619,7 @@ class HighLevelTabTest(UniqueCourseTest):
 
         # Navigate to the course info page from the progress page
         self.progress_page.visit()
-        self.tab_nav.go_to_tab('Course Info')
+        self.tab_nav.go_to_tab('Home')
 
         # Expect just one update
         self.assertEqual(self.course_info_page.num_updates, 1)
@@ -665,13 +689,13 @@ class HighLevelTabTest(UniqueCourseTest):
 
     def test_courseware_nav(self):
         """
-        Navigate to a particular unit in the courseware.
+        Navigate to a particular unit in the course.
         """
-        # Navigate to the courseware page from the info page
+        # Navigate to the course page from the info page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
-        # Check that the courseware navigation appears correctly
+        # Check that the course navigation appears correctly
         EXPECTED_SECTIONS = {
             'Test Section': ['Test Subsection'],
             'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
@@ -860,9 +884,9 @@ class TooltipTest(UniqueCourseTest):
         Verify that tooltips are displayed when you hover over the sequence nav bar.
         """
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
-        self.assertTrue(self.courseware_page.tooltips_displayed())
+        self.courseware_page.verify_tooltips_displayed()
 
 
 @attr('shard_1')
@@ -1009,11 +1033,11 @@ class ProblemExecutionTest(UniqueCourseTest):
     def test_python_execution_in_problem(self):
         # Navigate to the problem page
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
         self.course_nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'PYTHON PROBLEM')
+        self.assertEqual(problem_page.problem_name.upper(), 'PYTHON PROBLEM')
 
         # Does the page have computation results?
         self.assertIn("What is the sum of 17 and 3?", problem_page.problem_text)
@@ -1059,14 +1083,14 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at courseware
+         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
          page.
-            Given that I am on the courseware page
-            When I view the courseware that has an entrance exam
+            Given that I am on the course page
+            When I view the course that has an entrance exam
             Then there should be an "Entrance Exam" chapter.'
         """
         entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
-        # visit courseware page and make sure there is not entrance exam chapter.
+        # visit course page and make sure there is not entrance exam chapter.
         self.courseware_page.visit()
         self.courseware_page.wait_for_page()
         self.assertFalse(element_has_text(
@@ -1129,4 +1153,51 @@ class NotLiveRedirectTest(UniqueCourseTest):
         self.assertIn(
             'The course you are looking for does not start until',
             page.banner_text
+        )
+
+
+@attr('shard_1')
+class LMSLanguageTest(UniqueCourseTest):
+    """ Test suite for the LMS Language """
+    def setUp(self):
+        super(LMSLanguageTest, self).setUp()
+        self.dashboard_page = DashboardPage(self.browser)
+        self.account_settings = AccountSettingsPage(self.browser)
+        AutoAuthPage(self.browser).visit()
+
+    def test_lms_language_change(self):
+        """
+        Scenario: Ensure that language selection is working fine.
+        First I go to the user dashboard page in LMS. I can see 'English' is selected by default.
+        Then I choose 'Dummy Language' from drop down (at top of the page).
+        Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
+        in both drop downs.
+        After that I select the 'English' language and visit the dashboard page again.
+        Then I can see that top level language selector persist its value to 'English'.
+        """
+        self.dashboard_page.visit()
+        language_selector = self.dashboard_page.language_selector
+        self.assertEqual(
+            get_selected_option_text(language_selector),
+            u'English'
+        )
+
+        select_option_by_text(language_selector, 'Dummy Language (Esperanto)')
+        self.dashboard_page.wait_for_ajax()
+        self.account_settings.visit()
+        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'Dummy Language (Esperanto)')
+        self.assertEqual(
+            get_selected_option_text(language_selector),
+            u'Dummy Language (Esperanto)'
+        )
+
+        # changed back to English language.
+        select_option_by_text(language_selector, 'English')
+        self.account_settings.wait_for_ajax()
+        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'English')
+
+        self.dashboard_page.visit()
+        self.assertEqual(
+            get_selected_option_text(language_selector),
+            u'English'
         )

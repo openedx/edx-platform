@@ -225,6 +225,17 @@ class DashboardPage(PageObject):
                 return True
         return False
 
+    @property
+    def language_selector(self):
+        """
+        return language selector
+        """
+        self.wait_for_element_visibility(
+            '#settings-language-value',
+            'Language selector element is available'
+        )
+        return self.q(css='#settings-language-value')
+
 
 class DashboardPageWithPrograms(DashboardPage):
     """

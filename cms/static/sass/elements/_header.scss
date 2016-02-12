@@ -43,8 +43,19 @@
     vertical-align: middle;
   }
 
+  .user-language-selector {
+    width: 120px;
+    display: inline-block;
+    margin: 0 10px 0 5px;
+    vertical-align: sub;
+
+    .language-selector {
+      width: 120px;
+    }
+  }
+
   .nav-account {
-    width: 100%;
+    width: auto;
   }
 
   // basic layout - nav items
@@ -208,6 +219,13 @@
         }
       }
     }
+
+    .settings-language-form {
+      margin-top: 4px;
+      .language-selector {
+        width: 130px;
+      }
+    }
   }
 
   // ====================
@@ -229,11 +247,11 @@
 .is-signedin {
 
   .wrapper-l {
-    width: flex-grid(9,12);
+    width: flex-grid(8,12);
   }
 
   .wrapper-r {
-    width: flex-grid(3,12);
+    width: flex-grid(4,12);
   }
 
   .branding {
@@ -253,11 +271,11 @@
   .wrapper-header {
 
     .wrapper-l {
-      width: flex-grid(9,12);
+      width: flex-grid(8,12);
     }
 
     .wrapper-r {
-      width: flex-grid(3,12);
+      width: flex-grid(4,12);
     }
 
     .branding {

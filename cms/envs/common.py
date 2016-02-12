@@ -60,6 +60,8 @@ from lms.envs.common import (
 
     # Django REST framework configuration
     REST_FRAMEWORK,
+
+    STATICI18N_OUTPUT_DIR
 )
 from path import Path as path
 from warnings import simplefilter
@@ -188,6 +190,9 @@ FEATURES = {
     'ENABLE_SPECIAL_EXAMS': False,
 
     'ORGANIZATIONS_APP': False,
+
+    # Show Language selector
+    'SHOW_LANGUAGE_SELECTOR': False,
 }
 
 ENABLE_JASMINE = False
@@ -325,6 +330,9 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
+
+    # This is used to set or update the user language preferences.
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
@@ -465,6 +473,8 @@ LANGUAGE_DICT = dict(LANGUAGES)
 USE_I18N = True
 USE_L10N = True
 
+STATICI18N_ROOT = PROJECT_ROOT / "static"
+
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 
@@ -483,7 +493,6 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -842,6 +851,12 @@ INSTALLED_APPS = (
 
     # Credentials support
     'openedx.core.djangoapps.credentials',
+
+    # edx-milestones service
+    'milestones',
+
+    # Static i18n support
+    'statici18n',
 )
 
 
@@ -948,9 +963,6 @@ OPTIONAL_APPS = (
     # edxval
     'edxval',
 
-    # milestones
-    'milestones',
-
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 )
@@ -992,11 +1004,6 @@ ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 
 ### Default language for a new course
 DEFAULT_COURSE_LANGUAGE = "en"
-
-# Adding components in this list will disable the creation of new problem for
-# those components in Studio. Existing problems will work fine and one can edit
-# them in Studio.
-DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 # Specify XBlocks that should be treated as advanced problems. Each entry is a
 # dict:
@@ -1049,6 +1056,31 @@ XBLOCK_SETTINGS = {
     }
 }
 
+################################ XBlock Deprecation ################################
+
+# The following settings are used for deprecating XBlocks.
+
+# Adding an XBlock to this list does the following:
+# 1. Shows a warning on the course outline if the XBlock is listed in
+#    "Advanced Module List" in "Advanced Settings" page.
+# 2. List all instances of that XBlock on the top of the course outline page asking
+#    course authors to delete or replace the instances.
+DEPRECATED_BLOCK_TYPES = [
+    'peergrading',
+    'combinedopenended',
+    'graphical_slider_tool',
+    'randomize',
+]
+
+# Adding components in this list will disable the creation of new problems for
+# those advanced components in Studio. Existing problems will work fine
+# and one can edit them in Studio.
+# DEPRECATED. Please use /admin/xblock_django/xblockdisableconfig instead.
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+
+# XBlocks can be disabled from rendering in LMS Courseware by adding them to
+# /admin/xblock_django/xblockdisableconfig/.
+
 ################################ Settings for Credit Course Requirements ################################
 # Initial delay used for retrying tasks.
 # Additional retries use longer delays.
@@ -1064,16 +1096,6 @@ CREDIT_TASK_MAX_RETRIES = 5
 # or denied for credit.
 CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 
-
-################################ Deprecated Blocks Info ################################
-
-DEPRECATED_BLOCK_TYPES = [
-    'peergrading',
-    'combinedopenended',
-    'graphical_slider_tool',
-]
-
-
 ################################ Settings for Microsites ################################
 
 ### Select an implementation for the microsite backend
@@ -1088,8 +1110,7 @@ MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.Filebas
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
-#### PROCTORING CONFIGURATION DEFAULTS
-
+############################### PROCTORING CONFIGURATION DEFAULTS ##############
 PROCTORING_BACKEND_PROVIDER = {
     'class': 'edx_proctoring.backends.null.NullBackendProvider',
     'options': {},
@@ -1104,3 +1125,13 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
+
+USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
+
+# Partner support link for CMS footer
+PARTNER_SUPPORT_EMAIL = ''
+
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'

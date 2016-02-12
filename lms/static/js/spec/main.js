@@ -221,7 +221,7 @@
                 exports: 'Markdown.Converter'
             },
             'Markdown.Editor': {
-                deps: ['Markdown.Converter'],
+                deps: ['Markdown.Converter', 'gettext', 'underscore'],
                 exports: 'Markdown.Editor'
             },
             'Markdown.Sanitizer': {
@@ -708,6 +708,7 @@
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
         'lms/include/js/spec/navigation_spec.js',
+        'lms/include/js/spec/courseware/updates_visibility.js',
         'lms/include/js/spec/discovery/collections/filters_spec.js',
         'lms/include/js/spec/discovery/models/course_card_spec.js',
         'lms/include/js/spec/discovery/models/course_directory_spec.js',
@@ -744,7 +745,8 @@
         'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
         'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
-        'lms/include/js/spec/views/message_banner_spec.js'
+        'lms/include/js/spec/views/message_banner_spec.js',
+        'lms/include/js/spec/markdown_editor_spec.js'
     ]);
 
 }).call(this, requirejs, define);

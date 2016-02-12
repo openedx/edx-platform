@@ -58,6 +58,9 @@ class InstructorTask(models.Model):
     `created` stores date that entry was first created
     `updated` stores date that entry was last modified
     """
+    class Meta(object):
+        app_label = "instructor_task"
+
     task_type = models.CharField(max_length=50, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     task_key = models.CharField(max_length=255, db_index=True)

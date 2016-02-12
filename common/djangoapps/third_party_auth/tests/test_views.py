@@ -143,3 +143,9 @@ class SAMLAuthTest(SAMLTestCase):
         self.enable_saml()
         response = self.client.get(self.LOGIN_URL)
         self.assertEqual(response.status_code, 302)
+
+    def test_login_disabled(self):
+        """ When SAML is not enabled, the login view should return 404 """
+        self.enable_saml(enabled=False)
+        response = self.client.get(self.LOGIN_URL)
+        self.assertEqual(response.status_code, 404)

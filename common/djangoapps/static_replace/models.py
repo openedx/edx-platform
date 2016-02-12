@@ -27,3 +27,28 @@ class AssetBaseUrlConfig(ConfigurationModel):
 
     def __unicode__(self):
         return unicode(repr(self))
+
+
+class AssetExcludedExtensionsConfig(ConfigurationModel):
+    """Configuration for the the excluded file extensions when canonicalizing static asset paths."""
+
+    class Meta(object):
+        app_label = 'static_replace'
+
+    excluded_extensions = TextField(
+        default='html',
+        help_text='The file extensions to exclude from canonicalization.  No leading period required. ' +
+        'Values should be space separated i.e. "html svg css"'
+    )
+
+    @classmethod
+    def get_excluded_extensions(cls):
+        """Gets the excluded file extensions when canonicalizing static asset paths"""
+        add_period = lambda x: '.' + x
+        return map(add_period, cls.current().excluded_extensions.split())
+
+    def __repr__(self):
+        return '<AssetExcludedExtensionsConfig(extensions={})>'.format(self.get_excluded_extensions())
+
+    def __unicode__(self):
+        return unicode(repr(self))

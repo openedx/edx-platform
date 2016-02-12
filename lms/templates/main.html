@@ -19,18 +19,6 @@ from branding import api as branding_api
 ## embedding theme conditionals into templates. All inheriting
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
-<%def name="theme_enabled()">
-  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
-</%def>
-
-<%def name="stanford_theme_enabled()">
-  <%
-    if not theme_enabled():
-      return False
-
-    return getattr(settings, "THEME_NAME", None) == "stanford"
-  %>
-</%def>
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
@@ -51,7 +39,11 @@ from branding import api as branding_api
       </script>
   % endif
 
-  <script type="text/javascript" src="/i18n.js"></script>
+  <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+  %>
+
+  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
@@ -85,6 +77,9 @@ from branding import api as branding_api
     }).call(this, require || RequireJS.require);
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
+
+  <%block name="js_overrides">
+  </%block>
 
   % if not disable_courseware_js:
     <%static:js group='module-js'/>

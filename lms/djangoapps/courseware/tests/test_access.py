@@ -54,8 +54,8 @@ from xmodule.modulestore.tests.django_utils import (
 from util.milestones_helpers import (
     set_prerequisite_courses,
     fulfill_course_milestone,
-    seed_milestone_relationship_types,
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 
@@ -151,7 +151,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
 @attr('shard_1')
 @ddt.ddt
-class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the various access controls on the student dashboard
     """
@@ -428,7 +428,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Test course access when a course has pre-requisite course yet to be completed
         """
-        seed_milestone_relationship_types()
         user = UserFactory.create()
 
         pre_requisite_course = CourseFactory.create(
@@ -479,7 +478,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Test courseware access when a course has pre-requisite course yet to be completed
         """
-        seed_milestone_relationship_types()
         pre_requisite_course = CourseFactory.create(
             org='edX',
             course='900',

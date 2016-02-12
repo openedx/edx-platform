@@ -26,10 +26,10 @@ from contentstore.tests.utils import CourseTestCase
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
-from util.milestones_helpers import seed_milestone_relationship_types
 from models.settings.course_metadata import CourseMetadata
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class ImportEntranceExamTestCase(CourseTestCase):
+class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
     """
     Unit tests for importing a course with entrance exam
     """
@@ -51,7 +51,6 @@ class ImportEntranceExamTestCase(CourseTestCase):
 
         # Create tar test file -----------------------------------------------
         # OK course with entrance exam section:
-        seed_milestone_relationship_types()
         entrance_exam_dir = tempfile.mkdtemp(dir=self.content_dir)
         # test course being deeper down than top of tar file
         embedded_exam_dir = os.path.join(entrance_exam_dir, "grandparent", "parent")

@@ -1,0 +1,45 @@
+<form>
+    <% if (xblockInfo.get('prereqs').length > 0) { %>
+        <h3 class="modal-section-title"><%- gettext('Limit Access') %></h3>
+        <div class="modal-section-content gating-prereq">
+            <ul class="list-fields list-input">
+                <p class="field-message">
+                    <%- gettext('Select a prerequisite subsection and enter a minimum score percentage to limit access to this subsection.') %>
+                </p>
+                <li class="field field-select">
+                    <label class="label">
+                        <%- gettext('Prerequisite:') %>
+                        <select id="prereq" class="input">
+                            <option value=""><%- gettext('No prerequisite') %></option>
+                            <% _.each(xblockInfo.get('prereqs'), function(prereq){ %>
+                                <option value="<%- prereq.block_usage_key %>"><%- prereq.block_display_name %></option>
+                            <% }); %>
+                        </select>
+                    </label>
+                </li>
+                <li id="prereq_min_score_input" class="field field-input input-cosmetic">
+                    <label class="label">
+                        <%- gettext('Minimum Score:') %>
+                        <input type="text" id="prereq_min_score" name="prereq_min_score" class="input input-text" size="3" />
+                    </label>
+                </li>
+                <div id="prereq_min_score_error" class="message-status error">
+                    <%- gettext('The minimum score percentage must be a whole number between 0 and 100.') %>
+                </div>
+            </ul>
+        </div>
+    <% } %>
+    <h3 class="modal-section-title"><%- gettext('Use as a Prerequisite') %></h3>
+    <div class="modal-section-content gating-is-prereq">
+        <ul class="list-fields list-input">
+            <li class="field field-checkbox checkbox-cosmetic">
+                <input type="checkbox" id="is_prereq" name="is_prereq" class="input input-checkbox" />
+                <label for="is_prereq" class="label">
+                    <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+                    <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+                    <%- gettext('Make this subsection available as a prerequisite to other content') %>
+                </label>
+            </li>
+        </ul>
+    </div>
+</form>

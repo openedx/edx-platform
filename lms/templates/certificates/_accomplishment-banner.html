@@ -46,7 +46,7 @@ from django.template.defaultfilters import escapejs
                 <div class="message-actions">
                     <h3 class="sr-only">${_("Print or share your certificate:")}</h3>
                     % if facebook_share_enabled:
-                      <button class="action action-share-facebook btn btn-overlay btn-small icon-only" id="action-share-facebook"
+                      <button class="action action-share-facebook btn-inverse btn-small icon-only" id="action-share-facebook"
                          onclick="FaceBook.share({
                           share_text: '${facebook_share_text | escapejs}',
                           share_link: '${share_url}',
@@ -59,7 +59,7 @@ from django.template.defaultfilters import escapejs
                     %endif
                     % if twitter_share_enabled:
                       <button data-tooltip="${_('Share on Twitter')}"
-                        class="action action-share-twitter btn btn-overlay btn-small icon-only"
+                        class="action action-share-twitter btn-inverse btn-small icon-only"
                         title="${_('Share on Twitter')}"
                         onclick="popupWindow('${twitter_url}', 'tweetWindow', 640, 480); return false;">
                           <i class="icon fa fa-twitter" aria-hidden="true"></i>
@@ -68,7 +68,7 @@ from django.template.defaultfilters import escapejs
                     %endif
 
                     %if linked_in_url:
-                    <button class="action action-linkedin-profile btn btn-overlay btn-small icon-only" id="action-share-linkedin" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
+                    <button class="action action-linkedin-profile btn-inverse btn-small icon-only" id="action-share-linkedin" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
                         <i class="icon fa fa-linkedin" aria-hidden="true"></i>
                         <span class="action-label">${_("Add to LinkedIn Profile")}</span>
                     </button>
@@ -81,7 +81,7 @@ from django.template.defaultfilters import escapejs
                     </button>
                     %endif
 
-                    <button class="action action-print btn btn-overlay btn-small" id="action-print-view">
+                    <button class="action action-print btn-inverse btn-small" id="action-print-view">
                         <i class="icon fa fa-print" aria-hidden="true"></i>
                         ${_("Print Certificate")}
                     </button>

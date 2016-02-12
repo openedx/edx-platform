@@ -1,6 +1,6 @@
 """
 The Course Blocks app, built upon the Block Cache framework in
-openedx.core.lib.block_cache, is a higher layer django app in LMS that
+openedx.core.lib.block_structure, is a higher layer django app in LMS that
 provides additional context of Courses and Users (via usage_info.py) with
 implementations for Block Structure Transformers that are related to
 block structure course access.

@@ -38,7 +38,9 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
+from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.lib.gating import api as gating_api
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
@@ -948,7 +950,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((38, 4, True), (38, 4, False)), (True, False))
+        *itertools.product(((40, 4, True), (40, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1261,6 +1263,55 @@ class TestIndexView(ModuleStoreTestCase):
 
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertIn("Activate Block ID: test_block_id", response.content)
+
+
+class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the index view for a course with gated content
+    """
+    def setUp(self):
+        """
+        Set up the initial test data
+        """
+        super(TestIndexViewWithGating, self).setUp()
+
+        self.user = UserFactory()
+        self.course = CourseFactory.create()
+        self.course.enable_subsection_gating = True
+        self.course.save()
+        self.store.update_item(self.course, 0)
+        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+        self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
+        self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
+        gating_api.add_prerequisite(self.course.id, self.open_seq.location)
+        gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_index_with_gated_sequential(self):
+        """
+        Test index view with a gated sequential raises Http404
+        """
+        request = RequestFactory().get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.gated_seq.url_name,
+                }
+            )
+        )
+        request.user = self.user
+        mako_middleware_process_request(request)
+
+        with self.assertRaises(Http404):
+            __ = views.index(
+                request,
+                unicode(self.course.id),
+                chapter=self.chapter.url_name,
+                section=self.gated_seq.url_name
+            )
 
 
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):

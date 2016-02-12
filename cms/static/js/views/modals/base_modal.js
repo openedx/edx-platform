@@ -147,6 +147,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 return this.getActionBar().find('.action-' + type);
             },
 
+            enableActionButton: function(type) {
+                this.getActionBar().find('.action-' + type).prop('disabled', false).removeClass('is-disabled');
+            },
+
+            disableActionButton: function(type) {
+                this.getActionBar().find('.action-' + type).prop('disabled', true).addClass('is-disabled');
+            },
+
             resize: function() {
                 var top, left, modalWindow, modalWidth, modalHeight,
                     availableWidth, availableHeight, maxWidth, maxHeight;

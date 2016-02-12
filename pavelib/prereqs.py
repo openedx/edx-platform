@@ -1,5 +1,5 @@
 """
-Install Python, Ruby, and Node prerequisites.
+Install Python and Node prerequisites.
 """
 
 from distutils import sysconfig
@@ -24,6 +24,7 @@ PYTHON_REQ_FILES = [
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
+    'requirements/edx/paver.txt',
     'requirements/edx/post.txt',
 ]
 
@@ -120,13 +121,6 @@ def prereq_cache(cache_name, paths, install_func):
         print '{cache} unchanged, skipping...'.format(cache=cache_name)
 
 
-def ruby_prereqs_installation():
-    """
-    Installs Ruby prereqs
-    """
-    sh('bundle install --quiet')
-
-
 def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
@@ -143,18 +137,6 @@ def python_prereqs_installation():
     """
     for req_file in PYTHON_REQ_FILES:
         sh("pip install -q --disable-pip-version-check --exists-action w -r {req_file}".format(req_file=req_file))
-
-
-@task
-def install_ruby_prereqs():
-    """
-    Installs Ruby prereqs
-    """
-    if no_prereq_install():
-        print NO_PREREQ_MESSAGE
-        return
-
-    prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
 
 
 @task
@@ -182,7 +164,7 @@ def uninstall_python_packages():
     """
     # So that we don't constantly uninstall things, use a version number of the
     # uninstallation needs.  Check it, and skip this if we're up to date.
-    expected_version = 2
+    expected_version = 3
     state_file_path = os.path.join(PREREQS_STATE_DIR, "python_uninstall_version.txt")
     if os.path.isfile(state_file_path):
         with open(state_file_path) as state_file:
@@ -210,6 +192,11 @@ def uninstall_python_packages():
         # Uninstall django-storages
         if any("django-storages==" in line for line in frozen):
             sh("pip uninstall --disable-pip-version-check -y django-storages")
+            uninstalled = True
+
+        # Uninstall django-oauth2-provider
+        if any(line.startswith("django-oauth2-provider==") for line in frozen):
+            sh("pip uninstall --disable-pip-version-check -y django-oauth2-provider")
             uninstalled = True
 
         if not uninstalled:
@@ -258,13 +245,12 @@ def install_python_prereqs():
 @task
 def install_prereqs():
     """
-    Installs Ruby, Node and Python prerequisites
+    Installs Node and Python prerequisites
     """
     if no_prereq_install():
         print NO_PREREQ_MESSAGE
         return
 
-    install_ruby_prereqs()
     install_node_prereqs()
     uninstall_python_packages()
     install_python_prereqs()

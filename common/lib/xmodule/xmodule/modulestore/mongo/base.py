@@ -44,7 +44,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.mongo_connection import connect_to_mongodb
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
@@ -1212,7 +1212,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         query['_id.revision'] = key_revision
         for field in ['category', 'name']:
             if field in qualifiers:
-                query['_id.' + field] = qualifiers.pop(field)
+                qualifier_value = qualifiers.pop(field)
+                if isinstance(qualifier_value, list):
+                    qualifier_value = {'$in': qualifier_value}
+                query['_id.' + field] = qualifier_value
 
         for key, value in (settings or {}).iteritems():
             query['metadata.' + key] = value
@@ -1944,9 +1947,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         This method is intended for use by tests and administrative commands, and not
         to be run during server startup.
         """
-
         # Because we often query for some subset of the id, we define this index:
-        self.collection.create_index(
+        create_collection_index(
+            self.collection,
             [
                 ('_id.tag', pymongo.ASCENDING),
                 ('_id.org', pymongo.ASCENDING),
@@ -1955,16 +1958,17 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 ('_id.name', pymongo.ASCENDING),
                 ('_id.revision', pymongo.ASCENDING),
             ],
-            background=True)
+            background=True
+        )
 
         # Because we often scan for all category='course' regardless of the value of the other fields:
-        self.collection.create_index('_id.category', background=True)
+        create_collection_index(self.collection, '_id.category', background=True)
 
         # Because lms calls get_parent_locations frequently (for path generation):
-        self.collection.create_index('definition.children', sparse=True, background=True)
+        create_collection_index(self.collection, 'definition.children', sparse=True, background=True)
 
         # To allow prioritizing draft vs published material
-        self.collection.create_index('_id.revision', background=True)
+        create_collection_index(self.collection, '_id.revision', background=True)
 
     # Some overrides that still need to be implemented by subclasses
     def convert_to_draft(self, location, user_id):

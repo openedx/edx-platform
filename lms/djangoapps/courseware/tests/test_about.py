@@ -28,9 +28,9 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import (
     set_prerequisite_courses,
-    seed_milestone_relationship_types,
     get_prerequisite_courses_display,
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from .helpers import LoginEnrollmentTestCase
@@ -41,7 +41,7 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @attr('shard_1')
-class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingTestCase):
+class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
     """
@@ -105,7 +105,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("You are enrolled in this course", resp.content)
-        self.assertIn("View Courseware", resp.content)
+        self.assertIn("View Course", resp.content)
 
     @override_settings(COURSE_ABOUT_VISIBILITY_PERMISSION="see_about_page")
     def test_visible_about_page_settings(self):
@@ -136,7 +136,6 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course(self):
-        seed_milestone_relationship_types()
         pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
         course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
         self.setup_user()
@@ -151,7 +150,6 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, EventTrackingT
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_about_page_unfulfilled_prereqs(self):
-        seed_milestone_relationship_types()
         pre_requisite_course = CourseFactory.create(
             org='edX',
             course='900',
@@ -480,7 +478,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("You are enrolled in this course", resp.content)
-        self.assertIn("View Courseware", resp.content)
+        self.assertIn("View Course", resp.content)
         self.assertNotIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
 
     def test_closed_enrollment(self):

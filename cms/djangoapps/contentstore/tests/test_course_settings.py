@@ -26,7 +26,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
-from util.milestones_helpers import seed_milestone_relationship_types
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from .utils import CourseTestCase
 
@@ -69,7 +69,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
 
 
 @ddt.ddt
-class CourseDetailsViewTest(CourseTestCase):
+class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
@@ -156,14 +156,12 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course_list_present(self):
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
         self.assertContains(response, "Prerequisite Course")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course_update_and_fetch(self):
-        seed_milestone_relationship_types()
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -191,7 +189,6 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_invalid_pre_requisite_course(self):
-        seed_milestone_relationship_types()
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -254,7 +251,6 @@ class CourseDetailsViewTest(CourseTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         data = {
             'entrance_exam_enabled': 'true',
@@ -305,7 +301,6 @@ class CourseDetailsViewTest(CourseTestCase):
         test that creating an entrance exam should store the default value, if key missing in json request
         or entrance_exam_minimum_score_pct is an empty string
         """
-        seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         test_data_1 = {
             'entrance_exam_enabled': 'true',
@@ -941,8 +936,8 @@ class CourseMetadataEditingTest(CourseTestCase):
             self.assertNotIn("notes", course.advanced_modules)
 
     @ddt.data(
-        [{'type': 'courseware'}, {'type': 'course_info'}, {'type': 'wiki', 'is_hidden': True}],
-        [{'type': 'courseware', 'name': 'Courses'}, {'type': 'course_info', 'name': 'Info'}],
+        [{'type': 'course_info'}, {'type': 'courseware'}, {'type': 'wiki', 'is_hidden': True}],
+        [{'type': 'course_info', 'name': 'Home'}, {'type': 'courseware', 'name': 'Course'}],
     )
     def test_course_tab_configurations(self, tab_list):
         self.course.tabs = tab_list

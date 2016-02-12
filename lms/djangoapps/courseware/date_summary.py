@@ -68,28 +68,9 @@ class DateSummary(object):
 
     def get_context(self):
         """Return the template context used to render this summary block."""
-        date = ''
-        if self.date is not None:
-            # Translators: relative_date is a fuzzy description of the
-            # time from now until absolute_date. For example,
-            # absolute_date might be "Jan 01, 2020", and if today were
-            # December 5th, 2020, relative_date would be "1 month".
-            locale = to_locale(get_language())
-            try:
-                relative_date = format_timedelta(self.date - datetime.now(pytz.UTC), locale=locale)
-            # Babel doesn't have translations for Esperanto, so we get
-            # a KeyError when testing translations with
-            # ?preview-lang=eo. This should not happen with any other
-            # languages. See https://github.com/python-babel/babel/issues/107
-            except KeyError:
-                relative_date = format_timedelta(self.date - datetime.now(pytz.UTC))
-            date = _("in {relative_date} - {absolute_date}").format(
-                relative_date=relative_date,
-                absolute_date=self.date.strftime(self.date_format),
-            )
         return {
             'title': self.title,
-            'date': date,
+            'date': self._format_date(),
             'description': self.description,
             'css_class': self.css_class,
             'link': self.link,
@@ -101,6 +82,35 @@ class DateSummary(object):
         Return an HTML representation of this summary block.
         """
         return render_to_string('courseware/date_summary.html', self.get_context())
+
+    def _format_date(self):
+        """
+        Return this block's date in a human-readable format. If the date
+        is None, returns the empty string.
+        """
+        if self.date is None:
+            return ''
+        locale = to_locale(get_language())
+        delta = self.date - datetime.now(pytz.UTC)
+        try:
+            relative_date = format_timedelta(delta, locale=locale)
+        # Babel doesn't have translations for Esperanto, so we get
+        # a KeyError when testing translations with
+        # ?preview-lang=eo. This should not happen with any other
+        # languages. See https://github.com/python-babel/babel/issues/107
+        except KeyError:
+            relative_date = format_timedelta(delta)
+        date_has_passed = delta.days < 0
+        # Translators: 'absolute' is a date such as "Jan 01,
+        # 2020". 'relative' is a fuzzy description of the time until
+        # 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
+        # and if today were December 5th, 2020, 'relative' would be "1
+        # month".
+        date_format = _("{relative} ago - {absolute}") if date_has_passed else _("in {relative} - {absolute}")
+        return date_format.format(
+            relative=relative_date,
+            absolute=self.date.strftime(self.date_format),
+        )
 
     @property
     def is_enabled(self):
@@ -186,7 +196,10 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     """
     css_class = 'verified-upgrade-deadline'
     title = _('Verification Upgrade Deadline')
-    description = _('You are still eligible to upgrade to a Verified Certificate!')
+    description = _(
+        'You are still eligible to upgrade to a Verified Certificate! '
+        'Pursue it to highlight the knowledge and skills you gain in this course.'
+    )
     link_text = _('Upgrade to Verified Certificate')
 
     @property

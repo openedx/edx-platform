@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from mock import patch
 
+import django.core.cache
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -215,6 +216,16 @@ TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
 )
 
 
+def clear_all_caches():
+    """Clear all caches so that cache info doesn't leak across test cases."""
+    # This will no longer be necessary when Django adds (in Django 1.10?):
+    #     https://code.djangoproject.com/ticket/11505
+    for cache in django.core.cache.caches.all():
+        cache.clear()
+
+    RequestCache().clear_request_cache()
+
+
 class SharedModuleStoreTestCase(TestCase):
     """
     Subclass for any test case that uses a ModuleStore that can be shared
@@ -268,7 +279,7 @@ class SharedModuleStoreTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         drop_mongo_collections()  # pylint: disable=no-value-for-parameter
-        RequestCache().clear_request_cache()
+        clear_all_caches()
         XMODULE_FACTORY_LOCK.disable()
         cls._settings_override.__exit__(None, None, None)
 
@@ -279,6 +290,11 @@ class SharedModuleStoreTestCase(TestCase):
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
         super(SharedModuleStoreTestCase, self).setUp()
+
+    def tearDown(self):
+        """Reset caches."""
+        clear_all_caches()
+        super(SharedModuleStoreTestCase, self).tearDown()
 
     def reset(self):
         """
@@ -394,7 +410,7 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
 
         self.addCleanup(drop_mongo_collections)
-        self.addCleanup(RequestCache().clear_request_cache)
+        self.addCleanup(clear_all_caches)
 
         # Enable XModuleFactories for the space of this test (and its setUp).
         self.addCleanup(XMODULE_FACTORY_LOCK.disable)

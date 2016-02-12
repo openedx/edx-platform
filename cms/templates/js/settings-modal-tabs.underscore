@@ -1,0 +1,10 @@
+<ul class="settings-tabs-header">
+    <% _.each(tabs, function(tab) { %>
+    <li class="settings-tab-buttons">
+        <button class="settings-tab-button" data-tab="<%- tab.name %>" href="#"><%- tab.displayName %></button>
+    </li>
+    <% }); %>
+</ul>
+<% _.each(tabs, function(tab) { %>
+<div class='settings-tab <%- tab.name %>'></div>
+<% }); %>

@@ -10,13 +10,15 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
+from milestones.tests.utils import MilestonesTestCaseMixin
+
 from ..testutils import (
     MobileAPITestCase, MobileCourseAccessTestMixin, MobileAuthTestMixin
 )
 
 
 @ddt.ddt
-class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
+class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
     """
@@ -82,7 +84,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
+class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
     """
@@ -114,7 +116,19 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.store.delete_item(handouts_usage_key, self.user.id)
 
-        self.api_response(expected_response_code=404)
+        response = self.api_response(expected_response_code=200)
+        self.assertIsNone(response.data['handouts_html'])
+
+    def test_empty_handouts(self):
+        self.login_and_enroll()
+
+        # set handouts to empty tags
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<ol></ol>"
+        self.store.update_item(underlying_handouts, self.user.id)
+        response = self.api_response(expected_response_code=200)
+        self.assertIsNone(response.data['handouts_html'])
 
     def test_handouts_static_rewrites(self):
         self.login_and_enroll()

@@ -400,6 +400,14 @@ def prs_by_email(start_ref, end_ref):
             pass  # this commit will be included in the commits_without_prs table
         else:
             email = emails.get(merge.author.email, merge.author.email)
+            if email.endswith("@users.noreply.github.com"):
+                # A bogus GitHub address, look up their GitHub name in
+                # people.yaml
+                username = email.split("@")[0]
+                try:
+                    email = people[username]['email']
+                except KeyError:
+                    pass
             unordered_data[email].add((pr_num, merge))
 
     ordered_data = collections.OrderedDict()

@@ -7,8 +7,8 @@ Tests for BlockDepthTransformer.
 import ddt
 from unittest import TestCase
 
-from openedx.core.lib.block_cache.tests.test_utils import ChildrenMapTestMixin
-from openedx.core.lib.block_cache.block_structure import BlockStructureModulestoreData
+from openedx.core.lib.block_structure.tests.helpers import ChildrenMapTestMixin
+from openedx.core.lib.block_structure.block_structure import BlockStructureModulestoreData
 from ..block_depth import BlockDepthTransformer
 
 
@@ -34,7 +34,7 @@ class BlockDepthTransformerTestCase(TestCase, ChildrenMapTestMixin):
     )
     @ddt.unpack
     def test_block_depth(self, block_depth, children_map, transformed_children_map, missing_blocks):
-        block_structure = self.create_block_structure(BlockStructureModulestoreData, children_map)
+        block_structure = self.create_block_structure(children_map, BlockStructureModulestoreData)
         BlockDepthTransformer(block_depth).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
         self.assert_block_structure(block_structure, transformed_children_map, missing_blocks)

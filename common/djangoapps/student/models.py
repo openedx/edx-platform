@@ -48,6 +48,7 @@ from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
+from microsite_configuration import microsite
 import lms.lib.comment_client as cc
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -983,7 +984,7 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, created = CourseEnrollment.objects.get_or_create(
+        enrollment, created = cls.objects.get_or_create(
             user=user,
             course_id=course_key,
         )
@@ -1008,7 +1009,7 @@ class CourseEnrollment(models.Model):
             Course enrollment object or None
         """
         try:
-            return CourseEnrollment.objects.get(
+            return cls.objects.get(
                 user=user,
                 course_id=course_key
             )
@@ -1170,7 +1171,7 @@ class CourseEnrollment(models.Model):
                 raise NonExistentCourseError
 
         if check_access:
-            if CourseEnrollment.is_enrollment_closed(user, course):
+            if cls.is_enrollment_closed(user, course):
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
@@ -1178,14 +1179,15 @@ class CourseEnrollment(models.Model):
                 )
                 raise EnrollmentClosedError
 
-            if CourseEnrollment.objects.is_course_full(course):
+            if cls.objects.is_course_full(course):
                 log.warning(
-                    u"User %s failed to enroll in full course %s",
-                    user.username,
+                    u"Course %s has reached its maximum enrollment of %d learners. User %s failed to enroll.",
                     course_key.to_deprecated_string(),
+                    course.max_student_enrollments_allowed,
+                    user.username,
                 )
                 raise CourseFullError
-        if CourseEnrollment.is_enrolled(user, course_key):
+        if cls.is_enrolled(user, course_key):
             log.warning(
                 u"User %s attempted to enroll in %s, but they were already enrolled",
                 user.username,
@@ -1253,7 +1255,7 @@ class CourseEnrollment(models.Model):
         `skip_refund` can be set to True to avoid the refund process.
         """
         try:
-            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            record = cls.objects.get(user=user, course_id=course_id)
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
 
         except cls.DoesNotExist:
@@ -1299,7 +1301,7 @@ class CourseEnrollment(models.Model):
             return False
 
         try:
-            record = CourseEnrollment.objects.get(user=user, course_id=course_key)
+            record = cls.objects.get(user=user, course_id=course_key)
             return record.is_active
         except cls.DoesNotExist:
             return False
@@ -1324,7 +1326,7 @@ class CourseEnrollment(models.Model):
         course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
         querystring = unicode(course_key.to_deprecated_string())
         try:
-            return CourseEnrollment.objects.filter(
+            return cls.objects.filter(
                 user=user,
                 course_id__startswith=querystring,
                 is_active=1
@@ -1345,14 +1347,14 @@ class CourseEnrollment(models.Model):
         Returns (None, None) if the courseenrollment record does not exist.
         """
         try:
-            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            record = cls.objects.get(user=user, course_id=course_id)
             return (record.mode, record.is_active)
         except cls.DoesNotExist:
             return (None, None)
 
     @classmethod
     def enrollments_for_user(cls, user):
-        return CourseEnrollment.objects.filter(user=user, is_active=1)
+        return cls.objects.filter(user=user, is_active=1)
 
     def is_paid_course(self):
         """
@@ -1854,8 +1856,9 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             target (str): An identifier for the occurrance of the button.
 
         """
+        company_identifier = microsite.get_value('LINKEDIN_COMPANY_ID', self.company_identifier)
         params = OrderedDict([
-            ('_ed', self.company_identifier),
+            ('_ed', company_identifier),
             ('pfCertificationName', self._cert_name(course_name, cert_mode).encode('utf-8')),
             ('pfCertificationUrl', cert_url),
             ('source', source)
@@ -1875,7 +1878,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
             cert_mode,
             _(u"{platform_name} Certificate for {course_name}")
         ).format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME),
             course_name=course_name
         )
 

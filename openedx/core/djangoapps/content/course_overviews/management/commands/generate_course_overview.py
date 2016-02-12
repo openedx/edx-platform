@@ -24,17 +24,22 @@ class Command(BaseCommand):
     args = '<course_id course_id ...>'
     help = 'Generates and stores course overview for one or more courses.'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--all',
-                    action='store_true',
-                    default=False,
-                    help='Generate course overview for all courses.'),
-    )
+    def add_arguments(self, parser):
+        """
+        Add arguments to the command parser.
+        """
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            dest='all',
+            default=False,
+            help='Generate course overview for all courses.',
+        )
 
     def handle(self, *args, **options):
 
         if options['all']:
-            course_keys = [course.id for course in modulestore().get_courses()]
+            course_keys = [course.id for course in modulestore().get_course_summaries()]
         else:
             if len(args) < 1:
                 raise CommandError('At least one course or --all must be specified.')

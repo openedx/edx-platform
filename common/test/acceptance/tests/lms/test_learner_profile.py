@@ -767,7 +767,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'color-contrast',  # TODO: AC-232
                 'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],

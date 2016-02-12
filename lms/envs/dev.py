@@ -25,7 +25,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
@@ -86,11 +85,6 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_structure_mem_cache',
-    },
-    'lms.course_blocks': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
-        'LOCATION': 'lms_course_blocks_cache',
     },
 }
 
@@ -235,7 +229,7 @@ FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
 ########################## ANALYTICS TESTING ########################
 

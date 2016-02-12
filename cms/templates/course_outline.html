@@ -4,7 +4,7 @@
 import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
@@ -15,13 +15,16 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${escape_json_dumps(course_structure) | n}, ${escape_json_dumps(initial_state) | n});
+        OutlineFactory(
+            ${course_structure | n, dump_js_escaped_json},
+            ${initial_state | n, dump_js_escaped_json}
+        );
     });
 </%block>
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'settings-tab-section']:
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>

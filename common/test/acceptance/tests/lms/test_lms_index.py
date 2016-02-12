@@ -40,6 +40,8 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         Perform a general validation of the index page, renders normally, no exceptions raised, etc.
         """
         self.assertTrue(self.page.banner_element.visible)
+        expected_links = [u'About', u'Blog', u'News', u'Help Center', u'Contact', u'Careers', u'Donate']
+        self.assertEqual(self.page.footer_links, expected_links)
 
     def test_intro_video_hidden_by_default(self):
         """
@@ -48,9 +50,8 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         # Ensure the introduction video element is not shown
         self.assertFalse(self.page.intro_video_element.visible)
 
-        # @fghaas: The below presence check can now be modified along with your changeset
         # Still need to figure out how to swap platform settings in the context of a bok choy test
         # but we can at least prevent accidental exposure with these validations going forward
         # Note: 'present' is a DOM check, whereas 'visible' is an actual browser/screen check
-        self.assertTrue(self.page.video_modal_element.present)
+        self.assertFalse(self.page.video_modal_element.present)
         self.assertFalse(self.page.video_modal_element.visible)

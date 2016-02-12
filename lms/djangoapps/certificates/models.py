@@ -65,7 +65,6 @@ from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
 from config_models.models import ConfigurationModel
-from course_modes.models import CourseMode
 from instructor_task.models import InstructorTask
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from xmodule.modulestore.django import modulestore
@@ -96,6 +95,14 @@ class CertificateStatuses(object):
         notpassing: "didn't receive",
         error: "error states"
     }
+
+    @classmethod
+    def is_passing_status(cls, status):
+        """
+        Given the status of a certificate, return a boolean indicating whether
+        the student passed the course.
+        """
+        return status in [cls.downloadable, cls.generating]
 
 
 class CertificateSocialNetworks(object):
@@ -198,6 +205,9 @@ class GeneratedCertificate(models.Model):
     """
     Base model for generated certificates
     """
+    # Import here instead of top of file since this module gets imported before
+    # the course_modes app is loaded, resulting in a Django deprecation warning.
+    from course_modes.models import CourseMode
 
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
@@ -297,13 +307,10 @@ class GeneratedCertificate(models.Model):
     def save(self, *args, **kwargs):
         """
         After the base save() method finishes, fire the COURSE_CERT_AWARDED
-        signal iff we have stored a record of a learner passing the course.
-
-        The learner is assumed to have passed the course if certificate status
-        is either 'generating' or 'downloadable'.
+        signal iff we are saving a record of a learner passing the course.
         """
         super(GeneratedCertificate, self).save(*args, **kwargs)
-        if self.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+        if CertificateStatuses.is_passing_status(self.status):
             COURSE_CERT_AWARDED.send_robust(
                 sender=self.__class__,
                 user=self.user,
@@ -458,6 +465,9 @@ def certificate_status_for_student(student, course_id):
     If the student has been graded, the dictionary also contains their
     grade for the course with the key "grade".
     '''
+    # Import here instead of top of file since this module gets imported before
+    # the course_modes app is loaded, resulting in a Django deprecation warning.
+    from course_modes.models import CourseMode
 
     try:
         generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
@@ -540,6 +550,9 @@ class ExampleCertificateSet(TimeStampedModel):
             ExampleCertificateSet
 
         """
+        # Import here instead of top of file since this module gets imported before
+        # the course_modes app is loaded, resulting in a Django deprecation warning.
+        from course_modes.models import CourseMode
         cert_set = cls.objects.create(course_key=course_key)
 
         ExampleCertificate.objects.bulk_create([

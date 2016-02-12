@@ -132,7 +132,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.auth_page.visit()
         self.user_info = self.auth_page.user_info
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
     def _navigate_to_courseware_video_and_render(self):
         """ Wait for the video player to render """
@@ -679,14 +679,17 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # select the "2.0" speed on video "A"
         self.course_nav.go_to_sequential('A')
+        self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
         self.course_nav.go_to_sequential('B')
+        self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
         self.course_nav.go_to_sequential('C')
+        self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
         # because a playback speed has never explicitly been set for it. However, this video

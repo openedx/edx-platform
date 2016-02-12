@@ -14,7 +14,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, StaffLockEditor,
-        VerificationAccessEditor, TimedExaminationPreferenceEditor;
+        VerificationAccessEditor, TimedExaminationPreferenceEditor, AccessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events : {
@@ -104,6 +104,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     });
 
     SettingsXBlockModal = CourseOutlineXBlockModal.extend({
+
         getTitle: function () {
             return interpolate(
                 gettext('%(display_name)s Settings'),
@@ -112,37 +113,42 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getIntroductionMessage: function () {
-            return interpolate(
-                gettext('Change the settings for %(display_name)s'),
-                { display_name: this.model.get('display_name') }, true
-            );
+            var message = '';
+            var tabs = this.options.tabs;
+            if (!tabs || tabs.length < 2) {
+                message = interpolate(
+                    gettext('Change the settings for %(display_name)s'),
+                    { display_name: this.model.get('display_name') }, true);
+            }
+            return message;
         },
 
         initializeEditors: function () {
-            var special_exams_editors = this.options.special_exam_editors;
-            if (typeof special_exams_editors !== 'undefined' && special_exams_editors.length > 0) {
-                var tabs_html = this.loadTemplate('settings-tab-section');
-                this.$('.modal-section').html(tabs_html);
-                this.options.editors = _.map(this.options.editors, function (Editor) {
-                    return new Editor({
-                        parentElement: this.$('.modal-section .general-settings'),
-                        model: this.model,
-                        xblockType: this.options.xblockType,
-                        enable_proctored_exams: this.options.enable_proctored_exams,
-                        enable_timed_exams: this.options.enable_timed_exams
-                    });
-                }, this);
-
-                this.options.special_exam_editors = _.map(special_exams_editors, function (Editor) {
-                    return new Editor({
-                        parentElement: this.$('.modal-section .advanced-settings'),
-                        model: this.model,
-                        xblockType: this.options.xblockType,
-                        enable_proctored_exams: this.options.enable_proctored_exams,
-                        enable_timed_exams: this.options.enable_timed_exams
-                    });
-                }, this);
-                this.hideAdvancedSettings();
+            var tabs = this.options.tabs;
+            if (tabs && tabs.length > 0) {
+                if (tabs.length > 1) {
+                    var tabsTemplate = this.loadTemplate('settings-modal-tabs');
+                    this.$('.modal-section').html(tabsTemplate({tabs: tabs}));
+                    _.each(this.options.tabs, function(tab) {
+                        this.options.editors.push.apply(
+                            this.options.editors,
+                            _.map(tab.editors, function (Editor) {
+                                return new Editor({
+                                    parent: this,
+                                    parentElement: this.$('.modal-section .' + tab.name),
+                                    model: this.model,
+                                    xblockType: this.options.xblockType,
+                                    enable_proctored_exams: this.options.enable_proctored_exams,
+                                    enable_timed_exams: this.options.enable_timed_exams
+                                });
+                            }, this)
+                        );
+                    }, this);
+                    this.showTab(tabs[0].name);
+                } else {
+                    this.options.editors = tabs[0].editors;
+                    CourseOutlineXBlockModal.prototype.initializeEditors.call(this);
+                }
             } else {
                 CourseOutlineXBlockModal.prototype.initializeEditors.call(this);
             }
@@ -150,8 +156,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         events: {
             'click .action-save': 'save',
-            'click .general-settings-button': 'showGeneralSettings',
-            'click .advanced-settings-button': 'showAdvancedSettings'
+            'click .settings-tab-button': 'handleShowTab',
         },
 
         /**
@@ -159,35 +164,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * @return {Object}
          */
         getRequestData: function () {
-            var combined_editors = this.options.editors.concat(this.options.special_exam_editors);
-            var requestData = _.map(combined_editors, function (editor) {
+            var requestData = _.map(this.options.editors, function (editor) {
                 return editor.getRequestData();
             });
             return $.extend.apply(this, [true, {}].concat(requestData));
         },
 
-        hideAdvancedSettings: function() {
-            this.$('.modal-section .general-settings-button').addClass('active');
-            this.$('.modal-section .advanced-settings-button').removeClass('active');
-            this.$('.modal-section .general-settings').show();
-            this.$('.modal-section .advanced-settings').hide();
-
-        },
-
-        hideGeneralSettings: function() {
-            this.$('.modal-section .general-settings-button').removeClass('active');
-            this.$('.modal-section .advanced-settings-button').addClass('active');
-            this.$('.modal-section .general-settings').hide();
-            this.$('.modal-section .advanced-settings').show();
-        },
-        showGeneralSettings: function (event) {
+        handleShowTab: function (event) {
             event.preventDefault();
-            this.hideAdvancedSettings();
+            this.showTab($(event.target).data('tab'));
         },
 
-        showAdvancedSettings: function (event) {
-            event.preventDefault();
-            this.hideGeneralSettings();
+        showTab: function (tab) {
+            this.$('.modal-section .settings-tab-button').removeClass('active');
+            this.$('.modal-section .settings-tab-button[data-tab="' + tab + '"]').addClass('active');
+            this.$('.modal-section .settings-tab').hide();
+            this.$('.modal-section .' + tab).show();
         }
     });
 
@@ -230,6 +222,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         templateName: null,
         initialize: function() {
             this.template = this.loadTemplate(this.templateName);
+            this.parent = this.options.parent;
             this.parentElement = this.options.parentElement;
             this.render();
         },
@@ -488,6 +481,58 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+    AccessEditor = AbstractEditor.extend({
+        templateName: 'access-editor',
+        className: 'edit-settings-access',
+        events : {
+            'change #prereq': 'handlePrereqSelect',
+            'keyup #prereq_min_score': 'validateMinScore'
+        },
+        afterRender: function () {
+            AbstractEditor.prototype.afterRender.call(this);
+            var prereq = this.model.get('prereq') || '';
+            var prereq_min_score = this.model.get('prereq_min_score') || '';
+            this.$('#is_prereq').prop('checked', this.model.get('is_prereq'));
+            this.$('#prereq option[value="' + prereq + '"]').prop('selected', true);
+            this.$('#prereq_min_score').val(prereq_min_score);
+            this.$('#prereq_min_score_input').toggle(prereq.length > 0);
+        },
+        handlePrereqSelect: function () {
+            var showPrereqInput = this.$('#prereq option:selected').val().length > 0;
+            this.$('#prereq_min_score_input').toggle(showPrereqInput);
+        },
+        validateMinScore: function () {
+            var minScore = this.$('#prereq_min_score').val().trim();
+            var minScoreInt = parseInt(minScore);
+            // minScore needs to be an integer between 0 and 100
+            if (
+                minScore &&
+                (
+                    typeof(minScoreInt) === 'undefined' ||
+                    String(minScoreInt) !== minScore ||
+                    minScoreInt < 0 ||
+                    minScoreInt > 100
+                )
+            ) {
+                this.$('#prereq_min_score_error').show();
+                BaseModal.prototype.disableActionButton.call(this.parent, 'save');
+            } else {
+                this.$('#prereq_min_score_error').hide();
+                BaseModal.prototype.enableActionButton.call(this.parent, 'save');
+            }
+        },
+        getRequestData: function () {
+            var minScore = this.$('#prereq_min_score').val();
+            if (minScore) {
+                minScore = minScore.trim();
+            }
+            return {
+                isPrereq: this.$('#is_prereq').is(':checked'),
+                prereqUsageKey: this.$('#prereq option:selected').val(),
+                prereqMinScore: minScore
+            };
+        }
+    });
     GradingEditor = AbstractEditor.extend({
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
@@ -687,20 +732,33 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getEditModal: function (xblockInfo, options) {
             var editors = [];
-            var special_exam_editors = [];
+            var tabs = [];
 
             if (xblockInfo.isChapter()) {
                 editors = [ReleaseDateEditor, StaffLockEditor];
             } else if (xblockInfo.isSequential()) {
-                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
+                tabs.push({
+                    name: 'basic',
+                    displayName: gettext('Basic'),
+                    editors: [ReleaseDateEditor, GradingEditor, DueDateEditor, StaffLockEditor]
+                });
 
-                var enable_special_exams = (options.enable_proctored_exams || options.enable_timed_exams);
-                if (enable_special_exams) {
-                    special_exam_editors.push(TimedExaminationPreferenceEditor);
+                if (options.enable_proctored_exams || options.enable_timed_exams) {
+                    tabs.push({
+                        name: 'advanced',
+                        displayName: gettext('Advanced'),
+                        editors: [TimedExaminationPreferenceEditor]
+                    });
                 }
 
-                editors.push(StaffLockEditor);
-
+                if (typeof(xblockInfo.get('is_prereq')) !== 'undefined') {
+                    tabs.push({
+                        name: 'access',
+                        // Translators: This label refers to access to course content.
+                        displayName: gettext('Access'),
+                        editors: [AccessEditor]
+                    });
+                }
             } else if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor];
 
@@ -711,10 +769,13 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             /* globals course */
             if (course.get('self_paced')) {
                 editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
+                _.each(tabs, function (tab) {
+                    tab.editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
+                });
             }
             return new SettingsXBlockModal($.extend({
+                tabs: tabs,
                 editors: editors,
-                special_exam_editors: special_exam_editors,
                 model: xblockInfo
             }, options));
         },
