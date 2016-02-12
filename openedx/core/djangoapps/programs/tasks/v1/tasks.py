@@ -146,9 +146,9 @@ def award_program_certificates(self, username):
     countdown = 2 ** self.request.retries
 
     # If either programs or credentials config models are disabled for this
-    # feature, this task should not have been invoked in the first place, and
-    # an error somewhere is likely (though a race condition is also possible).
-    # In either case, the task should not be executed nor should it be retried.
+    # feature, it may indicate a condition where processing of such tasks
+    # has been temporarily disabled.  Since this is a recoverable situation,
+    # mark this task for retry instead of failing it altogether.
     if not config.is_certification_enabled:
         LOGGER.warning(
             'Task award_program_certificates cannot be executed when program certification is disabled in API config',
