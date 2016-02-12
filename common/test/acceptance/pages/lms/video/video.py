@@ -443,6 +443,8 @@ class VideoPage(PageObject):
 
         speed_selector = self.get_element_selector('li[data-speed="{speed}"] .control'.format(speed=speed))
         self.q(css=speed_selector).first.click()
+        # Click triggers an ajax event
+        self.wait_for_ajax()
 
     def verify_speed_changed(self, expected_speed):
         """
