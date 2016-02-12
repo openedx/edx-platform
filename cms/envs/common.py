@@ -1069,6 +1069,7 @@ DEPRECATED_BLOCK_TYPES = [
     'peergrading',
     'combinedopenended',
     'graphical_slider_tool',
+    'randomize',
 ]
 
 # Adding components in this list will disable the creation of new problems for
