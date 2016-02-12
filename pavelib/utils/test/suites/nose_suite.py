@@ -101,6 +101,9 @@ class NoseTestSuite(TestSuite):
         if self.pdb:
             opts += " --pdb"
 
+        if self.keepdb:
+            opts += " --keepdb"
+
         return opts
 
 
@@ -120,13 +123,14 @@ class SystemTestSuite(NoseTestSuite):
     def cmd(self):
         cmd = (
             './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {extra} '
+            '{test_id} {test_opts} --settings={settings} {extra} '
             '--with-xunit --xunit-file={xunit_report}'.format(
                 system=self.root,
                 verbosity=self.verbosity,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 extra=self.extra_args,
+                settings="test_keepdb" if self.keepdb else "test",
                 xunit_report=self.report_dir / "nosetests.xml",
             )
         )

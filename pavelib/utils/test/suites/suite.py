@@ -26,6 +26,7 @@ class TestSuite(object):
         self.verbosity = kwargs.get('verbosity', 1)
         self.skip_clean = kwargs.get('skip_clean', False)
         self.pdb = kwargs.get('pdb', False)
+        self.keepdb = kwargs.get('keepdb', False)
 
     def __enter__(self):
         """

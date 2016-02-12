@@ -35,6 +35,11 @@ __test__ = False  # do not collect
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
     make_option(
+        "--keepdb",
+        action="store_true",
+        help="Keep your sqlite database around to save time during initial setup on subsequent runs"
+    ),
+    make_option(
         '--disable-migrations',
         action='store_true',
         dest='disable_migrations',
@@ -56,6 +61,7 @@ def test_system(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
+        'keepdb': getattr(options, 'keepdb', False),
         'pdb': getattr(options, 'pdb', False),
         'disable_migrations': getattr(options, 'disable_migrations', False),
     }
