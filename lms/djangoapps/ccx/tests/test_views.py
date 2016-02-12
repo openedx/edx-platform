@@ -220,7 +220,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # assert ccx creator has role=ccx_coach
         role = CourseCcxCoachRole(course_key)
-        self.assertTrue(role.has_user(self.coach))
+        self.assertTrue(role.has_user(self.coach, refresh=True))
 
     def test_get_date(self):
         """
@@ -825,7 +825,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         headers = rows[0]
 
         # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
+        data = dict(zip(headers.strip().split(','), rows[2].strip().split(',')))
         self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')
