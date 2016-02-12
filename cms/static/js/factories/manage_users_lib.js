@@ -9,7 +9,7 @@ function(_, gettext, ManageUsersAndRoles) {
             var local_messages = _.extend({}, messages);
             local_messages.alreadyMember.title = gettext('Already a library team member');
             local_messages.deleteUser.messageTpl = gettext(
-                'Are you sure you want to delete {email} from the library “{container}”?'
+                'Are you sure you want to delete <%= email %> from the library “<%= container %>”?'
             );
             return local_messages;
         }

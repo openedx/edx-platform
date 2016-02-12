@@ -22,12 +22,12 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
             },
             alreadyMember: {
                 title: gettext('Already a member'),
-                messageTpl: gettext("{email} is already on the {container} team. Recheck the email address if you want to add a new member."),
+                messageTpl: gettext("<%= email %> is already on the <%= container %> team. Recheck the email address if you want to add a new member."), // jshint ignore:line
                 primaryAction: gettext('Return to team listing')
             },
             deleteUser: {
                 title: gettext('Are you sure?'),
-                messageTpl: gettext('Are you sure you want to restrict {email} access to “{container}”?'),
+                messageTpl: gettext('Are you sure you want to restrict <%= email %> access to “<%= container %>”?'),
                 primaryAction: gettext('Delete'),
                 secondaryAction: gettext('Cancel')
             }
@@ -53,9 +53,8 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
             return new PromptView.Warning({
                 title: messages.alreadyMember.title,
                 message: _.template(
-                    messages.alreadyMember.messageTpl,
-                    {email: email, container: containerName},
-                    {interpolate: /\{(.+?)}/g}
+                    messages.alreadyMember.messageTpl)(
+                    {email: email, container: containerName}
                 ),
                 actions: {
                     primary: {
@@ -140,7 +139,9 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     roles = _.object(_.pluck(this.roles, 'key'), _.pluck(this.roles, "name")),
                     adminRoleCount = this.getAdminRoleCount(),
                     viewHelpers = {
-                        format: function (template, data) { return _.template(template, data, {interpolate: /\{(.+?)}/g}); }
+                        format: function (template, data) {
+                            return interpolate(template, data, true);
+                        }
                     };
                 for (var i = 0; i < this.users.length; i++) {
                     var user = this.users[i],
@@ -283,9 +284,8 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 var msg = new PromptView.Warning({
                     title: self.messages.deleteUser.title,
                     message: _.template(
-                        self.messages.deleteUser.messageTpl,
-                        {email: email, container: self.containerName},
-                        {interpolate: /\{(.+?)}/g}
+                        self.messages.deleteUser.messageTpl)(
+                        {email: email, container: self.containerName}
                     ),
                     actions: {
                         primary: {

@@ -242,8 +242,7 @@
             this.setSubmitButtonEnabled( false );
 
             // Load the template for the webcam into the DOM
-            renderedHtml = _.template(
-                $( this.template ).html(),
+            renderedHtml = _.template($( this.template ).html())(
                 { backendName: this.backend.name }
             );
             $( this.el ).html( renderedHtml );

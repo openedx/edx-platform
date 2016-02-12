@@ -37,7 +37,9 @@ define([
         });
 
         afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         describe('destroy', function () {

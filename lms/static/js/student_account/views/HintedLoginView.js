@@ -23,7 +23,7 @@
             },
 
             render: function() {
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html(_.template(this.tpl)({
                     hintedProvider: this.hintedProvider
                 }));
 
