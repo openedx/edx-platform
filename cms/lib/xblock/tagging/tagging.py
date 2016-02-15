@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Structured Tagging based on XBlockAsides
 """
@@ -7,62 +8,13 @@ from xblock.fragment import Fragment
 from xblock.fields import Scope, Dict
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.capa_module import CapaModule
-from abc import ABCMeta, abstractproperty
 from edxmako.shortcuts import render_to_string
 from django.conf import settings
 from webob import Response
-from collections import OrderedDict
+from .models import TagCategories
 
 
 _ = lambda text: text
-
-
-class AbstractTag(object):
-    """
-    Abstract class for tags
-    """
-    __metaclass__ = ABCMeta
-
-    @abstractproperty
-    def key(self):
-        """
-        Subclasses must implement key
-        """
-        raise NotImplementedError('Subclasses must implement key')
-
-    @abstractproperty
-    def name(self):
-        """
-        Subclasses must implement name
-        """
-        raise NotImplementedError('Subclasses must implement name')
-
-    @abstractproperty
-    def allowed_values(self):
-        """
-        Subclasses must implement allowed_values
-        """
-        raise NotImplementedError('Subclasses must implement allowed_values')
-
-
-class DifficultyTag(AbstractTag):
-    """
-    Particular implementation tags for difficulty
-    """
-    @property
-    def key(self):
-        """ Identifier for the difficulty selector """
-        return 'difficulty_tag'
-
-    @property
-    def name(self):
-        """ Label for the difficulty selector """
-        return _('Difficulty')
-
-    @property
-    def allowed_values(self):
-        """ Allowed values for the difficulty selector """
-        return OrderedDict([('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')])
 
 
 class StructuredTagsAside(XBlockAside):
@@ -72,7 +24,12 @@ class StructuredTagsAside(XBlockAside):
     saved_tags = Dict(help=_("Dictionary with the available tags"),
                       scope=Scope.content,
                       default={},)
-    available_tags = [DifficultyTag()]
+
+    def get_available_tags(self):
+        """
+        Return available tags
+        """
+        return TagCategories.objects.all()
 
     def _get_studio_resource_url(self, relative_url):
         """
@@ -88,14 +45,21 @@ class StructuredTagsAside(XBlockAside):
         """
         if isinstance(block, CapaModule):
             tags = []
-            for tag in self.available_tags:
+            for tag in self.get_available_tags():
+                values = tag.get_values()
+                current_value = self.saved_tags.get(tag.name, None)
+
+                if current_value is not None and current_value not in values:
+                    values.insert(0, current_value)
+
                 tags.append({
-                    'key': tag.key,
-                    'title': tag.name,
-                    'values': tag.allowed_values,
-                    'current_value': self.saved_tags.get(tag.key, None),
+                    'key': tag.name,
+                    'title': tag.title,
+                    'values': values,
+                    'current_value': current_value
                 })
-            fragment = Fragment(render_to_string('structured_tags_block.html', {'tags': tags}))
+            fragment = Fragment(render_to_string('structured_tags_block.html', {'tags': tags,
+                                                                                'block_location': block.location}))
             fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock_asides/structured_tags.js'))
             fragment.initialize_js('StructuredTagsInit')
             return fragment
@@ -113,13 +77,13 @@ class StructuredTagsAside(XBlockAside):
 
         tag = request.params['tag'].split(':')
 
-        for av_tag in self.available_tags:
-            if av_tag.key == tag[0]:
-                if tag[1] in av_tag.allowed_values:
-                    self.saved_tags[tag[0]] = tag[1]
-                    found = True
-                elif tag[1] == '':
+        for av_tag in self.get_available_tags():
+            if av_tag.name == tag[0]:
+                if tag[1] == '':
                     self.saved_tags[tag[0]] = None
+                    found = True
+                elif tag[1] in av_tag.get_values():
+                    self.saved_tags[tag[0]] = tag[1]
                     found = True
 
         if not found:
