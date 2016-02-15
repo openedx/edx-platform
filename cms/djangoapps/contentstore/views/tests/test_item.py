@@ -1848,6 +1848,7 @@ class TestLibraryXBlockCreation(ItemTest):
         self.assertFalse(lib.children)
 
 
+@ddt.ddt
 class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
@@ -2171,7 +2172,8 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
-    def test_self_paced_item_visibility_state(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_self_paced_item_visibility_state(self, store_type):
         """
         Test that in self-paced course, item has `live` visibility state.
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
@@ -2179,20 +2181,22 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         SelfPacedConfiguration(enabled=True).save()
 
-        # Create chapter and setup future release date to make chapter in scheduled state
-        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
-        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        with self.store.default_store(store_type):
+            # Create course, chapter and setup future release date to make chapter in scheduled state
+            course = CourseFactory.create()
+            chapter = self._create_child(course, 'chapter', "Test Chapter")
+            self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
 
-        # Check that has scheduled state
-        xblock_info = self._get_xblock_info(chapter.location)
-        self._verify_visibility_state(xblock_info, VisibilityState.ready)
-        self.assertFalse(self.course.self_paced)
+            # Check that has scheduled state
+            xblock_info = self._get_xblock_info(chapter.location)
+            self._verify_visibility_state(xblock_info, VisibilityState.ready)
+            self.assertFalse(course.self_paced)
 
-        # Change course pacing to self paced
-        self.course.self_paced = True
-        self.store.update_item(self.course, self.user.id)
-        self.assertTrue(self.course.self_paced)
+            # Change course pacing to self paced
+            course.self_paced = True
+            self.store.update_item(course, self.user.id)
+            self.assertTrue(course.self_paced)
 
-        # Check that in self paced course content has live state now
-        xblock_info = self._get_xblock_info(chapter.location)
-        self._verify_visibility_state(xblock_info, VisibilityState.live)
+            # Check that in self paced course content has live state now
+            xblock_info = self._get_xblock_info(chapter.location)
+            self._verify_visibility_state(xblock_info, VisibilityState.live)

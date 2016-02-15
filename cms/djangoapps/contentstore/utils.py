@@ -463,4 +463,4 @@ def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
     """
-    return course.self_paced and SelfPacedConfiguration.current().enabled if course else False
+    return course and course.self_paced and SelfPacedConfiguration.current().enabled
