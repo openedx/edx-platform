@@ -7,7 +7,8 @@
     URL_TEMPLATES = {
       "licenses": _.template("<%= base %>/licenses/"),
       "simulations": _.template("<%= base %>/licenses/<%=license_id %>/simulations/"),
-      "students": _.template("<%= base %>/licenses/<%=license_id %>/simulations/<%=simulation_id %>/students/")
+      "students": _.template("<%= base %>/licenses/<%=license_id %>/simulations/<%=simulation_id %>/students/"),
+      "attempts": _.template("<%= base %>/licenses/<%=license_id %>/simulations/<%=simulation_id %>/attempts/")
     };
 
     utils.getUrl = function(type, context, addUser) {

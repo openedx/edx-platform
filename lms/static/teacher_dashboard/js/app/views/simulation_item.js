@@ -23,7 +23,7 @@
       },
 
       getContext: function() {
-        var csvUrl = utils.getUrl("students", {
+        var csvUrl = utils.getUrl("attempts", {
           license_id: this.model.get("license"),
           simulation_id: this.model.get("id")
         }) + "?format=csv";

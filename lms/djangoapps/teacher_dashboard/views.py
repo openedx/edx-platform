@@ -20,12 +20,6 @@ from teacher_dashboard.utils import _send_request
 log = logging.getLogger(__name__)
 
 
-MIME_TYPES = {
-    "csv": "text/csv",
-    "json": "application/json"
-}
-
-
 @login_required
 def dashboard_view(request, course_id):
     """
@@ -77,20 +71,15 @@ def simulations_api_call(request, license_pk):
 
 @login_required
 def students_api_call(request, license_pk, simulation_pk):
-    CONTENT_DESPOSITION_FORMATS = ('csv', )
-
-    if request.GET.get("format") in MIME_TYPES:
-        accept_format = request.GET.get("format")
-    else:
-        accept_format = "json"
-
     url = settings.LABSTER_ENDPOINTS.get('students').format(license_pk, simulation_pk)
-    content = _send_request(url, headers={"accept": MIME_TYPES.get(accept_format)})
-    response = HttpResponse(content, content_type=MIME_TYPES.get(accept_format))
+    content = _send_request(url)
+    return HttpResponse(content, content_type="application/json")
 
-    if request.GET.get("format") in CONTENT_DESPOSITION_FORMATS:
-        response['Content-Disposition'] = 'attachment; filename="export_student_results.{}"'.format(
-            request.GET.get("format")
-        )
 
+@login_required
+def attempts_api_call(request, license_pk, simulation_pk):
+    url = settings.LABSTER_ENDPOINTS.get('attempts').format(license_pk, simulation_pk)
+    content = _send_request(url, headers={"accept": "text/csv"})
+    response = HttpResponse(content, content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="export_student_results.csv"'
     return response
