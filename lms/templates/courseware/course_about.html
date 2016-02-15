@@ -193,15 +193,6 @@ from openedx.core.lib.courses import course_image_url
         </div>
       % endif
 
-      <nav aria-label="${_('Course About')}">
-        <a href="#" class="active">${_("Overview")}</a>
-      ##  <a href="#">${_("FAQ")}</a>
-      ##  <a href="#">${_("Requirements")}</a>
-      ##  <a href="#">${_("Text-book")}</a>
-      ##  <a href="#">${_("Syllabus")}</a>
-      ##  <a href="#">${_("Reviews")}</a>
-      </nav>
-
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>

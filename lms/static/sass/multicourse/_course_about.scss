@@ -260,41 +260,6 @@
         }
       }
     }
-
-    nav {
-      border-bottom: 1px solid $border-color-2;
-      @include box-sizing(border-box);
-      @include clearfix();
-      margin: 40px 0;
-      width: flex-grid(12);
-
-      &::after {
-        @extend %faded-hr-divider;
-        content: "";
-        display: none;
-      }
-
-      a {
-        border-bottom: 3px solid transparent;
-        color: $lighter-base-font-color;
-        display: inline-block;
-        letter-spacing: 1px;
-        margin: 0 15px;
-        padding: 0px 5px 15px;
-        text-align: center;
-        text-transform: lowercase;
-
-        &:first-child {
-          margin-left: 0px;
-        }
-
-        &:hover, &:active, &:focus {
-          border-color: $border-color-2;
-          color: $base-font-color;
-          text-decoration: none;
-        }
-      }
-    }
   }
 
   .details {
