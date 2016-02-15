@@ -1604,11 +1604,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             serial += 1
 
     @contract(returns='XBlock')
-    def create_item(
-        self, user_id, course_key, block_type, block_id=None,
-        definition_locator=None, fields=None,
-        force=False, **kwargs
-    ):
+    def create_item(self, user_id, course_key, block_type, block_id=None, definition_locator=None, fields=None,
+                    asides=None, force=False, **kwargs):
         """
         Add a descriptor to persistence as an element
         of the course. Return the resulting post saved version with populated locators.
@@ -1695,6 +1692,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_fields,
                 definition_locator.definition_id,
                 new_id,
+                asides=asides
             ))
 
             self.update_structure(course_key, new_structure)
@@ -1723,7 +1721,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # reconstruct the new_item from the cache
             return self.get_item(item_loc)
 
-    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, asides=None, **kwargs):
         """
         Creates and saves a new xblock that as a child of the specified block
 
@@ -1738,10 +1736,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 a new identifier will be generated
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
+            asides (dict): A dictionary specifying initial values for some or all aside fields
+                in the newly created block
         """
         with self.bulk_operations(parent_usage_key.course_key):
             xblock = self.create_item(
-                user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
+                user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields, asides=asides,
                 **kwargs)
 
             # skip attach to parent if xblock has 'detached' tag
@@ -1986,10 +1986,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             partitioned_fields, descriptor.definition_locator, allow_not_found, force, **kwargs
         ) or descriptor
 
-    def _update_item_from_fields(
-        self, user_id, course_key, block_key, partitioned_fields,
-        definition_locator, allow_not_found, force, **kwargs
-    ):
+    def _update_item_from_fields(self, user_id, course_key, block_key, partitioned_fields,    # pylint: disable=too-many-statements
+                                 definition_locator, allow_not_found, force, asides=None, **kwargs):
         """
         Broke out guts of update_item for short-circuited internal use only
         """
@@ -1999,7 +1997,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 for subfields in partitioned_fields.itervalues():
                     fields.update(subfields)
                 return self.create_item(
-                    user_id, course_key, block_key.type, fields=fields, force=force
+                    user_id, course_key, block_key.type, fields=fields, asides=asides, force=force
                 )
 
             original_structure = self._lookup_course(course_key).structure
@@ -2011,9 +2009,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     fields = {}
                     for subfields in partitioned_fields.itervalues():
                         fields.update(subfields)
-                    return self.create_item(
-                        user_id, course_key, block_key.type, block_id=block_key.id, fields=fields, force=force,
-                    )
+                    return self.create_item(user_id, course_key, block_key.type, block_id=block_key.id, fields=fields,
+                                            asides=asides, force=force)
                 else:
                     raise ItemNotFoundError(course_key.make_usage_key(block_key.type, block_key.id))
 
@@ -2039,13 +2036,23 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if is_updated:
                     settings['children'] = serialized_children
 
+            asides_data_to_update = None
+            if asides:
+                asides_data_to_update, asides_updated = self._get_asides_to_update_from_structure(original_structure,
+                                                                                                  block_key, asides)
+            else:
+                asides_updated = False
+
             # if updated, rev the structure
-            if is_updated:
+            if is_updated or asides_updated:
                 new_structure = self.version_structure(course_key, original_structure, user_id)
                 block_data = self._get_block_from_structure(new_structure, block_key)
 
                 block_data.definition = definition_locator.definition_id
                 block_data.fields = settings
+
+                if asides_updated:
+                    block_data.asides = asides_data_to_update
 
                 new_id = new_structure['_id']
 
@@ -3215,7 +3222,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
 
     @contract(returns=BlockData)
-    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
+    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False,
+                   asides=None, block_defaults=None):
         """
         Create the core document structure for a block.
 
@@ -3226,10 +3234,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
+        if not asides:
+            asides = []
         document = {
             'block_type': category,
             'definition': definition_id,
             'fields': block_fields,
+            'asides': asides,
             'edit_info': {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
@@ -3248,6 +3259,38 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         be a json dict key.
         """
         return structure['blocks'].get(block_key)
+
+    @contract(block_key=BlockKey)
+    def _get_asides_to_update_from_structure(self, structure, block_key, asides):
+        """
+        Get list of aside fields that should be updated/inserted
+        """
+        block = self._get_block_from_structure(structure, block_key)
+
+        if asides:
+            updated = False
+
+            tmp_new_asides_data = {}
+            for asd in asides:
+                aside_type = asd['aside_type']
+                tmp_new_asides_data[aside_type] = asd
+
+            result_list = []
+            for i, aside in enumerate(block.asides):
+                if aside['aside_type'] in tmp_new_asides_data:
+                    result_list.append(tmp_new_asides_data.pop(aside['aside_type']))
+                    updated = True
+                else:
+                    result_list.append(aside)
+
+            if tmp_new_asides_data:
+                for _, asd in tmp_new_asides_data.iteritems():
+                    result_list.append(asd)
+                    updated = True
+
+            return result_list, updated
+        else:
+            return block.asides, False
 
     @contract(block_key=BlockKey, content=BlockData)
     def _update_block_in_structure(self, structure, block_key, content):
