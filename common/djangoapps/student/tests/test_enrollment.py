@@ -36,7 +36,6 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp('embargo')
-        self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
