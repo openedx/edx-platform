@@ -7,9 +7,11 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 
 from importlib import import_module
+import gettext
 import logging
-
+from pkg_resources import resource_filename
 import re
+
 from django.conf import settings
 
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
@@ -20,6 +22,7 @@ if not settings.configured:
 from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+from django.utils.translation import get_language, to_locale
 
 from pymongo import ReadPreference
 from xmodule.contentstore.django import contentstore
@@ -27,7 +30,6 @@ from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
-
 
 try:
     # We may not always have the request_cache module available
@@ -185,7 +187,7 @@ def create_modulestore_instance(
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         disabled_xblock_types=disabled_xblock_types,
         doc_store_config=doc_store_config,
-        i18n_service=i18n_service or ModuleI18nService(),
+        i18n_service=i18n_service,
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
         signal_handler=signal_handler or SignalHandler(class_),
@@ -243,9 +245,46 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    def __init__(self, block):
+        """
+        Store a reference to the block currently being serviced by this runtime.  We'll use this
+        reference later on for things like locating the block's translation domain (PO+MO files)
+        """
+        self.block = block
 
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
+
+    def ugettext(self, string):
+        """
+        This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
+        the GNU gettext ugettext operation.  Here we attempts to look up the provided string in the
+        XBlock's own domain translation catalog, currently expected to be:
+            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
+        If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
+        django.utils.translation.ugettext, which will attempt to find a matching string in the
+        LMS' own domain translation catalog -- effectively achieving translation by coincidence.
+        """
+        # The translation workflow should only execute if there's an actual string to look up
+        # If gettext processes an empty string the PO file header information will oddly be returned
+        translated_string = unicode(string)
+        if translated_string and self.block:
+            try:
+                xblock_resource = self.block.__class__.unmixed_class.__module__
+                xblock_locale_dir = '/conf/locale'
+                xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
+                xblock_domain = 'django'
+                selected_language = get_language()
+                translator = gettext.translation(
+                    xblock_domain,
+                    xblock_locale_path,
+                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
+                )
+                _ = translator.ugettext
+            except IOError:
+                _ = django.utils.translation.ugettext
+            translated_string = _(translated_string)  # pylint: disable=translation-of-non-string
+        return translated_string
 
     def strftime(self, *args, **kwargs):
         """
