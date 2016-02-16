@@ -17,6 +17,7 @@ import hashlib
 from importlib import import_module
 import json
 import logging
+
 from pytz import UTC
 from urllib import urlencode
 import uuid
@@ -30,7 +31,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError, transaction
-from django.db.models import Count
+from django.db.models import Count, DO_NOTHING
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
@@ -920,7 +921,16 @@ class CourseEnrollment(models.Model):
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
     user = models.ForeignKey(User)
-    course_id = CourseKeyField(max_length=255, db_index=True)
+    batch_course_overview = models.ForeignObject(
+        CourseOverview,
+        from_fields=['course_id'],
+        to_fields=['id'],
+        blank=True,
+        null=True,
+        related_name='+',
+        on_delete=DO_NOTHING
+    )
+    course_id = CourseKeyField(db_column='course_id', max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     # If is_active is False, then the student is not considered to be enrolled
@@ -1445,10 +1455,13 @@ class CourseEnrollment(models.Model):
             become stale.
        """
         if not self._course_overview:
-            try:
-                self._course_overview = CourseOverview.get_from_id(self.course_id)
-            except (CourseOverview.DoesNotExist, IOError):
-                self._course_overview = None
+            if self.batch_course_overview:
+                self._course_overview = self.batch_course_overview
+            else:
+                try:
+                    self._course_overview = CourseOverview.get_from_id(self.course_id)
+                except (CourseOverview.DoesNotExist, IOError):
+                    self._course_overview = None
         return self._course_overview
 
     def is_verified_enrollment(self):
