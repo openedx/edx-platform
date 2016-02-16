@@ -122,6 +122,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         cls.content_location_unjsonable = StaticContent.compute_location(cls.course.id, filename_unjsonable)
 
     def setUp(self):
+        super(TestSaveSubsToStore, self).setUp()
         self.addCleanup(self.clear_subs_content)
         self.clear_subs_content()
 
