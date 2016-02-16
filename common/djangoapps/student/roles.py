@@ -55,6 +55,7 @@ class RoleCache(object):
         )
 
     def add_role(self, role):
+        """Adds a role to the cache."""
         self._roles.add(role)
 
 
@@ -160,6 +161,7 @@ class RoleBase(AccessRole):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
+                    # pylint: disable=protected-access
                     user._roles.add_role(entry)
 
     def remove_users(self, *users):
