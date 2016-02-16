@@ -32,7 +32,7 @@ def _calculate_course_xblocks_data(course_key):
             usage_id = unicode(current_block.scope_ids.usage_id)
             block_info = {
                 'usage_key': current_block.scope_ids.usage_id,
-                'display_name': current_block.display_name,
+                'display_name': current_block.display_name_with_default,
                 'children_ids': [unicode(child.scope_ids.usage_id) for child in children]
             }
             blocks_info_dict[usage_id] = block_info
