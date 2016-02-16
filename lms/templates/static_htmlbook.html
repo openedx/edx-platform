@@ -136,7 +136,7 @@
             </%def>
 
             %for (index, entry) in enumerate(textbook['chapters']):
-              ${print_entry(entry, index+1)}
+              ${print_entry(entry, index+1) | n, unicode}
             % endfor
           </ul>
         </section>

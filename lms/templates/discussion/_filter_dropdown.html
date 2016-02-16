@@ -6,9 +6,9 @@ import json
 <%def name="render_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
-            ${render_entry(map["entries"], child)}
+            ${render_entry(map["entries"], child) | n, unicode}
         %else:
-            ${render_category(map["subcategories"], child)}
+            ${render_category(map["subcategories"], child) | n, unicode}
         %endif
     %endfor
 </%def>
@@ -27,7 +27,7 @@ import json
     <li class="forum-nav-browse-menu-item">
         <button type="button" class="forum-nav-browse-title">${category}</button>
         <ul class="forum-nav-browse-submenu">
-            ${render_dropdown(categories[category])}
+            ${render_dropdown(categories[category]) | n, unicode}
         </ul>
     </li>
 </%def>
@@ -50,6 +50,6 @@ import json
                 ${_("Posts I'm Following")}
             </button>
         </li>
-        ${render_dropdown(category_map)}
+        ${render_dropdown(category_map) | n, unicode}
     </ul>
 </div>
