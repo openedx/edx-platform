@@ -22,7 +22,6 @@
         "domReady": "2.0.1",
         "draggabilly": "1.2.4",
         // "history": "1.8b2",
-        "jquery": "1.7.2",
         // "jquery.ajaxQueue": "unknown",
         // "jquery.ajax-retry": "unknown",
         "jquery.colorhelpers": "1.1",

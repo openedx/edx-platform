@@ -3,7 +3,11 @@ requirejs.config({
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
-        "jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        # The jquery-migrate library was added in upgrading from
+        # jQuery 1.7.x to 2.2.x.  This config allows developers to
+        # depend on "jquery" which opaquely requires both libraries.
+        "_jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        "jquery": "xmodule_js/common_static/js/vendor/jquery-migrate.min",
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
@@ -63,6 +67,10 @@ requirejs.config({
         },
         "date": {
             exports: "Date"
+        },
+        "jquery": {
+            deps: ["_jquery"],
+            exports: "jQuery"
         },
         "jquery.ui": {
             deps: ["jquery"],
