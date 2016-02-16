@@ -17,7 +17,7 @@ from pipeline_mako import render_require_js_path_overrides
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 
 <%block name="js_overrides">
-${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES) | n, unicode}
 </%block>
 
 <%block name="title"><title>
@@ -166,7 +166,7 @@ ${fragment.foot_html()}
       <div class="accordion">
         <nav class="course-navigation" aria-label="${_('Course')}">
           % if accordion.strip():
-            ${accordion}
+            ${accordion | n, unicode}
           % else:
             <div class="chapter">${_("No content has been added to this course")}</div>
           % endif

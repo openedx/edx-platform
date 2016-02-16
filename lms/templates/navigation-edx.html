@@ -48,9 +48,9 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if course and not disable_courseware_header:
     <h2 class="course-header">
-      <span class="provider">${course.display_org_with_default | h}:</span>
-      <span class="course-number">${course.display_number_with_default | h}</span>
-      <span class="course-name">${course.display_name_with_default_escaped}</span>
+      <span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
     </h2>
     % endif
 
