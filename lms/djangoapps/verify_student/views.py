@@ -522,9 +522,9 @@ class PayAndVerifyView(View):
             if mode.min_price > 0 and not CourseMode.is_credit_mode(mode):
                 return mode
 
-        # Otherwise, find the first expired mode
+        # Otherwise, find the first non credit expired paid mode
         for mode in all_modes[course_key]:
-            if mode.min_price > 0:
+            if mode.min_price > 0 and not CourseMode.is_credit_mode(mode):
                 return mode
 
         # Otherwise, return None and so the view knows to respond with a 404.
