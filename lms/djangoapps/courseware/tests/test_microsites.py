@@ -30,14 +30,10 @@ class TestMicrosites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             org='TestMicrositeX',
             emit_signals=True,
         )
-        cls.chapter0 = ItemFactory.create(parent_location=cls.course.location,
-                                           display_name='Overview')
-        cls.chapter9 = ItemFactory.create(parent_location=cls.course.location,
-                                           display_name='factory_chapter')
-        cls.section0 = ItemFactory.create(parent_location=cls.chapter0.location,
-                                           display_name='Welcome')
-        cls.section9 = ItemFactory.create(parent_location=cls.chapter9.location,
-                                           display_name='factory_section')
+        cls.chapter0 = ItemFactory.create(parent_location=cls.course.location, display_name='Overview')
+        cls.chapter9 = ItemFactory.create(parent_location=cls.course.location, display_name='factory_chapter')
+        cls.section0 = ItemFactory.create(parent_location=cls.chapter0.location, display_name='Welcome')
+        cls.section9 = ItemFactory.create(parent_location=cls.chapter9.location, display_name='factory_section')
 
         cls.course_outside_microsite = CourseFactory.create(
             display_name='Robot_Course_Outside_Microsite',
