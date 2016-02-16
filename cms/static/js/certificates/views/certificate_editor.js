@@ -97,11 +97,11 @@ function($, _, Backbone, gettext,
             return {
                 id: this.model.get('id'),
                 uniqueId: _.uniqueId(),
-                name: this.model.escape('name'),
-                description: this.model.escape('description'),
-                course_title: this.model.escape('course_title'),
-                org_logo_path: this.model.escape('org_logo_path'),
-                is_active: this.model.escape('is_active'),
+                name: this.model.get('name'),
+                description: this.model.get('description'),
+                course_title: this.model.get('course_title'),
+                org_logo_path: this.model.get('org_logo_path'),
+                is_active: this.model.get('is_active'),
                 isNew: this.model.isNew()
             };
         },
