@@ -5,7 +5,7 @@ define([
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     "use strict";
     describe("Library Instructor Access Page", function () {
-        const changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
+        var changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
         var team_member_fixture = readFixtures("team-member.underscore");
 
         function setRole(email, role){
@@ -48,7 +48,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can give a user permission to use the library", function () {
-                const email = 'other@example.com';
+                var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
@@ -61,7 +61,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can promote user", function() {
-                const email = "staff@example.com";
+                var email = "staff@example.com";
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole("staff@example.com", 'staff');

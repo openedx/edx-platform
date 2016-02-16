@@ -89,7 +89,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
                 items = this.$el.find('ol').find('.list-settings-item');
 
             _.each(items, function(element, index) {
-                var key = $(element).find('select').val(),
+                var key = $(element).find('select option:selected').val(),
                     value = $(element).find('.input').val();
 
                 // Keys should be unique, so if our keys are duplicated and
