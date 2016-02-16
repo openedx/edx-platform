@@ -7,9 +7,7 @@ from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from xblock.field_data import DictFieldData
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from ..field_overrides import (
     disable_overrides,

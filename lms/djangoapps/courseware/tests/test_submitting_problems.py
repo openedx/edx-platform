@@ -126,13 +126,10 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     COURSE_NAME = "test_course"
 
     def setUp(self):
-
-        super(TestSubmittingProblems, self).setUp(create_user=False)
-        # Create course
-        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        assert self.course, "Couldn't load course %r" % self.COURSE_NAME
+        super(TestSubmittingProblems, self).setUp()
 
         # create a test student
+        self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.student = 'view@test.com'
         self.password = 'foo'
         self.create_account('u1', self.student, self.password)
