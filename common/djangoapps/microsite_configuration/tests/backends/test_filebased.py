@@ -1,14 +1,21 @@
 """
 Test Microsite filebased backends.
 """
+import unittest
 from mock import patch
 
 from django.test import TestCase
+from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from microsite_configuration.backends.base import (
     BaseMicrositeBackend,
+    BaseMicrositeTemplateBackend,
 )
 from microsite_configuration import microsite
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @patch(
@@ -114,3 +121,40 @@ class FilebasedMicrositeBackendTests(TestCase):
         # if microsite config does not exist default config should be used
         microsite.set_by_domain('unknown')
         self.assertEqual(microsite.get_value('university'), 'default_university')
+
+
+@patch(
+    'microsite_configuration.microsite.TEMPLATES_BACKEND',
+    microsite.get_backend(
+        'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend', BaseMicrositeTemplateBackend
+    )
+)
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class FilebasedMicrositeTemplateBackendTests(ModuleStoreTestCase):
+    """
+    Go through and test the FilebasedMicrositeTemplateBackend class
+    """
+    def setUp(self):
+        super(FilebasedMicrositeTemplateBackendTests, self).setUp()
+        self.microsite_subdomain = 'testmicrosite'
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        self.client.login(username=self.user.username, password="edx")
+
+    def test_get_template_path(self):
+        """
+        Tests get template path works for both relative and absolute paths.
+        """
+        microsite.set_by_domain(self.microsite_subdomain)
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.user
+        )
+
+        response = self.client.get(
+            reverse('syllabus', args=[unicode(self.course.id)]),
+            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME,
+        )
+
+        self.assertContains(response, "Microsite relative path template contents")
+        self.assertContains(response, "Microsite absolute path template contents")
