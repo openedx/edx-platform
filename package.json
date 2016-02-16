@@ -4,6 +4,7 @@
   "dependencies": {
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.10.4",
+    "jquery": "2.2.0",
     "uglify-js": "2.4.24",
     "underscore": "1.4.4"
   },
