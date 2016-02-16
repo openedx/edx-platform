@@ -78,6 +78,28 @@
                 },
             ]
         },
+        {
+            'display_name': gettext('Rescind a single certificate'),
+            'method': 'update_cert_status',
+            'description': gettext('Rescind a certificate for a particular user in a particular course'),
+            'kwargs': [
+                {
+                    'argument': 'course_id',
+                    'display_name': gettext('course_id'),
+                    'required': true,
+                },
+                {
+                    'argument': 'username_or_email',
+                    'display_name': gettext('username or email'),
+                    'required': true,
+                },
+                {
+                    'argument': 'status',
+                    'display_name': gettext('status'),
+                    'required': false,
+                },
+            ],
+        },
     ]
 
     function commandChanged(e){
