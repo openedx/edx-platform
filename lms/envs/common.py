@@ -392,7 +392,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMPREHENSIVE_THEME_DIR = ""
+COMPREHENSIVE_THEME_DIR = "/".join([REPO_ROOT, "themes"])
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -773,7 +773,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 CMS_BASE = 'localhost:8001'
 
 # Site info
-SITE_ID = 1
+# SITE_ID = 1
 SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'

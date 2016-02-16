@@ -4,14 +4,22 @@ from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 
-from openedx.core.djangoapps.theming.helpers import get_page_title_breadcrumbs, get_value, get_template_path, get_themed_template_path, is_request_in_themed_site
+from openedx.core.djangoapps.theming.helpers import (
+  get_page_title_breadcrumbs,
+  get_value,
+  get_template_path,
+  get_themed_template_path,
+  is_request_in_themed_site,
+  get_request_domain,
+)
 from certificates.api import get_asset_url_by_slug
 from lang_pref.api import released_languages
 %>
 
 <%def name='url(file, raw=False)'><%
 try:
-    url = staticfiles_storage.url(file)
+    domain = get_request_domain(request)
+    url = staticfiles_storage.url(file, domain=domain)
 except:
     url = file
 %>${url}${"?raw" if raw else ""}</%def>

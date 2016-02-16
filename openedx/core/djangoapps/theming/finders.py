@@ -17,12 +17,13 @@ interface, as well.
 .. _Django-Pipeline: http://django-pipeline.readthedocs.org/
 .. _Django-Require: https://github.com/etianen/django-require
 """
-from path import Path
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
+
 from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
+from openedx.core.djangoapps.theming.helpers import is_themed_dir
 
 
 class ComprehensiveThemeFinder(BaseFinder):
@@ -34,7 +35,7 @@ class ComprehensiveThemeFinder(BaseFinder):
     """
     def __init__(self, *args, **kwargs):
         super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
-
+        self.storage = None
         theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
         if not theme_dir:
             self.storage = None
@@ -43,13 +44,7 @@ class ComprehensiveThemeFinder(BaseFinder):
         if not isinstance(theme_dir, basestring):
             raise ImproperlyConfigured("Your COMPREHENSIVE_THEME_DIR setting must be a string")
 
-        root = Path(settings.PROJECT_ROOT)
-        if root.name == "":
-            root = root.parent
-
-        component_dir = Path(theme_dir) / root.name
-        static_dir = component_dir / "static"
-        self.storage = CachedComprehensiveThemingStorage(location=static_dir)
+        self.storage = CachedComprehensiveThemingStorage(location=theme_dir)
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """
@@ -62,8 +57,13 @@ class ComprehensiveThemeFinder(BaseFinder):
             # strip the prefix
             path = path[len(self.storage.prefix):]
 
-        if self.storage.exists(path):
-            match = self.storage.path(path)
+        path_parts = path.split("/", 1)
+        if not is_themed_dir(path_parts[0]):
+            return []
+
+        themed_path = path_parts[0] + "/" + self.storage.root_name + self.storage.prefix + "/" + path_parts[1]
+        if self.storage.exists(themed_path):
+            match = self.storage.path(themed_path)
             if all:
                 match = [match]
             return match

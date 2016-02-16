@@ -1,9 +1,32 @@
 """
     Helpers for accessing comprehensive theming related variables.
 """
+import os
+
+from django.contrib.sites.shortcuts import get_current_site
+
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
 from django.conf import settings
+
+from util.url import strip_port_from_host
+
+
+def get_request_domain(request):
+    domain = get_current_site(request).domain
+    domain = strip_port_from_host(domain)
+    return domain
+
+
+def is_themed_dir(str):
+    themes_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
+    if not themes_dir.isdir():
+        return False
+
+    for theme_dir in os.listdir(themes_dir):
+        if theme_dir == str:
+            return True
+    return False
 
 
 def get_page_title_breadcrumbs(*args):

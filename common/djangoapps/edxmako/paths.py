@@ -11,6 +11,7 @@ from django.conf import settings
 from mako.lookup import TemplateLookup
 
 from microsite_configuration import microsite
+from openedx.core.djangoapps.theming.core import get_template_path
 from . import LOOKUP
 
 
@@ -51,13 +52,14 @@ class DynamicTemplateLookup(TemplateLookup):
         """
         Overridden method which will hand-off the template lookup to the microsite subsystem
         """
-        microsite_template = microsite.get_template(uri)
+        if microsite.is_request_in_microsite():
+            microsite_template = microsite.get_template(uri)
+            if microsite_template:
+                return microsite_template
+        else:
+            uri = get_template_path(uri)
 
-        return (
-            microsite_template
-            if microsite_template
-            else super(DynamicTemplateLookup, self).get_template(uri)
-        )
+        return super(DynamicTemplateLookup, self).get_template(uri)
 
 
 def clear_lookups(namespace):

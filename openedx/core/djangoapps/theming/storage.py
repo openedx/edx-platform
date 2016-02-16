@@ -29,20 +29,20 @@ class ComprehensiveThemingAwareMixin(object):
         root = Path(settings.PROJECT_ROOT)
         if root.name == "":
             root = root.parent
+        self.root_name = root.name
 
-        component_dir = Path(theme_dir) / root.name
-        self.theme_location = component_dir / "static"
+        if theme_dir:
+            self.theme_location = theme_dir
 
     @property
     def prefix(self):
         """
         This is used by the ComprehensiveThemeFinder in the collection step.
         """
-        theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
-        if not theme_dir:
-            return None
-        theme_name = os.path.basename(os.path.normpath(theme_dir))
-        return "themes/{name}/".format(name=theme_name)
+        theme_prefix = ""
+        if self.theme_location:
+            theme_prefix = "/static"
+        return theme_prefix
 
     def themed(self, name):
         """
@@ -67,13 +67,21 @@ class ComprehensiveThemingAwareMixin(object):
         path = safe_join(base, name)
         return os.path.normpath(path)
 
-    def url(self, name, *args, **kwargs):
+    def url(self, name, domain=None):
         """
         Add the theme prefix to the asset URL
         """
-        if self.themed(name):
-            name = self.prefix + name
-        return super(ComprehensiveThemingAwareMixin, self).url(name, *args, **kwargs)
+        if name.startswith(self.prefix):
+            # strip the prefix
+            name_without_prefix = name[len(self.prefix):]
+        else:
+            name_without_prefix = name
+
+        if domain:
+            themed_path = domain + "/" + self.root_name + self.prefix + name_without_prefix
+            if self.themed(themed_path):
+                name = self.prefix + "/" + domain + name_without_prefix
+        return super(ComprehensiveThemingAwareMixin, self).url(name)
 
 
 class CachedComprehensiveThemingStorage(
