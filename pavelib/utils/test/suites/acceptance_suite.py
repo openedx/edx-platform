@@ -135,6 +135,7 @@ class AcceptanceTestSuite(TestSuite):
 
             # Run migrations to update the db, starting from its cached state
             for db_alias in sorted(self.dbs.keys()):
+                # pylint: disable=line-too-long
                 sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
                 sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
         else:
