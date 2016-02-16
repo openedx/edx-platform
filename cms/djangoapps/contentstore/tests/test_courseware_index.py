@@ -750,11 +750,6 @@ class TestTaskExecution(SharedModuleStoreTestCase):
             publish_item=False,
         )
 
-    def setUp(self):
-        super(TestTaskExecution, self).setUp()
-        SignalHandler.course_published.disconnect(listen_for_course_publish)
-        SignalHandler.library_updated.disconnect(listen_for_library_update)
-
     def test_task_indexing_course(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
