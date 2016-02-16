@@ -14,18 +14,18 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 
 
-def get_db_overrides(name):
+def get_db_overrides(db_name):
     """
     Now that we have multiple databases, we want to look up from the environment
     for both databases.
     """
     db_overrides = dict(
         PASSWORD=os.environ.get('DB_MIGRATION_PASS', None),
-        ENGINE=os.environ.get('DB_MIGRATION_ENGINE', DATABASES[name]['ENGINE']),
-        USER=os.environ.get('DB_MIGRATION_USER', DATABASES[name]['USER']),
-        NAME=os.environ.get('DB_MIGRATION_NAME', DATABASES[name]['NAME']),
-        HOST=os.environ.get('DB_MIGRATION_HOST', DATABASES[name]['HOST']),
-        PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES[name]['PORT']),
+        ENGINE=os.environ.get('DB_MIGRATION_ENGINE', DATABASES[db_name]['ENGINE']),
+        USER=os.environ.get('DB_MIGRATION_USER', DATABASES[db_name]['USER']),
+        NAME=os.environ.get('DB_MIGRATION_NAME', DATABASES[db_name]['NAME']),
+        HOST=os.environ.get('DB_MIGRATION_HOST', DATABASES[db_name]['HOST']),
+        PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES[db_name]['PORT']),
     )
 
     if db_overrides['PASSWORD'] is None:
