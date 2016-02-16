@@ -29,7 +29,6 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-import datetime
 import imp
 import sys
 import os
@@ -1090,6 +1089,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'mobile_api.middleware.AppVersionUpgrade',
     'header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
@@ -2849,6 +2849,9 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# cache timeout in seconds for Mobile App Version Upgrade
+APP_UPGRADE_CACHE_TIMEOUT = 3600
 
 # Offset for courseware.StudentModuleHistoryExtended which is used to
 # calculate the starting primary key for the underlying table.  This gap
