@@ -235,3 +235,5 @@ def award_program_certificates(self, username):
             # N.B. This logic assumes that this task is idempotent
             LOGGER.info('Retrying task to award failed certificates to user %s', username)
             raise self.retry(countdown=countdown, max_retries=config.max_retries)
+
+    LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)
