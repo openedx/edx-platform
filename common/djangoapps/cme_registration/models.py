@@ -460,5 +460,5 @@ class CmeUserProfile(UserProfile):
                        ('Other', 'Other'))
 
     country_cme = models.CharField(blank=True, null=True, max_length=50, choices=COUNTRY_CHOICES)
-    GENDER_CHOICES = (('M', 'Male'),
-                      ('F', 'Female'))
+    GENDER_CHOICES = (('m', 'Male'),
+                      ('f', 'Female'))
