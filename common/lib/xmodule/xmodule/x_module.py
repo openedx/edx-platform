@@ -24,6 +24,7 @@ from xblock.fields import (
     String, Dict, ScopeIds, Reference, ReferenceList,
     ReferenceValueDict, UserScope
 )
+
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule import course_metadata_utils
@@ -1775,6 +1776,28 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
 
     def publish(self, block, event_type, event):
         pass
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(ModuleSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
 
 
 class CombinedSystem(object):
