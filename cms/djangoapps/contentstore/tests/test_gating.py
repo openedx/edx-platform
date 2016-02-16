@@ -13,32 +13,32 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test case for handle_score_changed django signal handler
     """
-    def setUp(self):
+    def setUp(cls):
         """
         Initial data setup
         """
-        super(TestHandleItemDeleted, self).setUp()
+        super(TestHandleItemDeleted, cls).setUp()
 
-        self.course = CourseFactory.create()
-        self.course.enable_subsection_gating = True
-        self.course.save()
-        self.chapter = ItemFactory.create(
-            parent=self.course,
+        cls.course = CourseFactory.create()
+        cls.course.enable_subsection_gating = True
+        cls.course.save()
+        cls.chapter = ItemFactory.create(
+            parent=cls.course,
             category="chapter",
             display_name="Chapter"
         )
-        self.open_seq = ItemFactory.create(
-            parent=self.chapter,
+        cls.open_seq = ItemFactory.create(
+            parent=cls.chapter,
             category='sequential',
             display_name="Open Sequential"
         )
-        self.gated_seq = ItemFactory.create(
-            parent=self.chapter,
+        cls.gated_seq = ItemFactory.create(
+            parent=cls.chapter,
             category='sequential',
             display_name="Gated Sequential"
         )
-        gating_api.add_prerequisite(self.course.id, self.open_seq.location)
-        gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
+        gating_api.add_prerequisite(cls.course.id, cls.open_seq.location)
+        gating_api.set_required_content(cls.course.id, cls.gated_seq.location, cls.open_seq.location, 100)
 
     @patch('contentstore.signals.gating_api.set_required_content')
     @patch('contentstore.signals.gating_api.remove_prerequisite')
