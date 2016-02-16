@@ -174,6 +174,11 @@ class StudentModuleHistory(models.Model):
 
     @property
     def csm(self):
+        """
+        Finds the StudentModule object for this history record, even if our data is split
+        across multiple data stores.  Django does not handle this correctly with the built-in
+        student_module property.
+        """
         return StudentModule.objects.get(pk=self.student_module_id)
 
 
@@ -231,6 +236,11 @@ class StudentModuleHistoryExtended(models.Model):
 
     @property
     def csm(self):
+        """
+        Finds the StudentModule object for this history record, even if our data is split
+        across multiple data stores.  Django does not handle this correctly with the built-in
+        student_module property.
+        """
         return StudentModule.objects.filter(pk=self.student_module_id).first()
 
 
