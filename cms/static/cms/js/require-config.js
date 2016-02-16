@@ -114,7 +114,6 @@
             "date": {
                 exports: "Date"
             },
-            // Note that "jquery"
             "jquery": {
                 deps: ["_jquery"],
                 exports: "jQuery"
@@ -153,7 +152,7 @@
             },
             "jquery.scrollTo": {
                 deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
+                exports: "jQuery.fn.scrollTo"
             },
             "jquery.flot": {
                 deps: ["jquery"],
