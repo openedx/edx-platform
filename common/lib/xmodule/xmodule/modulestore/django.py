@@ -7,6 +7,7 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 
 from importlib import import_module
+import gettext
 import logging
 
 import re
@@ -27,7 +28,7 @@ from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
-
+from django.utils.translation import get_language, to_locale
 
 try:
     # We may not always have the request_cache module available
@@ -243,9 +244,34 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    def ugettext(self, string):
+        """
+        Attempts to look up the string in the XBlock's own domain.  If it can't find that domain then
+        we fall-back onto django.utils.translation.ugettext
+        """
+        log_msg = "********** ModuleI18nService.ugettext: {0} **********".format(string)
+        log.info(log_msg)
+        translated_string = string
 
-    def __getattr__(self, name):
-        return getattr(django.utils.translation, name)
+        # The translation workflow should only execute if there's an actual string to look up
+        # If gettext processes an empty string the PO file header information will be returned
+        if translated_string:
+            try:
+                # TODO: Make this path dynamic for installed xBlocks
+                locale_path = "/edx/src/drag-and-drop-v2/conf/locale"
+                translator = gettext.translation(
+                    'django',
+                    locale_path,
+                    [to_locale(get_language())]
+                )
+                _ = translator.ugettext
+            except:
+                log_msg = "********** Translation catalog not found: {0}".format(locale_path)
+                log.info(log_msg)
+                _ = django.utils.translation.ugettext
+
+            translated_string = _(string)
+        return translated_string
 
     def strftime(self, *args, **kwargs):
         """

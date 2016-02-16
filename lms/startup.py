@@ -127,7 +127,7 @@ def enable_stanford_theme():
 
     # Include theme locale path for django translations lookup
     settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
-
+    settings.LOCALE_PATHS = ('/edx/src/xblock-drag-and-drop-v2/conf/locale',) + settings.LOCALE_PATHS
 
 def enable_microsites():
     """
