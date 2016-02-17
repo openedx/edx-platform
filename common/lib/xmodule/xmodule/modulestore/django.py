@@ -26,6 +26,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
+from xmodule.util import translation as xblock_translation
 import xblock.reference.plugins
 
 
@@ -243,14 +244,21 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    log.info('************* ModuleI18nService Usage!!!! **********')
 
     def __getattr__(self, name):
-        return getattr(django.utils.translation, name)
+        msg = '************* ModuleI18nService getattr call!!! Attr: {0} ************'.format(name)
+        log.info(msg)
+        try:
+            return getattr(xblock_translation, name)
+        except:
+            return getattr(django.utils.translation, name)
 
     def strftime(self, *args, **kwargs):
         """
         A locale-aware implementation of strftime.
         """
+        log.info('********** ModuleI18nService strftime call!!!**********')
         # This is the wrong place to import this function.  I'm putting it here
         # because the xmodule test suite can't import this module, because
         # Django is not available in that suite.  This function isn't called in
