@@ -36,7 +36,6 @@ from student.tests.factories import (
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
@@ -709,25 +708,28 @@ def patched_get_children(self, usage_key_filter=None):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
-class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestCCXGrades, cls).setUpClass()
-        cls._course = course = CourseFactory.create(enable_ccx=True)
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestCCXGrades, self).setUp()
+
+        self._course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
-        cls.mooc_start = start = datetime.datetime(
+        self.start = datetime.datetime(
             2010, 5, 12, 2, 42, tzinfo=pytz.UTC
         )
         chapter = ItemFactory.create(
-            start=start, parent=course, category='sequential'
+            start=self.start, parent=self._course, category='sequential'
         )
-        cls.sections = sections = [
+        self.sections = [
             ItemFactory.create(
                 parent=chapter,
                 category="sequential",
@@ -735,7 +737,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             for _ in xrange(4)
         ]
         # making problems available at class level for possible future use in tests
-        cls.problems = [
+        self.problems = [
             [
                 ItemFactory.create(
                     parent=section,
@@ -743,14 +745,8 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
                 ) for _ in xrange(4)
-            ] for section in sections
+            ] for section in self.sections
         ]
-
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(TestCCXGrades, self).setUp()
 
         # Create instructor account
         self.coach = coach = AdminFactory.create()
@@ -824,13 +820,18 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         rows = response.content.strip().split('\r')
         headers = rows[0]
 
-        # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[2].strip().split(',')))
-        self.assertNotIn('HW 04', data)
-        self.assertEqual(data['HW 01'], '0.75')
-        self.assertEqual(data['HW 02'], '0.5')
-        self.assertEqual(data['HW 03'], '0.25')
-        self.assertEqual(data['HW Avg'], '0.5')
+        records = dict()
+        for i in range(1, len(rows)):
+            data = dict(zip(headers.strip().split(','), rows[i].strip().split(',')))
+            records[data['username']] = data
+
+        student_data = records[self.student.username]  # pylint: disable=no-member
+
+        self.assertNotIn('HW 04', student_data)
+        self.assertEqual(student_data['HW 01'], '0.75')
+        self.assertEqual(student_data['HW 02'], '0.5')
+        self.assertEqual(student_data['HW 03'], '0.25')
+        self.assertEqual(student_data['HW Avg'], '0.5')
 
     @patch('courseware.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
