@@ -2181,22 +2181,21 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         SelfPacedConfiguration(enabled=True).save()
 
-        with self.store.default_store(store_type):
-            # Create course, chapter and setup future release date to make chapter in scheduled state
-            course = CourseFactory.create()
-            chapter = self._create_child(course, 'chapter', "Test Chapter")
-            self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        # Create course, chapter and setup future release date to make chapter in scheduled state
+        course = CourseFactory.create(default_store=store_type)
+        chapter = self._create_child(course, 'chapter', "Test Chapter")
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
 
-            # Check that has scheduled state
-            xblock_info = self._get_xblock_info(chapter.location)
-            self._verify_visibility_state(xblock_info, VisibilityState.ready)
-            self.assertFalse(course.self_paced)
+        # Check that chapter has scheduled state
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self.assertFalse(course.self_paced)
 
-            # Change course pacing to self paced
-            course.self_paced = True
-            self.store.update_item(course, self.user.id)
-            self.assertTrue(course.self_paced)
+        # Change course pacing to self paced
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        self.assertTrue(course.self_paced)
 
-            # Check that in self paced course content has live state now
-            xblock_info = self._get_xblock_info(chapter.location)
-            self._verify_visibility_state(xblock_info, VisibilityState.live)
+        # Check that in self paced course content has live state now
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
