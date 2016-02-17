@@ -316,6 +316,10 @@
 // ====================
 .dashboard .my-courses {
 
+  &:focus {
+    outline: none;
+  }
+
   // UI: individual course item
   .course {
     @include box-sizing(box);
