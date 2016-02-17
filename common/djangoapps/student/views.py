@@ -39,7 +39,6 @@ from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
 
-
 from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
@@ -55,6 +54,7 @@ from student.models import (
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
@@ -502,6 +502,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
     # if verified is an option.
     if CourseMode.VERIFIED in modes and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES:
         mode_info['show_upsell'] = True
+        mode_info['verified_sku'] = modes['verified'].sku
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
@@ -736,6 +737,13 @@ def dashboard(request):
         'disable_courseware_js': True,
         'xseries_credentials': xseries_credentials,
     }
+
+    ecommerce_service = EcommerceService()
+    if ecommerce_service.is_enabled():
+        context.update({
+            'use_ecommerce_payment_flow': True,
+            'ecommerce_payment_page': ecommerce_service.payment_page_url(),
+        })
 
     return render_to_response('dashboard.html', context)
 

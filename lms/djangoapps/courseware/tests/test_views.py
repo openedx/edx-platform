@@ -31,6 +31,7 @@ import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
+from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
@@ -69,21 +70,21 @@ class TestJumpTo(ModuleStoreTestCase):
         location = self.course_key.make_usage_key(None, 'NoSuchPlace')
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', unicode(self.course_key), unicode(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     @unittest.skip
     def test_jumpto_from_chapter(self):
         location = self.course_key.make_usage_key('chapter', 'Overview')
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', unicode(self.course_key), unicode(location))
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     @unittest.skip
     def test_jumpto_id(self):
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), 'Overview')
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', unicode(self.course_key), 'Overview')
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
@@ -173,7 +174,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
     def test_jumpto_id_invalid_location(self):
         location = Location('edX', 'toy', 'NoSuchPlace', None, None, None)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_key.to_deprecated_string(), location.to_deprecated_string())
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', unicode(self.course_key), unicode(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -212,25 +213,71 @@ class ViewsTestCase(ModuleStoreTestCase):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-        request = self.request_factory.get(reverse('about_course', args=[course.id.to_deprecated_string()]))
+        request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser()
         mako_middleware_process_request(request)
-        response = views.course_about(request, course.id.to_deprecated_string())
+        response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
         request.user = self.user
-        response = views.course_about(request, course.id.to_deprecated_string())
+        response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = views.course_about(request, course.id.to_deprecated_string())
+        response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
+
+    def assert_enrollment_link_present(self, is_anonymous, _id=False):
+        """
+        Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
+
+        Arguments:
+            is_anonymous(bool): Tell the method to use an anonymous user or the logged in one.
+            _id(bool): Tell the method to either expect an id in the href or not.
+
+        """
+        checkout_page = '/test_basket/'
+        sku = 'TEST123'
+        CommerceConfiguration.objects.create(
+            checkout_on_ecommerce_service=True,
+            single_course_checkout_page=checkout_page
+        )
+        course = CourseFactory.create()
+        CourseModeFactory(mode_slug=CourseMode.PROFESSIONAL, course_id=course.id, sku=sku, min_price=1)
+
+        request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
+        request.user = AnonymousUser() if is_anonymous else self.user
+        mako_middleware_process_request(request)
+
+        # Construct the link for each of the four possibilities:
+        #      (1) shopping cart is disabled and the user is not logged in
+        #      (2) shopping cart is disabled and the user is logged in
+        #      (3) shopping cart is enabled and the user is not logged in
+        #      (4) shopping cart is enabled and the user is logged in
+        href = '<a href="{}?{}" class="add-to-cart"{}'.format(
+            checkout_page,
+            'sku=TEST123',
+            ' id="">' if _id else ">"
+        )
+        response = views.course_about(request, unicode(course.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(href, response.content)
+
+    @ddt.data(True, False)
+    def test_ecommerce_checkout(self, is_anonymous):
+        self.assert_enrollment_link_present(is_anonymous=is_anonymous)
+
+    @ddt.data(True, False)
+    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
+    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
+        self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
 
     def test_user_groups(self):
         # depreciated function
@@ -268,7 +315,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_index_invalid_position(self):
         request_url = '/'.join([
             '/courses',
-            self.course.id.to_deprecated_string(),
+            unicode(self.course.id),
             'courseware',
             self.chapter.location.name,
             self.section.location.name,
@@ -281,7 +328,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_unicode_handling_in_url(self):
         url_parts = [
             '/courses',
-            self.course.id.to_deprecated_string(),
+            unicode(self.course.id),
             'courseware',
             self.chapter.location.name,
             self.section.location.name,
@@ -373,9 +420,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.client.login(username=admin.username, password='test')
 
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_key.to_deprecated_string(),
+            'course_id': unicode(self.course_key),
             'student_username': 'dummy',
-            'location': self.component.location.to_deprecated_string(),
+            'location': unicode(self.component.location),
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
@@ -389,7 +436,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_key.to_deprecated_string(),
+            'course_id': unicode(self.course_key),
             'student_username': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
@@ -398,7 +445,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
-            'course_id': self.course_key.to_deprecated_string(),
+            'course_id': unicode(self.course_key),
             'student_username': '<script>alert("hello");</script>',
             'location': 'dummy'
         })
@@ -697,7 +744,7 @@ class TestProgressDueDate(BaseDueDateTests):
         """ Returns the HTML for the progress page """
 
         mako_middleware_process_request(self.request)
-        return views.progress(self.request, course_id=course.id.to_deprecated_string(), student_id=self.user.id).content
+        return views.progress(self.request, course_id=unicode(course.id), student_id=self.user.id).content
 
 
 class TestAccordionDueDate(BaseDueDateTests):
@@ -742,7 +789,7 @@ class StartDateTests(ModuleStoreTestCase):
         """
         Get the text of the /about page for the course.
         """
-        text = views.course_about(self.request, course_key.to_deprecated_string()).content
+        text = views.course_about(self.request, unicode(course_key)).content
         return text
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
@@ -816,7 +863,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertEqual(resp.status_code, 200)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -845,12 +892,12 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         # Enroll student into course
         CourseEnrollment.enroll(self.user, self.course.id)
-        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
+        resp = views.progress(self.request, course_id=unicode(self.course.id), student_id=self.user.id)
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
 
     def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
 
         self.assertEqual(resp.status_code, 200)
 

@@ -39,6 +39,7 @@ import survey.utils
 import survey.views
 from certificates import api as certs_api
 from openedx.core.lib.gating import api as gating_api
+from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware import grades
 from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
@@ -63,13 +64,13 @@ from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
-from microsite_configuration import microsite
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -143,8 +144,10 @@ def courses(request):
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
-        if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                               settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+        if theming_helpers.get_value(
+                "ENABLE_COURSE_SORTING_BY_START_DATE",
+                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
+        ):
             courses_list = sort_by_start_date(courses_list)
         else:
             courses_list = sort_by_announcement(courses_list)
@@ -508,7 +511,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                     return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
 
-            ## Allow chromeless operation
+            # Allow chromeless operation
             if section_descriptor.chrome:
                 chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
                 if 'accordion' not in chrome:
@@ -855,8 +858,9 @@ def course_about(request, course_id):
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
         course = get_course_with_access(request.user, permission, course_key)
+        modes = CourseMode.modes_for_course_dict(course_key)
 
-        if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        if theming_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
         registered = registered_for_course(course, request.user)
@@ -871,10 +875,9 @@ def course_about(request, course_id):
 
         show_courseware_link = bool(
             (
-                has_access(request.user, 'load', course)
-                and has_access(request.user, 'view_courseware_with_prerequisites', course)
-            )
-            or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
+                has_access(request.user, 'load', course) and
+                has_access(request.user, 'view_courseware_with_prerequisites', course)
+            ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
@@ -884,15 +887,31 @@ def course_about(request, course_id):
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
         if _is_shopping_cart_enabled:
-            registration_price = CourseMode.min_course_price_for_currency(course_key,
-                                                                          settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
+            registration_price = CourseMode.min_course_price_for_currency(
+                course_key,
+                settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+            )
             if request.user.is_authenticated():
                 cart = shoppingcart.models.Order.get_cart_for_user(request.user)
                 in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
             reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id)))
+                reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id))
+            )
+
+        # If the ecommerce checkout flow is enabled and the mode of the course is
+        # professional or no id professional, we construct links for the enrollment
+        # button to add the course to the ecommerce basket.
+        ecommerce_checkout_link = ''
+        professional_mode = ''
+        ecomm_service = EcommerceService()
+        if ecomm_service.is_enabled() and (
+                CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
+        ):
+            professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
+                modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
+            ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
 
         course_price = get_cosmetic_display_price(course, registration_price)
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
@@ -925,6 +944,9 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'in_cart': in_cart,
+            'ecommerce_checkout': ecomm_service.is_enabled(),
+            'ecommerce_checkout_link': ecommerce_checkout_link,
+            'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,
@@ -1577,12 +1599,12 @@ def financial_assistance_form(request):
     enrolled_courses = [
         {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
         for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
-        if CourseMode.objects.filter(
+
+        if enrollment.mode != CourseMode.VERIFIED and CourseMode.objects.filter(
             Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
             course_id=enrollment.course_id,
             mode_slug=CourseMode.VERIFIED
         ).exists()
-        and enrollment.mode != CourseMode.VERIFIED
     ]
     return render_to_response('financial-assistance/apply.html', {
         'header_text': FINANCIAL_ASSISTANCE_HEADER,

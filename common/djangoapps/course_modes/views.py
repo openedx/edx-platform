@@ -3,28 +3,27 @@ Views for the course_mode module
 """
 
 import decimal
-from ipware.ip import get_ip
 
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from django.views.generic.base import View
-from django.utils.translation import ugettext as _
-from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-
-from edxmako.shortcuts import render_to_response
-
-from course_modes.models import CourseMode
-from courseware.access import has_access
-from student.models import CourseEnrollment
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.utils.translation import ugettext as _
+from django.views.generic.base import View
+from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from util.db import outer_atomic
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
+from lms.djangoapps.commerce.utils import EcommerceService
+from course_modes.models import CourseMode
+from courseware.access import has_access
+from edxmako.shortcuts import render_to_response
 from embargo import api as embargo_api
+from student.models import CourseEnrollment
+from util.db import outer_atomic
 
 
 class ChooseModeView(View):
@@ -39,7 +38,14 @@ class ChooseModeView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):        # pylint: disable=missing-docstring
+    def dispatch(self, *args, **kwargs):
+        """Disable atomicity for the view.
+
+        Otherwise, we'd be unable to commit to the database until the
+        request had concluded; Django will refuse to commit when an
+        atomic() block is active, since that would break atomicity.
+
+        """
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
     @method_decorator(login_required)
@@ -117,7 +123,10 @@ class ChooseModeView(View):
         )
 
         context = {
-            "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
+            "course_modes_choose_url": reverse(
+                "course_modes_choose",
+                kwargs={'course_id': course_key.to_deprecated_string()}
+            ),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
             "course_name": course.display_name_with_default_escaped,
@@ -129,15 +138,22 @@ class ChooseModeView(View):
             "nav_hidden": True,
         }
         if "verified" in modes:
+            verified_mode = modes["verified"]
             context["suggested_prices"] = [
                 decimal.Decimal(x.strip())
-                for x in modes["verified"].suggested_prices.split(",")
+                for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
-            context["currency"] = modes["verified"].currency.upper()
-            context["min_price"] = modes["verified"].min_price
-            context["verified_name"] = modes["verified"].name
-            context["verified_description"] = modes["verified"].description
+            context["currency"] = verified_mode.currency.upper()
+            context["min_price"] = verified_mode.min_price
+            context["verified_name"] = verified_mode.name
+            context["verified_description"] = verified_mode.description
+
+            if verified_mode.sku:
+                ecommerce_service = EcommerceService()
+                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled()
+                context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
+                context["sku"] = verified_mode.sku
 
         return render_to_response("course_modes/choose.html", context)
 
