@@ -1,6 +1,11 @@
 """Utilities to assist with commerce tasks."""
 import logging
+from urlparse import urljoin
 
+from django.conf import settings
+
+from commerce.models import CommerceConfiguration
+from openedx.core.djangoapps.theming import helpers
 
 log = logging.getLogger(__name__)
 
@@ -32,3 +37,29 @@ def audit_log(name, **kwargs):
     message = u'{name}: {payload}'.format(name=name, payload=payload)
 
     log.info(message)
+
+
+class EcommerceService(object):
+    """ Helper class for ecommerce service integration. """
+    def __init__(self):
+        self.config = CommerceConfiguration.current()
+
+    def is_enabled(self):
+        """ Check if the service is enabled and that the site is not a microsite. """
+        return self.config.checkout_on_ecommerce_service and not helpers.is_request_in_themed_site()
+
+    def payment_page_url(self):
+        """ Return the URL for the checkout page.
+
+        Example:
+            http://localhost:8002/basket/single_item/
+        """
+        return urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, self.config.single_course_checkout_page)
+
+    def checkout_page_url(self, sku):
+        """ Construct the URL to the ecommerce checkout page and include a product.
+
+        Example:
+            http://localhost:8002/basket/single_item/?sku=5H3HG5
+        """
+        return "{}?sku={}".format(self.payment_page_url(), sku)

@@ -51,7 +51,7 @@
                     enrollmentAction: $.url( '?enrollment_action' ),
                     courseId: $.url( '?course_id' ),
                     courseMode: $.url( '?course_mode' ),
-                    emailOptIn: $.url( '?email_opt_in')
+                    emailOptIn: $.url( '?email_opt_in' )
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
