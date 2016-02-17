@@ -19,15 +19,15 @@ class SendEmail
   constructor: (@$container) ->
     # gather elements
     @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-    @$send_to = @$container.find("select[name='send_to']'")
-    @$subject = @$container.find("input[name='subject']'")
-    @$btn_send = @$container.find("input[name='send']'")
+    @$send_to = @$container.find("select[name='send_to']")
+    @$subject = @$container.find("input[name='subject']")
+    @$btn_send = @$container.find("input[name='send']")
     @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
     @$content_request_response_error = @$container.find(".content-request-response-error")
     @$history_request_response_error = @$container.find(".history-request-response-error")
-    @$btn_task_history_email = @$container.find("input[name='task-history-email']'")
-    @$btn_task_history_email_content = @$container.find("input[name='task-history-email-content']'")
+    @$btn_task_history_email = @$container.find("input[name='task-history-email']")
+    @$btn_task_history_email_content = @$container.find("input[name='task-history-email-content']")
     @$table_task_history_email = @$container.find(".task-history-email-table")
     @$table_email_content_history = @$container.find(".content-history-email-table")
     @$email_content_table_inner = @$container.find(".content-history-table-inner")

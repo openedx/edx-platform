@@ -15,8 +15,8 @@ ReportDownloads = -> window.InstructorDashboard.util.ReportDownloads
 class @DataDownload_Certificate
   constructor: (@$container) ->
     # gather elements
-    @$list_issued_certificate_table_btn = @$container.find("input[name='issued-certificates-list']'")
-    @$list_issued_certificate_csv_btn = @$container.find("input[name='issued-certificates-csv']'")
+    @$list_issued_certificate_table_btn = @$container.find("input[name='issued-certificates-list']")
+    @$list_issued_certificate_csv_btn = @$container.find("input[name='issued-certificates-csv']")
     @$certificate_display_table       = @$container.find '.certificate-data-display-table'
     @$certificates_request_response_error  = @$container.find '.issued-certificates-error.request-response-error'
 
@@ -72,17 +72,17 @@ class DataDownload
     new DataDownload_Certificate @$section.find '.issued_certificates'
 
     # gather elements
-    @$list_studs_btn = @$section.find("input[name='list-profiles']'")
-    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
-    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
-    @$survey_results_csv_btn = @$section.find("input[name='survey-results-report']'")
+    @$list_studs_btn = @$section.find("input[name='list-profiles']")
+    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']")
+    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']")
+    @$survey_results_csv_btn = @$section.find("input[name='survey-results-report']")
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_problem_responses_csv_input = @$section.find("input[name='problem-location']")
     @$list_problem_responses_csv_btn = @$section.find("input[name='list-problem-responses-csv']")
-    @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
-    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
-    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']'")
+    @$list_anon_btn = @$section.find("input[name='list-anon-ids']")
+    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']")
+    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']")
+    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
