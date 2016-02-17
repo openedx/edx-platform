@@ -1242,10 +1242,19 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     # Track the user's sign in
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(user.id, {
-            'email': email,
-            'username': username
-        })
+        analytics.identify(
+            user.id,
+            {
+                'email': email,
+                'username': username
+            },
+            {
+                # Disable MailChimp because we don't want to update the user's email
+                # and username in MailChimp on every page load. We only need to capture
+                # this data on registration/activation.
+                'MailChimp': False
+            }
+        )
 
         analytics.track(
             user.id,
@@ -1699,7 +1708,9 @@ def create_account_with_params(request, params):
                 'email': user.email,
                 'username': user.username,
                 'name': profile.name,
-                'age': profile.age,
+                # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
+                'age': profile.age or -1,
+                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
