@@ -151,6 +151,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     """ Admin interface for UserProfile model. """
     list_display = ('user', 'name',)
     raw_id_fields = ('user',)
+    show_full_result_count = False
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
 
     def get_readonly_fields(self, request, obj=None):
