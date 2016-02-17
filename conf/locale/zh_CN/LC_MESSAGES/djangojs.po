@@ -138,9 +138,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-27 21:06+0000\n"
-"PO-Revision-Date: 2016-01-30 13:54+0000\n"
-"Last-Translator: 大芳 刘 <liuxiaolinfk@gmail.com>\n"
+"POT-Creation-Date: 2016-02-11 11:53+0000\n"
+"PO-Revision-Date: 2016-02-04 20:03+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -171,6 +171,7 @@ msgstr "正在保存"
 #: cms/static/js/views/course_info_update.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
+#: lms/static/js/Markdown.Editor.js
 msgid "OK"
 msgstr "是的"
 
@@ -187,6 +188,7 @@ msgstr "是的"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -230,6 +232,12 @@ msgstr "上传中"
 msgid "Name"
 msgstr "名称"
 
+#: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
+#: cms/templates/js/asset-upload-modal.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
+msgid "Choose File"
+msgstr ""
+
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
@@ -264,6 +272,13 @@ msgstr "上传文件"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Save"
 msgstr "保存"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/modals/course_outline_modals.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Advanced"
+msgstr "高级"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -397,12 +412,6 @@ msgstr "标题 6"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
 msgstr "加入到字典"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Advanced"
-msgstr "高级"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1616,6 +1625,10 @@ msgstr ""
 "如果你使用高级编辑器，该问题将转为XML，同时您也无法再回到简易编辑器界面。\n"
 "\n"
 "要继续使用高级编辑器并将该问题转为XML吗？"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Explanation"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -3231,18 +3244,75 @@ msgstr "由于涉及学生的敏感信息，生成的链接将在5分钟后失�
 msgid "Insert Hyperlink"
 msgstr "插入超链接"
 
-#. Translators: Please keep the quotation marks (") around this text
-#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
-msgid "\"optional title\""
-msgstr "“可选标题”"
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'http://google.com/'"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
-msgid "Insert Image (upload file or type url)"
-msgstr "插入图片(上传文件或输入图片的链接url)"
+msgid "Link Description"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "e.g. 'google'"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a description of the link destination."
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Insert Image (upload file or type URL)"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Type in a URL or use the \"Choose File\" button to upload a file from your "
+"machine. (e.g. 'http://example.com/img/clouds.jpg')"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Image Description"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"Please describe this image or agree that it has no contextual value by "
+"checking the checkbox."
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
+"the image."
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "How to create useful text alternatives."
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"This image is for decorative purposes only and does not require a "
+"description."
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
 msgstr "Markdown编辑帮助"
+
+#: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+msgid "URL"
+msgstr ""
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Please provide a valid URL."
+msgstr ""
+
+#. Translators: 'errorCount' is the number of errors found in the form.
+#: lms/static/js/Markdown.Editor.js
+msgid "%(errorCount)s error found in form."
+msgid_plural "%(errorCount)s errors found in form."
+msgstr[0] ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3303,10 +3373,6 @@ msgstr "加粗文字"
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
 msgstr "强调文字"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "enter image description here"
-msgstr "此处输入图像的描述"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
@@ -3429,27 +3495,51 @@ msgid " learner is not enrolled in course and not added to the exception"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate of "
+msgid ""
+"Certificate of <%= user %> has already been invalidated. Please check your "
+"spelling and retry."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid " has already been invalidated. Please check your spelling and retry."
+msgid "Certificate has been successfully invalidated for <%= user %>."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate has been successfully invalidated for "
-msgstr ""
-
-#: lms/static/js/certificates/views/certificate_invalidation_view.js
+#: lms/static/js/certificates/views/certificate_whitelist.js
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "Server Error, Please refresh the page and try again."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "The certificate for this learner has been re-validated and "
+msgid ""
+"The certificate for this learner has been re-validated and the system is re-"
+"running the grade for this learner."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Could not find Certificate Invalidation in the list. "
+msgid ""
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid "Student Removed from certificate white list successfully."
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid ""
+"Could not find Certificate Exception in white list. Please refresh the page "
+"and try again"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid "<%= user %> already in exception list."
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid ""
+"<%= user %> has been successfully added to the exception list. Click "
+"Generate Exception Certificate below to send the certificate."
 msgstr ""
 
 #: lms/static/js/course_survey.js
@@ -4620,10 +4710,6 @@ msgstr "您的文件无法上传。"
 msgid "Max file size exceeded"
 msgstr "文件大小超出限制"
 
-#: cms/static/js/views/assets.js
-msgid "Choose File"
-msgstr "选择文件"
-
 #: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Upload New File"
 msgstr "上传新文件"
@@ -4878,6 +4964,15 @@ msgstr "要发布此%(item)s中所有尚未发布的更改吗？"
 msgid "Publish"
 msgstr "发布"
 
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Basic"
+msgstr ""
+
+#. Translators: This label refers to access to course content.
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Access"
+msgstr ""
+
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -5116,20 +5211,26 @@ msgid ""
 msgstr "机构和知识库编号字段合在一起不能超过 <%=limit%> 个字符"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "component"
-msgstr "组件"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "要删除该%(xblock_type)s吗？"
-
-#: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
 msgstr "将永久删除该%(xblock_type)s，无法撤销。"
 
 #: cms/static/js/views/utils/xblock_utils.js
+msgid ""
+"Any content that has listed this content as a prerequisite will also have "
+"access limitations removed."
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s (and prerequisite)?"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
 msgstr "是的，删除该%(xblock_type)s"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this %(xblock_type)s?"
+msgstr "要删除该%(xblock_type)s吗？"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -5306,15 +5407,15 @@ msgid "Find discussions"
 msgstr "搜索讨论帖"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Focus in on specific topics"
+msgid "Use the Discussion Topics menu to find specific topics."
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Search for specific posts"
+msgid "Search all posts"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Sort by date, vote, or comments"
+msgid "Filter and sort topics"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5322,15 +5423,15 @@ msgid "Engage with posts"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Upvote posts and good responses"
+msgid "Vote for good posts and responses"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Report Forum Misuse"
+msgid "Report abuse, topics, and responses"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Follow posts for updates"
+msgid "Follow or unfollow posts"
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
@@ -5641,7 +5742,7 @@ msgid "Topic Area:"
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Discussion topics; current selection is: "
+msgid "Discussion topics; currently listing: "
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
@@ -6068,6 +6169,12 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -7218,6 +7325,40 @@ msgstr "重新拍照"
 msgid "Take Photo"
 msgstr "拍照"
 
+#: cms/templates/js/access-editor.underscore
+msgid "Limit Access"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"Select a prerequisite subsection and enter a minimum score percentage to "
+"limit access to this subsection."
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "Prerequisite:"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "No prerequisite"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "Minimum Score:"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "The minimum score percentage must be a whole number between 0 and 100."
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "Use as a Prerequisite"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid "Make this subsection available as a prerequisite to other content"
+msgstr ""
+
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
 msgstr ""
@@ -7266,10 +7407,6 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
-msgstr ""
-
-#: cms/templates/js/asset-library.underscore
-msgid "URL"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -7440,6 +7577,11 @@ msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Prerequisite: %(prereq_display_name)s"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -7931,10 +8073,6 @@ msgstr ""
 msgid "Clear Release Date/Time"
 msgstr ""
 
-#: cms/templates/js/settings-tab-section.underscore
-msgid "General Settings"
-msgstr ""
-
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr ""
@@ -8065,6 +8203,10 @@ msgstr ""
 
 #: cms/templates/js/team-member.underscore
 msgid "Delete the user, {username}"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Set as a Special Exam"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore

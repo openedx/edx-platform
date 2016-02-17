@@ -569,14 +569,15 @@ class VideoTranscriptsMixin(object):
                 Defaults to False
         """
         translations = []
-        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
+        sub, other_langs = transcripts["sub"], transcripts["transcripts"]
 
         # If we're not verifying the assets, we just trust our field values
         if not verify_assets:
-            translations = list(other_lang)
+            if other_langs:
+                translations = list(other_langs)
             if not translations or sub:
                 translations += ['en']
-            return set(translations)
+            return translations
 
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually in the contentstore.
@@ -589,16 +590,16 @@ class VideoTranscriptsMixin(object):
                 except NotFoundError:
                     pass
                 else:
-                    translations = ['en']
+                    translations += ['en']
             else:
-                translations = ['en']
+                translations += ['en']
 
-        for lang in other_lang:
+        for lang in other_langs:
             try:
-                Transcript.asset(self.location, None, None, other_lang[lang])
+                Transcript.asset(self.location, None, None, other_langs[lang])
             except NotFoundError:
                 continue
-            translations.append(lang)
+            translations += [lang]
 
         return translations
 

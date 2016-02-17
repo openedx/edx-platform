@@ -86,6 +86,26 @@ class ResetPasswordPage(PageObject):
             self.q(css="#password-reset-form").visible
         )
 
+    def fill_password_reset_form(self, email):
+        """
+        Fill in the form and submit it
+        """
+        self.wait_for_element_visibility('#password-reset-email', 'Reset Email field is shown')
+        self.q(css="#password-reset-email").fill(email)
+        self.q(css="button.js-reset").click()
+
+    def is_success_visible(self, selector):
+        """
+        Check element is visible
+        """
+        self.wait_for_element_visibility(selector, 'Success div is shown')
+
+    def get_success_message(self):
+        """
+        Return a success message displayed to the user
+        """
+        return self.q(css=".submission-success h4").text
+
 
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.

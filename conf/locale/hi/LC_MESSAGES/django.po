@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-01-27 21:06+0000\n"
+"POT-Creation-Date: 2016-02-11 11:54+0000\n"
 "PO-Revision-Date: 2015-11-24 13:39+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -239,6 +239,8 @@ msgid "You're enrolled as an honor code student"
 msgstr ""
 
 #: lms/templates/static_templates/honor.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
 msgstr "ऑनर कोड"
 
@@ -250,7 +252,8 @@ msgstr ""
 msgid "Professional Ed"
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py lms/djangoapps/courseware/views.py
+#: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
 #: lms/templates/courseware/courseware.html
 msgid "Course"
@@ -500,6 +503,12 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
@@ -1186,7 +1195,7 @@ msgstr ""
 msgid "Course {course_id} requires {prerequisite_course_id}"
 msgstr ""
 
-#: common/djangoapps/util/milestones_helpers.py
+#: common/djangoapps/util/milestones_helpers.py openedx/core/lib/gating/api.py
 msgid "System defined milestone"
 msgstr ""
 
@@ -1238,6 +1247,11 @@ msgstr ""
 msgid "Space-separated list of XBlocks which should not render."
 msgstr ""
 
+#: common/djangoapps/xblock_django/models.py
+msgid ""
+"Space-separated list of XBlock types whose creation to disable in Studio."
+msgstr ""
+
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
@@ -1269,23 +1283,23 @@ msgstr ""
 #. Translators: these are tooltips that indicate the state of an assessment
 #. question
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is correct."
+msgid "This answer is correct."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is incorrect."
+msgid "This answer is incorrect."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is partially correct."
+msgid "This answer is partially correct."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is unanswered."
+msgid "This answer is unanswered."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This is being processed."
+msgid "This answer is being processed."
 msgstr ""
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
@@ -1483,6 +1497,7 @@ msgstr ""
 #: lms/templates/login.html lms/templates/register-form.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "या"
 
@@ -2260,15 +2275,19 @@ msgid "Enter the names of the advanced components to use in your course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Info Sidebar Name"
+msgid "Course Home Sidebar Name"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the heading that you want students to see above your course handouts "
-"on the Course Info page. Your course handouts appear in the right panel of "
+"on the Course Home page. Your course handouts appear in the right panel of "
 "the page."
 msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid "Course Handouts"
+msgstr "पाठ्यक्रम हैंडआउट्स"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2345,8 +2364,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the short name of the course to use on the certificate that "
-"students receive when they complete the course."
+"marks, enter the short name of the type of certificate that students receive"
+" when they complete the course. For instance, \"Certificate\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2356,8 +2375,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the long name of the course to use on the certificate that "
-"students receive when they complete the course."
+"marks, enter the long name of the type of certificate that students receive "
+"when they complete the course. For instance, \"Certificate of Achievement\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2513,6 +2532,8 @@ msgstr ""
 
 #: lms/templates/footer.html lms/templates/static_templates/about.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
 msgstr "के बारे में"
 
@@ -2582,11 +2603,8 @@ msgid ""
 "for each topic, and another comma after the closing square brackets. For "
 "example, to specify that teams should have a maximum of 5 participants and "
 "provide a list of 2 topics, enter the configuration in this format: "
-"{\"topics\": [{\"name\": \"Topic1Name\", \"description\": "
-"\"Topic1Description\", \"id\": \"Topic1ID\"}, {\"name\": \"Topic2Name\", "
-"\"description\": \"Topic2Description\", \"id\": \"Topic2ID\"}], "
-"\"max_team_size\": 5}. In \"id\" values, the only supported special "
-"characters are underscore, hyphen, and period."
+"{example_format}. In \"id\" values, the only supported special characters "
+"are underscore, hyphen, and period."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2629,6 +2647,16 @@ msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
 " course at any rate before the course ends."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Prerequisites"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, you can hide a subsection until "
+"learners earn a minimum score in another, prerequisite subsection."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3238,11 +3266,8 @@ msgstr ""
 msgid ""
 "Identify a video, 5-10 seconds in length, to play before course videos. "
 "Enter the video ID from the Video Uploads page and one or more transcript "
-"files in the following format: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. For example, an entry for a video"
-" with two transcripts looks like this: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
+"files in the following format: {format}. For example, an entry for a video "
+"with two transcripts looks like this: {example}"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3429,6 +3454,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "External Discussion"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+msgid "Home"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3821,10 +3850,14 @@ msgstr ""
 
 #: lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
 msgstr "संपर्क करें"
 
 #: lms/djangoapps/branding/api.py
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr ""
 
@@ -3843,6 +3876,8 @@ msgstr ""
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
 msgstr "निजता नीति"
 
@@ -3852,6 +3887,8 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "सेवा की शर्तें"
 
@@ -4417,8 +4454,17 @@ msgstr ""
 msgid "You do not have access to this course on a mobile device"
 msgstr ""
 
+#. Translators: 'absolute' is a date such as "Jan 01,
+#. 2020". 'relative' is a fuzzy description of the time until
+#. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
+#. and if today were December 5th, 2020, 'relative' would be "1
+#. month".
 #: lms/djangoapps/courseware/date_summary.py
-msgid "in {relative_date} - {absolute_date}"
+msgid "{relative} ago - {absolute}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "in {relative} - {absolute}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -4453,7 +4499,9 @@ msgid "Verification Upgrade Deadline"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "You are still eligible to upgrade to a Verified Certificate!"
+msgid ""
+"You are still eligible to upgrade to a Verified Certificate! Pursue it to "
+"highlight the knowledge and skills you gain in this course."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -4499,15 +4547,6 @@ msgstr ""
 msgid ""
 "This type of component cannot be shown while viewing the course as a "
 "specific student."
-msgstr ""
-
-#: lms/templates/courseware/courseware-error.html
-msgid "Courseware"
-msgstr "पाठ्यक्रम"
-
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Course Info"
 msgstr ""
 
 #: lms/templates/courseware/syllabus.html
@@ -5099,6 +5138,7 @@ msgid "Birth Year"
 msgstr ""
 
 #: lms/templates/register-form.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "लिंग"
 
@@ -5108,6 +5148,7 @@ msgid "Level of Education"
 msgstr ""
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "डाक - पता"
 
@@ -5539,6 +5580,10 @@ msgid "CourseMode price updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Course Info"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "No end date set"
 msgstr ""
 
@@ -5653,6 +5698,8 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
 msgstr "पूरा नाम "
 
@@ -5748,18 +5795,21 @@ msgid "Title"
 msgstr "शीर्षक"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "जन्म का वर्ष"
 
 #: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "शहर"
 
 #: lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "देश"
 
@@ -5953,7 +6003,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Courseware Chrome"
+msgid "Course Chrome"
 msgstr ""
 
 #. Translators: DO NOT translate the words in quotes here, they are
@@ -5973,8 +6023,8 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
-" is selected."
+"Enter the tab that is selected in the XBlock. If not set, the Course tab is "
+"selected."
 msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -7356,6 +7406,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Required Information"
 msgstr "आवश्यक जानकारी"
 
@@ -7391,6 +7443,7 @@ msgstr "पासवर्ड रीसेट सहायता"
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need Help?"
 msgstr "मदद चाहिए?"
 
@@ -7836,10 +7889,9 @@ msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/discussion/_thread_list_template.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search"
 msgstr "खोजें"
 
@@ -7952,6 +8004,44 @@ msgstr ""
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Internal Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Public Service URL"
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable Learner Issuance"
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable issuance of credentials via Credential Service."
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable Authoring of Credential in Studio"
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+msgid "Enable authoring of Credential Service credentials in Studio."
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid "Cache Time To Live"
+msgstr ""
+
+#: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
 msgstr ""
 
 #: openedx/core/djangoapps/credit/email_utils.py
@@ -8080,14 +8170,6 @@ msgid "API Version"
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "Internal Service URL"
-msgstr ""
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Public Service URL"
-msgstr ""
-
-#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr ""
 
@@ -8098,16 +8180,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's CSS"
-msgstr ""
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Cache Time To Live"
-msgstr ""
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"Specified in seconds. Enable caching by setting this to a value greater than"
-" 0."
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
@@ -8178,6 +8250,7 @@ msgstr ""
 #: cms/templates/temp-course-landing.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "पासवर्ड"
 
@@ -8218,6 +8291,7 @@ msgstr ""
 #. immediately
 #. below a field meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
 
@@ -8294,6 +8368,15 @@ msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This field is not editable"
+msgstr ""
+
+#: openedx/core/lib/gating/api.py
+#, python-format
+msgid "%(min_score)s is not a valid grade percentage"
+msgstr ""
+
+#: openedx/core/lib/gating/api.py
+msgid "Gating milestone for {usage_key}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/course_group_config.py
@@ -8713,6 +8796,14 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr ""
 
+#: cms/lib/xblock/tagging.py
+msgid "Learning outcomes"
+msgstr ""
+
+#: cms/lib/xblock/tagging.py
+msgid "Dictionary with the available tags"
+msgstr ""
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -8783,6 +8874,8 @@ msgstr "पाठ्यक्रम"
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
 msgstr "ई-मेल"
 
@@ -8793,6 +8886,8 @@ msgstr "ई-मेल"
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "उदाहरण: username@domain.com"
 
@@ -8804,11 +8899,14 @@ msgstr "पासवर्ड भूल गए?"
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/verify_student/face_upload.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "उदाहरण: Jane Doe"
 
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
 msgstr "सार्वजनिक यूज़र नाम"
 
@@ -8816,6 +8914,8 @@ msgstr "सार्वजनिक यूज़र नाम"
 #. pick a username
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "उदाहरण: JaneDoe"
 
@@ -8860,6 +8960,10 @@ msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 "अपने पाठ्यक्रमों को देखने के लिए अपने {link_start}डैशबोर्ड{link_end} पर "
 "जाएं।"
+
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+msgid "Choose Language"
+msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -8929,6 +9033,7 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
 
@@ -9044,6 +9149,14 @@ msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
+msgstr ""
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "XSeries Program Certificates"
+msgstr ""
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "You have received a certificate for the following XSeries programs:"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
@@ -9235,6 +9348,7 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr "सबमिट"
 
@@ -9315,14 +9429,6 @@ msgstr "कृपया बाद में फिर से कोशिश क
 msgid "Note: only instructors may annotate."
 msgstr ""
 
-#: lms/templates/index.html
-msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "<strong>{university_name}</strong> से नि: शुल्क पाठ्यक्रम "
-
-#: lms/templates/index.html
-msgid "For anyone, anywhere, anytime"
-msgstr "किसी भी व्यक्ति के लिए, कभी भी, किसी भी वक्त"
-
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: lms/templates/index.html
@@ -9336,6 +9442,7 @@ msgid "It works! This is the default homepage for this Open edX instance."
 msgstr ""
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
+#: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr ""
 
@@ -9425,6 +9532,7 @@ msgstr "'मेरे पाठयक्रम' में प्रवेश क
 
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Processing your account information"
 msgstr ""
 
@@ -9606,6 +9714,11 @@ msgstr "इसके लिए डैशबोर्ड : "
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/edx.org/lms/templates/header.html
+msgid "Profile image for {username}"
+msgstr ""
+
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
 msgstr "और विकल्पों के लिए ड्रॉपडाउन करें"
@@ -9630,6 +9743,7 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "रजिस्टर करें"
 
@@ -9702,26 +9816,34 @@ msgid "Return To %s"
 msgstr "%s पर वापस जाएं"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "We're sorry, but this version of your browser is not supported. Try again "
 "using a different browser or a newer version of your browser."
 msgstr ""
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "The following errors occurred while processing your registration:"
 msgstr "आपके रजिस्ट्रेशन को प्रोसेस करते समय ये त्रुटियां हुईः"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
 msgstr ""
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create your own {platform_name} account below"
 msgstr ""
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -9732,102 +9854,130 @@ msgstr ""
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "You've successfully signed in with {selected_provider}."
 msgstr ""
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "We just need a little more information before you start learning with "
 "{platform_name}."
 msgstr ""
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please complete the following fields to register for an account. "
 msgstr "खाता खोलने के लिए कृपया नीचे दिए गए ख़ाने भरें। "
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr "जिन भी चर्चाओं या मंचों में आप भाग लेंगे उनमें दिखाया जाएगा"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "cannot be changed later"
 msgstr "बाद में बदला नहीं जा सकता"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Welcome {username}"
 msgstr " {username} आपका स्वागत है"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Enter a Public Display Name:"
 msgstr "एक सार्वजनिक उपयोगकर्ता नाम दर्ज करें:"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Public Display Name"
 msgstr "सार्वजनिक उपयोगकर्ता नाम"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Additional Personal Information"
 msgstr ""
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "example: New York"
 msgstr "उदाहरण: न्यू यॉर्क"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Highest Level of Education Completed"
 msgstr "पूरी की गई शिक्षा का उच्चतम स्तर"
 
 #: lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr "हमें बताएं कि आपने {platform_name} के साथ क्यों रजिस्टर किया है"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Account Acknowledgements"
 msgstr "खाते के लिए आभार"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr "मैं {link_start}सर्विस{link_end} की शर्तों से सहमत हूं"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr "मैं {link_start}ऑनर कोड{link_end} से सहमत हूं"
 
 #: lms/templates/register-form.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Create My Account"
 msgstr "मेरा खाता बनाएं"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
 msgstr "{platform_name} के लिए प्राथमिकताएं"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
 msgstr "मेरा {platform_name} खाता अपडेट करें"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "{username} आपका स्वागत है! कृपया अपनी प्राथमिकताओं को नीचे सेट करें"
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Enter a public username:"
 msgstr "एक सार्वजनिक यूज़र नाम दर्ज करें:"
 
 #: lms/templates/register-shib.html
+#: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
 msgstr "मेरा खाता अपडेट करें"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Registration Help"
 msgstr "रजिस्ट्रेशन सहायता"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "पहले से ही पंजीकृत?"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "लॉग इन"
 
@@ -9847,20 +9997,9 @@ msgstr ""
 " नए पाठ्यक्रम आने पर हम आपको इत्तला करते रहेंगे।"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Next Steps"
 msgstr "अगले कदम"
-
-#: lms/templates/register-sidebar.html
-msgid ""
-"You will receive an activation email.  You must click on the activation link"
-" to complete the process.  Don't see the email?  Check your spam folder and "
-"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
-"able to receive email from your courses."
-msgstr ""
-"आपको एक एक्टीवेशन ई-मेल भेजी जाएगी। प्रक्रिया पूरी करने के लिए आपका "
-"एक्टीवेशन लिंक पर क्लिक करना ज़रूरी है। क्या आपको कोई ई-मेल नहीं मिली? अपने "
-"स्पैम फ़ोल्डर में देखें और class.stanford.edu से भेजी गई ई-मेलों पर 'not "
-"spam' का निशान लगाए, वरना आप अपने पाठ्यक्रम से ई-मेलें नहीं पा सकेंगे।"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -9876,14 +10015,17 @@ msgstr ""
 "सूचना भेजते हैं।"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
 msgstr "{platform_name} पर रजिस्टर करने में कोई मदद चाहिए?"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
 msgstr "कुछ आम सवालों के जवाब जानने के लिए हमारे अक़्सर पूछे गए सवाल देखें।"
 
 #: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
@@ -10983,8 +11125,10 @@ msgid "You are enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "View Courseware"
-msgstr "पाठ्यक्रम देखें"
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course"
+msgstr "पाठयक्रम देखें"
 
 #: lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
@@ -11023,34 +11167,6 @@ msgid "Overview"
 msgstr "संक्षिप्त विवरण"
 
 #: lms/templates/courseware/course_about.html
-msgid "Share with friends and family!"
-msgstr "दोस्तों और परिवार वालों के साथ बांटें!"
-
-#: lms/templates/courseware/course_about.html
-msgid "Tweet that you've enrolled in this course"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "Email someone to say you've enrolled in this course"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "Take a course with {platform} online"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "I just enrolled in {number} {title} through {platform} {url}"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
-msgid "Post a Facebook message to say you've enrolled in this course"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "कक्षाएं शुरू"
 
@@ -11079,6 +11195,37 @@ msgstr "अतिरिक्त संसाधन"
 
 #: lms/templates/courseware/course_about.html
 msgid "enroll"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Share with friends and family!"
+msgstr "दोस्तों और परिवार वालों के साथ बांटें!"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {account}: {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {platform} {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Tweet that you've enrolled in this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Post a Facebook message to say you've enrolled in this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
+msgid "Email someone to say you've enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
@@ -11129,6 +11276,19 @@ msgid ""
 "release date."
 msgstr ""
 
+#: lms/templates/courseware/course_updates.html
+#: lms/templates/discussion/_similar_posts.html
+msgid "Hide"
+msgstr "छिपाएं"
+
+#: lms/templates/courseware/course_updates.html
+msgid "Show"
+msgstr ""
+
+#: lms/templates/courseware/course_updates.html
+msgid "Show Earlier Course Updates"
+msgstr ""
+
 #: lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr ""
@@ -11146,6 +11306,10 @@ msgstr "{course_number} पाठ्यक्रम"
 #: lms/templates/courseware/courseware.html
 msgid "Course Utilities"
 msgstr ""
+
+#: lms/templates/courseware/courseware-error.html
+msgid "Courseware"
+msgstr "पाठ्यक्रम"
 
 #: lms/templates/courseware/courseware.html
 msgid "Bookmarks"
@@ -11216,12 +11380,20 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/info.html
+msgid "Welcome to {org}'s {course_name}!"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid "Resume Course"
+msgstr ""
+
+#: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "Course Updates &amp; News"
-msgstr "पाठ्यक्रम अपडेट और समाचार "
+msgid "Course Updates and News"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -11232,8 +11404,8 @@ msgid "Important Course Dates"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "पाठ्यक्रम हैंडआउट्स"
+msgid "Course Updates &amp; News"
+msgstr "पाठ्यक्रम अपडेट और समाचार "
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -11580,11 +11752,6 @@ msgid "View Archived Course"
 msgstr "संग्रहित कोर्स देखें "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course"
-msgstr "पाठयक्रम देखें"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr ""
 
@@ -11902,13 +12069,9 @@ msgstr "फ़ॉलोइंग"
 msgid "Search posts"
 msgstr "पोस्ट खोजें"
 
-#: lms/templates/discussion/_similar_posts.html
-msgid "Hide"
-msgstr "छिपाएं"
-
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; current selection is: "
-msgstr "चर्चा के विषय, वर्तमान चयन है:"
+msgid "Discussion topics; currently listing: "
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
@@ -12101,14 +12264,6 @@ msgid ""
 "Change your life and start learning today by activating your {platform_name}"
 " account. Click on the link below or copy and paste it into your browser's "
 "address bar."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/email_change.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -12310,13 +12465,6 @@ msgstr ""
 #. tags in place.
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
-msgstr ""
-
-#: lms/templates/emails/confirm_email_change.txt
-msgid ""
-"This is to confirm that you changed the e-mail associated with "
-"{platform_name} from {old_email} to {new_email}. If you did not make this "
-"request, please contact us at"
 msgstr ""
 
 #: lms/templates/emails/confirm_email_change.txt
@@ -12562,13 +12710,6 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "For payment questions, contact {contact_email}"
-msgstr ""
-
-#: lms/templates/emails/reject_name_change.txt
-msgid ""
-"We are sorry. Our course staff did not approve your request to change your "
-"name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the tech support at {email}"
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
@@ -12864,7 +13005,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
-"To regenerate certificates for your course, chose the learners who will "
+"To regenerate certificates for your course, choose the learners who will "
 "receive regenerated certificates and click <br/> Regenerate Certificates."
 msgstr ""
 
@@ -15280,6 +15421,51 @@ msgstr ""
 
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Copyright"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/footer.html
+msgid "Copyright {year}. All rights reserved."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "Free courses from <strong>{university_name}</strong>"
+msgstr "<strong>{university_name}</strong> से नि: शुल्क पाठ्यक्रम "
+
+#: themes/stanford-style/lms/templates/index.html
+msgid "For anyone, anywhere, anytime"
+msgstr "किसी भी व्यक्ति के लिए, कभी भी, किसी भी वक्त"
+
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid ""
+"You will receive an activation email.  You must click on the activation link"
+" to complete the process.  Don't see the email?  Check your spam folder and "
+"mark emails from class.stanford.edu as 'not spam', since you'll want to be "
+"able to receive email from your courses."
+msgstr ""
+"आपको एक एक्टीवेशन ई-मेल भेजी जाएगी। प्रक्रिया पूरी करने के लिए आपका "
+"एक्टीवेशन लिंक पर क्लिक करना ज़रूरी है। क्या आपको कोई ई-मेल नहीं मिली? अपने "
+"स्पैम फ़ोल्डर में देखें और class.stanford.edu से भेजी गई ई-मेलों पर 'not "
+"spam' का निशान लगाए, वरना आप अपने पाठ्यक्रम से ई-मेलें नहीं पा सकेंगे।"
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Terms of Service here!"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Privacy Policy here!"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Honor Code here!"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/static_templates/tos.html
+msgid "Put your Copyright Text here!"
 msgstr ""
 
 #: cms/templates/404.html
@@ -18244,11 +18430,39 @@ msgid "Launch Latex Source Compiler"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Heading 1"
+msgid "Heading"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a heading"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add a multiple choice question"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add a question with checkboxes"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a text response"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a numerical response"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Insert a dropdown response"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Add an explanation for this question"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html

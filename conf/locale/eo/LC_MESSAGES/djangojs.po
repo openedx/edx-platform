@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-04 15:34+0000\n"
-"PO-Revision-Date: 2016-02-04 15:35:28.172537\n"
+"POT-Creation-Date: 2016-02-11 12:21+0000\n"
+"PO-Revision-Date: 2016-02-11 12:22:01.889310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1583,6 +1583,10 @@ msgstr ""
 "Ìf ýöü üsé thé Àdvänçéd Édïtör, thïs prößlém wïll ßé çönvértéd tö XML änd ýöü wïll nöt ßé äßlé tö rétürn tö thé Sïmplé Édïtör Ìntérfäçé.\n"
 "\n"
 "Pröçééd tö thé Àdvänçéd Édïtör änd çönvért thïs prößlém tö XML? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢α#"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Explanation"
+msgstr "Éxplänätïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -3954,38 +3958,69 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate of "
-msgstr "Çértïfïçäté öf  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid " has already been invalidated. Please check your spelling and retry."
+msgid ""
+"Certificate of <%= user %> has already been invalidated. Please check your "
+"spelling and retry."
 msgstr ""
-" häs älréädý ßéén ïnvälïdätéd. Pléäsé çhéçk ýöür spéllïng änd rétrý. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Çértïfïçäté öf <%= user %> häs älréädý ßéén ïnvälïdätéd. Pléäsé çhéçk ýöür "
+"spéllïng änd rétrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Certificate has been successfully invalidated for "
+msgid "Certificate has been successfully invalidated for <%= user %>."
 msgstr ""
-"Çértïfïçäté häs ßéén süççéssfüllý ïnvälïdätéd för  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Çértïfïçäté häs ßéén süççéssfüllý ïnvälïdätéd för <%= user %>. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
+#: lms/static/js/certificates/views/certificate_whitelist.js
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "Server Error, Please refresh the page and try again."
 msgstr ""
 "Sérvér Érrör, Pléäsé réfrésh thé pägé änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "The certificate for this learner has been re-validated and "
+msgid ""
+"The certificate for this learner has been re-validated and the system is re-"
+"running the grade for this learner."
 msgstr ""
-"Thé çértïfïçäté för thïs léärnér häs ßéén ré-välïdätéd änd  Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thé çértïfïçäté för thïs léärnér häs ßéén ré-välïdätéd änd thé sýstém ïs ré-"
+"rünnïng thé grädé för thïs léärnér. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
-msgid "Could not find Certificate Invalidation in the list. "
+msgid ""
+"Could not find Certificate Invalidation in the list. Please refresh the page"
+" and try again"
 msgstr ""
-"Çöüld nöt fïnd Çértïfïçäté Ìnvälïdätïön ïn thé lïst.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
+"Çöüld nöt fïnd Çértïfïçäté Ìnvälïdätïön ïn thé lïst. Pléäsé réfrésh thé pägé"
+" änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid "Student Removed from certificate white list successfully."
+msgstr ""
+"Stüdént Rémövéd fröm çértïfïçäté whïté lïst süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_whitelist.js
+msgid ""
+"Could not find Certificate Exception in white list. Please refresh the page "
+"and try again"
+msgstr ""
+"Çöüld nöt fïnd Çértïfïçäté Éxçéptïön ïn whïté lïst. Pléäsé réfrésh thé pägé "
+"änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid "<%= user %> already in exception list."
+msgstr ""
+"<%= user %> älréädý ïn éxçéptïön lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/certificates/views/certificate_whitelist_editor.js
+msgid ""
+"<%= user %> has been successfully added to the exception list. Click "
+"Generate Exception Certificate below to send the certificate."
+msgstr ""
+"<%= user %> häs ßéén süççéssfüllý äddéd tö thé éxçéptïön lïst. Çlïçk "
+"Généräté Éxçéptïön Çértïfïçäté ßélöw tö sénd thé çértïfïçäté. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -6303,32 +6338,36 @@ msgid "Find discussions"
 msgstr "Fïnd dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Focus in on specific topics"
-msgstr "Föçüs ïn ön spéçïfïç töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+msgid "Use the Discussion Topics menu to find specific topics."
+msgstr ""
+"Ûsé thé Dïsçüssïön Töpïçs ménü tö fïnd spéçïfïç töpïçs. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Search for specific posts"
-msgstr "Séärçh för spéçïfïç pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "Search all posts"
+msgstr "Séärçh äll pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Sort by date, vote, or comments"
-msgstr "Sört ßý däté, vöté, ör çömménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Filter and sort topics"
+msgstr "Fïltér änd sört töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Engage with posts"
 msgstr "Éngägé wïth pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Upvote posts and good responses"
-msgstr "Ûpvöté pösts änd gööd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Vote for good posts and responses"
+msgstr ""
+"Vöté för gööd pösts änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Report Forum Misuse"
-msgstr "Répört Förüm Mïsüsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Report abuse, topics, and responses"
+msgstr ""
+"Répört äßüsé, töpïçs, änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Follow posts for updates"
-msgstr "Föllöw pösts för üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "Follow or unfollow posts"
+msgstr "Föllöw ör ünföllöw pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Receive updates"
@@ -6658,10 +6697,10 @@ msgid "Topic Area:"
 msgstr "Töpïç Àréä: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Discussion topics; current selection is: "
+msgid "Discussion topics; currently listing: "
 msgstr ""
-"Dïsçüssïön töpïçs; çürrént séléçtïön ïs:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"Dïsçüssïön töpïçs; çürréntlý lïstïng:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Filter topics"

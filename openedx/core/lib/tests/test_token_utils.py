@@ -2,6 +2,7 @@
 import calendar
 import datetime
 
+import ddt
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
@@ -16,6 +17,7 @@ from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
+@ddt.ddt
 class TestIdTokenGeneration(TestCase):
     """Tests covering ID token generation."""
     client_name = 'edx-dummy-client'
@@ -24,15 +26,17 @@ class TestIdTokenGeneration(TestCase):
         super(TestIdTokenGeneration, self).setUp()
 
         self.oauth2_client = ClientFactory(name=self.client_name, client_type=CONFIDENTIAL)
-        self.user = UserFactory()
 
-        # Create a profile for the user
-        self.user_profile = UserProfileFactory(user=self.user)
+        self.user = UserFactory.build()
+        self.user.save()
 
     @override_settings(OAUTH_OIDC_ISSUER='test-issuer', OAUTH_ID_TOKEN_EXPIRATION=1)
     @freezegun.freeze_time('2015-01-01 12:00:00')
-    def test_get_id_token(self):
+    @ddt.data(True, False)
+    def test_get_id_token(self, has_profile):
         """Verify that ID tokens are signed with the correct secret and generated with the correct claims."""
+        full_name = UserProfileFactory(user=self.user).name if has_profile else None
+
         token = get_id_token(self.user, self.client_name)
 
         payload = jwt.decode(
@@ -47,7 +51,7 @@ class TestIdTokenGeneration(TestCase):
 
         expected_payload = {
             'preferred_username': self.user.username,
-            'name': self.user_profile.name,
+            'name': full_name,
             'email': self.user.email,
             'administrator': self.user.is_staff,
             'iss': settings.OAUTH_OIDC_ISSUER,

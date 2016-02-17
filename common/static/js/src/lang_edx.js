@@ -1,12 +1,9 @@
-var edx = edx || {},
-    Language = (function() {
+var Language = (function() {
         'use strict';
-        var preference_api_url,
-            settings_language_selector,
+        var settings_language_selector,
             self = null;
         return {
             init: function() {
-                preference_api_url = $('#preference-api-url').val();
                 settings_language_selector = $('#settings-language-value');
                 self = this;
                 this.listenForLanguagePreferenceChange();
@@ -18,24 +15,41 @@ var edx = edx || {},
              */
             listenForLanguagePreferenceChange: function() {
                 settings_language_selector.change(function(event) {
-                    var language = this.value;
+                    var language = this.value,
+                        url = $('.url-endpoint').val(),
+                        is_user_authenticated =  JSON.parse($('.url-endpoint').data('user-is-authenticated'));
                     event.preventDefault();
-                    $.ajax({
-                        type: 'PATCH',
-                        data: JSON.stringify({'pref-lang': language}) ,
-                        url: preference_api_url,
-                        dataType: 'json',
-                        contentType: "application/merge-patch+json",
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("X-CSRFToken", $('#csrf_token').val());
+                    self.submitAjaxRequest(language, url, function() {
+                        if (is_user_authenticated) {
+                            // User language preference has been set successfully
+                            // Now submit the form in success callback.
+                            $('#language-settings-form').submit();
+                        } else {
+                            self.refresh();
                         }
-                    }).done(function () {
-                        // User language preference has been set successfully
-                        // Now submit the form in success callback.
-                        $("#language-settings-form").submit();
-                    }).fail(function() {
-                        self.refresh();
                     });
+                });
+            },
+
+            /**
+             * Send an ajax request to set user language preferences.
+             */
+            submitAjaxRequest: function(language, url, callback) {
+
+                $.ajax({
+                    type: 'PATCH',
+                    data: JSON.stringify({'pref-lang': language}) ,
+                    url: url,
+                    dataType: 'json',
+                    contentType: 'application/merge-patch+json',
+                    notifyOnError: false,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                    }
+                }).done(function () {
+                    callback();
+                }).fail(function() {
+                    self.refresh();
                 });
             },
 
@@ -43,7 +57,7 @@ var edx = edx || {},
              * refresh the page.
              */
             refresh: function () {
-                // reloading the page so we can get the latest state of realsesd languages from model
+                // reloading the page so we can get the latest state of released languages from model
                 location.reload();
             }
 

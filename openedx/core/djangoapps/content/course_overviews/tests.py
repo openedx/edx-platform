@@ -17,6 +17,7 @@ from PIL import Image
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
+from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
@@ -348,7 +349,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 5, 5), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
@@ -642,6 +643,32 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 'large': expected_url
             }
         )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn(self, modulestore_type):
+        """
+        Test that we return CDN prefixed URLs if it is enabled.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # First the behavior when there's no CDN enabled...
+            AssetBaseUrlConfig.objects.all().delete()
+            if modulestore_type == ModuleStoreEnum.Type.mongo:
+                expected_path_start = "/c4x/"
+            elif modulestore_type == ModuleStoreEnum.Type.split:
+                expected_path_start = "/asset-v1:"
+
+            for url in overview.image_urls.values():
+                self.assertTrue(url.startswith(expected_path_start))
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org" + expected_path_start
+
+            for url in overview.image_urls.values():
+                self.assertTrue(url.startswith(expected_cdn_url))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_error_generating_thumbnails(self, modulestore_type):

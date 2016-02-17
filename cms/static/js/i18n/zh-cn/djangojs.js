@@ -19,7 +19,6 @@
   /* gettext library */
 
   django.catalog = {
-    "\"optional title\"": "\u201c\u53ef\u9009\u6807\u9898\u201d", 
     "#Replies": "\u56de\u590d", 
     "%(display_name)s Settings": "%(display_name)s\u8bbe\u7f6e", 
     "%(hours)s:%(minutes)s (current UTC time)": "%(hours)s:%(minutes)s (\u5f53\u524d UTC \u65f6\u95f4)", 
@@ -181,7 +180,6 @@
     ], 
     "Check the box to remove all flags.": "\u67e5\u770b\u4fe1\u606f\u680f\u4ee5\u79fb\u9664\u6240\u6709\u6807\u8bb0", 
     "Check your email": "\u67e5\u6536\u4f60\u7684\u90ae\u4ef6", 
-    "Choose File": "\u9009\u62e9\u6587\u4ef6", 
     "Choose a .csv file": "\u9009\u62e9\u4e00\u4e2a.csv\u7684\u6587\u4ef6", 
     "Choose a content group to associate": "\u9009\u62e9\u4e00\u4e2a\u5185\u5bb9\u7ec4\u6765\u5173\u8054", 
     "Choose new file": "\u9009\u62e9\u65b0\u6587\u4ef6", 
@@ -432,7 +430,6 @@
     "Inline": "\u5185\u8054", 
     "Insert": "\u63d2\u5165", 
     "Insert Hyperlink": "\u63d2\u5165\u8d85\u94fe\u63a5", 
-    "Insert Image (upload file or type url)": "\u63d2\u5165\u56fe\u7247(\u4e0a\u4f20\u6587\u4ef6\u6216\u8f93\u5165\u56fe\u7247\u7684\u94fe\u63a5url)", 
     "Insert column after": "\u5728\u53f3\u4fa7\u63d2\u5165\u5217", 
     "Insert column before": "\u5728\u5de6\u4fa7\u63d2\u5165\u5217", 
     "Insert date/time": "\u63d2\u5165\u65e5\u671f\uff0f\u65f6\u95f4", 
@@ -953,7 +950,6 @@
     "about an hour": "\u5927\u7ea6\u4e00\u5c0f\u65f6", 
     "anonymous": "\u533f\u540d", 
     "answer": "\u7b54\u6848", 
-    "component": "\u7ec4\u4ef6", 
     "content group": "\u5185\u5bb9\u7ec4", 
     "correct": "\u6b63\u786e", 
     "discussion": "\u8ba8\u8bba", 
@@ -964,7 +960,6 @@
     "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com": "\u4f8b\u5982\uff1ajohndoe@example.com, JaneDoe, joeydoe@example.com", 
     "emphasized text": "\u5f3a\u8c03\u6587\u5b57", 
     "enter code here": "\u6b64\u5904\u8f93\u5165\u4ee3\u7801", 
-    "enter image description here": "\u6b64\u5904\u8f93\u5165\u56fe\u50cf\u7684\u63cf\u8ff0", 
     "enter link description here": "\u6b64\u5904\u8f93\u5165\u94fe\u63a5\u7684\u63cf\u8ff0", 
     "group configuration": "\u7ec4\u914d\u7f6e", 
     "incorrect": "\u4e0d\u6b63\u786e", 

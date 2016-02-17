@@ -10,7 +10,6 @@ general:
 dependencies:
   override:
     - npm install
-    - bundle install
 
     - pip install setuptools
     - pip install --exists-action w -r requirements/edx/paver.txt

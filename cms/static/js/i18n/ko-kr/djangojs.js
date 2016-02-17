@@ -19,7 +19,6 @@
   /* gettext library */
 
   django.catalog = {
-    "\"optional title\"": "\"\uc120\ud0dd\uc801 \uc81c\ubaa9\"", 
     "#Replies": "#\ub2f5\uae00\ub4e4", 
     "%(numResponses)s other response": [
       "\ub2e4\ub978 \ub2f5\ubcc0: %(numResponses)s "
@@ -342,7 +341,6 @@
     "Inline": "inline", 
     "Insert": "\uc0bd\uc785", 
     "Insert Hyperlink": "\ud558\uc774\ud37c\ub9c1\ud06c \uc0bd\uc785", 
-    "Insert Image (upload file or type url)": "\uc774\ubbf8\uc9c0 \uc0bd\uc785 (\ud30c\uc77c\uc5c5\ub85c\ub4dc \ub610\ub294 url \uc785\ub825)", 
     "Insert column after": "\uc5f4\uc744 \ub098\uc911\uc5d0 \uc0bd\uc785", 
     "Insert column before": "\uc5f4\uc744 \uc804\uc5d0 \uc0bd\uc785", 
     "Insert date/time": "\ub0a0\uc9dc/\uc2dc\uac04 \uc0bd\uc785", 
@@ -762,7 +760,6 @@
     "dropped on target": "\ubaa9\ud45c\uc810\uc5d0 \ub5a8\uc5b4\ud2b8\ub838\uc2b5\ub2c8\ub2e4.", 
     "emphasized text": "\uac15\uc870\ub41c \ubb38\uc7a5", 
     "enter code here": "\ucf54\ub4dc \uc785\ub825\ud558\uc138\uc694", 
-    "enter image description here": "\uc774\ubbf8\uc9c0 \uc124\uba85\uc744 \uc5ec\uae30\uc5d0 \uc785\ub825\ud558\uc138\uc694", 
     "enter link description here": "\ub9c1\ud06c \uc124\uba85\uc744 \uc5ec\uae30\uc5d0 \uc785\ub825\ud558\uc138\uc694", 
     "incorrect": "\uc624\ub2f5\uc744 \uc785\ub825\ud558\uc138\uc694.", 
     "less than a minute": "\uc77c\ubd84 \uc774\ub0b4", 

@@ -34,6 +34,15 @@ from branding import api as branding_api
 log = logging.getLogger("edx.certificate")
 
 
+def is_passing_status(cert_status):
+    """
+    Given the status of a certificate, return a boolean indicating whether
+    the student passed the course.  This just proxies to the classmethod
+    defined in models.py
+    """
+    return CertificateStatuses.is_passing_status(cert_status)
+
+
 def get_certificates_for_user(username):
     """
     Retrieve certificate information for a particular user.
@@ -116,7 +125,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
-    if cert.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+    if CertificateStatuses.is_passing_status(cert.status):
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': unicode(course_key),

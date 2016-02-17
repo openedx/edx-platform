@@ -6,6 +6,7 @@ from mako.exceptions import TemplateLookupException
 
 from openedx.core.djangoapps.theming.helpers import get_page_title_breadcrumbs, get_value, get_template_path, get_themed_template_path, is_request_in_themed_site
 from certificates.api import get_asset_url_by_slug
+from lang_pref.api import released_languages
 %>
 
 <%def name='url(file, raw=False)'><%
@@ -131,4 +132,8 @@ else:
 
 <%def name="show_language_selector()"><%
     return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
+%></%def>
+
+<%def name="get_released_languages()"><%
+    return released_languages()
 %></%def>

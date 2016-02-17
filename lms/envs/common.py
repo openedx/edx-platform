@@ -365,7 +365,7 @@ FEATURES = {
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
 
-    # Show LMS Language selector
+    # Show Language selector.
     'SHOW_LANGUAGE_SELECTOR': False,
 }
 
@@ -1625,6 +1625,12 @@ REQUIRE_JS_PATH_OVERRIDES = [
 ]
 ################################# CELERY ######################################
 
+# Celery's task autodiscovery won't find tasks nested in a tasks package.
+# Tasks are only registered when the module they are defined in is imported.
+CELERY_IMPORTS = (
+    'openedx.core.djangoapps.programs.tasks.v1.tasks',
+)
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
@@ -2750,3 +2756,15 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# Deprecated xblock types
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+
+
+# Cutoff date for granting audit certificates
+
+AUDIT_CERT_CUTOFF_DATE = None
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'

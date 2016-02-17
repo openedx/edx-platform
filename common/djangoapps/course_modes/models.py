@@ -30,6 +30,9 @@ class CourseMode(models.Model):
     We would like to offer a course in a variety of modes.
 
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True, verbose_name=_("Course"))
 
@@ -636,6 +639,9 @@ class CourseModesArchive(models.Model):
     field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
     such as course price changes
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True)
 
@@ -665,6 +671,9 @@ class CourseModeExpirationConfig(ConfigurationModel):
     """
     Configuration for time period from end of course to auto-expire a course mode.
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     verification_window = models.DurationField(
         default=timedelta(days=10),
         help_text=_(

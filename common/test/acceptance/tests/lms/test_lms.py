@@ -51,7 +51,17 @@ class ForgotPasswordPageTest(UniqueCourseTest):
     def setUp(self):
         """ Initialize the page object """
         super(ForgotPasswordPageTest, self).setUp()
+        self.user_info = self._create_user()
         self.reset_password_page = ResetPasswordPage(self.browser)
+
+    def _create_user(self):
+        """
+        Create a unique user
+        """
+        auto_auth = AutoAuthPage(self.browser).visit()
+        user_info = auto_auth.user_info
+        LogoutPage(self.browser).visit()
+        return user_info
 
     def test_reset_password_form_visibility(self):
         # Navigate to the password reset page
@@ -59,6 +69,18 @@ class ForgotPasswordPageTest(UniqueCourseTest):
 
         # Expect that reset password form is visible on the page
         self.assertTrue(self.reset_password_page.is_form_visible())
+
+    def test_reset_password_confirmation_box_visibility(self):
+        # Navigate to the password reset page
+        self.reset_password_page.visit()
+
+        # Navigate to the password reset form and try to submit it
+        self.reset_password_page.fill_password_reset_form(self.user_info['email'])
+
+        self.reset_password_page.is_success_visible(".submission-success")
+
+        # Expect that we're shown a success message
+        self.assertIn("Password Reset Email Sent", self.reset_password_page.get_success_message())
 
 
 @attr('shard_8')

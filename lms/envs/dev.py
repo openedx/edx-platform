@@ -229,7 +229,7 @@ FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
 ########################## ANALYTICS TESTING ########################
 

@@ -3,10 +3,8 @@ Tests for discussion pages
 """
 
 import datetime
-from unittest import skip
 from uuid import uuid4
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import UTC
 
@@ -698,7 +696,6 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.edit_comment(page, "comment_self_author")
         self.edit_comment(page, "comment_other_author")
 
-    @flaky  # TODO: TNL-4057
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()

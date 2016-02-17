@@ -18,7 +18,6 @@ from courseware.courses import get_course_with_access
 
 from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
-from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
     can_delete,
     get_editable_fields,
@@ -38,6 +37,7 @@ from django_comment_common.signals import (
     comment_deleted,
 )
 from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
+from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
@@ -328,22 +328,30 @@ def get_thread_list(
             })
 
     if following:
-        threads, result_page, num_pages = context["cc_requester"].subscribed_threads(query_params)
+        paginated_results = context["cc_requester"].subscribed_threads(query_params)
     else:
         query_params["course_id"] = unicode(course.id)
         query_params["commentable_ids"] = ",".join(topic_id_list) if topic_id_list else None
         query_params["text"] = text_search
-        threads, result_page, num_pages, text_search_rewrite = Thread.search(query_params)
+        paginated_results = Thread.search(query_params)
     # The comments service returns the last page of results if the requested
     # page is beyond the last page, but we want be consistent with DRF's general
     # behavior and return a PageNotFoundError in that case
-    if result_page != page:
+    if paginated_results.page != page:
         raise PageNotFoundError("Page not found (No results on this page).")
 
-    results = [ThreadSerializer(thread, context=context).data for thread in threads]
-    ret = get_paginated_data(request, results, page, num_pages)
-    ret["text_search_rewrite"] = text_search_rewrite
-    return ret
+    results = [ThreadSerializer(thread, context=context).data for thread in paginated_results.collection]
+
+    paginator = DiscussionAPIPagination(
+        request,
+        paginated_results.page,
+        paginated_results.num_pages,
+        paginated_results.thread_count
+    )
+    return paginator.get_paginated_response({
+        "results": results,
+        "text_search_rewrite": paginated_results.corrected_text,
+    })
 
 
 def get_comment_list(request, thread_id, endorsed, page, page_size):
@@ -412,7 +420,8 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
     results = [CommentSerializer(response, context=context).data for response in responses]
-    return get_paginated_data(request, results, page, num_pages)
+    paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
+    return paginator.get_paginated_response(results)
 
 
 def _check_fields(allowed_fields, data, message):
@@ -747,11 +756,15 @@ def get_response_comments(request, comment_id, page, page_size):
 
         response_skip = page_size * (page - 1)
         paged_response_comments = response_comments[response_skip:(response_skip + page_size)]
+        if len(paged_response_comments) == 0 and page != 1:
+            raise PageNotFoundError("Page not found (No results on this page).")
+
         results = [CommentSerializer(comment, context=context).data for comment in paged_response_comments]
 
         comments_count = len(response_comments)
         num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
-        return get_paginated_data(request, results, page, num_pages)
+        paginator = DiscussionAPIPagination(request, page, num_pages, comments_count)
+        return paginator.get_paginated_response(results)
     except CommentClientRequestError:
         raise CommentNotFoundError("Comment not found")
 
