@@ -46,7 +46,7 @@
 
 ## Import styles for courseware search
 % if env["FEATURES"].get("ENABLE_COURSEWARE_SEARCH"):
-    @import 'search/_search';
+    @import 'course/courseware/courseware_search';
 % endif
 
 // course - modules

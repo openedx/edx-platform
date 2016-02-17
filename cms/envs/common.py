@@ -155,10 +155,10 @@ FEATURES = {
     'LICENSING': False,
 
     # Enable the courseware search functionality
-    'ENABLE_COURSEWARE_INDEX': True,
+    'ENABLE_COURSEWARE_INDEX': False,
 
     # Enable content libraries search functionality
-    'ENABLE_LIBRARY_INDEX': True,
+    'ENABLE_LIBRARY_INDEX': False,
 
     # Enable course reruns, which will always use the split modulestore
     'ALLOW_COURSE_RERUNS': False,
@@ -1056,7 +1056,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
 }
 
 # Default to no Search Engine
-SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
