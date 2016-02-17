@@ -417,6 +417,12 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
+############################ Global Database Configuration #####################
+
+DATABASE_ROUTERS = [
+    'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+]
+
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
@@ -2756,6 +2762,10 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# Offset for courseware.StudentModuleHistoryExtended which is used to
+# calculate the starting primary key for the underlying table.
+STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
 # Deprecated xblock types
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []

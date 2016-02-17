@@ -520,6 +520,7 @@ class UserRoleTestCase(TestCase):
     """
     Tests for user roles.
     """
+
     def setUp(self):
         super(UserRoleTestCase, self).setUp()
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
