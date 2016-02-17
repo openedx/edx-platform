@@ -108,12 +108,12 @@ from openedx.core.lib.courses import course_image_url
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">
-        <hgroup>
+        <div class="heading-group">
           <h1>
             ${course.display_name_with_default_escaped}
             <a href="#">${course.display_org_with_default | h}</a>
           </h1>
-        </hgroup>
+        </div>
 
         <div class="main-cta">
         %if user.is_authenticated() and registered:

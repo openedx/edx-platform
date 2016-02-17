@@ -7,14 +7,14 @@ from django.utils.translation import ugettext as _
   <header>
     <div class="outer-wrapper">
       <div class="title">
-        <hgroup>
+        <div class="heading-group">
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
             <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
             <h2>${_("For anyone, anywhere, anytime")}</h2>
           % endif
-        </hgroup>
+        </div>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
           <div class="course-search">
             <form method="get" action="/courses">

@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
   <header>
     <div class="outer-wrapper">
       <div class="title">
-        <hgroup>
+        <div class="heading-group">
           % if homepage_overlay_html:
             ${homepage_overlay_html}
           % else:
@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
               ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
               <h2>${_("It works! This is the default homepage for this Open edX instance.")}</h2>
           % endif
-        </hgroup>
+        </div>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
           <div class="course-search">
             <form method="get" action="/courses">
