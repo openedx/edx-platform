@@ -1056,7 +1056,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
 }
 
 # Default to no Search Engine
-SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
