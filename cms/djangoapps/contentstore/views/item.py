@@ -1021,7 +1021,7 @@ class VisibilityState(object):
     gated = 'gated'
 
 
-def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_course_self_paced):
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_course_self_paced=False):
     """
     Returns the current publish state for the specified xblock and its children
     """
