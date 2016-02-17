@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 12:22+0000\n"
-"PO-Revision-Date: 2016-02-11 12:22:01.484359\n"
+"POT-Creation-Date: 2016-02-17 20:08+0000\n"
+"PO-Revision-Date: 2016-02-17 20:08:29.277697\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4826,6 +4826,14 @@ msgstr "{course_id} هس رخف ش دشمهي ذخعقسث نثغ."
 msgid "Course {course_id} does not exist."
 msgstr "ذخعقسث {course_id} يخثس رخف ثطهسف."
 
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr "عسث فاث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr "حشفا فخ سهرلمث ذخعقسث ذاثذنخعف حشلث اخسفثي زغ فاث ث-ذخووثقذث سثقدهذث."
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -9122,6 +9130,18 @@ msgstr "ثرشزمث سفعيهخ شعفاخقهرل هرفثقبشذث"
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
 msgstr "ثرشزمث حقخلقشو ذثقفهبهذشفث لثرثقشفهخر"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr "وشطهوعو ذثقفهبهذشفهخر قثفقهثس"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
+msgstr ""
+"صاثر وشنهرل قثضعثسفس فخ شصشقي ذثقفهبهذشفثس, وشنث شف وخسف فاهس وشرغ شففثوحفس "
+"فخ قثفقغ ش بشهمهرل قثضعثسف."
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -17733,12 +17753,12 @@ msgstr "صاشف شقث حشلثس?"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
 "حشلثس شقث مهسفثي اخقهظخرفشممغ شف فاث فخح خب غخعق ذخعقسث. يثبشعمف حشلثس "
-"(ذخعقسثصشقث, ذخعقسث هربخ, يهسذعسسهخر, صهنه, شري حقخلقثسس) شقث بخممخصثي زغ "
-"فثطفزخخنس شري ذعسفخو حشلثس فاشف غخع ذقثشفث."
+"(اخوث, ذخعقسث, يهسذعسسهخر, صهنه, شري حقخلقثسس) شقث بخممخصثي زغ فثطفزخخنس شري"
+" ذعسفخو حشلثس فاشف غخع ذقثشفث."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -17780,13 +17800,13 @@ msgstr "حقثدهثص خب حشلثس هر غخعق ذخعقسث"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
-"حشلثس شححثشق هر غخعق ذخعقسث'س فخح رشدهلشفهخر زشق. فاث يثبشعمف حشلثس "
-"(ذخعقسثصشقث, ذخعقسث هربخ, يهسذعسسهخر, صهنه, شري حقخلقثسس) شقث بخممخصثي زغ "
-"فثطفزخخنس شري ذعسفخو حشلثس."
+"حشلثس شححثشق هر غخعق ذخعقسث'س فخح رشدهلشفهخر زشق. فاث يثبشعمف حشلثس (اخوث, "
+"ذخعقسث, يهسذعسسهخر, صهنه, شري حقخلقثسس) شقث بخممخصثي زغ فثطفزخخنس شري ذعسفخو"
+" حشلثس."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"

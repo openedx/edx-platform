@@ -658,6 +658,8 @@ msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
 msgstr ""
+"Al parecer {email} ya está asociado a una cuenta existente. Intente "
+"nuevamente con un correo electrónico diferente."
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -1459,6 +1461,8 @@ msgstr "Lista separada por espacios, de los XBlocks que no deben mostrarse."
 msgid ""
 "Space-separated list of XBlock types whose creation to disable in Studio."
 msgstr ""
+"Lista de tipos de XBlocks separada por espacios, con aquellos XBlocks que se"
+" desea deshabilitar en Studio"
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -1494,23 +1498,23 @@ msgstr "procesando"
 #. question
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is correct."
-msgstr ""
+msgstr "Esta respuesta es correcta."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is incorrect."
-msgstr ""
+msgstr "Esta respuesta es incorrecta."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is partially correct."
-msgstr ""
+msgstr "Esta respuesta es parcialmente correcta."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is unanswered."
-msgstr ""
+msgstr "Este problema no está contestado."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is being processed."
-msgstr ""
+msgstr "Esta respuesta está siendo procesada."
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -2636,7 +2640,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Home Sidebar Name"
-msgstr ""
+msgstr "Nombre de la pestaña de inicio del curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2644,7 +2648,10 @@ msgid ""
 "on the Course Home page. Your course handouts appear in the right panel of "
 "the page."
 msgstr ""
+"Ingrese el nombre que desea que sus estudiantes vean sobre la sección de "
+"Apuntes del curso en la página de inicio del curso a la derecha. "
 
+#: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
 msgstr "Apuntes del curso"
@@ -2748,6 +2755,9 @@ msgid ""
 "marks, enter the short name of the type of certificate that students receive"
 " when they complete the course. For instance, \"Certificate\"."
 msgstr ""
+"Use esta configuración solo cuando esté generando certificados en PDF. Entre"
+" comillas, ingrese el nombre corto del tipo de certificado que los "
+"estudiantes reciben al completar el curso. Por ejemplo \"Certificado\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Short)"
@@ -2759,6 +2769,10 @@ msgid ""
 "marks, enter the long name of the type of certificate that students receive "
 "when they complete the course. For instance, \"Certificate of Achievement\"."
 msgstr ""
+"Use esta configuración solo cuando esté generando certificados en PDF. Entre"
+" comillas, ingrese el nombre largo del tipo de certificado que los "
+"estudiantes reciben al completar el curso. Por ejemplo \"Certificado de "
+"terminación\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Long)"
@@ -3032,6 +3046,15 @@ msgid ""
 "{example_format}. In \"id\" values, the only supported special characters "
 "are underscore, hyphen, and period."
 msgstr ""
+"Especifique el tamaño máximo del equipo del curso y los temas para los "
+"equipos en los corchetes. Asegúrese de que se encierra todos los conjuntos "
+"de valores de temas dentro de un par de corchetes, con una coma después del "
+"cierre para cada tema, y otra coma después de los corchetes de cierre. Por "
+"ejemplo, para especificar que los equipos deben tener un máximo de 5 "
+"participantes y proporcionar una lista de 2 temas, introduzca la "
+"configuración en este formato: {example_format}. En los valores de \"id\", "
+"los únicos caracteres especiales soportados son subrayado, guión, y el "
+"punto."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -3089,13 +3112,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
-msgstr ""
+msgstr "Habilitar prerequisitos de subsección"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
 msgstr ""
+"Ingrese true o false. Si este valor es true, puede ocultar una subsección "
+"hasta que los estudiantes obtengan un puntaje mínimo en una subsección que "
+"sea prerequisito."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3820,6 +3846,11 @@ msgid ""
 "files in the following format: {format}. For example, an entry for a video "
 "with two transcripts looks like this: {example}"
 msgstr ""
+"Seleccione un video de 5-10 segundos para mostrar antes de los videos del "
+"curso.  Ingrese el ID del video, como aparece en la página de Videos "
+"cargados y uno o más archivos de transcripción en el siguiente formato: "
+"{format}. Por ejemplo, una entrada para un video con dos archivos de "
+"transcripción se verá asi: {example}"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
@@ -4050,7 +4081,7 @@ msgstr "Discusión externa"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
@@ -4524,6 +4555,8 @@ msgid "Contact"
 msgstr "Contacto"
 
 #: lms/djangoapps/branding/api.py
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "Carreras"
 
@@ -5195,11 +5228,11 @@ msgstr "Usted no tiene acceso a este curso desde dispositivos móviles"
 #. month".
 #: lms/djangoapps/courseware/date_summary.py
 msgid "{relative} ago - {absolute}"
-msgstr ""
+msgstr "Hace {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
-msgstr ""
+msgstr "Dentro de {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
@@ -5241,6 +5274,9 @@ msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
 msgstr ""
+"Usted todavía es elegible para ascender a la opción de Certificado "
+"Verificado. Utilice esta opción para destacar sus conocimientos y "
+"habilidades obtenidas en el curso."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
@@ -6955,7 +6991,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
-msgstr ""
+msgstr "Chrome de curso"
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -6982,6 +7018,8 @@ msgid ""
 "Enter the tab that is selected in the XBlock. If not set, the Course tab is "
 "selected."
 msgstr ""
+"Ingres la pestaña que está seleccionada en el XBlock. Si no se especifica, "
+"se utilizará la pestaña de Curso."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "LaTeX Source File Name"
@@ -9256,19 +9294,21 @@ msgstr "URL del servicio público"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Learner Issuance"
-msgstr ""
+msgstr "Habilitar expedición por parte del estudiante"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable issuance of credentials via Credential Service."
 msgstr ""
+"Habilitar la expedición de credenciales a través de un servicio de "
+"credenciales."
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Authoring of Credential in Studio"
-msgstr ""
+msgstr "Habilitar la Creación de credenciales desde Studio"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable authoring of Credential Service credentials in Studio."
-msgstr ""
+msgstr "Habilitar la creación de Servicio de credenciales desde Studio"
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -9668,11 +9708,11 @@ msgstr "Esta campo no puede editarse."
 #: openedx/core/lib/gating/api.py
 #, python-format
 msgid "%(min_score)s is not a valid grade percentage"
-msgstr ""
+msgstr "%(min_score)s no es un porcentaje de calificación válido"
 
 #: openedx/core/lib/gating/api.py
 msgid "Gating milestone for {usage_key}"
-msgstr ""
+msgstr "Hito de apertura para {usage_key}"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -10141,11 +10181,11 @@ msgstr "Formato incorrecto para el campo '{name}'. {detailed_message}"
 
 #: cms/lib/xblock/tagging.py
 msgid "Learning outcomes"
-msgstr ""
+msgstr "Resultados de aprendizaje"
 
 #: cms/lib/xblock/tagging.py
 msgid "Dictionary with the available tags"
-msgstr ""
+msgstr "Diccionario con etiquetas disponibles"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -10304,7 +10344,7 @@ msgstr "Visite su {link_start}Panel de control{link_end} para ver sus cursos."
 
 #: cms/templates/widgets/header.html lms/templates/navigation.html
 msgid "Choose Language"
-msgstr ""
+msgstr "Seleccionar idioma"
 
 #: cms/templates/widgets/header.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
@@ -10500,6 +10540,7 @@ msgstr "Certificados de programas de XSeries"
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You have received a certificate for the following XSeries programs:"
 msgstr ""
+"Usted ha recibido un certificado para los siguientes programas de XSeries:"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -11075,7 +11116,7 @@ msgstr "Panel de Control para:"
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
-msgstr ""
+msgstr "Foto de perfil para {username}"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 #: themes/edx.org/lms/templates/header.html
@@ -12856,11 +12897,11 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_name}!"
-msgstr ""
+msgstr "Bienvenido a {course_name} de {org}!"
 
 #: lms/templates/courseware/info.html
 msgid "Resume Course"
-msgstr ""
+msgstr "Continuar con el curso"
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -12868,7 +12909,7 @@ msgstr "Ver actualizaciones en Studio"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
-msgstr ""
+msgstr "Actualizaciones y noticias del curso"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -13614,7 +13655,7 @@ msgstr "Buscar entradas"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
-msgstr ""
+msgstr "Temas de discusión, actualmente:"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
@@ -17406,11 +17447,11 @@ msgstr "Registrarse"
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Copyright"
-msgstr ""
+msgstr "Derechos de Autor"
 
 #: themes/stanford-style/lms/templates/footer.html
 msgid "Copyright {year}. All rights reserved."
-msgstr ""
+msgstr "Derechos de autor {year}. Todos los derechos reservados."
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -17432,19 +17473,19 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
-msgstr ""
+msgstr "Escriba sus Términos y condiciones del servicio aquí."
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Privacy Policy here!"
-msgstr ""
+msgstr "Escriba su Política de privacidad aquí."
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Honor Code here!"
-msgstr ""
+msgstr "Escriba su Código de Honor aquí."
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
-msgstr ""
+msgstr "Escriba su texto de Derechos de Autor aquí."
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
@@ -20989,31 +21030,31 @@ msgstr "Lanzar el compilador de código Latex"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Heading"
-msgstr ""
+msgstr "Encabezado"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Insert a heading"
-msgstr ""
+msgstr "Inserte un encabezado"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Add a multiple choice question"
-msgstr ""
+msgstr "Añada una pregunta de selección múltiple"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Add a question with checkboxes"
-msgstr ""
+msgstr "Añada una pregunta de selección con multiple respuesta"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Insert a text response"
-msgstr ""
+msgstr "Inserte una pregunta de texto"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Insert a numerical response"
-msgstr ""
+msgstr "Inserte una pregunta con respuesta numérica"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Insert a dropdown response"
-msgstr ""
+msgstr "Inserte una pregunta de desplegar opciones"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
@@ -21021,7 +21062,7 @@ msgstr "Explicación"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Add an explanation for this question"
-msgstr ""
+msgstr "Añada una explicación para esta pregunta"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Advanced Editor"
