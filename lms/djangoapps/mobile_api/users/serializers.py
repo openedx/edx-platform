@@ -76,11 +76,6 @@ class CourseOverviewField(serializers.RelatedField):
                 kwargs={'course_id': course_id},
                 request=request,
             ),
-
-            # Note: The following should be deprecated.
-            'latest_updates': {
-                'video': None
-            },
         }
 
 
