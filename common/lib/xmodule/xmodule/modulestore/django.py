@@ -246,28 +246,32 @@ class ModuleI18nService(object):
     """
     def ugettext(self, string, **kwargs):
         """
-        Attempts to look up the string in the XBlock's own domain.  If it can't find that domain then
-        we fall-back onto django.utils.translation.ugettext
+        This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
+        the GNU gettext ugettext operation.  Here we attempts to look up the provided string in the
+        XBlock's own domain translation catalog, currently expected to be:
+            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
+        If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
+        django.utils.translation.ugettext, which will attempt to find a matching string in the
+        LMS' own domain translation catalog -- effectively achieving translation by coincidence.
         """
-        log_msg = "********** ModuleI18nService.ugettext: {0} **********".format(string)
-        log.info(log_msg)
-        translated_string = str(string)
-
         # The translation workflow should only execute if there's an actual string to look up
-        # If gettext processes an empty string the PO file header information will be returned
+        # If gettext processes an empty string the PO file header information will oddly be returned
+        translated_string = unicode(string)
         if translated_string:
             try:
-                # TODO: Make this path dynamic for installed xBlocks
-                locale_path = kwargs.get('xblock_root', '') + "/conf/locale"
+                # TODO: Move these values into settings.  We might allow for multiple possibilities
+                # for these values through the use of lists or tuples.  For example, instead of
+                # 'django' an XBlock developer could specify 'xblock_name' for their PO file.
+                xblock_domain = 'django'
+                xblock_locale = 'conf/locale'
+                locale_path = kwargs.get('xblock_root', '') + xblock_locale
                 translator = gettext.translation(
-                    'django',
+                    xblock_domain,
                     locale_path,
                     [to_locale(get_language())]
                 )
                 _ = translator.ugettext
             except:
-                log_msg = "********** Translation catalog not found: {0}".format(locale_path)
-                log.info(log_msg)
                 _ = django.utils.translation.ugettext
 
             translated_string = _(string)
