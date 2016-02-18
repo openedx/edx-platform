@@ -21,6 +21,7 @@ if not settings.configured:
 from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+from django.utils.translation import get_language, to_locale
 
 from pymongo import ReadPreference
 from xmodule.contentstore.django import contentstore
@@ -28,7 +29,6 @@ from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
-from django.utils.translation import get_language, to_locale
 
 try:
     # We may not always have the request_cache module available
