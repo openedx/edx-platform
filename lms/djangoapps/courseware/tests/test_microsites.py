@@ -199,6 +199,21 @@ class TestMicrosites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotContains(resp, 'Robot_Super_Course')
         self.assertContains(resp, 'Robot_Course_Outside_Microsite')
 
+    def test_microsite_course_custom_tabs(self):
+        """
+        Enroll user in a course scoped in a Microsite and make sure that
+        template with tabs is overridden
+        """
+        self.setup_users()
+
+        email, password = self.STUDENT_INFO[1]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        resp = self.client.get(reverse('courseware', args=[unicode(self.course.id)]),
+                               HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertContains(resp, 'Test Microsite Tab:')
+
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_visible_about_page_settings(self):
         """
