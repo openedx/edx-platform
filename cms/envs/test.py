@@ -135,9 +135,10 @@ class DisableMigrations(object):  # pylint: disable=missing-docstring
         if item in [
             'bulk_email',
             'certificates',
+            'commerce',
+            'dark_lang',
             'edxval',
             'embargo',
-            'util',
         ]:
             return True
         return False
