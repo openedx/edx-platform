@@ -334,6 +334,7 @@ def xblock_outline_handler(request, usage_key_string):
                 root_xblock,
                 include_child_info=True,
                 course_outline=True,
+                escape_html=False,
                 include_children_predicate=lambda xblock: not xblock.category == 'vertical'
             ))
     else:
@@ -358,7 +359,7 @@ def xblock_container_handler(request, usage_key_string):
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
             response = _get_module_info(
-                _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True
+                _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True, escape_html=False
             )
         return JsonResponse(response)
     else:
@@ -740,7 +741,7 @@ def _get_xblock(usage_key, user):
             return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
 
-def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
+def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False, escape_html=True):
     """
     metadata, data, id representation of a leaf module fetcher.
     :param usage_key: A UsageKey
@@ -761,7 +762,7 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
 
         # Note that children aren't being returned until we have a use case.
         xblock_info = create_xblock_info(
-            xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=include_ancestor_info
+            xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=include_ancestor_info, escape_html=escape_html
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
@@ -803,7 +804,8 @@ def _get_gating_info(course, xblock):
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
-                       user=None, course=None):
+                       user=None, course=None, escape_html=True):
+
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -849,7 +851,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             graders,
             include_children_predicate=include_children_predicate,
             user=user,
-            course=course
+            course=course,
+            escape_html=escape_html
         )
     else:
         child_info = None
@@ -886,7 +889,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     xblock_info = {
         "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default_escaped,
+        "display_name": xblock.display_name_with_default_escaped if escape_html else xblock.display_name_with_default,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
@@ -939,7 +942,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     if metadata is not None:
         xblock_info["metadata"] = metadata
     if include_ancestor_info:
-        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline)
+        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline, escape_html)
     if child_info:
         xblock_info['child_info'] = child_info
     if visibility_state == VisibilityState.staff_only:
@@ -1064,14 +1067,14 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
         return VisibilityState.ready
 
 
-def _create_xblock_ancestor_info(xblock, course_outline):
+def _create_xblock_ancestor_info(xblock, course_outline, escape_html=True):
     """
     Returns information about the ancestors of an xblock. Note that the direct parent will also return
     information about all of its children.
     """
     ancestors = []
 
-    def collect_ancestor_info(ancestor, include_child_info=False):
+    def collect_ancestor_info(ancestor, include_child_info=False, escape_html=True):
         """
         Collect xblock info regarding the specified xblock and its ancestors.
         """
@@ -1081,16 +1084,17 @@ def _create_xblock_ancestor_info(xblock, course_outline):
                 ancestor,
                 include_child_info=include_child_info,
                 course_outline=course_outline,
-                include_children_predicate=direct_children_only
+                include_children_predicate=direct_children_only,
+                escape_html=escape_html
             ))
-            collect_ancestor_info(get_parent_xblock(ancestor))
-    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=True)
+            collect_ancestor_info(get_parent_xblock(ancestor), escape_html=escape_html)
+    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=True, escape_html=escape_html)
     return {
         'ancestors': ancestors
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None):  # pylint: disable=line-too-long
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None, escape_html=True):  # pylint: disable=line-too-long
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1111,6 +1115,7 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 graders=graders,
                 user=user,
                 course=course,
+                escape_html=escape_html
             ) for child in xblock.get_children()
         ]
     return child_info
@@ -1158,4 +1163,4 @@ def _xblock_type_and_display_name(xblock):
     """
     return _('{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
-        display_name=xblock.display_name_with_default_escaped)
+        display_name=xblock.display_name_with_default)

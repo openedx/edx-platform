@@ -257,7 +257,7 @@ def course_handler(request, course_key_string=None):
                 course_key = CourseKey.from_string(course_key_string)
                 with modulestore().bulk_operations(course_key):
                     course_module = get_course_and_check_access(course_key, request.user, depth=None)
-                    return JsonResponse(_course_outline_json(request, course_module))
+                    return JsonResponse(_course_outline_json(request, course_module, escape_html=False))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
             elif not has_studio_write_access(request.user, CourseKey.from_string(course_key_string)):
@@ -333,7 +333,7 @@ def course_search_index_handler(request, course_key_string):
         }), content_type=content_type, status=200)
 
 
-def _course_outline_json(request, course_module):
+def _course_outline_json(request, course_module, escape_html=True):
     """
     Returns a JSON representation of the course module and recursively all of its children.
     """
@@ -341,6 +341,7 @@ def _course_outline_json(request, course_module):
         course_module,
         include_child_info=True,
         course_outline=True,
+        escape_html=escape_html,
         include_children_predicate=lambda xblock: not xblock.category == 'vertical',
         user=request.user
     )
@@ -590,7 +591,7 @@ def course_index(request, course_key):
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
             reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
         sections = course_module.get_children()
-        course_structure = _course_outline_json(request, course_module)
+        course_structure = _course_outline_json(request, course_module, escape_html=False)
         locator_to_show = request.REQUEST.get('show', None)
         course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
         settings_url = reverse_course_url('settings_handler', course_key)
