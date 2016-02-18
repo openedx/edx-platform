@@ -35,9 +35,6 @@
       getContext: function() {
         return {
           "code": this.model.get("code"),
-          "students_count": this.model.get("students_count"),
-          "score": this.model.get("score"),
-          "questions_answered": this.model.get("questions_answered"),
           "simulations_count": this.model.get("simulations_count"),
           "display_expiration_message": this.model.isExpired() || this.model.isExpiredSoon(),
           "expiration_message": this.model.getExpirationMessage(),

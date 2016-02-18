@@ -29,8 +29,6 @@
         }) + "?format=csv";
         return {
           "display_name": this.model.get("display_name"),
-          "score": this.model.get("score"),
-          "questions_answered": this.model.get("questions_answered"),
           "is_expanded": this.isExpanded,
           "csv_url": csvUrl
         };

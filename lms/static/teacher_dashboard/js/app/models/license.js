@@ -6,10 +6,7 @@
         "code": null,
         "valid_from": null,
         "valid_to": null,
-        "simulations_count": 0,
-        "students_count": 0,
-        "score": 0,
-        "questions_answered": 0
+        "simulations_count": 0
       },
 
       isExpired: function() {

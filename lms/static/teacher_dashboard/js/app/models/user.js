@@ -8,7 +8,7 @@
         "attempts_count": 0,
         "time": 0,
         "score": 0,
-        "questions_answered": 0
+        "completion": 0
       },
 
       getTime: function() {
