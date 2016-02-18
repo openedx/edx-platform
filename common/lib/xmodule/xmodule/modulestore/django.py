@@ -244,21 +244,21 @@ class ModuleI18nService(object):
     i18n service.
 
     """
-    def ugettext(self, string):
+    def ugettext(self, string, **kwargs):
         """
         Attempts to look up the string in the XBlock's own domain.  If it can't find that domain then
         we fall-back onto django.utils.translation.ugettext
         """
         log_msg = "********** ModuleI18nService.ugettext: {0} **********".format(string)
         log.info(log_msg)
-        translated_string = string
+        translated_string = str(string)
 
         # The translation workflow should only execute if there's an actual string to look up
         # If gettext processes an empty string the PO file header information will be returned
         if translated_string:
             try:
                 # TODO: Make this path dynamic for installed xBlocks
-                locale_path = "/edx/src/drag-and-drop-v2/conf/locale"
+                locale_path = kwargs.get('xblock_root', '') + "/conf/locale"
                 translator = gettext.translation(
                     'django',
                     locale_path,
