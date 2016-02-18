@@ -12,7 +12,6 @@
         ],
 
         function(_, str, Backbone, gettext){
-            str = str || _.str;
 
             return Backbone.Model.extend({
                 idAttribute: 'id',
