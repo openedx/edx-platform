@@ -132,7 +132,17 @@ DATABASES = {
 
 class DisableMigrations(object):  # pylint: disable=missing-docstring
     def __contains__(self, item):
-        return True
+        if item in [
+            'dark_lang',
+            'embargo',
+            'util',
+            'bulk_email',
+            'certificates',
+            'commerce',
+        ]:
+            return True
+        return False
+
     def __getitem__(self, item):
         return "notmigrations"
 
