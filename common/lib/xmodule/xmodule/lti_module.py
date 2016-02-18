@@ -401,6 +401,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         # parsing custom parameters to dict
         custom_parameters = {}
+
         for custom_parameter in self.custom_parameters:
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]

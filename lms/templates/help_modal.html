@@ -14,7 +14,7 @@ platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-    <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name)}">

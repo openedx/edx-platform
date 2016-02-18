@@ -377,7 +377,7 @@ def submit_course_forums_usage_task(request, course_key):
     """
     AlreadyRunningError is raised if an course forums usage report is already being generated.
     """
-    task_type = 'course_forums'
+    task_type = 'course_forums_usage'
     task_class = get_course_forums_usage
     task_input = {}
     task_key = ''

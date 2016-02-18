@@ -531,3 +531,54 @@ class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
         datarows = list(student_responses(self.course))
         #Invalid module state response will be skipped, so datarows should be empty
         self.assertEqual(len(datarows), 0)
+
+    def test_problem_with_student_answer_and_answers(self):
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
+        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P2')
+
+        self.create_student()
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"problem_id":"student response1"}}',
+        )
+
+        submit_and_compare_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P3')
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=submit_and_compare_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answer": "student response2"}',
+        )
+
+        submit_and_compare_location = Location("edX", "graded", "2012_Fall", "problem", 'H1P0')
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=submit_and_compare_location,
+            student=self.student,
+            grade=0,
+            state=u'{"answer": {"problem_id": "123"}}',
+        )
+
+        datarows = list(student_responses(self.course))
+        self.assertEqual(datarows[0][-1], u'problem_id=student response1')
+        self.assertEqual(datarows[1][-1], u'student response2')
+
+    def test_problem_with_no_answer(self):
+        self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
+        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P2')
+
+        self.create_student()
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"answer": {"problem_id": "123"}}',
+        )
+
+        datarows = list(student_responses(self.course))
+        self.assertEqual(datarows[0][-1], None)

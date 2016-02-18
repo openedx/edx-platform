@@ -13,10 +13,8 @@ from contracts import contract
 
 from django.conf import settings
 from django.utils.timezone import UTC
-from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError

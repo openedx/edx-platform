@@ -288,7 +288,7 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
-      
+
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
