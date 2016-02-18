@@ -57,7 +57,7 @@ class CourseNavPage(PageObject):
         Example return value:
             ['Chemical Bonds Video', 'Practice Problems', 'Homework']
         """
-        seq_css = 'ol#sequence-list>li>a>p'
+        seq_css = 'ol#sequence-list>li>a>.sequence-tooltip'
         return self.q(css=seq_css).map(self._clean_seq_titles).results
 
     def go_to_section(self, section_title, subsection_title):
