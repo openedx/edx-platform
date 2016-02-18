@@ -116,6 +116,9 @@
                     _.str = UnderscoreString;
                 }
             },
+            "underscore.string": {
+                exports: "s"
+            },
             'backbone': {
                 deps: ['underscore', 'jquery'],
                 exports: 'Backbone'
