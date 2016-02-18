@@ -136,6 +136,7 @@ class TestCreateAccount(TestCase):
             'username': self.params['username'],
             'name': self.params['name'],
             'age': 13,
+            'yearOfBirth': year_of_birth,
             'education': 'Associate degree',
             'address': self.params['mailing_address'],
             'gender': 'Other/Prefer Not to Say',

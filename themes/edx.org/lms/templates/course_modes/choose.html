@@ -21,7 +21,7 @@ from django.core.urlresolvers import reverse
             } else {
                 title.attr("aria-expanded", "false");
             }
-        }
+        };
 
         $(document).ready(function() {
             $('.expandable-area').slideUp();
@@ -38,6 +38,12 @@ from django.core.urlresolvers import reverse
                 $('#contribution-other').attr('checked',true);
             });
 
+            % if use_ecommerce_payment_flow:
+            $('input[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = '${ecommerce_payment_page}?sku=${sku}';
+            });
+            % endif
         });
     </script>
 </%block>
