@@ -10,6 +10,7 @@ from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangolib.markup import escape
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -63,7 +64,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
-        self.assertIn("You haven't created any programs yet.", response.content)
+        self.assertIn(escape("You haven't created any programs yet."), response.content)
 
         # When data is provided, expect a program listing.
         self.mock_programs_api()
