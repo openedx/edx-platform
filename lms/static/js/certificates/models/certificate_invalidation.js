@@ -8,7 +8,6 @@
         ['underscore', 'underscore.string', 'gettext', 'backbone'],
 
         function(_, str, gettext, Backbone) {
-            str = str || _.str;
 
             return Backbone.Model.extend({
                 idAttribute: 'id',

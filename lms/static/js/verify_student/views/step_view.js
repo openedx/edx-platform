@@ -1,3 +1,5 @@
+/*global jQuery, _, Backbone, gettext */
+
 /**
  * Base view for defining steps in the payment/verification flow.
  *
@@ -8,7 +10,7 @@
  */
  var edx = edx || {};
 
- (function( $, _, _s, Backbone, gettext ) {
+ (function( $, _, Backbone, gettext ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -21,13 +23,8 @@
             /* Mix non-conflicting functions from underscore.string
              * (all but include, contains, and reverse) into the
              * Underscore namespace.
-             *
-             * TODO: when running unit tests, _s is not defined. My first attempt at upgrading
-             * underscore.string did not solve this issue.
              */
-            if (_s) {
-                _.mixin(_s.exports());
-            }
+            _.mixin(_.str.exports());
         },
 
         render: function() {
@@ -106,4 +103,4 @@
 
     });
 
- })( jQuery, _, _.str, Backbone, gettext );
+ })( jQuery, _, Backbone, gettext );
