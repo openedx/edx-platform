@@ -140,7 +140,7 @@ def xblock_handler(request, usage_key_string):
             accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
             if 'application/json' in accept_header:
-                fields = request.REQUEST.get('fields', '').split(',')
+                fields = request.GET.get('fields', '').split(',')
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
@@ -254,24 +254,24 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             paging = None
             try:
-                if request.REQUEST.get('enable_paging', 'false') == 'true':
+                if request.GET.get('enable_paging', 'false') == 'true':
                     paging = {
-                        'page_number': int(request.REQUEST.get('page_number', 0)),
-                        'page_size': int(request.REQUEST.get('page_size', 0)),
+                        'page_number': int(request.GET.get('page_number', 0)),
+                        'page_size': int(request.GET.get('page_size', 0)),
                     }
             except ValueError:
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
                             "{0}, page_number: {1}, page_size: {2}".format(
-                                request.REQUEST.get('enable_paging', 'false'),
-                                request.REQUEST.get('page_number', 0),
-                                request.REQUEST.get('page_size', 0)
+                                request.GET.get('enable_paging', 'false'),
+                                request.GET.get('page_number', 0),
+                                request.GET.get('page_size', 0)
                             ),
                     status=400,
                     content_type="text/plain",
                 )
 
-            force_render = request.REQUEST.get('force_render', None)
+            force_render = request.GET.get('force_render', None)
 
             # Set up the context to be passed to each XBlock's render method.
             context = {
@@ -325,7 +325,7 @@ def xblock_outline_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         store = modulestore()
         with store.bulk_operations(usage_key.course_key):
@@ -354,7 +354,7 @@ def xblock_container_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
             response = _get_module_info(

@@ -83,7 +83,7 @@ def entrance_exam(request, course_key_string):
 
     # Create a new entrance exam for the specified course (returns 201 if created)
     elif request.method == 'POST':
-        response_format = request.REQUEST.get('format', 'html')
+        response_format = request.POST.get('format', 'html')
         http_accept = request.META.get('http_accept')
         if response_format == 'json' or 'application/json' in http_accept:
             ee_min_score = request.POST.get('entrance_exam_minimum_score_pct', None)
