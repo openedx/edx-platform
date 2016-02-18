@@ -102,6 +102,21 @@ class BlockStructure(object):
         """
         return self._block_relations[usage_key].children if self.has_block(usage_key) else []
 
+    def set_root_block(self, usage_key):
+        """
+        Sets the given usage key as the new root of the block structure.
+
+        Note: This method does *not* prune the rest of the structure. For
+        performance reasons, it is left to the caller to decide when exactly
+        to prune.
+
+        Arguments:
+            usage_key - The usage key of the block that is to be set as the
+                new root of the block structure.
+        """
+        self.root_block_usage_key = usage_key
+        self._block_relations[usage_key].parents = []
+
     def has_block(self, usage_key):
         """
         Returns whether a block with the given usage_key is in this
