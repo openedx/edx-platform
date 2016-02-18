@@ -126,7 +126,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def verify_mathjax_rendered(self):
         """ Checks that MathJax css class is present """
         self.wait_for(
-            lambda: self._is_element_visible(".MathJax"),
+            lambda: self._is_element_visible(".MathJax_CHTML"),
             description="MathJax Preview is rendered"
         )
 
