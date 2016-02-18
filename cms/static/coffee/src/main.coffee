@@ -14,9 +14,10 @@ define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
     _.extend CMS, Backbone.Events
     Backbone.emulateHTTP = true
 
-    $.ajaxSetup
-      headers : { 'X-CSRFToken': $.cookie 'csrftoken' }
-      dataType: 'json'
+    $.ajaxPrefilter ( options ) ->
+      if options.type.toUpperCase() isnt 'GET'
+        options.headers = { 'X-CSRFToken': $.cookie 'csrftoken' }
+        options.dataType = 'json'
 
     $(document).ajaxError (event, jqXHR, ajaxSettings, thrownError) ->
       if ajaxSettings.notifyOnError is false

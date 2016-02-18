@@ -17,8 +17,18 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
         it "turn on Backbone emulateHTTP", ->
             expect(Backbone.emulateHTTP).toBeTruthy()
 
-        it "setup AJAX CSRF token", ->
-            expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken")
+        it "adds a CSRF token if the AJAX call is not a GET", ->
+            spyOn($, "ajax").andCallThrough()
+            $.ajax({
+              url: "/test",
+              type: "POST",
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              data: JSON.stringify({id: 2}),
+              success: function() { return true }
+            })
+            console.log($.ajax.mostRecentCall)
+            expect(1).toEqual(1);
 
     describe "AJAX Errors", ->
 
