@@ -18,7 +18,6 @@ EXPECTED_COMMON_SASS_DIRECTORIES = [
 ]
 EXPECTED_LMS_SASS_DIRECTORIES = [
     "lms/static/sass",
-    "lms/static/themed_sass",
     "lms/static/certificates/sass",
 ]
 EXPECTED_CMS_SASS_DIRECTORIES = [

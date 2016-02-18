@@ -441,7 +441,6 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 
 # Site info
-SITE_ID = 1
 SITE_NAME = "localhost:8001"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
@@ -513,6 +512,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1127,6 +1127,10 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrosi
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
+
+# Cache expiration for the version of the footer served
+# by the branding API.
+FOOTER_CACHE_TIMEOUT = 30 * 60
 
 ############################### PROCTORING CONFIGURATION DEFAULTS ##############
 PROCTORING_BACKEND_PROVIDER = {

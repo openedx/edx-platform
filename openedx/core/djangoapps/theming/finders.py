@@ -22,7 +22,10 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
-from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
+from openedx.core.djangoapps.theming.helpers import (
+    get_base_theme_dir
+)
+from openedx.core.djangoapps.theming.storage import ComprehensiveThemingStorage
 
 
 class ComprehensiveThemeFinder(BaseFinder):
@@ -33,23 +36,21 @@ class ComprehensiveThemeFinder(BaseFinder):
     this finder will never find any files.
     """
     def __init__(self, *args, **kwargs):
+        """
+        Initialize finder with comprehensive theming storage if we have
+        a valid COMPREHENSIVE_THEME_DIR setting.
+        """
         super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
 
-        theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
-        if not theme_dir:
+        themes_dir = get_base_theme_dir()
+        if not themes_dir:
             self.storage = None
             return
 
-        if not isinstance(theme_dir, basestring):
+        if not isinstance(themes_dir, basestring):
             raise ImproperlyConfigured("Your COMPREHENSIVE_THEME_DIR setting must be a string")
 
-        root = Path(settings.PROJECT_ROOT)
-        if root.name == "":
-            root = root.parent
-
-        component_dir = Path(theme_dir) / root.name
-        static_dir = component_dir / "static"
-        self.storage = CachedComprehensiveThemingStorage(location=static_dir)
+        self.storage = ComprehensiveThemingStorage(location=themes_dir)
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """
@@ -57,10 +58,6 @@ class ComprehensiveThemeFinder(BaseFinder):
         """
         if not self.storage:
             return []
-
-        if path.startswith(self.storage.prefix):
-            # strip the prefix
-            path = path[len(self.storage.prefix):]
 
         if self.storage.exists(path):
             match = self.storage.path(path)

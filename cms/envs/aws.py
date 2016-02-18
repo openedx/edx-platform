@@ -381,6 +381,7 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
     "MICROSITE_DATABASE_TEMPLATE_CACHE_TTL", MICROSITE_DATABASE_TEMPLATE_CACHE_TTL
 )
 
+FOOTER_CACHE_TIMEOUT = ENV_TOKENS.get('FOOTER_CACHE_TIMEOUT', FOOTER_CACHE_TIMEOUT)
 ############################ OAUTH2 Provider ###################################
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
