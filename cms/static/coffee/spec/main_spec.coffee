@@ -18,8 +18,15 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect(Backbone.emulateHTTP).toBeTruthy()
 
         it "adds a CSRF token if the AJAX call is not a GET", ->
-            spyOn($, "ajax")
-            $.ajax({type: "POST", url: "/test"})
+            spyOn($, "ajax").andCallThrough()
+            $.ajax({
+              url: "/test",
+              type: "POST",
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              data: JSON.stringify({id: 2}),
+              success: function() { return true }
+            })
             console.log($.ajax.mostRecentCall)
             expect(1).toEqual(1);
 
