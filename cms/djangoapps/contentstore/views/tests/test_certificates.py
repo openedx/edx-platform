@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 """
-Group Configuration Tests.
+Certificates Tests.
 """
 import json
 import mock

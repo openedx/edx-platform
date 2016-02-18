@@ -1,9 +1,14 @@
 """Tests for models supporting Credentials-related functionality."""
 
+import unittest
+
+from django.conf import settings
 from django.test import TestCase
+
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
     """Tests covering the CredentialsApiConfig model."""
     def test_url_construction(self):

@@ -604,7 +604,7 @@ msgstr "كلمة المرور:"
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
-msgstr ""
+msgstr "عنوان بريد إلكتروني محظور."
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -1430,6 +1430,7 @@ msgstr "قائمة مفصولة بفراغات وتحدِّد XBlocks غير ا�
 msgid ""
 "Space-separated list of XBlock types whose creation to disable in Studio."
 msgstr ""
+"قائمة بأنواع ’XBlock‘، مفصولة بفراغات، التي أُنشئت ليلغى تفعيلها في استوديو."
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
@@ -1463,23 +1464,23 @@ msgstr "قيد المعالجة"
 #. question
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is correct."
-msgstr ""
+msgstr "هذه الإجابة صحيحة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is incorrect."
-msgstr ""
+msgstr "هذه الإجابة خاطئة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is partially correct."
-msgstr ""
+msgstr "هذه الإجابة صحيحة جزئيًا"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is unanswered."
-msgstr ""
+msgstr "لم تجري الإجابة عن هذه الإجابة."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is being processed."
-msgstr ""
+msgstr "هذه الإجابة قيد المعالجة."
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -2220,7 +2221,7 @@ msgstr "قائمة من أزواج (عنوان، رابط) خاصة بالكتب
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Slug that points to the wiki for this course"
-msgstr "الخط الذي يُشير إلى صفحة الويكي لهذ المساق"
+msgstr "اللقب الذي يُشير إلى صفحة الويكي لهذ المساق"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Date that enrollment for this class is opened"
@@ -2532,13 +2533,15 @@ msgstr ""
 #. course content.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "CCX Connector URL"
-msgstr ""
+msgstr "رابط واصلة ’CCX‘"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "URL for CCX Connector application for managing creation of CCXs. (optional)."
 " Ignored unless 'Enable CCX' is set to 'true'."
 msgstr ""
+"رابط تطبيق واصلة ’CCX‘ لإدارة عمليات إنشاء ’CCX‘. (اختياري). يجري تجاهله "
+"مالم تُضبط خاصية ’تفعيل CCX‘ على القيمة ’true‘."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
@@ -2588,9 +2591,10 @@ msgstr ""
 "يُرجى إدخال العنوان الذي تودّ أن يراه الطلّاب في الصفحة الرئيسية للمساق فوق "
 "نشرات مساقك. وتَظهر هذه النشرات على اللّوحة اليمنى في الصفحة."
 
+#: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/courseware/info.html
 msgid "Course Handouts"
-msgstr "نشرات المساق"
+msgstr "منشورات المساق"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2691,6 +2695,9 @@ msgid ""
 "marks, enter the short name of the type of certificate that students receive"
 " when they complete the course. For instance, \"Certificate\"."
 msgstr ""
+"يُرجى استخدام هذا الإعداد فقط عند إنشاء شهادات بصيغة PDF. أدخل، بين علامتيّ "
+"اقتباس، الاسم المختصر لنوع الشهادة التي يتلقّاها الطلّاب عند إتمامهم للمساق."
+" مثل ’شهادة‘."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Short)"
@@ -2702,6 +2709,9 @@ msgid ""
 "marks, enter the long name of the type of certificate that students receive "
 "when they complete the course. For instance, \"Certificate of Achievement\"."
 msgstr ""
+"يُرجى استخدام هذا الإعداد فقط عند إنشاء شهادات بصيغة PDF. أدخل، بين علامتيّ "
+"اقتباس، الاسم الكامل لنوع الشهادة التي يتلقّاها الطلّاب عند إتمامهم للمساق. "
+"مثل ’شهادة إنجاز‘."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Name (Long)"
@@ -2967,6 +2977,12 @@ msgid ""
 "{example_format}. In \"id\" values, the only supported special characters "
 "are underscore, hyphen, and period."
 msgstr ""
+"حدّد، بين حاصرتين، العدد الأقصى لعدد أعضاء وموضوعات الفرق. تأكّد من تضمين "
+"جميع مجموعات قيم الموضوعات داخل زوج من الأقواس المعقوفة، واستخدام فاصلة بعد "
+"إغلاق زوج الحواصر لكل موضوع، وفاصلة أخرى بعد إغلاق زوج الأقواس المعقوفة. "
+"مثال، للإشارة إلى وجوب تشكيل الفرق من 5 أعضاء على الأكثر وتحديد قائمة من 2 "
+"موضوع، أدخل الإعدادات بالصيغة التالية:{example_format}. ادعم قيم ’id‘ كل من "
+"الأحرف الخاصّة الشرطة السفلية، والشرطة والنقطة."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
@@ -3022,13 +3038,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
-msgstr ""
+msgstr "فعّل المتطلّبات الأساسية للقسم الفرعي"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
 msgstr ""
+"يُرجى إدخال ’true‘ أو ’false‘. إذا كانت هذه القيمة ’true‘، فيمكنك إخفاء قسم "
+"فرعي لحين حصول المتعلّمين على أدنى مجموع علامات في قسم متطلبات أساسية فرعي "
+"آخر."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -3743,6 +3762,10 @@ msgid ""
 "files in the following format: {format}. For example, an entry for a video "
 "with two transcripts looks like this: {example}"
 msgstr ""
+"حدّد فيديو، بطول 5-10 ثوانٍ، لتشغيله قبل فيديوهات المساق. أدخل الرقم "
+"التعريفي للفيديو من خلال صفحة ’تحميلات الفيديو‘ بالإضافة إلى ملف نصّوص واحد "
+"أو أكثر وذلك وفق الصيغة التالية: {format}. مثال، ستبدو الصيغة المُدخلة لملف "
+"فيديو ذا نصيّ كلام مدوّن بالشكل: {example}."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
@@ -3840,13 +3863,15 @@ msgstr "يحدِّد هذا الإعداد ما إذا كان هذا الامت�
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Software Secure Review Rules"
-msgstr ""
+msgstr "قواعد المراجعة الآمنة للبرنامج"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
 msgstr ""
+"يُحدّد هذا الإعداد القواعد التي يجب أن يتّبعها فريق المراقبة عند عرض مقاطع "
+"الفيديو."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Practice Exam"
@@ -3960,7 +3985,7 @@ msgstr "مناقشة خارجية"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 msgid "Home"
-msgstr ""
+msgstr "الصفحة الرئيسية"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
@@ -4421,6 +4446,8 @@ msgid "Contact"
 msgstr "معلومات الاتّصال"
 
 #: lms/djangoapps/branding/api.py
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "الوظائف"
 
@@ -4478,6 +4505,7 @@ msgstr "مدرِّب CCX"
 #: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr ""
+"هذا المساق مُمتلئ: الحد المسموح به هو {max_student_enrollments_allowed}"
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
@@ -4515,7 +4543,7 @@ msgstr "أُنشئ المقال."
 #. messages.
 #: lms/djangoapps/certificates/models.py
 msgid "regenerated"
-msgstr ""
+msgstr "جرت إعادة الإنشاء"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -4653,6 +4681,8 @@ msgid ""
 "Asset's unique slug. We can reference the asset in templates using this "
 "value."
 msgstr ""
+"لقب فريد مميِّز للمادّة. يمكننا الإشارة إاى المادّة ضمن النماذج باستخدام هذه"
+" القيمة."
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "user is not given."
@@ -4697,6 +4727,9 @@ msgid ""
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines."
 msgstr ""
+"تُفيد شهادة {cert_type} معنى أنّ المتعلِّم قد وافق على الالتزام بميثاق الشرف"
+" المتعمَد لدى {platform_name} واستكمَل كافة المهام المطلوبة في هذا المساق "
+"بموجب التعليمات."
 
 #. Translators:  This text describes the 'ID Verified' course certificate
 #. type, which is a higher level of
@@ -4710,6 +4743,10 @@ msgid ""
 "certificate also indicates that the identity of the learner has been checked"
 " and is valid."
 msgstr ""
+"تُفيد شهادة {cert_type} معنى أنّ المتعلِّم قد وافق على الالتزام بميثاق الشرف"
+" المتعمَد لدى {platform_name} واستكمَل كافة المهام المطلوبة في هذا المساق "
+"بموجب التعليمات. كما وتشير الشهادة {cert_type} إلى أن هوية المتعلّم صحيحة "
+"وجرى التأكّد منها."
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -4720,6 +4757,8 @@ msgid ""
 "An {cert_type} certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
 msgstr ""
+"تُعرِب شهادة {cert_type} عن مستوى عالٍ من الإنجازات في برنامج دراسي ما، "
+"وتتضمّن عملية التحقّق من هوية الطالب."
 
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
@@ -4750,6 +4789,8 @@ msgid ""
 "successfully completed, received a passing grade, and was awarded this "
 "{platform_name} {certificate_type} Certificate of Completion in "
 msgstr ""
+"قد نجح في إتمام المساق ونال درجة النجاح، ومُنِح بناءً على ذلك شهادة إتمام "
+"{certificate_type} من {platform_name}  في  "
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -4758,6 +4799,8 @@ msgid ""
 "{platform_name} acknowledges achievements through certificates, which are "
 "awarded for course activities that {platform_name} students complete."
 msgstr ""
+"تُقرّ المنصّة {platform_name} الإنجازات من خلال شهادات، تُمنح مقابل أنشطة "
+"المساق التي يُكملها طلّاب {platform_name}"
 
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
@@ -4868,11 +4911,13 @@ msgid ""
 "a course of study offered by {partner_short_name}, an online learning "
 "initiative of {partner_long_name}."
 msgstr ""
+"مساق دروس تعليمية يقدِّمه {partner_short_name}، وهو عبارة عن مبادرة تعليمية "
+"من  {partner_long_name}."
 
 #. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
 msgid "a course of study offered by {partner_short_name}."
-msgstr ""
+msgstr "مساق دروس تعليمية يقدِّمه {partner_short_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "I completed the {course_title} course on {platform_name}."
@@ -4891,7 +4936,7 @@ msgstr "المزيد من المعلومات عن شهادة {user_name}"
 #. and achieved a certification
 #: lms/djangoapps/certificates/views/webview.py
 msgid "{fullname}, you earned a certificate!"
-msgstr ""
+msgstr "{fullname}، تهانينا لك على نيل شهادة!"
 
 #. Translators: This line congratulates the user and instructs them to share
 #. their accomplishment on social networks
@@ -4900,6 +4945,8 @@ msgid ""
 "Congratulations! This page summarizes what you accomplished. Show it off to "
 "family, friends, and colleagues in your social and professional networks."
 msgstr ""
+"تهانينا! تلخِّص هذه الصفحة إنجازاتك. شارك كلّا من عائلتك وأصدقائك وزملائك "
+"ضمن دائرتك الاجتماعية والمهنية نجاحك."
 
 #. Translators: This line leads the reader to understand more about the
 #. certificate that a student has been awarded
@@ -5067,11 +5114,11 @@ msgstr "عذرًا، لا تملك صلاحية دخول هذا المساق م�
 #. month".
 #: lms/djangoapps/courseware/date_summary.py
 msgid "{relative} ago - {absolute}"
-msgstr ""
+msgstr "{relative} مضى - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
-msgstr ""
+msgstr "في {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "UTC"
@@ -5111,6 +5158,8 @@ msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
 msgstr ""
+"مازلت مؤهّلًا للترقية والحصول على شهادة موثّقة! اطلبها لتبرز المعارف "
+"والمهارات التي اكتسبتها بحضورك لهذا المساق."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
@@ -5709,6 +5758,9 @@ msgid ""
 "Without the email student would not be able to login. Please contact support"
 " for further information."
 msgstr ""
+"حدث الخطأ '{error}' أثناء إرسال بريد إلكتروني إلى المستخدم الجديد (user "
+"email={email}). لن يتمكّن الطالب من تسجيل الدخول دون البريد الإلكتروني. "
+"يُرجى الاتصال بفريق الدعم للحصول على مزيد من المعلومات."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
@@ -6201,24 +6253,30 @@ msgid ""
 "Certificate of {user} has already been invalidated. Please check your "
 "spelling and retry."
 msgstr ""
+"سبق أن أُلغيت شهادة المستخدم {user}. يُرجى التأكّد من التهجئة وأعادة "
+"المحاولة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Certificate for student {user} is already invalid, kindly verify that "
 "certificate was generated for this student and then proceed."
 msgstr ""
+"شهادة الطالب {user} غير صالحة. لُطفًا، تأكّد من توليد الشهادة لهذا الطالب ثم"
+" تابع."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Certificate Invalidation does not exist, Please refresh the page and try "
 "again."
-msgstr ""
+msgstr "إلغاء الشهادة غير موجود. يُرجى تحديث الصفحة وإعادة المحاولة."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
 "in username/email and then press \"Invalidate Certificate\" button."
 msgstr ""
+"حقل اسم المستخدم/البريد الإلكتروني للطالب مطلوب ولا يمكن تركه فارغًا. لطفًا،"
+" املأ حقل اسم المستخدم/البريد الإلكتروني ومن ثم اضغط على زر ’ألغي الشهادة‘."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6226,6 +6284,9 @@ msgid ""
 "Kindly verify student username/email and the selected course are correct and"
 " try again."
 msgstr ""
+"لم يُمنح الطالب {student} شهادةً للمساق {course}. يُرجى التأكّد من اسم "
+"المستخدم/عنوان البريد الإلكتروني للطالب ومن صحّة المساق المُختار ثمّ "
+"المحاولة من جديد. "
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
@@ -6776,7 +6837,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
-msgstr ""
+msgstr "متصفّح كروم للمساق"
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -6803,6 +6864,8 @@ msgid ""
 "Enter the tab that is selected in the XBlock. If not set, the Course tab is "
 "selected."
 msgstr ""
+"ادخل التبويبة التي جرى اختيارها في ’XBlock‘. في حال لم تُضبط، سيجري اختيار "
+"تبويبة \"المساق\"."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "LaTeX Source File Name"
@@ -7970,6 +8033,7 @@ msgstr "استرداد المبلغ يدويًّا "
 msgid "Track refunds issued directly through CyberSource."
 msgstr "تعقّب عمليات استرداد المبالغ الصادرة مباشرة عبر CyberSource."
 
+#: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
@@ -7977,7 +8041,7 @@ msgstr "التسجيل "
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and update learner enrollments."
-msgstr ""
+msgstr "عرض وتحديث عمليات تسجيل المتعلّمين."
 
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
@@ -8951,7 +9015,7 @@ msgstr "ستشير العودة إلى هذه المراجعة أنّ المقا
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
-msgstr ""
+msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "No data provided."
@@ -8959,25 +9023,27 @@ msgstr "لم تُقدّم أي بيانات."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Parameter usage_id not provided."
-msgstr ""
+msgstr "لم يُقدّم المعامل ’usage_id‘"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Invalid usage_id: {usage_id}."
-msgstr ""
+msgstr "قيمة usage_id غير صحيحة: {usage_id}."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Block with usage_id: {usage_id} not found."
-msgstr ""
+msgstr "حظر باستخدام usage_id: {usage_id} غير موجود."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid ""
 "You can create up to {max_num_bookmarks_per_course} bookmarks. You must "
 "remove some bookmarks before you can add new ones."
 msgstr ""
+"يمكنك إنشاء {max_num_bookmarks_per_course} علامة على الأكثر. يجب حذف بعض "
+"العلامات قبل السماح بإضافة علامات جديدة."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Bookmark with usage_id: {usage_id} does not exist."
-msgstr ""
+msgstr "ضع علامة باستخدام ’usage_id‘: {usage_id}  غير موجود."
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -9004,19 +9070,19 @@ msgstr "رابط خدمة عامّ"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Learner Issuance"
-msgstr ""
+msgstr "فعّل الإصدار للمتعلّم"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable issuance of credentials via Credential Service."
-msgstr ""
+msgstr "فعّل إصدار الوثائق من خلال خدمة الوثائق المعتمدة"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Authoring of Credential in Studio"
-msgstr ""
+msgstr "فعّل إصدار الوثائق المعتمدة في استديو"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable authoring of Credential Service credentials in Studio."
-msgstr ""
+msgstr "فعّل خدمة إصدار الوثائق المُعتمدة في استديو"
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -9202,7 +9268,7 @@ msgstr "فعّل واجهة التفويض في الأستوديو"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
-msgstr ""
+msgstr "تفعيل إنشاء شهادة البرنامج"
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -9402,11 +9468,11 @@ msgstr "هذا الحقل غير قابل للتعديل"
 #: openedx/core/lib/gating/api.py
 #, python-format
 msgid "%(min_score)s is not a valid grade percentage"
-msgstr ""
+msgstr "%(min_score)s ليست نسبة درجة صحيحة"
 
 #: openedx/core/lib/gating/api.py
 msgid "Gating milestone for {usage_key}"
-msgstr ""
+msgstr "تقييد الإنجاز الهام من أجل {usage_key}"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -13281,7 +13347,7 @@ msgstr "البحث في المنشورات"
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; currently listing: "
-msgstr ""
+msgstr "مواضيع النقاش، الاختيار الحالي هو: "
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
@@ -16955,11 +17021,11 @@ msgstr "سجِّل الآن"
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Copyright"
-msgstr ""
+msgstr "حقوق الطبع والنشر "
 
 #: themes/stanford-style/lms/templates/footer.html
 msgid "Copyright {year}. All rights reserved."
-msgstr ""
+msgstr "جميع حقوق النشر والطبع محفوظة {year}"
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -16984,19 +17050,19 @@ msgstr ""
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
-msgstr ""
+msgstr "ضع شروط الخدمة الخاصة بك هنا!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Privacy Policy here!"
-msgstr ""
+msgstr "ضع سياسة الخصوصية الخاصة بك هنا!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Honor Code here!"
-msgstr ""
+msgstr "ضع ميثاق الشرف الخاص بك هنا!"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
-msgstr ""
+msgstr "ضع نصّ حقوق النشر والطبع الخاصة بك هنا!"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

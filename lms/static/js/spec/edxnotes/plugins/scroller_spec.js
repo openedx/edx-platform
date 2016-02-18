@@ -46,7 +46,9 @@ define([
         });
 
         afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('should scroll to a note, open it and freeze the annotator if its id is part of the url hash', function() {

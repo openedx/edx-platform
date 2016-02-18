@@ -659,7 +659,6 @@ class StudioLibraryA11yTest(StudioLibraryTest):
                 'color-contrast',  # TODO: AC-225
                 'link-href',  # TODO: AC-226
                 'nav-aria-label',  # TODO: AC-227
-                'skip-link',  # TODO: AC-228
                 'icon-aria-hidden',  # TODO: AC-229
             ],
         })

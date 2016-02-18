@@ -19,7 +19,7 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Katerina <rosemaily@gmail.com>, 2014
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -58,7 +58,7 @@
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -79,7 +79,7 @@
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
 # Nikolay K Medvedev <elsin16@gmail.com>, 2015
@@ -88,6 +88,7 @@
 # Weyedide <weyedide@gmail.com>, 2014-2015
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # YummyTranslations EDX <yummytranslations.edx@gmail.com>, 2015
+# Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -99,7 +100,7 @@
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
 # Eric Fischer <efischer@edx.org>, 2016
 # Iaroslav <danwill@ukr.net>, 2015
-# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015
+# Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -108,12 +109,13 @@
 # Weyedide <weyedide@gmail.com>, 2014-2015
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
+# Яна Ловягина <yana.lovyagina@raccoongang.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-02-11 11:53+0000\n"
-"PO-Revision-Date: 2016-02-10 14:44+0000\n"
+"PO-Revision-Date: 2016-02-16 05:54+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -1493,7 +1495,7 @@ msgid ""
 "required mailto: prefix?"
 msgstr ""
 "Адрес URL, введённый вами, похож на электронный адрес.  Добавить "
-"обязательный префикс \"mailto:\"?"
+"обязательный префикс «mailto:»?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1503,7 +1505,7 @@ msgid ""
 "required http:// prefix?"
 msgstr ""
 "Адрес URL, введённый вами, похож на внешнюю ссылку.  Добавить обязательный "
-"префикс \"http://\"?"
+"префикс «http://»?"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1607,7 +1609,7 @@ msgstr "Слова: {0}"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
-msgstr "У Вас есть несохраненные изменения. Вы действительно хотите уйти?"
+msgstr "У вас есть несохраненные изменения. Вы действительно хотите уйти?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1671,13 +1673,13 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Если вы воспользуетесь расширенным редактором, задание будет преобразовано в формат XML, и Вы не сможете вернуться к простому редактору.\n"
+"Если вы воспользуетесь расширенным редактором, задание будет преобразовано в формат XML, и вы не сможете вернуться к простому редактору.\n"
 "\n"
 "Перейти к расширенному редактору и преобразовать задание в формат XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
-msgstr ""
+msgstr "Пояснение"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -1936,7 +1938,7 @@ msgstr "Не удалось загрузить обсуждение. Повто�
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
 msgstr ""
-"Возникла проблема при загрузке запрошенных Вами тем.  Пожалуйста, попробуйте"
+"Возникла проблема при загрузке запрошенных вами тем.  Пожалуйста, попробуйте"
 " еще раз."
 
 #: common/static/coffee/src/discussion/utils.js
@@ -1948,14 +1950,14 @@ msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
-"При обработке Вашего запроса возникла проблема.  Пожалуйста удостоверьтесь, "
+"При обработке вашего запроса возникла проблема.  Пожалуйста удостоверьтесь, "
 "что вы скопировали любую несохраненную работу и затем перезагрузите "
 "страницу."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
-"Возникла проблема при обработке Вашего запроса.  Пожалуйста, попробуйте ещё "
+"Возникла проблема при обработке вашего запроса.  Пожалуйста, попробуйте ещё "
 "раз."
 
 #: common/static/coffee/src/discussion/utils.js
@@ -2113,7 +2115,7 @@ msgstr "Показать сообщения пользователя %(username)
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr "Выбранная Вами тема была удалена.  Пожалуйста, выберите другую тему."
+msgstr "Выбранная вами тема была удалена.  Пожалуйста, выберите другую тему."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -2169,7 +2171,7 @@ msgstr "Вы действительно хотите удалить это со�
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
-"Возникла проблема при загрузке запрошенной Вами страницы.  Пожалуйста, "
+"Возникла проблема при загрузке запрошенной вами страницы.  Пожалуйста, "
 "попробуйте ещё раз."
 
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -2219,7 +2221,7 @@ msgstr "Отображается %(first_index)s-%(last_index)s из %(num_items
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
-msgstr "Предоставленный Вами электронный адрес имеет неправильный формат."
+msgstr "Предоставленный вами электронный адрес имеет неправильный формат."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
@@ -2544,7 +2546,7 @@ msgstr "Название команды (Поле, обязательное дл
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "A name that identifies your team (maximum 255 characters)."
-msgstr "Название, присвоенное Вашей команде (максимум 255 символов)."
+msgstr "Название, присвоенное вашей команде (максимум 255 символов)."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Team Description (Required) *"
@@ -2660,11 +2662,11 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"%(team)s\" successfully deleted."
-msgstr "Команда \"%(team)s\" успешно удалена."
+msgstr "Команда «%(team)s» успешно удалена."
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
-msgstr "В настоящий момент Вы не входите в состав ни одной команды."
+msgstr "В настоящий момент вы не входите в состав ни одной команды."
 
 #. Translators: "and others" refers to fact that additional members of a team
 #. exist that are not displayed.
@@ -2757,7 +2759,7 @@ msgstr "Просматривать список %(sr_start)s команд %(sr_e
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Your request could not be completed. Reload the page and try again."
 msgstr ""
-"Не удалось выполнить Ваш запрос.  Перезагрузите страницу и попробуйте ещё "
+"Не удалось выполнить ваш запрос.  Перезагрузите страницу и попробуйте ещё "
 "раз."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2766,7 +2768,7 @@ msgid ""
 " and try again. If the issue persists, click the Help tab to report the "
 "problem."
 msgstr ""
-"Не удалось выполнить Ваш запрос в связи с проблемой на сервере.  "
+"Не удалось выполнить ваш запрос в связи с проблемой на сервере.  "
 "Перезагрузите страницу и попробуйте ещё раз.  Если сбой повторится, щёлкните"
 " по вкладке Помощь и сообщите об этом."
 
@@ -2776,7 +2778,7 @@ msgstr "Поиск команды"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"%(searchString)s\""
-msgstr "Показаны результаты для \"%(searchString)s\""
+msgstr "Показаны результаты для «%(searchString)s»"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -2788,7 +2790,7 @@ msgid ""
 "would like to learn with friends you know."
 msgstr ""
 "Создайте новую команду, если не можете найти уже существующую команду, чтобы"
-" присоединиться, или если Вы хотите учиться вместе со своими друзьями."
+" присоединиться, или если вы хотите учиться вместе со своими друзьями."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
@@ -2825,15 +2827,15 @@ msgstr "Все темы"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"%(route)s\" could not be found."
-msgstr "Страница \"%(route)s\" не найдена."
+msgstr "Страница «%(route)s» не найдена."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"%(topic)s\" could not be found."
-msgstr "Тема \"%(topic)s\" не найдена."
+msgstr "Тема «%(topic)s» не найдена."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The team \"%(team)s\" could not be found."
-msgstr "Команда \"%(team)s\" не найдена."
+msgstr "Команда «%(team)s» не найдена."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -2867,7 +2869,7 @@ msgid ""
 "topic{span_end}."
 msgstr ""
 "{browse_span_start}Просмотр команд по другим темам{span_end} или "
-"{search_span_start} поиск{span_end} по этой теме. Если Вы все еще не можете "
+"{search_span_start} поиск{span_end} по этой теме. Если вы всё ещё не можете "
 "найти команду, чтобы присоединиться, {create_span_start}создайте новую "
 "команду по этой теме{span_end}."
 
@@ -3055,7 +3057,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Reason field should not be left blank."
-msgstr "Поле \"Причина\" не должно быть пустым."
+msgstr "Поле «Причина» не должно быть пустым."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
@@ -3319,8 +3321,8 @@ msgid ""
 "Make sure that entrance exam has problems in it and student identifier is "
 "correct."
 msgstr ""
-"Ошибка запуска задачи по перепроверке вступительного испытания для "
-"\"{student_id}\". Убедитесь, что вступительное испытание содержит задания и "
+"Ошибка запуска задачи по перепроверке вступительного испытания для слушателя"
+" «{student_id}». Убедитесь, что вступительное испытание содержит задания и "
 "идентификатор пользователя верен."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -3360,8 +3362,8 @@ msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
 msgstr ""
-"Ошибка получения истории задач вступительного испытания для "
-"\"{student_id}\". Убедитесь, что идентификатор пользователя верен."
+"Ошибка получения истории задач вступительного испытания для слушателя "
+"«{student_id}». Убедитесь, что идентификатор пользователя верен."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -3377,7 +3379,7 @@ msgid ""
 msgstr ""
 "Задача по сбросу количества попыток выполнения задания '<%= problem_id %>' "
 "запущена успешно. Чтобы просмотреть статус выполнения задания, нажмите "
-"'Показать историю фоновых задач для задания'."
+"«Показать историю фоновых задач для задания»."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3563,7 +3565,7 @@ msgid ""
 "machine. (e.g. 'http://example.com/img/clouds.jpg')"
 msgstr ""
 "Введите URL (напр. 'http://example.com/img/clouds.jpg') или нажмите кнопку "
-"\"Выбрать файл\" для загрузки файла."
+"«Выбрать файл» для загрузки файла."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image Description"
@@ -3582,7 +3584,7 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
-"например, \"небо с облаками'. Описание удобно для пользователей, которые не "
+"например, «небо с облаками». Описание удобно для пользователей, которые не "
 "могут видеть изображения."
 
 #: lms/static/js/Markdown.Editor.js
@@ -3754,7 +3756,7 @@ msgstr "Имя пользователя/адрес электронной поч
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr "Задания с загруженными файлами. Нажмите \"+\" для просмотра."
+msgstr "Задания с загруженными файлами. Нажмите «+» для просмотра."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
@@ -3801,10 +3803,12 @@ msgid ""
 "Certificate of <%= user %> has already been invalidated. Please check your "
 "spelling and retry."
 msgstr ""
+"Сертификат для <%= user %> уже аннулирован. Пожалуйста, проверьте "
+"правильность ввода и повторите запрос."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate has been successfully invalidated for <%= user %>."
-msgstr ""
+msgstr "Сертификат для <%= user %> успешно аннулирован."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 #: lms/static/js/certificates/views/certificate_whitelist.js
@@ -3817,32 +3821,40 @@ msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
 msgstr ""
+"Сертификат для данного обучающегося восстановлен, запущен пересчёт оценки."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "Could not find Certificate Invalidation in the list. Please refresh the page"
 " and try again"
 msgstr ""
+"Не удалось найти аннулированный сертификат в списке. Пожалуйста, обновите "
+"страницу и повторите попытку."
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid "Student Removed from certificate white list successfully."
 msgstr ""
+"Обучающийся успешно удалён из списка исключений для получения сертификатов."
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid ""
 "Could not find Certificate Exception in white list. Please refresh the page "
 "and try again"
 msgstr ""
+"Не удалось найти исключение в списке для получения сертификатов. Пожалуйста,"
+" обновите страницу и повторите попытку."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "<%= user %> already in exception list."
-msgstr ""
+msgstr "<%= user %> уже добавлен в список исключений."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
 "<%= user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
+"<%= user %> успешно добавлен. Для выдачи сертификата нажмите «Создать "
+"сертификаты для исключительных случаев»."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3878,7 +3890,7 @@ msgstr[3] "Просмотр %s курсов"
 #: lms/static/js/discovery/views/search_form.js
 #, c-format
 msgid "We couldn't find any results for \"%s\"."
-msgstr "Нет результатов для \"%s\"."
+msgstr "Нет результатов для «%s»."
 
 #: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
@@ -3935,7 +3947,7 @@ msgstr "Последние действия"
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr ""
-"По запросу \"%(query_string)s\" ничего не найдено. Пожалуйста, повторите "
+"По запросу «%(query_string)s» ничего не найдено. Пожалуйста, повторите "
 "поиск."
 
 #. Translators: this is a title shown before all Notes that have no associated
@@ -4117,8 +4129,8 @@ msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
 " to try again."
 msgstr ""
-"При составлении отчёта произошла ошибка. Повторите попытку, нажав \"Создать "
-"сводный отчёт\"."
+"При составлении отчёта произошла ошибка. Повторите попытку, нажав «Создать "
+"сводный отчёт»."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Enter the enrollment code."
@@ -4203,19 +4215,19 @@ msgstr "Проверьте электронную почту для подтве
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Saving your email preference"
-msgstr "Сохранение Ваших настроек электронной почты"
+msgstr "Сохранение ваших настроек электронной почты"
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Enrolling you in the selected course"
-msgstr "Идёт регистрация на выбранный Вами курс"
+msgstr "Идёт регистрация на выбранный вами курс"
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Adding the selected course to your cart"
-msgstr "Помещение выбранного Вами курса в корзину"
+msgstr "Помещение выбранного вами курса в корзину"
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Loading your courses"
-msgstr "Идёт загрузка Ваших курсов"
+msgstr "Идёт загрузка ваших курсов"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4233,7 +4245,7 @@ msgid ""
 "The name that identifies you throughout {platform_name}. You cannot change "
 "your username."
 msgstr ""
-"Имя, под которым Вас знают на сайте {platform_name}. Вы не можете сменить "
+"Имя, под которым вас знают на сайте {platform_name}. Вы не можете сменить "
 "имя пользователя."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4260,8 +4272,8 @@ msgid ""
 "The email address you use to sign in. Communications from {platform_name} "
 "and your courses are sent to this address."
 msgstr ""
-"Адрес электронной почты, используемый Вами для входа в систему. На этот "
-"адрес Вам отправляются сообщения от {platform_name} и информация по Вашим "
+"Адрес электронной почты, используемый вами для входа в систему. На этот "
+"адрес вам отправляются сообщения от {platform_name} и информация по вашим "
 "курсам."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4283,7 +4295,7 @@ msgid ""
 "When you click \"Reset Password\", a message will be sent to your email "
 "address. Click the link in the message to reset your password."
 msgstr ""
-"При нажатии на «Изменить пароль» на адрес Вашей электронной почты будет "
+"При нажатии на «Изменить пароль» на адрес вашей электронной почты будет "
 "выслано сообщение. Чтобы изменить пароль, перейдите по ссылке в полученном "
 "сообщении."
 
@@ -4340,7 +4352,7 @@ msgstr ""
 msgid ""
 "You must sign out and sign back in before your language changes take effect."
 msgstr ""
-"Чтобы изменение языка вступило в силу, Вам необходимо выйти и снова войти в "
+"Чтобы изменение языка вступило в силу, вам необходимо выйти и снова войти в "
 "систему."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
@@ -4412,7 +4424,7 @@ msgid ""
 "You must specify your birth year before you can share your full profile. To "
 "specify your birth year, go to the {account_settings_page_link}"
 msgstr ""
-"Для публикации полного профиля Вам необходимо указать год Вашего рождения на"
+"Для публикации полного профиля вам необходимо указать год вашего рождения на"
 " {account_settings_page_link}"
 
 #: lms/static/js/student_profile/views/learner_profile_fields.js
@@ -4420,7 +4432,7 @@ msgid ""
 "You must be over 13 to share a full profile. If you are over 13, make sure "
 "that you have specified a birth year on the {account_settings_page_link}"
 msgstr ""
-"Для публикации полного профиля Вам должно быть больше 13 лет. Если Вы старше"
+"Для публикации полного профиля вам должно быть больше 13 лет. Если вы старше"
 " 13 лет, удостоверьтесь, что Вы заполнили год рождения на "
 "{account_settings_page_link}"
 
@@ -4549,8 +4561,8 @@ msgid ""
 "You don't seem to have Flash installed. Get Flash to continue your "
 "verification."
 msgstr ""
-"Кажется, у Вас не установлен Flash Player. Установите Flash , чтобы "
-"продолжить Вашу верификацию."
+"Кажется, у вас не установлен Flash Player. Установите Flash, чтобы "
+"продолжить вашу верификацию."
 
 #: lms/static/js/views/fields.js
 msgid "Editable"
@@ -4750,7 +4762,7 @@ msgstr "Вы еще не создали ни одного сертификата
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "Удалить \"<%= signatoryName %>\" из списка подписей?"
+msgstr "Удалить «<%= signatoryName %>» из списка подписей?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -4857,7 +4869,7 @@ msgstr "Возникла ошибка при распаковке файла."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr "Возникла ошибка при подтверждении отправленного Вами файла."
+msgstr "Возникла ошибка при подтверждении отправленного вами файла."
 
 #: cms/static/js/factories/import.js
 msgid "Choose new file"
@@ -5249,7 +5261,7 @@ msgstr "Вы ещё не создали ни одной конфигурации
 
 #: cms/static/js/views/import.js
 msgid "Your import is in progress; navigating away will abort it."
-msgstr "Ваш импорт в процессе, покинув страницу, Вы его отмените."
+msgstr "Ваш импорт в процессе, покинув страницу, вы его отмените."
 
 #: cms/static/js/views/import.js
 msgid "Error importing course"
@@ -5292,8 +5304,8 @@ msgid ""
 "required."
 msgstr ""
 "Пользователям разрешается копировать, распространять, демонстрировать и "
-"исполнять Ваше защищённое авторским правом произведение, но только при "
-"указания Вашего авторства. Выбор данной опции обязателен. "
+"исполнять ваше защищённое авторским правом произведение, но только при "
+"указания вашего авторства. Выбор данной опции обязателен. "
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
@@ -5305,7 +5317,7 @@ msgid ""
 "derivative works based upon it - but for noncommercial purposes only."
 msgstr ""
 "Пользователям разрешается копировать, распространять, демонстрировать и "
-"исполнять Ваше защищённое авторским правом произведение — а также все "
+"исполнять ваше защищённое авторским правом произведение — а также все "
 "производные произведения ,— но только не в целях получения прибыли."
 
 #: cms/static/js/views/license.js
@@ -5319,7 +5331,7 @@ msgid ""
 "incompatible with \"Share Alike\"."
 msgstr ""
 "Пользователям разрешается копировать, распространять, демонстрировать и "
-"исполнять только точные копии Вашего защищённое авторским правом "
+"исполнять только точные копии вашего защищённое авторским правом "
 "произведения, но не создавать производные произведения. Несовместимо с "
 "опцией «Распространение на тех же условиях»."
 
@@ -5616,7 +5628,7 @@ msgid ""
 "Your changes will not take effect until you save your progress. Take care "
 "with key and value formatting, as validation is not implemented."
 msgstr ""
-"Ваши изменения не вступят в силу, пока Вы не сохраните их. Будьте осторожны "
+"Ваши изменения не вступят в силу, пока вы не сохраните их. Будьте осторожны "
 "с редактированием ключей и значений, так как проверка не реализована."
 
 #: cms/static/js/views/settings/advanced.js
@@ -5704,10 +5716,12 @@ msgid ""
 "Any content that has listed this content as a prerequisite will also have "
 "access limitations removed."
 msgstr ""
+"Ограничения на доступ к материалам, для которых прохождение этого "
+"содержимого является предварительным условием, будет снято."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this %(xblock_type)s (and prerequisite)?"
-msgstr ""
+msgstr "Удалить %(xblock_type)s (и предварительные условия)?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
@@ -5735,7 +5749,7 @@ msgstr "Вы сделали некоторые изменения"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
-msgstr "Ваши изменения не вступят в силу, пока Вы не сохраните их."
+msgstr "Ваши изменения не вступят в силу, пока вы не сохраните их."
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
@@ -5871,7 +5885,7 @@ msgstr "Номер страницы"
 
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
-msgstr "Введите номер страницы, к которой Вы хотите перейти."
+msgstr "Введите номер страницы, к которой вы хотите перейти."
 
 #: common/static/common/templates/components/paging-header.underscore
 msgid "Sorted by"
@@ -5896,15 +5910,15 @@ msgstr "Находите обсуждения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Use the Discussion Topics menu to find specific topics."
-msgstr ""
+msgstr "Для поиска конкретных тем воспользуйтесь меню тем обсуждений."
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Search all posts"
-msgstr ""
+msgstr "Поиск по всем темам"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Filter and sort topics"
-msgstr ""
+msgstr "Фильтруйте и сортируйте темы"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Engage with posts"
@@ -5912,15 +5926,15 @@ msgstr "Оценивайте сообщения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Vote for good posts and responses"
-msgstr ""
+msgstr "Голосуйте за хорошие сообщения и ответы"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Report abuse, topics, and responses"
-msgstr ""
+msgstr "Сообщайте об оскорблениях, темах и ответах"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Follow or unfollow posts"
-msgstr ""
+msgstr "Отслеживать/не отслеживать сообщения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Receive updates"
@@ -5936,7 +5950,7 @@ msgid ""
 "new, unread activity from posts you are following."
 msgstr ""
 "Поставьте галочку, чтобы ежедневно получать обзор новых непрочитанных "
-"комментариев и ответов на сообщения, которые Вы отслеживаете."
+"комментариев и ответов на сообщения, которые вы отслеживаете."
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
@@ -6245,7 +6259,7 @@ msgstr "Тема:"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Discussion topics; currently listing: "
-msgstr ""
+msgstr "Темы обсуждения; список текущих:"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Filter topics"
@@ -6254,7 +6268,7 @@ msgstr "Выборка тем"
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
-"Поместите Ваше сообщение в подходящую тему, чтобы упростить другим "
+"Поместите ваше сообщение в подходящую тему, чтобы упростить другим "
 "пользователям его поиск."
 
 #: common/static/common/templates/discussion/user-profile.underscore
@@ -6374,7 +6388,7 @@ msgstr "Режим зачисления"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Verified mode price"
-msgstr ""
+msgstr "Стоимость подтверждённого сертификата"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Reason"
@@ -6395,18 +6409,18 @@ msgstr "Изменить зачисление"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
-msgstr "Не удалось создать Вашу команду."
+msgstr "Не удалось создать вашу команду."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be updated."
-msgstr "Не удалось сохранить изменения в описании Вашей команды."
+msgstr "Не удалось сохранить изменения в описании вашей команды."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid ""
 "Enter information to describe your team. You cannot change these details "
 "after you create the team."
 msgstr ""
-"Введите информацию, описывающую Вашу команду. Вы не сможете изменить это "
+"Введите информацию, описывающую вашу команду. Вы не сможете изменить это "
 "описание после создания команды."
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
@@ -6516,9 +6530,9 @@ msgid ""
 "courseware page."
 msgstr ""
 "Используйте закладки для быстрого возврата к материалам курса. Для "
-"добавления закладки, нажмите \"Добавить в закладки\" в правом верхнем углу "
+"добавления закладки, нажмите «Добавить в закладки» в правом верхнем углу "
 "нужной страницы. Для того чтобы увидеть все свои закладки, нажмите "
-"\"Закладки\" в левом верхнем углу любой из страниц курса"
+"«Закладки» в левом верхнем углу любой из страниц курса"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -6672,7 +6686,7 @@ msgid ""
 "from your dashboard. You will receive periodic reminders from "
 "%(platformName)s to verify your identity."
 msgstr ""
-"Если Вы не подтвердите свои данные, Вы всё равно сможете просмотреть курс "
+"Если вы не подтвердите свои данные, вы всё равно сможете просмотреть курс "
 "через панель управления. Вы периодически будете получать напоминания о "
 "подтверждении сведений от %(platformName)s."
 
@@ -6698,6 +6712,9 @@ msgid ""
 "To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
 "on it before you select \"End My Exam\"."
 msgstr ""
+"Чтобы иметь возможность получить за задание зачётные единицы, перед нажатием"
+" кнопки «Завершить сдачу экзамена» необходимо нажать кнопку «Проверить» или "
+"«Проверить/последняя попытка» в этом задании."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -7192,7 +7209,7 @@ msgid ""
 "specify additional information and see your linked social accounts on this "
 "page."
 msgstr ""
-"В настройках указана основная информация о Вашей учётной записи. Вы также "
+"В настройках указана основная информация о вашей учётной записи. Вы также "
 "можете добавить дополнительные сведения и просмотреть список связанных "
 "учётных записей в социальных сетях."
 
@@ -7236,7 +7253,7 @@ msgstr "Войти, используя логин и пароль обучающ
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
 msgid "Choose your institution from the list below:"
-msgstr "Выберите Ваше учебное заведение."
+msgstr "Выберите ваше учебное заведение."
 
 #: lms/templates/student_account/institution_login.underscore
 msgid "Back to sign in"
@@ -7287,7 +7304,7 @@ msgid ""
 "providers listed below."
 msgstr ""
 "Чтобы войти в систему, введите адрес электронной почты и пароль или "
-"используйте один из следующих аккаунтов."
+"используйте одну из следующих учётных записей."
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
@@ -7388,7 +7405,7 @@ msgstr "Уже есть учётная запись?"
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "You are currently sharing a limited profile."
-msgstr "Сейчас сокурсникам разрешен ограниченный доступ к Вашему профилю."
+msgstr "Сейчас сокурсникам разрешен ограниченный доступ к вашему профилю."
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "This edX learner is currently sharing a limited profile."
@@ -7463,7 +7480,7 @@ msgid ""
 "make sure that you allow access to the camera."
 msgstr ""
 "Вам требуется компьютер с веб-камерой. Когда браузер предложит сделать фото,"
-" убедитесь, что Вы разрешили ему доступ к камере."
+" убедитесь, что вы разрешили ему доступ к камере."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -7475,7 +7492,7 @@ msgid ""
 "has your name and photo."
 msgstr ""
 "Вам требуются водительские права, паспорт или иной государственный документ,"
-" в котором есть Ваше имя и фотография."
+" в котором есть ваше имя и фотография."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7488,7 +7505,7 @@ msgid ""
 "When your face is in position, use the camera button %(icon)s below to take "
 "your photo."
 msgstr ""
-"Когда Ваше лицо полностью попадёт в кадр, нажмите расположенную ниже кнопку "
+"Когда ваше лицо полностью попадёт в кадр, нажмите расположенную ниже кнопку "
 "с изображением камеры %(icon)s, чтобы сделать снимок."
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -7505,7 +7522,7 @@ msgstr "Ваше лицо полностью помещается в рамку.
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "The photo of your face matches the photo on your ID."
-msgstr "Фото вашего лица соответствует фото в Вашем документе."
+msgstr "Фото вашего лица соответствует фото в вашем документе."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #, python-format
@@ -7591,7 +7608,7 @@ msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
 msgstr ""
-"Вам потребуется удостоверение личности с Вашим именем и фотографией.  "
+"Вам потребуется удостоверение личности с вашим именем и фотографией.  "
 "Подойдёт водительское удостоверение, паспорт или другой документ "
 "государственного образца."
 
@@ -7602,11 +7619,11 @@ msgstr "Советы: как сделать удачный снимок"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
-msgstr "Убедитесь в том, что Вы можете видеть Ваше фото и прочесть Ваше имя"
+msgstr "Убедитесь в том, что вы можете видеть ваше фото и прочесть ваше имя"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
-msgstr "Убедитесь, что Ваш документ хорошо освещён"
+msgstr "Убедитесь, что ваш документ хорошо освещён"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #, python-format
@@ -7618,7 +7635,7 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "Используйте кнопку \"Повторный снимок\", если Вы недовольны фотографией"
+msgstr "Используйте кнопку «Повторный снимок», если вы недовольны фотографией"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -7643,7 +7660,7 @@ msgstr "Убедитесь, что ваше лицо хорошо освещен
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
-msgstr "Убедитесь, что всё Ваше лицо находится внутри рамки"
+msgstr "Убедитесь, что всё ваше лицо находится внутри рамки"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
@@ -7655,13 +7672,13 @@ msgstr ""
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
-"Можем ли мы сопоставить снимок, сделанный Вами, с фото в Вашем документе?"
+"Можем ли мы сопоставить снимок, сделанный вами, с фото в вашем документе?"
 
 #: lms/templates/verify_student/intro_step.underscore
 #, python-format
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
 msgstr ""
-"Благодарим за то, что Вы вернулись и подтвердили свои данные на курсе: "
+"Благодарим за то, что вы вернулись и подтвердили свои данные на курсе: "
 "%(courseName)s"
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -7698,7 +7715,7 @@ msgid ""
 "and photo"
 msgstr ""
 "Водительское удостоверение, паспорт или другой документ государственного "
-"образца с Вашими именем и фотографией"
+"образца с вашими именем и фотографией"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #, python-format
@@ -7713,7 +7730,7 @@ msgstr "Вы меняете форму записи на курс: %(courseName)
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can now enter your payment information and complete your enrollment."
-msgstr "Теперь Вы можете ввести информацию о платеже и завершить регистрацию."
+msgstr "Теперь вы можете ввести информацию о платеже и завершить регистрацию."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #, python-format
@@ -7837,7 +7854,7 @@ msgstr ""
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Thank you! We have received your payment for %(courseName)s."
-msgstr "Благодарим Вас! Ваш платёж за курс %(courseName)s получен."
+msgstr "Благодарим вас! Ваш платёж за курс %(courseName)s получен."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -7861,7 +7878,7 @@ msgid ""
 "photo."
 msgstr ""
 "Водительское удостоверение, паспорт или удостоверение личности "
-"государственного образца с Вашими именем и фотографией."
+"государственного образца с вашими именем и фотографией."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -7892,8 +7909,8 @@ msgid ""
 "Make sure we can verify your identity with the photos and information you "
 "have provided."
 msgstr ""
-"Убедитесь, что мы сможем подтвердить Ваши данные с помощью фотографий и "
-"информации, предоставленных Вами."
+"Убедитесь, что мы сможем подтвердить ваши данные с помощью фотографий и "
+"информации, предоставленных вами."
 
 #: lms/templates/verify_student/review_photos_step.underscore
 #, python-format
@@ -7911,22 +7928,22 @@ msgstr "Требования к фотографии:"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
-msgstr "Видно ли на фотографии Ваше лицо целиком?"
+msgstr "Видно ли на фотографии ваше лицо целиком?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
 msgstr ""
-"Сопоставима ли фотография с фотографией в Вашем удостоверении личности?"
+"Сопоставима ли фотография с фотографией в вашем удостоверении личности?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
-msgstr "Чётко ли отображается ваше имя в Вашем удостоверении личности?"
+msgstr "Чётко ли отображается ваше имя в вашем удостоверении личности?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Does the name on your ID match your account name: %(fullName)s?"
 msgstr ""
-"Совпадает ли имя в Вашем удостоверении личности с именем, указанным в "
+"Совпадает ли имя в вашем удостоверении личности с именем, указанным в "
 "учётной записи: %(fullName)s?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
@@ -7937,7 +7954,7 @@ msgstr "Отредактируйте Своё Имя"
 msgid ""
 "Make sure that the full name on your account matches the name on your ID."
 msgstr ""
-"Убедитесь, что полное имя в Вашей учётной записи совпадает с именем в Вашем "
+"Убедитесь, что полное имя в вашей учётной записи совпадает с именем в вашем "
 "документе."
 
 #: lms/templates/verify_student/review_photos_step.underscore
@@ -7959,8 +7976,8 @@ msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
 msgstr ""
-"Не видите Ваше изображение? Убедитесь, что Вы разрешили браузеру "
-"использовать Вашу камеру, когда он запрашивает это."
+"Не видите ваше изображение? Убедитесь, что вы разрешили браузеру "
+"использовать вашу камеру, когда он запрашивает это."
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"
@@ -7983,6 +8000,8 @@ msgid ""
 "Select a prerequisite subsection and enter a minimum score percentage to "
 "limit access to this subsection."
 msgstr ""
+"Выберите подраздел предпосылок и введите минимальный уровень освоения в "
+"процентах для ограничения доступа к этому подразделу."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
@@ -7999,6 +8018,8 @@ msgstr "Минимальный балл:"
 #: cms/templates/js/access-editor.underscore
 msgid "The minimum score percentage must be a whole number between 0 and 100."
 msgstr ""
+"Минимальный уровень освоения выражается в процентах и должен быть целым "
+"числом между 0 и 100."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Use as a Prerequisite"
@@ -8007,6 +8028,8 @@ msgstr "Использовать как требование"
 #: cms/templates/js/access-editor.underscore
 msgid "Make this subsection available as a prerequisite to other content"
 msgstr ""
+"Сделайте прохождение этот подраздела обязательным для доступа к последующему"
+" содержимому"
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
@@ -8242,7 +8265,7 @@ msgstr ""
 #: cms/templates/js/course-outline.underscore
 #, python-format
 msgid "Prerequisite: %(prereq_display_name)s"
-msgstr ""
+msgstr "Предварительное условие: %(prereq_display_name)s"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -8538,7 +8561,7 @@ msgid ""
 "This configuration is currently used in content experiments. If you make "
 "changes to the groups, you may need to edit those experiments."
 msgstr ""
-"Эта конфигурация уже использована.Если Вы измените группы, Вам может "
+"Эта конфигурация уже использована.Если вы измените группы, вам может "
 "понадобиться редактировать эксперименты"
 
 #: cms/templates/js/group-edit.underscore
@@ -8891,7 +8914,7 @@ msgstr "Удалить пользователя {username}"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Set as a Special Exam"
-msgstr ""
+msgstr "Установить в качестве контрольного испытания"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
@@ -9045,7 +9068,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid "Which timed transcript would you like to use?"
-msgstr "Какие синхронизированные по времени субтитры Вы хотите использовать?"
+msgstr "Какие синхронизированные по времени субтитры вы хотите использовать?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore

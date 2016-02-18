@@ -30,7 +30,7 @@
     {% with course=request.course %}
       {% include "header.html"|microsite_template_path %}
     {% endwith %}
-    <div class="content-wrapper" id="content">
+    <div role="main" class="content-wrapper" id="content" tabindex="-1">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>

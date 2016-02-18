@@ -330,7 +330,11 @@ from student.helpers import (
                     ${_("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}" class="verified-info" data-course-key="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT'), enrollment.course_id), link_end="</a>", cert_name_long=cert_name_long)}
                 </p>
                 <div class="action-upgrade-container">
-                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
+                  % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
+                    <a class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
+                  % else:
+                    <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
+                  % endif
                       <i class="action-upgrade-icon"></i>
                     <span class="wrapper-copy">
                       <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified")}</span>

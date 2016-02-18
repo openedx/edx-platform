@@ -30,17 +30,21 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')
-class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
     """
-    def setUp(self):
-        super(CourseInfoTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.page = ItemFactory.create(
-            category="course_info", parent_location=self.course.location,
+    @classmethod
+    def setUpClass(cls):
+        super(CourseInfoTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.page = ItemFactory.create(
+            category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
         )
+
+    def setUp(self):
+        super(CourseInfoTestCase, self).setUp()
 
     def test_logged_in_unenrolled(self):
         self.setup_user()
@@ -242,11 +246,15 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
     Tests for the info page of self-paced courses.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super(SelfPacedCourseInfoTestCase, cls).setUpClass()
+        cls.instructor_paced_course = CourseFactory.create(self_paced=False)
+        cls.self_paced_course = CourseFactory.create(self_paced=True)
+
     def setUp(self):
         SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
-        self.instructor_paced_course = CourseFactory.create(self_paced=False)
-        self.self_paced_course = CourseFactory.create(self_paced=True)
         self.setup_user()
 
     def fetch_course_info_with_queries(self, course, sql_queries, mongo_queries):

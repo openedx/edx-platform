@@ -105,6 +105,9 @@ for log_name, log_level in LOG_OVERRIDES:
 # Enable milestones app
 FEATURES['MILESTONES_APP'] = True
 
+# Enable oauth authentication, which we test.
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 

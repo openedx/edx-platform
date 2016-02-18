@@ -1,0 +1,15 @@
+[
+    {
+        "fields": {
+            "client_id": "test-id",
+            "client_secret": "test-secret",
+            "client_type": 0,
+            "name": "Test OAuth2 Client",
+            "redirect_uri": "http://does-not-exist/",
+            "url": "http://does-not-exist/",
+            "user": null
+        },
+        "model": "oauth2.client",
+        "pk": 3
+    }
+]

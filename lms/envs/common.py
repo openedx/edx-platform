@@ -473,12 +473,10 @@ TEMPLATES = [
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': [
+                # We have to use mako-aware template loaders to be able to include
+                # mako templates inside django templates (such as main_django.html).
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
-
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-
             ],
             'context_processors': [
                 'django.template.context_processors.request',
@@ -1225,6 +1223,7 @@ base_vendor_js = [
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'js/vendor/underscore-min.js',
+    'js/vendor/underscore.string.min.js',
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
@@ -2768,3 +2767,4 @@ AUDIT_CERT_CUTOFF_DATE = None
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
+CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE

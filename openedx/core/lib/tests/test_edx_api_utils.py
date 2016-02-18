@@ -1,5 +1,7 @@
 """Tests covering Api utils."""
+import unittest
 
+from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
@@ -95,6 +97,8 @@ class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, Prog
             )
             self.assertEqual(actual, [])
 
+    # this test is skipped under cms because the credentials app is only installed under LMS.
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @httpretty.activate
     def test_get_edx_api_data_multiple_page(self):
         """Verify that all data is retrieve for multiple page response."""

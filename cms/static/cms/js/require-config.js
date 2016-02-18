@@ -14,7 +14,7 @@
         // Since we are serving the gettext catalog as static files,
         // the URL for the gettext file will vary depending on which locale
         // needs to be served. To handle this, we load the correct file in the
-        // rendered template and then use this to ensure that RequireJS knows 
+        // rendered template and then use this to ensure that RequireJS knows
         // how to find it.
         define("gettext", function () { return window.gettext; });
     }
@@ -91,7 +91,7 @@
             // end of Annotation tool files
 
             // externally hosted files
-            "mathjax": "//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured", // jshint ignore:line
+            "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_CHTML&delayStartupUntil=configured", // jshint ignore:line
             "youtube": [
                 // youtube URL does not end in ".js". We add "?noext" to the path so
                 // that require.js adds the ".js" to the query component of the URL,
@@ -289,16 +289,16 @@
             },
             "ova":{
                 exports: "ova",
-                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", 
-                       "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", 
-                       "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", 
+                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube",
+                       "rangeslider", "share-annotator", "richText-annotator", "reply-annotator",
+                       "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator",
                        "jquery-Watch", "catch", "handlebars", "URI"]
             },
             "osda":{
                 exports: "osda",
-                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", 
-                       "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", 
-                       "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", 
+                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube",
+                       "rangeslider", "share-annotator", "richText-annotator", "reply-annotator",
+                       "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator",
                        "openseadragon", "jquery-Watch", "catch", "handlebars", "URI"]
             }
             // end of annotation tool files

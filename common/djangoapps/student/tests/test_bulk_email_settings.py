@@ -12,7 +12,7 @@ from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -22,15 +22,17 @@ from bulk_email.models import CourseAuthorization  # pylint: disable=import-erro
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestStudentDashboardEmailView(ModuleStoreTestCase):
+class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     """
     Check for email view displayed with flag
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestStudentDashboardEmailView, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestStudentDashboardEmailView, self).setUp()
-
-        self.course = CourseFactory.create()
 
         # Create student account
         student = UserFactory.create()
@@ -84,7 +86,7 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
+class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on student dashboard, with XML backed course.
     """
