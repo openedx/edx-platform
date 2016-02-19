@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
             ${homepage_overlay_html}
           % else:
             <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
-            <h2>${_("For anyone, anywhere, anytime")}</h2>
+            <p>${_("For anyone, anywhere, anytime")}</p>
           % endif
         </div>
         % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):

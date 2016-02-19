@@ -86,7 +86,8 @@ $course-search-input-height: ($button-size);
           text-transform: none;
         }
 
-        h2 {
+        p {
+          @extend h2;
           margin-bottom: 0;
           text-transform: lowercase;
           font-style: italic;
