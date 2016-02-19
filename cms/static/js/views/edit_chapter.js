@@ -1,3 +1,5 @@
+/*global course */
+
 define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gettext", "js/models/uploads", "js/views/uploads"],
         function(BaseView, _, str, $, gettext, FileUploadModel, UploadDialogView) {
     _.str = str; // used in template
