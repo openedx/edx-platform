@@ -8,9 +8,11 @@ from __future__ import absolute_import
 
 from importlib import import_module
 import gettext
+import inspect
 import logging
-
+import os
 import re
+
 from django.conf import settings
 
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
@@ -247,7 +249,7 @@ class ModuleI18nService(object):
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
 
-    def ugettext(self, string, **kwargs):
+    def ugettext(self, string):
         """
         This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
         the GNU gettext ugettext operation.  Here we attempts to look up the provided string in the
@@ -262,16 +264,15 @@ class ModuleI18nService(object):
         translated_string = unicode(string)
         if translated_string:
             try:
-                # TODO: Move these values into settings.  We might allow for multiple possibilities
-                # for these values through the use of lists or tuples.  For example, instead of
-                # 'django' an XBlock developer could specify 'xblock_name' for their PO file.
-                xblock_domain = kwargs.get('xblock_domain', 'django')
-                xblock_locale = kwargs.get('xblock_locale', '/conf/locale')
-                locale_path = kwargs.get('xblock_root', '') + xblock_locale
+                xblock_domain = 'django'
+                xblock_locale_dir = '/conf/locale'
+                calling_module = inspect.stack()[1]
+                xblock_locale_root = os.path.dirname(calling_module[1])
+                xblock_locale_path = xblock_locale_root + xblock_locale_dir
                 selected_language = get_language()
                 translator = gettext.translation(
                     xblock_domain,
-                    locale_path,
+                    xblock_locale_path,
                     [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
                 )
                 _ = translator.ugettext
