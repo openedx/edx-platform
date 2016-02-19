@@ -94,6 +94,7 @@ class CreditService(object):
         result = {
             'enrollment_mode': enrollment.mode,
             'profile_fullname': user.profile.name,
+            'student_email': user.email,
             'is_credit_course': is_credit_course(course_key),
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
