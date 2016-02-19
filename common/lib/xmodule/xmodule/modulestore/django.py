@@ -244,6 +244,9 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    def __getattr__(self, name):
+        return getattr(django.utils.translation, name)
+
     def ugettext(self, string, **kwargs):
         """
         This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
@@ -263,7 +266,7 @@ class ModuleI18nService(object):
                 # for these values through the use of lists or tuples.  For example, instead of
                 # 'django' an XBlock developer could specify 'xblock_name' for their PO file.
                 xblock_domain = 'django'
-                xblock_locale = 'conf/locale'
+                xblock_locale = '/conf/locale'
                 locale_path = kwargs.get('xblock_root', '') + xblock_locale
                 translator = gettext.translation(
                     xblock_domain,
@@ -271,7 +274,7 @@ class ModuleI18nService(object):
                     [to_locale(get_language())]
                 )
                 _ = translator.ugettext
-            except:
+            except IOError:
                 _ = django.utils.translation.ugettext
 
             translated_string = _(string)
