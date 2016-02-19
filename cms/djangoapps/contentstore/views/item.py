@@ -804,7 +804,6 @@ def _get_gating_info(course, xblock):
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
                        user=None, course=None):
-
     """
     Creates the information needed for client-side XBlockInfo.
 
