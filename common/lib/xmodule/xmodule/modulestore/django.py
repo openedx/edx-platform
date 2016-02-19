@@ -278,7 +278,7 @@ class ModuleI18nService(object):
             except IOError:
                 _ = django.utils.translation.ugettext
 
-            translated_string = _(string)
+            translated_string = _(string)  # pylint: disable=translation-of-non-string
         return translated_string
 
     def strftime(self, *args, **kwargs):
