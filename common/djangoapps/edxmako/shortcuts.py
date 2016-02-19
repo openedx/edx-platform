@@ -156,4 +156,5 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     """
 
     dictionary = dictionary or {}
+    dictionary['scratch'] = {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

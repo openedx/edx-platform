@@ -76,7 +76,7 @@ source, template_path = Loader(engine).load_template_source(path)
                 });
             % else:
                 ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-                ## static_replace calls (as woudl happen if require_module is used within courseware).
+                ## static_replace calls (as would happen if require_module is used within courseware).
                 ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
                 ## being appended more than once, causing the import to fail in production environments.
                 require(['${staticfiles_storage.url(module_name + ".js") + "?raw"}'], function () {
@@ -87,6 +87,23 @@ source, template_path = Loader(engine).load_template_source(path)
             % endif
         }).call(this, require || RequireJS.require);
     </script>
+</%def>
+
+<%def name="deferred_js()">
+    <%
+        if 'deferred_js' not in context['scratch']:
+            context['scratch']['deferred_js'] = []
+
+        caller_body = capture(caller.body)
+        context['scratch']['deferred_js'].append(caller_body)
+    %>
+</%def>
+
+<%def name="get_deferred_js()">
+    <%
+        if 'deferred_js' in context['scratch']:
+            context.write("\n".join(context['scratch']['deferred_js']))
+    %>
 </%def>
 
 <%def name="optional_include_mako(file, is_theming_enabled=False)"><%

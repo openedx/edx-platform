@@ -103,6 +103,7 @@ from branding import api as branding_api
         <%static:js group='application'/>
     % endif
 
+    <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
     <script>
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
@@ -111,7 +112,6 @@ from branding import api as branding_api
       });
     }).call(this, require || RequireJS.require);
     </script>
-    <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
 
     <%block name="js_overrides">
     </%block>
@@ -136,10 +136,12 @@ from branding import api as branding_api
         })();
         </script>
     % endif
-  <%block name="js_extra"/>
+
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
+
+  <%block name="js_extra"/>
   <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
 </body>
 </html>

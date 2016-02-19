@@ -34,6 +34,9 @@ from django.core.urlresolvers import reverse
         window.Range.prototype = { };
     }
   </script>
+</%block>
+
+<%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/instructor_dashboard/proctoring.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/date.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
@@ -55,13 +58,14 @@ from django.core.urlresolvers import reverse
 
   <%static:js group='module-descriptor-js'/>
   <%static:js group='instructor_dash'/>
-  <%static:js group='application'/>
 
   ## Backbone classes declared explicitly until RequireJS is supported
   <script type="text/javascript" src="${static.url('js/models/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/utils/animation.js')}"></script>
+
+  <%static:get_deferred_js/>
 </%block>
 
 ## Include Underscore templates

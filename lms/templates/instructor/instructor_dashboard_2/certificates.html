@@ -4,14 +4,6 @@
 import json
 %>
 
-<%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
-        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}", "${generate_bulk_certificate_exceptions_url}");
-</%static:require_module>
-
-<%static:require_module module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
-        CertificateInvalidationFactory('${json.dumps(certificate_invalidations)}', '${certificate_invalidation_view_url}');
-</%static:require_module>
-
 <%page args="section_data"/>
 <div class="certificates-wrapper">
 
@@ -191,3 +183,13 @@ import json
     </div>
 
 </div>
+
+<%static:deferred_js>
+    <%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
+        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}", "${generate_bulk_certificate_exceptions_url}");
+    </%static:require_module>
+
+    <%static:require_module module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
+        CertificateInvalidationFactory('${json.dumps(certificate_invalidations)}', '${certificate_invalidation_view_url}');
+    </%static:require_module>
+</%static:deferred_js>
