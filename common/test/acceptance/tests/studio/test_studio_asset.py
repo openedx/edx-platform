@@ -27,11 +27,15 @@ class AssetIndexTest(StudioCourseTest):
         Populate the children of the test course fixture.
         """
         self.course_fixture.add_asset(['image.jpg', 'textbook.pdf'])
+        from time import sleep
+        sleep(0.5)
 
     def test_page_existence(self):
         """
         Make sure that the page is accessible.
         """
+        # from nose.tools import set_trace
+        # set_trace()
         self.asset_page.visit()
 
     def test_type_filter_exists(self):
