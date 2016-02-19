@@ -19,11 +19,9 @@
         };
         defineDependency("jQuery", "jquery");
         defineDependency("_", "underscore");
-        if (window._ && window._.str) {
-            define("underscore.string", [], function () {return window._.str;});
-        }
-        else {
-            console.error("Expected _.str (underscore.string) to be on the window object, but not found.");
+        defineDependency("s", "underscore.string");
+        if (window._ && window.s) {
+            window._.str = window.s;
         }
         defineDependency("gettext", "gettext");
         defineDependency("Logger", "logger");
