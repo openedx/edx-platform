@@ -1055,7 +1055,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         }
         return self.video.student_view_data(context)
 
-    def verify_result_with_fallback_url(self, result):
+    def verify_result_with_fallback_url(self, result, edx_video_id):
         """
         Verifies the result is as expected when returning "fallback" video data (not from VAL).
         """
@@ -1066,10 +1066,11 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "duration": None,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
                 "encoded_videos": {"fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0}},
+                "edx_video_id": edx_video_id,
             }
         )
 
-    def verify_result_with_val_profile(self, result):
+    def verify_result_with_val_profile(self, result, edx_video_id):
         """
         Verifies the result is as expected when returning video data from VAL.
         """
@@ -1083,6 +1084,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "only_on_web": False,
                 "duration": self.TEST_DURATION,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                "edx_video_id": edx_video_id,
             }
         )
 
@@ -1093,7 +1095,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
 
     def test_no_edx_video_id(self):
         result = self.get_result()
-        self.verify_result_with_fallback_url(result)
+        self.verify_result_with_fallback_url(result, edx_video_id='')
 
     @ddt.data(
         *itertools.product([True, False], [True, False], [True, False])
@@ -1105,9 +1107,9 @@ class TestVideoDescriptorStudentViewJson(TestCase):
             self.setup_val_video(associate_course_in_val)
         result = self.get_result(allow_cache_miss)
         if video_exists_in_val and (associate_course_in_val or allow_cache_miss):
-            self.verify_result_with_val_profile(result)
+            self.verify_result_with_val_profile(result, edx_video_id=self.video.edx_video_id)
         else:
-            self.verify_result_with_fallback_url(result)
+            self.verify_result_with_fallback_url(result, edx_video_id=self.video.edx_video_id)
 
 
 @attr('shard_1')

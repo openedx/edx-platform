@@ -872,4 +872,5 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "duration": val_video_data.get('duration', None),
             "transcripts": transcripts,
             "encoded_videos": encoded_videos,
+            "edx_video_id": self.edx_video_id,
         }
