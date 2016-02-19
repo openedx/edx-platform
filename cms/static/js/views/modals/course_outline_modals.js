@@ -770,7 +770,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (course.get('self_paced')) {
                 editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
                 _.each(tabs, function (tab) {
-                    tab.editors = _.without(editors, ReleaseDateEditor, DueDateEditor);
+                    tab.editors = _.without(tab.editors, ReleaseDateEditor, DueDateEditor);
                 });
             }
             return new SettingsXBlockModal($.extend({
