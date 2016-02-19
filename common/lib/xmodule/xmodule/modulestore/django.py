@@ -265,7 +265,7 @@ class ModuleI18nService(object):
                 # TODO: Move these values into settings.  We might allow for multiple possibilities
                 # for these values through the use of lists or tuples.  For example, instead of
                 # 'django' an XBlock developer could specify 'xblock_name' for their PO file.
-                xblock_domain = 'django'
+                xblock_domain = kwargs.get('xblock_domain', 'django')
                 xblock_locale = '/conf/locale'
                 locale_path = kwargs.get('xblock_root', '') + xblock_locale
                 translator = gettext.translation(
