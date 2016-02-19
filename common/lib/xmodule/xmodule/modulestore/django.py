@@ -268,10 +268,11 @@ class ModuleI18nService(object):
                 xblock_domain = kwargs.get('xblock_domain', 'django')
                 xblock_locale = '/conf/locale'
                 locale_path = kwargs.get('xblock_root', '') + xblock_locale
+                selected_language = get_language()
                 translator = gettext.translation(
                     xblock_domain,
                     locale_path,
-                    [to_locale(get_language())]
+                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
                 )
                 _ = translator.ugettext
             except IOError:
