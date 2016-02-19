@@ -359,7 +359,8 @@ def xblock_container_handler(request, usage_key_string):
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
             response = _get_module_info(
-                _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True, escape_html=False
+                _get_xblock(usage_key, request.user), include_ancestor_info=True,
+                include_publishing_info=True, escape_html=False
             )
         return JsonResponse(response)
     else:
@@ -741,7 +742,8 @@ def _get_xblock(usage_key, user):
             return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
 
-def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False, escape_html=True):
+def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False,
+                     include_publishing_info=False, escape_html=True):
     """
     metadata, data, id representation of a leaf module fetcher.
     :param usage_key: A UsageKey
@@ -762,7 +764,8 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
 
         # Note that children aren't being returned until we have a use case.
         xblock_info = create_xblock_info(
-            xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=include_ancestor_info, escape_html=escape_html
+            xblock, data=data, metadata=own_metadata(xblock),
+            include_ancestor_info=include_ancestor_info, escape_html=escape_html
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
