@@ -97,7 +97,7 @@ class TestUserSignup(TestCase):
         self.assertIn('password', mail.outbox[0].body)
         self.assertIn('John Doe', mail.outbox[0].body)
 
-    def test_uses_existing_org(self):
+    def test_does_not_use_existing_org(self):
         Organization.objects.create(key="acme", display_name="ACME Inc")
         self.assertEqual(Organization.objects.filter(key='acme').count(), 1)
 
@@ -109,10 +109,10 @@ class TestUserSignup(TestCase):
                    'secret_key': 'secret_key'}
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Organization.objects.all().count(), 1)
+        self.assertEqual(Organization.objects.all().count(), 2)
         organization = Organization.objects.get(key='acme')
         self.assertEqual(User.objects.filter(email='jane@doe.com').count(), 1)
-        self.assertIn(organization, User.objects.get(email='jane@doe.com').organizations.all())
+        self.assertNotIn(organization, User.objects.get(email='jane@doe.com').organizations.all())
 
 
 

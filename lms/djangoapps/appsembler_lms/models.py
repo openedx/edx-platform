@@ -21,7 +21,7 @@ class Organization(TimeStampedModel):
     )
     display_name = models.CharField(
         help_text=_('The display name of this organization.'),
-        unique=True,
+        unique=False,
         max_length=128,
     )
     users = models.ManyToManyField(
