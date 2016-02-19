@@ -24,6 +24,7 @@ from path import Path as path
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
+from util.db import MigrationModules
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 # This patch disables the commit_on_success decorator during tests
@@ -188,6 +189,9 @@ DATABASES = {
 
 }
 
+# Earlier migrations were disabled during Python unit tests. If we enable migrations
+# these data migrations seed data that cause tests to fail. So for now they are being
+# skipped. Please do not add to this list.
 DISABLED_DATA_MIGRATIONS = [
     'bulk_email.migrations.0002_data__load_course_email_template',
     'certificates.migrations.0002_data__certificatehtmlviewconfiguration_data',
@@ -198,36 +202,8 @@ DISABLED_DATA_MIGRATIONS = [
     'embargo.migrations.0002_data__add_countries',
 ]
 
-os.environ['ENABLE_MIGRATIONS'] = '1'
-from importlib import import_module
-
-
-class MigrationModules(object):
-    """ Class which allows disabling migrations during tests. """
-
-    patched = False
-
-    def disable_data_migrations(self):
-        """ Disable data migrations which are causing test failures. """
-        if self.patched is not True:
-            for migration in DISABLED_DATA_MIGRATIONS:
-                migration_class = import_module(migration).Migration
-                migration_class.operations = []
-        self.patched = True
-
-    def __contains__(self, item):
-        if os.getenv('ENABLE_MIGRATIONS'):
-            # Since this requires importing modules
-            # we wait till the migrations are about to run.
-            self.disable_data_migrations()
-            return False
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
-
-
-MIGRATION_MODULES = MigrationModules()
+# This hack disables migrations during tests. We want to create tables directly from models for speed.
+MIGRATION_MODULES = MigrationModules(os.getenv('ENABLE_MIGRATIONS'), DISABLED_DATA_MIGRATIONS)
 
 
 CACHES = {

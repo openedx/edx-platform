@@ -4,6 +4,7 @@ Utility functions related to databases.
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
 from functools import wraps
+from importlib import import_module
 import random
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
@@ -231,3 +232,32 @@ def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
         cid = random.randint(minimum, maximum)
 
     return cid
+
+
+class MigrationModules(object):
+    """ Class which allows disabling migrations during tests. """
+
+    patched = False
+
+    def __init__(self, enable_migrations, disabled_data_migrations):
+        self.enable_migrations = enable_migrations
+        self.disabled_data_migrations = disabled_data_migrations
+
+    def disable_data_migrations(self):
+        """ Disable data migrations which are causing test failures. """
+        if self.patched is not True:
+            for migration in self.disabled_data_migrations:
+                migration_class = import_module(migration).Migration
+                migration_class.operations = []
+        self.patched = True
+
+    def __contains__(self, item):
+        if self.enable_migrations:
+            # Since this requires importing modules
+            # we wait till the migrations are about to run.
+            self.disable_data_migrations()
+            return False
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
