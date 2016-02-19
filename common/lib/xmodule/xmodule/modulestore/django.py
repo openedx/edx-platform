@@ -266,7 +266,7 @@ class ModuleI18nService(object):
                 # for these values through the use of lists or tuples.  For example, instead of
                 # 'django' an XBlock developer could specify 'xblock_name' for their PO file.
                 xblock_domain = kwargs.get('xblock_domain', 'django')
-                xblock_locale = '/conf/locale'
+                xblock_locale = kwargs.get('xblock_locale', '/conf/locale')
                 locale_path = kwargs.get('xblock_root', '') + xblock_locale
                 selected_language = get_language()
                 translator = gettext.translation(
