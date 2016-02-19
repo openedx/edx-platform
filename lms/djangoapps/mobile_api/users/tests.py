@@ -253,23 +253,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             )
         )
 
-    def test_no_facebook_url(self):
-        self.login_and_enroll()
-
-        response = self.api_response()
-        course_data = response.data[0]['course']
-        self.assertIsNone(course_data['social_urls']['facebook'])
-
-    def test_facebook_url(self):
-        self.login_and_enroll()
-
-        self.course.facebook_url = "http://facebook.com/test_group_page"
-        self.store.update_item(self.course, self.user.id)
-
-        response = self.api_response()
-        course_data = response.data[0]['course']
-        self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
-
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_discussion_url(self):
         self.login_and_enroll()

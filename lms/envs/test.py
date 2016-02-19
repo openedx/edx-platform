@@ -293,9 +293,7 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
-FEATURES['ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
-FEATURES['ENABLE_COURSE_BLOCKS_NAVIGATION_API'] = True
 
 ###################### Payment ##############################3
 # Enable fake payment processing page
