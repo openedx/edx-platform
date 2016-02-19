@@ -202,6 +202,7 @@ DISABLED_DATA_MIGRATIONS = [
     'embargo.migrations.0002_data__add_countries',
 ]
 
+os.environ['ENABLE_MIGRATIONS'] = '1'
 # This hack disables migrations during tests. We want to create tables directly from models for speed.
 MIGRATION_MODULES = MigrationModules(os.getenv('ENABLE_MIGRATIONS'), DISABLED_DATA_MIGRATIONS)
 
