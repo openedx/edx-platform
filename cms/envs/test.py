@@ -130,23 +130,41 @@ DATABASES = {
 }
 
 
-class DisableMigrations(object):  # pylint: disable=missing-docstring
+DISABLED_DATA_MIGRATIONS = [
+    'dark_lang.migrations.0002_data__enable_on_install',
+    'embargo.migrations.0002_data__add_countries',
+]
+
+os.environ['ENABLE_MIGRATIONS'] = '1'
+from importlib import import_module
+
+
+class MigrationModules(object):
+    """ Class which allows disabling migrations during tests. """
+
+    patched = False
+
+    def disable_data_migrations(self):
+        """ Disable data migrations which are causing test failures. """
+        if self.patched is not True:
+            for migration in DISABLED_DATA_MIGRATIONS:
+                migration_class = import_module(migration).Migration
+                migration_class.operations = []
+        self.patched = True
+
     def __contains__(self, item):
-        if item in [
-            'bulk_email',
-            'certificates',
-            'commerce',
-            'dark_lang',
-            'edxval',
-            'embargo',
-        ]:
-            return True
-        return False
+        if os.getenv('ENABLE_MIGRATIONS'):
+            # Since this requires importing modules
+            # we wait till the migrations are about to run.
+            self.disable_data_migrations()
+            return False
+        return True
 
     def __getitem__(self, item):
         return "notmigrations"
 
-MIGRATION_MODULES = DisableMigrations()
+
+MIGRATION_MODULES = MigrationModules()
 
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview"

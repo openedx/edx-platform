@@ -188,24 +188,46 @@ DATABASES = {
 
 }
 
+DISABLED_DATA_MIGRATIONS = [
+    'bulk_email.migrations.0002_data__load_course_email_template',
+    'certificates.migrations.0002_data__certificatehtmlviewconfiguration_data',
+    'certificates.migrations.0003_data__default_modes',
+    'commerce.migrations.0001_data__add_ecommerce_service_user',
+    'dark_lang.migrations.0002_data__enable_on_install',
+    'edxval.migrations.0002_data__default_profiles',
+    'embargo.migrations.0002_data__add_countries',
+]
 
-class DisableMigrations(object):  # pylint: disable=missing-docstring
+os.environ['ENABLE_MIGRATIONS'] = '1'
+from importlib import import_module
+
+
+class MigrationModules(object):
+    """ Class which allows disabling migrations during tests. """
+
+    patched = False
+
+    def disable_data_migrations(self):
+        """ Disable data migrations which are causing test failures. """
+        if self.patched is not True:
+            for migration in DISABLED_DATA_MIGRATIONS:
+                migration_class = import_module(migration).Migration
+                migration_class.operations = []
+        self.patched = True
+
     def __contains__(self, item):
-        if item in [
-            'bulk_email',
-            'certificates',
-            'commerce',
-            'dark_lang',
-            'edxval',
-            'embargo',
-        ]:
-            return True
-        return False
+        if os.getenv('ENABLE_MIGRATIONS'):
+            # Since this requires importing modules
+            # we wait till the migrations are about to run.
+            self.disable_data_migrations()
+            return False
+        return True
 
     def __getitem__(self, item):
         return "notmigrations"
 
-MIGRATION_MODULES = DisableMigrations()
+
+MIGRATION_MODULES = MigrationModules()
 
 
 CACHES = {
