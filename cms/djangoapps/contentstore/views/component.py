@@ -116,7 +116,7 @@ def container_handler(request, usage_key_string):
 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
-            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, escape_html=False)
+            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
             if is_unit_page:
                 add_container_page_publishing_info(xblock, xblock_info)
