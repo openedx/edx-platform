@@ -1,5 +1,9 @@
-<%! from openedx.core.djangolib.markup import HTML, ugettext as _ %>
 <%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import Text, HTML
+%>
 
 <%inherit file="base.html" />
 
@@ -80,7 +84,7 @@
                   ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
                   ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
                   <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-course-org tip-error-new-course-org" />
-                  <span class="tip" id="tip-new-course-org">${_("The name of the organization sponsoring the course. {strong_start}Note: The organization name is part of the course URL.{strong_end} This cannot be changed, but you can set a different display name in Advanced Settings later.").format(
+                  <span class="tip" id="tip-new-course-org">${Text(_("The name of the organization sponsoring the course. {strong_start}Note: The organization name is part of the course URL.{strong_end} This cannot be changed, but you can set a different display name in Advanced Settings later.")).format(
                       strong_start=HTML('<strong>'),
                       strong_end=HTML('</strong>'),
                   )}</span>
@@ -93,7 +97,7 @@
                   ## seen when filling out the form to create a new course. The number here is
                   ## short for "Computer Science 101". It can contain letters but cannot contain spaces.
                   <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" required placeholder="${_('e.g. CS101')}" aria-describedby="tip-new-course-number tip-error-new-course-number" />
-                  <span class="tip" id="tip-new-course-number">${_("The unique number that identifies your course within your organization. {strong_start}Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.{strong_end}").format(
+                  <span class="tip" id="tip-new-course-number">${Text(_("The unique number that identifies your course within your organization. {strong_start}Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.{strong_end}")).format(
                       strong_start=HTML('<strong>'),
                       strong_end=HTML('</strong>'),
                   )}</span>
@@ -105,7 +109,7 @@
                   ## Translators: This is an example for the "run" used to identify different
                   ## instances of a course, seen when filling out the form to create a new course.
                   <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" required placeholder="${_('e.g. 2014_T1')}" aria-describedby="tip-new-course-run tip-error-new-course-run" />
-                  <span class="tip" id="tip-new-course-run">${_("The term in which your course will run. {strong_start}Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.{strong_end}").format(
+                  <span class="tip" id="tip-new-course-run">${Text(_("The term in which your course will run. {strong_start}Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.{strong_end}")).format(
                       strong_start=HTML('<strong>'),
                       strong_end=HTML('</strong>'),
                   )}</span>
@@ -165,7 +169,7 @@
                   ## for "Computer Science Problems". The example number may contain letters
                   ## but must not contain spaces.
                   <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
-                  <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library. {strong_start}Note: This is part of your library URL, so no spaces or special characters are allowed.{strong_end} This cannot be changed.").format(
+                  <span class="tip" id="tip-new-library-number">${Text(_("The unique code that identifies this library. {strong_start}Note: This is part of your library URL, so no spaces or special characters are allowed.{strong_end} This cannot be changed.")).format(
                       strong_start=HTML('<strong>'),
                       strong_end=HTML('</strong>'),
                   )}</span>
@@ -228,7 +232,7 @@
               </div>
 
               <div class="status-message">
-                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.').format(
+                <p class="copy">${Text(_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.')).format(
                     link_start=HTML('<a href="#" class="action-reload">'),
                     link_end=HTML('</a>'),
                   )}</p>
@@ -575,7 +579,7 @@
       % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
         <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
-        <p>${_("In order to create courses in {studio_name}, you must {link_start}contact {platform_name} staff to help you create a course{link_end}.").format(
+        <p>${Text(_("In order to create courses in {studio_name}, you must {link_start}contact {platform_name} staff to help you create a course{link_end}.")).format(
             studio_name=settings.STUDIO_NAME,
             platform_name=settings.PLATFORM_NAME,
             link_start=HTML('<a href="mailto:{email}">').format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
@@ -593,7 +597,7 @@
       % elif course_creator_status == "denied":
       <div class="bit">
         <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
-        <p>${_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.").format(
+        <p>${Text(_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.")).format(
             studio_name=settings.STUDIO_NAME,
             platform_name=settings.PLATFORM_NAME,
             link_start=HTML('<a href="mailto:{email}">').format(email=settings.TECH_SUPPORT_EMAIL),
