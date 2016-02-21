@@ -1448,8 +1448,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         potential_set = set(super(DescriptorSystem, self).applicable_aside_types(block))
         if getattr(block, 'xmodule_runtime', None) is not None:
-            application_set = set(block.xmodule_runtime.applicable_aside_types(block))
-            return list(potential_set.intersection(application_set))
+            if hasattr(block.xmodule_runtime, 'applicable_aside_types'):
+                application_set = set(block.xmodule_runtime.applicable_aside_types(block))
+                return list(potential_set.intersection(application_set))
         return list(potential_set)
 
     def resource_url(self, resource):

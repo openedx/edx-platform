@@ -30,7 +30,7 @@ from contentstore.utils import (
 )
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
-from contentstore.views.preview import get_preview_fragment
+from contentstore.views.preview import get_preview_fragment, StudioPermissionsService
 from contentstore.utils import is_self_paced
 
 from openedx.core.lib.gating import api as gating_api
@@ -198,6 +198,27 @@ def xblock_handler(request, usage_key_string):
         )
 
 
+class StudioViewModuleRuntime(object):
+    """
+    An extremely minimal ModuleSystem shim used for studio_view.
+    This only exists so that we can provide use-specific runtime services within studio_view,
+    which is not normally bound to a particular user (is a descriptor-only view).
+    """
+    def __init__(self, request):
+        self._request = request
+
+    def service(self, block, service_name):
+        """
+        This block is not bound to a user but some blocks (LibraryContentModule) may need
+        user-specific services to check for permissions, etc.
+        If we return None here, CombinedSystem will load services from the descriptor runtime.
+        """
+        if block.service_declaration(service_name) is not None:
+            if service_name == "studio_user_permissions":
+                return StudioPermissionsService(self._request)
+        return None
+
+
 @require_http_methods(("GET"))
 @login_required
 @expect_json
@@ -231,6 +252,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
         ))
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
+            if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
+                xblock.xmodule_runtime = StudioViewModuleRuntime(request)
+
             try:
                 fragment = xblock.render(view_name)
             # catch exceptions indiscriminately, since after this point they escape the

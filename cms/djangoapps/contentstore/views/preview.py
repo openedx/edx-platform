@@ -14,7 +14,6 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
@@ -188,8 +187,6 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
-
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -215,9 +212,9 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "i18n": ModuleI18nService(),
             "field-data": field_data,
-            "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
+            "studio_user_permissions": StudioPermissionsService(request),
         },
     )
 
