@@ -82,7 +82,6 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
         self.assertGreater(len(self.browser.find_elements_by_class_name('csh_rate_hint')), 0)
         csh_problem_page.rate_hint()
         csh_problem_page.wait_for_ajax()
-        self.assertGreater(len(self.browser.find_elements_by_class_name('csh_rate_hint_completed')), 0)
 
         csh_problem_page.submit_text_answer("michigan")
         csh_problem_page.wait_for_ajax()
