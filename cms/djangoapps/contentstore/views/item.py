@@ -21,6 +21,7 @@ from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
 from xblock.fields import Scope
 from xblock.fragment import Fragment
+from xblock_django.user_service import DjangoXBlockUserService
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
@@ -30,7 +31,7 @@ from contentstore.utils import (
 )
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
-from contentstore.views.preview import get_preview_fragment, StudioPermissionsService
+from contentstore.views.preview import get_preview_fragment
 from contentstore.utils import is_self_paced
 
 from openedx.core.lib.gating import api as gating_api
@@ -198,14 +199,34 @@ def xblock_handler(request, usage_key_string):
         )
 
 
-class StudioViewModuleRuntime(object):
+class StudioPermissionsService(object):
     """
-    An extremely minimal ModuleSystem shim used for studio_view.
-    This only exists so that we can provide use-specific runtime services within studio_view,
-    which is not normally bound to a particular user (is a descriptor-only view).
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentDescriptor (and library_tools.py).
     """
-    def __init__(self, request):
-        self._request = request
+    def __init__(self, user):
+        self._user = user
+
+    def can_read(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_read_access(self._user, course_key)
+
+    def can_write(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_write_access(self._user, course_key)
+
+
+class StudioEditModuleRuntime(object):
+    """
+    An extremely minimal ModuleSystem shim used for XBlock edits and studio_view.
+    (i.e. whenever we're not using PreviewModuleSystem.) This is required to make information
+    about the current user (especially permissions) available via services as needed.
+    """
+    def __init__(self, user):
+        self._user = user
 
     def service(self, block, service_name):
         """
@@ -214,8 +235,10 @@ class StudioViewModuleRuntime(object):
         If we return None here, CombinedSystem will load services from the descriptor runtime.
         """
         if block.service_declaration(service_name) is not None:
+            if service_name == "user":
+                return DjangoXBlockUserService(self._user)
             if service_name == "studio_user_permissions":
-                return StudioPermissionsService(self._request)
+                return StudioPermissionsService(self._user)
         return None
 
 
@@ -253,7 +276,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
-                xblock.xmodule_runtime = StudioViewModuleRuntime(request)
+                xblock.xmodule_runtime = StudioEditModuleRuntime(request.user)
 
             try:
                 fragment = xblock.render(view_name)
@@ -399,6 +422,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
             old_metadata = own_metadata(xblock)
         if old_content is None:
             old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+        xblock.xmodule_runtime = StudioEditModuleRuntime(user)
         xblock.editor_saved(user, old_metadata, old_content)
 
     # Update after the callback so any changes made in the callback will get persisted.
@@ -635,6 +659,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
+            dest_module.xmodule_runtime = StudioEditModuleRuntime(user)
             children_handled = dest_module.studio_post_duplicate(store, source_item)
 
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).

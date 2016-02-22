@@ -133,28 +133,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return result
 
 
-class StudioPermissionsService(object):
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentDescriptor (and library_tools.py).
-    """
-
-    def __init__(self, request):
-        super(StudioPermissionsService, self).__init__()
-        self._request = request
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._request.user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._request.user, course_key)
-
-
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -214,7 +192,6 @@ def _preview_module_system(request, descriptor, field_data):
             "field-data": field_data,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
-            "studio_user_permissions": StudioPermissionsService(request),
         },
     )
 
