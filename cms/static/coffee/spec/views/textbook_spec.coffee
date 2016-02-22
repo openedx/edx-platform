@@ -5,16 +5,6 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     "js/spec_helpers/modal_helpers", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
 
-    beforeEach ->
-        # remove this when we upgrade jasmine-jquery
-        @addMatchers
-            toContainText: (text) ->
-                trimmedText = $.trim(@actual.text())
-                if text and $.isFunction(text.test)
-                    return text.test(trimmedText)
-                else
-                    return trimmedText.indexOf(text) != -1;
-
     describe "ShowTextbook", ->
         tpl = readFixtures('show-textbook.underscore')
 
