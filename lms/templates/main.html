@@ -39,12 +39,6 @@ from branding import api as branding_api
       </script>
   % endif
 
-  <%
-    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
-  %>
-
-  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
-
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
@@ -60,56 +54,14 @@ from branding import api as branding_api
   %>
   <link rel="stylesheet" href="${static.url(application_css_path)}" type="text/css" media="all" />
 
-  % if disable_courseware_js:
-    <%static:js group='base_vendor'/>
-    <%static:js group='base_application'/>
-  % else:
-    <%static:js group='main_vendor'/>
-    <%static:js group='application'/>
-  % endif
-
-  <script>
-    window.baseUrl = "${settings.STATIC_URL}";
-    (function (require) {
-      require.config({
-          baseUrl: window.baseUrl
-      });
-    }).call(this, require || RequireJS.require);
-  </script>
-  <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
-
-  <%block name="js_overrides">
-  </%block>
-
-  % if not disable_courseware_js:
-    <%static:js group='module-js'/>
-  % endif
-
   <%block name="headextra"/>
 
   <%static:optional_include_mako file="head-extra.html" is_theming_enabled="True" />
 
   <%include file="widgets/optimizely.html" />
-  <%include file="widgets/segment-io.html" />
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
-
-<% ga_acct = static.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
-% if ga_acct:
-    <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', '${ga_acct}']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-    </script>
-% endif
-
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
@@ -137,11 +89,63 @@ from branding import api as branding_api
   </div>
 % endif
 
-  <%block name="js_extra"/>
+  <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+  %>
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+
+    % if disable_courseware_js:
+        <%static:js group='base_vendor'/>
+        <%static:js group='base_application'/>
+    % else:
+        <%static:js group='main_vendor'/>
+        <%static:js group='application'/>
+    % endif
+
+    <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
+    <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    (function (require) {
+      require.config({
+          baseUrl: window.baseUrl
+      });
+    }).call(this, require || RequireJS.require);
+    </script>
+
+    <%block name="js_overrides">
+    </%block>
+
+    % if not disable_courseware_js:
+        <%static:js group='module-js'/>
+    % endif
+
+    <%include file="widgets/segment-io.html" />
+
+    <% ga_acct = static.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
+    % if ga_acct:
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', '${ga_acct}']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+        </script>
+    % endif
+
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
+
   <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
+
+  <%block name="js_extra" />
+
+  <%static:get_deferred_js />
 </body>
 </html>
 

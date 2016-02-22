@@ -13,15 +13,19 @@ from django.core.urlresolvers import reverse
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
-
-<%include file="_js_head_dependencies.html" />
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
 </%block>
 
-<%block name="js_extra">
-## Enable fast preview to fix discussion MathJax rendering bug when page first loads.
-<%include file="_js_body_dependencies.html" args="disable_fast_preview=False"/>
-<%static:js group='discussion'/>
-</%block>
+<%static:deferred_js>
+    <script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+    <%static:js group='discussion_vendor'/>
+
+    ## Enable fast preview to fix discussion MathJax rendering bug when page first loads.
+    <%include file="/mathjax_include.html" args="disable_fast_preview=False"/>
+    <%static:js group='discussion'/>
+</%static:deferred_js>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
