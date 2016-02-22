@@ -66,6 +66,7 @@
             'jquery.url': 'empty:',
             'backbone': 'empty:',
             'underscore': 'empty:',
+            'underscore.string': 'empty:',
             'logger': 'empty:',
             'utility': 'empty:',
             'URI': 'empty:',

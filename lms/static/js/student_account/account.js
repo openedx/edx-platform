@@ -84,7 +84,7 @@ var edx = edx || {};
         },
 
         render: function() {
-            this.$el.html(_.template($('#account-tpl').html(), {}));
+            this.$el.html(_.template($('#account-tpl').html())({}));
             this.$email = $('#new-email', this.$el);
             this.$password = $('#password', this.$el);
             this.$emailStatus = $('#new-email-status', this.$el);
@@ -113,7 +113,7 @@ var edx = edx || {};
             event.preventDefault();
             this.clearStatus();
 
-            self = this;
+            var self = this;
             $.ajax({
                 url: 'password',
                 type: 'POST',
