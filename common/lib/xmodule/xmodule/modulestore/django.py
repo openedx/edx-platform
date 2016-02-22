@@ -246,8 +246,23 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    def __init__(self):
+        self._xBlock_i18n_info = {}
+
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
+
+    @property
+    def xBlock_i18n_info(self):
+        """
+        :return _xBlock_i18n_info dictionary
+        xBlock_i18n_info = {
+            'root': xBlock root path,
+            'domain': xBlock domain name,
+            'locale': xBlock locale info
+        }
+        """
+        return self._xBlock_i18n_info
 
     def ugettext(self, string):
         """
@@ -264,11 +279,9 @@ class ModuleI18nService(object):
         translated_string = unicode(string)
         if translated_string:
             try:
-                xblock_domain = 'django'
-                xblock_locale_dir = '/conf/locale'
-                calling_module = inspect.stack()[1]
-                xblock_locale_root = os.path.dirname(calling_module[1])
-                xblock_locale_path = xblock_locale_root + xblock_locale_dir
+                xblock_domain = self.xBlock_i18n_info.get('domain', 'django')
+                xblock_locale = self.xBlock_i18n_info.get('locale', '/conf/locale')
+                xblock_locale_path = self.xBlock_i18n_info.get('root', '') + xblock_locale
                 selected_language = get_language()
                 translator = gettext.translation(
                     xblock_domain,
