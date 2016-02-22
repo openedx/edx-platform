@@ -127,6 +127,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance['marketing_link'] = marketing_link
     context_instance['is_any_marketing_link_set'] = is_any_marketing_link_set
     context_instance['is_marketing_link_set'] = is_marketing_link_set
+    context_instance['scratch'] = {}
 
     # In various testing contexts, there might not be a current request context.
     request_context = get_template_request_context()
@@ -156,5 +157,4 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     """
 
     dictionary = dictionary or {}
-    dictionary['scratch'] = {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

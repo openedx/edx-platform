@@ -1,0 +1,10 @@
+<%namespace name='static' file='../static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+<%static:js group='discussion_vendor'/>
+<%static:js group='discussion'/>
+
+## Enable fast preview to fix discussion MathJax rendering bug when page first loads.
+<%include file="/mathjax_include.html" args="disable_fast_preview=False"/>
