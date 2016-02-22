@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import UsageKey
 import xmodule.graders as xmgraders
@@ -27,7 +28,8 @@ from certificates.models import CertificateStatuses
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
-                    'level_of_education', 'mailing_address', 'goals', 'meta')
+                    'level_of_education', 'mailing_address', 'city', 'country',
+                    'goals', 'meta')
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -222,6 +224,15 @@ def enrolled_students_features(course_key, features):
     if include_team_column:
         students = students.prefetch_related('teams')
 
+    def extract_attr(student, feature):
+        """Evaluate a student attribute that is ready for JSON serialization"""
+        attr = getattr(student, feature)
+        try:
+            DjangoJSONEncoder().default(attr)
+            return attr
+        except TypeError:
+            return unicode(attr)
+
     def extract_student(student, features):
         """ convert student to dictionary """
         student_features = [x for x in STUDENT_FEATURES if x in features]
@@ -236,11 +247,11 @@ def enrolled_students_features(course_key, features):
                 meta_key = feature.split('.')[1]
                 meta_features.append((feature, meta_key))
 
-        student_dict = dict((feature, getattr(student, feature))
+        student_dict = dict((feature, extract_attr(student, feature))
                             for feature in student_features)
         profile = student.profile
         if profile is not None:
-            profile_dict = dict((feature, getattr(profile, feature))
+            profile_dict = dict((feature, extract_attr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
 
