@@ -28,27 +28,20 @@ COURSE_BLOCK_ACCESS_TRANSFORMERS = [
 
 def get_course_blocks(
         user,
-        root_block_usage_key,
+        starting_block_usage_key,
         transformers=None,
 ):
     """
     A higher order function implemented on top of the
     block_structure.get_blocks function returning a transformed block
-    structure for the given user starting at root_block_usage_key.
-
-    Note: The current implementation requires the root_block_usage_key
-    to be the root block of its corresponding course. However, this
-    is a short-term limitation, which will be addressed in a coming
-    ticket (https://openedx.atlassian.net/browse/MA-1604). Once that
-    ticket is implemented, callers will be able to get course blocks
-    starting at any arbitrary location within a block structure.
+    structure for the given user starting at starting_block_usage_key.
 
     Arguments:
         user (django.contrib.auth.models.User) - User object for
             which the block structure is to be transformed.
 
-        root_block_usage_key (UsageKey) - The usage_key for the root
-            of the block structure that is being accessed.
+        starting_block_usage_key (UsageKey) - Specifies the starting block
+            of the block structure that is to be transformed.
 
         transformers (BlockStructureTransformers) - A collection of
             transformers whose transform methods are to be called.
@@ -56,26 +49,21 @@ def get_course_blocks(
 
     Returns:
         BlockStructureBlockData - A transformed block structure,
-            starting at root_block_usage_key, that has undergone the
+            starting at starting_block_usage_key, that has undergone the
             transform methods for the given user and the course
             associated with the block structure.  If using the default
             transformers, the transformed block structure will be
             exactly equivalent to the blocks that the given user has
             access.
     """
-    if root_block_usage_key != modulestore().make_course_usage_key(root_block_usage_key.course_key):
-        # Enforce this check for now until MA-1604 is implemented.
-        # Otherwise, callers will get incorrect block data after a
-        # new version of the course is published, since
-        # clear_course_from_cache only clears the cached block
-        # structures starting at the root block of the course.
-        raise NotImplementedError
-
     if not transformers:
         transformers = BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS)
-    transformers.usage_info = CourseUsageInfo(root_block_usage_key.course_key, user)
+    transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user)
 
-    return _get_block_structure_manager(root_block_usage_key.course_key).get_transformed(transformers)
+    return _get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
+        transformers,
+        starting_block_usage_key,
+    )
 
 
 def get_course_in_cache(course_key):

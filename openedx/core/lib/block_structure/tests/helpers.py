@@ -219,7 +219,7 @@ class ChildrenMapTestMixin(object):
         for block_key, children in enumerate(children_map):
             # Verify presence
             self.assertEquals(
-                block_structure.has_block(block_key),
+                block_key in block_structure,
                 block_key not in missing_blocks,
                 'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
                     unicode(block_key)

@@ -88,14 +88,14 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
         BlockNavigationTransformer.collect(block_structure)
         block_structure._collect_requested_xblock_fields()
 
-        self.assertTrue(block_structure.has_block(chapter_x_key))
+        self.assertIn(chapter_x_key, block_structure)
 
         # transform phase
         BlockDepthTransformer().transform(usage_info=None, block_structure=block_structure)
         BlockNavigationTransformer(0).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
 
-        self.assertTrue(block_structure.has_block(chapter_x_key))
+        self.assertIn(chapter_x_key, block_structure)
 
         course_descendants = block_structure.get_transformer_block_field(
             course_usage_key,
