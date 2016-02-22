@@ -145,7 +145,7 @@ formulaEquationPreview.enable = function () {
                             console.log("[FormulaEquationInput] Oops no mathjax for ", latex);
                             // Fall back to modifying the actual element.
                             var textNode = previewElement.childNodes[0];
-                            textNode.data = "\\[" + latex + "\\]";
+                            textNode.data = "\\(" + latex + "\\)";
                             MathJax.Hub.Queue(["Typeset", MathJax.Hub, previewElement]);
                         }
                     });
