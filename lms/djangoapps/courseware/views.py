@@ -906,7 +906,7 @@ def course_about(request, course_id):
         ecommerce_checkout_link = ''
         professional_mode = ''
         ecomm_service = EcommerceService()
-        if ecomm_service.is_enabled() and (
+        if ecomm_service.is_enabled(request) and (
                 CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
         ):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
@@ -944,7 +944,7 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'in_cart': in_cart,
-            'ecommerce_checkout': ecomm_service.is_enabled(),
+            'ecommerce_checkout': ecomm_service.is_enabled(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
