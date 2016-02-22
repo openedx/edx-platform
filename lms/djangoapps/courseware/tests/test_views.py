@@ -39,6 +39,7 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
@@ -271,13 +272,23 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
-        self.assert_enrollment_link_present(is_anonymous=is_anonymous)
+        if not is_anonymous:
+            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
+        else:
+            request = self.request_factory.get("foo")
+            request.user = AnonymousUser()
+            self.assertEqual(EcommerceService().is_enabled(request), False)
 
     @ddt.data(True, False)
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
-        self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
+        if not is_anonymous:
+            self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
+        else:
+            request = self.request_factory.get("foo")
+            request.user = AnonymousUser()
+            self.assertEqual(EcommerceService().is_enabled(request), False)
 
     def test_user_groups(self):
         # depreciated function
