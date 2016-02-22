@@ -1,9 +1,9 @@
 (function() {
     'use strict';
     define([
-        'jquery', 'common/js/components/utils/view_utils', 'js/spec_helpers/edit_helpers',
+        'jquery', 'js/spec_helpers/edit_helpers',
         'js/views/module_edit', 'js/models/module_info', 'xmodule'],
-    function($, ViewUtils, edit_helpers, ModuleEdit, ModuleModel) {
+    function($, edit_helpers, ModuleEdit, ModuleModel) {
         describe('ModuleEdit', function() {
             beforeEach(function() {
                 this.stubModule = new ModuleModel({
@@ -67,7 +67,7 @@
                         spyOn(this.moduleEdit, 'loadDisplay');
                         spyOn(this.moduleEdit, 'delegateEvents');
                         spyOn($.fn, 'append');
-                        spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().resolve().promise());
+                        spyOn(XBlock, 'loadJavaScript').and.returnValue($.Deferred().resolve().promise());
                         window.MockXBlock = function() {
                             return {};
                         };
@@ -222,7 +222,7 @@
                         return expect($('head').append).toHaveBeenCalledWith('<script>inline-js</script>');
                     });
                     it('loads js urls from fragments', function() {
-                        return expect(ViewUtils.loadJavaScript).toHaveBeenCalledWith('js-url');
+                        return expect(XBlock.loadJavaScript).toHaveBeenCalledWith('js-url');
                     });
                     it('loads head html', function() {
                         return expect($('head').append).toHaveBeenCalledWith('head-html');

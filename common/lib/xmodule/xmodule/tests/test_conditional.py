@@ -7,6 +7,7 @@ from mock import Mock, patch
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.fragment import FragmentResource
 from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
@@ -81,6 +82,9 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
+        child_descriptor._xmodule.student_view.return_value.resources = [
+            FragmentResource('url', 'bogus_css_url', 'text/css', 'head'),
+            FragmentResource('url', 'bogus_js_url', 'application_javascript', 'head')]
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
@@ -169,8 +173,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         modules['cond_module'].save()
         print "post-attempt ajax: ", ajax
-        html = ajax['html']
-        self.assertTrue(any(['This is a secret' in item for item in html]))
+        self.assertTrue(any(['This is a secret' in item['html'] for item in ajax]))
 
     def test_error_as_source(self):
         '''
@@ -271,8 +274,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         ajax = json.loads(module.handle_ajax('', ''))
         module.save()
         print "post-attempt ajax: ", ajax
-        html = ajax['html']
-        self.assertTrue(any(['This is a secret' in item for item in html]))
+        self.assertTrue(any(['This is a secret' in item['html'] for item in ajax]))
 
     def test_conditional_module_with_empty_sources_list(self):
         """

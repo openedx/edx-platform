@@ -34,7 +34,9 @@
             'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
-            'draggabilly': 'js/vendor/draggabilly'
+            'draggabilly': 'js/vendor/draggabilly',
+            'xblock': 'js/xblock/core',
+            'xblock.runtime': 'coffee/src/xblock/runtime.v1'
         },
         shim: {
             'gettext': {
@@ -148,6 +150,14 @@
             },
             'sinon': {
                 exports: 'sinon'
+            },
+            "xblock": {
+                deps: ['jquery', 'jquery.immediateDescendents'],
+                exports: "XBlock"
+            },
+            "xblock.runtime": {
+                deps: ['xblock'],
+                exports: "XBlock.Runtime"
             }
         }
     });
@@ -161,7 +171,9 @@
         'common/js/spec/components/paging_footer_spec.js',
         'common/js/spec/components/search_field_spec.js',
         'common/js/spec/components/view_utils_spec.js',
-        'common/js/spec/utils/edx.utils.validate_spec.js'
+        'common/js/spec/utils/edx.utils.validate_spec.js',
+        'common/js/spec/xblock/core_spec.js',
+        'common/js/spec/xblock/runtime.v1_spec.js'
     ];
 
     for (var i = 0; i < testFiles.length; i++) {

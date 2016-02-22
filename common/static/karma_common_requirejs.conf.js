@@ -19,7 +19,8 @@ var options = {
         {pattern: 'coffee/src/**/*.js'},
         {pattern: 'js/libs/**/*.js'},
         {pattern: 'js/test/**/*.js'},
-        {pattern: 'js/vendor/**/*.js'}
+        {pattern: 'js/vendor/**/*.js'},
+        {pattern: 'js/xblock/*.js'},
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.

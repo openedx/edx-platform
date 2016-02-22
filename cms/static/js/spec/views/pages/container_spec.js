@@ -635,7 +635,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                                 EditHelpers.verifyXBlockRequest(requests, expectedRequest);
                                 AjaxHelpers.respondWithJson(requests, {'locator': 'new_item'});
                                 respondWithHtml(mockXBlockHtml);
-                                expect(containerPage.$('.studio-xblock-wrapper').length).toBe(xblockCount + 1);
+                                expect(containerPage.$('.studio-xblock-wrapper').length).toBe(xblockCount + 2);
                             };
 
                             it('can add an HTML component without a template', function() {
