@@ -8,8 +8,10 @@
     "underscore": "1.4.4"
   },
   "devDependencies": {
-    "jshint": "^2.7.0",
     "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules",
+    "jasmine": "~2.4.1",
+    "jasmine-jquery": "~2.1.1",
+    "jshint": "^2.7.0",
     "plato": "1.2.2"
   }
 }
