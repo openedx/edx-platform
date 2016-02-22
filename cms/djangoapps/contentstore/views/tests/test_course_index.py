@@ -411,7 +411,7 @@ class TestCourseOutline(CourseTestCase):
             parsed_html = lxml.html.fromstring(response.content)
             settings_link = parsed_html.find_class('course-status')[0].find_class('action-edit')[0].find('a')
             self.assertIsNotNone(settings_link)
-            self.assertEqual(settings_link.get('href'), reverse_course_url('settings_handler', self.course.id))
+            self.assertEqual(settings_link.get('href'), reverse_course_url('settings_schedule_handler', self.course.id))
 
         outline_url = reverse_course_url('course_handler', self.course.id)
         response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')

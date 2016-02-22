@@ -100,7 +100,8 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
         <div class="bit">
         % if context_course:
           <%
-            details_url = utils.reverse_course_url('settings_handler', context_course.id)
+            schedule_settings_url = utils.reverse_course_url('settings_schedule_handler', context_course.id)
+            detailed_settings_url = utils.reverse_course_url('settings_details_handler', context_course.id)
             grading_url = utils.reverse_course_url('grading_handler', context_course.id)
             course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
             advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
@@ -108,7 +109,8 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
         <h2 class="title-3">${_("Other Course Settings")}</h2>
           <nav class="nav-related" aria-label="${_('Other Course Settings')}">
             <ul>
-              <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+              <li class="nav-item"><a href="${schedule_settings_url}">${_("Details &amp; Configuration")}</a></li>
+              <li class="nav-item"><a href="${detailed_settings_url}">${_("Course Details")}</a></li>
               <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
               <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
               <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>

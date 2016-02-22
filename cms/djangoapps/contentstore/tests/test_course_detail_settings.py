@@ -31,7 +31,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from .utils import CourseTestCase
 
 
-def get_url(course_id, handler_name='settings_handler'):
+def get_url(course_id, handler_name='settings_details_handler'):
     return reverse_course_url(handler_name, course_id)
 
 
@@ -1053,7 +1053,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """ Initialize course used to test enrollment fields. """
         super(CourseEnrollmentEndFieldTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+        self.course_details_url = reverse_course_url('settings_details_handler', unicode(self.course.id))
 
     def _get_course_details_response(self, global_staff):
         """ Return the course details page as either global or non-global staff"""

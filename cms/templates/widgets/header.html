@@ -25,7 +25,8 @@
             import_url = reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(course_key)})
             course_info_url = reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(course_key)})
             export_url = reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(course_key)})
-            settings_url = reverse('contentstore.views.settings_handler', kwargs={'course_key_string': unicode(course_key)})
+            settings_schedule_url = reverse('contentstore.views.settings_schedule_handler', kwargs={'course_key_string': unicode(course_key)})
+            settings_details_url = reverse('contentstore.views.settings_details_handler', kwargs={'course_key_string': unicode(course_key)})
             grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -82,10 +83,10 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
-                    <a href="${settings_url}">${_("Schedule &amp; Configuration")}</a>
+                    <a href="${settings_schedule_url}">${_("Schedule &amp; Configuration")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-details">
-                    <a href="${settings_url}">${_("Course Details")}</a>
+                    <a href="${settings_details_url}">${_("Course Details")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${grading_url}">${_("Grading")}</a>
