@@ -14,7 +14,7 @@ from .views import (
 
 TEAM_ID_PATTERN = r'(?P<team_id>[a-z\d_-]+)'
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
-TOPIC_ID_PATTERN = TEAM_ID_PATTERN.replace('team_id', 'topic_id')
+TOPIC_ID_PATTERN = r'(?P<topic_id>[A-Za-z\d_.-]+)'
 
 urlpatterns = patterns(
     '',
