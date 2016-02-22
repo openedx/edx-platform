@@ -79,6 +79,7 @@ class BlockStructure(object):
         Returns the parents of the block identified by the given
         usage_key.
 
+
         Arguments:
             usage_key - The usage key of the block whose parents
                 are to be returned.
@@ -86,7 +87,7 @@ class BlockStructure(object):
         Returns:
             [UsageKey] - A list of usage keys of the block's parents.
         """
-        return self._block_relations[usage_key].parents if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].parents if usage_key in self else []
 
     def get_children(self, usage_key):
         """
@@ -100,7 +101,7 @@ class BlockStructure(object):
         Returns:
             [UsageKey] - A list of usage keys of the block's children.
         """
-        return self._block_relations[usage_key].children if self.has_block(usage_key) else []
+        return self._block_relations[usage_key].children if usage_key in self else []
 
     def set_root_block(self, usage_key):
         """
@@ -117,7 +118,7 @@ class BlockStructure(object):
         self.root_block_usage_key = usage_key
         self._block_relations[usage_key].parents = []
 
-    def has_block(self, usage_key):
+    def __contains__(self, usage_key):
         """
         Returns whether a block with the given usage_key is in this
         block structure.

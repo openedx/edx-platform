@@ -311,7 +311,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         for i, xblock_key in enumerate(self.xblock_keys):
 
             # compute access results of the block
-            block_structure_result = block_structure.has_block(xblock_key)
+            block_structure_result = xblock_key in block_structure
             has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
 
             # compare with expected value
