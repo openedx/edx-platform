@@ -132,6 +132,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
+    if isinstance(course_key, CCXLocator):
+        course_key = course_key.to_course_locator()
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
