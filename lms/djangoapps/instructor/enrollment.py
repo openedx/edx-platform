@@ -219,8 +219,6 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
         submissions.SubmissionError: unexpected error occurred while resetting the score in the submissions API.
 
     """
-    user_id = anonymous_id_for_user(student, course_id)
-    submission_cleared = False
     try:
         # A block may have children. Clear state on children first.
         block = modulestore().get_item(module_state_key)
@@ -231,27 +229,16 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
                 except StudentModule.DoesNotExist:
                     # If a particular child doesn't have any state, no big deal, as long as the parent does.
                     pass
-        if delete_module:
-            # Some blocks (openassessment) use StudentModule data as a key for internal submission data.
-            # Inform these blocks of the reset and allow them to handle their data.
-            clear_student_state = getattr(block, "clear_student_state", None)
-            if callable(clear_student_state):
-                clear_student_state(
-                    user_id=user_id,
-                    course_id=unicode(course_id),
-                    item_id=unicode(module_state_key)
-                )
-                submission_cleared = True
     except ItemNotFoundError:
         log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
-    # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
-    # TODO: Remove this once we've finalized and communicated how xblocks should handle clear_student_state
-    # and made sure that other xblocks relying on the submission api understand this is going away.
-    # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
-    if delete_module and not submission_cleared:
+    # Reset the student's score in the submissions API
+    # Currently this is used only by open assessment (ORA 2)
+    # We need to do this *before* retrieving the `StudentModule` model,
+    # because it's possible for a score to exist even if no student module exists.
+    if delete_module:
         sub_api.reset_score(
-            user_id,
+            anonymous_id_for_user(student, course_id),
             course_id.to_deprecated_string(),
             module_state_key.to_deprecated_string(),
         )
