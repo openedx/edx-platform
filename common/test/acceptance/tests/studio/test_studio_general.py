@@ -14,7 +14,7 @@ from ...pages.studio.index import DashboardPage
 from ...pages.studio.login import LoginPage
 from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.settings import SettingsPage
+from ...pages.studio.settings_schedule import SettingsSchedulePage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_graders import GradingPage
 from ...pages.studio.signup import SignupPage
@@ -80,7 +80,7 @@ class CoursePagesTest(StudioCourseTest):
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
                 AssetIndexPage, CourseUpdatesPage,
-                PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
+                PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsSchedulePage,
                 AdvancedSettingsPage, GradingPage, TextbooksPage
             ]
         ]

@@ -20,14 +20,14 @@ class CreditEligibilityTest(CourseTestCase):
     def setUp(self):
         super(CreditEligibilityTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Credit Course')
-        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+        self.course_schedule_url = reverse_course_url('settings_schedule_handler', unicode(self.course.id))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': False})
     def test_course_details_with_disabled_setting(self):
         """Test that user don't see credit eligibility requirements in response
         if the feature flag 'ENABLE_CREDIT_ELIGIBILITY' is not enabled.
         """
-        response = self.client.get_html(self.course_details_url)
+        response = self.client.get_html(self.course_schedule_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Course Credit Requirements")
         self.assertNotContains(response, "Steps required to earn course credit")
@@ -39,7 +39,7 @@ class CreditEligibilityTest(CourseTestCase):
         """
         # verify that credit eligibility requirements block don't show if the
         # course is not set as credit course
-        response = self.client.get_html(self.course_details_url)
+        response = self.client.get_html(self.course_schedule_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Course Credit Requirements")
         self.assertNotContains(response, "Steps required to earn course credit")
@@ -53,7 +53,7 @@ class CreditEligibilityTest(CourseTestCase):
         on_course_publish(self.course.id)
         self.assertEqual(len(get_credit_requirements(self.course.id)), 1)
 
-        response = self.client.get_html(self.course_details_url)
+        response = self.client.get_html(self.course_schedule_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Course Credit Requirements")
         self.assertContains(response, "Steps required to earn course credit")

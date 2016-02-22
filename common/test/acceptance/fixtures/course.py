@@ -305,7 +305,7 @@ class CourseFixture(XBlockContainerFixture):
         """
         Configure course settings (e.g. start and end date)
         """
-        url = STUDIO_BASE_URL + '/settings/details/' + self._course_key
+        url = STUDIO_BASE_URL + '/settings/schedule/' + self._course_key
 
         # First, get the current values
         response = self.session.get(url, headers=self.headers)

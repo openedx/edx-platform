@@ -6,7 +6,7 @@ from mock import patch
 from django.test.utils import override_settings
 
 from contentstore.models import PushNotificationConfig
-from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.test_course_schedule_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore

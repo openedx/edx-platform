@@ -1,9 +1,10 @@
 define([
-    'jquery', 'js/models/settings/course_details', 'js/views/settings/main'
-], function($, CourseDetailsModel, MainView) {
+    'jquery', 'js/models/settings/course_details', 'js/views/settings/course_details'
+], function($, CourseDetailsModel, DetailsView) {
     'use strict';
     return function (detailsUrl, showMinGradeWarning) {
         var model;
+
         // highlighting labels when fields are focused in
         $('form :input')
             .focus(function() {
@@ -17,7 +18,7 @@ define([
         model.urlRoot = detailsUrl;
         model.fetch({
             success: function(model) {
-                var editor = new MainView({
+                var editor = new DetailsView({
                     el: $('.settings-details'),
                     model: model,
                     showMinGradeWarning: showMinGradeWarning

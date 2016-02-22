@@ -8,7 +8,7 @@ from unittest import skip
 from .base_studio_test import StudioCourseTest
 from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import CourseFixture
-from ...pages.studio.settings import SettingsPage
+from ...pages.studio.settings_schedule import SettingsSchedulePage
 from ...pages.studio.overview import CourseOutlinePage
 from ...tests.studio.base_studio_test import StudioCourseTest
 from ..helpers import (
@@ -25,7 +25,7 @@ class StudioSettingsDetailsTest(StudioCourseTest):
 
     def setUp(self, is_staff=True):
         super(StudioSettingsDetailsTest, self).setUp(is_staff=is_staff)
-        self.settings_detail = SettingsPage(
+        self.settings_detail = SettingsSchedulePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],

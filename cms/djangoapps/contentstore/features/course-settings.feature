@@ -6,7 +6,7 @@ Feature: CMS.Course Settings
   @skip_safari
   Scenario: User can set course dates
     Given I have opened a new course in Studio
-    When I select Schedule and Details
+    When I select course Schedule
     And I set course dates
     And I press the "Save" notification button
     And I reload the page
@@ -65,7 +65,7 @@ Feature: CMS.Course Settings
   @skip_safari
   Scenario: Confirmation is shown on save
     Given I have opened a new course in Studio
-    When I select Schedule and Details
+    When I select course Schedule
     And I change the "<field>" field to "<value>"
     And I press the "Save" notification button
     Then I see a confirmation that my changes have been saved
@@ -77,27 +77,44 @@ Feature: CMS.Course Settings
   Examples:
     | field                     | value             |
     | Course Start Time         | 11:00             |
-    | Course Introduction Video | 4r7wHMg5Yjg       |
     | Course Effort             | 200:00            |
+
+
+  # Safari gets CSRF token errors
+  @skip_safari
+  Scenario: Confirmation is shown on save
+    Given I have opened a new course in Studio
+    When I select course Details
+    And I change the "<field>" field to "<value>"
+    And I press the "Save" notification button
+    Then I see a confirmation that my changes have been saved
+    # Lettuce hooks don't get called between each example, so we need
+    # to run the before.each_scenario hook manually to avoid database
+    # errors.
+    And I reset the database
+
+  Examples:
+    | field                     | value             |
+    | Course Introduction Video | 4r7wHMg5Yjg       |
     | Course Image URL          | image.jpg         |
 
   # Special case because we have to type in code mirror
   Scenario: Changes in Course Overview show a confirmation
     Given I have opened a new course in Studio
-    When I select Schedule and Details
+    When I select course Details
     And I change the course overview
     And I press the "Save" notification button
     Then I see a confirmation that my changes have been saved
 
   Scenario: User cannot save invalid settings
     Given I have opened a new course in Studio
-    When I select Schedule and Details
+    When I select course Schedule
     And I change the "Course Start Date" field to ""
     Then the save notification button is disabled
 
   Scenario: User can upload course image
     Given I have opened a new course in Studio
-    When I select Schedule and Details
+    When I select course Details
     And I click the "Upload Course Image" button
     And I upload a new course image
     Then I should see the new course image

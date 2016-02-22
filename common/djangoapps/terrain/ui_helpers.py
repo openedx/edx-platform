@@ -26,10 +26,15 @@ from nose.tools import assert_true
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 
 REQUIREJS_WAIT = {
-    # Settings - Schedule & Details
-    re.compile(r'^Schedule & Details Settings \|'): [
+    # Settings - Schedule
+    re.compile(r'^Schedule & Configuration \|'): [
         "jquery", "js/base", "js/models/course",
-        "js/models/settings/course_details", "js/views/settings/main"],
+        "js/models/settings/course_schedule", "js/views/settings/course_schedule"],
+
+    # Settings - Details
+    re.compile(r'^Course Details \|'): [
+        "jquery", "js/base", "js/models/course",
+        "js/models/settings/course_details", "js/views/settings/course_details"],
 
     # Settings - Advanced Settings
     re.compile(r'^Advanced Settings \|'): [

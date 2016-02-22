@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.test_course_schedule_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 from pytz import UTC

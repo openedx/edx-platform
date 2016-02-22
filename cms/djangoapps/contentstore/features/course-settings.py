@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
@@ -25,20 +26,30 @@ DEFAULT_TIME = "00:00"
 
 
 ############### ACTIONS ####################
-@step('I select Schedule and Details$')
-def test_i_select_schedule_and_details(step):
+@step('I select course Schedule$')
+def test_i_select_course_schedule(step):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-schedule a'
     world.css_click(link_css)
     world.wait_for_requirejs(
         ["jquery", "js/models/course",
-         "js/models/settings/course_details", "js/views/settings/main"])
+         "js/models/settings/course_schedule", "js/views/settings/course_schedule"])
+
+
+@step('I select course Details$')
+def test_i_select_course_details(step):
+    world.click_course_content()
+    link_css = 'li.nav-course-courseware-details a'
+    world.css_click(link_css)
+    world.wait_for_requirejs(
+        ["jquery", "js/models/course",
+         "js/models/settings/course_details", "js/views/settings/course_details"])
 
 
 @step('I have set course dates$')
 def test_i_have_set_course_dates(step):
     step.given('I have opened a new course in Studio')
-    step.given('I select Schedule and Details')
+    step.given('I select course Schedule')
     step.given('And I set course dates')
 
 

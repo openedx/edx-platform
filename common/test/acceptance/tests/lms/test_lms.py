@@ -33,7 +33,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.studio.settings import SettingsPage
+from ...pages.studio.settings_schedule import SettingsSchedulePage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
@@ -926,7 +926,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         self.pre_requisite_course_id = unicode(pre_requisite_course_key)
 
         self.dashboard_page = DashboardPage(self.browser)
-        self.settings_page = SettingsPage(
+        self.settings_page = SettingsSchedulePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -1071,7 +1071,7 @@ class EntranceExamTest(UniqueCourseTest):
         ).install()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.settings_page = SettingsPage(
+        self.settings_page = SettingsSchedulePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
