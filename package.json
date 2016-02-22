@@ -2,6 +2,10 @@
   "name": "edx",
   "version": "0.1.0",
   "dependencies": {
+    "backbone": "~1.2.3",
+    "backbone-associations": "~0.6.2",
+    "backbone-relational": "~0.10.0",
+    "backbone.paginator": "~2.0.3",
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.10.4",
     "uglify-js": "2.4.24",
