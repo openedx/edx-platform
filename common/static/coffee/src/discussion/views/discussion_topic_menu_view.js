@@ -206,9 +206,9 @@
                 }
 
                 $items.addClass('hidden');
-                $items.each(function () {
+                $items.each(function (_index, item) {
                     var path, pathText, pathTitles;
-                    path = $(this).parents(".topic-menu-item").andSelf();
+                    path = $(item).parents(".topic-menu-item").andSelf();
                     pathTitles = path.children(".topic-title").map(function (_, elem) {
                         return $(elem).text();
                     }).get();
@@ -216,9 +216,9 @@
                     if (query.split(" ").every(function (term) {
                             return pathText.search(term.toLowerCase()) !== -1;
                         })) {
-                        $(this).removeClass('hidden');
-                        $(this).find('.topic-menu-item').removeClass('hidden');
-                        $(this).parents('.topic-menu-item').removeClass('hidden');
+                        $(item).removeClass('hidden');
+                        $(item).find('.topic-menu-item').removeClass('hidden');
+                        $(item).parents('.topic-menu-item').removeClass('hidden');
                     }
                 });
             }

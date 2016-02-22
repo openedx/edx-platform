@@ -30,7 +30,8 @@ define(["js/views/baseview", "underscore", "gettext", "common/js/components/view
             var textbook = this.model;
             new PromptView.Warning({
                 title: _.template(gettext("Delete “<%= name %>”?"))(
-                    {name: textbook.get('name')}),
+                    {name: textbook.get('name')}
+                ),
                 message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
                 actions: {
                     primary: {

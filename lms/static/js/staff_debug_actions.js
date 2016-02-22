@@ -35,7 +35,6 @@ var StaffDebug = (function (){
         url: get_url(action.method),
         data: pdata,
         success: function(data){
-
             var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
                 {user: data.student}
             );
