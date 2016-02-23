@@ -27,6 +27,7 @@ from .component import (
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
+from ccx_keys.locator import CCXLocator
 from contentstore import utils
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -389,6 +390,11 @@ def _accessible_courses_list(request):
         if isinstance(course, ErrorDescriptor):
             return False
 
+        # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+        if isinstance(course, CCXLocator):
+            return False
+
         # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
@@ -433,8 +439,11 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
-            if course is not None and not isinstance(course, ErrorDescriptor):
-                # ignore deleted or errored courses
+
+            # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+            # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+            if course is not None and not isinstance(course, ErrorDescriptor) and not isinstance(course.id, CCXLocator):
+                # ignore deleted, errored or ccx courses
                 courses_list[course_key] = course
 
     return courses_list.values(), in_process_course_actions
