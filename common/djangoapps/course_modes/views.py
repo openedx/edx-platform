@@ -151,7 +151,7 @@ class ChooseModeView(View):
 
             if verified_mode.sku:
                 ecommerce_service = EcommerceService()
-                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled()
+                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
 
