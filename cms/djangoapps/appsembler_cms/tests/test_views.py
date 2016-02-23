@@ -11,6 +11,7 @@ from rest_framework import status
 from appsembler_lms.models import Organization
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
 @ddt.ddt
@@ -23,7 +24,7 @@ class TestUserSignup(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_fails_for_nonexisting_user(self):
+    def test_fails_for_nonexistant_user(self):
         org = Organization.objects.create(key="acme")
         payload = {
             'email': 'john@doe.com',
@@ -34,22 +35,57 @@ class TestUserSignup(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('User does not exist in academy.appsembler.com', response.content)
 
-    def test_creates_course_for_existing_user(self):
+    # def test_creates_cloned_course_for_existing_user(self):
+    #     user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
+    #     org = Organization.objects.create(key="acme")
+    #     self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
+    #     existing_course_key = ToyCourseFactory.create().id
+    #
+    #     payload = {
+    #         'email': 'john@doe.com',
+    #         'secret_key': 'secret_key',
+    #         'organization_key': 'acme',
+    #         'course_id': existing_course_key
+    #     }
+    #     response = self.client.post(self.url, payload)
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     number = "{}101".format(user.username)
+    #     run = "CurrentTerm"
+    #     self.assertIn("course-v1:{}+{}+{}".format(org.key, number, run), response.content)
+
+    def test_creates_new_course_if_missing_course_id(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
         org = Organization.objects.create(key="acme")
         self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
+        existing_course_key = ToyCourseFactory.create().id
 
         payload = {
             'email': 'john@doe.com',
             'secret_key': 'secret_key',
-            'organization_key': 'acme'
+            'organization_key': 'acme',
+        }
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
+
+    def test_creates_new_course_if_wrong_course_id(self):
+        user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
+        org = Organization.objects.create(key="acme")
+        self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
+        existing_course_key = ToyCourseFactory.create().id
+
+        payload = {
+            'email': 'john@doe.com',
+            'secret_key': 'secret_key',
+            'organization_key': 'acme',
+            'course_id': 'bad/course/id'
         }
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
 
 
-    def test_fails_for_nonexisting_organization(self):
+    def test_fails_for_nonexistant_organization(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
         payload = {
             'email': 'john@doe.com',
