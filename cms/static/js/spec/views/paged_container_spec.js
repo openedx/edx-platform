@@ -71,10 +71,15 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
         });
 
         describe("Paging Container", function() {
-            var pagingContainer;
+            var pagingContainer, mockPage;
 
             beforeEach(function () {
-                pagingContainer = new MockPagingView({page_size: PAGE_SIZE});
+                // paged_container's renderPage method expects to be able to call these methods on the page object
+                mockPage = {
+                    updatePreviewButton: function(){},
+                    renderAddXBlockComponents: function(){}
+                };
+                pagingContainer = new MockPagingView({page_size: PAGE_SIZE, page: mockPage});
             });
 
             describe("Container", function () {
