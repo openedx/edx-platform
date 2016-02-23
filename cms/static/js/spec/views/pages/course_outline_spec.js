@@ -253,6 +253,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     ])
                 ]);
 
+                // Create a mock Course object as the JS now expects it.
+                window.course = new Course({
+                    id: '333',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
+
             });
 
             afterEach(function () {
