@@ -5,6 +5,7 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import UTC
 
@@ -400,6 +401,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         )
         view.push()
 
+    @flaky  # TODO: TNL-4151
     def test_comment_deletion_as_student(self):
         self.setup_user()
         self.setup_view()
