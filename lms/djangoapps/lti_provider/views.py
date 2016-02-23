@@ -14,9 +14,13 @@ from lti_provider.users import authenticate_lti_user
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
+from student.models import CourseEnrollment
 
 log = logging.getLogger("edx.lti_provider")
 
+LTI_PARAM_EMAIL = 'lis_person_contact_email_primary'
+LTI_PARAM_FIRST_NAME = 'lis_person_name_given'
+LTI_PARAM_LAST_NAME = 'lis_person_name_family'
 
 # LTI launch parameters that must be present for a successful launch
 REQUIRED_PARAMETERS = [
@@ -27,6 +31,7 @@ REQUIRED_PARAMETERS = [
 
 OPTIONAL_PARAMETERS = [
     'lis_result_sourcedid', 'lis_outcome_service_url',
+    LTI_PARAM_EMAIL, LTI_PARAM_FIRST_NAME, LTI_PARAM_LAST_NAME,
     'tool_consumer_instance_guid'
 ]
 
@@ -84,7 +89,14 @@ def lti_launch(request, course_id, usage_id):
 
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.
-    authenticate_lti_user(request, params['user_id'], lti_consumer)
+    lti_params = {}
+    lti_keys = {LTI_PARAM_EMAIL: 'email', LTI_PARAM_FIRST_NAME: 'first_name', LTI_PARAM_LAST_NAME: 'last_name'}
+    for key in lti_keys:
+        if key in params:
+            lti_params[lti_keys[key]] = params[key]
+    authenticate_lti_user(request, params['user_id'], lti_consumer, lti_params)
+    if request.user.is_authenticated():
+        enroll_user_to_course(request.user, course_key)
 
     # Store any parameters required by the outcome service in order to report
     # scores back later. We know that the consumer exists, since the record was
@@ -92,6 +104,14 @@ def lti_launch(request, course_id, usage_id):
     store_outcome_parameters(params, request.user, lti_consumer)
 
     return render_courseware(request, params['usage_key'])
+
+
+def enroll_user_to_course(edx_user, course_key):
+    """
+    Enrolles the user to the course if he is not already enrolled.
+    """
+    if course_key is not None and not CourseEnrollment.is_enrolled(edx_user, course_key):
+        CourseEnrollment.enroll(edx_user, course_key)
 
 
 def get_required_parameters(dictionary, additional_params=None):
