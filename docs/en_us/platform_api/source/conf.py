@@ -143,6 +143,14 @@ MOCK_MODULES = [
     'rest_framework_oauth.authentication',
     'certificates.api',
     'courseware.date_summary',
+    'rest_framework_jwt',
+    'rest_framework_jwt.authentication',
+    'microsite_configuration',
+    'xmodule.assetstore',
+    'xmodule.assetstore.assetmgr',
+    'xmodule.assetstore.assetmgr.AssetManager',
+    'xmodule.contentstore.django',
+    'piexif',
 ]
 
 for mod_name in MOCK_MODULES:
