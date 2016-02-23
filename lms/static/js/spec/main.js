@@ -298,6 +298,10 @@
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
             },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid']
+            },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
                 deps: ['jquery', 'gettext', 'underscore']
@@ -500,6 +504,14 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            'slick.core': {
+                deps: ['jquery'],
+                exports: 'Slick'
+            },
+            'slick.grid': {
+                deps: ['jquery', 'jquery.eventDrag', 'slick.core'],
+                exports: 'Slick'
             },
             // Discussions
             'xmodule_js/common_static/coffee/src/discussion/utils': {

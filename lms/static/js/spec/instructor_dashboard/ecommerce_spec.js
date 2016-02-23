@@ -22,7 +22,6 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
 
             it("shows the input field when the checkbox is checked", function () {
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
-                target.attr("checked","checked");
                 target.click();
                 expect(expiryCouponView.$el.find('#coupon_expiration_date').is(':visible')).toBe(true);
             });
@@ -30,7 +29,6 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
             it("hides the input field when the checkbox is unchecked", function () {
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 expect(expiryCouponView.$el.find('#coupon_expiration_date')).toHaveAttr('style','display: none;');
-
             });
         });
     });

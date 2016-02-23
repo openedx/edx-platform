@@ -84,7 +84,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(@confirmationSpies.constructor).not.toHaveBeenCalled()
                 expect(@collection.contains(@model)).toBeTruthy()
                 # return a success response
-                requests[0].respond(200)
+                requests[0].respond(204)
                 expect(@confirmationSpies.constructor).toHaveBeenCalled()
                 expect(@confirmationSpies.show).toHaveBeenCalled()
                 savingOptions = @confirmationSpies.constructor.calls.mostRecent().args[0]
@@ -118,7 +118,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(savingOptions.title).toMatch("Saving")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
-                requests[0].respond(200)
+                requests[0].respond(204)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 expect(@model.get("locked")).toBeTruthy()
 

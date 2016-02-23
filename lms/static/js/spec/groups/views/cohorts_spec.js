@@ -223,7 +223,7 @@ define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/
             clearContentGroup = function() {
                 cohortsView.$('.radio-no').prop('checked', true).change();
                 expect(cohortsView.$('.input-cohort-group-association').prop('disabled')).toBeTruthy();
-                expect(cohortsView.$('.input-cohort-group-association').val()).toBe('None');
+                expect(cohortsView.$('.input-cohort-group-association').val()).toBe(null);
             };
 
             verifyMessage = function(expectedTitle, expectedMessageType, expectedAction, hasDetails) {
