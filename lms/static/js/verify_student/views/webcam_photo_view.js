@@ -218,13 +218,13 @@
             this.backend = this.backends[obj.backendName] || obj.backend;
             this.captureSoundPath =  obj.captureSoundPath || "";
 
+            _.extend( this.backend, Backbone.Events );
             this.backend.initialize({
                 wrapper: "#camera",
                 video: '#photo_id_video',
                 canvas: '#photo_id_canvas'
             });
 
-            _.extend( this.backend, Backbone.Events );
             this.listenTo( this.backend, 'error', this.handleError );
             this.listenTo( this.backend, 'webcam-loaded', this.handleWebcamLoaded );
         },

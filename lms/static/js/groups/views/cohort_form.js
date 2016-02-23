@@ -56,7 +56,7 @@
                     if (!groupsEnabled) {
                         // If the user has chosen 'no', then clear the selection by setting
                         // it to the first option which represents no selection.
-                        this.$('.input-cohort-group-association').val('None');
+                        this.$('.input-cohort-group-association').val(null);
                     }
                     // Enable the select if the user has chosen groups, else disable it
                     this.$('.input-cohort-group-association').prop('disabled', !groupsEnabled);
@@ -69,7 +69,7 @@
                 getSelectedContentGroup: function() {
                     var selectValue = this.$('.input-cohort-group-association').val(),
                         ids, groupId, userPartitionId, i, contentGroup;
-                    if (!this.hasAssociatedContentGroup() || selectValue === 'None') {
+                    if (!this.hasAssociatedContentGroup() || _.isNull(selectValue)) {
                         return null;
                     }
                     ids = selectValue.split(':');
@@ -107,7 +107,7 @@
                         errorMessages.push(gettext('You must specify a name for the cohort'));
                     }
                     if (this.hasAssociatedContentGroup() && fieldData.group_id === null) {
-                        if (this.$('.input-cohort-group-association').val() === 'None') {
+                        if (_.isNull(this.$('.input-cohort-group-association').val())) {
                             errorMessages.push(gettext('You did not select a content group'));
                         } else {
                             // If a value was selected, then it must be for a non-existent/deleted content group
