@@ -1,5 +1,4 @@
 requirejs.config({
-    baseUrl: '/base/',
     paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
@@ -33,7 +32,7 @@ requirejs.config({
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
         "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
-        "backbone": "xmodule_js/common_static/common/js/vendor/backbone-min",
+        "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
@@ -47,9 +46,10 @@ requirejs.config({
         "accessibility": "xmodule_js/common_static/js/src/accessibility_tools",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
+        "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
         "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
-        "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
-        "jasmine-waituntil": "xmodule_js/common_static/js/libs/jasmine-waituntil",
+        "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
+        "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
@@ -166,17 +166,17 @@ requirejs.config({
         "mathjax": {
             exports: "MathJax",
             init: ->
-                MathJax.Hub.Config
-                    tex2jax:
-                        inlineMath: [
-                            ["\\(", "\\)"],
-                            ['[mathjaxinline]', '[/mathjaxinline]']
-                        ]
-                        displayMath: [
-                            ["\\[", "\\]"],
-                            ['[mathjax]', '[/mathjax]']
-                        ]
-                MathJax.Hub.Configured()
+              MathJax.Hub.Config
+                tex2jax:
+                  inlineMath: [
+                    ["\\(","\\)"],
+                    ['[mathjaxinline]','[/mathjaxinline]']
+                  ]
+                  displayMath: [
+                    ["\\[","\\]"],
+                    ['[mathjax]','[/mathjax]']
+                  ]
+              MathJax.Hub.Configured()
         },
         "URI": {
             exports: "URI"
@@ -187,12 +187,18 @@ requirejs.config({
         "sinon": {
             exports: "sinon"
         },
-        "jasmine-imagediff": {},
-        "jasmine-stealth": {
-            deps: ["underscore", "underscore.string"]
+        "jasmine-jquery": {
+            deps: ["jasmine"]
         },
-        "jasmine-waituntil": {
-            deps: ["jquery"]
+        "jasmine-imagediff": {
+            deps: ["jasmine"]
+        },
+        "jasmine-stealth": {
+            deps: ["jasmine"]
+        },
+        "jasmine.async": {
+            deps: ["jasmine"],
+            exports: "AsyncSpec"
         },
         "xblock/core": {
             exports: "XBlock",
@@ -203,7 +209,7 @@ requirejs.config({
             deps: ["xblock/core"]
         },
         "mock-ajax": {
-            deps: ["jquery"]
+            deps: ["jasmine", "jquery"]
         }
 
         "coffee/src/main": {
@@ -223,8 +229,9 @@ requirejs.config({
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
-testFiles = [
+define([
     "coffee/spec/main_spec",
+
     "coffee/spec/models/course_spec",
     "coffee/spec/models/metadata_spec",
     "coffee/spec/models/section_spec",
@@ -232,24 +239,32 @@ testFiles = [
     "coffee/spec/models/settings_grading_spec",
     "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
-    "coffee/spec/views/course_info_spec",
+
+# TODO: this test causes all tests to run and re-run indefinitely.
+#   "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
+
+
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
+
     "js/spec/video/transcripts/utils_spec",
     "js/spec/video/transcripts/editor_spec",
-#    "js/spec/video/transcripts/videolist_spec",
-#    "js/spec/video/transcripts/message_manager_spec",
-#    "js/spec/video/transcripts/file_uploader_spec",
+    # "js/spec/video/transcripts/videolist_spec",  @TODO: Add back
+    # "js/spec/video/transcripts/message_manager_spec",  @TODO: Add back
+    # "js/spec/video/transcripts/file_uploader_spec",  @TODO: Add back
+
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
     "js/spec/models/xblock_info_spec",
     "js/spec/models/xblock_validation_spec",
     "js/spec/models/license_spec",
+
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
+
     "js/spec/views/active_video_upload_list_spec",
     "js/spec/views/previous_video_upload_spec",
     "js/spec/views/previous_video_upload_list_spec",
@@ -266,6 +281,7 @@ testFiles = [
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/login_studio_spec",
+
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
@@ -273,24 +289,25 @@ testFiles = [
     "js/spec/views/pages/course_rerun_spec",
     "js/spec/views/pages/index_spec",
     "js/spec/views/pages/library_users_spec",
+
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
     "js/spec/views/modals/validation_error_modal_spec",
+
     "js/spec/views/settings/main_spec",
+
     "js/spec/factories/xblock_validation_spec",
+
     "js/spec/xblock/cms.runtime.v1_spec",
+
+    # Certificates application test suite mappings
     "js/certificates/spec/models/certificate_spec",
     "js/certificates/spec/views/certificate_details_spec",
     "js/certificates/spec/views/certificate_editor_spec",
     "js/certificates/spec/views/certificates_list_spec",
-    "js/certificates/spec/views/certificate_preview_spec"
-]
+    "js/certificates/spec/views/certificate_preview_spec",
 
-i = 0
-while i < testFiles.length
-    testFiles[i] = '/base/' + testFiles[i] + '.js'
-    i++
-
-require testFiles, ->
-# start test run, once Require.js is done
-    window.__karma__.start()
+    # these tests are run separately in the cms-squire suite, due to process
+    # isolation issues with Squire.js
+    # "coffee/spec/views/assets_spec"
+    ])

@@ -254,7 +254,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$(SELECTORS.signatory_panel_save).click();
 
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-                requests[0].respond(200);
+                requests[0].respond(204);
                 ViewHelpers.verifyNotificationHidden(notificationSpy);
 
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');
