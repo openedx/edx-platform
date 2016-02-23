@@ -331,7 +331,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect(savingOptions.title).toMatch(/Saving/);
                     expect($('#unit-1')).toHaveClass('was-dropped');
                     expect(request.requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
-                    request.respond(200);
+                    request.respond(204);
                     expect(this.savingSpies.hide).toHaveBeenCalled();
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
@@ -360,7 +360,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect(request.requestBody).toEqual(
                         '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
                     );
-                    request.respond(200);
+                    request.respond(204);
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
                     // parent
