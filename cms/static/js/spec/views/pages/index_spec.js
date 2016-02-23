@@ -101,7 +101,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                     var values_with_blank = values.slice();
                     values_with_blank[i] = '';
                     fillInLibraryFields.apply(this, values_with_blank);
-                    expect($('.create-library li.field.text input[value=]').parent()).toHaveClass('error');
+                    expect($('.create-library li.field.text input').parent()).toHaveClass('error');
                     expect($('.new-library-save')).toHaveClass('is-disabled');
                     expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
                     $('.new-library-save').click();
