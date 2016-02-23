@@ -29,7 +29,7 @@
     width: ($baseline*0.75);
 
     &:hover, &:focus {
-      background: url("../images/calc-icon.png") $gray-d1 no-repeat center;
+      background: url("#{$static-path}/images/calc-icon.png") $gray-d1 no-repeat center;
     }
 
     &.closed {
