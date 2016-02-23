@@ -130,7 +130,8 @@ class TestUserEnroll(ModuleStoreTestCase):
                    'org': 'acme',
                    'org_name': 'ACME Inc',
                    'secret_key': 'secret_key',
-                   'course_id': 'edX/toy/2012_Fall'}
+                   'course_id': self.course_key}      # 'edX/toy/2012_Fall'
+
         response = self.client.post(self.url, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -146,6 +147,33 @@ class TestUserEnroll(ModuleStoreTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, render_to_string('appsembler/emails/user_welcome_email_subject.txt'))
         self.assertIn('Toy Course', mail.outbox[0].body)
+        self.assertIn('john@doe.com', mail.outbox[0].body)
+        self.assertIn('password', mail.outbox[0].body)
+        self.assertIn('John Doe', mail.outbox[0].body)
+
+    def test_creates_unenrolled_user_on_bad_course_id(self):
+        payload = {'name': 'John Doe',
+                   'email': 'john@doe.com',
+                   'password': 'password',
+                   'org': 'acme',
+                   'org_name': 'ACME Inc',
+                   'secret_key': 'secret_key',
+                   'course_id': 'bad/course/id'}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('JohnDoe', response.content)
+        self.assertEqual(User.objects.filter(email="john@doe.com").count(), 1)
+
+        user = User.objects.get(email=payload['email'])
+        self.assertFalse(CourseEnrollment.is_enrolled(user=user, course_key=self.course_key))
+        self.assertIn(payload['email'], response.content)
+        self.assertIn('JohnDoe', response.content)
+        self.assertNotIn('Toy Course', response.content)
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, render_to_string('appsembler/emails/user_welcome_email_subject.txt'))
+        self.assertNotIn('Toy Course', mail.outbox[0].body)
         self.assertIn('john@doe.com', mail.outbox[0].body)
         self.assertIn('password', mail.outbox[0].body)
         self.assertIn('John Doe', mail.outbox[0].body)

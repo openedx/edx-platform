@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
@@ -45,8 +46,14 @@ class UserSignupAPIView(GenericAPIView):
                 }
                 message_data = {}
                 if serializer.data.get('course_id'):
-                    course_name = self._enroll_in_course(user, serializer.data.get('course_id'))
-                    response_data['course'] = message_data['course_name'] = course_name
+                    course_id=serializer.data.get('course_id')
+                    try:
+                        course_name = self._enroll_in_course(user, course_id)
+                        response_data['course'] = message_data['course_name'] = course_name
+                    except InvalidKeyError:
+                        message = "Could not enroll user in {}; could not find course.".format(course_id)
+                        logger.error(message)
+
 
                 message_data.update(serializer.data)
                 # TODO: extract appsembler info (phone/email) from email template
