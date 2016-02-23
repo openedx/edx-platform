@@ -28,7 +28,7 @@
             },
 
             parse : function(response) {
-                if (_.isNull(response)) {
+                if (_.isNull(response) || _.isUndefined(response)) {
                     return {};
                 }
 
