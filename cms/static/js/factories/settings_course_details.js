@@ -4,7 +4,6 @@ define([
     'use strict';
     return function (detailsUrl, showMinGradeWarning) {
         var model;
-        debugger;
 
         // highlighting labels when fields are focused in
         $('form :input')
