@@ -1,5 +1,5 @@
 define([
-    'jquery', 'js/models/settings/course_details', 'js/views/settings/main'
+    'jquery', 'js/models/settings/course_details', 'js/views/settings/course_details'
 ], function($, CourseDetailsModel, MainView) {
     'use strict';
     return function (detailsUrl, showMinGradeWarning) {

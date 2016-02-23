@@ -1124,10 +1124,8 @@ def settings_details_handler(request, course_key_string):
             )
 
             about_page_editable = not marketing_site_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
 
-            self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
@@ -1138,15 +1136,8 @@ def settings_details_handler(request, course_key_string):
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url,
-                'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
-                'credit_eligibility_enabled': credit_eligibility_enabled,
-                'is_credit_course': False,
                 'show_min_grade_warning': False,
-                'enrollment_end_editable': enrollment_end_editable,
-                'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
-                'is_entrance_exams_enabled': is_entrance_exams_enabled(),
-                'self_paced_enabled': self_paced_enabled,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
