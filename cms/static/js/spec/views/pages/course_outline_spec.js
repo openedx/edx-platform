@@ -1,7 +1,8 @@
 define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils", "js/views/pages/course_outline",
         "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
-        "common/js/spec_helpers/template_helpers"],
-    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
+        "common/js/spec_helpers/template_helpers", 'js/models/course', "jasmine-stealth"],
+    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers,
+             Course) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
@@ -242,6 +243,16 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                         ])
                     ])
                 ]);
+
+                // Create a mock Course object as the JS now expects it.
+                window.course = new Course({
+                    id: '333',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
 
             });
 
