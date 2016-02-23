@@ -18,12 +18,11 @@
             }
         };
         defineDependency("jQuery", "jquery");
-        defineDependency("_", "underscore");
-        if (window._ && window._.str) {
-            define("underscore.string", [], function () {return window._.str;});
-        }
-        else {
-            console.error("Expected _.str (underscore.string) to be on the window object, but not found.");
+        defineDependency("s", "underscore.string");
+        // Underscore.string no longer installs itself directly on "_". For compatibility with existing
+        // code, add it to "_" with its previous name.
+        if (window._ && window.s) {
+            window._.str = window.s;
         }
         defineDependency("gettext", "gettext");
         defineDependency("Logger", "logger");
