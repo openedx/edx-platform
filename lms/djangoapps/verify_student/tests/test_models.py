@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
-import ddt
 import json
-import mock
-import requests.exceptions
-import pytz
 
+import ddt
 from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
+from freezegun import freeze_time
+import mock
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
+import pytz
+import requests.exceptions
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -42,8 +43,9 @@ iwIDAQAB
         "API_URL": "http://localhost/verify_student/fake_endpoint",
         "AWS_ACCESS_KEY": "FAKEACCESSKEY",
         "AWS_SECRET_KEY": "FAKESECRETKEY",
-        "S3_BUCKET": "fake-bucket"
-    }
+        "S3_BUCKET": "fake-bucket",
+    },
+    "DAYS_GOOD_FOR": 10,
 }
 
 
@@ -523,6 +525,21 @@ class TestPhotoVerification(ModuleStoreTestCase):
         second_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
         self.assertIsNotNone(second_result)
         self.assertEqual(second_result, first_result)
+
+        # Test method 'get_initial_verification' returns None after expiration
+        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        with freeze_time(expired_future):
+            third_result = SoftwareSecurePhotoVerification.get_initial_verification(user)
+            self.assertIsNone(third_result)
+
+        # Test method 'get_initial_verification' returns correct attempt after system expiration,
+        # but within earliest allowed override.
+        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        earliest_allowed = datetime.utcnow() - timedelta(days=1)
+        with freeze_time(expired_future):
+            fourth_result = SoftwareSecurePhotoVerification.get_initial_verification(user, earliest_allowed)
+            self.assertIsNotNone(fourth_result)
+            self.assertEqual(fourth_result, first_result)
 
 
 @ddt.ddt
