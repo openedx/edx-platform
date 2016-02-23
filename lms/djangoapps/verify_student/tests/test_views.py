@@ -1427,7 +1427,8 @@ class TestSubmitPhotosForVerification(TestCase):
             "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "S3_BUCKET": "test.example.com",
-        }
+        },
+        "DAYS_GOOD_FOR": 10,
     })
     @httpretty.activate
     @moto.mock_s3
@@ -1469,6 +1470,16 @@ class TestSubmitPhotosForVerification(TestCase):
         self.assertEqual(reverification_photo_response.status_code, 200)
 
         self.assertNotEqual(initial_photo_response.content, reverification_photo_response.content)
+
+        # Submit a new face photo and photo id for verification
+        self._submit_photos(
+            face_image=self.IMAGE_DATA + "9999",
+            photo_id_image=self.IMAGE_DATA + "1111",
+        )
+        two_photo_reverification_data = self._get_post_data()
+
+        # Verify that the initial attempt sent a new ID photo for the reverification attempt
+        self.assertNotEqual(initial_data["PhotoIDKey"], two_photo_reverification_data["PhotoIDKey"])
 
     @ddt.data('face_image', 'photo_id_image')
     def test_invalid_image_data(self, invalid_param):
