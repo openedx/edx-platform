@@ -66,6 +66,9 @@
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
                   </li>
+                  <li class="nav-item nav-course-courseware-details">
+                    <a href="${settings_details_url}">${_("Course Details")}</a>
+                  </li>
                   % if context_course.video_pipeline_configured:
                   <li class="nav-item nav-course-courseware-videos">
                     <a href="${videos_url}">${_("Video Uploads")}</a>
@@ -84,9 +87,6 @@
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
                     <a href="${settings_schedule_url}">${_("Schedule &amp; Configuration")}</a>
-                  </li>
-                  <li class="nav-item nav-course-settings-details">
-                    <a href="${settings_details_url}">${_("Course Details")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${grading_url}">${_("Grading")}</a>

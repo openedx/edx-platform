@@ -32,8 +32,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 </%block>
 
 <%block name="requirejs">
-    require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory(
+    require(["js/factories/settings_course_schedule"], function(ScheduleSettingsFactory) {
+        ScheduleSettingsFactory(
             "${schedule_url | n, js_escaped_string}",
             ${show_min_grade_warning | n, dump_js_escaped_json}
         );

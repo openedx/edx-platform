@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "details" %></%def>
 <%block name="title">${_("Course Details")}</%block>
-<%block name="bodyclass">is-signedin course details view-settings feature-upload</%block>
+<%block name="bodyclass">is-signedin course view-course-details view-settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -32,8 +32,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 </%block>
 
 <%block name="requirejs">
-    require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory(
+    require(["js/factories/settings_course_details"], function(DetailedSettingsFactory) {
+        DetailedSettingsFactory(
             "${details_url | n, js_escaped_string}",
             ${show_min_grade_warning | n, dump_js_escaped_json}
         );
