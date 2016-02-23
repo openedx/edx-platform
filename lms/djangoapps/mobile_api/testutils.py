@@ -11,8 +11,9 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 import ddt
+from datetime import timedelta
+from django.utils import timezone
 from mock import patch
-from unittest import skip
 
 from django.core.urlresolvers import reverse
 
@@ -168,9 +169,13 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         response = self.api_response(expected_response_code=None, course_id=non_existent_course_id)
         self.verify_failure(response)  # allow subclasses to override verification
 
-    @skip  # TODO fix this, see MA-1038
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_unreleased_course(self):
+        # ensure the course always starts in the future
+        # pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
+        # pylint: disable=attribute-defined-outside-init
+        self.course.start = timezone.now() + timedelta(days=365)
         self.init_course_access()
         self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))
 
