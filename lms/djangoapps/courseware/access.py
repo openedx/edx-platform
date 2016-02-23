@@ -135,9 +135,6 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if isinstance(course_key, CCXLocator):
-        course_key = course_key.to_course_locator()
-
     if in_preview_mode():
         if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
             return ACCESS_DENIED
