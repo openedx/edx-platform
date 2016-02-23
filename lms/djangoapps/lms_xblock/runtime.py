@@ -10,7 +10,6 @@ from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_a
 from request_cache.middleware import RequestCache
 from xblock.exceptions import NoSuchServiceError
 import xblock.reference.plugins
-from xblock.runtime import NullI18nService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.services import SettingsService
 from xmodule.library_tools import LibraryToolsService
