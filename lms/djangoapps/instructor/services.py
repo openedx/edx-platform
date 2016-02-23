@@ -27,9 +27,9 @@ class InstructorService(object):
     and attempt counts if there had been an earlier attempt.
     """
 
-    def delete_student_attempt(self, student_identifier, course_id, content_id):
+    def delete_student_attempt(self, student_identifier, course_id, content_id, requesting_user):
         """
-        Deletes student state for a problem.
+        Deletes student state for a problem. requesting_user may be kept as an audit trail.
 
         Takes some of the following query parameters
             - student_identifier is an email or username
@@ -63,7 +63,13 @@ class InstructorService(object):
 
         if student:
             try:
-                enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=True)
+                enrollment.reset_student_attempts(
+                    course_id,
+                    student,
+                    module_state_key,
+                    requesting_user=requesting_user,
+                    delete_module=True,
+                )
             except (StudentModule.DoesNotExist, enrollment.sub_api.SubmissionError):
                 err_msg = (
                     'Error occurred while attempting to reset student attempts for user '
