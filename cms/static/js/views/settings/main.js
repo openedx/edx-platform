@@ -6,7 +6,7 @@ define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui"
                 timepicker, date, gettext) {
 
 var DetailsView = ValidatingView.extend({
-    // Model class is CMS.Models.Settings.CourseDetails
+    // Model class is CMS.Models.Settings.CourseSchedule
     events : {
         "input input" : "updateModel",
         "input textarea" : "updateModel",
