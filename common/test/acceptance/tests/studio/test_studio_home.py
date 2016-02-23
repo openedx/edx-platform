@@ -3,6 +3,7 @@ Acceptance tests for Home Page (My Courses / My Libraries).
 """
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import LibraryLocator
+from uuid import uuid4
 
 from ...fixtures import PROGRAMS_STUB_URL
 from ...fixtures.config import ConfigModelFixture
@@ -41,12 +42,14 @@ class CreateLibraryTest(WebAppTest):
             Return to the home page
             The newly created library should now appear in the list of libraries
         """
-        name = "New Library Name"
-        org = "TestOrgX"
-        number = "TESTLIB"
+        unique_suffix = uuid4().hex[:4]
+        name = "New Library Name " + unique_suffix
+        org = "TestOrgX" + unique_suffix
+        number = "TESTLIB_" + unique_suffix
 
         self.auth_page.visit()
         self.dashboard_page.visit()
+        self.dashboard_page.wait_for_element_visibility('.content-primary', 'See library list.')
         self.assertFalse(self.dashboard_page.has_library(name=name, org=org, number=number))
         self.assertTrue(self.dashboard_page.has_new_library_button())
 
