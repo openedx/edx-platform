@@ -70,7 +70,9 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     containerPage.render();
                     respondWithHtml(html);
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
-                    AjaxHelpers.respondWithJson(requests, options);
+                    // Note that here we don't really care what JSON is sent back. We are only
+                    // responding to the request to keep the request queue flushed out.
+                    AjaxHelpers.respondWithJson(requests, {});
                 };
 
                 handleContainerPageRefresh = function(requests) {
