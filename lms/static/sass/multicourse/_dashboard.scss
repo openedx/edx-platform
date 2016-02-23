@@ -255,7 +255,7 @@
         font-family: $sans-serif;
         display: inline-block;
         letter-spacing: 1px;
-        margin-left: ($baseline/4);
+        @include margin-left($baseline/4);
         padding: 5px 10px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
@@ -490,7 +490,7 @@
             display: none;
             position: absolute;
             top: ($baseline*2);
-            right: 19px;
+            @include right(19px);
             pointer-events: none;
             min-width: ($baseline*7);
 
@@ -516,7 +516,7 @@
               &:after,
               &:before {
                 bottom: 100%;
-                right: 6px;
+                @include right(6px);
                 border: solid transparent;
                 content: " ";
                 height: 0;
@@ -565,7 +565,7 @@
         border: 1px solid $border-color-2;
         box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
         margin-top: 17px;
-        margin-right: flex-gutter();
+        @include margin-right(flex-gutter());
         padding: ($baseline/4);
         width: flex-grid(8);
         @include float(left);
@@ -728,7 +728,7 @@
               @include font-size(18);
               display: inline-block;
               vertical-align: middle;
-              margin-right: ($baseline/4);
+              @include margin-right($baseline/4);
             }
 
             .message-copy {
@@ -758,8 +758,8 @@
             @extend %btn-primary-green;
             @include clearfix();
             position: relative;
-            left: ($baseline/2);
-            padding: ($baseline * 0.4) 0 ($baseline * 0.4) ($baseline * 0.75);
+            @include left($baseline/2);
+            @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
 
             .action-upgrade-icon{
               @include float(left);
@@ -777,7 +777,7 @@
             .deco-graphic {
               position: absolute;
               top: -($baseline/4);
-              left: -($baseline*0.75);
+              @include left(-($baseline*0.75));
               width: ($baseline*2);
             }
 
@@ -793,7 +793,7 @@
             .copy {
               @extend %t-action3;
               @extend %t-weight4;
-              margin-right: $baseline;
+              @include margin-right($baseline);
             }
 
             .copy-sub {
@@ -825,7 +825,7 @@
             .credit-btn {
               @extend %btn-pl-yellow-base;
               @include float(right);
-              margin-right: 5px;
+              @include margin-right(5px);
               background-image: none ;
               text-shadow: none;
               box-shadow: none;
@@ -852,7 +852,7 @@
               @extend %btn-pl-black-border;
               @include float(right);
               position: relative;
-              left: 10px;
+              @include left(10px);
               padding: ($baseline*0.4) ($baseline*0.6);
               background-image: none ;
               text-shadow: none;
@@ -891,7 +891,7 @@
               @extend %btn-pl-black-base;
               @include float(right);
               position: relative;
-              left: 10px;
+              @include left(10px);
               padding: ($baseline*0.4) ($baseline*0.6);
               background-image: none ;
               text-shadow: none;
@@ -931,7 +931,7 @@
 
             .action {
               @include float(left);
-              margin: 0 15px 0 0;
+              @include margin(0, 15px, 0, 0);
 
               .btn, .cta {
                 display: inline-block;
@@ -1261,7 +1261,7 @@
     .deco-arrow {
       @include triangle(($baseline/2), $m-gray-d3, up);
       position: absolute;
-      left: 45%;
+      @include left(45%);
       top: -6px;
     }
   }
@@ -1334,7 +1334,7 @@
   }
 
   .list--nav {
-    margin-left: 26px;
+    @include margin-left(26px);
   }
 
   // STATE: is denied
@@ -1348,7 +1348,7 @@
 
 // message
 .msg {
-  margin: ($baseline/2) 0 ($baseline/2) 26px;
+  @include margin(($baseline/2), 0, ($baseline/2), 26px);
 }
 
 .msg__title {
