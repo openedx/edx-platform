@@ -39,6 +39,7 @@ from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
 from xblock_config.models import StudioConfig
+from xblock.exceptions import NoSuchServiceError
 
 __all__ = ['preview_handler']
 
@@ -91,6 +92,11 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
 
+    def __init__(self, **kwargs):
+        services = kwargs.setdefault('services', {})
+        services['i18n'] = None  # This key overrides super, populated on-demand by service() below
+        super(PreviewModuleSystem, self).__init__(**kwargs)
+
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
             'usage_key_string': unicode(block.scope_ids.usage_id),
@@ -132,6 +138,36 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         result.add_content(frag.content)
         return result
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        declaration = block.service_declaration(service_name)
+        if declaration is None:
+            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
+
+        service = self._services.get(service_name)
+        if service is None and declaration == "need":
+            service_map = {
+                'i18n': ModuleI18nService,
+            }
+            try:
+                service = service_map[service_name](block)
+            except KeyError:
+                raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
+
+        return service
 
 
 class StudioPermissionsService(object):
@@ -213,7 +249,6 @@ def _preview_module_system(request, descriptor, field_data):
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
-            "i18n": ModuleI18nService(),
             "field-data": field_data,
             "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
