@@ -21,6 +21,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from common.test.acceptance.tests.helpers import disable_animations
 from ...fixtures.certificates import CertificateConfigFixture
 
@@ -58,6 +59,9 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.auto_enroll_section = instructor_dashboard_page.select_membership().select_auto_enroll_section()
+        # Initialize the page objects
+        self.register_page = CombinedLoginAndRegisterPage(self.browser, start_page="register")
+        self.dashboard_page = DashboardPage(self.browser)
 
     def test_browse_and_upload_buttons_are_visible(self):
         """
@@ -67,6 +71,38 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         """
         self.assertTrue(self.auto_enroll_section.is_file_attachment_browse_button_visible())
         self.assertTrue(self.auto_enroll_section.is_upload_button_visible())
+
+    def test_enroll_unregister_student(self):
+        """
+        Scenario: On the Membership tab of the Instructor Dashboard, Batch Enrollment div is visible.
+            Given that I am on the Membership tab on the Instructor Dashboard
+            Then I enter the email and enroll it.
+            Logout the current page.
+            And Navigate to the registration page and register the student.
+            Then I see the course which enrolled the student.
+        """
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = "{user}@example.com".format(user=username)
+        self.auto_enroll_section.fill_enrollment_batch_text_box(email)
+        self.assertIn(
+            'Successfully sent enrollment emails to the following users. '
+            'They will be enrolled once they register:',
+            self.auto_enroll_section.get_notification_text()
+        )
+        LogoutPage(self.browser).visit()
+        self.register_page.visit()
+        self.register_page.register(
+            email=email,
+            password="123456",
+            username=username,
+            full_name="Test User",
+            terms_of_service=True,
+            country="US",
+            favorite_movie="Harry Potter",
+        )
+        course_names = self.dashboard_page.wait_for_page().available_courses
+        self.assertEquals(len(course_names), 1)
+        self.assertIn(self.course_info["display_name"], course_names)
 
     def test_clicking_file_upload_button_without_file_shows_error(self):
         """
