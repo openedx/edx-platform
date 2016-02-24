@@ -142,7 +142,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:54+0000\n"
+"POT-Creation-Date: 2016-02-17 21:30+0000\n"
 "PO-Revision-Date: 2015-12-07 09:55+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -5005,6 +5005,14 @@ msgstr "مفتاح المساق {course_id} غير صحيح"
 msgid "Course {course_id} does not exist."
 msgstr "المساق {course_id} غير موجود"
 
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -8356,6 +8364,43 @@ msgstr "اشترك في قناة منصّة {platform_name} على موقع يو
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid ""
+"\n"
+"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
+"  "
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid "Manage your data: %(permission)s"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "استُكملت عملية تغيير كلمة المرور الخاصة بك"
@@ -9269,6 +9314,16 @@ msgstr "فعّل واجهة التفويض في الأستوديو"
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
 msgstr "تفعيل إنشاء شهادة البرنامج"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
+msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -17877,12 +17932,9 @@ msgstr "ما هي الصفحات؟"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
-"ستجد الصفحات مسرودة أفقيًّا في أعلى مساقك، بحيث تُدرَج الصفحات الافتراضية "
-"(محتويات المساق، ومعلومات المساق، والنقاشات، والويكي، والعلامات) قبل الكتب "
-"والصفحات المخصّصة التي تنشئها."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -17923,13 +17975,10 @@ msgstr "معاينة الصفحات في مساقك"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
-"تظهر الصفحات في الركن العلوي لشريط التصفّح في مساقك، بحيث تُدرَج الصفحات "
-"الافتراضية (محتويات المساق، ومعلومات المساق، والنقاشات، والويكي، والعلامات) "
-"قبل الكتب والصفحات المخصّصة."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
