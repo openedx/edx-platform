@@ -813,6 +813,7 @@ class SpecialExamsPageAllowanceSection(PageObject):
         self.q(css='input#user_info').fill(username)
         self.q(css="input#addNewAllowance").click()
         self.wait_for_element_absence("div.modal div.modal-header", "Popup should be hidden")
+        self.wait_for_ajax()
 
 
 class SpecialExamsPageAttemptsSection(PageObject):
