@@ -186,11 +186,18 @@ getJasmineRequireObj().AjaxFakeRequest = function(eventBusFactory) {
     return destination;
   }
 
-  function arrayContains(arr, item) {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i] === item) {
-        return true;
-      }
+      this.onload();
+
+      // With newer versions of JQuery, the onload function sets onreadystatechange to null.
+      // Once we upgrade Jasmine to 2.x, we can also upgrade mock-ajax.
+      // Note that mock-ajax is only used by active_video_upload_list_spec.js, so it is also
+      // possible that the test could be rewritten to not require it.
+      // this.onreadystatechange();
+    },
+    responseTimeout: function() {
+      this.readyState = 4;
+      jasmine.Clock.tick(jQuery.ajaxSettings.timeout || 30000);
+      this.onreadystatechange('timeout');
     }
     return false;
   }
