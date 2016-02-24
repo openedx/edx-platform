@@ -1,6 +1,6 @@
 define([
-    'jquery', 'js/models/settings/course_schedule', 'js/views/settings/main'
-], function($, CourseScheduleModel, MainView) {
+    'jquery', 'js/models/settings/course_schedule', 'js/views/settings/course_schedule'
+], function($, CourseScheduleModel, ScheduleView) {
     'use strict';
     return function (detailsUrl, showMinGradeWarning) {
         var model;
@@ -17,7 +17,7 @@ define([
         model.urlRoot = detailsUrl;
         model.fetch({
             success: function(model) {
-                var editor = new MainView({
+                var editor = new ScheduleView({
                     el: $('.settings-details'),
                     model: model,
                     showMinGradeWarning: showMinGradeWarning

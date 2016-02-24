@@ -16,7 +16,6 @@ var DetailsView = ValidatingView.extend({
         "change select" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
-        'mouseover .timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
@@ -63,116 +62,18 @@ var DetailsView = ValidatingView.extend({
         }
         else this.$el.find('.remove-course-introduction-video').hide();
 
-        this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
-
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
-
-        var pre_requisite_courses = this.model.get('pre_requisite_courses');
-        pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
-        this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
-
-        if (this.model.get('entrance_exam_enabled') == 'true') {
-            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
-            this.$('.div-grade-requirements').show();
-        }
-        else {
-            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
-            this.$('.div-grade-requirements').hide();
-        }
-        this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
-
-        var selfPacedButton = this.$('#course-pace-self-paced'),
-            instructorPacedButton = this.$('#course-pace-instructor-paced'),
-            paceToggleTip = this.$('#course-pace-toggle-tip');
-        (this.model.get('self_paced') ? selfPacedButton : instructorPacedButton).attr('checked', true);
-        if (this.model.canTogglePace()) {
-            selfPacedButton.removeAttr('disabled');
-            instructorPacedButton.removeAttr('disabled');
-            paceToggleTip.text('');
-        }
-        else {
-            selfPacedButton.attr('disabled', true);
-            instructorPacedButton.attr('disabled', true);
-            paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
-        }
-
-        this.licenseView.render()
 
         return this;
     },
     fieldToSelectorMap : {
         'language' : 'course-language',
-        'start_date' : "course-start",
-        'end_date' : 'course-end',
-        'enrollment_start' : 'enrollment-start',
-        'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
-        'effort' : "course-effort",
-        'course_image_asset_path': 'course-image-url',
-        'pre_requisite_courses': 'pre-requisite-course',
-        'entrance_exam_enabled': 'entrance-exam-enabled',
-        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
-    },
-
-    updateTime : function(e) {
-        var now = new Date(),
-            hours = now.getUTCHours(),
-            minutes = now.getUTCMinutes(),
-            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
-
-        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
-            'hours': hours,
-            'minutes': minutes
-        }, true));
-    },
-
-    setupDatePicker: function (fieldName) {
-        var cacheModel = this.model;
-        var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-        var datefield = $(div).find("input.date");
-        var timefield = $(div).find("input.time");
-        var cachethis = this;
-        var setfield = function () {
-            var newVal = DateUtils.getDate(datefield, timefield),
-                oldTime = new Date(cacheModel.get(fieldName)).getTime();
-            if (newVal) {
-                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
-                    cachethis.clearValidationErrors();
-                    cachethis.setAndValidate(fieldName, newVal);
-                }
-            }
-            else {
-                // Clear date (note that this clears the time as well, as date and time are linked).
-                // Note also that the validation logic prevents us from clearing the start date
-                // (start date is required by the back end).
-                cachethis.clearValidationErrors();
-                cachethis.setAndValidate(fieldName, null);
-            }
-        };
-
-        // instrument as date and time pickers
-        timefield.timepicker({'timeFormat' : 'H:i'});
-        datefield.datepicker();
-
-        // Using the change event causes setfield to be triggered twice, but it is necessary
-        // to pick up when the date is typed directly in the field.
-        datefield.change(setfield).keyup(TriggerChangeEventOnEnter);
-        timefield.on('changeTime', setfield);
-        timefield.on('input', setfield);
-
-        date = this.model.get(fieldName)
-        // timepicker doesn't let us set null, so check that we have a time
-        if (date) {
-            DateUtils.setDate(datefield, timefield, date);
-        } // but reset fields either way
-        else {
-            timefield.val('');
-            datefield.val('');
-        }
+        'course_image_asset_path': 'course-image-url'
     },
 
     updateModel: function(event) {
@@ -191,33 +92,8 @@ var DetailsView = ValidatingView.extend({
                 $('#course-image').attr('src', $(event.currentTarget).val());
             }, 1000);
             break;
-        case 'course-effort':
-            this.setField(event);
-            break;
-        case 'entrance-exam-enabled':
-            if($(event.currentTarget).is(":checked")){
-                this.$('.div-grade-requirements').show();
-            }else{
-                this.$('.div-grade-requirements').hide();
-            }
-            this.setField(event);
-            break;
-        case 'entrance-exam-minimum-score-pct':
-            // If the val is an empty string then update model with default value.
-            if ($(event.currentTarget).val() === '') {
-                this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
-            }
-            else {
-                this.setField(event);
-            }
-            break;
         case 'course-short-description':
             this.setField(event);
-            break;
-        case 'pre-requisite-course':
-            var value = $(event.currentTarget).val();
-            value = value == "" ? [] : [value];
-            this.model.set('pre_requisite_courses', value);
             break;
         // Don't make the user reload the page to check the Youtube ID.
         // Wait for a second to load the video, avoiding egregious AJAX calls.
@@ -234,11 +110,6 @@ var DetailsView = ValidatingView.extend({
                     this.$el.find('.remove-course-introduction-video').hide();
                 }
             }, this), 1000);
-            break;
-        case 'course-pace-self-paced':
-            // Fallthrough to handle both radio buttons
-        case 'course-pace-instructor-paced':
-            this.model.set('self_paced', JSON.parse(event.currentTarget.value));
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
@@ -347,11 +218,6 @@ var DetailsView = ValidatingView.extend({
             }
         });
         modal.show();
-    },
-
-    handleLicenseChange: function() {
-        this.showNotificationBar()
-        this.model.set("license", this.licenseModel.toString())
     }
 });
 
