@@ -9,7 +9,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         var team_member_fixture = readFixtures("team-member.underscore");
 
         function setRole(email, role){
-            var user_li = $("li.user-item[data-email="+ email + "]");
+            var user_li = $('li.user-item[data-email="'+ email + '"]');
             var role_action = $("li.action-role a.make-"+role, user_li);
             expect(role_action).toBeVisible();
             role_action.click();
