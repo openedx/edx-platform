@@ -23,7 +23,7 @@ from instructor.enrollment import (
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.permissions import IsCourseInstructor
+from openedx.core.lib.api import permissions
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
@@ -301,7 +301,7 @@ class CCXListView(GenericAPIView):
             }
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated, IsCourseInstructor)
+    permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
     pagination_class = CCXAPIPagination
 
@@ -510,8 +510,16 @@ class CCXDetailView(GenericAPIView):
     """
 
     authentication_classes = (OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated, IsCourseInstructor)
+    permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
+
+    def get_object(self, course_id, is_ccx=False):  # pylint: disable=arguments-differ
+        """
+        Override the default get_object to allow a custom getter for the CCX
+        """
+        course_object, course_key, error_code, http_status = get_valid_course(course_id, is_ccx)
+        self.check_object_permissions(self.request, course_object)
+        return course_object, course_key, error_code, http_status
 
     def get(self, request, ccx_course_id=None):
         """
@@ -524,7 +532,7 @@ class CCXDetailView(GenericAPIView):
         Return:
             A JSON serialized representation of the CCX course.
         """
-        ccx_course_object, _, error_code, http_status = get_valid_course(ccx_course_id, is_ccx=True)
+        ccx_course_object, _, error_code, http_status = self.get_object(ccx_course_id, is_ccx=True)
         if ccx_course_object is None:
             return Response(
                 status=http_status,
@@ -543,7 +551,7 @@ class CCXDetailView(GenericAPIView):
             request (Request): Django request object.
             ccx_course_id (string): URI element specifying the CCX course location.
         """
-        ccx_course_object, ccx_course_key, error_code, http_status = get_valid_course(ccx_course_id, is_ccx=True)
+        ccx_course_object, ccx_course_key, error_code, http_status = self.get_object(ccx_course_id, is_ccx=True)
         if ccx_course_object is None:
             return Response(
                 status=http_status,
@@ -571,7 +579,7 @@ class CCXDetailView(GenericAPIView):
             request (Request): Django request object.
             ccx_course_id (string): URI element specifying the CCX course location.
         """
-        ccx_course_object, ccx_course_key, error_code, http_status = get_valid_course(ccx_course_id, is_ccx=True)
+        ccx_course_object, ccx_course_key, error_code, http_status = self.get_object(ccx_course_id, is_ccx=True)
         if ccx_course_object is None:
             return Response(
                 status=http_status,
