@@ -3,16 +3,10 @@ define(["backbone", "underscore", "gettext", "js/models/validation_helpers", "js
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
-        org : '',
-        course_id: '',
-        run: '',
         language: '',
-        syllabus: null,
         short_description: "",
         overview: "",
         intro_video: null,
-        effort: null,	// an int or null,
-        license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
     },
