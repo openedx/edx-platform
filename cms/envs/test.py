@@ -23,6 +23,7 @@ import os
 from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
+from util.db import MigrationModules
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -129,9 +130,17 @@ DATABASES = {
     },
 }
 
-# This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+# Earlier migrations were disabled during Python unit tests. If we enable migrations
+# these data migrations seed data that cause tests to fail. So for now they are being
+# skipped. Please do not add to this list.
+DISABLED_DATA_MIGRATIONS = [
+    'dark_lang.migrations.0002_data__enable_on_install',
+    'embargo.migrations.0002_data__add_countries',
+]
+
+os.environ['ENABLE_MIGRATIONS'] = '1'
+# This hack disables migrations during tests. We want to create tables directly from models for speed.
+MIGRATION_MODULES = MigrationModules(os.getenv('ENABLE_MIGRATIONS'), DISABLED_DATA_MIGRATIONS)
 
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview"

@@ -34,6 +34,7 @@ __test__ = False  # do not collect
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    make_option("--enable-migrations", action="store_true", dest="enable_migrations", help="Run migrations instead of syncdb"),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 def test_system(options):
     """
@@ -51,6 +52,7 @@ def test_system(options):
         'cov_args': getattr(options, 'cov_args', ''),
         'skip_clean': getattr(options, 'skip_clean', False),
         'pdb': getattr(options, 'pdb', False),
+        'enable_migrations': getattr(options, 'enable_migrations', False),
     }
 
     if test_id:
@@ -134,6 +136,7 @@ def test_lib(options):
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
+    make_option("--enable-migrations", action="store_true", dest="enable_migrations", help="Run migrations instead of syncdb"),
 ])
 def test_python(options):
     """
@@ -146,6 +149,7 @@ def test_python(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
         'pdb': getattr(options, 'pdb', False),
+        'enable_migrations': getattr(options, 'enable_migrations', False),
     }
 
     python_suite = suites.PythonTestSuite('Python Tests', **opts)

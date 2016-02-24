@@ -24,6 +24,7 @@ from path import Path as path
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
+from util.db import MigrationModules
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 # This patch disables the commit_on_success decorator during tests
@@ -188,9 +189,23 @@ DATABASES = {
 
 }
 
-# This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+# Earlier migrations were disabled during Python unit tests. If we enable migrations
+# these data migrations seed data that cause tests to fail. So for now they are being
+# skipped. Please do not add to this list.
+DISABLED_DATA_MIGRATIONS = [
+    'bulk_email.migrations.0002_data__load_course_email_template',
+    'certificates.migrations.0002_data__certificatehtmlviewconfiguration_data',
+    'certificates.migrations.0003_data__default_modes',
+    'commerce.migrations.0001_data__add_ecommerce_service_user',
+    'dark_lang.migrations.0002_data__enable_on_install',
+    'edxval.migrations.0002_data__default_profiles',
+    'embargo.migrations.0002_data__add_countries',
+]
+
+os.environ['ENABLE_MIGRATIONS'] = '1'
+# This hack disables migrations during tests. We want to create tables directly from models for speed.
+MIGRATION_MODULES = MigrationModules(os.getenv('ENABLE_MIGRATIONS'), DISABLED_DATA_MIGRATIONS)
+
 
 CACHES = {
     # This is the cache used for most things.
