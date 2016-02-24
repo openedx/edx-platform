@@ -57,24 +57,6 @@ Feature: CMS.Component Adding
            | Numerical Input      |
            | Text Input           |
 
-    Scenario Outline: I can add Advanced Problem components
-       Given I am in Studio editing a new unit
-       When I add a "<Component>" "Advanced Problem" component
-       Then I see a "<Component>" Problem component
-       # Flush out the database before the next example executes
-       And I reset the database
-
-    Examples:
-           | Component                     |
-           | Blank Advanced Problem        |
-           | Circuit Schematic Builder     |
-           | Custom Python-Evaluated Input |
-           | Drag and Drop                 |
-           | Image Mapped Input            |
-           | Math Expression Input         |
-           | Problem with Adaptive Hint    |
-
-
 # Disabled 1/21/14 due to flakiness seen in master
 #    Scenario: I can add Advanced Latex Problem components
 #       Given I am in Studio editing a new unit
