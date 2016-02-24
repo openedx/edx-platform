@@ -245,12 +245,29 @@ class ModuleI18nService(object):
     i18n service.
 
     """
-    def __init__(self, block):
+    def __init__(self, block=None):
         """
-        Store a reference to the block currently being serviced by this runtime.  We'll use this
-        reference later on for things like locating the block's translation domain (PO+MO files)
+        We are using this block for things like locating the block's translation domain (PO+MO files). Here we attempts
+         to look up the provided string in the XBlock's own domain translation catalog, currently expected to be:
+            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
+        If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
+        django.utils.translation.ugettext, which will attempt to find a matching string in the
+        LMS' own domain translation catalog -- effectively achieving translation by coincidence.
         """
-        self.block = block
+        if block:
+            xblock_resource = block.__class__.unmixed_class.__module__
+            xblock_locale_dir = '/conf/locale'
+            xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
+            xblock_domain = 'django'
+            selected_language = get_language()
+            try:
+                self.translator = gettext.translation(
+                    xblock_domain,
+                    xblock_locale_path,
+                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
+                )
+            except IOError:
+                self.translator = django.utils.translation
 
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
@@ -258,32 +275,13 @@ class ModuleI18nService(object):
     def ugettext(self, string):
         """
         This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
-        the GNU gettext ugettext operation.  Here we attempts to look up the provided string in the
-        XBlock's own domain translation catalog, currently expected to be:
-            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
-        If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
-        django.utils.translation.ugettext, which will attempt to find a matching string in the
-        LMS' own domain translation catalog -- effectively achieving translation by coincidence.
+        the GNU gettext ugettext operation.
         """
         # The translation workflow should only execute if there's an actual string to look up
         # If gettext processes an empty string the PO file header information will oddly be returned
         translated_string = unicode(string)
-        if translated_string and self.block:
-            try:
-                xblock_resource = self.block.__class__.unmixed_class.__module__
-                xblock_locale_dir = '/conf/locale'
-                xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
-                xblock_domain = 'django'
-                selected_language = get_language()
-                translator = gettext.translation(
-                    xblock_domain,
-                    xblock_locale_path,
-                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
-                )
-                _ = translator.ugettext
-            except IOError:
-                _ = django.utils.translation.ugettext
-            translated_string = _(translated_string)  # pylint: disable=translation-of-non-string
+        if translated_string:
+            translated_string = self.translator.ugettext(translated_string)  # pylint: disable=translation-of-non-string
         return translated_string
 
     def strftime(self, *args, **kwargs):
