@@ -49,9 +49,9 @@ class TestUserSignup(ModuleStoreTestCase):
     #     }
     #     response = self.client.post(self.url, payload)
     #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     number = "{}101".format(user.username)
+    #     number = "{}Clone".format(user.username)
     #     run = "CurrentTerm"
-    #     self.assertIn("course-v1:{}+{}+{}".format(org.key, number, run), response.content)
+    #     self.assertIn("{}/{}/{}".format(org.key, number, run), response.content)
 
     def test_creates_new_course_if_missing_course_id(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")

@@ -6,6 +6,7 @@ from rest_framework import status
 
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
@@ -37,19 +38,23 @@ class CreateCourseAPIView(GenericAPIView):
             number = "{}101".format(user.username)
             run = "CurrentTerm"
 
-            new_course_id = "course-v1:{}+{}+{}".format(org.key, number, run)
+            destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
+            logger.warning(destination_course_key)
             fields = {
-                "display_name": "Your First Course"
+                "display_name": "{}'s First Course".format(user.profile.name)
             }
             new_course = None
             logger.warning("===============================================================")
             if serializer.data.get('course_id'):
                 course_id = serializer.data.get('course_id')
                 try:
-                    with modulestore().default_store(ModuleStoreEnum.Type.split):
-                        new_course = modulestore().clone_course(source_course_id=course_id,
-                                                            dest_course_id=new_course_id,
-                                                            user_id=user.id)
+                    # with modulestore().default_store(ModuleStoreEnum.Type.split):
+                    # this is here just so we know for sure whether it was cloned or not
+                    number = "{}Clone".format(user.username)
+                    new_course = modulestore().clone_course(source_course_id=course_id,
+                                                            dest_course_id=destination_course_key,
+                                                            user_id=user.username,
+                                                            fields=fields)
                 except Exception as e:
                     message = "Unable to clone course {}. {}".format(course_id, e)
                     logger.error(message)
@@ -57,12 +62,16 @@ class CreateCourseAPIView(GenericAPIView):
 
             if not new_course:
                 try:
+                    number = "{}101".format(user.username)
                     new_course = create_new_course_in_store(store_for_new_course, user, org.key,
                                                             number, run, fields)
-                except:
+                except Exception as e:
                     message = "Unable to create new course."
                     logger.error(message)
+                    logger.warning(e)
                     return Response(status=status.HTTP_400_BAD_REQUEST)
+            # add_instructor(new_course.id, User.objects.get(email="staff@example.com"), user)
+            # CourseEnrollment.enroll(user, new_course.id, mode='honor')
             new_course_url = reverse_course_url('course_handler', new_course.id)
             response_data = {
                 'course_url': new_course_url,
