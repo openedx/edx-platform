@@ -254,6 +254,7 @@ class ModuleI18nService(object):
         django.utils.translation.ugettext, which will attempt to find a matching string in the
         LMS' own domain translation catalog -- effectively achieving translation by coincidence.
         """
+        self.translator = django.utils.translation
         if block:
             xblock_resource = block.__class__.unmixed_class.__module__
             xblock_locale_dir = '/conf/locale'
@@ -267,7 +268,7 @@ class ModuleI18nService(object):
                     [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
                 )
             except IOError:
-                self.translator = django.utils.translation
+                pass
 
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
