@@ -170,7 +170,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:53+0000\n"
+"POT-Creation-Date: 2016-02-17 21:29+0000\n"
 "PO-Revision-Date: 2016-02-13 17:13+0000\n"
 "Last-Translator: Fabio Eis <fabio@fabioeis.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -8626,7 +8626,6 @@ msgstr ""
 "%(publish_username)s"
 
 #: cms/templates/js/publish-history.underscore
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
 msgstr "mensagem"

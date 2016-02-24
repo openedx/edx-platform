@@ -821,7 +821,7 @@
     "The following errors were generated:": "Les erreurs suivantes ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9es:", 
     "The following users are no longer enrolled in the course:": "Les utilisateurs suivants ont \u00e9t\u00e9 d\u00e9sinscrits du cours\u00a0:", 
     "The following warnings were generated:": "Les avertissements suivants ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9s:", 
-    "The language used throughout this site. This site is currently available in a limited number of languages.": "La langue utilis\u00e9e au travers du site. Le site est actuellement disponible dans un nombre limit\u00e9 de langue.", 
+    "The language used throughout this site. This site is currently available in a limited number of languages.": "La langue utilis\u00e9e au travers du site. Le site est actuellement disponible dans un nombre limit\u00e9 de langues.", 
     "The name that identifies you throughout {platform_name}. You cannot change your username.": "Votre nom sur {platform_name}. Vous ne pouvez pas modifier votre nom d'utilisateur", 
     "The page \"%(route)s\" could not be found.": "Page \"%(route)s\" non trouv\u00e9e.", 
     "The photo of your face matches the photo on your ID.": "La photo de votre visage concorde avec la photo sur votre pi\u00e8ce d'identit\u00e9.", 

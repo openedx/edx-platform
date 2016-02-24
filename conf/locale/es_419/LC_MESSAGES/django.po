@@ -183,7 +183,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:54+0000\n"
+"POT-Creation-Date: 2016-02-17 21:30+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5120,6 +5120,14 @@ msgstr "{course_id} no es una referencia de curso válida."
 msgid "Course {course_id} does not exist."
 msgstr "El curso {course_id} no existe."
 
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -8565,6 +8573,43 @@ msgstr "Suscríbase al canal YouTube de {platform_name}."
 msgid "Skip to main content"
 msgstr "Ir al contenido principal"
 
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid ""
+"\n"
+"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
+"  "
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr "Leer su ID de usuario"
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr "Leer su perfil de usuario"
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr "Leer su dirección de correo electrónico"
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid "Manage your data: %(permission)s"
+msgstr "Administrar sus datos: %(permission)s"
+
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "Tu reseteo de contraseña está completado"
@@ -9503,6 +9548,16 @@ msgstr "Habilitar la interfaz de autoría de STUDIO"
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
 msgstr "Activar generación de certificados de programa"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
+msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -18322,13 +18377,13 @@ msgstr "¿Qué son páginas?"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
 "Las páginas se listan en forma horizontal en la parte superior del curso. "
-"Las páginas por defecto (Contenidos, información, discusión, wiki y "
-"progreso) vienen seguidas por los libros de texto y las páginas "
-"personalizadas que usted crea."
+"Las páginas por defecto (Inicio, Curso, Discusión, Wiki, y Progreso) vienen "
+"seguidas por los libros de texto y las páginas personalizadas que usted "
+"crea."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -18372,13 +18427,13 @@ msgstr "Vista previa de páginas en su curso"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
 "Las páginas aparecen en la parte superior del curso. Las páginas por defecto"
-" (Contenidos, información, discusión, wiki y progreso) vienen seguidas por "
-"los libros de texto y las páginas personalizadas."
+" (Inicio, Curso, Discusión, Wiki, y Progreso) vienen seguidas por los libros"
+" de texto y las páginas personalizadas."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
