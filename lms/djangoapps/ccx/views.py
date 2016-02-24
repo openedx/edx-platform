@@ -503,7 +503,7 @@ def ccx_gradebook(request, course, ccx=None):
 
         return render_to_response('courseware/gradebook.html', {
             'page': page,
-            'page_url': reverse('ccx_gradebook', kwargs={'course_id': ccx_key}),
+            'page_url': './ccx_coach',
             'students': student_info,
             'course': course,
             'course_id': course.id,

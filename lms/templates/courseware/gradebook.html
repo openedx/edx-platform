@@ -135,7 +135,6 @@ from django.core.urlresolvers import reverse
         %endif
       </script>
     </div>
-    %if not ccx:
       <span class="grade-book-footer">
           %if page["previous_offset"] is not None:
             <a href="${page_url}?offset=${page['previous_offset']}"
@@ -154,7 +153,6 @@ from django.core.urlresolvers import reverse
             </a>
           %endif
       </span>
-    %endif
     %endif
   </section>
 </div>

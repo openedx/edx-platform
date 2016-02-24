@@ -10,22 +10,4 @@
   <div id="grade-book-ccx">
       <i class="icon fa fa-spinner fa-pulse fa-5x"></i>
   </div>
-  <div class="grade-book-footer">
-      %if grade_book_page["previous_offset"] is not None:
-        <a href="./ccx_coach?offset=${grade_book_page['previous_offset']}"
-           class="sequence-nav-button button-previous">
-          <span class="icon fa fa-chevron-left" aria-hidden="true"></span><span class="sr">${_('previous page')}</span>
-        </a>
-      %endif
-
-      ## Translators: Current page number out of total pages in grade book.
-      ${_('Page {page_num} of {total_pages}').format(page_num=grade_book_page["page_num"], total_pages=grade_book_page["total_pages"])}
-
-      %if grade_book_page["next_offset"] is not None:
-        <a href="./ccx_coach?offset=${grade_book_page['next_offset']}"
-           class="sequence-nav-button button-next">
-          <span class="icon fa fa-chevron-right" aria-hidden="true"></span><span class="sr">${_('next page')}</span>
-        </a>
-      %endif
-  </div>
 </section>
