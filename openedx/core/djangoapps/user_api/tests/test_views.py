@@ -1683,6 +1683,16 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             }
         )
 
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"honor_code": "hidden", "terms_of_service": "hidden"})
+    def test_register_hidden_honor_code_and_terms_of_service(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
     def test_missing_fields(self):
         response = self.client.post(
             self.url,

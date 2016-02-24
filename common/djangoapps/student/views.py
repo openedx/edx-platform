@@ -1628,7 +1628,7 @@ def create_account_with_params(request, params):
         not do_external_auth
     )
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_required = (
+    tos_required = settings.REGISTRATION_EXTRA_FIELDS.get('terms_of_service') != 'hidden' and (
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
