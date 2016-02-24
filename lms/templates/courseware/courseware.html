@@ -185,6 +185,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
                     current_score=int(round(entrance_exam_current_score * 100))
                 )}
             </p>
+            <%static:deferred_js>
             <script type="text/javascript">
             $(document).ajaxSuccess(function(event, xhr, settings) {
                 if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
@@ -195,6 +196,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
                 }
             });
             </script>
+            </%static:deferred_js>
             % else:
               <p class="sequential-status-message">
                 ${_('Your score is {current_score}%. You have passed the entrance exam.').format(

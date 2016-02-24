@@ -134,7 +134,7 @@ from branding import api as branding_api
             ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
-        </script>
+    </script>
     % endif
 
   <%include file="widgets/segment-io-footer.html" />
@@ -146,6 +146,19 @@ from branding import api as branding_api
   <%block name="js_extra" />
 
   <%static:get_deferred_js />
+
+  <script>
+      (function() {
+          var ds = document.getElementsByTagName('script');
+          for (var i = 0; i < ds.length; i++) {
+              if(ds[i].type == 'text/javascript+deferred') {
+                  var s = document.createElement('script'); s.innerHTML = ds[i].innerHTML;
+                  document.body.appendChild(s);
+                  ds[i].remove();
+              }
+          }
+      })();
+  </script>
 </body>
 </html>
 

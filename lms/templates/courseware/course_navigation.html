@@ -34,12 +34,14 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
 %>
 
 % if include_special_exams:
-  <%static:js group='proctoring'/>
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
     </script>
   % endfor
+  <%static:deferred_js>
+    <%static:js group='proctoring'/>
+  </%static:deferred_js>
 <div class="proctored_exam_status"></div>
 % endif
 % if show_preview_menu:
