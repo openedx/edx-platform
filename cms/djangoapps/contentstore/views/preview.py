@@ -16,10 +16,10 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
-from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.django import modulestore
 from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
-from xmodule.x_module import ModuleSystem
+from xmodule.x_module_layer import ModuleSystemLayer
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
@@ -39,7 +39,6 @@ from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
 from xblock_config.models import StudioConfig
-from xblock.exceptions import NoSuchServiceError
 
 __all__ = ['preview_handler']
 
@@ -84,7 +83,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
-class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class PreviewModuleSystem(ModuleSystemLayer):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
@@ -93,8 +92,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     is_author_mode = True
 
     def __init__(self, **kwargs):
-        services = kwargs.setdefault('services', {})
-        services['i18n'] = None  # This key overrides super, populated on-demand by service() below
         super(PreviewModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
@@ -138,36 +135,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         result.add_content(frag.content)
         return result
-
-    def service(self, block, service_name):
-        """
-        Runtime-specific override for the XBlock service manager.  If a service is not currently
-        instantiated and is declared as a critical requirement, an attempt is made to load the
-        module.
-
-        Arguments:
-            block (an XBlock): this block's class will be examined for service
-                decorators.
-            service_name (string): the name of the service requested.
-
-        Returns:
-            An object implementing the requested service, or None.
-        """
-        declaration = block.service_declaration(service_name)
-        if declaration is None:
-            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
-
-        service = self._services.get(service_name)
-        if service is None and declaration == "need":
-            service_map = {
-                'i18n': ModuleI18nService,
-            }
-            try:
-                service = service_map[service_name](block)
-            except KeyError:
-                raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
-
-        return service
 
 
 class StudioPermissionsService(object):
