@@ -77,3 +77,27 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
                 self.assertIn(unicode(block.location), blocks['blocks'])
             else:
                 self.assertNotIn(unicode(block.location), blocks['blocks'])
+
+    def test_visible_to_staff_only(self):
+        """
+        Assert that visible_to_staff_only works as a requested_field
+        """
+        # Update user factory to have staff access
+        self.user = UserFactory.create(is_staff=True)
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+
+        # self.course.visible_to_staff_only is False
+        blocks = get_blocks(self.request, self.course.location, self.user, requested_fields=['visible_to_staff_only'])
+        block = blocks['blocks'][blocks['root']]
+        self.assertFalse(block['visible_to_staff_only'])
+
+        # self.html_block.visible_to_staff_only was set to True in setUpClass
+        blocks = get_blocks(self.request, self.html_block.location, self.user, requested_fields=['visible_to_staff_only'])
+        block = blocks['blocks'][blocks['root']]
+        self.assertTrue(block['visible_to_staff_only'])
+
+        # Not there by default
+        blocks = get_blocks(self.request, self.html_block.location, self.user)
+        block = blocks['blocks'][blocks['root']]
+        self.assertNotIn('visible_to_staff_only', block)
