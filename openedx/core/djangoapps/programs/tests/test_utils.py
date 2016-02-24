@@ -1,4 +1,7 @@
 """Tests covering Programs utilities."""
+import unittest
+
+from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 import httpretty
@@ -15,6 +18,7 @@ from openedx.core.djangoapps.programs.utils import (
 from student.tests.factories import UserFactory
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
                            CredentialsApiConfigMixin, TestCase):
     """Tests covering the retrieval of programs from the Programs service."""

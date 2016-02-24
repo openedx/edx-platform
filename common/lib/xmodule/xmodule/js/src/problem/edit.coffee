@@ -13,7 +13,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @explanationTemplate: "[explanation]\n#{gettext 'Short explanation'}\n[explanation]\n"
 
   constructor: (element) ->
-    @element = element
+    @element = $(element)
 
     if $(".markdown-box", @element).length != 0
       @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", element)[0], {

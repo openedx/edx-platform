@@ -124,7 +124,7 @@ from branding import api as branding_api
         <%include file="${static.get_template_path('header.html')}" />
     % endif
 
-    <div class="content-wrapper" id="content">
+    <div role="main" class="content-wrapper" id="content" tabindex="-1">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>

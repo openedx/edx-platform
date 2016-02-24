@@ -303,7 +303,7 @@ class BaseMicrositeTemplateBackend(object):
     configuration of microsite on filesystem.
     """
 
-    def get_template_path(self, relative_path, **kwargs):
+    def get_template_path(self, template_path, **kwargs):
         """
         Returns a path (string) to a Mako template, which can either be in
         an override or will just return what is passed in which is expected to be a string
@@ -312,7 +312,6 @@ class BaseMicrositeTemplateBackend(object):
         from microsite_configuration.microsite import get_value as microsite_get_value
 
         microsite_template_path = microsite_get_value('template_dir', None)
-
         if not microsite_template_path:
             microsite_template_path = '/'.join([
                 settings.MICROSITE_ROOT_DIR,
@@ -320,6 +319,7 @@ class BaseMicrositeTemplateBackend(object):
                 'templates',
             ])
 
+        relative_path = template_path[1:] if template_path.startswith('/') else template_path
         search_path = os.path.join(microsite_template_path, relative_path)
         if os.path.isfile(search_path):
             path = '/{0}/templates/{1}'.format(
@@ -328,7 +328,7 @@ class BaseMicrositeTemplateBackend(object):
             )
             return path
         else:
-            return relative_path
+            return template_path
 
     def get_template(self, uri):
         """

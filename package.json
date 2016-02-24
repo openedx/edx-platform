@@ -4,7 +4,8 @@
   "dependencies": {
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.10.4",
-    "uglify-js": "2.4.24"
+    "uglify-js": "2.4.24",
+    "underscore": "1.4.4"
   },
   "devDependencies": {
     "jshint": "^2.7.0",

@@ -9,6 +9,9 @@ from mock import patch, Mock
 import ddt
 
 from django.test import RequestFactory
+from django.test.client import Client
+
+from common.test.utils import XssTestMixin
 from xmodule.course_module import CourseSummary
 
 from contentstore.views.course import (_accessible_courses_list, _accessible_courses_list_from_groups,
@@ -30,7 +33,7 @@ USER_COURSES_COUNT = 50
 
 
 @ddt.ddt
-class TestCourseListing(ModuleStoreTestCase):
+class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -71,6 +74,30 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)
+
+    def test_course_listing_is_escaped(self):
+        """
+        Tests course listing returns escaped data.
+        """
+        escaping_content = "<script>alert('ESCAPE')</script>"
+
+        # Make user staff to access course listing
+        self.user.is_staff = True
+        self.user.save()  # pylint: disable=no-member
+
+        self.client = Client()
+        self.client.login(username=self.user.username, password='test')
+
+        # Change 'display_coursenumber' field and update the course.
+        course = CourseFactory.create()
+        course.display_coursenumber = escaping_content
+        course = self.store.update_item(course, self.user.id)  # pylint: disable=no-member
+        self.assertEqual(course.display_coursenumber, escaping_content)
+
+        # Check if response is escaped
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assert_no_xss(response, escaping_content)
 
     def test_get_course_list(self):
         """

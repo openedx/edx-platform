@@ -270,6 +270,14 @@ will drop you into pdb on error. This lets you go up and down the stack
 and see what the values of the variables are. Check out `the pdb
 documentation <http://docs.python.org/library/pdb.html>`__
 
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins.
+
+::
+
+    from nose.tools import set_trace; set_trace()
+
+
 Note: More on the ``--failed`` functionality
 
 * In order to use this, you must run the tests first. If you haven't already
@@ -407,7 +415,8 @@ test case method.
 During acceptance test execution, log files and also screenshots of
 failed tests are captured in test\_root/log.
 
-Use this command to put a debugging breakpoint in a test.
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins.
 
 ::
 

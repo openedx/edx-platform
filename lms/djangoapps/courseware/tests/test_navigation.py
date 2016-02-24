@@ -26,6 +26,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         super(TestNavigation, self).setUp()
+
         self.test_course = CourseFactory.create()
         self.course = CourseFactory.create()
         self.chapter0 = ItemFactory.create(parent=self.course,

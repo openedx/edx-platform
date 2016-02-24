@@ -8,7 +8,7 @@ from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from course_modes.models import CourseMode
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
@@ -18,7 +18,7 @@ from student.models import CourseEnrollment
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
+class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
@@ -27,11 +27,15 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
+    @classmethod
+    def setUpClass(cls):
+        super(EnrollmentTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp('embargo')
-        self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 

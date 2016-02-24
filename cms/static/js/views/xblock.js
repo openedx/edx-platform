@@ -43,7 +43,7 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 fragmentsRendered.always(function() {
                     xblockElement = self.$('.xblock').first();
                     try {
-                        xblock = XBlock.initializeBlock(xblockElement);
+                        xblock = XBlock.initializeBlock(xblockElement.get(0));
                         self.xblock = xblock;
                         self.xblockReady(xblock);
                         if (successCallback) {
