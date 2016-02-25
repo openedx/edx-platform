@@ -52,9 +52,14 @@ mako==1.0.2
 Markdown==2.2.1
 --allow-external meliae
 --allow-unverified meliae
-meliae==0.4.0
+# Removing meliae because it's not installable with pip
+# on all OSes.
+# (https://bugs.launchpad.net/meliae/+bug/1469925)
+# meliae==0.4.0
 mongoengine==0.10.0
-MySQL-python==1.2.5
+# Removing MySQL-python because it can't be installed unless
+# MySQL is already present
+# MySQL-python==1.2.5
 networkx==1.7
 nose-xunitmp==0.3.2
 oauthlib==0.7.2
@@ -65,7 +70,10 @@ Pillow==2.7.0
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
-pygraphviz==1.1
+
+# Removing pygraphviz because it can't be installed unless
+# Graphviz is already installed.
+# pygraphviz==1.1
 PyJWT==1.4.0
 pymongo==2.9.1
 pyparsing==2.0.1
