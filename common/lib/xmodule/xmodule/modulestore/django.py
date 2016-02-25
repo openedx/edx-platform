@@ -187,7 +187,7 @@ def create_modulestore_instance(
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         disabled_xblock_types=disabled_xblock_types,
         doc_store_config=doc_store_config,
-        i18n_service=i18n_service,
+        i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
         signal_handler=signal_handler or SignalHandler(class_),
