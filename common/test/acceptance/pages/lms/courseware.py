@@ -21,6 +21,13 @@ class CoursewarePage(CoursePage):
         return self.q(css='body.courseware').present
 
     @property
+    def chapter_count_in_navigation(self):
+        """
+        Returns count of chapters available on LHS navigation.
+        """
+        return len(self.q(css='nav.course-navigation a.chapter'))
+
+    @property
     def num_sections(self):
         """
         Return the number of sections in the sidebar on the page
@@ -101,11 +108,66 @@ class CoursewarePage(CoursePage):
             return element.text[0]
         return None
 
-    def get_active_subsection_url(self):
+    def go_to_sequential_position(self, sequential_position):
         """
-        return the url of the active subsection in the left nav
+        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
+
+        Arguments:
+            sequential_position (int): position in sequential bar
         """
-        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
+        sequential_position_css = '#sequence-list #tab_{0}'.format(sequential_position - 1)
+        self.q(css=sequential_position_css).first.click()
+
+    @property
+    def sequential_position(self):
+        """
+        Returns the position of the active tab in the sequence.
+        """
+        tab_id = self._active_sequence_tab.attrs('id')[0]
+        return int(tab_id.split('_')[1])
+
+    @property
+    def _active_sequence_tab(self):  # pylint: disable=missing-docstring
+        return self.q(css='#sequence-list .nav-item.active')
+
+    @property
+    def is_next_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-next.disabled').is_present()
+
+    @property
+    def is_previous_button_enabled(self):  # pylint: disable=missing-docstring
+        return not self.q(css='.sequence-nav > .sequence-nav-button.button-previous.disabled').is_present()
+
+    def click_next_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-next')
+
+    def click_next_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-next')
+
+    def click_previous_button_on_top(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-nav', 'button-previous')
+
+    def click_previous_button_on_bottom(self):  # pylint: disable=missing-docstring
+        self._click_navigation_button('sequence-bottom', 'button-previous')
+
+    def _click_navigation_button(self, top_or_bottom_class, next_or_previous_class):
+        """
+        Clicks the navigation button, given the respective CSS classes.
+        """
+        previous_tab_id = self._active_sequence_tab.attrs('data-id')[0]
+
+        def is_at_new_tab_id():
+            """
+            Returns whether the active tab has changed. It is defensive
+            against the case where the page is still being loaded.
+            """
+            active_tab = self._active_sequence_tab
+            return active_tab and previous_tab_id != active_tab.attrs('data-id')[0]
+
+        self.q(
+            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+        ).first.click()
+        EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
     @property
     def can_start_proctored_exam(self):
@@ -159,13 +221,6 @@ class CoursewarePage(CoursePage):
         """
         return self.entrance_exam_message_selector.is_present() \
             and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
-
-    @property
-    def chapter_count_in_navigation(self):
-        """
-        Returns count of chapters available on LHS navigation.
-        """
-        return len(self.q(css='nav.course-navigation a.chapter'))
 
     @property
     def is_timer_bar_present(self):

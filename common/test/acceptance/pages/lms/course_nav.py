@@ -3,7 +3,7 @@ Course navigation page object
 """
 
 import re
-from bok_choy.page_object import PageObject
+from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 
 
@@ -165,10 +165,11 @@ class CourseNavPage(PageObject):
         """
         desc = "currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
         return EmptyPromise(
-            lambda: self._is_on_section(section_title, subsection_title), desc
+            lambda: self.is_on_section(section_title, subsection_title), desc
         )
 
-    def _is_on_section(self, section_title, subsection_title):
+    @unguarded
+    def is_on_section(self, section_title, subsection_title):
         """
         Return a boolean indicating whether the user is on the section and subsection
         with the specified titles.
@@ -203,13 +204,9 @@ class CourseNavPage(PageObject):
         """
         return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
 
-    def go_to_sequential_position(self, sequential_position):
+    @property
+    def active_subsection_url(self):
         """
-        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
-
-        Arguments:
-            sequential_position (int): position in sequential bar
-
+        return the url of the active subsection in the left nav
         """
-        sequential_position_css = '#tab_{0}'.format(sequential_position - 1)
-        self.q(css=sequential_position_css).first.click()
+        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]

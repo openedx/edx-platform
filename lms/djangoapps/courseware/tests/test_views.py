@@ -37,6 +37,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
+from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -192,9 +193,25 @@ class ViewsTestCase(ModuleStoreTestCase):
         super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        self.section = ItemFactory.create(
+            category='sequential',
+            parent_location=self.chapter.location,
+            due=datetime(2013, 9, 18, 11, 30, 00),
+        )
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
-        self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
+        self.component = ItemFactory.create(
+            category='problem',
+            parent_location=self.vertical.location,
+            display_name='Problem 1',
+        )
+
+        self.section2 = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical2 = ItemFactory.create(category='vertical', parent_location=self.section2.location)
+        ItemFactory.create(
+            category='problem',
+            parent_location=self.vertical2.location,
+            display_name='Problem 2',
+        )
 
         self.course_key = self.course.id
         self.password = '123456'
@@ -209,6 +226,74 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
+
+    def test_index_success(self):
+        response = self._verify_index_response()
+        self.assertIn('Problem 2', response.content)
+
+        # re-access to the main course page redirects to last accessed view.
+        url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response.url)  # pylint: disable=no-member
+        self.assertNotIn('Problem 1', response.content)
+        self.assertIn('Problem 2', response.content)
+
+    def test_index_nonexistent_chapter(self):
+        self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
+
+    def test_index_nonexistent_chapter_masquerade(self):
+        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+            masquerade = MagicMock(role='student')
+            patch_masquerade.return_value = (masquerade, self.user)
+            self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
+
+    def test_index_nonexistent_section(self):
+        self._verify_index_response(expected_response_code=404, section_name='non-existent')
+
+    def test_index_nonexistent_section_masquerade(self):
+        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+            masquerade = MagicMock(role='student')
+            patch_masquerade.return_value = (masquerade, self.user)
+            self._verify_index_response(expected_response_code=302, section_name='non-existent')
+
+    def _verify_index_response(self, expected_response_code=200, chapter_name=None, section_name=None):
+        """
+        Verifies the response when the courseware index page is accessed with
+        the given chapter and section names.
+        """
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course_key),
+                'chapter': unicode(self.chapter.location.name) if chapter_name is None else chapter_name,
+                'section': unicode(self.section2.location.name) if section_name is None else section_name,
+            }
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, expected_response_code)
+        return response
+
+    def test_index_no_visible_section_in_chapter(self):
+        self.client.login(username=self.user.username, password=self.password)
+
+        # reload the chapter from the store so its children information is updated
+        self.chapter = self.store.get_item(self.chapter.location)
+
+        # disable the visibility of the sections in the chapter
+        for section in self.chapter.get_children():
+            section.visible_to_staff_only = True
+            self.store.update_item(section, ModuleStoreEnum.UserID.test)
+
+        url = reverse(
+            'courseware_chapter',
+            kwargs={'course_id': unicode(self.course.id), 'chapter': unicode(self.chapter.location.name)},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('Problem 1', response.content)
+        self.assertNotIn('Problem 2', response.content)
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -299,15 +384,37 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(views.user_groups(mock_user), [])
 
     def test_get_current_child(self):
-        self.assertIsNone(views.get_current_child(MagicMock()))
         mock_xmodule = MagicMock()
+        self.assertIsNone(views.get_current_child(mock_xmodule))
+
         mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one', 'two']
+        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
         self.assertEqual(views.get_current_child(mock_xmodule), 'one')
-        mock_xmodule_2 = MagicMock()
-        mock_xmodule_2.position = 3
-        mock_xmodule_2.get_display_items.return_value = []
-        self.assertIsNone(views.get_current_child(mock_xmodule_2))
+
+        mock_xmodule.position = 2
+        self.assertEqual(views.get_current_child(mock_xmodule), 'two')
+        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='first'), 'one')
+        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='last'), 'three')
+
+        mock_xmodule.position = 3
+        mock_xmodule.get_display_items.return_value = []
+        self.assertIsNone(views.get_current_child(mock_xmodule))
+
+    def test_get_redirect_url(self):
+        self.assertIn(
+            'activate_block_id',
+            get_redirect_url(self.course_key, self.section.location),
+        )
+
+        self.assertIn(
+            'child=first',
+            get_redirect_url(self.course_key, self.section.location, child='first'),
+        )
+
+        self.assertIn(
+            'child=last',
+            get_redirect_url(self.course_key, self.section.location, child='last'),
+        )
 
     def test_redirect_to_course_position(self):
         mock_module = MagicMock()

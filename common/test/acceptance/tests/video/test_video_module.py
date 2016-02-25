@@ -11,6 +11,7 @@ from unittest import skipIf, skip
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.tab_nav import TabNavPage
+from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
@@ -49,6 +50,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
         self.course_nav = CourseNavPage(self.browser)
+        self.courseware = CoursewarePage(self.browser, self.course_id)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
 
@@ -190,7 +192,7 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Navigate to sequential specified by `video_display_name`
         """
-        self.course_nav.go_to_sequential_position(position)
+        self.courseware.go_to_sequential_position(position)
         self.video.wait_for_video_player_render()
 
 
@@ -916,13 +918,13 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(['A'])
 
         # go to second sequential position
-        self.course_nav.go_to_sequential_position(2)
+        self.courseware.go_to_sequential_position(2)
 
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        self.course_nav.go_to_sequential_position(1)
+        self.courseware.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
         self.video.browser.refresh()
