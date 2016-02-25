@@ -247,12 +247,13 @@ class ModuleI18nService(object):
     """
     def __init__(self, block=None):
         """
-        We are using this block for things like locating the block's translation domain (PO+MO files). Here we attempts
-         to look up the provided string in the XBlock's own domain translation catalog, currently expected to be:
-            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
-        If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
-        django.utils.translation, which will attempt to find a matching string in the
-        LMS' own domain translation catalog -- effectively achieving translation by coincidence.
+        Attempt to load an XBlock-specific GNU gettext translator using the XBlock's own domain
+        translation catalog, currently expected to be found at:
+            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po|mo
+        If we can't locate the domain translation catalog then we fall-back onto
+        django.utils.translation, which will point to the system's own domain translation catalog
+        This effectively achieves translations by coincidence for an XBlock which does not provide
+        its own dedicated translation catalog along with its implementation.
         """
         self.translator = django.utils.translation
         if block:
@@ -272,19 +273,7 @@ class ModuleI18nService(object):
                 pass
 
     def __getattr__(self, name):
-        return getattr(django.utils.translation, name)
-
-    def ugettext(self, string):
-        """
-        This operation is a proxy for django.utils.translation.ugettext, which is itself a proxy for
-        the GNU gettext ugettext operation.
-        """
-        # The translation workflow should only execute if there's an actual string to look up
-        # If gettext processes an empty string the PO file header information will oddly be returned
-        translated_string = unicode(string)
-        if translated_string:
-            translated_string = self.translator.ugettext(translated_string)  # pylint: disable=translation-of-non-string
-        return translated_string
+        return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):
         """
