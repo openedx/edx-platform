@@ -181,7 +181,7 @@ def render_accordion(user, request, course, chapter, section, field_data_cache):
     return render_to_string('courseware/accordion.html', context)
 
 
-def get_current_child(xmodule, min_depth=None):
+def get_current_child(xmodule, min_depth=None, first_child=False):
     """
     Get the xmodule.position's display item of an xmodule that has a position and
     children.  If xmodule has no position or is out of bounds, return the first
@@ -209,7 +209,7 @@ def get_current_child(xmodule, min_depth=None):
     if not hasattr(xmodule, 'position'):
         return None
 
-    if xmodule.position is None:
+    if xmodule.position is None or first_child:
         return _get_default_child_module(xmodule.get_display_items())
     else:
         # position is 1-indexed.
@@ -437,7 +437,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
@@ -501,66 +500,65 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 context['entrance_exam_current_score'] = get_entrance_exam_score(request, course)
                 context['entrance_exam_passed'] = user_has_passed_entrance_exam(request, course)
 
-        if section is not None:
+        if section is None:
+            section_descriptor = get_current_child(chapter_module, first_child=request.GET.get("first_child"))
+            section = section_descriptor.url_name
+        else:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
 
-            if section_descriptor is None:
-                # Specifically asked-for section doesn't exist
-                if masquerade and masquerade.role == 'student':  # don't 404 if staff is masquerading as student
-                    log.debug('staff masquerading as student: no section %s', section)
-                    return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
-                raise Http404
-
-            # Allow chromeless operation
-            if section_descriptor.chrome:
-                chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
-                if 'accordion' not in chrome:
-                    context['disable_accordion'] = True
-                if 'tabs' not in chrome:
-                    context['disable_tabs'] = True
-
-            if section_descriptor.default_tab:
-                context['default_tab'] = section_descriptor.default_tab
-
-            # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
-            # which will prefetch the children more efficiently than doing a recursive load
-            section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
-
-            # Load all descendants of the section, because we're going to display its
-            # html, which in general will need all of its children
-            field_data_cache.add_descriptor_descendents(
-                section_descriptor, depth=None
-            )
-
-            section_module = get_module_for_descriptor(
-                user,
-                request,
-                section_descriptor,
-                field_data_cache,
-                course_key,
-                position,
-                course=course
-            )
-
-            if section_module is None:
-                # User may be trying to be clever and access something
-                # they don't have access to.
-                raise Http404
-
-            # Save where we are in the chapter.
-            save_child_position(chapter_module, section)
-            section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
-            context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
-            context['section_title'] = section_descriptor.display_name_with_default_escaped
-        else:
-            prev_section = get_current_child(chapter_module)
-            if prev_section is None:
-                # Something went wrong -- perhaps this chapter has no sections visible to the user.
-                # Clearing out the last-visited state and showing "first-time" view by redirecting
-                # to courseware.
-                course_module.position = None
-                course_module.save()
+        if section_descriptor is None:
+            # Specifically asked-for section doesn't exist
+            if masquerade and masquerade.role == 'student':  # don't 404 if staff is masquerading as student
+                log.debug('staff masquerading as student: no section %s', section)
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+            raise Http404
+
+        # Allow chromeless operation
+        if section_descriptor.chrome:
+            chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
+            if 'accordion' not in chrome:
+                context['disable_accordion'] = True
+            if 'tabs' not in chrome:
+                context['disable_tabs'] = True
+
+        if section_descriptor.default_tab:
+            context['default_tab'] = section_descriptor.default_tab
+
+        # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
+        # which will prefetch the children more efficiently than doing a recursive load
+        section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
+
+        # Load all descendants of the section, because we're going to display its
+        # html, which in general will need all of its children
+        field_data_cache.add_descriptor_descendents(
+            section_descriptor, depth=None
+        )
+
+        section_module = get_module_for_descriptor(
+            user,
+            request,
+            section_descriptor,
+            field_data_cache,
+            course_key,
+            position,
+            course=course
+        )
+
+        if section_module is None:
+            # User may be trying to be clever and access something
+            # they don't have access to.
+            raise Http404
+
+        # Save where we are in the chapter.
+        save_child_position(chapter_module, section)
+        section_render_context = {
+            'activate_block_id': request.GET.get('activate_block_id'),
+            'get_redirect_url': get_redirect_url,
+            'first_child': request.GET.get("first_child"),
+        }
+        context['accordion'] = render_accordion(user, request, course, chapter, section, field_data_cache)
+        context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
+        context['section_title'] = section_descriptor.display_name_with_default_escaped
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
 
