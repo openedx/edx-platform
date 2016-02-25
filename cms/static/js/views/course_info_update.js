@@ -10,8 +10,8 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         // collection is CourseUpdateCollection
         events: {
             "click .new-update-button" : "onNew",
-            "click #course-update-view .save-button" : "onSave",
-            "click #course-update-view .cancel-button" : "onCancel",
+            "click .save-button" : "onSave",
+            "click .cancel-button" : "onCancel",
             "click .post-actions > .edit-button" : "onEdit",
             "click .post-actions > .delete-button" : "onDelete"
         },
@@ -128,6 +128,7 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         },
 
         onSave: function(event) {
+            debugger
             event.preventDefault();
             var targetModel = this.eventModel(event);
             targetModel.set({
@@ -160,6 +161,7 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         },
 
         onCancel: function(event) {
+            debugger
             event.preventDefault();
             // Since we're cancelling, the model should be using it's previous attributes
             var targetModel = this.eventModel(event);

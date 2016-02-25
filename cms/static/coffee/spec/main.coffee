@@ -240,11 +240,9 @@ define([
     "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
-# TODO: this test causes all tests to run and re-run indefinitely.
-#   "coffee/spec/views/course_info_spec",
+    "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
-
 
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
