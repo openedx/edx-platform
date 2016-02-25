@@ -155,12 +155,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.fail(field + " included in encoding but missing from details at " + context)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def test_pre_requisite_course_list_present(self):
-        settings_details_url = get_url(self.course.id)
-        response = self.client.get_html(settings_details_url)
-        self.assertContains(response, "Prerequisite Course")
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_pre_requisite_course_update_and_fetch(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -200,28 +194,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
 
-    @ddt.data(
-        (False, False, False),
-        (True, False, True),
-        (False, True, False),
-        (True, True, True),
-    )
-    def test_visibility_of_entrance_exam_section(self, feature_flags):
-        """
-        Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
-        feature is enabled or disabled i.e ENABLE_MKTG_SITE.
-        """
-        with patch.dict("django.conf.settings.FEATURES", {
-            'ENTRANCE_EXAMS': feature_flags[0],
-            'ENABLE_MKTG_SITE': feature_flags[1]
-        }):
-            course_details_url = get_url(self.course.id)
-            resp = self.client.get_html(course_details_url)
-            self.assertEqual(
-                feature_flags[2],
-                '<h3 id="heading-entrance-exam">' in resp.content
-            )
-
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
@@ -232,22 +204,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'ENABLE_PREREQUISITE_COURSES': False
         }):
             response = self.client.get_html(settings_details_url)
-            self.assertNotContains(response, "Course Summary Page")
-            self.assertNotContains(response, "Send a note to students via email")
-            self.assertContains(response, "course summary page will not be viewable")
-
-            self.assertContains(response, "Course Start Date")
-            self.assertContains(response, "Course End Date")
-            self.assertContains(response, "Enrollment Start Date")
-            self.assertContains(response, "Enrollment End Date")
-            self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
-            self.assertNotContains(response, "Requirements")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
@@ -357,22 +319,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get_html(settings_details_url)
-            self.assertContains(response, "Course Summary Page")
-            self.assertContains(response, "Send a note to students via email")
-            self.assertNotContains(response, "course summary page will not be viewable")
-
-            self.assertContains(response, "Course Start Date")
-            self.assertContains(response, "Course End Date")
-            self.assertContains(response, "Enrollment Start Date")
-            self.assertContains(response, "Enrollment End Date")
-            self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
-            self.assertContains(response, "Requirements")
 
 
 @ddt.ddt
@@ -1012,116 +964,3 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(obj, grader)
         current_graders = CourseGradingModel.fetch(self.course.id).graders
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
-
-
-class CourseEnrollmentEndFieldTest(CourseTestCase):
-    """
-    Base class to test the enrollment end fields in the course settings details view in Studio
-    when using marketing site flag and global vs non-global staff to access the page.
-    """
-    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX Partner Manager to update these settings."
-    NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
-    NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
-    NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
-id=\"course-enrollment-end-date\" placeholder=\"MM/DD/YYYY\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
-    NOT_EDITABLE_TIME_FIELD = "<input type=\"text\" class=\"time end\" id=\"course-enrollment-end-time\" \
-value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
-
-    EDITABLE_DATE_WRAPPER = "<div class=\"field date \" id=\"field-enrollment-end-date\">"
-    EDITABLE_TIME_WRAPPER = "<div class=\"field time \" id=\"field-enrollment-end-time\">"
-    EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
-id=\"course-enrollment-end-date\" placeholder=\"MM/DD/YYYY\" autocomplete=\"off\"  />"
-    EDITABLE_TIME_FIELD = "<input type=\"text\" class=\"time end\" \
-id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\"  />"
-
-    EDITABLE_ELEMENTS = [
-        EDITABLE_DATE_WRAPPER,
-        EDITABLE_TIME_WRAPPER,
-        EDITABLE_DATE_FIELD,
-        EDITABLE_TIME_FIELD,
-    ]
-
-    NOT_EDITABLE_ELEMENTS = [
-        NOT_EDITABLE_HELPER_MESSAGE,
-        NOT_EDITABLE_DATE_WRAPPER,
-        NOT_EDITABLE_TIME_WRAPPER,
-        NOT_EDITABLE_DATE_FIELD,
-        NOT_EDITABLE_TIME_FIELD,
-    ]
-
-    def setUp(self):
-        """ Initialize course used to test enrollment fields. """
-        super(CourseEnrollmentEndFieldTest, self).setUp()
-        self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_details_handler', unicode(self.course.id))
-
-    def _get_course_details_response(self, global_staff):
-        """ Return the course details page as either global or non-global staff"""
-        user = UserFactory(is_staff=global_staff)
-        CourseInstructorRole(self.course.id).add_users(user)
-
-        self.client.login(username=user.username, password='test')
-
-        return self.client.get_html(self.course_details_url)
-
-    def _verify_editable(self, response):
-        """ Verify that the response has expected editable fields.
-
-        Assert that all editable field content exists and no
-        uneditable field content exists for enrollment end fields.
-        """
-        self.assertEqual(response.status_code, 200)
-        for element in self.NOT_EDITABLE_ELEMENTS:
-            self.assertNotContains(response, element)
-
-        for element in self.EDITABLE_ELEMENTS:
-            self.assertContains(response, element)
-
-    def _verify_not_editable(self, response):
-        """ Verify that the response has expected non-editable fields.
-
-        Assert that all uneditable field content exists and no
-        editable field content exists for enrollment end fields.
-        """
-        self.assertEqual(response.status_code, 200)
-        for element in self.NOT_EDITABLE_ELEMENTS:
-            self.assertContains(response, element)
-
-        for element in self.EDITABLE_ELEMENTS:
-            self.assertNotContains(response, element)
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
-    def test_course_details_with_disabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
-
-        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
-        User is global staff.
-        """
-        self._verify_editable(self._get_course_details_response(True))
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
-    def test_course_details_with_disabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
-
-        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
-        User is non-global staff.
-        """
-        self._verify_editable(self._get_course_details_response(False))
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
-    def test_course_details_with_enabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
-
-        Feature flag 'ENABLE_MKTG_SITE' is enabled.
-        User is global staff.
-        """
-        self._verify_editable(self._get_course_details_response(True))
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
-    def test_course_details_with_enabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is not editable in response.
-
-        Feature flag 'ENABLE_MKTG_SITE' is enabled.
-        User is non-global staff.
-        """
-        self._verify_not_editable(self._get_course_details_response(False))
