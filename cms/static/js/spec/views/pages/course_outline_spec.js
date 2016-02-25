@@ -787,6 +787,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($(".edit-settings-release").length).toBe(0);
                     expect($(".grading-due-date").length).toBe(0);
+                    expect($(".edit-settings-grading").length).toBe(1);
+                    expect($(".edit-staff-lock").length).toBe(1);
                 });
 
                 it('can select valid time', function() {
