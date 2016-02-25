@@ -251,7 +251,7 @@ class ModuleI18nService(object):
          to look up the provided string in the XBlock's own domain translation catalog, currently expected to be:
             <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po
         If ModuleI18nService can't locate the domain translation catalog then we fall-back onto
-        django.utils.translation.ugettext, which will attempt to find a matching string in the
+        django.utils.translation, which will attempt to find a matching string in the
         LMS' own domain translation catalog -- effectively achieving translation by coincidence.
         """
         self.translator = django.utils.translation
@@ -268,6 +268,7 @@ class ModuleI18nService(object):
                     [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
                 )
             except IOError:
+                # Fall back to the default Django translator if the XBlock translator is not found.
                 pass
 
     def __getattr__(self, name):
