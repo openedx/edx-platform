@@ -128,7 +128,6 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         },
 
         onSave: function(event) {
-            debugger
             event.preventDefault();
             var targetModel = this.eventModel(event);
             targetModel.set({
@@ -161,7 +160,6 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         },
 
         onCancel: function(event) {
-            debugger
             event.preventDefault();
             // Since we're cancelling, the model should be using it's previous attributes
             var targetModel = this.eventModel(event);
