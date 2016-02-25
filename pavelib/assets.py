@@ -20,20 +20,57 @@ from .utils.cmd import cmd, django_cmd
 
 ALL_SYSTEMS = ['lms', 'studio']
 COFFEE_DIRS = ['lms', 'cms', 'common']
-# A list of directories.  Each will be paired with a sibling /css directory.
-COMMON_SASS_DIRECTORIES = [
-    path("common/static/sass"),
-]
-LMS_SASS_DIRECTORIES = [
-    path("lms/static/sass"),
-    path("lms/static/themed_sass"),
-    path("lms/static/certificates/sass"),
-]
-CMS_SASS_DIRECTORIES = [
-    path("cms/static/sass"),
-]
-THEME_SASS_DIRECTORIES = []
-SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
+
+# Directories that contain SASS files that need to be compiled, each element in a list of paths is a tuple with the
+# following format
+#   (sass_dir, css_dir)
+# where sass_dir points to source sass files and css_dir points to destination dir where css files should be put.
+SASS_DIRECTORIES = {
+    "COMMON": [
+        (path("common/static/sass"), path("common/static/css"))
+    ],
+    "LMS": [
+        (path("lms/static/sass"), path("lms/static/css")),
+        (path("lms/static/themed_sass"), path("lms/static/css")),
+        (path("lms/static/certificates/sass"), path("lms/static/certificates/css")),
+    ],
+    "CMS": [
+        (path("cms/static/sass"), path("cms/static/css")),
+    ],
+    "THEME_LMS": [
+
+    ],
+    "THEME_CMS": [
+
+    ],
+}
+
+# Directories that needs to be added LOOKUP Path while compiling sass, each element of the list is a path object
+# containing the path to be added to lookup paths
+SASS_LOOKUP_DIRECTORIES = {
+    "COMMON": [
+        path("common/static"),
+        path("common/static/sass"),
+    ],
+    "LMS": [
+        path("lms/static/sass/partials"),
+        path("lms/static/sass"),
+        path("lms/static/themed_sass"),
+        path("lms/static/certificates/sass"),
+    ],
+    "CMS": [
+        path("cms/static/sass/partials"),
+        path("cms/static/sass"),
+        path("lms/static/sass/partials"),  # TODO: remove usage of base/_variables.scss from
+        # common/static/xmodule/modules/css/_module-styles.scss and also this line.
+    ],
+    "THEME_LMS": [
+
+    ],
+    "THEME_CMS": [
+
+    ],
+}
 
 
 def configure_paths():
@@ -48,7 +85,8 @@ def configure_paths():
         css_dir = theme_root / "static" / "css"
         if sass_dir.isdir():
             css_dir.mkdir_p()
-            THEME_SASS_DIRECTORIES.append(sass_dir)
+            SASS_DIRECTORIES['THEME'].append((sass_dir, css_dir))
+            SASS_LOOKUP_DIRECTORIES['THEME'].append(sass_dir)
 
     if edxapp_env.env_tokens.get("COMPREHENSIVE_THEME_DIR", ""):
         theme_dir = path(edxapp_env.env_tokens["COMPREHENSIVE_THEME_DIR"])
@@ -56,17 +94,24 @@ def configure_paths():
         lms_css = theme_dir / "lms" / "static" / "css"
         if lms_sass.isdir():
             lms_css.mkdir_p()
-            THEME_SASS_DIRECTORIES.append(lms_sass)
+            SASS_DIRECTORIES['THEME_LMS'].append(("lms/static/sass", lms_css))
+            SASS_DIRECTORIES['THEME_LMS'].append((lms_sass, lms_css))
+            SASS_LOOKUP_DIRECTORIES['THEME_LMS'].append(lms_sass / "partials")
+            SASS_LOOKUP_DIRECTORIES['THEME_LMS'].append(lms_sass)
+
         cms_sass = theme_dir / "cms" / "static" / "sass"
         cms_css = theme_dir / "cms" / "static" / "css"
         if cms_sass.isdir():
             cms_css.mkdir_p()
-            THEME_SASS_DIRECTORIES.append(cms_sass)
+            SASS_DIRECTORIES['THEME_CMS'].append(("cms/static/sass", cms_css))
+            SASS_DIRECTORIES['THEME_CMS'].append((cms_sass, cms_css))
+            SASS_LOOKUP_DIRECTORIES['THEME_CMS'].append(cms_sass / "partials")
+            SASS_LOOKUP_DIRECTORIES['THEME_CMS'].append(cms_sass)
 
 configure_paths()
 
 
-def applicable_sass_directories(systems=None):
+def sass_source_directories(systems=None):
     """
     Determine the applicable set of SASS directories to be
     compiled for the specified list of systems.
@@ -80,13 +125,51 @@ def applicable_sass_directories(systems=None):
     if not systems:
         systems = ALL_SYSTEMS
     applicable_directories = []
-    applicable_directories.extend(COMMON_SASS_DIRECTORIES)
+
+    applicable_directories.extend(SASS_DIRECTORIES['COMMON'])
     if "lms" in systems:
-        applicable_directories.extend(LMS_SASS_DIRECTORIES)
+        # If Theme is enabled compile sass for the theme only
+        if SASS_DIRECTORIES['THEME_LMS']:
+            applicable_directories.extend(SASS_DIRECTORIES['THEME_LMS'])
+        # If Theme is disabled compile sass lms only
+        else:
+            applicable_directories.extend(SASS_DIRECTORIES['LMS'])
     if "studio" in systems or "cms" in systems:
-        applicable_directories.extend(CMS_SASS_DIRECTORIES)
-    applicable_directories.extend(THEME_SASS_DIRECTORIES)
+        # If Theme is enabled compile sass for the theme only
+        if SASS_DIRECTORIES['THEME_CMS']:
+            applicable_directories.extend(SASS_DIRECTORIES['THEME_CMS'])
+        # If Theme is disabled compile sass cms only
+        else:
+            applicable_directories.extend(SASS_DIRECTORIES['CMS'])
+
     return applicable_directories
+
+
+def sass_lookup_directories(systems=None):
+    """
+    Determine the sass directories to be added to sass lookup paths.
+
+    Args:
+        systems: A list of systems (defaults to all)
+
+    Returns:
+        A list of SASS directories to be added to SASS lookup path.
+    """
+    if not systems:
+        systems = ALL_SYSTEMS
+    system_sass_lookup_directories = []
+    system_sass_lookup_directories.extend(SASS_LOOKUP_DIRECTORIES['COMMON'])
+
+    if "lms" in systems:
+        # Put theme sass at the top so that theme directories have highest priority on sass file lookup.
+        system_sass_lookup_directories.extend(SASS_LOOKUP_DIRECTORIES['THEME_LMS'])
+        system_sass_lookup_directories.extend(SASS_LOOKUP_DIRECTORIES['LMS'])
+    if "studio" in systems or "cms" in systems:
+        # Put theme sass at the top so that theme directories have highest priority on sass file lookup.
+        system_sass_lookup_directories.extend(SASS_LOOKUP_DIRECTORIES['THEME_CMS'])
+        system_sass_lookup_directories.extend(SASS_LOOKUP_DIRECTORIES['CMS'])
+
+    return system_sass_lookup_directories
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
@@ -126,7 +209,7 @@ class SassWatcher(PatternMatchingEventHandler):
         """
         register files with observer
         """
-        for dirname in SASS_LOAD_PATHS + applicable_sass_directories():
+        for dirname in sass_lookup_directories():
             paths = []
             if '*' in dirname:
                 paths.extend(glob.glob(dirname))
@@ -240,12 +323,12 @@ def compile_sass(options):
         output_style = 'compressed'
 
     timing_info = []
-    system_sass_directories = applicable_sass_directories(systems)
-    all_sass_directories = applicable_sass_directories()
+    system_sass_directories = sass_source_directories(systems)
+    system_sass_lookup_directories = sass_lookup_directories(systems)
     dry_run = tasks.environment.dry_run
-    for sass_dir in system_sass_directories:
+    for system_sass_dir, system_css_dir in system_sass_directories:
         start = datetime.now()
-        css_dir = sass_dir.parent / "css"
+        css_dir = system_css_dir or system_sass_dir.parent / "css"
 
         if force:
             if dry_run:
@@ -257,17 +340,17 @@ def compile_sass(options):
 
         if dry_run:
             tasks.environment.info("libsass {sass_dir}".format(
-                sass_dir=sass_dir,
+                sass_dir=system_sass_dir,
             ))
         else:
             sass.compile(
-                dirname=(sass_dir, css_dir),
-                include_paths=SASS_LOAD_PATHS + all_sass_directories,
+                dirname=(system_sass_dir, css_dir),
+                include_paths=system_sass_lookup_directories,
                 source_comments=source_comments,
                 output_style=output_style,
             )
             duration = datetime.now() - start
-            timing_info.append((sass_dir, css_dir, duration))
+            timing_info.append((system_sass_dir, css_dir, duration))
 
     print("\t\tFinished compiling Sass:")
     if not dry_run:
