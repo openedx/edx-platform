@@ -80,7 +80,6 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
         },
 
         onSave: function(event) {
-            debugger
             event.preventDefault();
             var targetModel = this.eventModel(event);
             targetModel.set({
@@ -112,7 +111,6 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
         },
 
         onCancel: function(event) {
-            debugger
             event.preventDefault();
             // change editor contents back to model values and hide the editor
             $(this.editor(event)).hide();
