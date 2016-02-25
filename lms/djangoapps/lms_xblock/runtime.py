@@ -10,11 +10,11 @@ from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_a
 from request_cache.middleware import RequestCache
 from xblock.exceptions import NoSuchServiceError
 import xblock.reference.plugins
-from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.django import modulestore
 from xmodule.services import SettingsService
 from xmodule.library_tools import LibraryToolsService
-from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
+from xmodule.x_module_layer import ModuleSystemLayer
 
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
@@ -196,7 +196,7 @@ class UserTagsService(object):
         )
 
 
-class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(ModuleSystemLayer):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
@@ -213,7 +213,6 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['library_tools'] = LibraryToolsService(modulestore())
         services['fs'] = xblock.reference.plugins.FSService()
         services['settings'] = SettingsService()
-        services['i18n'] = None  # This key overrides super, populated on-demand by service() below
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 
@@ -281,33 +280,3 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             return []
 
         return super(LmsModuleSystem, self).applicable_aside_types()
-
-    def service(self, block, service_name):
-        """
-        Runtime-specific override for the XBlock service manager.  If a service is not currently
-        instantiated and is declared as a critical requirement, an attempt is made to load the
-        module.
-
-        Arguments:
-            block (an XBlock): this block's class will be examined for service
-                decorators.
-            service_name (string): the name of the service requested.
-
-        Returns:
-            An object implementing the requested service, or None.
-        """
-        declaration = block.service_declaration(service_name)
-        if declaration is None:
-            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
-
-        service = self._services.get(service_name)
-        if service is None and declaration == "need":
-            service_map = {
-                'i18n': ModuleI18nService,
-            }
-            try:
-                service = service_map[service_name](block)
-            except KeyError:
-                raise NoSuchServiceError("Service {!r} is not available.".format(service_name))
-
-        return service
