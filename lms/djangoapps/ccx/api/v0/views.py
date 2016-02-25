@@ -1,6 +1,7 @@
 """ API v0 views. """
 
 import datetime
+import json
 import logging
 import pytz
 
@@ -21,7 +22,7 @@ from instructor.enrollment import (
     get_email_params,
 )
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import permissions
 from student.models import CourseEnrollment
@@ -35,6 +36,7 @@ from lms.djangoapps.ccx.overrides import (
 from lms.djangoapps.ccx.utils import (
     assign_coach_role_to_ccx,
     is_email,
+    get_course_chapters,
 )
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer
@@ -156,7 +158,44 @@ def get_valid_input(request_data, ignore_missing=False):
             field_errors['max_students_allowed'] = {'error_code': 'invalid_max_students_allowed'}
     elif 'max_students_allowed' in request_data:
         field_errors['max_students_allowed'] = {'error_code': 'null_field_max_students_allowed'}
+
+    course_modules = request_data.get('course_modules')
+    if course_modules is not None:
+        if isinstance(course_modules, list):
+            # de-duplicate list of modules
+            course_modules = list(set(course_modules))
+            for course_module_id in course_modules:
+                try:
+                    UsageKey.from_string(course_module_id)
+                except InvalidKeyError:
+                    field_errors['course_modules'] = {'error_code': 'invalid_course_module_keys'}
+                    break
+            else:
+                valid_input['course_modules'] = course_modules
+        else:
+            field_errors['course_modules'] = {'error_code': 'invalid_course_module_list'}
+    elif 'course_modules' in request_data:
+        # case if the user actually passed null as input
+        valid_input['course_modules'] = None
+
     return valid_input, field_errors
+
+
+def valid_course_modules(course_module_list, master_course_key):
+    """
+    Function to validate that each element in the course_module_list belongs
+    to the master course structure.
+    Args:
+        course_module_list (list): A list of strings representing Block Usage Keys
+        master_course_key (CourseKey): An object representing the master course key id
+
+    Returns:
+        bool: whether or not all the course module strings belong to the master course
+    """
+    course_chapters = get_course_chapters(master_course_key)
+    if course_chapters is None:
+        return False
+    return set(course_module_list).intersection(set(course_chapters)) == set(course_module_list)
 
 
 def make_user_coach(user, master_course_key):
@@ -190,7 +229,12 @@ class CCXListView(GenericAPIView):
                 "master_course_id": "course-v1:Organization+EX101+RUN-FALL2099",
                 "display_name": "CCX example title",
                 "coach_email": "john@example.com",
-                "max_students_allowed": 123
+                "max_students_allowed": 123,
+                "course_modules" : [
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week5"
+                ]
 
             }
 
@@ -220,6 +264,8 @@ class CCXListView(GenericAPIView):
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * course_modules: Optional. A list of course modules id keys.
+
         **GET Response Values**
 
             If the request for information about the course is successful, an HTTP 200 "OK" response
@@ -242,6 +288,8 @@ class CCXListView(GenericAPIView):
                 * max_students_allowed: An integer representing he maximum number of students that
                   can be enrolled in the CCX Course.
 
+                * course_modules: A list of course modules id keys.
+
             * count: An integer representing the total number of records that matched the request parameters.
 
             * next: A string representing the URL where to retrieve the next page of results. This can be `null`
@@ -263,7 +311,12 @@ class CCXListView(GenericAPIView):
                         "coach_email": "john@example.com",
                         "start": "2019-01-01",
                         "due": "2019-06-01",
-                        "max_students_allowed": 123
+                        "max_students_allowed": 123,
+                        "course_modules" : [
+                            "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
+                            "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
+                            "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week5"
+                        ]
                     },
                     { ... }
                 }
@@ -289,6 +342,8 @@ class CCXListView(GenericAPIView):
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * course_modules: A list of course modules id keys.
+
         **Example POST Response**
 
             {
@@ -297,8 +352,13 @@ class CCXListView(GenericAPIView):
                 "coach_email": "john@example.com",
                 "start": "2019-01-01",
                 "due": "2019-06-01",
-                "max_students_allowed": 123
-            }
+                "max_students_allowed": 123,
+                "course_modules" : [
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week5"
+                ]
+    }
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -383,11 +443,24 @@ class CCXListView(GenericAPIView):
                 }
             )
 
+        if valid_input.get('course_modules'):
+            if not valid_course_modules(valid_input['course_modules'], master_course_key):
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        'error_code': 'course_module_list_not_belonging_to_master_course'
+                    }
+                )
+        # prepare the course_modules to be stored in a json stringified field
+        course_modules_json = json.dumps(valid_input.get('course_modules'))
+
         with transaction.atomic():
             ccx_course_object = CustomCourseForEdX(
                 course_id=master_course_object.id,
                 coach=coach,
-                display_name=valid_input['display_name'])
+                display_name=valid_input['display_name'],
+                structure_json=course_modules_json
+            )
             ccx_course_object.save()
 
             # Make sure start/due are overridden for entire course
@@ -459,7 +532,12 @@ class CCXDetailView(GenericAPIView):
 
                 "display_name": "CCX example title modified",
                 "coach_email": "joe@example.com",
-                "max_students_allowed": 111
+                "max_students_allowed": 111,
+                "course_modules" : [
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week1",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week4",
+                    "block-v1:Organization+EX101+RUN-FALL2099+type@chapter+block@week5"
+                ]
             }
 
             DELETE /api/ccx/v0/ccx/{ccx_course_id}
@@ -483,6 +561,8 @@ class CCXDetailView(GenericAPIView):
             * max_students_allowed: Optional. An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
 
+            * course_modules: Optional. A list of course modules id keys.
+
         **GET Response Values**
 
             If the request for information about the CCX course is successful, an HTTP 200 "OK" response
@@ -502,6 +582,8 @@ class CCXDetailView(GenericAPIView):
 
             * max_students_allowed: An integer representing he maximum number of students that
               can be enrolled in the CCX Course.
+
+            * course_modules: A list of course modules id keys.
 
         **PATCH and DELETE Response Values**
 
@@ -606,6 +688,9 @@ class CCXDetailView(GenericAPIView):
                 }
             )
 
+        # get the master course key and master course object
+        master_course_object, master_course_key, _, _ = get_valid_course(unicode(ccx_course_object.course_id))
+
         with transaction.atomic():
             # update the display name
             if 'display_name' in valid_input:
@@ -625,6 +710,17 @@ class CCXDetailView(GenericAPIView):
                 if ccx_course_object.coach.id != coach.id:
                     old_coach = ccx_course_object.coach
                     ccx_course_object.coach = coach
+            if 'course_modules' in valid_input:
+                if valid_input.get('course_modules'):
+                    if not valid_course_modules(valid_input['course_modules'], master_course_key):
+                        return Response(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            data={
+                                'error_code': 'course_module_list_not_belonging_to_master_course'
+                            }
+                        )
+                # course_modules to be stored in a json stringified field
+                ccx_course_object.structure_json = json.dumps(valid_input.get('course_modules'))
             ccx_course_object.save()
             # update the overridden field for the maximum amount of students
             if 'max_students_allowed' in valid_input:
@@ -636,8 +732,6 @@ class CCXDetailView(GenericAPIView):
                 )
             # if the coach has changed, update the permissions
             if old_coach is not None:
-                # get the master course key and master course object
-                master_course_object, master_course_key, _, _ = get_valid_course(unicode(ccx_course_object.course_id))
                 # make the new ccx coach a coach on the master course
                 make_user_coach(coach, master_course_key)
                 # enroll the coach in the ccx

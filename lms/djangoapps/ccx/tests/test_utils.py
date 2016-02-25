@@ -1,9 +1,9 @@
 """
 test utils
 """
+import mock
 from nose.plugins.attrib import attr
 
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory,
@@ -12,7 +12,11 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory
+from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.ccx import utils
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from ccx_keys.locator import CCXLocator
 
 
@@ -47,3 +51,45 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
         course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         result = self.call_fut(course_key)
         self.assertEqual(result, ccx)
+
+
+@attr('shard_1')
+class TestGetCourseChapters(CcxTestCase):
+    """
+    Tests for the `get_course_chapters` util function
+    """
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestGetCourseChapters, self).setUp()
+        self.course_key = self.course.location.course_key
+
+    def test_get_structure_non_existing_key(self):
+        """
+        Test to get the course structure
+        """
+        self.assertEqual(utils.get_course_chapters(None), None)
+        # build a fake key
+        fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
+        self.assertEqual(utils.get_course_chapters(fake_course_key), None)
+
+    @mock.patch('openedx.core.djangoapps.content.course_structures.models.CourseStructure.structure',
+                new_callable=mock.PropertyMock)
+    def test_wrong_course_structure(self, mocked_attr):
+        """
+        Test the case where the course  has an unexpected structure.
+        """
+        mocked_attr.return_value = {'foo': 'bar'}
+        self.assertEqual(utils.get_course_chapters(self.course_key), [])
+
+    def test_get_chapters(self):
+        """
+        Happy path
+        """
+        course_chapters = utils.get_course_chapters(self.course_key)
+        self.assertEqual(len(course_chapters), 2)
+        self.assertEqual(
+            sorted(course_chapters),
+            sorted([unicode(child) for child in self.course.children])
+        )
