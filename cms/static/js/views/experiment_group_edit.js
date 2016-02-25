@@ -13,8 +13,8 @@ function(BaseView, _, str, gettext) {
         events: {
             'click .action-close': 'removeGroup',
             'change .group-name': 'changeName',
-            'focus .groups-fields input': 'onFocus',
-            'blur .groups-fields input': 'onBlur'
+            'focus .group-name': 'onFocus',
+            'blur .group-name': 'onBlur'
         },
 
         className: function() {

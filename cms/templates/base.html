@@ -52,7 +52,6 @@ from openedx.core.djangolib.js_utils import (
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
-    <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
 
     <!-- view -->
     <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
@@ -81,28 +80,30 @@ from openedx.core.djangolib.js_utils import (
 
     <%block name="jsextra"></%block>
     <script type="text/javascript">
-      require(['common/js/common_libraries'], function () {
-          require(['js/factories/base'], function () {
-              require(['js/models/course'], function(Course) {
-                  % if context_course:
-                      window.course = new Course({
-                          id: "${context_course.id | n, js_escaped_string}",
-                          name: "${context_course.display_name_with_default | n, js_escaped_string}",
-                          url_name: "${context_course.location.name | n, js_escaped_string}",
-                          org: "${context_course.location.org | n, js_escaped_string}",
-                          num: "${context_course.location.course | n, js_escaped_string}",
-                          display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
-                          revision: "${context_course.location.revision | n, js_escaped_string}",
-                          self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
-                      });
-                  % endif
-                  % if user.is_authenticated():
-                      require(['js/sock']);
-                  % endif
-                  <%block name='requirejs'></%block>
-              });
-          });
-      });
+        require(['${static.url("cms/js/require-config.js")}'], function () {
+            require(['common/js/common_libraries'], function () {
+                require(['js/factories/base'], function () {
+                    require(['js/models/course'], function (Course) {
+                        % if context_course:
+                            window.course = new Course({
+                                id: "${context_course.id | n, js_escaped_string}",
+                                name: "${context_course.display_name_with_default | n, js_escaped_string}",
+                                url_name: "${context_course.location.name | n, js_escaped_string}",
+                                org: "${context_course.location.org | n, js_escaped_string}",
+                                num: "${context_course.location.course | n, js_escaped_string}",
+                                display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
+                                revision: "${context_course.location.revision | n, js_escaped_string}",
+                                self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
+                            });
+                        % endif
+                        % if user.is_authenticated():
+                            require(['js/sock']);
+                        % endif
+                        <%block name='requirejs'></%block>
+                    });
+                });
+            });
+        });
     </script>
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>

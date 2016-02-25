@@ -3,14 +3,18 @@ requirejs.config({
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
-        "jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        # The jquery-migrate library was added in upgrading from
+        # jQuery 1.7.x to 2.2.x.  This config allows developers to
+        # depend on "jquery" which opaquely requires both libraries.
+        "_jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        "jquery": "xmodule_js/common_static/js/vendor/jquery-migrate.min",
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
-        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
+        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo.min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
@@ -63,6 +67,10 @@ requirejs.config({
         },
         "date": {
             exports: "Date"
+        },
+        "jquery": {
+            deps: ["_jquery"],
+            exports: "jQuery"
         },
         "jquery.ui": {
             deps: ["jquery"],
@@ -215,20 +223,25 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 define([
     "coffee/spec/main_spec",
 
-    "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
+    "coffee/spec/models/course_spec",
+    "coffee/spec/models/metadata_spec",
     "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
-    "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
+    "coffee/spec/models/settings_grading_spec",
+    "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
     "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
+
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
 
-    "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
-    "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
+    "js/spec/video/transcripts/utils_spec",
+    "js/spec/video/transcripts/editor_spec",
+    "js/spec/video/transcripts/videolist_spec",
+    "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
     "js/spec/models/component_template_spec",

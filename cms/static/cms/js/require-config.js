@@ -27,7 +27,12 @@
             "mustache": "js/vendor/mustache",
             "codemirror": "js/vendor/codemirror-compressed",
             "codemirror/stex": "js/vendor/CodeMirror/stex",
-            "jquery": "js/vendor/jquery.min",
+            // The jquery-migrate library was added in upgrading from
+            // jQuery 1.7.x to 2.2.x.  This config allows developers
+            // to depend on "jquery" which opaquely requires both
+            // libraries.
+            "_jquery": "js/vendor/jquery.min",
+            "jquery": "js/vendor/jquery-migrate.min",
             "jquery.ui": "js/vendor/jquery-ui.min",
             "jquery.form": "js/vendor/jquery.form",
             "jquery.markitup": "js/vendor/markitup/jquery.markitup",
@@ -37,7 +42,7 @@
             "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
             "jquery.cookie": "js/vendor/jquery.cookie",
             "jquery.qtip": "js/vendor/jquery.qtip.min",
-            "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
+            "jquery.scrollTo": "js/vendor/jquery.scrollTo.min",
             "jquery.flot": "js/vendor/flot/jquery.flot.min",
             "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
             "jquery.fileupload-process": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
@@ -109,6 +114,10 @@
             "date": {
                 exports: "Date"
             },
+            "jquery": {
+                deps: ["_jquery"],
+                exports: "jQuery"
+            },
             "jquery.ui": {
                 deps: ["jquery"],
                 exports: "jQuery.ui"
@@ -143,7 +152,7 @@
             },
             "jquery.scrollTo": {
                 deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
+                exports: "jQuery.fn.scrollTo"
             },
             "jquery.flot": {
                 deps: ["jquery"],
