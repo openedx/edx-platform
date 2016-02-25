@@ -6,7 +6,7 @@ import ddt
 import json
 import copy
 import mock
-from mock import patch
+from mock import Mock, patch
 import unittest
 
 from django.conf import settings
@@ -20,7 +20,7 @@ from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from student.roles import CourseInstructorRole
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -29,7 +29,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
 from util.milestones_helpers import seed_milestone_relationship_types
 
-from .utils import CourseTestCase
+from .utils import CourseTestCase, AjaxEnabledTestClient
 
 
 def get_url(course_id, handler_name='settings_handler'):
@@ -954,6 +954,23 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         tab_list.append(self.notes_tab)
         self.assertEqual(tab_list, course.tabs)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
+    @patch('xmodule.util.django.get_current_request')
+    def test_post_settings_with_staff_not_enrolled(self, mock_request):
+        """
+        Tests that we can post advance settings when course staff is not enrolled.
+        """
+        mock_request.return_value = Mock(META={'HTTP_HOST': 'localhost'})
+        user = UserFactory.create(is_staff=True)
+        CourseStaffRole(self.course.id).add_users(user)
+
+        client = AjaxEnabledTestClient()
+        client.login(username=user.username, password=user.password)
+        response = self.client.ajax_post(self.course_setting_url, {
+            'advanced_modules': {"value": [""]}
+        })
+        self.assertEqual(response.status_code, 200)
 
 
 class CourseGraderUpdatesTest(CourseTestCase):
