@@ -3,13 +3,14 @@
     define([
             'jquery',
             'underscore',
+            'sinon',
             'common/js/spec_helpers/template_helpers',
             'common/js/spec_helpers/ajax_helpers',
             'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView',
             'js/student_account/models/PasswordResetModel'
         ],
-        function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
+        function($, _, sinon, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
 
         describe('edx.student.account.LoginView', function() {
             var model = null,
