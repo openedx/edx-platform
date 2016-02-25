@@ -498,7 +498,7 @@ def export_handler(request, course_key_string):
     context['export_url'] = export_url + '?_accept=application/x-tgz'
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
-    requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
+    requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
     if 'application/x-tgz' in requested_format:
         try:
