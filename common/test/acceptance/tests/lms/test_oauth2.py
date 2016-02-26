@@ -53,8 +53,17 @@ class OAuth2PermissionDelegationTests(WebAppTest):
         """
         self._auth()
         assert self.oauth_page.visit()
-        self.oauth_page.confirm()
 
         # This redirects to an invalid URI.
-        query = self._qs(self.browser.current_url)
+        self.oauth_page.confirm()
+        self.oauth_page.wait_for_element_absence('input[name=authorize]', 'Authorization button is not present')
+
+        # Due to a bug in ChromeDriver, when chrome is on invalid URI,self.browser.current_url outputs
+        # data:text/html,chromewebdata. When this happens in our case,query string is present in the title.
+        # So to get query string, we branch out based on selected browser.
+        if self.browser.name == 'chrome':
+            query = self._qs(self.browser.title)
+        else:
+            query = self._qs(self.browser.current_url)
+
         self.assertIn('code', query)
