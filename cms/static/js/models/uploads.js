@@ -14,11 +14,11 @@ var FileUpload = Backbone.Model.extend({
     },
     validate: function(attrs, options) {
         if(attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
+            var template = _.template(
+                gettext("Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload.") // jshint ignore:line
+            );
             return {
-                message: _.template(
-                    gettext("Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload."),
-                    this.formatValidTypes()
-                ),
+                message: template(this.formatValidTypes()),
                 attributes: {selectedFile: true}
             };
         }
@@ -63,8 +63,9 @@ var FileUpload = Backbone.Model.extend({
             };
         }
         var or = gettext('or');
+        var template = _.template('<%- initial %> <%- or %> <%- last %>');
         var formatTypes = function(types) {
-            return _.template('<%= initial %> <%= or %> <%= last %>', {
+            return template({
                 initial: _.initial(types).join(', '),
                 or: or,
                 last: _.last(types)

@@ -62,7 +62,7 @@ class SendEmail
           success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
 
         subject = @$subject.val()
-        full_confirm_message = _.template(confirm_message, {subject: subject})
+        full_confirm_message = _.template(confirm_message)({subject: subject})
 
         if confirm full_confirm_message
 

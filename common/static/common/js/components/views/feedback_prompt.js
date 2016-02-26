@@ -2,7 +2,7 @@
     'use strict';
     define(["jquery", "underscore", "underscore.string", "common/js/components/views/feedback"],
         function($, _, str, SystemFeedbackView) {
-            str = str || _.str;
+
             var Prompt = SystemFeedbackView.extend({
                 options: $.extend({}, SystemFeedbackView.prototype.options, {
                     type: "prompt",

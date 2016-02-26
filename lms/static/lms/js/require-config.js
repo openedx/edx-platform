@@ -19,6 +19,10 @@
         };
         defineDependency("jQuery", "jquery");
         defineDependency("_", "underscore");
+        defineDependency("s", "underscore.string");
+        if (window._ && window.s) {
+            window._.str = window.s;
+        }
         defineDependency("gettext", "gettext");
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
