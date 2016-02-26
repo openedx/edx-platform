@@ -56,5 +56,6 @@ class OAuth2PermissionDelegationTests(WebAppTest):
         self.oauth_page.confirm()
 
         # This redirects to an invalid URI.
-        query = self._qs(self.browser.current_url)
+        self.oauth_page.wait_for_element_absence('input[name=authorize]', 'Authorization button is not present')
+        query = self._qs(self.browser.current_url) or self._qs(self.browser.title)
         self.assertIn('code', query)
