@@ -81,8 +81,6 @@ def initial_setup(server):
             desired_capabilities['loggingPrefs'] = {
                 'browser': 'ALL',
             }
-        elif browser_driver == 'firefox':
-            desired_capabilities = {}
         else:
             desired_capabilities = {}
 
@@ -99,7 +97,9 @@ def initial_setup(server):
             # raise a WebDriverException
             try:
                 if browser_driver == 'firefox':
-
+                    # Lettuce initializes differently for firefox, and sending
+                    # desired_capabilities will not work. So initialize without
+                    # sending desired_capabilities.
                     world.browser = Browser(browser_driver)
                 else:
                     world.browser = Browser(browser_driver, desired_capabilities=desired_capabilities)
