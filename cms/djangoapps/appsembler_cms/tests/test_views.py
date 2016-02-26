@@ -35,23 +35,24 @@ class TestUserSignup(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('User does not exist in academy.appsembler.com', response.content)
 
-    # def test_creates_cloned_course_for_existing_user(self):
-    #     user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
-    #     org = Organization.objects.create(key="acme")
-    #     self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
-    #     existing_course_key = ToyCourseFactory.create().id
-    #
-    #     payload = {
-    #         'email': 'john@doe.com',
-    #         'secret_key': 'secret_key',
-    #         'organization_key': 'acme',
-    #         'course_id': existing_course_key
-    #     }
-    #     response = self.client.post(self.url, payload)
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     number = "{}Clone".format(user.username)
-    #     run = "CurrentTerm"
-    #     self.assertIn("{}/{}/{}".format(org.key, number, run), response.content)
+    def test_creates_cloned_course_for_existing_user(self):
+        user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
+        org = Organization.objects.create(key="acme")
+        self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
+        existing_course_key = ToyCourseFactory.create().id
+        print "                    == {}".format(existing_course_key)
+
+        payload = {
+            'email': 'john@doe.com',
+            'secret_key': 'secret_key',
+            'organization_key': 'acme',
+            'course_id': existing_course_key
+        }
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        number = "{}Clone".format(user.username)
+        run = "CurrentTerm"
+        self.assertIn("course-v1:{}+{}+{}".format(org.key, number, run), response.content)
 
     def test_creates_new_course_if_missing_course_id(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")

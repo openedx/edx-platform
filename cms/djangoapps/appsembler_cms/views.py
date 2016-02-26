@@ -6,9 +6,12 @@ from rest_framework import status
 
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views.course import create_new_course_in_store
+from contentstore.utils import add_instructor
+# from enrollment.api import add_enrollment
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
+from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
@@ -38,8 +41,6 @@ class CreateCourseAPIView(GenericAPIView):
             number = "{}101".format(user.username)
             run = "CurrentTerm"
 
-            destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
-            logger.warning(destination_course_key)
             fields = {
                 "display_name": "{}'s First Course".format(user.profile.name)
             }
@@ -50,6 +51,9 @@ class CreateCourseAPIView(GenericAPIView):
                 try:
                     # with modulestore().default_store(ModuleStoreEnum.Type.split):
                     # this is here just so we know for sure whether it was cloned or not
+                    # source_course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+                    destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
+                    logger.warning(destination_course_key)
                     number = "{}Clone".format(user.username)
                     new_course = modulestore().clone_course(source_course_id=course_id,
                                                             dest_course_id=destination_course_key,
@@ -70,8 +74,10 @@ class CreateCourseAPIView(GenericAPIView):
                     logger.error(message)
                     logger.warning(e)
                     return Response(status=status.HTTP_400_BAD_REQUEST)
-            # add_instructor(new_course.id, User.objects.get(email="staff@example.com"), user)
-            # CourseEnrollment.enroll(user, new_course.id, mode='honor')
+            ## TODO: this must be removed before pushing to production
+            ## requesting_user should be set to a valid academy.appsembler.com staff email address
+            add_instructor(new_course.id, user, user)
+            CourseEnrollment.enroll(user, new_course.id, mode='honor')
             new_course_url = reverse_course_url('course_handler', new_course.id)
             response_data = {
                 'course_url': new_course_url,
