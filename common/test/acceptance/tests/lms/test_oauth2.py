@@ -42,9 +42,13 @@ class OAuth2PermissionDelegationTests(WebAppTest):
         assert self.oauth_page.visit()
         self.oauth_page.cancel()
 
-        # This redirects to an invalid URI.
-        query = self._qs(self.browser.current_url)
-        self.assertEqual('access_denied', query['error'])
+        # This redirects to an invalid URI. For chrome verify title, current_url otherwise
+        if self.browser.name == 'chrome':
+            query = self._qs(self.browser.title)
+            self.assertIn('access_denied', query['error'])
+        else:
+            query = self._qs(self.browser.current_url)
+            self.assertIn('access_denied', query['error'])
 
     def test_accepting_redirects(self):
         """
