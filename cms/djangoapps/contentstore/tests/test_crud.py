@@ -25,7 +25,6 @@ class TemplateTests(ModuleStoreTestCase):
         self.assertIsNotNone(found.get('problem'))
         self.assertEqual(len(found.get('course')), 0)
         self.assertEqual(len(found.get('about')), 1)
-        self.assertGreaterEqual(len(found.get('html')), 2)
         self.assertGreaterEqual(len(found.get('problem')), 10)
         dropdown = None
         for template in found['problem']:
@@ -42,10 +41,10 @@ class TemplateTests(ModuleStoreTestCase):
 
     def test_get_some_templates(self):
         self.assertEqual(len(SequenceDescriptor.templates()), 0)
-        self.assertGreater(len(HtmlDescriptor.templates()), 0)
+        self.assertGreater(len(CapaDescriptor.templates()), 0)
         self.assertIsNone(SequenceDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNone(HtmlDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
+        self.assertIsNone(CapaDescriptor.get_template('doesntexist.yaml'))
+        self.assertIsNotNone(CapaDescriptor.get_template('blank_common.yaml'))
 
     def test_factories(self):
         test_course = CourseFactory.create(

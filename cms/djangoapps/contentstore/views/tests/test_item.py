@@ -223,13 +223,13 @@ class GetItemTest(ItemTest):
         root_usage_key = self._create_vertical()
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
         split_test_usage_key = self.response_usage_key(resp)
-        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html', boilerplate='announcement.yaml')
+        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='problem', boilerplate='blank_common.yaml')
         self.assertEqual(resp.status_code, 200)
-        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='html', boilerplate='zooming_image.yaml')
+        resp = self.create_xblock(parent_usage_key=split_test_usage_key, category='problem', boilerplate='checkboxes_response.yaml')
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
-        self.assertIn('Announcement', html)
-        self.assertIn('Zooming', html)
+        self.assertIn('Blank Common Problem', html)
+        self.assertIn('Checkboxes', html)
 
     def test_split_test_edited(self):
         """
