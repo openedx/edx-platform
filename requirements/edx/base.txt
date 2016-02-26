@@ -91,7 +91,8 @@ pysrt==0.4.7
 PyYAML==3.10
 requests==2.7.0
 requests-oauthlib==0.4.1
-scipy==0.14.0
+# Removing scipy because RTD can't install it.
+# scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==12.3
