@@ -45,16 +45,13 @@ class CreateCourseAPIView(GenericAPIView):
                 "display_name": "{}'s First Course".format(user.profile.name)
             }
             new_course = None
-            logger.warning("===============================================================")
             if serializer.data.get('course_id'):
                 course_id = serializer.data.get('course_id')
                 try:
-                    # with modulestore().default_store(ModuleStoreEnum.Type.split):
-                    # this is here just so we know for sure whether it was cloned or not
-                    # source_course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
                     destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
-                    logger.warning(destination_course_key)
+                    # this is here just so we know for sure whether it was cloned or not
                     number = "{}Clone".format(user.username)
+                    # with modulestore().default_store(ModuleStoreEnum.Type.split):
                     new_course = modulestore().clone_course(source_course_id=course_id,
                                                             dest_course_id=destination_course_key,
                                                             user_id=user.username,

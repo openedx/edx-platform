@@ -40,7 +40,6 @@ class TestUserSignup(ModuleStoreTestCase):
         org = Organization.objects.create(key="acme")
         self.assertEqual(User.objects.filter(username="JohnDoe").count(), 1)
         existing_course_key = ToyCourseFactory.create().id
-        print "                    == {}".format(existing_course_key)
 
         payload = {
             'email': 'john@doe.com',
