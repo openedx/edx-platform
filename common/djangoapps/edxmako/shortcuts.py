@@ -33,7 +33,6 @@ def marketing_link(name):
     possible URLs for certain links. This function is to decides
     which URL should be provided.
     """
-
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
