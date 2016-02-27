@@ -27,12 +27,8 @@
             "mustache": "js/vendor/mustache",
             "codemirror": "js/vendor/codemirror-compressed",
             "codemirror/stex": "js/vendor/CodeMirror/stex",
-            // The jquery-migrate library was added in upgrading from
-            // jQuery 1.7.x to 2.2.x.  This config allows developers
-            // to depend on "jquery" which opaquely requires both
-            // libraries.
-            "_jquery": "js/vendor/jquery.min",
-            "jquery": "js/vendor/jquery-migrate.min",
+            "jquery": "js/vendor/jquery.min",
+            "jquery-migrate": "js/vendor/jquery-migrate.min",
             "jquery.ui": "js/vendor/jquery-ui.min",
             "jquery.form": "js/vendor/jquery.form",
             "jquery.markitup": "js/vendor/markitup/jquery.markitup",
@@ -117,10 +113,7 @@
             "date": {
                 exports: "Date"
             },
-            "jquery": {
-                deps: ["_jquery"],
-                exports: "jQuery"
-            },
+            "jquery-migrate": ['jquery'],
             "jquery.ui": {
                 deps: ["jquery"],
                 exports: "jQuery.ui"
