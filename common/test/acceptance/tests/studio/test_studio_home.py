@@ -49,7 +49,6 @@ class CreateLibraryTest(WebAppTest):
 
         self.auth_page.visit()
         self.dashboard_page.visit()
-        self.dashboard_page.wait_for_element_visibility('.content-primary', 'See library list.')
         self.assertFalse(self.dashboard_page.has_library(name=name, org=org, number=number))
         self.assertTrue(self.dashboard_page.has_new_library_button())
 
