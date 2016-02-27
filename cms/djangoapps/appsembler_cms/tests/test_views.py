@@ -6,6 +6,7 @@ import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from appsembler_lms.models import Organization
@@ -50,7 +51,7 @@ class TestUserSignup(ModuleStoreTestCase):
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         number = "{}Clone".format(user.username)
-        run = "CurrentTerm"
+        run = timezone.now().year
         self.assertIn("course-v1:{}+{}+{}".format(org.key, number, run), response.content)
 
     def test_creates_new_course_if_missing_course_id(self):
@@ -66,7 +67,9 @@ class TestUserSignup(ModuleStoreTestCase):
         }
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
+        number = "{}101".format(user.username)
+        run = timezone.now().year
+        self.assertIn("/course/{}/{}/{}".format(org.key, number, run), response.content)
 
     def test_creates_new_course_if_wrong_course_id(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")
@@ -82,8 +85,9 @@ class TestUserSignup(ModuleStoreTestCase):
         }
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('/course/acme/JohnDoe101/CurrentTerm', response.content)
-
+        number = "{}101".format(user.username)
+        run = timezone.now().year
+        self.assertIn("/course/{}/{}/{}".format(org.key, number, run), response.content)
 
     def test_fails_for_nonexistant_organization(self):
         user = UserFactory.create(username="JohnDoe", email="john@doe.com", password="password")

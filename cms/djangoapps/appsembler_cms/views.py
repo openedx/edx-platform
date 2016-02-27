@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from rest_framework import status
 
@@ -36,10 +37,8 @@ class CreateCourseAPIView(GenericAPIView):
                 message = "User does not exist in academy.appsembler.com"
                 return Response(status=status.HTTP_404_NOT_FOUND, data=message)
 
-            store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
             org = get_object_or_404(Organization, key=serializer.data.get('organization_key'))
-            number = "{}101".format(user.username)
-            run = "CurrentTerm"
+            run = str(timezone.now().year)
 
             fields = {
                 "display_name": "{}'s First Course".format(user.profile.name)
@@ -48,11 +47,12 @@ class CreateCourseAPIView(GenericAPIView):
             if serializer.data.get('course_id'):
                 course_id = serializer.data.get('course_id')
                 try:
-                    destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
+                    source_course_key = CourseKey.from_string(course_id)
                     # this is here just so we know for sure whether it was cloned or not
                     number = "{}Clone".format(user.username)
+                    destination_course_key = CourseKey.from_string("course-v1:{}+{}+{}".format(org.key, number, run))
                     # with modulestore().default_store(ModuleStoreEnum.Type.split):
-                    new_course = modulestore().clone_course(source_course_id=course_id,
+                    new_course = modulestore().clone_course(source_course_id=source_course_key,
                                                             dest_course_id=destination_course_key,
                                                             user_id=user.username,
                                                             fields=fields)
@@ -63,9 +63,11 @@ class CreateCourseAPIView(GenericAPIView):
 
             if not new_course:
                 try:
+                    store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
                     number = "{}101".format(user.username)
                     new_course = create_new_course_in_store(store_for_new_course, user, org.key,
                                                             number, run, fields)
+                    destination_course_key = new_course.id
                 except Exception as e:
                     message = "Unable to create new course."
                     logger.error(message)
@@ -73,9 +75,9 @@ class CreateCourseAPIView(GenericAPIView):
                     return Response(status=status.HTTP_400_BAD_REQUEST)
             ## TODO: this must be removed before pushing to production
             ## requesting_user should be set to a valid academy.appsembler.com staff email address
-            add_instructor(new_course.id, user, user)
-            CourseEnrollment.enroll(user, new_course.id, mode='honor')
-            new_course_url = reverse_course_url('course_handler', new_course.id)
+            add_instructor(destination_course_key, user, user)
+            CourseEnrollment.enroll(user, destination_course_key, mode='honor')
+            new_course_url = reverse_course_url('course_handler', destination_course_key)
             response_data = {
                 'course_url': new_course_url,
             }
