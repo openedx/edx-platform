@@ -3,6 +3,7 @@ define([
         'edx-ui-toolkit/js/utils/html-utils',
         'domReady!',
         'jquery',
+        'jquery-migrate',
         'backbone',
         'underscore',
         'gettext'

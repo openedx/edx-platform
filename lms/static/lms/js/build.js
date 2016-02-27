@@ -65,10 +65,8 @@
         paths: {
             'gettext': 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
-            // '_jquery' is the name of the current jQuery in the
-            // platform, and 'jquery' refers to jquery-migrate.
-            '_jquery': 'empty:',
             'jquery': 'empty:',
+            'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
             'backbone': 'empty:',

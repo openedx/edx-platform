@@ -1,9 +1,12 @@
 (function(requirejs, define) {
+    'use strict';
+
     requirejs.config({
         baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
-            'jquery': 'js/vendor/jquery.min',
+            'jquery': 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'js/vendor/jquery-ui.min',
             'jquery.flot': 'js/vendor/flot/jquery.flot.min',
             'jquery.form': 'js/vendor/jquery.form',
