@@ -28,6 +28,7 @@
             }
         };
         defineDependency("jQuery", "jquery");
+        defineDependency("jQuery", "jquery-migrate");
         defineDependency("_", "underscore");
         defineDependency("s", "underscore.string");
         // Underscore.string no longer installs itself directly on "_". For compatibility with existing
@@ -68,8 +69,8 @@
             // jQuery 1.7.x to 2.2.x.  This config allows developers
             // to depend on "jquery" which opaquely requires both
             // libraries.
-            "_jquery": "js/vendor/jquery.min",
-            "jquery": "js/vendor/jquery-migrate.min",
+            "jquery": "js/vendor/jquery.min",
+            "jquery-migrate": "js/vendor/jquery-migrate.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
             'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",
@@ -116,13 +117,11 @@
             "date": {
                 exports: "Date"
             },
-<<<<<<< HEAD
-=======
             "jquery": {
                 deps: ["_jquery"],
                 exports: "jQuery"
             },
->>>>>>> Upgrade jQuery 1.7.2 to 2.2.0
+            "jquery-migrate": ['jquery'],
             "jquery.cookie": {
                 deps: ["jquery"],
                 exports: "jQuery.fn.cookie"

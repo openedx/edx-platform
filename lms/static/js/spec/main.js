@@ -6,12 +6,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            // The jquery-migrate library was added in upgrading from
-            // jQuery 1.7.x to 2.2.x.  This config allows developers
-            // to depend on "jquery" which opaquely requires both
-            // libraries.
-            '_jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
-            'jquery': 'xmodule_js/common_static/js/vendor/jquery-migrate.min',
+            'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
+            'jquery-migrate': 'xmodule_js/common_static/js/vendor/jquery-migrate.min',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -123,10 +119,7 @@
             'date': {
                 exports: 'Date'
             },
-            "jquery": {
-                deps: ["_jquery"],
-                exports: "jQuery"
-            },
+            "jquery-migrate": ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
                 exports: 'jQuery.ui'
