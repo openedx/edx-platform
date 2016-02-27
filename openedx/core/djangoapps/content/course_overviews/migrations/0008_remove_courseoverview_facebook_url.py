@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='courseoverview',
-            name='facebook_url',
-        ),
+        # Removed because we accidentally removed this column without first
+        # removing the code that refers to this.  This can cause errors in production.
     ]
