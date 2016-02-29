@@ -854,6 +854,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Django-rest-swagger
+    'rest_framework_swagger',
 )
 
 
@@ -1127,3 +1130,12 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
+
+###################### Registration ##################################
+
+# For each of the fields, give one of the following values:
+# - 'required': to display the field, and make it mandatory
+# - 'optional': to display the field, and make it non-mandatory
+# - 'hidden': to not display the field
+
+REGISTRATION_EXTRA_FIELDS = {}
