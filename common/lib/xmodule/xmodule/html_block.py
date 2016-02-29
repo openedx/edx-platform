@@ -27,6 +27,12 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List
 from xblock.fragment import Fragment
 
+log = logging.getLogger("edx.courseware")
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+
 class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
