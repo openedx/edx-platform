@@ -75,10 +75,6 @@ describe('VideoVolumeControl', function () {
         });
 
         it('bind the volume control', function () {
-            var button = $('.volume .control');
-
-            expect(button).toHandle('keydown');
-            expect(button).toHandle('mousedown');
             expect($('.volume')).not.toHaveClass('is-opened');
 
             $('.volume').mouseenter();
