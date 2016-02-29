@@ -29,7 +29,7 @@
       color: $white;
     }
 
-    &.is_fullscreen {
+    &.in_fullscreen {
       background-color: lighten($action-primary-bg,10%);
       color: $white;
 
@@ -43,5 +43,6 @@
   .fullscreen-element {
     overflow: auto;
     padding: 10px;
+    height: 100vh;
   }
 }
