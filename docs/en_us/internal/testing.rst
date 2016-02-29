@@ -173,6 +173,15 @@ To run cms python tests without ``collectstatic`` use this command.
 
     paver test_system -s cms --fasttest
 
+To run unit tests but retain your database between test runs (which is nice performance boost
+when iterating on a single test) use this command.  Your first test run will run at the normal
+speed since the database needs to be created, but any future ``--keepdb`` runs will use the
+cached database and run significantly faster.
+
+::
+
+    paver test_system -s lms --keepdb
+
 To run a single django test class use this command.
 
 ::
