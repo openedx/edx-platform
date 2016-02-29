@@ -8,6 +8,7 @@ could re-design and re-engineer it from scratch.
 TODOS:
 - Features:
     - Add realtime text search to nav app to locate sections
+    - Use the pattern library
 - Refactorings:
     - Choose a better name for the app
     - Refactor the django app into a separate repository
