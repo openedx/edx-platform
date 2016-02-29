@@ -194,30 +194,33 @@ describe 'Problem', ->
 
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
+        correctHTML = '<div>problem description <span class="status correct">Correct!</span></div>'
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'correct', contents: 'Correct!')
+          callback(success: 'correct', contents: correctHTML)
           promise =
             always: (callable) -> callable()
             done: (callable) -> callable()
         @problem.check()
-        expect(@problem.el.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual correctHTML
         expect(window.SR.readElts).toHaveBeenCalled()
 
     describe 'when the response is incorrect', ->
+      incorrectHTML = '<div>problem description <span class="status incorrect">Incorrect!</span></div>'
       it 'call render with returned content', ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'incorrect', contents: 'Incorrect!')
+          callback(success: 'incorrect', contents: incorrectHTML)
           promise =
             always: (callable) -> callable()
             done: (callable) -> callable()
         @problem.check()
-        expect(@problem.el.html()).toEqual 'Incorrect!'
+        expect(@problem.el.html()).toEqual incorrectHTML
         expect(window.SR.readElts).toHaveBeenCalled()
 
     it 'tests if all the capa buttons are disabled while checking', ->
+      incorrectHTML = '<div>problem description <span class="status incorrect">Incorrect!</span></div>'
       runs ->
         spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
-          callback(success: 'incorrect', contents: 'Incorrect!')
+          callback(success: 'incorrect', contents: incorrectHTML)
           promise =
             always: (callable) -> callable()
             done: (callable) -> callable()
@@ -346,7 +349,7 @@ describe 'Problem', ->
 
       it 'reads the answers', ->
         runs ->
-          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: 'answers')
+          spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {problem: "answer"})
           @problem.show()
 
         waitsFor (->
