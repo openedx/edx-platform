@@ -32,7 +32,7 @@ from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_block import HtmlBlock
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
@@ -52,7 +52,7 @@ LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
     DiscussionDescriptor: [{}],
-    HtmlDescriptor: [{}],
+    HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
     # This is being excluded because it has dependencies on django
@@ -135,7 +135,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.get_module.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -163,7 +163,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.load_item.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,

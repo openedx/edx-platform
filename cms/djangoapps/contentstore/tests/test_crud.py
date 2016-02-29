@@ -7,7 +7,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DAT
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_block import HtmlBlock
 from xmodule.modulestore.exceptions import DuplicateCourseError
 
 
@@ -42,10 +42,10 @@ class TemplateTests(ModuleStoreTestCase):
 
     def test_get_some_templates(self):
         self.assertEqual(len(SequenceDescriptor.templates()), 0)
-        self.assertGreater(len(HtmlDescriptor.templates()), 0)
+        self.assertGreater(len(HtmlBlock.templates()), 0)
         self.assertIsNone(SequenceDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNone(HtmlDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
+        self.assertIsNone(HtmlBlock.get_template('doesntexist.yaml'))
+        self.assertIsNotNone(HtmlBlock.get_template('announcement.yaml'))
 
     def test_factories(self):
         test_course = CourseFactory.create(
