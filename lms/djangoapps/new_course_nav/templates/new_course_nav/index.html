@@ -1,0 +1,28 @@
+## mako
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+<%block name="js_overrides">
+    <script type="text/javascript" src="/static/js/elm.js"></script>
+</%block>
+<%block name="headextra">
+    <link rel="stylesheet"  href="" />
+</%block>
+<%block name="bodyclass">view-new_course_nav is-in-course course</%block>
+<%block name="pagetitle">${_("New Course Navigation")}</%block>
+<%block name="headextra">
+<%static:css group='style-course'/>
+</%block>
+<%include file="/courseware/course_navigation.html" args="active_page='new_course_nav'" />
+
+<div id="nav-app"
+    data-course-api-url="${course_api_url}"
+    data-course-blocks-api-url="${course_blocks_api_url}">
+</div>
+
+<%block name="js_extra">
+    <script>
+        var appContainerElement = document.getElementById('nav-app');
+        Elm.embed(Elm.Main, appContainerElement);
+    </script>
+</%block>

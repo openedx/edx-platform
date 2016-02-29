@@ -731,6 +731,19 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             name='resubscribe_forum_update',
         ),
     )
+
+
+urlpatterns += (
+    url(
+        r'^courses/{}/new_course_nav'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('lms.djangoapps.new_course_nav.urls'),
+        name='new_course_nav',
+    ),
+)
+
+
 urlpatterns += (
     # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
     url(
