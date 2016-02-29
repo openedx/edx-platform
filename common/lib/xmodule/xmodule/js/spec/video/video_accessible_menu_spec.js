@@ -111,14 +111,6 @@
                     expect(container).not.toHaveClass('open');
                 });
 
-                it('do not close the menu on mouseleave if a menu item has ' +
-                    'focus', function () {
-                    // Open menu. Focus is on last menu item.
-                    container.trigger(keyPressEvent(KEY.ENTER));
-                    container.mouseenter().mouseleave();
-                    expect(container).toHaveClass('open');
-                });
-
                 it('close the menu on click', function () {
                     container.mouseenter().click();
                     expect(container).not.toHaveClass('open');
