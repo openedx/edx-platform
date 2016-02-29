@@ -1,13 +1,10 @@
-// js-imagediff 1.0.3
-// (c) 2011-2012 Carl Sutherland, Humble Software
-// Distributed under the MIT License
-// For original source and documentation visit:
-// http://www.github.com/HumbleSoftware/js-imagediff
-
 (function (name, definition) {
   var root = this;
   if (typeof module !== 'undefined') {
-    var Canvas = require('canvas');
+    var Canvas;
+    try {
+      Canvas = require('canvas');
+    } catch (e) {}
     module.exports = definition(root, name, Canvas);
   } else if (typeof define === 'function' && typeof define.amd === 'object') {
     define(definition);
@@ -32,10 +29,17 @@
 
   // Creation
   function getCanvas (width, height) {
-    var
-      canvas = Canvas ?
-        new Canvas() :
-        document.createElement('canvas');
+    var canvas;
+    if (Canvas) {
+      canvas = new Canvas();
+    } else if (root.document && root.document.createElement) {
+      canvas = document.createElement('canvas');
+    } else {
+        throw new Error(
+          e.message + '\n' +
+          'Please see https://github.com/HumbleSoftware/js-imagediff#cannot-find-module-canvas\n'
+        );
+    }
     if (width) canvas.width = width;
     if (height) canvas.height = height;
     return canvas;
@@ -166,10 +170,10 @@
 
 
   // Diff
-  function diff (a, b) {
-    return (equalDimensions(a, b) ? diffEqual : diffUnequal)(a, b);
+  function diff (a, b, options) {
+    return (equalDimensions(a, b) ? diffEqual : diffUnequal)(a, b, options);
   }
-  function diffEqual (a, b) {
+  function diffEqual (a, b, options) {
 
     var
       height  = a.height,
@@ -191,7 +195,7 @@
 
     return c;
   }
-  function diffUnequal (a, b) {
+  function diffUnequal (a, b, options) {
 
     var
       height  = Math.max(a.height, b.height),
@@ -200,6 +204,7 @@
       aData   = a.data,
       bData   = b.data,
       cData   = c.data,
+      align   = options && options.align,
       rowOffset,
       columnOffset,
       row, column,
@@ -237,8 +242,13 @@
 
     // Helpers
     function offsets (imageData) {
-      rowOffset = Math.floor((height - imageData.height) / 2);
-      columnOffset = Math.floor((width - imageData.width) / 2);
+      if (align === 'top') {
+        rowOffset = 0;
+        columnOffset = 0;
+      } else {
+        rowOffset = Math.floor((height - imageData.height) / 2);
+        columnOffset = Math.floor((width - imageData.width) / 2);
+      }
     }
 
     return c;
@@ -358,11 +368,11 @@
       b = toImageData(b);
       return equal(a, b, tolerance);
     },
-    diff : function (a, b) {
+    diff : function (a, b, options) {
       checkType(a, b);
       a = toImageData(a);
       b = toImageData(b);
-      return diff(a, b);
+      return diff(a, b, options);
     },
 
     jasmine : jasmine,
