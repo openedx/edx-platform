@@ -43,7 +43,6 @@
                 expect(el.find('.shortform')).toContain('.full-top');
                 expect(el.find('.shortform')).toContain('.full-bottom');
                 expect(el.find('.longform')).toBeHidden();
-                expect(el.find('.full')).toHandle('click');
             });
 
             it('Custom container initialized correctly', function () {
@@ -52,7 +51,6 @@
                 expect(el.find('.shortform-custom')).toContain('.full-custom');
                 expect(el.find('.full-custom')).toHaveText('Show shortform-custom');
                 expect(el.find('.longform')).toBeHidden();
-                expect(el.find('.full-custom')).toHandle('click');
             });
         });
 
@@ -90,34 +88,28 @@
             });
 
             it('Default container', function () {
-                var event;
+                var item;
 
                 initialize(html);
+                item =  el.find('.full').get(0);
 
-                event = jQuery.Event('click', {
-                    target: el.find('.full').get(0)
-                });
-
-                Collapsible.toggleFull(event, 'See full output', 'Hide output');
+                item.click();
                 assertChanges('opened', 'full', 'See full output', 'Hide output');
 
-                Collapsible.toggleFull(event, 'See full output', 'Hide output');
+                item.click();
                 assertChanges('closed', 'full', 'See full output', 'Hide output');
             });
 
             it('Custom container', function () {
-                var event;
+                var item;
 
                 initialize(html_custom);
+                item =  el.find('.full-custom').get(0);
 
-                event = jQuery.Event('click', {
-                    target: el.find('.full-custom').get(0)
-                });
-
-                Collapsible.toggleFull(event, 'Show shortform-custom', 'Hide shortform-custom');
+                item.click();
                 assertChanges('opened', 'full-custom', 'Show shortform-custom', 'Hide shortform-custom');
 
-                Collapsible.toggleFull(event, 'Show shortform-custom', 'Hide shortform-custom');
+                item.click();
                 assertChanges('closed', 'full-custom', 'Show shortform-custom', 'Hide shortform-custom');
             });
         });
