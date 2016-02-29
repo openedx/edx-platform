@@ -126,20 +126,11 @@
                     });
                 });
 
-                it('bind the mouse movement', function () {
-                    state = jasmine.initializePlayer();
-                    expect($('.subtitles-menu')).toHandle('mouseover');
-                    expect($('.subtitles-menu')).toHandle('mouseout');
-                    expect($('.subtitles-menu')).toHandle('mousemove');
-                    expect($('.subtitles-menu')).toHandle('mousewheel');
-                    expect($('.subtitles-menu')).toHandle('DOMMouseScroll');
-                 });
-
-                 it('bind the scroll', function () {
+                it('bind the scroll', function () {
                     state = jasmine.initializePlayer();
                     expect($('.subtitles-menu'))
                         .toHandleWith('scroll', state.videoControl.showControls);
-                 });
+                });
 
             });
 
