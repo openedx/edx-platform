@@ -37,14 +37,6 @@
                 });
             });
 
-            it('bind the quality control', function () {
-                expect(qualityControl.el).toHandleWith('click',
-                    qualityControl.toggleQuality
-                );
-
-                expect(state.el).toHandle('play');
-            });
-
             it('calls fetchAvailableQualities only once', function () {
                 expect(player.getAvailableQualityLevels.calls.length)
                     .toEqual(0);
