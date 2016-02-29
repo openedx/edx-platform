@@ -186,13 +186,20 @@ DATABASES = {
         'NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': TEST_ROOT / 'db' / 'student_module_history.db'
+    },
 }
 
 if os.environ.get('DISABLE_MIGRATIONS'):
     # Create tables directly from apps' models. This can be removed once we upgrade
     # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
     MIGRATION_MODULES = NoOpMigrationModules()
+
+# Make sure we test with the extended history table
+FEATURES['ENABLE_CSMH_EXTENDED'] = True
+INSTALLED_APPS += ('coursewarehistoryextended',)
 
 CACHES = {
     # This is the cache used for most things.
