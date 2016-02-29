@@ -29,8 +29,9 @@ from opaque_keys.edx.locations import CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
-TOTAL_COURSES_COUNT = 500
-USER_COURSES_COUNT = 50
+
+TOTAL_COURSES_COUNT = 10
+USER_COURSES_COUNT = 1
 
 
 @ddt.ddt
@@ -157,8 +158,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
                 self.assertEqual(courses_list_by_groups, [])
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5),
-        (ModuleStoreEnum.Type.mongo, 3)
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -265,8 +266,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 150, 505),
-        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 3)
+        (ModuleStoreEnum.Type.split, 3, 13),
+        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):
