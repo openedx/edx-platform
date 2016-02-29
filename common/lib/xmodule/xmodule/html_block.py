@@ -51,9 +51,9 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
         # use display_name_with_default for those
         default=_("Text")
     )
-    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    data = String(help=_(u"Html contents to display for this module"), default=u"Data string!", scope=Scope.content)
     source_code = String(
-        help=_("Source code for LaTeX documents. This feature is not well-supported."),
+        help=_(u"Source code for LaTeX documents. This feature is not well-supported."),
         scope=Scope.settings
     )
     use_latex_compiler = Boolean(
@@ -76,25 +76,23 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
     )
 
     @XBlock.supports("multi_device")
-    def student_view(self, _context):
+    def student_view(self):
         """
         Return a fragment that contains the html for the student view
         """
-        response_fragment = Fragment()
-        if self.system.anonymous_student_id:
-            response_fragment = Fragment(self.data.replace("%%USER_ID%%", self.system.anonymous_student_id))
-        else:
-            response_fragment = Fragment(self.data)
+        data = self.data
+        if self.runtime.anonymous_student_id:
+            data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
 
+        response_fragment = Fragment(unicode(data))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/javascript_loader.coffee'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/display.coffee'))
 
-        response_fragment.add_javascript_url(self.resource_url('js/src/javascript_loader.coffee'))
-        response_fragment.add_javascript_url(self.resource_url('js/src/html/display.coffee'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/collapsible.js'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/imageModal.js'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/common_static/js/vendor/draggabilly.pkgd.js'))
 
-        response_fragment.add_javascript_url(self.resource_url('js/src/collapsible.js'))
-        response_fragment.add_javascript_url(self.resource_url('js/src/html/imageModal.js'))
-        response_fragment.add_javascript_url(self.resource_url('js/common_static/js/vendor/draggabilly.pkgd.js'))
-
-        response_fragment.add_css_url(self.resource_url('css/html/display.scss'))
+        response_fragment.add_css_url(self.runtime.local_resource_url(self, 'css/html/display.scss'))
 
         return response_fragment
 
@@ -361,8 +359,8 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlock):
         # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
         if self.data != "":
-            if self.system.anonymous_student_id:
-                return Fragment(self.data.replace("%%USER_ID%%", self.system.anonymous_student_id))
+            if self.runtime.anonymous_student_id:
+                return Fragment(self.data.replace("%%USER_ID%%", self.runtime.anonymous_student_id))
             return Fragment(self.data)
         else:
             course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
@@ -373,4 +371,4 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlock):
                 'hidden_updates': course_updates[3:],
             }
 
-            return Fragment(self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context))
+            return Fragment(self.runtime.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context))
