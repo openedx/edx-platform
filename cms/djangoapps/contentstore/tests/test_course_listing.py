@@ -8,6 +8,7 @@ from chrono import Timer
 from mock import patch, Mock
 import ddt
 
+from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
 
@@ -98,6 +99,15 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         response = self.client.get('/home')
         self.assertEqual(response.status_code, 200)
         self.assert_no_xss(response, escaping_content)
+
+    def test_empty_course_listing(self):
+        """
+        Test on empty course listing, studio name is properly displayed
+        """
+        message = "Are you staff on an existing {studio_name} course?".format(studio_name=settings.STUDIO_SHORT_NAME)
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(message, response.content)
 
     def test_get_course_list(self):
         """
