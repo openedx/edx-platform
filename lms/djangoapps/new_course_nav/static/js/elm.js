@@ -10825,7 +10825,26 @@ Elm.Main.make = function (_elm) {
       return $Effects.task(A2($Task.map,CourseBlocksApiResponse,$Task.toResult(A2($Http.get,courseBlocksDecoder,url))));
    }();
    var Error = {ctor: "Error"};
-   var fromApiResponse = function (response) {    var blah = $Debug.log($Basics.toString(response));return Error;};
+   var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
+   var Vertical = F2(function (a,b) {    return {ctor: "Vertical",_0: a,_1: b};});
+   var Sequential = F2(function (a,b) {    return {ctor: "Sequential",_0: a,_1: b};});
+   var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
+   var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
+   var Empty = {ctor: "Empty"};
+   var buildCourseTree = F2(function (courseBlocksData,rootId) {
+      if (_U.eq(rootId,"")) return Empty; else {
+            var maybeBlockData = A2($Dict.get,rootId,courseBlocksData.blocks);
+            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",lms_web_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
+            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,lmsWebUrl: blockData.lms_web_url};
+            var children = A2($List.map,buildCourseTree(courseBlocksData),A2($Maybe.withDefault,_U.list([]),blockData.children));
+            return _U.eq(blockData.type$,"course") ? A2(Course,blockAttributes,children) : _U.eq(blockData.type$,"chapter") ? A2(Chapter,
+            blockAttributes,
+            children) : _U.eq(blockData.type$,"sequential") ? A2(Sequential,blockAttributes,children) : _U.eq(blockData.type$,"vertical") ? A2(Vertical,
+            blockAttributes,
+            children) : Error;
+         }
+   });
+   var fromApiResponse = function (courseBlocksData) {    return A2(buildCourseTree,courseBlocksData,courseBlocksData.root);};
    var update = F2(function (action,courseBlock) {
       var foo = $Debug.log($Basics.toString(action));
       var _p1 = action;
@@ -10840,12 +10859,6 @@ Elm.Main.make = function (_elm) {
             return {ctor: "_Tuple2",_0: Error,_1: $Effects.none};
          }
    });
-   var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
-   var Vertical = F2(function (a,b) {    return {ctor: "Vertical",_0: a,_1: b};});
-   var Sequential = F2(function (a,b) {    return {ctor: "Sequential",_0: a,_1: b};});
-   var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
-   var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
-   var Empty = {ctor: "Empty"};
    var init = {ctor: "_Tuple2",_0: Empty,_1: getCourseBlocks};
    var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([])});
    var main = app.html;
@@ -10865,6 +10878,7 @@ Elm.Main.make = function (_elm) {
                              ,courseBlocksDecoder: courseBlocksDecoder
                              ,courseBlockDecoder: courseBlockDecoder
                              ,fromApiResponse: fromApiResponse
+                             ,buildCourseTree: buildCourseTree
                              ,CourseBlocksApiResponse: CourseBlocksApiResponse
                              ,CourseBlocksApiError: CourseBlocksApiError
                              ,update: update

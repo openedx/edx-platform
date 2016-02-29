@@ -74,11 +74,44 @@ courseBlockDecoder =
 
 
 fromApiResponse : CourseBlocksData -> CourseBlock
-fromApiResponse response =
+fromApiResponse courseBlocksData =
+  buildCourseTree courseBlocksData courseBlocksData.root
+
+
+buildCourseTree : CourseBlocksData -> String -> CourseBlock
+buildCourseTree courseBlocksData rootId =
+  if rootId == "" then
+    Empty
+  else
     let
-      blah = Debug.log (toString response)
+      maybeBlockData = Dict.get rootId courseBlocksData.blocks
+      blockData = Maybe.withDefault
+        { id = ""
+        , type' = ""
+        , display_name = ""
+        , lms_web_url = ""
+        , children = Just []
+        }
+        maybeBlockData
+      blockAttributes =
+        { id = blockData.id
+        , nodeType = blockData.type'
+        , displayName = blockData.display_name
+        , lmsWebUrl = blockData.lms_web_url
+        }
+      children =
+        List.map (buildCourseTree courseBlocksData) (Maybe.withDefault [] blockData.children)
     in
-      Error
+      if blockData.type' == "course" then
+        Course blockAttributes children
+      else if blockData.type' == "chapter" then
+        Chapter blockAttributes children
+      else if blockData.type' == "sequential" then
+        Sequential blockAttributes children
+      else if blockData.type' == "vertical" then
+        Vertical blockAttributes children
+      else
+        Error
 
 
 -- update
@@ -115,7 +148,7 @@ view address courseBlock =
       Html.text "Loading..."
 
     Course attributes children ->
-      Html.text attributes.displayName
+        Html.text attributes.displayName
 
     Error ->
       Html.text "Error - Some sort of HTTP error occurred"
