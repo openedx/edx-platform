@@ -19,7 +19,7 @@ type Action
   | Decrement
 
 
-update: Action -> Model -> Model
+update : Action -> Model -> Model
 update action model =
   case action of
     Increment ->
@@ -29,17 +29,23 @@ update action model =
       { model | count = model.count - 1 }
 
 
+-- view
 view : Signal.Address Action -> Model -> Html.Html
 view address model =
   Html.div
     []
-    [ Html.button
-        [ Html.Events.onClick address Decrement ]
-        [ Html.text "-" ]
-    , Html.text ("Count: " ++ (toString model.count))
-    , Html.button
-        [ Html.Events.onClick address Increment ]
-        [ Html.text "+" ]
+    [ Html.div [] [ Html.text courseApiUrl ]
+    , Html.div [] [ Html.text courseBlocksApiUrl ]
+    , Html.div
+        []
+        [ Html.button
+            [ Html.Events.onClick address Decrement ]
+            [ Html.text "-" ]
+        , Html.text ("Count: " ++ (toString model.count))
+        , Html.button
+            [ Html.Events.onClick address Increment ]
+            [ Html.text "+" ]
+        ]
     ]
 
 
@@ -49,3 +55,10 @@ main =
     , update = update
     , view = view
     }
+
+
+-- ports
+port courseApiUrl : String
+
+
+port courseBlocksApiUrl : String

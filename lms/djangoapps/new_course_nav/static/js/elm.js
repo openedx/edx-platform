@@ -10110,6 +10110,16 @@ Elm.Main.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $StartApp$Simple = Elm.StartApp.Simple.make(_elm);
    var _op = {};
+   var courseBlocksApiUrl = Elm.Native.Port.make(_elm).inbound("courseBlocksApiUrl",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   });
+   var courseApiUrl = Elm.Native.Port.make(_elm).inbound("courseApiUrl",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   });
    var update = F2(function (action,model) {
       var _p0 = action;
       if (_p0.ctor === "Increment") {
@@ -10123,9 +10133,13 @@ Elm.Main.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Decrement)]),_U.list([$Html.text("-")]))
-              ,$Html.text(A2($Basics._op["++"],"Count: ",$Basics.toString(model.count)))
-              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Increment)]),_U.list([$Html.text("+")]))]));
+      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text(courseApiUrl)]))
+              ,A2($Html.div,_U.list([]),_U.list([$Html.text(courseBlocksApiUrl)]))
+              ,A2($Html.div,
+              _U.list([]),
+              _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Decrement)]),_U.list([$Html.text("-")]))
+                      ,$Html.text(A2($Basics._op["++"],"Count: ",$Basics.toString(model.count)))
+                      ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Increment)]),_U.list([$Html.text("+")]))]))]));
    });
    var initialModel = {count: 0};
    var main = $StartApp$Simple.start({model: initialModel,update: update,view: view});
