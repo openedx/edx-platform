@@ -173,7 +173,6 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
 
     def test_basic(self):
         response = self.verify_response()
-        self.assertEquals(response.data['root'], unicode(self.course_usage_key))
         self.verify_response_block_dict(response)
         for block_key_string, block_data in response.data['blocks'].iteritems():
             block_key = deserialize_usage_key(block_key_string, self.course_key)
