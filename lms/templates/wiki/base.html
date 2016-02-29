@@ -1,4 +1,5 @@
 {% extends "main_django.html" %}
+{% with online_help_token="wiki" %}
 {% load pipeline %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
@@ -78,3 +79,4 @@
 </main>
 
 {% endblock %}
+{% endwith %}

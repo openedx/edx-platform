@@ -1,5 +1,5 @@
 """
-Django Template Context Processor for CMS Online Contextual Help
+Django Template Context Processor for LMS Online Contextual Help
 """
 import ConfigParser
 from django.conf import settings
@@ -8,7 +8,7 @@ from util.help_context_processor import common_doc_url
 
 
 # Open and parse the configuration file when the module is initialized
-CONFIG_FILE = open(settings.REPO_ROOT / "docs" / "cms_config.ini")
+CONFIG_FILE = open(settings.REPO_ROOT / "docs" / "lms_config.ini")
 CONFIG = ConfigParser.ConfigParser()
 CONFIG.readfp(CONFIG_FILE)
 

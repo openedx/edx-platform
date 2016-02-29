@@ -1,5 +1,6 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "instructor" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse

@@ -514,6 +514,9 @@ TEMPLATES = [
 
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.microsite_footer_context_processor',
+
+                # Online contextual help
+                'context_processors.doc_url',
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False
