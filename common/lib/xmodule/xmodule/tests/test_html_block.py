@@ -1,6 +1,7 @@
 import unittest
 
 from mock import Mock
+from xmodule.html_module import HtmlModule
 
 from xblock.field_data import DictFieldData
 from xmodule.html_block import HtmlBlock

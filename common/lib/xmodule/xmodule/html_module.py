@@ -30,80 +30,80 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
-# class HtmlBlock(object):
-#     """
-#     This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
-#     into one. For now, it's a place to put the pieces that are already sharable
-#     between the two (field information and XBlock handlers).
-#     """
-#     display_name = String(
-#         display_name=_("Display Name"),
-#         help=_("This name appears in the horizontal navigation at the top of the page."),
-#         scope=Scope.settings,
-#         # it'd be nice to have a useful default but it screws up other things; so,
-#         # use display_name_with_default for those
-#         default=_("Text")
-#     )
-#     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
-#     source_code = String(
-#         help=_("Source code for LaTeX documents. This feature is not well-supported."),
-#         scope=Scope.settings
-#     )
-#     use_latex_compiler = Boolean(
-#         help=_("Enable LaTeX templates?"),
-#         default=False,
-#         scope=Scope.settings
-#     )
-#     editor = String(
-#         help=_(
-#             "Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit "
-#             "HTML directly. If you change this setting, you must save the component and then re-open it for editing."
-#         ),
-#         display_name=_("Editor"),
-#         default="visual",
-#         values=[
-#             {"display_name": _("Visual"), "value": "visual"},
-#             {"display_name": _("Raw"), "value": "raw"}
-#         ],
-#         scope=Scope.settings
-#     )
-#
-#     @XBlock.supports("multi_device")
-#     def student_view(self, _context):
-#         """
-#         Return a fragment that contains the html for the student view
-#         """
-#         return Fragment(self.get_html())
-#
-#     def get_html(self):
-#         """ Returns html required for rendering XModule. """
-#
-#         # When we switch this to an XBlock, we can merge this with student_view,
-#         # but for now the XModule mixin requires that this method be defined.
-#         # pylint: disable=no-member
-#         if self.system.anonymous_student_id:
-#             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-#         return self.data
+class HtmlBlock(object):
+    """
+    This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
+    into one. For now, it's a place to put the pieces that are already sharable
+    between the two (field information and XBlock handlers).
+    """
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=_("Text")
+    )
+    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    source_code = String(
+        help=_("Source code for LaTeX documents. This feature is not well-supported."),
+        scope=Scope.settings
+    )
+    use_latex_compiler = Boolean(
+        help=_("Enable LaTeX templates?"),
+        default=False,
+        scope=Scope.settings
+    )
+    editor = String(
+        help=_(
+            "Select Visual to enter content and have the editor automatically create the HTML. Select Raw to edit "
+            "HTML directly. If you change this setting, you must save the component and then re-open it for editing."
+        ),
+        display_name=_("Editor"),
+        default="visual",
+        values=[
+            {"display_name": _("Visual"), "value": "visual"},
+            {"display_name": _("Raw"), "value": "raw"}
+        ],
+        scope=Scope.settings
+    )
 
-#
-# class HtmlModuleMixin(HtmlBlock, XModule):
-#     """
-#     Attributes and methods used by HtmlModules internally.
-#     """
-#     js = {
-#         'coffee': [
-#             resource_string(__name__, 'js/src/javascript_loader.coffee'),
-#             resource_string(__name__, 'js/src/html/display.coffee'),
-#         ],
-#         'js': [
-#             resource_string(__name__, 'js/src/collapsible.js'),
-#             resource_string(__name__, 'js/src/html/imageModal.js'),
-#             resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
-#         ]
-#     }
-#     js_module_name = "HTMLModule"
-#     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
-#
+    @XBlock.supports("multi_device")
+    def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view
+        """
+        return Fragment(self.get_html())
+
+    def get_html(self):
+        """ Returns html required for rendering XModule. """
+
+        # When we switch this to an XBlock, we can merge this with student_view,
+        # but for now the XModule mixin requires that this method be defined.
+        # pylint: disable=no-member
+        if self.system.anonymous_student_id:
+            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+        return self.data
+
+
+class HtmlModuleMixin(HtmlBlock, XModule):
+    """
+    Attributes and methods used by HtmlModules internally.
+    """
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            resource_string(__name__, 'js/src/html/display.coffee'),
+        ],
+        'js': [
+            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/src/html/imageModal.js'),
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
+        ]
+    }
+    js_module_name = "HTMLModule"
+    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+
 
 @edxnotes
 class HtmlModule(HtmlModuleMixin):

@@ -105,7 +105,7 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
 
 
     ###############################################################################################################
-    ### HTMLDescriptor implemenation
+    ### HTMLDescriptor implemenation / consolidation with XBlock
     ###############################################################################################################
 
 
@@ -276,3 +276,101 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
             xblock_body["content"] = html_body
         xblock_body["content_type"] = "Text"
         return xblock_body
+
+###############################################################################################################
+### Carrying over the Blocks that inherit from HtmlBlock.
+###############################################################################################################
+
+
+class AboutFields(XBlock):
+    display_name = String(
+        help=_("Display name for this module"),
+        scope=Scope.settings,
+        default="overview",
+    )
+    data = String(
+        help=_("Html contents to display for this module"),
+        default=u"",
+        scope=Scope.content
+    )
+
+@XBlock.tag("detached")
+class AboutBlock(AboutFields, HtmlBlock):
+    """
+    Overriding defaults but otherwise treated as HtmlBlock.
+    """
+    template_dir_name = "about"
+
+
+class StaticTabFields(XBlock):
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
+        scope=Scope.settings,
+        default="Empty",
+    )
+    data = String(
+        default=textwrap.dedent(u"""\
+            <p>Add the content you want students to see on this page.</p>
+        """),
+        scope=Scope.content,
+        help=_("HTML for the additional pages")
+    )
+
+@XBlock.tag("detached")
+class StaticTabBlock(StaticTabFields, HtmlBlock):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = None
+
+
+class CourseInfoFields(XBlock):
+    """
+    Field overrides
+    """
+    items = List(
+        help=_("List of course update items"),
+        default=[],
+        scope=Scope.content
+    )
+    data = String(
+        help=_("Html contents to display for this module"),
+        default=u"<ol></ol>",
+        scope=Scope.content
+    )
+
+@XBlock.tag("detached")
+class CourseInfoBlock(CourseInfoFields, HtmlBlock):
+    """
+    Just to support xblock field overrides
+    """
+    template_dir_name = None
+
+    # statuses
+    STATUS_VISIBLE = 'visible'
+    STATUS_DELETED = 'deleted'
+    TEMPLATE_DIR = 'courseware'
+
+    @XBlock.supports("multi_device")
+    def student_view(self):
+        """ Returns html required for rendering XModule. """
+
+        # When we switch this to an XBlock, we can merge this with student_view,
+        # but for now the XModule mixin requires that this method be defined.
+        # pylint: disable=no-member
+        if self.data != "":
+            if self.system.anonymous_student_id:
+                return Fragment(self.data.replace("%%USER_ID%%", self.system.anonymous_student_id))
+            return Fragment(self.data)
+        else:
+            course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
+            course_updates.sort(key=lambda item: datetime.strptime(item['date'], '%B %d, %Y'), reverse=True)
+
+            context = {
+                'visible_updates': course_updates[:3],
+                'hidden_updates': course_updates[3:],
+            }
+
+            return Fragment(self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context))
