@@ -1,0 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
+<div class="fullscreen-button-wrapper">
+    <button class="btn fullscreen-button"
+        aria-pressed="${"true" if in_fullscreen else "false"}">
+        <span class="sr fullscreen-sr">
+            ${_("Click to exit fullscreen") if in_fullscreen else _("Click to enter distraction free mode")}
+        </span>&nbsp;${_("fullscreen")}
+    </button>
+</div>
