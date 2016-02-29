@@ -26,7 +26,10 @@
             };
         });
 
-        testUpdate = function(view, thread, newTopicId, newTopicName) {
+        testUpdate = function(view, thread, newTopicId, newTopicName, topicIdSelector) {
+            if (!topicIdSelector) {
+                topicIdSelector = newTopicId;
+            }
             spyOn($, 'ajax').andCallFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');
@@ -35,7 +38,7 @@
                 params.success();
                 return {always: function() {}};
             });
-            view.$el.find('a.topic-title[data-discussion-id="'+newTopicId+'"]').click(); // set new topic
+            view.$el.find('a.topic-title[data-discussion-id="'+topicIdSelector+'"]').click(); // set new topic
             view.$('.edit-post-title').val('changed thread title'); // set new title
             view.$("label[for$='post-type-discussion']").click(); // set new thread type
             view.$('.post-update').click();
@@ -104,7 +107,9 @@
 
             it('can save new data correctly for current discussion id with dots', function () {
                 this.createEditView({topicId: "6.00.1x_General"});
-                testUpdate(this.view, this.thread, "6>00'1x\"Basic_Question", "Basic Question");
+                testUpdate(
+                    this.view, this.thread, "6>00'1x\"Basic_Question", "Basic Question", "6>00'1x\22Basic_Question"
+                );
             });
 
             it('can save new data correctly for current discussion id with special characters', function () {
