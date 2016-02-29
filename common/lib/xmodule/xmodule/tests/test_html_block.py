@@ -31,8 +31,7 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        block = HTMLBlock(self.descriptor, module_system, field_data, Mock())
-        #module = HtmlModule(self.descriptor, module_system, field_data, Mock())
+        block = HtmlBlock(self.descriptor, module_system, field_data, Mock())
         self.assertEqual(block.student_view(), str(module_system.anonymous_student_id))
 
     def test_substitution_without_magic_string(self):
@@ -43,16 +42,16 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         '''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        module = HtmlModule(self.descriptor, module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), sample_xml)
+        block = HtmlBlock(self.descriptor, module_system, field_data, Mock())
+        self.assertEqual(block.student_view(), sample_xml)
 
     def test_substitution_without_anonymous_student_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
         module_system.anonymous_student_id = None
-        module = HtmlModule(self.descriptor, module_system, field_data, Mock())
-        self.assertEqual(module.get_html(), sample_xml)
+        block = HtmlBlock(self.descriptor, module_system, field_data, Mock())
+        self.assertEqual(block.student_view(), sample_xml)
 
 
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):

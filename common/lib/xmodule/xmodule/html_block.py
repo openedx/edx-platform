@@ -43,6 +43,14 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
     mako_template = "widgets/html-edit.html"
     show_in_read_only_mode = True
 
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("This name appears in the horizontal navigation at the top of the page."),
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=_("Text")
+    )
     data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
     source_code = String(
         help=_("Source code for LaTeX documents. This feature is not well-supported."),
@@ -239,12 +247,12 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
         """
         `use_latex_compiler` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
+        non_editable_fields = super(HtmlBlock, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlBlock.use_latex_compiler)
         return non_editable_fields
 
     def index_dictionary(self):
-        xblock_body = super(HtmlDescriptor, self).index_dictionary()
+        xblock_body = super(HtmlBlock, self).index_dictionary()
         # Removing script and style
         html_content = re.sub(
             re.compile(
