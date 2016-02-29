@@ -104,9 +104,8 @@ class UserSignupAPIView(GenericAPIView):
                 i += 1
             organization = Organization(key=org_key,
                                         display_name=data.get('org_name'))
-            organization.users.add(user)
             organization.save()
-
+            organization.users.add(user)
 
             user.is_active = True
             user.save()
