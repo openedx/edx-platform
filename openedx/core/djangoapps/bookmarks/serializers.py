@@ -8,7 +8,7 @@ from . import DEFAULT_FIELDS
 from .models import Bookmark
 
 
-class BookmarkSerializer(serializers.ModelSerializer):
+class  BookmarkSerializer(serializers.ModelSerializer):
     """
     Serializer for the Bookmark model.
     """

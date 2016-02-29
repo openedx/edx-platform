@@ -1958,6 +1958,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Django-rest-swagger
+    'rest_framework_swagger',
 )
 
 # Migrations which are not in the standard module "migrations"
