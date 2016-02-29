@@ -44,6 +44,7 @@ lib_paths:
     - common_static/js/vendor/jquery-ui.min.js
     - common_static/js/vendor/jquery.ui.draggable.js
     - common_static/js/vendor/jquery.cookie.js
+    - common_static/js/vendor/jquery.simulate.js
     - common_static/js/vendor/json2.js
     - common_static/js/vendor/underscore-min.js
     - common_static/js/vendor/backbone-min.js

@@ -23,6 +23,12 @@ describe 'Problem', ->
       $(@).html readFixtures('problem_content.html')
       callback()
 
+    @verifyHandlerCalled = (selector, prototype_function)=>
+        button = $(selector)
+        spyOn(Problem.prototype, prototype_function).andCallFake(->)
+        button.click()
+        expect(Problem.prototype[prototype_function]).toHaveBeenCalled()
+
   describe 'constructor', ->
 
     it 'set the element from html', ->
@@ -54,22 +60,32 @@ describe 'Problem', ->
       expect(window.update_schematics).toHaveBeenCalled()
 
     it 'bind answer refresh on button click', ->
-      expect($('div.action button')).toHandleWith 'click', @problem.refreshAnswers
+      # Clicking on all buttons will cause several callbacks to trigger, each of which
+      # calls disableAllButtonsWhileRunning, which in turn makes an AJAX call.
+      spyOn(Problem.prototype, 'disableAllButtonsWhileRunning').andCallFake(->)
+      @verifyHandlerCalled('div.action button', 'refreshAnswers')
 
     it 'bind the check button', ->
-      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
+      @verifyHandlerCalled('div.action button.check', 'check_fd')
 
     it 'bind the reset button', ->
-      expect($('div.action button.reset')).toHandleWith 'click', @problem.reset
+      @verifyHandlerCalled('div.action button.reset', 'reset')
 
     it 'bind the show button', ->
-      expect($('div.action button.show')).toHandleWith 'click', @problem.show
+      @verifyHandlerCalled('div.action button.show', 'show')
 
     it 'bind the save button', ->
-      expect($('div.action button.save')).toHandleWith 'click', @problem.save
+      @verifyHandlerCalled('div.action button.save', 'save')
 
     it 'bind the math input', ->
-      expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath
+      input = $('input.math')
+      spyOn(Problem.prototype, "refreshMath").andCallFake(->)
+      input.first().simulate(
+        "keyup",
+        { keyCode: $.simulate.keyCode.SPACE }
+      );
+
+      expect(Problem.prototype.refreshMath).toHaveBeenCalled()
 
   describe 'bind_with_custom_input_id', ->
     beforeEach ->
@@ -79,10 +95,10 @@ describe 'Problem', ->
       $(@).html readFixtures('problem_content_1240.html')
 
     it 'bind the check button', ->
-      expect($('div.action button.check')).toHandleWith 'click', @problem.check_fd
+      @verifyHandlerCalled('div.action button.check', 'check_fd')
 
     it 'bind the show button', ->
-      expect($('div.action button.show')).toHandleWith 'click', @problem.show
+      @verifyHandlerCalled('div.action button.show', 'show')
 
   describe 'renderProgressState', ->
     beforeEach ->
