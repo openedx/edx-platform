@@ -52,11 +52,11 @@ from lms.djangoapps.ccx.overrides import (
     bulk_delete_ccx_override_fields,
 )
 from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
     assign_coach_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_for_coach,
+    get_ccx_by_ccx_id,
     get_date,
     parse_date,
     prep_course_for_grading,
@@ -94,8 +94,8 @@ def coach_dashboard(view):
 
         # if there is a ccx, we must validate that it is the ccx for this coach
         if ccx is not None:
-            coach_ccx = get_ccx_for_coach(course, request.user)
-            if coach_ccx is None or coach_ccx.id != ccx.id:
+            coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
+            if coach_ccx is None:
                 return HttpResponseForbidden(
                     _('You must be the coach for this ccx to access this view')
                 )
@@ -146,9 +146,6 @@ def dashboard(request, course, ccx=None):
         context['grading_policy'] = json.dumps(grading_policy, indent=4)
         context['grading_policy_url'] = reverse(
             'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
-
-        with ccx_course(ccx_locator) as course:
-            context['course'] = course
 
     else:
         context['create_ccx_url'] = reverse(
@@ -212,7 +209,7 @@ def create_ccx(request, course, ccx=None):
     )
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
-    add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
+
     return redirect(url)
 
 

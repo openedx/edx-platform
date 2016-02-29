@@ -233,7 +233,7 @@ class TestCourseIndex(CourseTestCase):
             # delete nofications that are dismissed
             CourseRerunState.objects.get(id=rerun_state.id)
 
-        self.assertFalse(has_course_author_access(user2, rerun_course_key))
+        self.assertTrue(has_course_author_access(user2, rerun_course_key))
 
     def assert_correct_json_response(self, json_response):
         """

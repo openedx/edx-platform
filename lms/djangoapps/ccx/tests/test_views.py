@@ -15,8 +15,6 @@ from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
-from instructor.access import list_with_level, allow_access
-
 from django.conf import settings
 from django.core.urlresolvers import reverse, resolve
 from django.utils.timezone import UTC
@@ -25,11 +23,7 @@ from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-)
+from student.roles import CourseCcxCoachRole
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -42,7 +36,6 @@ from student.tests.factories import (
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
@@ -55,7 +48,6 @@ from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
-from lms.djangoapps.ccx.views import ccx_course
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import (
     CcxTestCase,
@@ -143,16 +135,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # Login with the instructor account
         self.client.login(username=self.coach.username, password="test")
 
-        # adding staff to master course.
-        staff = UserFactory()
-        allow_access(self.course, staff, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
-
-        # adding instructor to master course.
-        instructor = UserFactory()
-        allow_access(self.course, instructor, 'instructor')
-        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
-
     def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
         """
         Helper function to count visible elements in the schedule
@@ -203,7 +185,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             '<form action=".+create_ccx"',
             response.content))
 
-    def test_create_ccx(self):
+    def test_create_ccx(self, ccx_name='New CCX'):
         """
         Create CCX. Follow redirect to coach dashboard, confirm we see
         the coach dashboard for the new CCX.
@@ -214,7 +196,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             'create_ccx',
             kwargs={'course_id': unicode(self.course.id)})
 
-        response = self.client.post(url, {'name': 'New CCX'})
+        response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
         url = response.get('location')  # pylint: disable=no-member
         response = self.client.get(url)
@@ -237,20 +219,11 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # assert ccx creator has role=ccx_coach
         role = CourseCcxCoachRole(course_key)
-        self.assertTrue(role.has_user(self.coach))
+        self.assertTrue(role.has_user(self.coach, refresh=True))
 
-        # assert that staff and instructors of master course has staff and instructor roles on ccx
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
-
-        with ccx_course(course_key) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
-            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
-
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
-            self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
-            self.assertEqual(list_instructor_ccx_course[0].email, list_instructor_master_course[0].email)
+    @ddt.data("CCX demo 1", "CCX demo 2", "CCX demo 3")
+    def test_create_multiple_ccx(self, ccx_name):
+        self.test_create_ccx(ccx_name)
 
     def test_get_date(self):
         """
@@ -739,25 +712,28 @@ def patched_get_children(self, usage_key_filter=None):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)
-class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestCCXGrades, cls).setUpClass()
-        cls._course = course = CourseFactory.create(enable_ccx=True)
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestCCXGrades, self).setUp()
+
+        self._course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
-        cls.mooc_start = start = datetime.datetime(
+        self.start = datetime.datetime(
             2010, 5, 12, 2, 42, tzinfo=pytz.UTC
         )
         chapter = ItemFactory.create(
-            start=start, parent=course, category='sequential'
+            start=self.start, parent=self._course, category='sequential'
         )
-        cls.sections = sections = [
+        self.sections = [
             ItemFactory.create(
                 parent=chapter,
                 category="sequential",
@@ -765,7 +741,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             for _ in xrange(4)
         ]
         # making problems available at class level for possible future use in tests
-        cls.problems = [
+        self.problems = [
             [
                 ItemFactory.create(
                     parent=section,
@@ -773,14 +749,8 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
                 ) for _ in xrange(4)
-            ] for section in sections
+            ] for section in self.sections
         ]
-
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(TestCCXGrades, self).setUp()
 
         # Create instructor account
         self.coach = coach = AdminFactory.create()
@@ -854,13 +824,18 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         rows = response.content.strip().split('\r')
         headers = rows[0]
 
-        # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
-        self.assertNotIn('HW 04', data)
-        self.assertEqual(data['HW 01'], '0.75')
-        self.assertEqual(data['HW 02'], '0.5')
-        self.assertEqual(data['HW 03'], '0.25')
-        self.assertEqual(data['HW Avg'], '0.5')
+        records = dict()
+        for i in range(1, len(rows)):
+            data = dict(zip(headers.strip().split(','), rows[i].strip().split(',')))
+            records[data['username']] = data
+
+        student_data = records[self.student.username]  # pylint: disable=no-member
+
+        self.assertNotIn('HW 04', student_data)
+        self.assertEqual(student_data['HW 01'], '0.75')
+        self.assertEqual(student_data['HW 02'], '0.5')
+        self.assertEqual(student_data['HW 03'], '0.25')
+        self.assertEqual(student_data['HW Avg'], '0.5')
 
     @patch('courseware.views.render_to_response', intercept_renderer)
     def test_student_progress(self):

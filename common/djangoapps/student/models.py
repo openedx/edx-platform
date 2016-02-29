@@ -772,6 +772,19 @@ class LoginFailures(models.Model):
     lockout_until = models.DateTimeField(null=True)
 
     @classmethod
+    def _get_record_for_user(cls, user):
+        """
+        Gets a user's record, and fixes any duplicates that may have arisen due to get_or_create
+        race conditions. See https://code.djangoproject.com/ticket/13906 for details.
+
+        Use this method in place of `LoginFailures.objects.get(user=user)`
+        """
+        records = LoginFailures.objects.filter(user=user).order_by('-lockout_until')
+        for extra_record in records[1:]:
+            extra_record.delete()
+        return records.get()
+
+    @classmethod
     def is_feature_enabled(cls):
         """
         Returns whether the feature flag around this functionality has been set
@@ -784,7 +797,7 @@ class LoginFailures(models.Model):
         Static method to return in a given user has his/her account locked out
         """
         try:
-            record = LoginFailures.objects.get(user=user)
+            record = cls._get_record_for_user(user)
             if not record.lockout_until:
                 return False
 
@@ -819,7 +832,7 @@ class LoginFailures(models.Model):
         Removes the lockout counters (normally called after a successful login)
         """
         try:
-            entry = LoginFailures.objects.get(user=user)
+            entry = cls._get_record_for_user(user)
             entry.delete()
         except ObjectDoesNotExist:
             return

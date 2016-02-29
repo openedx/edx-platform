@@ -58,7 +58,7 @@ if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_migratio
 else
     echo "Did not find a bok_choy DB cache. Creating a new one from scratch."
     # Clean the cache directory
-    rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
+    mkdir -p $DB_CACHE_DIR && rm -f $DB_CACHE_DIR/bok_choy*
 
     # Re-run migrations on the test database
     echo "Issuing a migrate command to the bok_choy MySQL database for the lms django apps."

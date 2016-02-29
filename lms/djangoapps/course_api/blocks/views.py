@@ -89,7 +89,8 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
         The following fields are returned with a successful response.
 
-        * root: The ID of the root node of the course blocks.
+        * root: The ID of the root node of the requested course block
+          structure.
 
         * blocks: A dictionary that maps block usage IDs to a collection of
           information about each block.  Each block contains the following

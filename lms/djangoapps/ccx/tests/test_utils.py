@@ -1,32 +1,23 @@
 """
 test utils
 """
+import mock
 from nose.plugins.attrib import attr
 
-from ccx_keys.locator import CCXLocator
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-)
+from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory
 )
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.instructor.access import list_with_level, allow_access
-
-from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx
-from lms.djangoapps.ccx.views import ccx_course
+from lms.djangoapps.ccx import utils
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
+from ccx_keys.locator import CCXLocator
 
 
 @attr('shard_1')
@@ -62,49 +53,43 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
         self.assertEqual(result, ccx)
 
 
-class TestStaffOnCCX(CcxTestCase, SharedModuleStoreTestCase):
+@attr('shard_1')
+class TestGetCourseChapters(CcxTestCase):
     """
-    Tests for staff on ccx courses.
+    Tests for the `get_course_chapters` util function
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def setUp(self):
-        super(TestStaffOnCCX, self).setUp()
-
-        # Create instructor account
-        self.client.login(username=self.coach.username, password="test")
-
-        # create an instance of modulestore
-        self.mstore = modulestore()
-
-        # adding staff to master course.
-        staff = UserFactory()
-        allow_access(self.course, staff, 'staff')
-        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
-
-        # adding instructor to master course.
-        instructor = UserFactory()
-        allow_access(self.course, instructor, 'instructor')
-        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
-
-    def test_add_master_course_staff_to_ccx(self):
         """
-        Test add staff of master course to ccx course
+        Set up tests
         """
-        self.make_coach()
-        ccx = self.make_ccx()
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        add_master_course_staff_to_ccx(self.course, ccx_locator, ccx.display_name)
+        super(TestGetCourseChapters, self).setUp()
+        self.course_key = self.course.location.course_key
 
-        # assert that staff and instructors of master course has staff and instructor roles on ccx
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+    def test_get_structure_non_existing_key(self):
+        """
+        Test to get the course structure
+        """
+        self.assertEqual(utils.get_course_chapters(None), None)
+        # build a fake key
+        fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
+        self.assertEqual(utils.get_course_chapters(fake_course_key), None)
 
-        with ccx_course(ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
-            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
+    @mock.patch('openedx.core.djangoapps.content.course_structures.models.CourseStructure.structure',
+                new_callable=mock.PropertyMock)
+    def test_wrong_course_structure(self, mocked_attr):
+        """
+        Test the case where the course  has an unexpected structure.
+        """
+        mocked_attr.return_value = {'foo': 'bar'}
+        self.assertEqual(utils.get_course_chapters(self.course_key), [])
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
-            self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
-            self.assertEqual(list_instructor_ccx_course[0].email, list_instructor_master_course[0].email)
+    def test_get_chapters(self):
+        """
+        Happy path
+        """
+        course_chapters = utils.get_course_chapters(self.course_key)
+        self.assertEqual(len(course_chapters), 2)
+        self.assertEqual(
+            sorted(course_chapters),
+            sorted([unicode(child) for child in self.course.children])
+        )

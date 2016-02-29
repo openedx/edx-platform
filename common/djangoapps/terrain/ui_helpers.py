@@ -346,7 +346,7 @@ def css_contains_text(css_selector, partial_text, index=0):
     # If we're expecting a non-empty string, give the page
     # a chance to fill in text fields.
     if partial_text:
-        wait_for(lambda _: css_html(css_selector, index=index))
+        wait_for(lambda _: css_html(css_selector, index=index), timeout=8)
 
     actual_text = css_html(css_selector, index=index)
 

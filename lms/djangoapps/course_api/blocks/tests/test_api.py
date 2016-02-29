@@ -58,3 +58,22 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
 
         self.assertIn(unicode(problem_block.location), vertical_descendants)
         self.assertNotIn(unicode(self.html_block.location), vertical_descendants)
+
+    def test_sub_structure(self):
+        sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
+
+        blocks = get_blocks(self.request, sequential_block.location, self.user)
+        self.assertEquals(blocks['root'], unicode(sequential_block.location))
+        self.assertEquals(len(blocks['blocks']), 5)
+
+        for block_type, block_name, is_inside_of_structure in (
+                ('vertical', 'vertical_y1a', True),
+                ('problem', 'problem_y1a_1', True),
+                ('chapter', 'chapter_y', False),
+                ('sequential', 'sequential_x1', False),
+        ):
+            block = self.store.get_item(self.course.id.make_usage_key(block_type, block_name))
+            if is_inside_of_structure:
+                self.assertIn(unicode(block.location), blocks['blocks'])
+            else:
+                self.assertNotIn(unicode(block.location), blocks['blocks'])

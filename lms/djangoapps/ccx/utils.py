@@ -18,18 +18,18 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from instructor.enrollment import (
     enroll_email,
-    get_email_params,
     unenroll_email,
 )
-from instructor.access import allow_access, list_with_level, revoke_access
+from instructor.access import allow_access
 from instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 log = logging.getLogger("edx.ccx")
 
@@ -126,6 +126,30 @@ def get_ccx_for_coach(course, coach):
     if ccxs.exists():
         return ccxs[0]
     return None
+
+
+def get_ccx_by_ccx_id(course, coach, ccx_id):
+    """
+    Finds a CCX of given coach on given master course.
+
+    Arguments:
+        course (CourseDescriptor): Master course
+        coach (User): Coach to ccx
+        ccx_id (long): Id of ccx
+
+    Returns:
+     ccx (CustomCourseForEdX): Instance of CCX.
+    """
+    try:
+        ccx = CustomCourseForEdX.objects.get(
+            id=ccx_id,
+            course_id=course.id,
+            coach=coach
+        )
+    except CustomCourseForEdX.DoesNotExist:
+        return None
+
+    return ccx
 
 
 def get_valid_student_email(identifier):
@@ -263,81 +287,27 @@ def is_email(identifier):
     return True
 
 
-def add_master_course_staff_to_ccx(master_course, ccx_key, display_name):
+def get_course_chapters(course_key):
     """
-    Added staff role on ccx to all the staff members of master course.
+    Extracts the chapters from a course structure.
+    If the course does not exist returns None.
+    If the structure does not contain 1st level children,
+    it returns an empty list.
 
-    Arguments:
-        master_course (CourseDescriptorWithMixins): Master course instance
-        ccx_key (CCXLocator): CCX course key
-        display_name (str): ccx display name for email
+    Args:
+        course_key (CourseLocator): the course key
+    Returns:
+        list (string): a list of string representing the chapters modules
+            of the course
     """
-    list_staff = list_with_level(master_course, 'staff')
-    list_instructor = list_with_level(master_course, 'instructor')
-
-    with ccx_course(ccx_key) as course_ccx:
-        email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
-        for staff in list_staff:
-            # allow 'staff' access on ccx to staff of master course
-            allow_access(course_ccx, staff, 'staff')
-
-            # Enroll the staff in the ccx
-            enroll_email(
-                course_id=ccx_key,
-                student_email=staff.email,
-                auto_enroll=True,
-                email_students=True,
-                email_params=email_params,
-            )
-
-        for instructor in list_instructor:
-            # allow 'instructor' access on ccx to instructor of master course
-            allow_access(course_ccx, instructor, 'instructor')
-
-            # Enroll the instructor in the ccx
-            enroll_email(
-                course_id=ccx_key,
-                student_email=instructor.email,
-                auto_enroll=True,
-                email_students=True,
-                email_params=email_params,
-            )
-
-
-def reverse_add_master_course_staff_to_ccx(master_course, ccx_key, display_name):
-    """
-    Remove staff of ccx.
-
-    Arguments:
-        master_course (CourseDescriptorWithMixins): Master course instance
-        ccx_key (CCXLocator): CCX course key
-        display_name (str): ccx display name for email
-    """
-    list_staff = list_with_level(master_course, 'staff')
-    list_instructor = list_with_level(master_course, 'instructor')
-
-    with ccx_course(ccx_key) as course_ccx:
-        email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
-        for staff in list_staff:
-            # allow 'staff' access on ccx to staff of master course
-            revoke_access(course_ccx, staff, 'staff')
-
-            # Enroll the staff in the ccx
-            unenroll_email(
-                course_id=ccx_key,
-                student_email=staff.email,
-                email_students=True,
-                email_params=email_params,
-            )
-
-        for instructor in list_instructor:
-            # allow 'instructor' access on ccx to instructor of master course
-            revoke_access(course_ccx, instructor, 'instructor')
-
-            # Enroll the instructor in the ccx
-            unenroll_email(
-                course_id=ccx_key,
-                student_email=instructor.email,
-                email_students=True,
-                email_params=email_params,
-            )
+    if course_key is None:
+        return
+    try:
+        course_obj = CourseStructure.objects.get(course_id=course_key)
+    except CourseStructure.DoesNotExist:
+        return
+    course_struct = course_obj.structure
+    try:
+        return course_struct['blocks'][course_struct['root']].get('children', [])
+    except KeyError:
+        return []

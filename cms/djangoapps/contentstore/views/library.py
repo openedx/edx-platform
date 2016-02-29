@@ -86,7 +86,7 @@ def _display_library(library_key_string, request):
 
     response_format = 'html'
     if (
-            request.REQUEST.get('format', 'html') == 'json' or
+            request.GET.get('format', 'html') == 'json' or
             'application/json' in request.META.get('HTTP_ACCEPT', 'text/html')
     ):
         response_format = 'json'

@@ -44,9 +44,10 @@ class EcommerceService(object):
     def __init__(self):
         self.config = CommerceConfiguration.current()
 
-    def is_enabled(self):
-        """ Check if the service is enabled and that the site is not a microsite. """
-        return self.config.checkout_on_ecommerce_service and not helpers.is_request_in_themed_site()
+    def is_enabled(self, request):
+        """ Check if the user is activated, if the service is enabled and that the site is not a microsite. """
+        return (request.user.is_active and self.config.checkout_on_ecommerce_service and not
+                helpers.is_request_in_themed_site())
 
     def payment_page_url(self):
         """ Return the URL for the checkout page.

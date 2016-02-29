@@ -303,7 +303,7 @@ class CourseFields(object):
         scope=Scope.settings, default=False,
         help=_(
             "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically."
+            "If false, they are sorted chronologically by creation date and time."
         )
     )
     announcement = Date(
@@ -357,8 +357,8 @@ class CourseFields(object):
     html_textbooks = List(
         display_name=_("HTML Textbooks"),
         help=_(
-            "For HTML textbooks that appear as separate tabs in the courseware, enter the name of the tab (usually "
-            "the name of the book) as well as the URLs and titles of all the chapters in the book."
+            "For HTML textbooks that appear as separate tabs in the course, enter the name of the tab (usually "
+            "the title of the book) as well as the URLs and titles of each chapter in the book."
         ),
         scope=Scope.settings
     )
@@ -423,7 +423,7 @@ class CourseFields(object):
         scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
-            "True if timezones should be shown on dates in the courseware. "
+            "True if timezones should be shown on dates in the course. "
             "Deprecated in favor of due_date_display_format."
         ),
         scope=Scope.settings, default=True
@@ -568,7 +568,7 @@ class CourseFields(object):
     display_organization = String(
         display_name=_("Course Organization Display String"),
         help=_(
-            "Enter the course organization that you want to appear in the courseware. This setting overrides the "
+            "Enter the course organization that you want to appear in the course. This setting overrides the "
             "organization that you entered when you created the course. To use the organization that you entered "
             "when you created the course, enter null."
         ),
@@ -578,7 +578,7 @@ class CourseFields(object):
     display_coursenumber = String(
         display_name=_("Course Number Display String"),
         help=_(
-            "Enter the course number that you want to appear in the courseware. This setting overrides the course "
+            "Enter the course number that you want to appear in the course. This setting overrides the course "
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),

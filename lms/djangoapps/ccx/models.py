@@ -1,8 +1,9 @@
 """
 Models for the custom course feature
 """
-from datetime import datetime
+import json
 import logging
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -24,6 +25,9 @@ class CustomCourseForEdX(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
+    # if not empty, this field contains a json serialized list of
+    # the master course modules
+    structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
 
     class Meta(object):
         app_label = 'ccx'
@@ -106,6 +110,15 @@ class CustomCourseForEdX(models.Model):
         if format_string == 'DATE_TIME':
             value += u' UTC'
         return value
+
+    @property
+    def structure(self):
+        """
+        Deserializes a course structure JSON object
+        """
+        if self.structure_json:
+            return json.loads(self.structure_json)
+        return None
 
 
 class CcxFieldOverride(models.Model):

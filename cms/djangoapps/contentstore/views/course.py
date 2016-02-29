@@ -27,7 +27,6 @@ from .component import (
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
-from ccx_keys.locator import CCXLocator
 from contentstore import utils
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -166,7 +165,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     if not course_key_string or not action_state_id:
         return HttpResponseBadRequest()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format') or request.POST.get('format') or 'html'
 
     course_key = CourseKey.from_string(course_key_string)
 
@@ -252,7 +251,7 @@ def course_handler(request, course_key_string=None):
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     try:
-        response_format = request.REQUEST.get('format', 'html')
+        response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
                 course_key = CourseKey.from_string(course_key_string)
@@ -391,11 +390,6 @@ def _accessible_courses_list(request):
         if isinstance(course, ErrorDescriptor):
             return False
 
-        # Custom Courses for edX (CCX) is an edX feature for re-using course content.
-        # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
-        if isinstance(course, CCXLocator):
-            return False
-
         # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
@@ -440,11 +434,8 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
-
-            # Custom Courses for edX (CCX) is an edX feature for re-using course content.
-            # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
-            if course is not None and not isinstance(course, ErrorDescriptor) and not isinstance(course.id, CCXLocator):
-                # ignore deleted, errored or ccx courses
+            if course is not None and not isinstance(course, ErrorDescriptor):
+                # ignore deleted or errored courses
                 courses_list[course_key] = course
 
     return courses_list.values(), in_process_course_actions
@@ -592,7 +583,7 @@ def course_index(request, course_key):
             reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
-        locator_to_show = request.REQUEST.get('show', None)
+        locator_to_show = request.GET.get('show', None)
         course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
         settings_url = reverse_course_url('settings_schedule_handler', course_key)
 

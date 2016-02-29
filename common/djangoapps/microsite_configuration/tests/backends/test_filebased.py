@@ -122,6 +122,15 @@ class FilebasedMicrositeBackendTests(TestCase):
         microsite.set_by_domain('unknown')
         self.assertEqual(microsite.get_value('university'), 'default_university')
 
+    def test_has_configuration_set(self):
+        """
+        Tests microsite.has_configuration_set works as expected.
+        """
+        self.assertTrue(microsite.BACKEND.has_configuration_set())
+
+        with patch('django.conf.settings.MICROSITE_CONFIGURATION', {}):
+            self.assertFalse(microsite.BACKEND.has_configuration_set())
+
 
 @patch(
     'microsite_configuration.microsite.TEMPLATES_BACKEND',
