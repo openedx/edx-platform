@@ -129,19 +129,11 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
         };
 
         verifyElementInFocus = function(view, selector) {
-            waitsFor(
-              function() { return view.$(selector + ':focus').length === 1; },
-              "element to have focus: " + selector,
-              500
-            );
+            expect($(document.activeElement)).toBe(view.$(selector));
         };
 
         verifyElementNotInFocus = function(view, selector) {
-            waitsFor(
-              function() { return view.$(selector + ':focus').length === 0; },
-              "element to not have focus: " + selector,
-              500
-            );
+            expect($(document.activeElement)).toNotBe(view.$(selector));
         };
 
         return {
