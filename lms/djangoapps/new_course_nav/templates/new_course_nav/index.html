@@ -20,8 +20,9 @@
     <script>
         var appContainerElement = document.getElementById('nav-app');
         Elm.embed(Elm.Main, appContainerElement, {
-            courseApiUrl: '${course_api_url}',
-            courseBlocksApiUrl: '${course_blocks_api_url}'
+            courseApiUrl: '${course_api_url}'
+          , courseBlocksApiUrl: '${course_blocks_api_url}'
+          , courseId: '${course_id}'
         });
     </script>
 </%block>

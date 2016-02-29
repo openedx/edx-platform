@@ -19,6 +19,7 @@ class NewCourseNavView(TemplateView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(user, "load", course_key)
         context['course'] = course
+        context['course_id'] = course_id
         context['course_api_url'] = reverse('course-detail', args=[course_id])
         context['course_blocks_api_url'] = reverse('blocks_in_course')
         return context
