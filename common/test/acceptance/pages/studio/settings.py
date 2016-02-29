@@ -10,7 +10,7 @@ from .course_page import CoursePage
 from .utils import press_the_notification_button
 
 
-@requirejs('js/factories/settings')
+@requirejs('js/factories/settings_course_schedule')
 class SettingsPage(CoursePage):
     """
     Course Schedule and Details Settings page.
