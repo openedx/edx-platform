@@ -1,191 +1,24 @@
 module Main (..) where
 
 import Effects exposing (Effects, Never)
-import Debug
-import Dict exposing (Dict)
-import Html
-import Html.Events
-import Http
-import Json.Decode exposing (..)
-import Result
 import StartApp
 import Task
 
-
--- model
-type alias URL =
-  String
-
-
-type alias CourseBlockAttributes =
-  -- the course node identifier
-  { id : String
-  -- the type of the course node
-  , nodeType : String
-  -- the student-facing title of the course node
-  , displayName : String
-  -- LMS URL of the course node
-  , lmsWebUrl : String
-  -- -- API URL which renders the course node
-  -- , studentViewUrl : String
-  }
+import CourseNav
+import ParseCourse exposing (getCourseBlocks)
+import NavTypes
 
 
-type CourseBlock
-  = Empty
-  | Course CourseBlockAttributes (List CourseBlock)
-  | Chapter CourseBlockAttributes (List CourseBlock)
-  | Sequential CourseBlockAttributes (List CourseBlock)
-  | Vertical CourseBlockAttributes (List CourseBlock)
-  | Leaf CourseBlockAttributes
-  | Error
-
-
-type alias CourseBlocksData =
-  { root : String
-  , blocks : Dict String CourseBlockData
-  }
-
-
-type alias CourseBlockData =
-  { id : String
-  , type' : String
-  , display_name : String
-  , lms_web_url : String
-  , children : Maybe (List String)
-  }
-
-
-courseBlocksDecoder : Decoder CourseBlocksData
-courseBlocksDecoder =
-  object2 CourseBlocksData
-    ("root" := string)
-    ("blocks" := dict courseBlockDecoder)
-
-
-courseBlockDecoder : Decoder CourseBlockData
-courseBlockDecoder =
-  object5 CourseBlockData
-    ("id" := string)
-    ("type" := string)
-    ("display_name" := string)
-    ("lms_web_url" := string)
-    (maybe ("children" := list string))
-
-
-fromApiResponse : CourseBlocksData -> CourseBlock
-fromApiResponse courseBlocksData =
-  buildCourseTree courseBlocksData courseBlocksData.root
-
-
-buildCourseTree : CourseBlocksData -> String -> CourseBlock
-buildCourseTree courseBlocksData rootId =
-  if rootId == "" then
-    Empty
-  else
-    let
-      maybeBlockData = Dict.get rootId courseBlocksData.blocks
-      blockData = Maybe.withDefault
-        { id = ""
-        , type' = ""
-        , display_name = ""
-        , lms_web_url = ""
-        , children = Just []
-        }
-        maybeBlockData
-      blockAttributes =
-        { id = blockData.id
-        , nodeType = blockData.type'
-        , displayName = blockData.display_name
-        , lmsWebUrl = blockData.lms_web_url
-        }
-      children =
-        List.map (buildCourseTree courseBlocksData) (Maybe.withDefault [] blockData.children)
-    in
-      if blockData.type' == "course" then
-        Course blockAttributes children
-      else if blockData.type' == "chapter" then
-        Chapter blockAttributes children
-      else if blockData.type' == "sequential" then
-        Sequential blockAttributes children
-      else if blockData.type' == "vertical" then
-        Vertical blockAttributes children
-      else
-        Error
-
-
--- update
-type Action
-  = CourseBlocksApiResponse (Result Http.Error CourseBlocksData)
-  | CourseBlocksApiError Http.Error
-
-
-update : Action -> CourseBlock -> (CourseBlock, Effects Action)
-update action courseBlock =
-  -- TODO: can we flatten the Ok/Err results into action types?
-  let
-    foo = Debug.log (toString action)
-  in
-    case action of
-      CourseBlocksApiResponse result ->
-        case result of
-          Ok value ->
-            -- TODO: handle failure value
-            ( fromApiResponse value, Effects.none )
-
-          Err value ->
-            ( courseBlock, Effects.task (Task.succeed (CourseBlocksApiError value)) )
-
-      CourseBlocksApiError value ->
-        ( Error, Effects.none )
-
-
--- view
-view : Signal.Address Action -> CourseBlock -> Html.Html
-view address courseBlock =
-  case courseBlock of
-    Empty ->
-      Html.text "Loading..."
-
-    Course attributes children ->
-        Html.text attributes.displayName
-
-    Error ->
-      Html.text "Error - Some sort of HTTP error occurred"
-
-    _ ->
-      Html.text "Error - expected a course."
-
-
--- app
-init : (CourseBlock, Effects Action)
+init : (NavTypes.CourseBlock, Effects NavTypes.Action)
 init =
-  ( Empty, getCourseBlocks )
-
-
-getCourseBlocks : Effects Action
-getCourseBlocks =
-  let
-    url =
-      Http.url
-        courseBlocksApiUrl
-        [ ( "course_id", courseId )
-        , ( "all_blocks", "true" )
-        , ( "depth", "all" )
-        , ( "requested_fields", "children" )
-        ]
-  in
-    Http.get courseBlocksDecoder url
-      |> Task.toResult
-      |> Task.map CourseBlocksApiResponse
-      |> Effects.task
+  ( NavTypes.Empty, getCourseBlocks courseBlocksApiUrl courseId )
 
 
 app =
   StartApp.start
     { init = init
-    , update = update
-    , view = view
+    , update = CourseNav.update
+    , view = CourseNav.view
     , inputs = []
     }
 
@@ -198,10 +31,7 @@ main =
 port courseId : String
 
 
-port courseApiUrl : URL
-
-
-port courseBlocksApiUrl : URL
+port courseBlocksApiUrl : String
 
 
 port tasks : Signal (Task.Task Never ())

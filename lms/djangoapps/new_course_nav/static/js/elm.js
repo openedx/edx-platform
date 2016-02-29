@@ -10348,72 +10348,6 @@ Elm.Html.make = function (_elm) {
                              ,menuitem: menuitem
                              ,menu: menu};
 };
-Elm.Html = Elm.Html || {};
-Elm.Html.Events = Elm.Html.Events || {};
-Elm.Html.Events.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Events = _elm.Html.Events || {};
-   if (_elm.Html.Events.values) return _elm.Html.Events.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
-   var _op = {};
-   var keyCode = A2($Json$Decode._op[":="],"keyCode",$Json$Decode.$int);
-   var targetChecked = A2($Json$Decode.at,_U.list(["target","checked"]),$Json$Decode.bool);
-   var targetValue = A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string);
-   var defaultOptions = $VirtualDom.defaultOptions;
-   var Options = F2(function (a,b) {    return {stopPropagation: a,preventDefault: b};});
-   var onWithOptions = $VirtualDom.onWithOptions;
-   var on = $VirtualDom.on;
-   var messageOn = F3(function (name,addr,msg) {    return A3(on,name,$Json$Decode.value,function (_p0) {    return A2($Signal.message,addr,msg);});});
-   var onClick = messageOn("click");
-   var onDoubleClick = messageOn("dblclick");
-   var onMouseMove = messageOn("mousemove");
-   var onMouseDown = messageOn("mousedown");
-   var onMouseUp = messageOn("mouseup");
-   var onMouseEnter = messageOn("mouseenter");
-   var onMouseLeave = messageOn("mouseleave");
-   var onMouseOver = messageOn("mouseover");
-   var onMouseOut = messageOn("mouseout");
-   var onBlur = messageOn("blur");
-   var onFocus = messageOn("focus");
-   var onSubmit = messageOn("submit");
-   var onKey = F3(function (name,addr,handler) {    return A3(on,name,keyCode,function (code) {    return A2($Signal.message,addr,handler(code));});});
-   var onKeyUp = onKey("keyup");
-   var onKeyDown = onKey("keydown");
-   var onKeyPress = onKey("keypress");
-   return _elm.Html.Events.values = {_op: _op
-                                    ,onBlur: onBlur
-                                    ,onFocus: onFocus
-                                    ,onSubmit: onSubmit
-                                    ,onKeyUp: onKeyUp
-                                    ,onKeyDown: onKeyDown
-                                    ,onKeyPress: onKeyPress
-                                    ,onClick: onClick
-                                    ,onDoubleClick: onDoubleClick
-                                    ,onMouseMove: onMouseMove
-                                    ,onMouseDown: onMouseDown
-                                    ,onMouseUp: onMouseUp
-                                    ,onMouseEnter: onMouseEnter
-                                    ,onMouseLeave: onMouseLeave
-                                    ,onMouseOver: onMouseOver
-                                    ,onMouseOut: onMouseOut
-                                    ,on: on
-                                    ,onWithOptions: onWithOptions
-                                    ,defaultOptions: defaultOptions
-                                    ,targetValue: targetValue
-                                    ,targetChecked: targetChecked
-                                    ,keyCode: keyCode
-                                    ,Options: Options};
-};
 Elm.Native.Http = {};
 Elm.Native.Http.make = function(localRuntime) {
 
@@ -10757,41 +10691,119 @@ Elm.StartApp.make = function (_elm) {
    var Config = F4(function (a,b,c,d) {    return {init: a,update: b,view: c,inputs: d};});
    return _elm.StartApp.values = {_op: _op,start: start,Config: Config,App: App};
 };
-Elm.Main = Elm.Main || {};
-Elm.Main.make = function (_elm) {
+Elm.NavTypes = Elm.NavTypes || {};
+Elm.NavTypes.make = function (_elm) {
    "use strict";
-   _elm.Main = _elm.Main || {};
-   if (_elm.Main.values) return _elm.Main.values;
+   _elm.NavTypes = _elm.NavTypes || {};
+   if (_elm.NavTypes.values) return _elm.NavTypes.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,lms_web_url: d,children: e};});
+   var CourseBlocksData = F2(function (a,b) {    return {root: a,blocks: b};});
+   var Error = {ctor: "Error"};
+   var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
+   var Vertical = F2(function (a,b) {    return {ctor: "Vertical",_0: a,_1: b};});
+   var Sequential = F2(function (a,b) {    return {ctor: "Sequential",_0: a,_1: b};});
+   var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
+   var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
+   var Empty = {ctor: "Empty"};
+   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,lmsWebUrl: d};});
+   var CourseBlocksApiError = function (a) {    return {ctor: "CourseBlocksApiError",_0: a};};
+   var CourseBlocksApiResponse = function (a) {    return {ctor: "CourseBlocksApiResponse",_0: a};};
+   return _elm.NavTypes.values = {_op: _op
+                                 ,CourseBlocksApiResponse: CourseBlocksApiResponse
+                                 ,CourseBlocksApiError: CourseBlocksApiError
+                                 ,CourseBlockAttributes: CourseBlockAttributes
+                                 ,Empty: Empty
+                                 ,Course: Course
+                                 ,Chapter: Chapter
+                                 ,Sequential: Sequential
+                                 ,Vertical: Vertical
+                                 ,Leaf: Leaf
+                                 ,Error: Error
+                                 ,CourseBlocksData: CourseBlocksData
+                                 ,CourseBlockData: CourseBlockData};
+};
+Elm.ParseCourse = Elm.ParseCourse || {};
+Elm.ParseCourse.make = function (_elm) {
+   "use strict";
+   _elm.ParseCourse = _elm.ParseCourse || {};
+   if (_elm.ParseCourse.values) return _elm.ParseCourse.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $NavTypes = Elm.NavTypes.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var courseBlocksApiUrl = Elm.Native.Port.make(_elm).inbound("courseBlocksApiUrl",
-   "Main.URL",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   var buildCourseTree = F2(function (courseBlocksData,rootId) {
+      if (_U.eq(rootId,"")) return $NavTypes.Empty; else {
+            var maybeBlockData = A2($Dict.get,rootId,courseBlocksData.blocks);
+            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",lms_web_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
+            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,lmsWebUrl: blockData.lms_web_url};
+            var children = A2($List.map,buildCourseTree(courseBlocksData),A2($Maybe.withDefault,_U.list([]),blockData.children));
+            return _U.eq(blockData.type$,"course") ? A2($NavTypes.Course,blockAttributes,children) : _U.eq(blockData.type$,"chapter") ? A2($NavTypes.Chapter,
+            blockAttributes,
+            children) : _U.eq(blockData.type$,"sequential") ? A2($NavTypes.Sequential,blockAttributes,children) : _U.eq(blockData.type$,
+            "vertical") ? A2($NavTypes.Vertical,blockAttributes,children) : $NavTypes.Error;
+         }
    });
-   var courseApiUrl = Elm.Native.Port.make(_elm).inbound("courseApiUrl",
-   "Main.URL",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   var fromApiResponse = function (courseBlocksData) {    return A2(buildCourseTree,courseBlocksData,courseBlocksData.root);};
+   var courseBlockDecoder = A6($Json$Decode.object5,
+   $NavTypes.CourseBlockData,
+   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"type",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"display_name",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"lms_web_url",$Json$Decode.string),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"children",$Json$Decode.list($Json$Decode.string))));
+   var courseBlocksDecoder = A3($Json$Decode.object2,
+   $NavTypes.CourseBlocksData,
+   A2($Json$Decode._op[":="],"root",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"blocks",$Json$Decode.dict(courseBlockDecoder)));
+   var getCourseBlocks = F2(function (url,courseId) {
+      var url = A2($Http.url,
+      url,
+      _U.list([{ctor: "_Tuple2",_0: "course_id",_1: courseId}
+              ,{ctor: "_Tuple2",_0: "all_blocks",_1: "true"}
+              ,{ctor: "_Tuple2",_0: "depth",_1: "all"}
+              ,{ctor: "_Tuple2",_0: "requested_fields",_1: "children"}]));
+      return $Effects.task(A2($Task.map,$NavTypes.CourseBlocksApiResponse,$Task.toResult(A2($Http.get,courseBlocksDecoder,url))));
    });
-   var courseId = Elm.Native.Port.make(_elm).inbound("courseId",
-   "String",
-   function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
-   });
+   return _elm.ParseCourse.values = {_op: _op,fromApiResponse: fromApiResponse,getCourseBlocks: getCourseBlocks};
+};
+Elm.CourseNav = Elm.CourseNav || {};
+Elm.CourseNav.make = function (_elm) {
+   "use strict";
+   _elm.CourseNav = _elm.CourseNav || {};
+   if (_elm.CourseNav.values) return _elm.CourseNav.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $NavTypes = Elm.NavTypes.make(_elm),
+   $ParseCourse = Elm.ParseCourse.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
    var view = F2(function (address,courseBlock) {
       var _p0 = courseBlock;
       switch (_p0.ctor)
@@ -10800,91 +10812,54 @@ Elm.Main.make = function (_elm) {
          case "Error": return $Html.text("Error - Some sort of HTTP error occurred");
          default: return $Html.text("Error - expected a course.");}
    });
-   var CourseBlocksApiError = function (a) {    return {ctor: "CourseBlocksApiError",_0: a};};
-   var CourseBlocksApiResponse = function (a) {    return {ctor: "CourseBlocksApiResponse",_0: a};};
-   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,lms_web_url: d,children: e};});
-   var courseBlockDecoder = A6($Json$Decode.object5,
-   CourseBlockData,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"type",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"display_name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"lms_web_url",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"children",$Json$Decode.list($Json$Decode.string))));
-   var CourseBlocksData = F2(function (a,b) {    return {root: a,blocks: b};});
-   var courseBlocksDecoder = A3($Json$Decode.object2,
-   CourseBlocksData,
-   A2($Json$Decode._op[":="],"root",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"blocks",$Json$Decode.dict(courseBlockDecoder)));
-   var getCourseBlocks = function () {
-      var url = A2($Http.url,
-      courseBlocksApiUrl,
-      _U.list([{ctor: "_Tuple2",_0: "course_id",_1: courseId}
-              ,{ctor: "_Tuple2",_0: "all_blocks",_1: "true"}
-              ,{ctor: "_Tuple2",_0: "depth",_1: "all"}
-              ,{ctor: "_Tuple2",_0: "requested_fields",_1: "children"}]));
-      return $Effects.task(A2($Task.map,CourseBlocksApiResponse,$Task.toResult(A2($Http.get,courseBlocksDecoder,url))));
-   }();
-   var Error = {ctor: "Error"};
-   var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
-   var Vertical = F2(function (a,b) {    return {ctor: "Vertical",_0: a,_1: b};});
-   var Sequential = F2(function (a,b) {    return {ctor: "Sequential",_0: a,_1: b};});
-   var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
-   var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
-   var Empty = {ctor: "Empty"};
-   var buildCourseTree = F2(function (courseBlocksData,rootId) {
-      if (_U.eq(rootId,"")) return Empty; else {
-            var maybeBlockData = A2($Dict.get,rootId,courseBlocksData.blocks);
-            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",lms_web_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
-            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,lmsWebUrl: blockData.lms_web_url};
-            var children = A2($List.map,buildCourseTree(courseBlocksData),A2($Maybe.withDefault,_U.list([]),blockData.children));
-            return _U.eq(blockData.type$,"course") ? A2(Course,blockAttributes,children) : _U.eq(blockData.type$,"chapter") ? A2(Chapter,
-            blockAttributes,
-            children) : _U.eq(blockData.type$,"sequential") ? A2(Sequential,blockAttributes,children) : _U.eq(blockData.type$,"vertical") ? A2(Vertical,
-            blockAttributes,
-            children) : Error;
-         }
-   });
-   var fromApiResponse = function (courseBlocksData) {    return A2(buildCourseTree,courseBlocksData,courseBlocksData.root);};
    var update = F2(function (action,courseBlock) {
       var foo = $Debug.log($Basics.toString(action));
       var _p1 = action;
       if (_p1.ctor === "CourseBlocksApiResponse") {
             var _p2 = _p1._0;
             if (_p2.ctor === "Ok") {
-                  return {ctor: "_Tuple2",_0: fromApiResponse(_p2._0),_1: $Effects.none};
+                  return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p2._0),_1: $Effects.none};
                } else {
-                  return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed(CourseBlocksApiError(_p2._0)))};
+                  return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($NavTypes.CourseBlocksApiError(_p2._0)))};
                }
          } else {
-            return {ctor: "_Tuple2",_0: Error,_1: $Effects.none};
+            return {ctor: "_Tuple2",_0: $NavTypes.Error,_1: $Effects.none};
          }
    });
-   var init = {ctor: "_Tuple2",_0: Empty,_1: getCourseBlocks};
-   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([])});
+   return _elm.CourseNav.values = {_op: _op,update: update,view: view};
+};
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values) return _elm.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $CourseNav = Elm.CourseNav.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $NavTypes = Elm.NavTypes.make(_elm),
+   $ParseCourse = Elm.ParseCourse.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp = Elm.StartApp.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var courseBlocksApiUrl = Elm.Native.Port.make(_elm).inbound("courseBlocksApiUrl",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   });
+   var courseId = Elm.Native.Port.make(_elm).inbound("courseId",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   });
+   var init = {ctor: "_Tuple2",_0: $NavTypes.Empty,_1: A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId)};
+   var app = $StartApp.start({init: init,update: $CourseNav.update,view: $CourseNav.view,inputs: _U.list([])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
-   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,lmsWebUrl: d};});
-   return _elm.Main.values = {_op: _op
-                             ,CourseBlockAttributes: CourseBlockAttributes
-                             ,Empty: Empty
-                             ,Course: Course
-                             ,Chapter: Chapter
-                             ,Sequential: Sequential
-                             ,Vertical: Vertical
-                             ,Leaf: Leaf
-                             ,Error: Error
-                             ,CourseBlocksData: CourseBlocksData
-                             ,CourseBlockData: CourseBlockData
-                             ,courseBlocksDecoder: courseBlocksDecoder
-                             ,courseBlockDecoder: courseBlockDecoder
-                             ,fromApiResponse: fromApiResponse
-                             ,buildCourseTree: buildCourseTree
-                             ,CourseBlocksApiResponse: CourseBlocksApiResponse
-                             ,CourseBlocksApiError: CourseBlocksApiError
-                             ,update: update
-                             ,view: view
-                             ,init: init
-                             ,getCourseBlocks: getCourseBlocks
-                             ,app: app
-                             ,main: main};
+   return _elm.Main.values = {_op: _op,init: init,app: app,main: main};
 };
