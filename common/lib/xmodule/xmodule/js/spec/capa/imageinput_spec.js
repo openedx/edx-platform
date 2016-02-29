@@ -31,8 +31,6 @@
 
             expect(state.inputEl).toBeDefined();
             expect(state.inputEl).toExist();
-
-            expect(state.el).toHandle('click');
         });
 
         it('cross becomes visible after first click', function () {
