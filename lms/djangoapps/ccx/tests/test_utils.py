@@ -2,22 +2,41 @@
 test utils
 """
 import mock
+import uuid
 from nose.plugins.attrib import attr
 
-from student.roles import CourseCcxCoachRole
+from ccx_keys.locator import CCXLocator
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+)
 from student.tests.factories import (
     AdminFactory,
+    CourseEnrollmentFactory,
+    UserFactory
 )
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE)
+    SharedModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.ccx import utils
+from lms.djangoapps.instructor.access import (
+    allow_access,
+    list_with_level,
+)
+from lms.djangoapps.ccx.utils import (
+    add_master_course_staff_to_ccx,
+    ccx_course,
+    reverse_add_master_course_staff_to_ccx
+)
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
-from ccx_keys.locator import CCXLocator
 
 
 @attr('shard_1')
@@ -93,3 +112,135 @@ class TestGetCourseChapters(CcxTestCase):
             sorted(course_chapters),
             sorted([unicode(child) for child in self.course.children])
         )
+
+
+class TestStaffOnCCX(CcxTestCase):
+    """
+    Tests for staff on ccx courses.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        super(TestStaffOnCCX, self).setUp()
+
+        # Create instructor account
+        self.client.login(username=self.coach.username, password="test")
+
+        # create an instance of modulestore
+        self.mstore = modulestore()
+
+        # adding staff to master course.
+        staff = AdminFactory()
+        allow_access(self.course, staff, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
+
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
+
+        self.make_coach()
+        self.ccx = self.make_ccx()
+        self.ccx_locator = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
+
+    def test_add_master_course_staff_to_ccx(self):
+        """
+        Test add staff of master course to ccx course
+        """
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
+
+        # assert that staff and instructors of master course has staff and instructor roles on ccx
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+
+        with ccx_course(self.ccx_locator) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
+
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
+            self.assertEqual(list_instructor_ccx_course[0].email, list_instructor_master_course[0].email)
+
+    def test_reverse_add_master_course_staff_to_ccx(self):
+        """
+        Test add staff of master course to ccx course
+        """
+        reverse_add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
+
+        # assert that staff and instructors of master course has staff and instructor roles on ccx
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+
+        with ccx_course(self.ccx_locator) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            self.assertNotEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            self.assertNotEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
+
+    def test_add_master_course_staff_to_ccx_display_name(self):
+        """
+        Test add staff of master course to ccx course.
+        Specific test to check that a passed display name is in the
+        subject of the email sent to the enrolled users.
+        """
+        outbox = self.get_outbox()
+        # create a unique display name
+        display_name = 'custom_display_{}'.format(uuid.uuid4())
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        self.assertEqual(len(outbox), 0)
+        # give access to the course staff/instructor
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, display_name)
+        self.assertEqual(len(outbox), len(list_staff_master_course) + len(list_instructor_master_course))
+        for email in outbox:
+            self.assertIn(display_name, email.subject)
+
+    def test_add_master_course_staff_to_ccx_idempotent(self):
+        """
+        Test add staff of master course to ccx course multiple time will
+        not result in multiple enrollments.
+        """
+        outbox = self.get_outbox()
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        self.assertEqual(len(outbox), 0)
+
+        # run the assignment the first time
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
+        self.assertEqual(len(outbox), len(list_staff_master_course) + len(list_instructor_master_course))
+        with ccx_course(self.ccx_locator) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+        self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+        for user in list_staff_master_course:
+            self.assertIn(user, list_staff_ccx_course)
+        self.assertEqual(len(list_instructor_master_course), len(list_instructor_ccx_course))
+        for user in list_instructor_master_course:
+            self.assertIn(user, list_instructor_ccx_course)
+
+        # run the assignment again
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
+        # there are no new duplicated email
+        self.assertEqual(len(outbox), len(list_staff_master_course) + len(list_instructor_master_course))
+        # there are no duplicated staffs
+        with ccx_course(self.ccx_locator) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+        self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+        for user in list_staff_master_course:
+            self.assertIn(user, list_staff_ccx_course)
+        self.assertEqual(len(list_instructor_master_course), len(list_instructor_ccx_course))
+        for user in list_instructor_master_course:
+            self.assertIn(user, list_instructor_ccx_course)
+
+    def test_add_master_course_staff_to_ccx_no_email(self):
+        """
+        Test add staff of master course to ccx course without
+        sending enrollment email.
+        """
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+        add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name, send_email=False)
+        self.assertEqual(len(outbox), 0)
