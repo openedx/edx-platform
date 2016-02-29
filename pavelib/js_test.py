@@ -12,6 +12,7 @@ __test__ = False  # do not collect
 @task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
+    'pavelib.prereqs.install_python_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
