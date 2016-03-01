@@ -45,6 +45,8 @@ def get_blocks(
             which blocks to return their student_view_data.
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
+        block_types (list): Optional list of names of block types which to
+            return blocks.
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
@@ -63,13 +65,11 @@ def get_blocks(
     blocks = get_course_blocks(user, usage_key, transformers)
 
     # filter blocks by types
-    if block_types and len(block_types) == 0:
-        block_types = None
     if block_types:
         block_keys_to_remove = []
         for block_key in blocks:
             block_type = blocks.get_xblock_field(block_key, 'category')
-            if not block_type in block_types:
+            if block_type not in block_types:
                 block_keys_to_remove.append(block_key)
         for block_key in block_keys_to_remove:
             blocks.remove_block(block_key, True)
