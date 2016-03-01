@@ -1,9 +1,13 @@
 """
 This app was introduced by Dan Friedman <dfriedman@edx.org> and
-(maybe?) others during edX's 12th hackathon on 2/29/2016 - 3/1-2016.
+Christine Lytwynec <clytwynec@edx.org> during edX's 12th hackathon on
+2/29/2016 - 3/1-2016.
 
 The goal was to imagine what course navigation might look like if we
 could re-design and re-engineer it from scratch.
+
+The UX design attempts to match Marco's work here:
+https://github.com/edx/edx-platform/pull/11493
 
 TODOS:
 - Features:
