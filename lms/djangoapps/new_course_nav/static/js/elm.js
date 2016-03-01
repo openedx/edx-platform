@@ -11450,6 +11450,47 @@ Elm.Hop.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    return _elm.Hop.values = {_op: _op,$new: $new,navigateTo: navigateTo,addQuery: addQuery,setQuery: setQuery,removeQuery: removeQuery,clearQuery: clearQuery};
 };
+Elm.Routing = Elm.Routing || {};
+Elm.Routing.make = function (_elm) {
+   "use strict";
+   _elm.Routing = _elm.Routing || {};
+   if (_elm.Routing.values) return _elm.Routing.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Hop = Elm.Hop.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "ShowCourseOutline": return {ctor: "_Tuple2",_0: _U.update(model,{currentView: "courseOutline",routerPayload: _p0._0}),_1: $Effects.none};
+         case "ShowBlock": return {ctor: "_Tuple2",_0: _U.update(model,{currentView: "block",routerPayload: _p0._0}),_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var Model = F2(function (a,b) {    return {routerPayload: a,currentView: b};});
+   var ShowNotFound = function (a) {    return {ctor: "ShowNotFound",_0: a};};
+   var ShowBlock = function (a) {    return {ctor: "ShowBlock",_0: a};};
+   var ShowCourseOutline = function (a) {    return {ctor: "ShowCourseOutline",_0: a};};
+   var routes = _U.list([{ctor: "_Tuple2",_0: "",_1: ShowCourseOutline},{ctor: "_Tuple2",_0: "/block/:blockId",_1: ShowBlock}]);
+   var router = $Hop.$new({routes: routes,notFoundAction: ShowNotFound});
+   var initialModel = {routerPayload: router.payload,currentView: "courseOutline"};
+   var HopAction = function (a) {    return {ctor: "HopAction",_0: a};};
+   return _elm.Routing.values = {_op: _op
+                                ,HopAction: HopAction
+                                ,ShowCourseOutline: ShowCourseOutline
+                                ,ShowBlock: ShowBlock
+                                ,ShowNotFound: ShowNotFound
+                                ,Model: Model
+                                ,initialModel: initialModel
+                                ,update: update
+                                ,routes: routes
+                                ,router: router};
+};
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.make = function (_elm) {
    "use strict";
@@ -11499,16 +11540,18 @@ Elm.Main.make = function (_elm) {
    $CourseOutline = Elm.CourseOutline.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Hop = Elm.Hop.make(_elm),
+   $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $ParseCourse = Elm.ParseCourse.make(_elm),
    $Result = Elm.Result.make(_elm),
+   $Routing = Elm.Routing.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm),
    $Types = Elm.Types.make(_elm);
    var _op = {};
+   var routeRunTask = Elm.Native.Task.make(_elm).perform($Routing.router.run);
    var courseBlocksApiUrl = Elm.Native.Port.make(_elm).inbound("courseBlocksApiUrl",
    "String",
    function (v) {
@@ -11519,22 +11562,50 @@ Elm.Main.make = function (_elm) {
    function (v) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
    });
-   var init = {ctor: "_Tuple2",_0: $Types.Empty,_1: A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId)};
-   var app = $StartApp.start({init: init,update: $CourseOutline.update,view: $CourseOutline.courseOutlineView,inputs: _U.list([])});
+   var initialModel = {routing: $Routing.initialModel,courseBlock: $Types.Empty};
+   var NoOp = {ctor: "NoOp"};
+   var CourseBlocksAction = function (a) {    return {ctor: "CourseBlocksAction",_0: a};};
+   var init = {ctor: "_Tuple2",_0: initialModel,_1: A2($Effects.map,CourseBlocksAction,A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId))};
+   var view = F2(function (address,model) {
+      var childView = function () {
+         var _p0 = model.routing.currentView;
+         if (_p0 === "courseOutline") {
+               return A2($CourseOutline.courseOutlineView,A2($Signal.forwardTo,address,CourseBlocksAction),model.courseBlock);
+            } else {
+               return $Html.text("oogabooga");
+            }
+      }();
+      return A2($Html.div,_U.list([]),_U.list([childView]));
+   });
+   var RoutingAction = function (a) {    return {ctor: "RoutingAction",_0: a};};
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "RoutingAction": var _p2 = A2($Routing.update,_p1._0,model.routing);
+           var updatedRouting = _p2._0;
+           var fx = _p2._1;
+           var updatedModel = _U.update(model,{routing: updatedRouting});
+           return {ctor: "_Tuple2",_0: updatedModel,_1: A2($Effects.map,RoutingAction,fx)};
+         case "CourseBlocksAction": var _p3 = A2($CourseOutline.update,_p1._0,model.courseBlock);
+           var updatedCourseBlock = _p3._0;
+           var fx = _p3._1;
+           var updatedModel = _U.update(model,{courseBlock: updatedCourseBlock});
+           return {ctor: "_Tuple2",_0: updatedModel,_1: A2($Effects.map,CourseBlocksAction,fx)};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([A2($Signal.map,RoutingAction,$Routing.router.signal)])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
-   var ShowNotFound = function (a) {    return {ctor: "ShowNotFound",_0: a};};
-   var ShowBlock = function (a) {    return {ctor: "ShowBlock",_0: a};};
-   var ShowCourseOutline = function (a) {    return {ctor: "ShowCourseOutline",_0: a};};
-   var routes = _U.list([{ctor: "_Tuple2",_0: "/",_1: ShowCourseOutline},{ctor: "_Tuple2",_0: "/:blockId",_1: ShowBlock}]);
-   var HopAction = function (a) {    return {ctor: "HopAction",_0: a};};
+   var Model = F2(function (a,b) {    return {routing: a,courseBlock: b};});
    return _elm.Main.values = {_op: _op
-                             ,HopAction: HopAction
-                             ,ShowCourseOutline: ShowCourseOutline
-                             ,ShowBlock: ShowBlock
-                             ,ShowNotFound: ShowNotFound
-                             ,routes: routes
+                             ,Model: Model
+                             ,RoutingAction: RoutingAction
+                             ,CourseBlocksAction: CourseBlocksAction
+                             ,NoOp: NoOp
+                             ,initialModel: initialModel
                              ,init: init
+                             ,update: update
+                             ,view: view
                              ,app: app
                              ,main: main};
 };
