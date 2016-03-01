@@ -2,6 +2,7 @@ module CourseNav (update, courseOutlineView) where
 
 import Effects exposing (Effects)
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Http
 import Task
 
@@ -29,20 +30,29 @@ update action courseBlock =
         ( Error, Effects.none )
 
 
--- views
+wrapWithContainer : List Html -> Html
+wrapWithContainer htmlList =
+  div
+    [ class "grid-container" ]
+    htmlList
+
 
 courseOutlineView : Signal.Address Action -> CourseBlock -> Html
 courseOutlineView address courseBlock =
   case courseBlock of
     Empty ->
-      div [] [ text "Loading..." ]
+      wrapWithContainer
+        [ div [ class "depth col-4 pre-4 post-4" ] [ text "Loading..." ] ]
 
     Course attributes children ->
-        div
-          []
-          ( div [] [text attributes.displayName ]
-            :: List.map (chapterOutlineView address) children
-          )
+      wrapWithContainer
+        [ div
+          [ class "depth" ]
+          [ h3 [ class "hd-3 emphasized" ] [text attributes.displayName ] ]
+        , div
+          [ class "depth" ]
+          (List.map (chapterOutlineView address) children)
+        ]
 
     Error ->
       div [] [ text "Error - Some sort of HTTP error occurred" ]
@@ -57,11 +67,10 @@ chapterOutlineView address courseBlock =
     Chapter attributes children ->
       div
         []
-        ( div [] [ text attributes.displayName ]
+        ( h4 [ class "hd-4" ] [ text attributes.displayName ]
           :: List.map (sequentialOutlineView address) children
         )
 
-    -- We're expecting a chapter, so don't render anything else.
     _ ->
       div [] []
 
@@ -71,8 +80,11 @@ sequentialOutlineView address courseBlock =
   case courseBlock of
     Sequential attributes children ->
       div
-        []
-        [ text attributes.displayName ]
+        [ class "card" ]
+        [ h5
+            [ class "hd-5" ]
+            [ a [ href attributes.lmsWebUrl ] [ text attributes.displayName ] ]
+        ]
 
     _ ->
       div [] []
