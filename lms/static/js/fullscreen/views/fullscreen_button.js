@@ -58,6 +58,7 @@
                 var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
                 $fullscreenBreadcrumb.addClass('in_fullscreen');
                 this.launchIntoFullscreen($fullscreenElement[0]);
+                Logger.log('fullscreen_opened', "event information here about entering fullscreen" );
             },
 
             exitFullscreen: function() {
@@ -74,6 +75,7 @@
                 } else if(document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 }
+                Logger.log('fullscreen_closed', "evenr information here about exiting fullscreen" );
             }
         });
     });
