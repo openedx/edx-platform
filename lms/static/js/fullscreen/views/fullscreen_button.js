@@ -65,6 +65,11 @@
                 $fullscreenElement.addClass('fullscreen-element');
                 var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
                 $fullscreenBreadcrumb.addClass('in_fullscreen');
+                this.launchIntoFullscreen($fullscreenElement[0]);
+                var srText = document.getElementsByClassName('sr fullscreen-sr')
+                for(var i = 0; i < srText.length; i++){
+                    srText[i].innerText="Click to exit distraction free mode";
+                }
                 Logger.log('fullscreen_opened', "event information here about entering fullscreen" );
             },
 
@@ -87,6 +92,11 @@
                 $fullscreenElement.removeClass('fullscreen-element');
                 var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
                 $fullscreenBreadcrumb.removeClass('in_fullscreen');
+                var srText = document.getElementsByClassName('sr fullscreen-sr')
+                for(var i = 0; i < srText.length; i++){
+                    srText[i].innerText="Click to enter distraction free mode";
+                }
+                Logger.log('fullscreen_closed', "event information here about exiting fullscreen" );
             }
         });
     });
