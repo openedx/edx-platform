@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.utils import translation
-from nose.plugins.attrib import attr
+import pytest
 import unittest
 from rest_framework.test import APITestCase, APIClient
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -31,7 +31,7 @@ from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     test_password = "test"

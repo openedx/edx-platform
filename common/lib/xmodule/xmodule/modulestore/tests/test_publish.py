@@ -9,7 +9,7 @@ import unittest
 import uuid
 import xml.etree.ElementTree as ET
 from contextlib import contextmanager
-from nose.plugins.attrib import attr
+import pytest
 from shutil import rmtree
 from tempfile import mkdtemp
 
@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.utils import (
 )
 
 
-@attr('mongo')
+@pytest.mark.mongo
 class TestPublish(SplitWMongoCourseBootstrapper):
     """
     Test the publish code (primary causing orphans)

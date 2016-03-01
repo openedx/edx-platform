@@ -18,7 +18,7 @@ from django.core.urlresolvers import (
     resolve,
     Resolver404
 )
-from nose.plugins.attrib import attr
+import pytest
 from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import (
     Client,
@@ -128,7 +128,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.assertEqual(expected_field_errors, resp_dict_error)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class CcxListTest(CcxRestApiTest):
     """
@@ -608,7 +608,7 @@ class CcxListTest(CcxRestApiTest):
         self.assertEqual(resp.data.get('course_modules'), chapters)  # pylint: disable=no-member
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class CcxDetailTest(CcxRestApiTest):
     """

@@ -12,7 +12,7 @@ import uuid
 
 import ddt
 from contracts import contract
-from nose.plugins.attrib import attr
+import pytest
 from django.core.cache import caches, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir
@@ -42,7 +42,7 @@ BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
-@attr('mongo')
+@pytest.mark.mongo
 class SplitModuleTest(unittest.TestCase):
     '''
     The base set of tests manually populates a db w/ courses which have

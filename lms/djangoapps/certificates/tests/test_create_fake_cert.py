@@ -1,7 +1,7 @@
 """Tests for the create_fake_certs management command. """
 from django.test import TestCase
 from django.core.management.base import CommandError
-from nose.plugins.attrib import attr
+import pytest
 
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
@@ -9,7 +9,7 @@ from certificates.management.commands import create_fake_cert
 from certificates.models import GeneratedCertificate
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CreateFakeCertTest(TestCase):
     """Tests for the create_fake_certs management command. """
 

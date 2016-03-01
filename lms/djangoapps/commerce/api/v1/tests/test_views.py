@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 from flaky import flaky
-from nose.plugins.attrib import attr
+import pytest
 import pytz
 from rest_framework.utils.encoders import JSONEncoder
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -358,7 +358,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertDictEqual(expected_dict, json.loads(response.content))
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class OrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

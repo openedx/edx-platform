@@ -5,7 +5,7 @@ import json
 import ddt
 import mock
 from uuid import uuid4
-from nose.plugins.attrib import attr
+import pytest
 from mock import patch
 from urllib import urlencode
 from collections import OrderedDict
@@ -62,7 +62,7 @@ def _fake_is_request_in_microsite():
     return True
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
     """

@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
+import pytest
 
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -8,7 +8,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from mock import patch
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.

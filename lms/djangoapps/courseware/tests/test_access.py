@@ -14,7 +14,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from mock import Mock, patch
-from nose.plugins.attrib import attr
+import pytest
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
@@ -149,7 +149,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertIsNotNone(context.exception)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -515,7 +515,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertEqual(response.status_code, 200)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class UserRoleTestCase(TestCase):
     """
     Tests for user roles.

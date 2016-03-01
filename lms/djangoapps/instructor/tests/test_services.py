@@ -9,13 +9,13 @@ from courseware.models import StudentModule
 from instructor.access import allow_access
 from instructor.services import InstructorService
 from instructor.tests.test_tools import msk_from_problem_urlname
-from nose.plugins.attrib import attr
+import pytest
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService

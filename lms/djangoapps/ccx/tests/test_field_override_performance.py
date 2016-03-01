@@ -15,7 +15,7 @@ from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.middleware import MakoMiddleware
-from nose.plugins.attrib import attr
+import pytest
 from pytz import UTC
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
@@ -30,7 +30,7 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @mock.patch.dict(
     'django.conf.settings.FEATURES',
     {

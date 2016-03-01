@@ -9,7 +9,6 @@ from shutil import rmtree
 from bson.code import Code
 import datetime
 import ddt
-#from nose.plugins.attrib import attr
 
 from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
@@ -60,9 +59,9 @@ ASSET_XSD_PATH = PLATFORM_ROOT / "common" / "lib" / "xmodule" / "xmodule" / "ass
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class CrossStoreXMLRoundtrip(unittest.TestCase):
     """
@@ -144,9 +143,9 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class FindAssetTest(unittest.TestCase):
     """
@@ -227,9 +226,9 @@ class FindAssetTest(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class TestModulestoreAssetSize(unittest.TestCase):
     """

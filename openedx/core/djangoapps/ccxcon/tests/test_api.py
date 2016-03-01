@@ -6,7 +6,7 @@ import datetime
 import mock
 import pytz
 import urlparse
-from nose.plugins.attrib import attr
+import pytest
 
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import AdminFactory
@@ -38,7 +38,7 @@ def fetch_token_mock(*args, **kwargs):  # pylint: disable=unused-argument
     return
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class APIsTestCase(SharedModuleStoreTestCase):
     """
     Unit tests for the API module functions

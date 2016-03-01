@@ -3,13 +3,13 @@
 
 import json
 from operator import itemgetter
-from nose.plugins.attrib import attr
+import pytest
 
 from . import BaseTestXmodule
 from xmodule.x_module import STUDENT_VIEW
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"

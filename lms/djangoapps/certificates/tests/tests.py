@@ -4,7 +4,7 @@ Tests for the certificates models.
 from ddt import ddt, data, unpack
 from mock import patch
 from django.conf import settings
-from nose.plugins.attrib import attr
+import pytest
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -25,7 +25,7 @@ from util.milestones_helpers import (
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt
 class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """

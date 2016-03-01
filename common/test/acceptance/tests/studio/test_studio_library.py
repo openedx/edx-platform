@@ -2,7 +2,7 @@
 Acceptance tests for Content Libraries in Studio
 """
 from ddt import ddt, data
-from nose.plugins.attrib import attr
+import pytest
 from flaky import flaky
 
 from .base_studio_test import StudioLibraryTest
@@ -13,7 +13,7 @@ from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.users import LibraryUsersPage
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -186,7 +186,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
@@ -638,7 +638,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
         self.assertTrue(user.is_current_user)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class StudioLibraryA11yTest(StudioLibraryTest):
     """
     Class to test Studio pages accessibility.

@@ -4,7 +4,7 @@ access control rules.
 """
 
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 from stevedore.extension import Extension, ExtensionManager
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -51,7 +51,7 @@ def resolve_attrs(test_method):
     return _wrapper
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class GroupAccessTestCase(ModuleStoreTestCase):
     """

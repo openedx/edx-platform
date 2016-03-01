@@ -10,7 +10,7 @@ import itertools
 import unittest
 from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
-from nose.plugins.attrib import attr
+import pytest
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -57,7 +57,7 @@ from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -182,7 +182,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
@@ -655,7 +655,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
@@ -774,7 +774,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -830,7 +830,7 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
@@ -1056,7 +1056,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
@@ -1082,7 +1082,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         self.assertFalse(mocked_view.called)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class IsCoursePassedTests(ModuleStoreTestCase):
     """
     Tests for the is_course_passed helper function
@@ -1127,7 +1127,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -1281,7 +1281,7 @@ class ViewCheckerBlock(XBlock):
         return result
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """

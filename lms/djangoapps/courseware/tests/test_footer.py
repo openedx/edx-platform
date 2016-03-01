@@ -3,7 +3,7 @@ Tests related to the basic footer-switching based off SITE_NAME to ensure
 edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
-from nose.plugins.attrib import attr
+import pytest
 
 from django.conf import settings
 from django.test import TestCase
@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestFooter(TestCase):
 
     SOCIAL_MEDIA_NAMES = [

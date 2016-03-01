@@ -12,7 +12,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
-from nose.plugins.attrib import attr
+import pytest
 from ccx_keys.locator import CCXLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -40,7 +40,7 @@ from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
@@ -104,7 +104,7 @@ class TestEnrollmentChangeBase(TestCase):
         self.assertEqual(after, after_ideal)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
@@ -222,7 +222,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):
@@ -302,7 +302,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
     @classmethod
@@ -558,7 +558,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, None)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestSendBetaRoleEmail(TestCase):
     """
     Test edge cases for `send_beta_role_email`
@@ -576,7 +576,7 @@ class TestSendBetaRoleEmail(TestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params for CCX student enrollment.
@@ -625,7 +625,7 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -671,7 +671,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestRenderMessageToString(SharedModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.

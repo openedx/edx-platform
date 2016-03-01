@@ -7,7 +7,7 @@ import datetime
 import pytz
 
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
+import pytest
 
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestECommerceDashboardViews(SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard

@@ -5,12 +5,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 
 import sys
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class FaviconTestCase(TestCase):
 
     def setUp(self):

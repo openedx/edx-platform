@@ -6,7 +6,7 @@ import datetime
 from uuid import uuid4
 
 from flaky import flaky
-from nose.plugins.attrib import attr
+import pytest
 from pytz import UTC
 
 from .helpers import BaseDiscussionTestCase
@@ -178,7 +178,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -205,7 +205,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.assertIsNotNone(self.page.new_post_form)
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -278,7 +278,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page with multiple threads
@@ -333,7 +333,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
@@ -382,7 +382,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
@@ -423,7 +423,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
@@ -656,7 +656,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.endorse_response('response_other_author')
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -739,7 +739,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -898,7 +898,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
     Tests for user profile page in discussion tab.
@@ -1027,7 +1027,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -1101,7 +1101,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         ).wait_for_page()
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
     Tests for the discussion page displaying a single thread.

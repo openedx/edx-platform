@@ -2,7 +2,7 @@
 Test the course_info xblock
 """
 import mock
-from nose.plugins.attrib import attr
+import pytest
 from pyquery import PyQuery as pq
 from urllib import urlencode
 
@@ -29,7 +29,7 @@ from .helpers import LoginEnrollmentTestCase
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
@@ -207,7 +207,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(response, expected, status_code=302, target_status_code=200)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
@@ -239,7 +239,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertNotIn(self.xml_data, resp.content)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """

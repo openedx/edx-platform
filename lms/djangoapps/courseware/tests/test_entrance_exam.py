@@ -5,7 +5,7 @@ from mock import patch, Mock
 
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
+import pytest
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.model_data import FieldDataCache
@@ -38,7 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """

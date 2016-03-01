@@ -4,7 +4,7 @@ Unit tests for student optouts from course email
 """
 import json
 from mock import patch, Mock
-from nose.plugins.attrib import attr
+import pytest
 
 from django.core import mail
 from django.core.management import call_command
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """

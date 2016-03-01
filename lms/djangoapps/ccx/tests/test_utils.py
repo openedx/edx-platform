@@ -2,7 +2,7 @@
 test utils
 """
 import mock
-from nose.plugins.attrib import attr
+import pytest
 
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
@@ -20,7 +20,7 @@ from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from ccx_keys.locator import CCXLocator
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
     """Verify that get_ccx_from_ccx_locator functions properly"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
@@ -53,7 +53,7 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
         self.assertEqual(result, ccx)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestGetCourseChapters(CcxTestCase):
     """
     Tests for the `get_course_chapters` util function

@@ -4,10 +4,10 @@ Single page performance tests for Studio.
 from bok_choy.web_app_test import WebAppTest, with_cache
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
-from nose.plugins.attrib import attr
+import pytest
 
 
-@attr(har_mode='explicit')
+@pytest.mark.har_mode_explicit
 class StudioPagePerformanceTest(WebAppTest):
     """
     Base class to capture studio performance with HTTP Archives.

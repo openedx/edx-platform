@@ -6,7 +6,7 @@ Acceptance tests for CMS Video Module.
 import os
 
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 from unittest import skipIf
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -161,7 +161,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class
@@ -320,7 +320,7 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.video.click_player_button('play')
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class CMSVideoA11yTest(CMSVideoBaseTest):
     """
     CMS Video Accessibility Test Class

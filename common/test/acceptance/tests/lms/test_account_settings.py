@@ -3,7 +3,7 @@
 End-to-end tests for the Account Settings page.
 """
 from unittest import skip
-from nose.plugins.attrib import attr
+import pytest
 
 from bok_choy.web_app_test import WebAppTest
 
@@ -87,7 +87,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         self.assert_no_matching_events_were_emitted({'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME})
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
@@ -110,7 +110,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         dashboard_page.click_account_settings_link()
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
     """
     Tests that verify behaviour of the Account Settings page.
@@ -447,7 +447,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
     """
     Class to test account settings accessibility.

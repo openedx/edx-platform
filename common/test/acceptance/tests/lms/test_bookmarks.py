@@ -3,7 +3,7 @@
 End-to-end tests for the courseware unit bookmarks.
 """
 import json
-from nose.plugins.attrib import attr
+import pytest
 import requests
 from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from ...pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
@@ -60,7 +60,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(event_data, actual_events)
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.

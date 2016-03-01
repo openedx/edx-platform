@@ -10,14 +10,14 @@ from mock import patch
 from django.test import TestCase
 from django.conf import settings
 from unittest import skipUnless
-from nose.plugins.attrib import attr
+import pytest
 
 from courseware.models import BaseStudentModuleHistory, StudentModuleHistory, StudentModule
 
 from courseware.tests.factories import StudentModuleFactory, location, course_id
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """

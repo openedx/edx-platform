@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import ddt
 import json
 from mock import patch, Mock
-from nose.plugins.attrib import attr
+import pytest
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -38,7 +38,7 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 
 
 @ddt.ddt
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
@@ -281,7 +281,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """

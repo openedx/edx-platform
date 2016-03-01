@@ -3,7 +3,7 @@
 Acceptance tests for licensing of the Video module
 """
 from __future__ import unicode_literals
-from nose.plugins.attrib import attr
+import pytest
 from ..studio.base_studio_test import StudioCourseTest
 
 #from ..helpers import UniqueCourseTest
@@ -12,7 +12,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...fixtures.course import XBlockFixtureDesc
 
 
-@attr('shard_2')
+@pytest.mark.shard_2
 class VideoLicenseTest(StudioCourseTest):
     """
     Tests for video module-level licensing (that is, setting the license,

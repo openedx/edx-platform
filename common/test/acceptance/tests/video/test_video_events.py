@@ -2,7 +2,7 @@
 
 import datetime
 import json
-from nose.plugins.attrib import attr
+import pytest
 import ddt
 import unittest
 
@@ -150,7 +150,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
