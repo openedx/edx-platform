@@ -28,7 +28,7 @@ from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
@@ -44,7 +44,7 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
-class SysadminBaseTestCase(ModuleStoreTestCase):
+class SysadminBaseTestCase(SharedModuleStoreTestCase):
     """
     Base class with common methods used in XML and Mongo tests
     """
@@ -55,7 +55,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp(create_user=False)
+        super(SysadminBaseTestCase, self).setUp()
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
