@@ -23,6 +23,7 @@ from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
+from x_module import ResourceTemplates
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List
 from xblock.fragment import Fragment
@@ -33,7 +34,7 @@ log = logging.getLogger("edx.courseware")
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
+class HtmlBlock(ResourceTemplates, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
     into one. For now, it's a place to put the pieces that are already sharable
