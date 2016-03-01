@@ -7,8 +7,10 @@ could re-design and re-engineer it from scratch.
 
 TODOS:
 - Features:
+    x Use the pattern library
+    - Link into sequentials
+    - Add nav within sequentials
     - Add realtime text search to nav app to locate sections
-    - Use the pattern library
 - Refactorings:
     - Choose a better name for the app
     - Refactor the django app into a separate repository
