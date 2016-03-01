@@ -76,7 +76,7 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
     )
 
     @XBlock.supports("multi_device")
-    def student_view(self):
+    def student_view(self, context):
         """
         Return a fragment that contains the html for the student view
         """
@@ -352,7 +352,7 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlock):
     TEMPLATE_DIR = 'courseware'
 
     @XBlock.supports("multi_device")
-    def student_view(self):
+    def student_view(self, context):
         """ Returns html required for rendering XModule. """
 
         # When we switch this to an XBlock, we can merge this with student_view,
