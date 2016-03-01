@@ -4,7 +4,7 @@
         function (gettext, $, _, Backbone) {
 
         return Backbone.View.extend({
-            srFullscreenText: gettext('Click to toggle distraction-free mode'),
+            srFullscreenText: gettext('Click to enter distraction-free mode'),
 
             events: {
                 'click': 'toggleFullscreen',
@@ -68,7 +68,7 @@
                 this.launchIntoFullscreen($fullscreenElement[0]);
                 var srText = document.getElementsByClassName('sr fullscreen-sr')
                 for(var i = 0; i < srText.length; i++){
-                    srText[i].innerText="Click to exit distraction free mode";
+                    srText[i].innerText=("Click to exit distraction free mode");
                 }
                 Logger.log('fullscreen_opened', "event information here about entering fullscreen" );
             },
@@ -81,7 +81,6 @@
                 } else if(document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 }
-                Logger.log('fullscreen_closed', "evenr information here about exiting fullscreen" );
                 this.exitFullscreenHandler();
             },
 
@@ -94,7 +93,7 @@
                 $fullscreenBreadcrumb.removeClass('in_fullscreen');
                 var srText = document.getElementsByClassName('sr fullscreen-sr')
                 for(var i = 0; i < srText.length; i++){
-                    srText[i].innerText="Click to enter distraction free mode";
+                    srText[i].innerText=gettext("Click to enter distraction free mode");
                 }
                 Logger.log('fullscreen_closed', "event information here about exiting fullscreen" );
             }
