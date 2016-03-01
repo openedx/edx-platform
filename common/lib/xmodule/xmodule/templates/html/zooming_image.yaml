@@ -2,7 +2,7 @@
 metadata:
     display_name: Zooming Image Tool
 data: |
-      <h3>Zooming Image Tool</h3>
+      <h3 class="hd hd-2">Zooming Image Tool</h3>
       <p>Use the Zooming Image Tool to enable learners to see details of large, complex images.</p>
       <p>With the Zooming Image Tool, the learner can move the mouse pointer over a part of the image to enlarge it and see more detail.</p>
       <p>To use the Zooming Image Tool, you must first add the <a href="http://files.edx.org/jquery.loupeAndLightbox.js" target="_blank">jquery.loupeAndLightbox.js JavaScript file</a> to your course.</p>
