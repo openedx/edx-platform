@@ -5,7 +5,7 @@ Performance tests for field overrides.
 import ddt
 import itertools
 import mock
-from nose.plugins.skip import SkipTest
+import pytest
 
 from courseware.views import progress
 from courseware.field_overrides import OverrideFieldData
@@ -198,13 +198,13 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
             'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
         }
         if overrides == 'no_overrides' and view_as_ccx:
-            raise SkipTest("Can't view a ccx course if field overrides are disabled.")
+            pytest.skip("Can't view a ccx course if field overrides are disabled.")
 
         if not enable_ccx and view_as_ccx:
-            raise SkipTest("Can't view a ccx course if ccx is disabled on the course")
+            pytest.skip("Can't view a ccx course if ccx is disabled on the course")
 
         if self.MODULESTORE == TEST_DATA_MONGO_MODULESTORE and view_as_ccx:
-            raise SkipTest("Can't use a MongoModulestore test as a CCX course")
+            pytest.skip("Can't use a MongoModulestore test as a CCX course")
 
         with self.settings(FIELD_OVERRIDE_PROVIDERS=providers[overrides]):
             default_queries, history_queries, reads, xblocks = self.TEST_DATA[

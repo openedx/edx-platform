@@ -10,7 +10,6 @@ from bson.code import Code
 import datetime
 import ddt
 
-from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -83,13 +82,14 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
         ASSET_AMOUNT_PER_TEST
     ))
     @ddt.unpack
+    @unittest.skipIf(
+        CodeBlockTimer is None,
+        "CodeBlockTimer undefined."
+    )
     def test_generate_import_export_timings(self, source_ms, dest_ms, num_assets):
         """
         Generate timings for different amounts of asset metadata and different modulestores.
         """
-        if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
-
         desc = "XMLRoundTrip:{}->{}:{}".format(
             SHORT_NAME_MAP[source_ms],
             SHORT_NAME_MAP[dest_ms],
@@ -166,13 +166,14 @@ class FindAssetTest(unittest.TestCase):
         ASSET_AMOUNT_PER_TEST,
     ))
     @ddt.unpack
+    @unittest.skipif(
+        CodeBlockTimer is None,
+        "CodeBlockTimer undefined."
+    )
     def test_generate_find_timings(self, source_ms, num_assets):
         """
         Generate timings for different amounts of asset metadata and different modulestores.
         """
-        if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
-
         desc = "FindAssetTest:{}:{}".format(
             SHORT_NAME_MAP[source_ms],
             num_assets,
