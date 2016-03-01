@@ -7,24 +7,34 @@
             srFullscreenText: gettext('Click to toggle distraction-free mode'),
 
             events: {
-                'click': 'toggleFullscreen'
+                'click': 'toggleFullscreen',
             },
 
             initialize: function (options) {
                 this.in_fullscreen=false;
+                var $fullscreenElement = $('.xblock-student_view-sequential');
+                $(document).focusin(this.exitIfNothingFocused.bind(this));
             },
 
             toggleFullscreen: function(event) {
                 event.preventDefault();
 
                 if (this.$el.hasClass('in_fullscreen')) {
-                    this.$el.removeClass('in_fullscreen');
-                    this.in_fullscreen=false;
                     this.exitFullscreen();
                 } else {
-                    this.$el.addClass('in_fullscreen');
-                    this.in_fullscreen=true;
                     this.enterFullscreen();
+                }
+            },
+
+            exitIfNothingFocused: function() {
+                if(this.in_fullscreen) {
+                    setTimeout(function(exitFtn) {
+                        var $fullscreenElement = $('.xblock-student_view-sequential');
+                        var focusedChildren = $fullscreenElement.find(':focus'); 
+                        if (focusedChildren.length < 1 && document.activeElement.tabIndex != -1) {
+                            exitFtn();
+                        }
+                    }, 10, this.exitFullscreen.bind(this));
                 }
             },
 
@@ -41,6 +51,8 @@
             },
 
             enterFullscreen: function() {
+                this.$el.addClass('in_fullscreen');
+                this.in_fullscreen=true;
                 var $fullscreenElement = $('.xblock-student_view-sequential');
                 $fullscreenElement.addClass('fullscreen-element');
                 var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
@@ -49,6 +61,8 @@
             },
 
             exitFullscreen: function() {
+                this.$el.removeClass('in_fullscreen');
+                this.in_fullscreen=false;
                 var $fullscreenElement = $('.xblock-student_view-sequential');
                 $fullscreenElement.removeClass('fullscreen-element');
                 var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
