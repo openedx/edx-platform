@@ -96,16 +96,15 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
 
         return response_fragment
 
-    def author_view(self):
-        #TODO BBEGGS Implement me
-        pass
+    def studio_view(self, context):
+        fragment = super(HtmlBlock, self).studio_view(context)
+        return fragment
 
-
+    author_view = student_view
 
     ###############################################################################################################
     ### HTMLDescriptor implemenation / consolidation with XBlock
     ###############################################################################################################
-
 
     @classmethod
     def filter_templates(cls, template, course):
