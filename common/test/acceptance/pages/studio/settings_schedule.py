@@ -11,12 +11,12 @@ from .utils import press_the_notification_button
 
 
 @requirejs('js/factories/settings_course_schedule')
-class SettingsPage(CoursePage):
+class SettingsSchedulePage(CoursePage):
     """
     Course Schedule and Details Settings page.
     """
 
-    url_path = "settings/details"
+    url_path = "settings/schedule"
 
     ################
     # Helpers

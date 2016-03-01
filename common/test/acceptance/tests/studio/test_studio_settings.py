@@ -10,7 +10,7 @@ from bok_choy.promise import EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
 from ..helpers import create_user_partition_json
 from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.settings import SettingsPage
+from ...pages.studio.settings_schedule import SettingsSchedulePage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ...pages.lms.courseware import CoursewarePage
@@ -417,7 +417,7 @@ class ContentLicenseTest(StudioCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
-        self.settings_page = SettingsPage(
+        self.settings_page = SettingsSchedulePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
