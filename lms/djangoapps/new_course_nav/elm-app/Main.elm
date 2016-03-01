@@ -1,13 +1,17 @@
 module Main (..) where
 
+import Dict exposing (Dict)
 import Effects exposing (Effects, Never)
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Routing exposing (router)
 import StartApp
 import Task exposing (Task)
 
+import CourseBlock
 import CourseOutline
 import ParseCourse exposing (getCourseBlocks)
+import Styles
 import Types
 
 
@@ -21,6 +25,7 @@ type alias Model =
 type Action
   = RoutingAction Routing.Action
   | CourseBlocksAction Types.CourseBlocksAction
+  | CourseBlockAction CourseBlock.Action
   | NoOp
 
 
@@ -57,7 +62,10 @@ update action model =
       in
         (updatedModel, Effects.map CourseBlocksAction fx)
 
-    _ ->
+    CourseBlockAction subaction ->
+      (model, Effects.map CourseBlockAction Effects.none)
+
+    NoOp ->
       (model, Effects.none)
 
 
@@ -72,12 +80,24 @@ view address model =
             model.courseBlock
 
         "block" ->
-          text "oogabooga"
+          let
+            blockId =
+              model.routing.routerPayload.params
+                |> Dict.get "blockId"
+                |> Maybe.withDefault ""
+          in
+            CourseBlock.view
+              (Signal.forwardTo address CourseBlockAction)
+              blockId
 
         _ ->
           text ""
   in
-    div [] [ childView ]
+    div
+      [ class "grid-container grid-manual"
+      , Styles.gridContainerStyle
+      ]
+      [ childView ]
 
 
 app =

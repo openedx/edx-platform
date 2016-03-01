@@ -36,15 +36,6 @@ update action courseBlock =
         ( Error, Effects.none )
 
 
-wrapWithContainer : List Html -> Html
-wrapWithContainer htmlList =
-  div
-    [ class "grid-container grid-manual"
-    , Styles.gridContainerStyle
-    ]
-    htmlList
-
-
 courseSearchView : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 courseSearchView address courseBlock =
   case courseBlock of
@@ -113,11 +104,11 @@ view : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 view address courseBlock =
   case courseBlock of
     Empty ->
-      wrapWithContainer
-        [ div [ class "depth col-4 pre-4 post-4" ] [ text "Loading..." ] ]
+        div [ class "depth col-4 pre-4 post-4" ] [ text "Loading..." ]
 
     Course attributes children ->
-        wrapWithContainer
+        div
+          []
           [ div
             [ class "row" ]
             [ breadcrumbsView address courseBlock
@@ -163,7 +154,7 @@ sequentialOutlineView address courseBlock =
     Sequential attributes children ->
       li
         [ class "item has-block-link" ]
-        [ a [ href attributes.studentViewUrl ] [ text attributes.displayName ] ]
+        [ a [ href <| "#block/" ++ attributes.id ] [ text attributes.displayName ] ]
 
     _ ->
       li [] []
