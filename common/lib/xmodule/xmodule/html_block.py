@@ -98,6 +98,9 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
 
     def studio_view(self, context):
         fragment = super(HtmlBlock, self).studio_view(context)
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/edit.js'))
+        fragment.add_css_url(self.runtime.local_resource_url(self, 'css/editor/edit.scss'))
+        fragment.add_css_url(self.runtime.local_resource_url(self, 'css/html/edit.scss'))
         return fragment
 
     ###############################################################################################################
@@ -245,6 +248,8 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
         """
         non_editable_fields = super(HtmlBlock, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlBlock.use_latex_compiler)
+        non_editable_fields.append(HtmlBlock.data)
+        non_editable_fields.append(HtmlBlock.xml_attributes)
         return non_editable_fields
 
     def index_dictionary(self):
