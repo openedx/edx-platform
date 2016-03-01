@@ -18,7 +18,7 @@ app =
   StartApp.start
     { init = init
     , update = CourseNav.update
-    , view = CourseNav.view
+    , view = CourseNav.courseOutlineView
     , inputs = []
     }
 

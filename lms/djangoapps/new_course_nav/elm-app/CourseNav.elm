@@ -1,7 +1,7 @@
-module CourseNav (update, view) where
+module CourseNav (update, courseOutlineView) where
 
 import Effects exposing (Effects)
-import Html
+import Html exposing (..)
 import Http
 import Task
 
@@ -29,18 +29,50 @@ update action courseBlock =
         ( Error, Effects.none )
 
 
--- view
-view : Signal.Address Action -> CourseBlock -> Html.Html
-view address courseBlock =
+-- views
+
+courseOutlineView : Signal.Address Action -> CourseBlock -> Html
+courseOutlineView address courseBlock =
   case courseBlock of
     Empty ->
-      Html.text "Loading..."
+      div [] [ text "Loading..." ]
 
     Course attributes children ->
-        Html.text attributes.displayName
+        div
+          []
+          ( div [] [text attributes.displayName ]
+            :: List.map (chapterOutlineView address) children
+          )
 
     Error ->
-      Html.text "Error - Some sort of HTTP error occurred"
+      div [] [ text "Error - Some sort of HTTP error occurred" ]
 
     _ ->
-      Html.text "Error - expected a course."
+      div [] [ text "Error - expected a course." ]
+
+
+chapterOutlineView : Signal.Address Action -> CourseBlock -> Html
+chapterOutlineView address courseBlock =
+  case courseBlock of
+    Chapter attributes children ->
+      div
+        []
+        ( div [] [ text attributes.displayName ]
+          :: List.map (sequentialOutlineView address) children
+        )
+
+    -- We're expecting a chapter, so don't render anything else.
+    _ ->
+      div [] []
+
+
+sequentialOutlineView : Signal.Address Action -> CourseBlock -> Html
+sequentialOutlineView address courseBlock =
+  case courseBlock of
+    Sequential attributes children ->
+      div
+        []
+        [ text attributes.displayName ]
+
+    _ ->
+      div [] []

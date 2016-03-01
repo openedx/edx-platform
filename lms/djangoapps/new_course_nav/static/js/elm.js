@@ -10804,29 +10804,49 @@ Elm.CourseNav.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var view = F2(function (address,courseBlock) {
+   var sequentialOutlineView = F2(function (address,courseBlock) {
       var _p0 = courseBlock;
-      switch (_p0.ctor)
-      {case "Empty": return $Html.text("Loading...");
-         case "Course": return $Html.text(_p0._0.displayName);
-         case "Error": return $Html.text("Error - Some sort of HTTP error occurred");
-         default: return $Html.text("Error - expected a course.");}
+      if (_p0.ctor === "Sequential") {
+            return A2($Html.div,_U.list([]),_U.list([$Html.text(_p0._0.displayName)]));
+         } else {
+            return A2($Html.div,_U.list([]),_U.list([]));
+         }
+   });
+   var chapterOutlineView = F2(function (address,courseBlock) {
+      var _p1 = courseBlock;
+      if (_p1.ctor === "Chapter") {
+            return A2($Html.div,
+            _U.list([]),
+            A2($List._op["::"],A2($Html.div,_U.list([]),_U.list([$Html.text(_p1._0.displayName)])),A2($List.map,sequentialOutlineView(address),_p1._1)));
+         } else {
+            return A2($Html.div,_U.list([]),_U.list([]));
+         }
+   });
+   var courseOutlineView = F2(function (address,courseBlock) {
+      var _p2 = courseBlock;
+      switch (_p2.ctor)
+      {case "Empty": return A2($Html.div,_U.list([]),_U.list([$Html.text("Loading...")]));
+         case "Course": return A2($Html.div,
+           _U.list([]),
+           A2($List._op["::"],A2($Html.div,_U.list([]),_U.list([$Html.text(_p2._0.displayName)])),A2($List.map,chapterOutlineView(address),_p2._1)));
+         case "Error": return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - Some sort of HTTP error occurred")]));
+         default: return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - expected a course.")]));}
    });
    var update = F2(function (action,courseBlock) {
       var foo = $Debug.log($Basics.toString(action));
-      var _p1 = action;
-      if (_p1.ctor === "CourseBlocksApiResponse") {
-            var _p2 = _p1._0;
-            if (_p2.ctor === "Ok") {
-                  return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p2._0),_1: $Effects.none};
+      var _p3 = action;
+      if (_p3.ctor === "CourseBlocksApiResponse") {
+            var _p4 = _p3._0;
+            if (_p4.ctor === "Ok") {
+                  return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p4._0),_1: $Effects.none};
                } else {
-                  return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($NavTypes.CourseBlocksApiError(_p2._0)))};
+                  return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($NavTypes.CourseBlocksApiError(_p4._0)))};
                }
          } else {
             return {ctor: "_Tuple2",_0: $NavTypes.Error,_1: $Effects.none};
          }
    });
-   return _elm.CourseNav.values = {_op: _op,update: update,view: view};
+   return _elm.CourseNav.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
@@ -10858,7 +10878,7 @@ Elm.Main.make = function (_elm) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
    });
    var init = {ctor: "_Tuple2",_0: $NavTypes.Empty,_1: A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId)};
-   var app = $StartApp.start({init: init,update: $CourseNav.update,view: $CourseNav.view,inputs: _U.list([])});
+   var app = $StartApp.start({init: init,update: $CourseNav.update,view: $CourseNav.courseOutlineView,inputs: _U.list([])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    return _elm.Main.values = {_op: _op,init: init,app: app,main: main};
