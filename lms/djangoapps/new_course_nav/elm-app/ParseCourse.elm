@@ -9,7 +9,7 @@ import Task
 import Types exposing (..)
 
 
-getCourseBlocks : String -> String -> Effects Action
+getCourseBlocks : String -> String -> Effects CourseBlocksAction
 getCourseBlocks url courseId =
   let
     url =
@@ -40,7 +40,7 @@ courseBlockDecoder =
     ("id" := string)
     ("type" := string)
     ("display_name" := string)
-    ("lms_web_url" := string)
+    ("student_view_url" := string)
     (maybe ("children" := list string))
 
 
@@ -60,7 +60,7 @@ buildCourseTree courseBlocksData rootId =
         { id = ""
         , type' = ""
         , display_name = ""
-        , lms_web_url = ""
+        , student_view_url = ""
         , children = Just []
         }
         maybeBlockData
@@ -68,7 +68,7 @@ buildCourseTree courseBlocksData rootId =
         { id = blockData.id
         , nodeType = blockData.type'
         , displayName = blockData.display_name
-        , lmsWebUrl = blockData.lms_web_url
+        , studentViewUrl = blockData.student_view_url
         }
       children =
         List.map (buildCourseTree courseBlocksData) (Maybe.withDefault [] blockData.children)

@@ -4,8 +4,8 @@ import Dict exposing (Dict)
 import Http
 
 
--- Defines all our actions within the app.
-type Action
+-- Defines course block api actions within the app.
+type CourseBlocksAction
   = CourseBlocksApiResponse (Result Http.Error CourseBlocksData)
   | CourseBlocksApiSuccess CourseBlocksData
   | CourseBlocksApiError Http.Error
@@ -20,7 +20,7 @@ type alias CourseBlockAttributes =
   { id : String
   , nodeType : String
   , displayName : String
-  , lmsWebUrl : String
+  , studentViewUrl : String
   }
 
 
@@ -50,6 +50,6 @@ type alias CourseBlockData =
   { id : String
   , type' : String
   , display_name : String
-  , lms_web_url : String
+  , student_view_url : String
   , children : Maybe (List String)
   }

@@ -5421,359 +5421,6 @@ Elm.Signal.make = function (_elm) {
                                ,forwardTo: forwardTo
                                ,Mailbox: Mailbox};
 };
-Elm.Native.Effects = {};
-Elm.Native.Effects.make = function(localRuntime) {
-
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Effects = localRuntime.Native.Effects || {};
-	if (localRuntime.Native.Effects.values)
-	{
-		return localRuntime.Native.Effects.values;
-	}
-
-	var Task = Elm.Native.Task.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
-	var Signal = Elm.Signal.make(localRuntime);
-	var List = Elm.Native.List.make(localRuntime);
-
-
-	// polyfill so things will work even if rAF is not available for some reason
-	var _requestAnimationFrame =
-		typeof requestAnimationFrame !== 'undefined'
-			? requestAnimationFrame
-			: function(cb) { setTimeout(cb, 1000 / 60); }
-			;
-
-
-	// batchedSending and sendCallback implement a small state machine in order
-	// to schedule only one send(time) call per animation frame.
-	//
-	// Invariants:
-	// 1. In the NO_REQUEST state, there is never a scheduled sendCallback.
-	// 2. In the PENDING_REQUEST and EXTRA_REQUEST states, there is always exactly
-	//    one scheduled sendCallback.
-	var NO_REQUEST = 0;
-	var PENDING_REQUEST = 1;
-	var EXTRA_REQUEST = 2;
-	var state = NO_REQUEST;
-	var messageArray = [];
-
-
-	function batchedSending(address, tickMessages)
-	{
-		// insert ticks into the messageArray
-		var foundAddress = false;
-
-		for (var i = messageArray.length; i--; )
-		{
-			if (messageArray[i].address === address)
-			{
-				foundAddress = true;
-				messageArray[i].tickMessages = A3(List.foldl, List.cons, messageArray[i].tickMessages, tickMessages);
-				break;
-			}
-		}
-
-		if (!foundAddress)
-		{
-			messageArray.push({ address: address, tickMessages: tickMessages });
-		}
-
-		// do the appropriate state transition
-		switch (state)
-		{
-			case NO_REQUEST:
-				_requestAnimationFrame(sendCallback);
-				state = PENDING_REQUEST;
-				break;
-			case PENDING_REQUEST:
-				state = PENDING_REQUEST;
-				break;
-			case EXTRA_REQUEST:
-				state = PENDING_REQUEST;
-				break;
-		}
-	}
-
-
-	function sendCallback(time)
-	{
-		switch (state)
-		{
-			case NO_REQUEST:
-				// This state should not be possible. How can there be no
-				// request, yet somehow we are actively fulfilling a
-				// request?
-				throw new Error(
-					'Unexpected send callback.\n' +
-					'Please report this to <https://github.com/evancz/elm-effects/issues>.'
-				);
-
-			case PENDING_REQUEST:
-				// At this point, we do not *know* that another frame is
-				// needed, but we make an extra request to rAF just in
-				// case. It's possible to drop a frame if rAF is called
-				// too late, so we just do it preemptively.
-				_requestAnimationFrame(sendCallback);
-				state = EXTRA_REQUEST;
-
-				// There's also stuff we definitely need to send.
-				send(time);
-				return;
-
-			case EXTRA_REQUEST:
-				// Turns out the extra request was not needed, so we will
-				// stop calling rAF. No reason to call it all the time if
-				// no one needs it.
-				state = NO_REQUEST;
-				return;
-		}
-	}
-
-
-	function send(time)
-	{
-		for (var i = messageArray.length; i--; )
-		{
-			var messages = A3(
-				List.foldl,
-				F2( function(toAction, list) { return List.Cons(toAction(time), list); } ),
-				List.Nil,
-				messageArray[i].tickMessages
-			);
-			Task.perform( A2(Signal.send, messageArray[i].address, messages) );
-		}
-		messageArray = [];
-	}
-
-
-	function requestTickSending(address, tickMessages)
-	{
-		return Task.asyncFunction(function(callback) {
-			batchedSending(address, tickMessages);
-			callback(Task.succeed(Utils.Tuple0));
-		});
-	}
-
-
-	return localRuntime.Native.Effects.values = {
-		requestTickSending: F2(requestTickSending)
-	};
-
-};
-
-Elm.Native.Time = {};
-
-Elm.Native.Time.make = function(localRuntime)
-{
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Time = localRuntime.Native.Time || {};
-	if (localRuntime.Native.Time.values)
-	{
-		return localRuntime.Native.Time.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-	var Maybe = Elm.Maybe.make(localRuntime);
-
-
-	// FRAMES PER SECOND
-
-	function fpsWhen(desiredFPS, isOn)
-	{
-		var msPerFrame = 1000 / desiredFPS;
-		var ticker = NS.input('fps-' + desiredFPS, null);
-
-		function notifyTicker()
-		{
-			localRuntime.notify(ticker.id, null);
-		}
-
-		function firstArg(x, y)
-		{
-			return x;
-		}
-
-		// input fires either when isOn changes, or when ticker fires.
-		// Its value is a tuple with the current timestamp, and the state of isOn
-		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
-
-		var initialState = {
-			isOn: false,
-			time: localRuntime.timer.programStart,
-			delta: 0
-		};
-
-		var timeoutId;
-
-		function update(input, state)
-		{
-			var currentTime = input._0;
-			var isOn = input._1;
-			var wasOn = state.isOn;
-			var previousTime = state.time;
-
-			if (isOn)
-			{
-				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
-			}
-			else if (wasOn)
-			{
-				clearTimeout(timeoutId);
-			}
-
-			return {
-				isOn: isOn,
-				time: currentTime,
-				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
-			};
-		}
-
-		return A2(
-			NS.map,
-			function(state) { return state.delta; },
-			A3(NS.foldp, F2(update), update(input.value, initialState), input)
-		);
-	}
-
-
-	// EVERY
-
-	function every(t)
-	{
-		var ticker = NS.input('every-' + t, null);
-		function tellTime()
-		{
-			localRuntime.notify(ticker.id, null);
-		}
-		var clock = A2(NS.map, fst, NS.timestamp(ticker));
-		setInterval(tellTime, t);
-		return clock;
-	}
-
-
-	function fst(pair)
-	{
-		return pair._0;
-	}
-
-
-	function read(s)
-	{
-		var t = Date.parse(s);
-		return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
-	}
-
-	return localRuntime.Native.Time.values = {
-		fpsWhen: F2(fpsWhen),
-		every: every,
-		toDate: function(t) { return new Date(t); },
-		read: read
-	};
-};
-
-Elm.Time = Elm.Time || {};
-Elm.Time.make = function (_elm) {
-   "use strict";
-   _elm.Time = _elm.Time || {};
-   if (_elm.Time.values) return _elm.Time.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Native$Signal = Elm.Native.Signal.make(_elm),
-   $Native$Time = Elm.Native.Time.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var delay = $Native$Signal.delay;
-   var since = F2(function (time,signal) {
-      var stop = A2($Signal.map,$Basics.always(-1),A2(delay,time,signal));
-      var start = A2($Signal.map,$Basics.always(1),signal);
-      var delaydiff = A3($Signal.foldp,F2(function (x,y) {    return x + y;}),0,A2($Signal.merge,start,stop));
-      return A2($Signal.map,F2(function (x,y) {    return !_U.eq(x,y);})(0),delaydiff);
-   });
-   var timestamp = $Native$Signal.timestamp;
-   var every = $Native$Time.every;
-   var fpsWhen = $Native$Time.fpsWhen;
-   var fps = function (targetFrames) {    return A2(fpsWhen,targetFrames,$Signal.constant(true));};
-   var inMilliseconds = function (t) {    return t;};
-   var millisecond = 1;
-   var second = 1000 * millisecond;
-   var minute = 60 * second;
-   var hour = 60 * minute;
-   var inHours = function (t) {    return t / hour;};
-   var inMinutes = function (t) {    return t / minute;};
-   var inSeconds = function (t) {    return t / second;};
-   return _elm.Time.values = {_op: _op
-                             ,millisecond: millisecond
-                             ,second: second
-                             ,minute: minute
-                             ,hour: hour
-                             ,inMilliseconds: inMilliseconds
-                             ,inSeconds: inSeconds
-                             ,inMinutes: inMinutes
-                             ,inHours: inHours
-                             ,fps: fps
-                             ,fpsWhen: fpsWhen
-                             ,every: every
-                             ,timestamp: timestamp
-                             ,delay: delay
-                             ,since: since};
-};
-Elm.Effects = Elm.Effects || {};
-Elm.Effects.make = function (_elm) {
-   "use strict";
-   _elm.Effects = _elm.Effects || {};
-   if (_elm.Effects.values) return _elm.Effects.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$Effects = Elm.Native.Effects.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm),
-   $Time = Elm.Time.make(_elm);
-   var _op = {};
-   var ignore = function (task) {    return A2($Task.map,$Basics.always({ctor: "_Tuple0"}),task);};
-   var requestTickSending = $Native$Effects.requestTickSending;
-   var toTaskHelp = F3(function (address,effect,_p0) {
-      var _p1 = _p0;
-      var _p5 = _p1._1;
-      var _p4 = _p1;
-      var _p3 = _p1._0;
-      var _p2 = effect;
-      switch (_p2.ctor)
-      {case "Task": var reporter = A2($Task.andThen,_p2._0,function (answer) {    return A2($Signal.send,address,_U.list([answer]));});
-           return {ctor: "_Tuple2",_0: A2($Task.andThen,_p3,$Basics.always(ignore($Task.spawn(reporter)))),_1: _p5};
-         case "Tick": return {ctor: "_Tuple2",_0: _p3,_1: A2($List._op["::"],_p2._0,_p5)};
-         case "None": return _p4;
-         default: return A3($List.foldl,toTaskHelp(address),_p4,_p2._0);}
-   });
-   var toTask = F2(function (address,effect) {
-      var _p6 = A3(toTaskHelp,address,effect,{ctor: "_Tuple2",_0: $Task.succeed({ctor: "_Tuple0"}),_1: _U.list([])});
-      var combinedTask = _p6._0;
-      var tickMessages = _p6._1;
-      return $List.isEmpty(tickMessages) ? combinedTask : A2($Task.andThen,combinedTask,$Basics.always(A2(requestTickSending,address,tickMessages)));
-   });
-   var Never = function (a) {    return {ctor: "Never",_0: a};};
-   var Batch = function (a) {    return {ctor: "Batch",_0: a};};
-   var batch = Batch;
-   var None = {ctor: "None"};
-   var none = None;
-   var Tick = function (a) {    return {ctor: "Tick",_0: a};};
-   var tick = Tick;
-   var Task = function (a) {    return {ctor: "Task",_0: a};};
-   var task = Task;
-   var map = F2(function (func,effect) {
-      var _p7 = effect;
-      switch (_p7.ctor)
-      {case "Task": return Task(A2($Task.map,func,_p7._0));
-         case "Tick": return Tick(function (_p8) {    return func(_p7._0(_p8));});
-         case "None": return None;
-         default: return Batch(A2($List.map,map(func),_p7._0));}
-   });
-   return _elm.Effects.values = {_op: _op,none: none,task: task,tick: tick,map: map,batch: batch,toTask: toTask};
-};
 Elm.Native.Json = {};
 
 Elm.Native.Json.make = function(localRuntime) {
@@ -10758,6 +10405,162 @@ Elm.Native.Http.make = function(localRuntime) {
 	};
 };
 
+Elm.Native.Time = {};
+
+Elm.Native.Time.make = function(localRuntime)
+{
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Time = localRuntime.Native.Time || {};
+	if (localRuntime.Native.Time.values)
+	{
+		return localRuntime.Native.Time.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+	var Maybe = Elm.Maybe.make(localRuntime);
+
+
+	// FRAMES PER SECOND
+
+	function fpsWhen(desiredFPS, isOn)
+	{
+		var msPerFrame = 1000 / desiredFPS;
+		var ticker = NS.input('fps-' + desiredFPS, null);
+
+		function notifyTicker()
+		{
+			localRuntime.notify(ticker.id, null);
+		}
+
+		function firstArg(x, y)
+		{
+			return x;
+		}
+
+		// input fires either when isOn changes, or when ticker fires.
+		// Its value is a tuple with the current timestamp, and the state of isOn
+		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
+
+		var initialState = {
+			isOn: false,
+			time: localRuntime.timer.programStart,
+			delta: 0
+		};
+
+		var timeoutId;
+
+		function update(input, state)
+		{
+			var currentTime = input._0;
+			var isOn = input._1;
+			var wasOn = state.isOn;
+			var previousTime = state.time;
+
+			if (isOn)
+			{
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
+			}
+			else if (wasOn)
+			{
+				clearTimeout(timeoutId);
+			}
+
+			return {
+				isOn: isOn,
+				time: currentTime,
+				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
+			};
+		}
+
+		return A2(
+			NS.map,
+			function(state) { return state.delta; },
+			A3(NS.foldp, F2(update), update(input.value, initialState), input)
+		);
+	}
+
+
+	// EVERY
+
+	function every(t)
+	{
+		var ticker = NS.input('every-' + t, null);
+		function tellTime()
+		{
+			localRuntime.notify(ticker.id, null);
+		}
+		var clock = A2(NS.map, fst, NS.timestamp(ticker));
+		setInterval(tellTime, t);
+		return clock;
+	}
+
+
+	function fst(pair)
+	{
+		return pair._0;
+	}
+
+
+	function read(s)
+	{
+		var t = Date.parse(s);
+		return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
+	}
+
+	return localRuntime.Native.Time.values = {
+		fpsWhen: F2(fpsWhen),
+		every: every,
+		toDate: function(t) { return new Date(t); },
+		read: read
+	};
+};
+
+Elm.Time = Elm.Time || {};
+Elm.Time.make = function (_elm) {
+   "use strict";
+   _elm.Time = _elm.Time || {};
+   if (_elm.Time.values) return _elm.Time.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Signal = Elm.Native.Signal.make(_elm),
+   $Native$Time = Elm.Native.Time.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var delay = $Native$Signal.delay;
+   var since = F2(function (time,signal) {
+      var stop = A2($Signal.map,$Basics.always(-1),A2(delay,time,signal));
+      var start = A2($Signal.map,$Basics.always(1),signal);
+      var delaydiff = A3($Signal.foldp,F2(function (x,y) {    return x + y;}),0,A2($Signal.merge,start,stop));
+      return A2($Signal.map,F2(function (x,y) {    return !_U.eq(x,y);})(0),delaydiff);
+   });
+   var timestamp = $Native$Signal.timestamp;
+   var every = $Native$Time.every;
+   var fpsWhen = $Native$Time.fpsWhen;
+   var fps = function (targetFrames) {    return A2(fpsWhen,targetFrames,$Signal.constant(true));};
+   var inMilliseconds = function (t) {    return t;};
+   var millisecond = 1;
+   var second = 1000 * millisecond;
+   var minute = 60 * second;
+   var hour = 60 * minute;
+   var inHours = function (t) {    return t / hour;};
+   var inMinutes = function (t) {    return t / minute;};
+   var inSeconds = function (t) {    return t / second;};
+   return _elm.Time.values = {_op: _op
+                             ,millisecond: millisecond
+                             ,second: second
+                             ,minute: minute
+                             ,hour: hour
+                             ,inMilliseconds: inMilliseconds
+                             ,inSeconds: inSeconds
+                             ,inMinutes: inMinutes
+                             ,inHours: inHours
+                             ,fps: fps
+                             ,fpsWhen: fpsWhen
+                             ,every: every
+                             ,timestamp: timestamp
+                             ,delay: delay
+                             ,since: since};
+};
 Elm.Http = Elm.Http || {};
 Elm.Http.make = function (_elm) {
    "use strict";
@@ -10892,7 +10695,7 @@ Elm.Types.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,lms_web_url: d,children: e};});
+   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,student_view_url: d,children: e};});
    var CourseBlocksData = F2(function (a,b) {    return {root: a,blocks: b};});
    var Error = {ctor: "Error"};
    var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
@@ -10901,7 +10704,7 @@ Elm.Types.make = function (_elm) {
    var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
    var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
    var Empty = {ctor: "Empty"};
-   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,lmsWebUrl: d};});
+   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,studentViewUrl: d};});
    var CourseBlocksApiError = function (a) {    return {ctor: "CourseBlocksApiError",_0: a};};
    var CourseBlocksApiSuccess = function (a) {    return {ctor: "CourseBlocksApiSuccess",_0: a};};
    var CourseBlocksApiResponse = function (a) {    return {ctor: "CourseBlocksApiResponse",_0: a};};
@@ -10919,6 +10722,227 @@ Elm.Types.make = function (_elm) {
                               ,Error: Error
                               ,CourseBlocksData: CourseBlocksData
                               ,CourseBlockData: CourseBlockData};
+};
+Elm.CourseBlock = Elm.CourseBlock || {};
+Elm.CourseBlock.make = function (_elm) {
+   "use strict";
+   _elm.CourseBlock = _elm.CourseBlock || {};
+   if (_elm.CourseBlock.values) return _elm.CourseBlock.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {
+      return _U.eq(model,"") ? $Html.text("Error loading block - no block URL") : A2($Html.iframe,
+      _U.list([$Html$Attributes.src(A2($Basics._op["++"],"/xblock/",model))
+              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "100%"},{ctor: "_Tuple2",_0: "height",_1: "1000px"}]))]),
+      _U.list([]));
+   });
+   var NoOp = {ctor: "NoOp"};
+   return _elm.CourseBlock.values = {_op: _op,NoOp: NoOp,view: view};
+};
+Elm.Native.Effects = {};
+Elm.Native.Effects.make = function(localRuntime) {
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Effects = localRuntime.Native.Effects || {};
+	if (localRuntime.Native.Effects.values)
+	{
+		return localRuntime.Native.Effects.values;
+	}
+
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+	var Signal = Elm.Signal.make(localRuntime);
+	var List = Elm.Native.List.make(localRuntime);
+
+
+	// polyfill so things will work even if rAF is not available for some reason
+	var _requestAnimationFrame =
+		typeof requestAnimationFrame !== 'undefined'
+			? requestAnimationFrame
+			: function(cb) { setTimeout(cb, 1000 / 60); }
+			;
+
+
+	// batchedSending and sendCallback implement a small state machine in order
+	// to schedule only one send(time) call per animation frame.
+	//
+	// Invariants:
+	// 1. In the NO_REQUEST state, there is never a scheduled sendCallback.
+	// 2. In the PENDING_REQUEST and EXTRA_REQUEST states, there is always exactly
+	//    one scheduled sendCallback.
+	var NO_REQUEST = 0;
+	var PENDING_REQUEST = 1;
+	var EXTRA_REQUEST = 2;
+	var state = NO_REQUEST;
+	var messageArray = [];
+
+
+	function batchedSending(address, tickMessages)
+	{
+		// insert ticks into the messageArray
+		var foundAddress = false;
+
+		for (var i = messageArray.length; i--; )
+		{
+			if (messageArray[i].address === address)
+			{
+				foundAddress = true;
+				messageArray[i].tickMessages = A3(List.foldl, List.cons, messageArray[i].tickMessages, tickMessages);
+				break;
+			}
+		}
+
+		if (!foundAddress)
+		{
+			messageArray.push({ address: address, tickMessages: tickMessages });
+		}
+
+		// do the appropriate state transition
+		switch (state)
+		{
+			case NO_REQUEST:
+				_requestAnimationFrame(sendCallback);
+				state = PENDING_REQUEST;
+				break;
+			case PENDING_REQUEST:
+				state = PENDING_REQUEST;
+				break;
+			case EXTRA_REQUEST:
+				state = PENDING_REQUEST;
+				break;
+		}
+	}
+
+
+	function sendCallback(time)
+	{
+		switch (state)
+		{
+			case NO_REQUEST:
+				// This state should not be possible. How can there be no
+				// request, yet somehow we are actively fulfilling a
+				// request?
+				throw new Error(
+					'Unexpected send callback.\n' +
+					'Please report this to <https://github.com/evancz/elm-effects/issues>.'
+				);
+
+			case PENDING_REQUEST:
+				// At this point, we do not *know* that another frame is
+				// needed, but we make an extra request to rAF just in
+				// case. It's possible to drop a frame if rAF is called
+				// too late, so we just do it preemptively.
+				_requestAnimationFrame(sendCallback);
+				state = EXTRA_REQUEST;
+
+				// There's also stuff we definitely need to send.
+				send(time);
+				return;
+
+			case EXTRA_REQUEST:
+				// Turns out the extra request was not needed, so we will
+				// stop calling rAF. No reason to call it all the time if
+				// no one needs it.
+				state = NO_REQUEST;
+				return;
+		}
+	}
+
+
+	function send(time)
+	{
+		for (var i = messageArray.length; i--; )
+		{
+			var messages = A3(
+				List.foldl,
+				F2( function(toAction, list) { return List.Cons(toAction(time), list); } ),
+				List.Nil,
+				messageArray[i].tickMessages
+			);
+			Task.perform( A2(Signal.send, messageArray[i].address, messages) );
+		}
+		messageArray = [];
+	}
+
+
+	function requestTickSending(address, tickMessages)
+	{
+		return Task.asyncFunction(function(callback) {
+			batchedSending(address, tickMessages);
+			callback(Task.succeed(Utils.Tuple0));
+		});
+	}
+
+
+	return localRuntime.Native.Effects.values = {
+		requestTickSending: F2(requestTickSending)
+	};
+
+};
+
+Elm.Effects = Elm.Effects || {};
+Elm.Effects.make = function (_elm) {
+   "use strict";
+   _elm.Effects = _elm.Effects || {};
+   if (_elm.Effects.values) return _elm.Effects.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Effects = Elm.Native.Effects.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var ignore = function (task) {    return A2($Task.map,$Basics.always({ctor: "_Tuple0"}),task);};
+   var requestTickSending = $Native$Effects.requestTickSending;
+   var toTaskHelp = F3(function (address,effect,_p0) {
+      var _p1 = _p0;
+      var _p5 = _p1._1;
+      var _p4 = _p1;
+      var _p3 = _p1._0;
+      var _p2 = effect;
+      switch (_p2.ctor)
+      {case "Task": var reporter = A2($Task.andThen,_p2._0,function (answer) {    return A2($Signal.send,address,_U.list([answer]));});
+           return {ctor: "_Tuple2",_0: A2($Task.andThen,_p3,$Basics.always(ignore($Task.spawn(reporter)))),_1: _p5};
+         case "Tick": return {ctor: "_Tuple2",_0: _p3,_1: A2($List._op["::"],_p2._0,_p5)};
+         case "None": return _p4;
+         default: return A3($List.foldl,toTaskHelp(address),_p4,_p2._0);}
+   });
+   var toTask = F2(function (address,effect) {
+      var _p6 = A3(toTaskHelp,address,effect,{ctor: "_Tuple2",_0: $Task.succeed({ctor: "_Tuple0"}),_1: _U.list([])});
+      var combinedTask = _p6._0;
+      var tickMessages = _p6._1;
+      return $List.isEmpty(tickMessages) ? combinedTask : A2($Task.andThen,combinedTask,$Basics.always(A2(requestTickSending,address,tickMessages)));
+   });
+   var Never = function (a) {    return {ctor: "Never",_0: a};};
+   var Batch = function (a) {    return {ctor: "Batch",_0: a};};
+   var batch = Batch;
+   var None = {ctor: "None"};
+   var none = None;
+   var Tick = function (a) {    return {ctor: "Tick",_0: a};};
+   var tick = Tick;
+   var Task = function (a) {    return {ctor: "Task",_0: a};};
+   var task = Task;
+   var map = F2(function (func,effect) {
+      var _p7 = effect;
+      switch (_p7.ctor)
+      {case "Task": return Task(A2($Task.map,func,_p7._0));
+         case "Tick": return Tick(function (_p8) {    return func(_p7._0(_p8));});
+         case "None": return None;
+         default: return Batch(A2($List.map,map(func),_p7._0));}
+   });
+   return _elm.Effects.values = {_op: _op,none: none,task: task,tick: tick,map: map,batch: batch,toTask: toTask};
 };
 Elm.ParseCourse = Elm.ParseCourse || {};
 Elm.ParseCourse.make = function (_elm) {
@@ -10942,8 +10966,8 @@ Elm.ParseCourse.make = function (_elm) {
    var buildCourseTree = F2(function (courseBlocksData,rootId) {
       if (_U.eq(rootId,"")) return $Types.Empty; else {
             var maybeBlockData = A2($Dict.get,rootId,courseBlocksData.blocks);
-            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",lms_web_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
-            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,lmsWebUrl: blockData.lms_web_url};
+            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",student_view_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
+            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,studentViewUrl: blockData.student_view_url};
             var children = A2($List.map,buildCourseTree(courseBlocksData),A2($Maybe.withDefault,_U.list([]),blockData.children));
             return _U.eq(blockData.type$,"course") ? A2($Types.Course,blockAttributes,children) : _U.eq(blockData.type$,"chapter") ? A2($Types.Chapter,
             blockAttributes,
@@ -10957,7 +10981,7 @@ Elm.ParseCourse.make = function (_elm) {
    A2($Json$Decode._op[":="],"id",$Json$Decode.string),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
    A2($Json$Decode._op[":="],"display_name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"lms_web_url",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"student_view_url",$Json$Decode.string),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"children",$Json$Decode.list($Json$Decode.string))));
    var courseBlocksDecoder = A3($Json$Decode.object2,
    $Types.CourseBlocksData,
@@ -10994,11 +11018,11 @@ Elm.Styles.make = function (_elm) {
    var gridContainerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding",_1: "30px"}]));
    return _elm.Styles.values = {_op: _op,gridContainerStyle: gridContainerStyle,btnBrandStyle: btnBrandStyle,chapterOutlineStyles: chapterOutlineStyles};
 };
-Elm.CourseNav = Elm.CourseNav || {};
-Elm.CourseNav.make = function (_elm) {
+Elm.CourseOutline = Elm.CourseOutline || {};
+Elm.CourseOutline.make = function (_elm) {
    "use strict";
-   _elm.CourseNav = _elm.CourseNav || {};
-   if (_elm.CourseNav.values) return _elm.CourseNav.values;
+   _elm.CourseOutline = _elm.CourseOutline || {};
+   if (_elm.CourseOutline.values) return _elm.CourseOutline.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -11020,7 +11044,7 @@ Elm.CourseNav.make = function (_elm) {
             var _p1 = _p0._0;
             return A2($Html.li,
             _U.list([$Html$Attributes.$class("item has-block-link")]),
-            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(_p1.lmsWebUrl)]),_U.list([$Html.text(_p1.displayName)]))]));
+            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(A2($Basics._op["++"],"#block/",_p1.id))]),_U.list([$Html.text(_p1.displayName)]))]));
          } else {
             return A2($Html.li,_U.list([]),_U.list([]));
          }
@@ -11084,21 +11108,16 @@ Elm.CourseNav.make = function (_elm) {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
    });
-   var wrapWithContainer = function (htmlList) {
-      return A2($Html.div,_U.list([$Html$Attributes.$class("grid-container grid-manual"),$Styles.gridContainerStyle]),htmlList);
-   };
-   var courseOutlineView = F2(function (address,courseBlock) {
+   var view = F2(function (address,courseBlock) {
       var _p5 = courseBlock;
       switch (_p5.ctor)
-      {case "Empty": return wrapWithContainer(_U.list([A2($Html.div,
-           _U.list([$Html$Attributes.$class("depth col-4 pre-4 post-4")]),
-           _U.list([$Html.text("Loading...")]))]));
-         case "Course": return wrapWithContainer(_U.list([A2($Html.div,
-                                                         _U.list([$Html$Attributes.$class("row")]),
-                                                         _U.list([A2(breadcrumbsView,address,courseBlock),A2(courseSearchView,address,courseBlock)]))
-                                                         ,A2($Html.div,
-                                                         _U.list([$Html$Attributes.$class("depth")]),
-                                                         A2($List.map,chapterOutlineView(address),_p5._1))]));
+      {case "Empty": return A2($Html.div,_U.list([$Html$Attributes.$class("depth col-4 pre-4 post-4")]),_U.list([$Html.text("Loading...")]));
+         case "Course": return A2($Html.div,
+           _U.list([]),
+           _U.list([A2($Html.div,
+                   _U.list([$Html$Attributes.$class("row")]),
+                   _U.list([A2(breadcrumbsView,address,courseBlock),A2(courseSearchView,address,courseBlock)]))
+                   ,A2($Html.div,_U.list([$Html$Attributes.$class("depth")]),A2($List.map,chapterOutlineView(address),_p5._1))]));
          case "Error": return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - Some sort of HTTP error occurred")]));
          default: return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - expected a course.")]));}
    });
@@ -11114,7 +11133,382 @@ Elm.CourseNav.make = function (_elm) {
          case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p6._0),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: $Types.Error,_1: $Effects.none};}
    });
-   return _elm.CourseNav.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
+   return _elm.CourseOutline.values = {_op: _op,update: update,view: view};
+};
+Elm.Native = Elm.Native || {};
+Elm.Native.History = {};
+Elm.Native.History.make = function(localRuntime){
+
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.History = localRuntime.Native.History || {};
+
+  if (localRuntime.Native.History.values){
+    return localRuntime.Native.History.values;
+  }
+
+  var NS = Elm.Native.Signal.make(localRuntime);
+  var Task = Elm.Native.Task.make(localRuntime);
+  var Utils = Elm.Native.Utils.make(localRuntime);
+  var node = window;
+
+  // path : Signal String
+  var path = NS.input('History.path', window.location.pathname);
+
+  // length : Signal Int
+  var length = NS.input('History.length', window.history.length);
+
+  // hash : Signal String
+  var hash = NS.input('History.hash', window.location.hash);
+
+  localRuntime.addListener([path.id, length.id], node, 'popstate', function getPath(event){
+    localRuntime.notify(path.id, window.location.pathname);
+    localRuntime.notify(length.id, window.history.length);
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  localRuntime.addListener([hash.id], node, 'hashchange', function getHash(event){
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  // setPath : String -> Task error ()
+  var setPath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.pushState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // replacePath : String -> Task error ()
+  var replacePath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.replaceState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // go : Int -> Task error ()
+  var go = function(n){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        window.history.go(n);
+        localRuntime.notify(length.id, window.history.length);
+        localRuntime.notify(hash.id, window.location.hash);
+      }, 0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // back : Task error ()
+  var back = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      localRuntime.notify(hash.id, window.location.hash);
+      window.history.back();
+      localRuntime.notify(length.id, window.history.length);
+
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+  // forward : Task error ()
+  var forward = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      window.history.forward();
+      localRuntime.notify(length.id, window.history.length);
+      localRuntime.notify(hash.id, window.location.hash);
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+
+
+  return {
+    path        : path,
+    setPath     : setPath,
+    replacePath : replacePath,
+    go          : go,
+    back        : back,
+    forward     : forward,
+    length      : length,
+    hash        : hash
+  };
+
+};
+
+Elm.History = Elm.History || {};
+Elm.History.make = function (_elm) {
+   "use strict";
+   _elm.History = _elm.History || {};
+   if (_elm.History.values) return _elm.History.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$History = Elm.Native.History.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var path = $Native$History.path;
+   var hash = $Native$History.hash;
+   var length = $Native$History.length;
+   var forward = $Native$History.forward;
+   var back = $Native$History.back;
+   var go = $Native$History.go;
+   var replacePath = $Native$History.replacePath;
+   var setPath = $Native$History.setPath;
+   return _elm.History.values = {_op: _op,setPath: setPath,replacePath: replacePath,go: go,back: back,forward: forward,length: length,hash: hash,path: path};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Types = Elm.Hop.Types || {};
+Elm.Hop.Types.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Types = _elm.Hop.Types || {};
+   if (_elm.Hop.Types.values) return _elm.Hop.Types.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var newUrl = {query: $Dict.empty,path: _U.list([])};
+   var newPayload = {params: $Dict.empty,url: newUrl};
+   var Router = F3(function (a,b,c) {    return {signal: a,payload: b,run: c};});
+   var Config = F2(function (a,b) {    return {notFoundAction: a,routes: b};});
+   var Payload = F2(function (a,b) {    return {params: a,url: b};});
+   var Url = F2(function (a,b) {    return {path: a,query: b};});
+   return _elm.Hop.Types.values = {_op: _op,Url: Url,Payload: Payload,Config: Config,Router: Router,newUrl: newUrl,newPayload: newPayload};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Url = Elm.Hop.Url || {};
+Elm.Hop.Url.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Url = _elm.Hop.Url || {};
+   if (_elm.Hop.Url.values) return _elm.Hop.Url.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var clearQuery = function (url) {    return _U.update(url,{query: $Dict.empty});};
+   var removeQuery = F2(function (key,url) {    var updatedQuery = A2($Dict.remove,key,url.query);return _U.update(url,{query: updatedQuery});});
+   var setQuery = F2(function (query,url) {    return _U.update(url,{query: query});});
+   var addQuery = F2(function (query,url) {    var updatedQuery = A2($Dict.union,query,url.query);return _U.update(url,{query: updatedQuery});});
+   var queryKVtoTuple = function (kv) {
+      var splitted = A2($String.split,"=",kv);
+      var first = A2($Maybe.withDefault,"",$List.head(splitted));
+      var firstDecoded = $Http.uriDecode(first);
+      var second = A2($Maybe.withDefault,"",$List.head(A2($List.drop,1,splitted)));
+      var secondDecoded = $Http.uriDecode(second);
+      return {ctor: "_Tuple2",_0: firstDecoded,_1: secondDecoded};
+   };
+   var extractQuery = function (route) {    return A2($Maybe.withDefault,"",$List.head(A2($List.drop,1,A2($String.split,"?",route))));};
+   var parseQuery = function (route) {
+      return $Dict.fromList(A2($List.map,
+      queryKVtoTuple,
+      A2($List.filter,function (_p0) {    return $Basics.not($String.isEmpty(_p0));},A2($String.split,"&",extractQuery(route)))));
+   };
+   var extractPath = function (route) {
+      return A2($Maybe.withDefault,"",$List.head(A2($String.split,"?",A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"#",route)))))));
+   };
+   var parsePath = function (route) {
+      return A2($List.filter,function (_p1) {    return $Basics.not($String.isEmpty(_p1));},A2($String.split,"/",extractPath(route)));
+   };
+   var parse = function (route) {    return {path: parsePath(route),query: parseQuery(route)};};
+   var urlFromUser = function (route) {
+      var normalized = A2($String.startsWith,"#",route) ? route : A2($Basics._op["++"],"#",route);
+      return parse(normalized);
+   };
+   var pathFromUrl = function (url) {    return $List.isEmpty(url.path) ? "" : A2($String.join,"/",url.path);};
+   var queryFromUrl = function (url) {
+      return $Dict.isEmpty(url.query) ? "" : A2($String.append,
+      "?",
+      A2($String.join,
+      "&",
+      A2($List.map,function (_p2) {    var _p3 = _p2;return A2($Basics._op["++"],_p3._0,A2($Basics._op["++"],"=",_p3._1));},$Dict.toList(url.query))));
+   };
+   var routeFromUrl = function (url) {    return A2($Basics._op["++"],"#/",A2($Basics._op["++"],pathFromUrl(url),queryFromUrl(url)));};
+   return _elm.Hop.Url.values = {_op: _op
+                                ,routeFromUrl: routeFromUrl
+                                ,queryFromUrl: queryFromUrl
+                                ,pathFromUrl: pathFromUrl
+                                ,parse: parse
+                                ,extractPath: extractPath
+                                ,parsePath: parsePath
+                                ,extractQuery: extractQuery
+                                ,parseQuery: parseQuery
+                                ,queryKVtoTuple: queryKVtoTuple
+                                ,urlFromUser: urlFromUser
+                                ,addQuery: addQuery
+                                ,setQuery: setQuery
+                                ,removeQuery: removeQuery
+                                ,clearQuery: clearQuery};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Resolver = Elm.Hop.Resolver || {};
+Elm.Hop.Resolver.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Resolver = _elm.Hop.Resolver || {};
+   if (_elm.Hop.Resolver.values) return _elm.Hop.Resolver.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Hop$Url = Elm.Hop.Url.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var isRouteHashPlaceholder = function (hash) {    return A2($String.startsWith,":",hash);};
+   var isRouteFragmentMatch = function (_p0) {    var _p1 = _p0;var _p2 = _p1._1;return isRouteHashPlaceholder(_p2) ? true : _U.eq(_p2,_p1._0);};
+   var parseRouteFragment = function (route) {
+      var notEmpty = function (x) {    return $Basics.not($String.isEmpty(x));};
+      return A2($List.filter,notEmpty,A2($String.split,"/",route));
+   };
+   var isRouteMatch = F2(function (url,routeDef) {
+      var definitionFragmentList = parseRouteFragment($Basics.fst(routeDef));
+      var definitionFragmentLen = $List.length(definitionFragmentList);
+      var currentFragmentList = url.path;
+      var currentLen = $List.length(currentFragmentList);
+      var combinedCurrentAndDefinition = A3($List.map2,
+      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
+      currentFragmentList,
+      definitionFragmentList);
+      return _U.eq(currentLen,definitionFragmentLen) ? A2($List.all,isRouteFragmentMatch,combinedCurrentAndDefinition) : false;
+   });
+   var matchedRoute = F2(function (routes,url) {    return $List.head(A2($List.filter,isRouteMatch(url),routes));});
+   var routeDefintionForUrl = F2(function (config,url) {
+      return A2($Maybe.withDefault,{ctor: "_Tuple2",_0: "",_1: config.notFoundAction},A2(matchedRoute,config.routes,url));
+   });
+   var paramsForRoute = F2(function (routeDefinition,url) {
+      var maybeParam = F2(function (routeFragment,urlFragment) {
+         return isRouteHashPlaceholder(routeFragment) ? {ctor: "_Tuple2",_0: A2($String.dropLeft,1,routeFragment),_1: urlFragment} : {ctor: "_Tuple2"
+                                                                                                                                     ,_0: ""
+                                                                                                                                     ,_1: ""};
+      });
+      var routeFragments = parseRouteFragment(routeDefinition);
+      var params = A3($List.map2,maybeParam,routeFragments,url.path);
+      var relevantParams = A2($List.filter,function (_p3) {    var _p4 = _p3;return $Basics.not($String.isEmpty(_p4._0));},params);
+      return A2($Dict.union,url.query,$Dict.fromList(relevantParams));
+   });
+   var userActionFromUrlString = F2(function (config,urlString) {
+      var url = $Hop$Url.parse(urlString);
+      var _p5 = A2(routeDefintionForUrl,config,url);
+      var route = _p5._0;
+      var userAction = _p5._1;
+      var params = A2(paramsForRoute,route,url);
+      var payload = {params: params,url: url};
+      return userAction(payload);
+   });
+   return _elm.Hop.Resolver.values = {_op: _op
+                                     ,userActionFromUrlString: userActionFromUrlString
+                                     ,paramsForRoute: paramsForRoute
+                                     ,parseRouteFragment: parseRouteFragment
+                                     ,routeDefintionForUrl: routeDefintionForUrl
+                                     ,matchedRoute: matchedRoute
+                                     ,isRouteMatch: isRouteMatch
+                                     ,isRouteFragmentMatch: isRouteFragmentMatch
+                                     ,isRouteHashPlaceholder: isRouteHashPlaceholder};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   if (_elm.Hop.values) return _elm.Hop.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $History = Elm.History.make(_elm),
+   $Hop$Resolver = Elm.Hop.Resolver.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Hop$Url = Elm.Hop.Url.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var locationChangeSignal = function (config) {    return A2($Signal.map,$Hop$Resolver.userActionFromUrlString(config),$History.hash);};
+   var $new = function (config) {    return {signal: locationChangeSignal(config),payload: $Hop$Types.newPayload,run: $History.setPath("")};};
+   var GoToRouteResult = function (a) {    return {ctor: "GoToRouteResult",_0: a};};
+   var navigateToUrl = function (url) {    return $Effects.task(A2($Task.map,GoToRouteResult,$Task.toResult($History.setPath($Hop$Url.routeFromUrl(url)))));};
+   var navigateTo = function (route) {    return navigateToUrl($Hop$Url.urlFromUser(route));};
+   var addQuery = F2(function (query,currentUrl) {    return navigateToUrl(A2($Hop$Url.addQuery,query,currentUrl));});
+   var setQuery = F2(function (query,currentUrl) {    return navigateToUrl(A2($Hop$Url.setQuery,query,currentUrl));});
+   var removeQuery = F2(function (key,currentUrl) {    return navigateToUrl(A2($Hop$Url.removeQuery,key,currentUrl));});
+   var clearQuery = function (currentUrl) {    return navigateToUrl($Hop$Url.clearQuery(currentUrl));};
+   var NoOp = {ctor: "NoOp"};
+   return _elm.Hop.values = {_op: _op,$new: $new,navigateTo: navigateTo,addQuery: addQuery,setQuery: setQuery,removeQuery: removeQuery,clearQuery: clearQuery};
+};
+Elm.Routing = Elm.Routing || {};
+Elm.Routing.make = function (_elm) {
+   "use strict";
+   _elm.Routing = _elm.Routing || {};
+   if (_elm.Routing.values) return _elm.Routing.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Hop = Elm.Hop.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "ShowCourseOutline": return {ctor: "_Tuple2",_0: _U.update(model,{currentView: "courseOutline",routerPayload: _p0._0}),_1: $Effects.none};
+         case "ShowBlock": return {ctor: "_Tuple2",_0: _U.update(model,{currentView: "block",routerPayload: _p0._0}),_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var Model = F2(function (a,b) {    return {routerPayload: a,currentView: b};});
+   var ShowNotFound = function (a) {    return {ctor: "ShowNotFound",_0: a};};
+   var ShowBlock = function (a) {    return {ctor: "ShowBlock",_0: a};};
+   var ShowCourseOutline = function (a) {    return {ctor: "ShowCourseOutline",_0: a};};
+   var routes = _U.list([{ctor: "_Tuple2",_0: "",_1: ShowCourseOutline},{ctor: "_Tuple2",_0: "/block/:blockId",_1: ShowBlock}]);
+   var router = $Hop.$new({routes: routes,notFoundAction: ShowNotFound});
+   var initialModel = {routerPayload: router.payload,currentView: "courseOutline"};
+   var HopAction = function (a) {    return {ctor: "HopAction",_0: a};};
+   return _elm.Routing.values = {_op: _op
+                                ,HopAction: HopAction
+                                ,ShowCourseOutline: ShowCourseOutline
+                                ,ShowBlock: ShowBlock
+                                ,ShowNotFound: ShowNotFound
+                                ,Model: Model
+                                ,initialModel: initialModel
+                                ,update: update
+                                ,routes: routes
+                                ,router: router};
 };
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.make = function (_elm) {
@@ -11162,18 +11556,25 @@ Elm.Main.make = function (_elm) {
    if (_elm.Main.values) return _elm.Main.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $CourseNav = Elm.CourseNav.make(_elm),
+   $CourseBlock = Elm.CourseBlock.make(_elm),
+   $CourseOutline = Elm.CourseOutline.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $ParseCourse = Elm.ParseCourse.make(_elm),
    $Result = Elm.Result.make(_elm),
+   $Routing = Elm.Routing.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp = Elm.StartApp.make(_elm),
+   $Styles = Elm.Styles.make(_elm),
    $Task = Elm.Task.make(_elm),
    $Types = Elm.Types.make(_elm);
    var _op = {};
+   var routeRunTask = Elm.Native.Task.make(_elm).perform($Routing.router.run);
    var courseBlocksApiUrl = Elm.Native.Port.make(_elm).inbound("courseBlocksApiUrl",
    "String",
    function (v) {
@@ -11184,9 +11585,53 @@ Elm.Main.make = function (_elm) {
    function (v) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
    });
-   var init = {ctor: "_Tuple2",_0: $Types.Empty,_1: A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId)};
-   var app = $StartApp.start({init: init,update: $CourseNav.update,view: $CourseNav.courseOutlineView,inputs: _U.list([])});
+   var initialModel = {routing: $Routing.initialModel,courseBlock: $Types.Empty};
+   var NoOp = {ctor: "NoOp"};
+   var CourseBlockAction = function (a) {    return {ctor: "CourseBlockAction",_0: a};};
+   var CourseBlocksAction = function (a) {    return {ctor: "CourseBlocksAction",_0: a};};
+   var init = {ctor: "_Tuple2",_0: initialModel,_1: A2($Effects.map,CourseBlocksAction,A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId))};
+   var view = F2(function (address,model) {
+      var childView = function () {
+         var _p0 = model.routing.currentView;
+         switch (_p0)
+         {case "courseOutline": return A2($CourseOutline.view,A2($Signal.forwardTo,address,CourseBlocksAction),model.courseBlock);
+            case "block": var blockId = A2($Maybe.withDefault,"",A2($Dict.get,"blockId",model.routing.routerPayload.params));
+              return A2($CourseBlock.view,A2($Signal.forwardTo,address,CourseBlockAction),blockId);
+            default: return $Html.text("");}
+      }();
+      return A2($Html.div,_U.list([$Html$Attributes.$class("grid-container grid-manual"),$Styles.gridContainerStyle]),_U.list([childView]));
+   });
+   var RoutingAction = function (a) {    return {ctor: "RoutingAction",_0: a};};
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "RoutingAction": var _p2 = A2($Routing.update,_p1._0,model.routing);
+           var updatedRouting = _p2._0;
+           var fx = _p2._1;
+           var updatedModel = _U.update(model,{routing: updatedRouting});
+           return {ctor: "_Tuple2",_0: updatedModel,_1: A2($Effects.map,RoutingAction,fx)};
+         case "CourseBlocksAction": var _p3 = A2($CourseOutline.update,_p1._0,model.courseBlock);
+           var updatedCourseBlock = _p3._0;
+           var fx = _p3._1;
+           var updatedModel = _U.update(model,{courseBlock: updatedCourseBlock});
+           return {ctor: "_Tuple2",_0: updatedModel,_1: A2($Effects.map,CourseBlocksAction,fx)};
+         case "CourseBlockAction": return {ctor: "_Tuple2",_0: model,_1: A2($Effects.map,CourseBlockAction,$Effects.none)};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([A2($Signal.map,RoutingAction,$Routing.router.signal)])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
-   return _elm.Main.values = {_op: _op,init: init,app: app,main: main};
+   var Model = F2(function (a,b) {    return {routing: a,courseBlock: b};});
+   return _elm.Main.values = {_op: _op
+                             ,Model: Model
+                             ,RoutingAction: RoutingAction
+                             ,CourseBlocksAction: CourseBlocksAction
+                             ,CourseBlockAction: CourseBlockAction
+                             ,NoOp: NoOp
+                             ,initialModel: initialModel
+                             ,init: init
+                             ,update: update
+                             ,view: view
+                             ,app: app
+                             ,main: main};
 };
