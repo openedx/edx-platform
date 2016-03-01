@@ -24,11 +24,6 @@
       font-family: FontAwesome;
     }
 
-    &.is-active {
-      background-color: lighten($action-primary-bg,10%);
-      color: $white;
-    }
-
     &.in_fullscreen {
       background-color: lighten($action-primary-bg,10%);
       color: $white;

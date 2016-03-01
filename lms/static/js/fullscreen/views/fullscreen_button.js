@@ -43,12 +43,16 @@
             enterFullscreen: function() {
                 var $fullscreenElement = $('.xblock-student_view-sequential');
                 $fullscreenElement.addClass('fullscreen-element');
+                var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
+                $fullscreenBreadcrumb.addClass('in_fullscreen');
                 this.launchIntoFullscreen($fullscreenElement[0]);
             },
 
             exitFullscreen: function() {
                 var $fullscreenElement = $('.xblock-student_view-sequential');
                 $fullscreenElement.removeClass('fullscreen-element');
+                var $fullscreenBreadcrumb = $('.course-wrapper .course-content .sequence .path');
+                $fullscreenBreadcrumb.removeClass('in_fullscreen');
                 if(document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if(document.mozCancelFullScreen) {
