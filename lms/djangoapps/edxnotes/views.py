@@ -22,6 +22,7 @@ from edxnotes.helpers import (
     get_course_position,
     DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
+    NoteJSONEncoder,
 )
 
 
@@ -47,18 +48,19 @@ def edxnotes(request, course_id):
         raise Http404
 
     notes_info = get_notes(request, course)
-
+    has_notes = (len(notes_info.get('results')) > 0)
     context = {
         "course": course,
         "notes_endpoint": reverse("notes", kwargs={"course_id": course_id}),
         "notes": notes_info,
         "page_size": DEFAULT_PAGE_SIZE,
-        "debug": json.dumps(settings.DEBUG),
+        "debug": settings.DEBUG,
         'position': None,
         'disabled_tabs': settings.NOTES_DISABLED_TABS,
+        'has_notes': has_notes,
     }
 
-    if len(json.loads(notes_info)['results']) == 0:
+    if not has_notes:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2
         )
@@ -164,7 +166,7 @@ def notes(request, course_id):
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
-    return HttpResponse(notes_info, content_type="application/json")
+    return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
 
 
 # pylint: disable=unused-argument

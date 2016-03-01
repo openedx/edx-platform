@@ -344,7 +344,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
         collection['previous']
     )
 
-    return json.dumps(collection, cls=NoteJSONEncoder)
+    return collection
 
 
 def get_endpoint(api_url, path=""):
