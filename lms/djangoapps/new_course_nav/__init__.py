@@ -10,6 +10,7 @@ TODOS:
     x Use the pattern library
     - Link into sequentials
     - Add nav within sequentials
+    - Make sure markup is accessible
     - Add realtime text search to nav app to locate sections
 - Refactorings:
     - Choose a better name for the app
