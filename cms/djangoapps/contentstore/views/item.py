@@ -237,7 +237,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
+                log.exception("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in PREVIEW_VIEWS + container_views:

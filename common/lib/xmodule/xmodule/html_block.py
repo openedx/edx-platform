@@ -85,8 +85,8 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
             data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
 
         response_fragment = Fragment(unicode(data))
-        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/javascript_loader.coffee'))
-        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/display.coffee'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/javascript_loader.js'))
+        response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/display.js'))
 
         response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/collapsible.js'))
         response_fragment.add_javascript_url(self.runtime.local_resource_url(self, 'js/src/html/imageModal.js'))
@@ -99,8 +99,6 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
     def studio_view(self, context):
         fragment = super(HtmlBlock, self).studio_view(context)
         return fragment
-
-    author_view = student_view
 
     ###############################################################################################################
     ### HTMLDescriptor implemenation / consolidation with XBlock
@@ -121,13 +119,14 @@ class HtmlBlock(XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplate
         an override to add in specific rendering context, in this case we need to
         add in a base path to our c4x content addressing scheme
         """
-        _context = EditingDescriptor.get_context(self)
+        _context = super(HtmlBlock, self).get_context()
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({
             'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location.course_key),
             'enable_latex_compiler': self.use_latex_compiler,
-            'editor': self.editor
+            'editor': self.editor,
+            'data': self.data
         })
         return _context
 
