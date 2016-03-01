@@ -34,7 +34,7 @@ class AcceptanceTest(TestSuite):
     def cmd(self):
 
         report_file = self.report_dir / "{}.xml".format(self.system)
-        report_args = "--with-xunit --xunit-file {}".format(report_file)
+        report_args = "--junitxml {}".format(report_file)
 
         cmd = (
             "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
