@@ -66,9 +66,9 @@ class BlockStructure(object):
 
     def __iter__(self):
         """
-        The default iterator for a block structure is a topological
-        traversal since it's the more common case and we currently
-        need to support DAGs.
+        The default iterator for a block structure is get_block_keys()
+        since we need to filter blocks as a list.
+        A topological traversal can be used to support DAGs.
         """
         return self.get_block_keys()
 
