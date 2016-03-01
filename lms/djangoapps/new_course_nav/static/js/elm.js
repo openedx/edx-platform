@@ -10892,7 +10892,7 @@ Elm.Types.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,lms_web_url: d,children: e};});
+   var CourseBlockData = F5(function (a,b,c,d,e) {    return {id: a,type$: b,display_name: c,student_view_url: d,children: e};});
    var CourseBlocksData = F2(function (a,b) {    return {root: a,blocks: b};});
    var Error = {ctor: "Error"};
    var Leaf = function (a) {    return {ctor: "Leaf",_0: a};};
@@ -10901,7 +10901,7 @@ Elm.Types.make = function (_elm) {
    var Chapter = F2(function (a,b) {    return {ctor: "Chapter",_0: a,_1: b};});
    var Course = F2(function (a,b) {    return {ctor: "Course",_0: a,_1: b};});
    var Empty = {ctor: "Empty"};
-   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,lmsWebUrl: d};});
+   var CourseBlockAttributes = F4(function (a,b,c,d) {    return {id: a,nodeType: b,displayName: c,studentViewUrl: d};});
    var CourseBlocksApiError = function (a) {    return {ctor: "CourseBlocksApiError",_0: a};};
    var CourseBlocksApiSuccess = function (a) {    return {ctor: "CourseBlocksApiSuccess",_0: a};};
    var CourseBlocksApiResponse = function (a) {    return {ctor: "CourseBlocksApiResponse",_0: a};};
@@ -10942,8 +10942,8 @@ Elm.ParseCourse.make = function (_elm) {
    var buildCourseTree = F2(function (courseBlocksData,rootId) {
       if (_U.eq(rootId,"")) return $Types.Empty; else {
             var maybeBlockData = A2($Dict.get,rootId,courseBlocksData.blocks);
-            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",lms_web_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
-            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,lmsWebUrl: blockData.lms_web_url};
+            var blockData = A2($Maybe.withDefault,{id: "",type$: "",display_name: "",student_view_url: "",children: $Maybe.Just(_U.list([]))},maybeBlockData);
+            var blockAttributes = {id: blockData.id,nodeType: blockData.type$,displayName: blockData.display_name,studentViewUrl: blockData.student_view_url};
             var children = A2($List.map,buildCourseTree(courseBlocksData),A2($Maybe.withDefault,_U.list([]),blockData.children));
             return _U.eq(blockData.type$,"course") ? A2($Types.Course,blockAttributes,children) : _U.eq(blockData.type$,"chapter") ? A2($Types.Chapter,
             blockAttributes,
@@ -10957,7 +10957,7 @@ Elm.ParseCourse.make = function (_elm) {
    A2($Json$Decode._op[":="],"id",$Json$Decode.string),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
    A2($Json$Decode._op[":="],"display_name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"lms_web_url",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"student_view_url",$Json$Decode.string),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"children",$Json$Decode.list($Json$Decode.string))));
    var courseBlocksDecoder = A3($Json$Decode.object2,
    $Types.CourseBlocksData,
@@ -10994,11 +10994,11 @@ Elm.Styles.make = function (_elm) {
    var gridContainerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding",_1: "30px"}]));
    return _elm.Styles.values = {_op: _op,gridContainerStyle: gridContainerStyle,btnBrandStyle: btnBrandStyle,chapterOutlineStyles: chapterOutlineStyles};
 };
-Elm.CourseNav = Elm.CourseNav || {};
-Elm.CourseNav.make = function (_elm) {
+Elm.CourseOutline = Elm.CourseOutline || {};
+Elm.CourseOutline.make = function (_elm) {
    "use strict";
-   _elm.CourseNav = _elm.CourseNav || {};
-   if (_elm.CourseNav.values) return _elm.CourseNav.values;
+   _elm.CourseOutline = _elm.CourseOutline || {};
+   if (_elm.CourseOutline.values) return _elm.CourseOutline.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -11020,7 +11020,7 @@ Elm.CourseNav.make = function (_elm) {
             var _p1 = _p0._0;
             return A2($Html.li,
             _U.list([$Html$Attributes.$class("item has-block-link")]),
-            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(_p1.lmsWebUrl)]),_U.list([$Html.text(_p1.displayName)]))]));
+            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(_p1.studentViewUrl)]),_U.list([$Html.text(_p1.displayName)]))]));
          } else {
             return A2($Html.li,_U.list([]),_U.list([]));
          }
@@ -11114,7 +11114,341 @@ Elm.CourseNav.make = function (_elm) {
          case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p6._0),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: $Types.Error,_1: $Effects.none};}
    });
-   return _elm.CourseNav.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
+   return _elm.CourseOutline.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
+};
+Elm.Native = Elm.Native || {};
+Elm.Native.History = {};
+Elm.Native.History.make = function(localRuntime){
+
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.History = localRuntime.Native.History || {};
+
+  if (localRuntime.Native.History.values){
+    return localRuntime.Native.History.values;
+  }
+
+  var NS = Elm.Native.Signal.make(localRuntime);
+  var Task = Elm.Native.Task.make(localRuntime);
+  var Utils = Elm.Native.Utils.make(localRuntime);
+  var node = window;
+
+  // path : Signal String
+  var path = NS.input('History.path', window.location.pathname);
+
+  // length : Signal Int
+  var length = NS.input('History.length', window.history.length);
+
+  // hash : Signal String
+  var hash = NS.input('History.hash', window.location.hash);
+
+  localRuntime.addListener([path.id, length.id], node, 'popstate', function getPath(event){
+    localRuntime.notify(path.id, window.location.pathname);
+    localRuntime.notify(length.id, window.history.length);
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  localRuntime.addListener([hash.id], node, 'hashchange', function getHash(event){
+    localRuntime.notify(hash.id, window.location.hash);
+  });
+
+  // setPath : String -> Task error ()
+  var setPath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.pushState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // replacePath : String -> Task error ()
+  var replacePath = function(urlpath){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        localRuntime.notify(path.id, urlpath);
+        window.history.replaceState({}, "", urlpath);
+        localRuntime.notify(hash.id, window.location.hash);
+        localRuntime.notify(length.id, window.history.length);
+      },0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // go : Int -> Task error ()
+  var go = function(n){
+    return Task.asyncFunction(function(callback){
+      setTimeout(function(){
+        window.history.go(n);
+        localRuntime.notify(length.id, window.history.length);
+        localRuntime.notify(hash.id, window.location.hash);
+      }, 0);
+      return callback(Task.succeed(Utils.Tuple0));
+    });
+  };
+
+  // back : Task error ()
+  var back = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      localRuntime.notify(hash.id, window.location.hash);
+      window.history.back();
+      localRuntime.notify(length.id, window.history.length);
+
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+  // forward : Task error ()
+  var forward = Task.asyncFunction(function(callback){
+    setTimeout(function(){
+      window.history.forward();
+      localRuntime.notify(length.id, window.history.length);
+      localRuntime.notify(hash.id, window.location.hash);
+    }, 0);
+    return callback(Task.succeed(Utils.Tuple0));
+  });
+
+
+
+  return {
+    path        : path,
+    setPath     : setPath,
+    replacePath : replacePath,
+    go          : go,
+    back        : back,
+    forward     : forward,
+    length      : length,
+    hash        : hash
+  };
+
+};
+
+Elm.History = Elm.History || {};
+Elm.History.make = function (_elm) {
+   "use strict";
+   _elm.History = _elm.History || {};
+   if (_elm.History.values) return _elm.History.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$History = Elm.Native.History.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var path = $Native$History.path;
+   var hash = $Native$History.hash;
+   var length = $Native$History.length;
+   var forward = $Native$History.forward;
+   var back = $Native$History.back;
+   var go = $Native$History.go;
+   var replacePath = $Native$History.replacePath;
+   var setPath = $Native$History.setPath;
+   return _elm.History.values = {_op: _op,setPath: setPath,replacePath: replacePath,go: go,back: back,forward: forward,length: length,hash: hash,path: path};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Types = Elm.Hop.Types || {};
+Elm.Hop.Types.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Types = _elm.Hop.Types || {};
+   if (_elm.Hop.Types.values) return _elm.Hop.Types.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var newUrl = {query: $Dict.empty,path: _U.list([])};
+   var newPayload = {params: $Dict.empty,url: newUrl};
+   var Router = F3(function (a,b,c) {    return {signal: a,payload: b,run: c};});
+   var Config = F2(function (a,b) {    return {notFoundAction: a,routes: b};});
+   var Payload = F2(function (a,b) {    return {params: a,url: b};});
+   var Url = F2(function (a,b) {    return {path: a,query: b};});
+   return _elm.Hop.Types.values = {_op: _op,Url: Url,Payload: Payload,Config: Config,Router: Router,newUrl: newUrl,newPayload: newPayload};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Url = Elm.Hop.Url || {};
+Elm.Hop.Url.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Url = _elm.Hop.Url || {};
+   if (_elm.Hop.Url.values) return _elm.Hop.Url.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var clearQuery = function (url) {    return _U.update(url,{query: $Dict.empty});};
+   var removeQuery = F2(function (key,url) {    var updatedQuery = A2($Dict.remove,key,url.query);return _U.update(url,{query: updatedQuery});});
+   var setQuery = F2(function (query,url) {    return _U.update(url,{query: query});});
+   var addQuery = F2(function (query,url) {    var updatedQuery = A2($Dict.union,query,url.query);return _U.update(url,{query: updatedQuery});});
+   var queryKVtoTuple = function (kv) {
+      var splitted = A2($String.split,"=",kv);
+      var first = A2($Maybe.withDefault,"",$List.head(splitted));
+      var firstDecoded = $Http.uriDecode(first);
+      var second = A2($Maybe.withDefault,"",$List.head(A2($List.drop,1,splitted)));
+      var secondDecoded = $Http.uriDecode(second);
+      return {ctor: "_Tuple2",_0: firstDecoded,_1: secondDecoded};
+   };
+   var extractQuery = function (route) {    return A2($Maybe.withDefault,"",$List.head(A2($List.drop,1,A2($String.split,"?",route))));};
+   var parseQuery = function (route) {
+      return $Dict.fromList(A2($List.map,
+      queryKVtoTuple,
+      A2($List.filter,function (_p0) {    return $Basics.not($String.isEmpty(_p0));},A2($String.split,"&",extractQuery(route)))));
+   };
+   var extractPath = function (route) {
+      return A2($Maybe.withDefault,"",$List.head(A2($String.split,"?",A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"#",route)))))));
+   };
+   var parsePath = function (route) {
+      return A2($List.filter,function (_p1) {    return $Basics.not($String.isEmpty(_p1));},A2($String.split,"/",extractPath(route)));
+   };
+   var parse = function (route) {    return {path: parsePath(route),query: parseQuery(route)};};
+   var urlFromUser = function (route) {
+      var normalized = A2($String.startsWith,"#",route) ? route : A2($Basics._op["++"],"#",route);
+      return parse(normalized);
+   };
+   var pathFromUrl = function (url) {    return $List.isEmpty(url.path) ? "" : A2($String.join,"/",url.path);};
+   var queryFromUrl = function (url) {
+      return $Dict.isEmpty(url.query) ? "" : A2($String.append,
+      "?",
+      A2($String.join,
+      "&",
+      A2($List.map,function (_p2) {    var _p3 = _p2;return A2($Basics._op["++"],_p3._0,A2($Basics._op["++"],"=",_p3._1));},$Dict.toList(url.query))));
+   };
+   var routeFromUrl = function (url) {    return A2($Basics._op["++"],"#/",A2($Basics._op["++"],pathFromUrl(url),queryFromUrl(url)));};
+   return _elm.Hop.Url.values = {_op: _op
+                                ,routeFromUrl: routeFromUrl
+                                ,queryFromUrl: queryFromUrl
+                                ,pathFromUrl: pathFromUrl
+                                ,parse: parse
+                                ,extractPath: extractPath
+                                ,parsePath: parsePath
+                                ,extractQuery: extractQuery
+                                ,parseQuery: parseQuery
+                                ,queryKVtoTuple: queryKVtoTuple
+                                ,urlFromUser: urlFromUser
+                                ,addQuery: addQuery
+                                ,setQuery: setQuery
+                                ,removeQuery: removeQuery
+                                ,clearQuery: clearQuery};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Resolver = Elm.Hop.Resolver || {};
+Elm.Hop.Resolver.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Resolver = _elm.Hop.Resolver || {};
+   if (_elm.Hop.Resolver.values) return _elm.Hop.Resolver.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Hop$Url = Elm.Hop.Url.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var isRouteHashPlaceholder = function (hash) {    return A2($String.startsWith,":",hash);};
+   var isRouteFragmentMatch = function (_p0) {    var _p1 = _p0;var _p2 = _p1._1;return isRouteHashPlaceholder(_p2) ? true : _U.eq(_p2,_p1._0);};
+   var parseRouteFragment = function (route) {
+      var notEmpty = function (x) {    return $Basics.not($String.isEmpty(x));};
+      return A2($List.filter,notEmpty,A2($String.split,"/",route));
+   };
+   var isRouteMatch = F2(function (url,routeDef) {
+      var definitionFragmentList = parseRouteFragment($Basics.fst(routeDef));
+      var definitionFragmentLen = $List.length(definitionFragmentList);
+      var currentFragmentList = url.path;
+      var currentLen = $List.length(currentFragmentList);
+      var combinedCurrentAndDefinition = A3($List.map2,
+      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
+      currentFragmentList,
+      definitionFragmentList);
+      return _U.eq(currentLen,definitionFragmentLen) ? A2($List.all,isRouteFragmentMatch,combinedCurrentAndDefinition) : false;
+   });
+   var matchedRoute = F2(function (routes,url) {    return $List.head(A2($List.filter,isRouteMatch(url),routes));});
+   var routeDefintionForUrl = F2(function (config,url) {
+      return A2($Maybe.withDefault,{ctor: "_Tuple2",_0: "",_1: config.notFoundAction},A2(matchedRoute,config.routes,url));
+   });
+   var paramsForRoute = F2(function (routeDefinition,url) {
+      var maybeParam = F2(function (routeFragment,urlFragment) {
+         return isRouteHashPlaceholder(routeFragment) ? {ctor: "_Tuple2",_0: A2($String.dropLeft,1,routeFragment),_1: urlFragment} : {ctor: "_Tuple2"
+                                                                                                                                     ,_0: ""
+                                                                                                                                     ,_1: ""};
+      });
+      var routeFragments = parseRouteFragment(routeDefinition);
+      var params = A3($List.map2,maybeParam,routeFragments,url.path);
+      var relevantParams = A2($List.filter,function (_p3) {    var _p4 = _p3;return $Basics.not($String.isEmpty(_p4._0));},params);
+      return A2($Dict.union,url.query,$Dict.fromList(relevantParams));
+   });
+   var userActionFromUrlString = F2(function (config,urlString) {
+      var url = $Hop$Url.parse(urlString);
+      var _p5 = A2(routeDefintionForUrl,config,url);
+      var route = _p5._0;
+      var userAction = _p5._1;
+      var params = A2(paramsForRoute,route,url);
+      var payload = {params: params,url: url};
+      return userAction(payload);
+   });
+   return _elm.Hop.Resolver.values = {_op: _op
+                                     ,userActionFromUrlString: userActionFromUrlString
+                                     ,paramsForRoute: paramsForRoute
+                                     ,parseRouteFragment: parseRouteFragment
+                                     ,routeDefintionForUrl: routeDefintionForUrl
+                                     ,matchedRoute: matchedRoute
+                                     ,isRouteMatch: isRouteMatch
+                                     ,isRouteFragmentMatch: isRouteFragmentMatch
+                                     ,isRouteHashPlaceholder: isRouteHashPlaceholder};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   if (_elm.Hop.values) return _elm.Hop.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $History = Elm.History.make(_elm),
+   $Hop$Resolver = Elm.Hop.Resolver.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $Hop$Url = Elm.Hop.Url.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var locationChangeSignal = function (config) {    return A2($Signal.map,$Hop$Resolver.userActionFromUrlString(config),$History.hash);};
+   var $new = function (config) {    return {signal: locationChangeSignal(config),payload: $Hop$Types.newPayload,run: $History.setPath("")};};
+   var GoToRouteResult = function (a) {    return {ctor: "GoToRouteResult",_0: a};};
+   var navigateToUrl = function (url) {    return $Effects.task(A2($Task.map,GoToRouteResult,$Task.toResult($History.setPath($Hop$Url.routeFromUrl(url)))));};
+   var navigateTo = function (route) {    return navigateToUrl($Hop$Url.urlFromUser(route));};
+   var addQuery = F2(function (query,currentUrl) {    return navigateToUrl(A2($Hop$Url.addQuery,query,currentUrl));});
+   var setQuery = F2(function (query,currentUrl) {    return navigateToUrl(A2($Hop$Url.setQuery,query,currentUrl));});
+   var removeQuery = F2(function (key,currentUrl) {    return navigateToUrl(A2($Hop$Url.removeQuery,key,currentUrl));});
+   var clearQuery = function (currentUrl) {    return navigateToUrl($Hop$Url.clearQuery(currentUrl));};
+   var NoOp = {ctor: "NoOp"};
+   return _elm.Hop.values = {_op: _op,$new: $new,navigateTo: navigateTo,addQuery: addQuery,setQuery: setQuery,removeQuery: removeQuery,clearQuery: clearQuery};
 };
 Elm.StartApp = Elm.StartApp || {};
 Elm.StartApp.make = function (_elm) {
@@ -11162,9 +11496,10 @@ Elm.Main.make = function (_elm) {
    if (_elm.Main.values) return _elm.Main.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $CourseNav = Elm.CourseNav.make(_elm),
+   $CourseOutline = Elm.CourseOutline.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Hop = Elm.Hop.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $ParseCourse = Elm.ParseCourse.make(_elm),
@@ -11185,8 +11520,21 @@ Elm.Main.make = function (_elm) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
    });
    var init = {ctor: "_Tuple2",_0: $Types.Empty,_1: A2($ParseCourse.getCourseBlocks,courseBlocksApiUrl,courseId)};
-   var app = $StartApp.start({init: init,update: $CourseNav.update,view: $CourseNav.courseOutlineView,inputs: _U.list([])});
+   var app = $StartApp.start({init: init,update: $CourseOutline.update,view: $CourseOutline.courseOutlineView,inputs: _U.list([])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
-   return _elm.Main.values = {_op: _op,init: init,app: app,main: main};
+   var ShowNotFound = function (a) {    return {ctor: "ShowNotFound",_0: a};};
+   var ShowBlock = function (a) {    return {ctor: "ShowBlock",_0: a};};
+   var ShowCourseOutline = function (a) {    return {ctor: "ShowCourseOutline",_0: a};};
+   var routes = _U.list([{ctor: "_Tuple2",_0: "/",_1: ShowCourseOutline},{ctor: "_Tuple2",_0: "/:blockId",_1: ShowBlock}]);
+   var HopAction = function (a) {    return {ctor: "HopAction",_0: a};};
+   return _elm.Main.values = {_op: _op
+                             ,HopAction: HopAction
+                             ,ShowCourseOutline: ShowCourseOutline
+                             ,ShowBlock: ShowBlock
+                             ,ShowNotFound: ShowNotFound
+                             ,routes: routes
+                             ,init: init
+                             ,app: app
+                             ,main: main};
 };

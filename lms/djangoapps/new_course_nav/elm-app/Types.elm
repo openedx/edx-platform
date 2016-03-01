@@ -20,7 +20,7 @@ type alias CourseBlockAttributes =
   { id : String
   , nodeType : String
   , displayName : String
-  , lmsWebUrl : String
+  , studentViewUrl : String
   }
 
 
@@ -50,6 +50,6 @@ type alias CourseBlockData =
   { id : String
   , type' : String
   , display_name : String
-  , lms_web_url : String
+  , student_view_url : String
   , children : Maybe (List String)
   }

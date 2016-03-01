@@ -1,4 +1,4 @@
-module CourseNav (update, courseOutlineView) where
+module CourseOutline (update, courseOutlineView) where
 
 import Effects exposing (Effects)
 import Html exposing (..)
@@ -163,7 +163,7 @@ sequentialOutlineView address courseBlock =
     Sequential attributes children ->
       li
         [ class "item has-block-link" ]
-        [ a [ href attributes.lmsWebUrl ] [ text attributes.displayName ] ]
+        [ a [ href attributes.studentViewUrl ] [ text attributes.displayName ] ]
 
     _ ->
       li [] []
