@@ -6,12 +6,12 @@ import Task
 
 import CourseNav
 import ParseCourse exposing (getCourseBlocks)
-import NavTypes
+import Types
 
 
-init : (NavTypes.CourseBlock, Effects NavTypes.Action)
+init : (Types.CourseBlock, Effects Types.Action)
 init =
-  ( NavTypes.Empty, getCourseBlocks courseBlocksApiUrl courseId )
+  ( Types.Empty, getCourseBlocks courseBlocksApiUrl courseId )
 
 
 app =

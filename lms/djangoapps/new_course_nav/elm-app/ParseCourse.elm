@@ -6,7 +6,7 @@ import Http
 import Json.Decode exposing (..)
 import Task
 
-import NavTypes exposing (..)
+import Types exposing (..)
 
 
 getCourseBlocks : String -> String -> Effects Action

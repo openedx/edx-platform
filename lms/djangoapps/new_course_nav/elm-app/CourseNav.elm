@@ -7,7 +7,7 @@ import Http
 import Task
 
 import ParseCourse
-import NavTypes exposing (..)
+import Types exposing (..)
 
 
 update : Action -> CourseBlock -> (CourseBlock, Effects Action)
