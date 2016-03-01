@@ -7,6 +7,7 @@ import Http
 -- Defines all our actions within the app.
 type Action
   = CourseBlocksApiResponse (Result Http.Error CourseBlocksData)
+  | CourseBlocksApiSuccess CourseBlocksData
   | CourseBlocksApiError Http.Error
 
 

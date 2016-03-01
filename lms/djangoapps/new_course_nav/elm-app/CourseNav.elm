@@ -12,21 +12,26 @@ import NavTypes exposing (..)
 
 update : Action -> CourseBlock -> (CourseBlock, Effects Action)
 update action courseBlock =
-  -- TODO: can we flatten the Ok/Err results into action types?
-  let
-    foo = Debug.log (toString action)
-  in
     case action of
+      -- Feed the API response result back as either 'CourseBlocksApiSuccess'
+      -- or 'CourseBlocksApiError'.
       CourseBlocksApiResponse result ->
         case result of
-          Ok value ->
-            -- TODO: handle failure value
-            ( ParseCourse.fromApiResponse value, Effects.none )
+          Ok blocksData ->
+            ( courseBlock
+            , blocksData
+              |> Task.succeed
+              |> Task.map CourseBlocksApiSuccess
+              |> Effects.task
+            )
 
-          Err value ->
-            ( courseBlock, Effects.task (Task.succeed (CourseBlocksApiError value)) )
+          Err error ->
+            ( courseBlock, Effects.task (Task.succeed (CourseBlocksApiError error)) )
 
-      CourseBlocksApiError value ->
+      CourseBlocksApiSuccess blocksData ->
+        ( ParseCourse.fromApiResponse blocksData, Effects.none )
+
+      CourseBlocksApiError error ->
         ( Error, Effects.none )
 
 
