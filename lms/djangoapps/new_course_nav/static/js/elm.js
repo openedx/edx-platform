@@ -10974,6 +10974,26 @@ Elm.ParseCourse.make = function (_elm) {
    });
    return _elm.ParseCourse.values = {_op: _op,fromApiResponse: fromApiResponse,getCourseBlocks: getCourseBlocks};
 };
+Elm.Styles = Elm.Styles || {};
+Elm.Styles.make = function (_elm) {
+   "use strict";
+   _elm.Styles = _elm.Styles || {};
+   if (_elm.Styles.values) return _elm.Styles.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var chapterOutlineStyles = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-bottom",_1: "30px"}]));
+   var btnBrandStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "10px"},{ctor: "_Tuple2",_0: "box-shadow",_1: "none"}]));
+   var gridContainerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding",_1: "30px"}]));
+   return _elm.Styles.values = {_op: _op,gridContainerStyle: gridContainerStyle,btnBrandStyle: btnBrandStyle,chapterOutlineStyles: chapterOutlineStyles};
+};
 Elm.CourseNav = Elm.CourseNav || {};
 Elm.CourseNav.make = function (_elm) {
    "use strict";
@@ -10990,6 +11010,7 @@ Elm.CourseNav.make = function (_elm) {
    $ParseCourse = Elm.ParseCourse.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $Styles = Elm.Styles.make(_elm),
    $Task = Elm.Task.make(_elm),
    $Types = Elm.Types.make(_elm);
    var _op = {};
@@ -10997,55 +11018,100 @@ Elm.CourseNav.make = function (_elm) {
       var _p0 = courseBlock;
       if (_p0.ctor === "Sequential") {
             var _p1 = _p0._0;
-            return A2($Html.div,
-            _U.list([$Html$Attributes.$class("card")]),
-            _U.list([A2($Html.h5,
-            _U.list([$Html$Attributes.$class("hd-5")]),
-            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(_p1.lmsWebUrl)]),_U.list([$Html.text(_p1.displayName)]))]))]));
+            return A2($Html.li,
+            _U.list([$Html$Attributes.$class("item has-block-link")]),
+            _U.list([A2($Html.a,_U.list([$Html$Attributes.href(_p1.lmsWebUrl)]),_U.list([$Html.text(_p1.displayName)]))]));
          } else {
-            return A2($Html.div,_U.list([]),_U.list([]));
+            return A2($Html.li,_U.list([]),_U.list([]));
          }
    });
    var chapterOutlineView = F2(function (address,courseBlock) {
       var _p2 = courseBlock;
       if (_p2.ctor === "Chapter") {
+            var _p3 = _p2._0;
             return A2($Html.div,
-            _U.list([]),
-            A2($List._op["::"],
-            A2($Html.h4,_U.list([$Html$Attributes.$class("hd-4")]),_U.list([$Html.text(_p2._0.displayName)])),
-            A2($List.map,sequentialOutlineView(address),_p2._1)));
+            _U.list([$Styles.chapterOutlineStyles]),
+            _U.list([A2($Html.h4,
+                    _U.list([$Html$Attributes.$class("hd-4"),$Html$Attributes.id(A2($Basics._op["++"],"hd-",_p3.id))]),
+                    _U.list([$Html.text(_p3.displayName)]))
+                    ,A2($Html.ul,
+                    _U.list([$Html$Attributes.$class("list-grouped"),A2($Html$Attributes.attribute,"aria-labelledby",A2($Basics._op["++"],"hd-",_p3.id))]),
+                    A2($List.map,sequentialOutlineView(address),_p2._1))]));
          } else {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
    });
-   var wrapWithContainer = function (htmlList) {    return A2($Html.div,_U.list([$Html$Attributes.$class("grid-container")]),htmlList);};
+   var breadcrumbsView = F2(function (address,courseBlock) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("col col-7")]),
+      _U.list([A2($Html.h3,
+      _U.list([$Html$Attributes.$class("hd-4")]),
+      _U.list([A2($Html.span,
+              _U.list([$Html$Attributes.$class("icon-fallback icon-fallback-text")
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding-right",_1: "20px"}]))]),
+              _U.list([A2($Html.span,
+              _U.list([$Html$Attributes.$class("icon fa fa-bars"),A2($Html$Attributes.attribute,"aria-hidden","true")]),
+              _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("text")]),_U.list([$Html.text("Menu")]))]))]))
+              ,$Html.text("Week 1 > subsection 1")]))]));
+   });
+   var courseSearchView = F2(function (address,courseBlock) {
+      var _p4 = courseBlock;
+      if (_p4.ctor === "Course") {
+            var searchId = A2($Basics._op["++"],"search-",_p4._0.id);
+            return A2($Html.div,
+            _U.list([$Html$Attributes.$class("col col-5")]),
+            _U.list([A2($Html.form,
+            _U.list([$Html$Attributes.$class("form")]),
+            _U.list([A2($Html.fieldset,
+            _U.list([$Html$Attributes.$class("form-group")]),
+            _U.list([A2($Html.legend,_U.list([$Html$Attributes.$class("form-group-hd sr-only")]),_U.list([$Html.text("Search Course")]))
+                    ,A2($Html.div,
+                    _U.list([$Html$Attributes.$class("field")]),
+                    _U.list([A2($Html.label,
+                            _U.list([$Html$Attributes.$class("field-label sr-only"),$Html$Attributes.$for(searchId)]),
+                            _U.list([$Html.text("Search this course")]))
+                            ,A2($Html.input,
+                            _U.list([$Html$Attributes.$class("field-input input-text")
+                                    ,A2($Html$Attributes.attribute,"type","search")
+                                    ,$Html$Attributes.id(searchId)
+                                    ,$Html$Attributes.name(searchId)
+                                    ,$Html$Attributes.placeholder("Search this course")]),
+                            _U.list([$Html.text("")]))
+                            ,A2($Html.button,
+                            _U.list([$Html$Attributes.$class("btn-brand btn-small"),A2($Html$Attributes.attribute,"type","button"),$Styles.btnBrandStyle]),
+                            _U.list([$Html.text("Search")]))]))]))]))]));
+         } else {
+            return A2($Html.div,_U.list([]),_U.list([]));
+         }
+   });
+   var wrapWithContainer = function (htmlList) {
+      return A2($Html.div,_U.list([$Html$Attributes.$class("grid-container grid-manual"),$Styles.gridContainerStyle]),htmlList);
+   };
    var courseOutlineView = F2(function (address,courseBlock) {
-      var _p3 = courseBlock;
-      switch (_p3.ctor)
+      var _p5 = courseBlock;
+      switch (_p5.ctor)
       {case "Empty": return wrapWithContainer(_U.list([A2($Html.div,
            _U.list([$Html$Attributes.$class("depth col-4 pre-4 post-4")]),
            _U.list([$Html.text("Loading...")]))]));
          case "Course": return wrapWithContainer(_U.list([A2($Html.div,
-                                                         _U.list([$Html$Attributes.$class("depth")]),
-                                                         _U.list([A2($Html.h3,
-                                                         _U.list([$Html$Attributes.$class("hd-3 emphasized")]),
-                                                         _U.list([$Html.text(_p3._0.displayName)]))]))
+                                                         _U.list([$Html$Attributes.$class("row")]),
+                                                         _U.list([A2(breadcrumbsView,address,courseBlock),A2(courseSearchView,address,courseBlock)]))
                                                          ,A2($Html.div,
                                                          _U.list([$Html$Attributes.$class("depth")]),
-                                                         A2($List.map,chapterOutlineView(address),_p3._1))]));
+                                                         A2($List.map,chapterOutlineView(address),_p5._1))]));
          case "Error": return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - Some sort of HTTP error occurred")]));
          default: return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - expected a course.")]));}
    });
    var update = F2(function (action,courseBlock) {
-      var _p4 = action;
-      switch (_p4.ctor)
-      {case "CourseBlocksApiResponse": var _p5 = _p4._0;
-           if (_p5.ctor === "Ok") {
-                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task(A2($Task.map,$Types.CourseBlocksApiSuccess,$Task.succeed(_p5._0)))};
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "CourseBlocksApiResponse": var _p7 = _p6._0;
+           if (_p7.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task(A2($Task.map,$Types.CourseBlocksApiSuccess,$Task.succeed(_p7._0)))};
               } else {
-                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($Types.CourseBlocksApiError(_p5._0)))};
+                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($Types.CourseBlocksApiError(_p7._0)))};
               }
-         case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p4._0),_1: $Effects.none};
+         case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p6._0),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: $Types.Error,_1: $Effects.none};}
    });
    return _elm.CourseNav.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
