@@ -33,5 +33,7 @@ def get_db_overrides(db_name):
                                    "migrations.  This is fatal.")
     return db_overrides
 
-for db in ['default', 'student_module_history']:
-    DATABASES[db].update(get_db_overrides(db))
+for db in DATABASES:
+    # You never migrate a read_replica
+    if db != 'read_replica':
+        DATABASES[db].update(get_db_overrides(db))
