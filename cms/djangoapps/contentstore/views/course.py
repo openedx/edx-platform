@@ -1117,7 +1117,6 @@ def settings_details_handler(request, course_key_string):
             about_page_editable = not marketing_site_enabled
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
 
-
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
