@@ -91,23 +91,23 @@ END
     "lms-unit")
         case "$SHARD" in
             "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_1'" --cov_args="-p"
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_1=False'" --cov_args="-p"
                 ;;
             *)
-                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+                paver test_system -s lms --cov_args="-p"
                 ;;
         esac
         ;;
 
     "cms-unit")
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s cms --cov_args="-p"
         ;;
 
     "commonlib-unit")
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+        paver test_lib --cov_args="-p"
         ;;
 
     "js-unit")

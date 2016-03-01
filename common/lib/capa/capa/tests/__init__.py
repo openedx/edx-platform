@@ -35,6 +35,8 @@ def test_capa_system():
     Construct a mock LoncapaSystem instance.
 
     """
+    __test__ = False  # Do not discover this with the test runner.
+
     the_system = Mock(
         spec=LoncapaSystem,
         ajax_url='/dummy-ajax-url',

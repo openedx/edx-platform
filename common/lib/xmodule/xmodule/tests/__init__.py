@@ -99,6 +99,8 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
+    __test__ = False  # Do not discover this with the test runner.
+
     user = Mock(name='get_test_system.user', is_staff=False)
 
     descriptor_system = get_test_descriptor_system()
@@ -152,6 +154,8 @@ def get_test_descriptor_system():
     """
     Construct a test DescriptorSystem instance.
     """
+    __test__ = False  # Do not discover this with the test runner.
+
     field_data = DictFieldData({})
 
     descriptor_system = MakoDescriptorSystem(
