@@ -20,7 +20,7 @@ type alias Model =
 -- TODO: refactor action types for clarity
 type Action
   = RoutingAction Routing.Action
-  | CourseBlocksAction Types.Action
+  | CourseBlocksAction Types.CourseBlocksAction
   | NoOp
 
 
@@ -67,12 +67,15 @@ view address model =
     childView =
       case model.routing.currentView of
         "courseOutline" ->
-          CourseOutline.courseOutlineView
+          CourseOutline.view
             (Signal.forwardTo address CourseBlocksAction)
             model.courseBlock
 
-        _ ->
+        "block" ->
           text "oogabooga"
+
+        _ ->
+          text ""
   in
     div [] [ childView ]
 

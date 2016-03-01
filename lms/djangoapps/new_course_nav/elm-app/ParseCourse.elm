@@ -9,7 +9,7 @@ import Task
 import Types exposing (..)
 
 
-getCourseBlocks : String -> String -> Effects Action
+getCourseBlocks : String -> String -> Effects CourseBlocksAction
 getCourseBlocks url courseId =
   let
     url =

@@ -11041,6 +11041,7 @@ Elm.CourseOutline.make = function (_elm) {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
    });
+<<<<<<< HEAD
    var breadcrumbsView = F2(function (address,courseBlock) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("col col-7")]),
@@ -11090,6 +11091,12 @@ Elm.CourseOutline.make = function (_elm) {
    var courseOutlineView = F2(function (address,courseBlock) {
       var _p5 = courseBlock;
       switch (_p5.ctor)
+=======
+   var wrapWithContainer = function (htmlList) {    return A2($Html.div,_U.list([$Html$Attributes.$class("grid-container")]),htmlList);};
+   var view = F2(function (address,courseBlock) {
+      var _p3 = courseBlock;
+      switch (_p3.ctor)
+>>>>>>> Refactor the CourseBlocksAction
       {case "Empty": return wrapWithContainer(_U.list([A2($Html.div,
            _U.list([$Html$Attributes.$class("depth col-4 pre-4 post-4")]),
            _U.list([$Html.text("Loading...")]))]));
@@ -11114,7 +11121,7 @@ Elm.CourseOutline.make = function (_elm) {
          case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p6._0),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: $Types.Error,_1: $Effects.none};}
    });
-   return _elm.CourseOutline.values = {_op: _op,update: update,courseOutlineView: courseOutlineView};
+   return _elm.CourseOutline.values = {_op: _op,update: update,view: view};
 };
 Elm.Native = Elm.Native || {};
 Elm.Native.History = {};
@@ -11569,11 +11576,10 @@ Elm.Main.make = function (_elm) {
    var view = F2(function (address,model) {
       var childView = function () {
          var _p0 = model.routing.currentView;
-         if (_p0 === "courseOutline") {
-               return A2($CourseOutline.courseOutlineView,A2($Signal.forwardTo,address,CourseBlocksAction),model.courseBlock);
-            } else {
-               return $Html.text("oogabooga");
-            }
+         switch (_p0)
+         {case "courseOutline": return A2($CourseOutline.view,A2($Signal.forwardTo,address,CourseBlocksAction),model.courseBlock);
+            case "block": return $Html.text("oogabooga");
+            default: return $Html.text("");}
       }();
       return A2($Html.div,_U.list([]),_U.list([childView]));
    });

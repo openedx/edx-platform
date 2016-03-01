@@ -1,4 +1,4 @@
-module CourseOutline (update, courseOutlineView) where
+module CourseOutline (update, view) where
 
 import Effects exposing (Effects)
 import Html exposing (..)
@@ -11,7 +11,7 @@ import Styles
 import Types exposing (..)
 
 
-update : Action -> CourseBlock -> (CourseBlock, Effects Action)
+update : CourseBlocksAction -> CourseBlock -> (CourseBlock, Effects CourseBlocksAction)
 update action courseBlock =
     case action of
       -- Feed the API response result back as either 'CourseBlocksApiSuccess'
@@ -45,7 +45,7 @@ wrapWithContainer htmlList =
     htmlList
 
 
-courseSearchView : Signal.Address Action -> CourseBlock -> Html
+courseSearchView : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 courseSearchView address courseBlock =
   case courseBlock of
     Course attributes children ->
@@ -86,7 +86,7 @@ courseSearchView address courseBlock =
     _ ->
       div [] []
 
-breadcrumbsView : Signal.Address Action -> CourseBlock -> Html
+breadcrumbsView : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 breadcrumbsView address courseBlock =
   div
     [class "col col-7"]
@@ -109,8 +109,8 @@ breadcrumbsView address courseBlock =
       ]
     ]
 
-courseOutlineView : Signal.Address Action -> CourseBlock -> Html
-courseOutlineView address courseBlock =
+view : Signal.Address CourseBlocksAction -> CourseBlock -> Html
+view address courseBlock =
   case courseBlock of
     Empty ->
       wrapWithContainer
@@ -135,7 +135,7 @@ courseOutlineView address courseBlock =
       div [] [ text "Error - expected a course." ]
 
 
-chapterOutlineView : Signal.Address Action -> CourseBlock -> Html
+chapterOutlineView : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 chapterOutlineView address courseBlock =
   case courseBlock of
     Chapter attributes children ->
@@ -157,7 +157,7 @@ chapterOutlineView address courseBlock =
       div [] []
 
 
-sequentialOutlineView : Signal.Address Action -> CourseBlock -> Html
+sequentialOutlineView : Signal.Address CourseBlocksAction -> CourseBlock -> Html
 sequentialOutlineView address courseBlock =
   case courseBlock of
     Sequential attributes children ->

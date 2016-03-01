@@ -4,8 +4,8 @@ import Dict exposing (Dict)
 import Http
 
 
--- Defines all our actions within the app.
-type Action
+-- Defines course block api actions within the app.
+type CourseBlocksAction
   = CourseBlocksApiResponse (Result Http.Error CourseBlocksData)
   | CourseBlocksApiSuccess CourseBlocksData
   | CourseBlocksApiError Http.Error
