@@ -14,8 +14,13 @@ TODOS:
     x Use the pattern library
     - Link into sequentials
     - Add nav within sequentials
+    - Add hamburger to toggle between course outline and sequential nav
+    - Add breadcrumb
+    - Add bookmarks
+    - Add courseware search
+    - Add ~design~
     - Make sure markup is accessible
-    - Add realtime text search to nav app to locate sections
+    - Add realtime text search to nav app to locate sections?
 - Refactorings:
     - Choose a better name for the app
     - Refactor the django app into a separate repository
