@@ -14,6 +14,7 @@ TODOS:
 - Refactorings:
     - Choose a better name for the app
     - Refactor the django app into a separate repository
+    - Separate styles from the HTML
 - Tests:
     - Django view test
     - Elm unit tests
