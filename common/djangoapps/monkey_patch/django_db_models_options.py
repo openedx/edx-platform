@@ -19,21 +19,26 @@ def patch():
 
         # This method is usually called by apps.cache_clear(), when the
         # registry is finalized, or when a new field is added.
+        is_abstract = self.abstract
+        attrs = self.__dict__
+        fwd_prop = self.FORWARD_PROPERTIES
+        rev_prop = self.REVERSE_PROPERTIES
+
         if forward:
-            for cache_key in self.FORWARD_PROPERTIES:
-                if cache_key in self.__dict__:
+            for cache_key in fwd_prop:
+                if cache_key in attrs:
                     delattr(self, cache_key)
-        if reverse and not self.abstract:
-            for cache_key in self.REVERSE_PROPERTIES:
-                if cache_key in self.__dict__:
+        if reverse and not is_abstract:
+            for cache_key in rev_prop:
+                if cache_key in attrs:
                     delattr(self, cache_key)
         self._get_fields_cache = {}  # pylint: disable=protected-access
 
-    # Patch constants as a set instead of a list.
-    Options.FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
-                                  'local_concrete_fields', '_forward_fields_map'}
+    # # Patch constants as a set instead of a list.
+    # Options.FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
+    #                               'local_concrete_fields', '_forward_fields_map'}
 
-    Options.REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
+    # Options.REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
     # Patch the expire_cache method to utilize constant's new set data structure.
     Options._expire_cache = _expire_cache  # pylint: disable=protected-access
