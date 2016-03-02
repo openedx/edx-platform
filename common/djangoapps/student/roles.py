@@ -54,10 +54,6 @@ class RoleCache(object):
             for access_role in self._roles
         )
 
-    def add_role(self, role):
-        """Adds a role to the cache."""
-        self._roles.add(role)
-
 
 class AccessRole(object):
     """
@@ -66,7 +62,7 @@ class AccessRole(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def has_user(self, user, refresh=True):
+    def has_user(self, user):
         """
         Return whether the supplied django user has access to this role.
         """
@@ -134,7 +130,7 @@ class RoleBase(AccessRole):
         self.course_key = course_key
         self._role_name = role_name
 
-    def has_user(self, user, refresh=False):
+    def has_user(self, user):
         """
         Return whether the supplied django user has access to this role.
         """
@@ -142,7 +138,7 @@ class RoleBase(AccessRole):
             return False
 
         # pylint: disable=protected-access
-        if not hasattr(user, '_roles') or refresh:
+        if not hasattr(user, '_roles'):
             # Cache a list of tuples identifying the particular roles that a user has
             # Stored as tuples, rather than django models, to make it cheaper to construct objects for comparison
             user._roles = RoleCache(user)
@@ -161,8 +157,7 @@ class RoleBase(AccessRole):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
-                    # pylint: disable=protected-access
-                    user._roles.add_role(entry)
+                    del user._roles
 
     def remove_users(self, *users):
         """
