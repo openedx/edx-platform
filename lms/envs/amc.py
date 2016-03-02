@@ -8,6 +8,5 @@ APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 # needed to show only users and appsembler courses
 #FEATURES["ENABLE_COURSE_DISCOVERY"] = False
 FEATURES["SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES"] = True
-OAUTH_ENFORCE_SECURE = True
 
 INSTALLED_APPS += ('appsembler_lms',)
