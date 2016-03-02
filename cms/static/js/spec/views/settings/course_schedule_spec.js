@@ -10,7 +10,7 @@ define([
         grade_requirement_div: '.div-grade-requirements div'
     };
 
-    describe('Settings/Main', function () {
+    describe('Settings/CourseSchedule', function () {
         var urlRoot = '/course/settings/org/DemoX/Demo_Course',
             modelData = {
                 start_date: "2014-10-05T00:00:00Z",
