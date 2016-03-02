@@ -86,20 +86,10 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
-# Nose Test Runner
-TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
-
 _SYSTEM = 'lms'
 
 _REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
 _REPORT_DIR.makedirs_p()
-_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
-_NOSEID_DIR.makedirs_p()
-
-NOSE_ARGS = [
-    '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
-]
 
 # Local Directories
 TEST_ROOT = path("test_root")

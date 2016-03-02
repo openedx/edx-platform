@@ -42,20 +42,10 @@ MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
 THIS_UUID = uuid4().hex[:5]
 
-# Nose Test Runner
-TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
-
 _SYSTEM = 'cms'
 
 _REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
 _REPORT_DIR.makedirs_p()
-_NOSEID_DIR = REPO_ROOT / '.testids' / _SYSTEM
-_NOSEID_DIR.makedirs_p()
-
-NOSE_ARGS = [
-    '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
-]
 
 TEST_ROOT = path('test_root')
 

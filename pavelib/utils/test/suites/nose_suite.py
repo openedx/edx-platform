@@ -119,11 +119,10 @@ class SystemTestSuite(NoseTestSuite):
     @property
     def cmd(self):
         cmd = (
-            './manage.py {system} test '
-            '{test_id} {test_opts} --settings=test {extra} '
+            'py.test {system}.envs.test '
+            '{test_id} {test_opts} --ds==test {extra} '
             '--junitxml={xunit_report}'.format(
                 system=self.root,
-                verbosity=self.verbosity,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 extra=self.extra_args,
