@@ -19,8 +19,6 @@ from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from student.roles import CourseInstructorRole
-from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -32,6 +30,9 @@ from .utils import CourseTestCase
 
 
 def get_url(course_id, handler_name='settings_details_handler'):
+    """
+    Returning the URL for given course_id
+    """
     return reverse_course_url(handler_name, course_id)
 
 
@@ -722,7 +723,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertTrue(is_valid)
-        self.assertTrue(len(errors) == 0)
+        self.assertAssetsEqual(len(errors), 0)
         self.update_check(test_model)
 
         # Tab gets tested in test_advanced_settings_munge_tabs
@@ -755,7 +756,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['advertised_start']['value'], 1,
+                            'advertised_start should not be updated to a wrong value')
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 

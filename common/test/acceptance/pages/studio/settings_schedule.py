@@ -39,6 +39,9 @@ class SettingsSchedulePage(CoursePage):
         self.wait_for_page()
 
     def get_elements(self, css_selector):
+        """
+        Wait for the element to appear and return it
+        """
         self.wait_for_element_presence(
             css_selector,
             'Elements matching "{}" selector are present'.format(css_selector)
@@ -47,6 +50,9 @@ class SettingsSchedulePage(CoursePage):
         return results
 
     def get_element(self, css_selector):
+        """
+        If selector is valid then return the element otherwise None
+        """
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
 

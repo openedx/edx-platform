@@ -946,6 +946,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
             )
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
@@ -1086,6 +1087,7 @@ def settings_schedule_handler(request, course_key_string):
                 )
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
