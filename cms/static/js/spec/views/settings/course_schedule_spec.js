@@ -156,19 +156,6 @@ define([
             AjaxHelpers.respondWithJson(requests, expectedJson);
         });
 
-        it('should save language as part of course details', function(){
-            var requests = AjaxHelpers.requests(this);
-            var expectedJson = $.extend(true, {}, modelData, {
-                language: 'en',
-            });
-            $('#course-language').val('en').trigger('change');
-            expect(this.model.get('language')).toEqual('en');
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-        });
-
         it('should not error if about_page_editable is False', function(){
             var requests = AjaxHelpers.requests(this);
             // if about_page_editable is false, there is no section.course_details
