@@ -1,7 +1,7 @@
 define([
-    'jquery', 'js/models/settings/course_details', 'js/views/settings/course_schedule',
+    'jquery', 'js/models/settings/course_details', 'js/views/settings/course_details',
     'common/js/spec_helpers/ajax_helpers'
-], function($, CourseDetailsModel, MainView, AjaxHelpers) {
+], function($, CourseDetailsModel, CourseDetailsView, AjaxHelpers) {
     'use strict';
 
     var SELECTORS = {
@@ -40,7 +40,7 @@ define([
 
             this.model = new CourseDetailsModel(modelData, {parse: true});
             this.model.urlRoot = urlRoot;
-            this.view = new MainView({
+            this.view = new CourseDetailsView({
                 el: $('.settings-details'),
                 model: this.model
             }).render();
