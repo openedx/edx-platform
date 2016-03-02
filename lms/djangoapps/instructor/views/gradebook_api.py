@@ -90,7 +90,6 @@ def get_grade_book_page(request, course, course_key):
             'id': student.id,
             'email': student.email,
             'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
         }
         for student in enrolled_students
     ]
