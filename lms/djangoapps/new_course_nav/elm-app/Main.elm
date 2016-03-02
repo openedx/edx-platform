@@ -38,7 +38,6 @@ initialModel =
 
 init : (Model, Effects Action)
 init =
-  -- ( initialModel, getCourseBlocks courseBlocksApiUrl courseId )
   ( initialModel
   , getCourseBlocks courseBlocksApiUrl courseId
       |> Effects.map CourseBlocksAction

@@ -12,8 +12,8 @@ https://github.com/edx/edx-platform/pull/11493
 TODOS:
 - Features:
     x Use the pattern library
-    - Link into sequentials
-    - Add nav within sequentials
+    x Link into sequentials
+    x Add nav within sequentials
     - Add hamburger to toggle between course outline and sequential nav
     - Add breadcrumb
     - Add bookmarks
