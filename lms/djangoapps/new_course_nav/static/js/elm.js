@@ -10723,11 +10723,11 @@ Elm.Types.make = function (_elm) {
                               ,CourseBlocksData: CourseBlocksData
                               ,CourseBlockData: CourseBlockData};
 };
-Elm.CourseBlock = Elm.CourseBlock || {};
-Elm.CourseBlock.make = function (_elm) {
+Elm.Styles = Elm.Styles || {};
+Elm.Styles.make = function (_elm) {
    "use strict";
-   _elm.CourseBlock = _elm.CourseBlock || {};
-   if (_elm.CourseBlock.values) return _elm.CourseBlock.values;
+   _elm.Styles = _elm.Styles || {};
+   if (_elm.Styles.values) return _elm.Styles.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -10738,11 +10738,93 @@ Elm.CourseBlock.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var chapterOutlineStyles = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-bottom",_1: "30px"}]));
+   var btnBrandStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "10px"},{ctor: "_Tuple2",_0: "box-shadow",_1: "none"}]));
+   var gridContainerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding",_1: "30px"}]));
+   return _elm.Styles.values = {_op: _op,gridContainerStyle: gridContainerStyle,btnBrandStyle: btnBrandStyle,chapterOutlineStyles: chapterOutlineStyles};
+};
+Elm.CourseNav = Elm.CourseNav || {};
+Elm.CourseNav.make = function (_elm) {
+   "use strict";
+   _elm.CourseNav = _elm.CourseNav || {};
+   if (_elm.CourseNav.values) return _elm.CourseNav.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Styles = Elm.Styles.make(_elm);
+   var _op = {};
+   var breadcrumbsView = function (currentLocation) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("col col-7")]),
+      _U.list([A2($Html.h3,
+      _U.list([$Html$Attributes.$class("hd-4")]),
+      _U.list([A2($Html.span,
+              _U.list([$Html$Attributes.$class("icon-fallback icon-fallback-text")
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding-right",_1: "20px"}]))]),
+              _U.list([A2($Html.span,
+              _U.list([$Html$Attributes.$class("icon fa fa-bars"),A2($Html$Attributes.attribute,"aria-hidden","true")]),
+              _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("text")]),_U.list([$Html.text("Menu")]))]))]))
+              ,$Html.text(currentLocation)]))]));
+   };
+   var courseSearchView = function (searchId) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("col col-5")]),
+      _U.list([A2($Html.form,
+      _U.list([$Html$Attributes.$class("form")]),
+      _U.list([A2($Html.fieldset,
+      _U.list([$Html$Attributes.$class("form-group")]),
+      _U.list([A2($Html.legend,_U.list([$Html$Attributes.$class("form-group-hd sr-only")]),_U.list([$Html.text("Search Course")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.$class("field")]),
+              _U.list([A2($Html.label,
+                      _U.list([$Html$Attributes.$class("field-label sr-only"),$Html$Attributes.$for(searchId)]),
+                      _U.list([$Html.text("Search this course")]))
+                      ,A2($Html.input,
+                      _U.list([$Html$Attributes.$class("field-input input-text")
+                              ,A2($Html$Attributes.attribute,"type","search")
+                              ,$Html$Attributes.id(searchId)
+                              ,$Html$Attributes.name(searchId)
+                              ,$Html$Attributes.placeholder("Search this course")]),
+                      _U.list([$Html.text("")]))
+                      ,A2($Html.button,
+                      _U.list([$Html$Attributes.$class("btn-brand btn-small"),A2($Html$Attributes.attribute,"type","button"),$Styles.btnBrandStyle]),
+                      _U.list([$Html.text("Search")]))]))]))]))]));
+   };
+   var courseNavView = F2(function (breadcrumbsString,searchId) {
+      return A2($Html.div,_U.list([$Html$Attributes.$class("row")]),_U.list([breadcrumbsView(breadcrumbsString),courseSearchView(searchId)]));
+   });
+   return _elm.CourseNav.values = {_op: _op,courseSearchView: courseSearchView,breadcrumbsView: breadcrumbsView,courseNavView: courseNavView};
+};
+Elm.CourseBlock = Elm.CourseBlock || {};
+Elm.CourseBlock.make = function (_elm) {
+   "use strict";
+   _elm.CourseBlock = _elm.CourseBlock || {};
+   if (_elm.CourseBlock.values) return _elm.CourseBlock.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $CourseNav = Elm.CourseNav.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
    var view = F2(function (address,model) {
-      return _U.eq(model,"") ? $Html.text("Error loading block - no block URL") : A2($Html.iframe,
-      _U.list([$Html$Attributes.src(A2($Basics._op["++"],"/xblock/",model))
-              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "100%"},{ctor: "_Tuple2",_0: "height",_1: "1000px"}]))]),
-      _U.list([]));
+      return _U.eq(model,"") ? $Html.text("Error loading block - no block URL") : A2($Html.div,
+      _U.list([]),
+      _U.list([A2($CourseNav.courseNavView,"Go Back!",A2($Basics._op["++"],"search-",model))
+              ,A2($Html.iframe,
+              _U.list([$Html$Attributes.src(A2($Basics._op["++"],"/xblock/",model))
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "100%"},{ctor: "_Tuple2",_0: "height",_1: "1000px"}]))]),
+              _U.list([]))]));
    });
    var NoOp = {ctor: "NoOp"};
    return _elm.CourseBlock.values = {_op: _op,NoOp: NoOp,view: view};
@@ -10998,26 +11080,6 @@ Elm.ParseCourse.make = function (_elm) {
    });
    return _elm.ParseCourse.values = {_op: _op,fromApiResponse: fromApiResponse,getCourseBlocks: getCourseBlocks};
 };
-Elm.Styles = Elm.Styles || {};
-Elm.Styles.make = function (_elm) {
-   "use strict";
-   _elm.Styles = _elm.Styles || {};
-   if (_elm.Styles.values) return _elm.Styles.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var chapterOutlineStyles = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-bottom",_1: "30px"}]));
-   var btnBrandStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "10px"},{ctor: "_Tuple2",_0: "box-shadow",_1: "none"}]));
-   var gridContainerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding",_1: "30px"}]));
-   return _elm.Styles.values = {_op: _op,gridContainerStyle: gridContainerStyle,btnBrandStyle: btnBrandStyle,chapterOutlineStyles: chapterOutlineStyles};
-};
 Elm.CourseOutline = Elm.CourseOutline || {};
 Elm.CourseOutline.make = function (_elm) {
    "use strict";
@@ -11025,6 +11087,7 @@ Elm.CourseOutline.make = function (_elm) {
    if (_elm.CourseOutline.values) return _elm.CourseOutline.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $CourseNav = Elm.CourseNav.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -11065,72 +11128,28 @@ Elm.CourseOutline.make = function (_elm) {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
    });
-   var breadcrumbsView = F2(function (address,courseBlock) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("col col-7")]),
-      _U.list([A2($Html.h3,
-      _U.list([$Html$Attributes.$class("hd-4")]),
-      _U.list([A2($Html.span,
-              _U.list([$Html$Attributes.$class("icon-fallback icon-fallback-text")
-                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "padding-right",_1: "20px"}]))]),
-              _U.list([A2($Html.span,
-              _U.list([$Html$Attributes.$class("icon fa fa-bars"),A2($Html$Attributes.attribute,"aria-hidden","true")]),
-              _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("text")]),_U.list([$Html.text("Menu")]))]))]))
-              ,$Html.text("Week 1 > subsection 1")]))]));
-   });
-   var courseSearchView = F2(function (address,courseBlock) {
-      var _p4 = courseBlock;
-      if (_p4.ctor === "Course") {
-            var searchId = A2($Basics._op["++"],"search-",_p4._0.id);
-            return A2($Html.div,
-            _U.list([$Html$Attributes.$class("col col-5")]),
-            _U.list([A2($Html.form,
-            _U.list([$Html$Attributes.$class("form")]),
-            _U.list([A2($Html.fieldset,
-            _U.list([$Html$Attributes.$class("form-group")]),
-            _U.list([A2($Html.legend,_U.list([$Html$Attributes.$class("form-group-hd sr-only")]),_U.list([$Html.text("Search Course")]))
-                    ,A2($Html.div,
-                    _U.list([$Html$Attributes.$class("field")]),
-                    _U.list([A2($Html.label,
-                            _U.list([$Html$Attributes.$class("field-label sr-only"),$Html$Attributes.$for(searchId)]),
-                            _U.list([$Html.text("Search this course")]))
-                            ,A2($Html.input,
-                            _U.list([$Html$Attributes.$class("field-input input-text")
-                                    ,A2($Html$Attributes.attribute,"type","search")
-                                    ,$Html$Attributes.id(searchId)
-                                    ,$Html$Attributes.name(searchId)
-                                    ,$Html$Attributes.placeholder("Search this course")]),
-                            _U.list([$Html.text("")]))
-                            ,A2($Html.button,
-                            _U.list([$Html$Attributes.$class("btn-brand btn-small"),A2($Html$Attributes.attribute,"type","button"),$Styles.btnBrandStyle]),
-                            _U.list([$Html.text("Search")]))]))]))]))]));
-         } else {
-            return A2($Html.div,_U.list([]),_U.list([]));
-         }
-   });
    var view = F2(function (address,courseBlock) {
-      var _p5 = courseBlock;
-      switch (_p5.ctor)
+      var _p4 = courseBlock;
+      switch (_p4.ctor)
       {case "Empty": return A2($Html.div,_U.list([$Html$Attributes.$class("depth col-4 pre-4 post-4")]),_U.list([$Html.text("Loading...")]));
-         case "Course": return A2($Html.div,
+         case "Course": var currentLocation = "users > most recent > location";
+           return A2($Html.div,
            _U.list([]),
-           _U.list([A2($Html.div,
-                   _U.list([$Html$Attributes.$class("row")]),
-                   _U.list([A2(breadcrumbsView,address,courseBlock),A2(courseSearchView,address,courseBlock)]))
-                   ,A2($Html.div,_U.list([$Html$Attributes.$class("depth")]),A2($List.map,chapterOutlineView(address),_p5._1))]));
+           _U.list([A2($CourseNav.courseNavView,currentLocation,A2($Basics._op["++"],"search-",_p4._0.id))
+                   ,A2($Html.div,_U.list([$Html$Attributes.$class("depth")]),A2($List.map,chapterOutlineView(address),_p4._1))]));
          case "Error": return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - Some sort of HTTP error occurred")]));
          default: return A2($Html.div,_U.list([]),_U.list([$Html.text("Error - expected a course.")]));}
    });
    var update = F2(function (action,courseBlock) {
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "CourseBlocksApiResponse": var _p7 = _p6._0;
-           if (_p7.ctor === "Ok") {
-                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task(A2($Task.map,$Types.CourseBlocksApiSuccess,$Task.succeed(_p7._0)))};
+      var _p5 = action;
+      switch (_p5.ctor)
+      {case "CourseBlocksApiResponse": var _p6 = _p5._0;
+           if (_p6.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task(A2($Task.map,$Types.CourseBlocksApiSuccess,$Task.succeed(_p6._0)))};
               } else {
-                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($Types.CourseBlocksApiError(_p7._0)))};
+                 return {ctor: "_Tuple2",_0: courseBlock,_1: $Effects.task($Task.succeed($Types.CourseBlocksApiError(_p6._0)))};
               }
-         case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p6._0),_1: $Effects.none};
+         case "CourseBlocksApiSuccess": return {ctor: "_Tuple2",_0: $ParseCourse.fromApiResponse(_p5._0),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: $Types.Error,_1: $Effects.none};}
    });
    return _elm.CourseOutline.values = {_op: _op,update: update,view: view};

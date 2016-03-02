@@ -4,6 +4,7 @@ module CourseBlock (..) where
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Types
+import CourseNav exposing (courseNavView)
 
 
 type alias BlockId =
@@ -21,11 +22,15 @@ view address model =
   if model == "" then
     text "Error loading block - no block URL"
   else
-    iframe
-      [ src <| "/xblock/" ++ model
-      , style
-        [ ("width", "100%")
-        , ("height", "1000px")
-        ]
-      ]
+    div
       []
+      [ courseNavView "Go Back!" ("search-" ++ model)
+      , iframe
+        [ src <| "/xblock/" ++ model
+        , style
+          [ ("width", "100%")
+          , ("height", "1000px")
+          ]
+        ]
+        []
+      ]
