@@ -3,6 +3,7 @@ Acceptance tests for the Import and Export pages
 """
 from nose.plugins.attrib import attr
 from datetime import datetime
+from flaky import flaky
 
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
@@ -336,6 +337,7 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
+    # @flaky(max_runs=10, min_passes=10)
     def test_course_updated(self):
         """
         Given that I visit an empty course before import
@@ -352,7 +354,8 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         # from nose.tools import set_trace
         # set_trace()
         self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
+        self.import_page.wait_for_element_visibility('#view-updated-button')
+        # self.import_page.wait_for_upload()
         # from nose.tools import set_trace; set_trace()
         self.landing_page.visit()
         # There's a section named 'Section' in the tarball.
