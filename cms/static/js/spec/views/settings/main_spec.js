@@ -1,5 +1,5 @@
 define([
-    'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
+    'jquery', 'js/models/settings/course_details', 'js/views/settings/course_schedule',
     'common/js/spec_helpers/ajax_helpers'
 ], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
