@@ -87,6 +87,13 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
             advanced_tab = page.q(css='.problem-type-tabs a').filter(text='Advanced').first
             advanced_tab.click()
 
+            # Wait for the advanced tab to be active
+            css = '.problem-type-tabs li.ui-tabs-active a'
+            page.wait_for(
+                lambda: len(page.q(css=css).filter(text='Advanced').execute()) > 0,
+                'Waiting for the Advanced problem tab to be active'
+            )
+
         all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
         chosen_option = all_options.filter(text=specific_type).first
         chosen_option.click()

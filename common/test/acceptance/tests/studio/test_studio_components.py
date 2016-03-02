@@ -15,8 +15,6 @@ class AdvancedProblemComponentTest(ContainerBase):
     Feature: CMS.Component Adding
     As a course author, I want to be able to add a wide variety of components
     """
-    __test__ = True
-
     def setUp(self, is_staff=True):
         """
         Create a course with a section, subsection, and unit to which to add the component.
