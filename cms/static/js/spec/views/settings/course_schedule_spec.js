@@ -89,8 +89,7 @@ define([
         });
 
         it('should disallow save with an invalid minimum score percentage', function(){
-            var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field),
-                entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);
+            var entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);
 
             //input some invalid values.
             expect(entrance_exam_min_score.val('101').trigger('input')).toHaveClass("error");
@@ -108,7 +107,8 @@ define([
                 .toEqual(this.model.defaults.entrance_exam_minimum_score_pct);
         });
 
-        it('show and hide the grade requirement section when the check box is selected and deselected respectively', function(){
+        it('show and hide the grade requirement section when the check box is selected and deselected respectively',
+          function(){
 
             var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field);
 
