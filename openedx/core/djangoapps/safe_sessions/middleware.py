@@ -223,7 +223,7 @@ class SafeCookieData(object):
             # 3rd party Auth and external Auth transactions
             # as some of the session requests are made as
             # Anonymous users.
-            log.warning(
+            log.debug(
                 "SafeCookieData received empty user_id '%s' for session_id '%s'.",
                 user_id,
                 session_id,
@@ -360,7 +360,11 @@ class SafeSessionMiddleware(SessionMiddleware):
         """
         if hasattr(request, 'safe_cookie_verified_user_id'):
             if request.safe_cookie_verified_user_id != request.user.id:
-                log.warning(
+                # The user at response time is expected to be None when the user
+                # is logging out. To prevent extra noise in the logs,
+                # conditionally set the log level.
+                log_func = log.debug if request.user.id is None else log.warning
+                log_func(
                     "SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id,
                         request.user.id,
