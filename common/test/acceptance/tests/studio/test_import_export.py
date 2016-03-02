@@ -349,8 +349,11 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         # Should not exist yet.
         self.assertRaises(IndexError, self.landing_page.section, "Section")
         self.import_page.visit()
+        # from nose.tools import set_trace
+        # set_trace()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
+        # from nose.tools import set_trace; set_trace()
         self.landing_page.visit()
         # There's a section named 'Section' in the tarball.
         self.landing_page.section("Section")
