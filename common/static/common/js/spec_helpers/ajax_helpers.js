@@ -30,7 +30,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      */
     fakeServer = function (that, response) {
         var server = sinon.fakeServer.create();
-        that.after(function() {
+        afterEach(function() {
             server.restore();
         });
         server.respondWith(response);
@@ -43,15 +43,17 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * to respond for individual requests.
      */
     fakeRequests = function (that) {
-        var requests = [],
-            xhr = sinon.useFakeXMLHttpRequest();
+        var requests = [];
+        that.xhr = sinon.useFakeXMLHttpRequest();
         requests.currentIndex = 0;
-        xhr.onCreate = function(request) {
+        that.xhr.onCreate = function(request) {
             requests.push(request);
         };
 
-        that.after(function() {
-            xhr.restore();
+        afterEach(function() {
+            if(_.has(that.xhr, 'restore')){
+                that.xhr.restore();
+            }
         });
         return requests;
     };
