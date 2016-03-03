@@ -143,8 +143,8 @@ END
 
     "bok-choy")
 
-        curl -o ff42.tar.bz2 -L https://ftp.mozilla.org/pub/firefox/releases/42.0/linux-x86_64/en-US/firefox-42.0.tar.bz2
-        tar -xjf ff42.tar.bz2
+        curl -o ff43.0.4.tar.bz2 -L https://ftp.mozilla.org/pub/firefox/releases/43.0.4/linux-x86_64/en-US/firefox-43.0.4.tar.bz2
+        tar -xjf ff43.0.4.tar.bz2
         echo "firefox version is..."
         firefox/firefox --version
         export SELENIUM_FIREFOX_PATH=firefox/firefox
