@@ -42,17 +42,17 @@ Mobile API User Resource
      - Method
      - Endpoint
    * - :ref:`Get details about a user<Get User Details>`
-     - GET 
+     - GET
      - /api/mobile/v0.5/users/{username}
    * - :ref:`Get course enrollments for a user<Get a User's Course Enrollments>`
-     - GET 
+     - GET
      - /api/mobile/v0.5/users/{username}/course_enrollments/
    * - :ref:`Get a user's status in a course<Get or Change User Status in a Course>`
-     - GET 
+     - GET
      - /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
    * - :ref:`Change a user's status in a course<Get or Change User Status in a Course>`
-     - PATCH 
-     - /api/mobile/v0.5/rs/{username}/course_status_info/{course_id}
+     - PATCH
+     - /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
 ========================================
 Mobile API Course Information Resource
@@ -67,7 +67,7 @@ Mobile API Course Information Resource
      - Endpoint
    * - :ref:`Get updates for a course<Get Course Updates>`
      - GET
-     - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates   
+     - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates
    * - :ref:`Get handouts for a course<Get Course Handouts>`
      - GET
      - /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/handouts
