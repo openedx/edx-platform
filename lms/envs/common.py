@@ -1087,7 +1087,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'clean_headers.middleware.CleanHeadersMiddleware',
+    'header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
