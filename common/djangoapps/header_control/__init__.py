@@ -11,6 +11,7 @@ def remove_headers_from_response(response, *headers):
     """Removes the given headers from the response using the header_control middleware."""
     response.remove_headers = headers
 
+
 def force_header_for_response(response, header, value):
     """Forces the given header for the given response using the header_control middleware."""
     force_headers = {}

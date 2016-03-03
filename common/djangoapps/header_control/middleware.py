@@ -15,20 +15,10 @@ class HeaderControlMiddleware(object):
         Processes the given response, potentially remove or modifying headers.
         """
 
-        if len(getattr(response, 'remove_headers', [])) > 0:
-            for header in response.remove_headers:
-                try:
-                    del response[header]
-                except KeyError:
-                    pass
+        for header in getattr(response, 'remove_headers', []):
+            del response[header]
 
-        if len(getattr(response, 'force_headers', {})) > 0:
-            for header, value in response.force_headers.iteritems():
-                try:
-                    del response[header]
-                except KeyError:
-                    pass
-
-                response[header] = value
+        for header, value in getattr(response, 'force_headers', {}).iteritems():
+            response[header] = value
 
         return response

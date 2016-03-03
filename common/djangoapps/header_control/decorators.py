@@ -5,6 +5,7 @@ Middleware decorator for removing headers.
 from functools import wraps
 from header_control import remove_headers_from_response, force_header_for_response
 
+
 def remove_headers(*headers):
     """
     Decorator that removes specific headers from the response.

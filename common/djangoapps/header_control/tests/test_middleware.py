@@ -11,6 +11,29 @@ class TestHeaderControlMiddlewareProcessResponse(TestCase):
         super(TestHeaderControlMiddlewareProcessResponse, self).setUp()
         self.middleware = HeaderControlMiddleware()
 
+    def test_doesnt_barf_if_not_modifying_anything(self):
+        fake_request = HttpRequest()
+
+        fake_response = HttpResponse()
+        fake_response['Vary'] = 'Cookie'
+        fake_response['Accept-Encoding'] = 'gzip'
+
+        result = self.middleware.process_response(fake_request, fake_response)
+        self.assertEquals('Cookie', result['Vary'])
+        self.assertEquals('gzip', result['Accept-Encoding'])
+
+    def test_doesnt_barf_removing_nonexistent_headers(self):
+        fake_request = HttpRequest()
+
+        fake_response = HttpResponse()
+        fake_response['Vary'] = 'Cookie'
+        fake_response['Accept-Encoding'] = 'gzip'
+        remove_headers_from_response(fake_response, 'Vary', 'FakeHeaderWeeee')
+
+        result = self.middleware.process_response(fake_request, fake_response)
+        self.assertNotIn('Vary', result)
+        self.assertEquals('gzip', result['Accept-Encoding'])
+
     def test_removes_intended_headers(self):
         fake_request = HttpRequest()
 

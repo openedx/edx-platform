@@ -11,7 +11,7 @@ from django.http import (
 from student.models import CourseEnrollment
 from contentserver.models import CourseAssetCacheTtlConfig
 
-from clean_headers import remove_headers_from_response
+from header_control import force_header_for_response
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
@@ -153,7 +153,10 @@ class StaticContentServer(object):
 
         response['Last-Modified'] = content.last_modified_at.strftime(HTTP_DATE_FORMAT)
 
-        remove_headers_from_response(response, "Vary")
+        # Force the Vary header to only vary responses on Origin, so that XHR and browser requests get cached
+        # separately and don't screw over one another. i.e. a browser request that doesn't send Origin, and
+        # caches a version of the response without CORS headers, in turn breaking XHR requests.
+        force_header_for_response(response, 'Vary', 'Origin')
 
     @staticmethod
     def get_expiration_value(now, cache_ttl):
