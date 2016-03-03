@@ -41,6 +41,20 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict('django.conf.settings.MKTG_URL_LINK_MAP', {'COURSES': 'courses'})
+    def test_marketing_link_internal_courses_url(self):
+        expected_link = reverse('courses')
+        link = marketing_link('COURSES')
+        self.assertEqual(link, expected_link)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict('django.conf.settings.MKTG_URL_LINK_MAP', {'COURSES': 'https://example.com'})
+    def test_marketing_link_external_courses_url(self):
+        expected_link = 'https://example.com'
+        link = marketing_link('COURSES')
+        self.assertEqual(link, expected_link)
+
     @ddt.data((True, None), (False, None))
     @ddt.unpack
     def test_edx_footer(self, expected_result, _):

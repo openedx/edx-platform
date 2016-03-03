@@ -8,14 +8,14 @@
                 {
                     'argument': 'add',
                     'display_name': gettext('username'),
-                    'required': true
+                    'required': true,
                 },
                 {
                     'argument': 'course_id',
                     'display_name': gettext('course_id'),
-                    'required': true
-                }
-            ]
+                    'required': true,
+                },
+            ],
         },
         {
             'display_name': gettext('De-whitelist a user'),
@@ -25,14 +25,14 @@
                 {
                     'argument': 'del',
                     'display_name': gettext('username'),
-                    'required': true
+                    'required': true,
                 },
                 {
                     'argument': 'course_id',
                     'display_name': gettext('course_id'),
-                    'required': true
-                }
-            ]
+                    'required': true,
+                },
+            ],
         },
         {
             'display_name': gettext('View user whitelist'),
@@ -42,9 +42,9 @@
                 {
                     'argument': 'course_id',
                     'display_name': gettext('course_id'),
-                    'required': true
-                }
-            ]
+                    'required': true,
+                },
+            ],
         },
         {
             'display_name': gettext('Generate a single certificate'),
@@ -54,29 +54,51 @@
                 {
                     'argument': 'course',
                     'display_name': gettext('course_id'),
-                    'required': true
+                    'required': true,
                 },
                 {
                     'argument': 'username',
                     'display_name': gettext('username'),
-                    'required': true
+                    'required': true,
                 },
                 {
                     'argument': 'grade_value',
                     'display_name': gettext('grade'),
-                    'required': false
+                    'required': false,
                 },
                 {
                     'argument': 'designation',
                     'display_name': gettext('designation'),
-                    'required': false
+                    'required': false,
                 },
                 {
                     'argument': 'template_file',
                     'display_name': gettext('template'),
-                    'required': false
+                    'required': false,
                 },
             ]
+        },
+        {
+            'display_name': gettext('Update certificate status'),
+            'method': 'update_cert_status',
+            'description': gettext('Update the status of a certificate for a particular user in a particular course'),
+            'kwargs': [
+                {
+                    'argument': 'course_id',
+                    'display_name': gettext('course_id'),
+                    'required': true,
+                },
+                {
+                    'argument': 'username_or_email',
+                    'display_name': gettext('username or email'),
+                    'required': true,
+                },
+                {
+                    'argument': 'status',
+                    'display_name': gettext('status (defaults to `unavailable`)'),
+                    'required': false,
+                },
+            ],
         },
     ]
 
@@ -130,13 +152,13 @@
             },
             error: function(std_ajax_err) {
               console.log('Management Command failed to execute');
-            }
+            },
         });
     }
 
     function generateInputRow(arg, type){
         var $inputRow = $(document.createElement('div'));
-        $inputRow.addClass('form-actions')
+        $inputRow.addClass('form-actions');
         var label = $(document.createElement('label'));
         label.html(arg.display_name);
         var input = $(document.createElement('input'));
@@ -180,10 +202,10 @@
 
     function loadCommand(command_key){
         var command = commands[command_key];
-        //update description
+        // update description
         $('#command-description').text(command.description);
 
-        //update form
+        // update form
         var $form_fieldset = $('#form-fieldset');
         $form_fieldset.html('');
         var legend = $(document.createElement('legend'));
@@ -215,8 +237,8 @@
         }
         var commandName = $(document.createElement('input'));
         commandName.attr({
-                type: 'hidden',
-                name: 'command'
+            type: 'hidden',
+            name: 'command',
         });
         commandName.val(command.method);
         $form_fieldset.append(commandName);

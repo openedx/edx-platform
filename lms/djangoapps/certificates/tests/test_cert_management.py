@@ -2,6 +2,7 @@
 import ddt
 from contextlib import contextmanager
 from django.core.management.base import CommandError
+from django.core.management import call_command
 from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from mock import patch
@@ -12,6 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
+from certificates.management.commands import update_cert_status
 from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
 
 
@@ -252,3 +254,80 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         with patch(symbol) as mock_grade:
             mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
             yield
+
+
+@attr('shard_1')
+@ddt.ddt
+class UpdateCertificateStatusTest(CertificateManagementTest):
+    """
+    Tests for updating the status of a certificate.
+    """
+    command = update_cert_status
+
+    def setUp(self):
+        """
+        Creates one course, with two users. A single certificate is generated
+        only for the first user.
+        """
+        super(UpdateCertificateStatusTest, self).setUp()
+        self.course = self.courses[0]
+        self.key = self.course.location.course_key
+        self._create_cert(self.key, self.user, CertificateStatuses.downloadable)
+
+        self.no_certs_user = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            user=self.no_certs_user,
+            course_id=self.key,
+        )
+
+    def test_update_cert_default_status(self):
+        call_command(
+            'update_cert_status',
+            None,  # tuple of args
+            course_id=unicode(self.key),
+            username_or_email=self.user.username,
+        )
+        certificate = GeneratedCertificate.objects.get(
+            user=self.user,
+            course_id=self.key,
+        )
+        self.assertEqual(certificate.status, CertificateStatuses.unavailable)
+
+    @ddt.data(*update_cert_status.VALID_STATUSES)
+    def test_update_cert_change_status(self, target_status):
+        self._run_command(
+            course_id=unicode(self.key),
+            username_or_email=self.user.username,
+            status=target_status,
+        )
+        certificate = GeneratedCertificate.objects.get(
+            user=self.user,
+            course_id=self.key,
+        )
+        self.assertEqual(certificate.status, target_status)
+
+    def test_update_cert_bad_status(self):
+        self.assertNotIn('garbage', update_cert_status.VALID_STATUSES)
+        with self.assertRaisesRegexp(CommandError, 'INVALID STATUS'):
+            self._run_command(
+                course_id=unicode(self.key),
+                username_or_email=self.user.username,
+                status='garbage',
+            )
+
+    def test_update_cert_no_course(self):
+        with self.assertRaisesRegexp(CommandError, 'course-id is required'):
+            self._run_command(course_id=None, username_or_email=self.user.username)
+
+    def test_update_cert_no_user(self):
+        with self.assertRaisesRegexp(CommandError, 'username-or-email is required'):
+            self._run_command(course_id=unicode(self.key), username_or_email=None)
+
+    @ddt.data(*update_cert_status.VALID_STATUSES)
+    def test_update_cert_missing_error(self, target_status):
+        with self.assertRaises(GeneratedCertificate.DoesNotExist):
+            self._run_command(
+                course_id=unicode(self.key),
+                username_or_email=self.no_certs_user.username,
+                status=target_status,
+            )
