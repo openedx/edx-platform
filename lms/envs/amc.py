@@ -1,9 +1,8 @@
 from .aws import *
-from .appsembler import *
 
-APPSEMBLER_SECRET_KEY = APPSEMBLER_FEATURES.get("APPSEMBLER_SECRET_KEY")
+APPSEMBLER_SECRET_KEY = AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
 # the following ip should work for all dev setups....
-APPSEMBLER_AMC_API_BASE = APPSEMBLER_FEATURES.get('APPSEMBLER_AMC_API_BASE')
+APPSEMBLER_AMC_API_BASE = AUTH_TOKENS.get('APPSEMBLER_AMC_API_BASE')
 APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 
 # needed to show only users and appsembler courses
