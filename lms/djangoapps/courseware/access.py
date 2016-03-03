@@ -620,8 +620,8 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         """
         if user.is_authenticated():
             if not UserProfile.has_registered(user):
-                if _can_load_descriptor_nonregistered(descriptor):
-                    return ACCESS_GRANTED
+                if not _can_load_descriptor_nonregistered(descriptor):
+                    return ACCESS_DENIED
         response = (
             _visible_to_nonstaff_users(descriptor)
             and _has_group_access(descriptor, user, course_key)

@@ -238,17 +238,10 @@ function () {
         // params.duration could accidentally be construed as a floating
         // point double. Since we're displaying this number, round down
         // to nearest second
-        // TODO:FUNK <<<<<<< HEAD
-        // var duration = Math.floor(params.duration);
-        //
-        // if (this.config.endTime !== null) {
-        //     duration = Math.min(this.config.endTime, duration);
-        // TODO:FUNK =======
         var endTime = Math.floor(params.duration);
 
         if (this.config.endTime !== null) {
             endTime = Math.min(this.config.endTime, endTime);
-        // TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         }
 
         if (

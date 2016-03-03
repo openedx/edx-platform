@@ -280,7 +280,9 @@ def generate_course_forums_d3(url_handle):
     previous_date = -1
     previous = None
     rows = [['Date', 'New Threads', 'Responses', 'Comments']]
-    for date, comment_type, number, up_vote, down, net in reader:  # pylint: disable=unused-variable
+    for row in reader:
+        # this is for backward compatibility because there is a variable number of columns. we only want the first 3
+        date, comment_type, number = row[0:3]
         if date != previous_date:
             if previous:
                 rows.append([previous_date] + previous)
@@ -293,7 +295,7 @@ def generate_course_forums_d3(url_handle):
         elif comment_type == 'Comment':
             previous[2] = number
     # return nothing if there's no data
-    if len(rows) == 1:
+    if not previous:
         return None
     else:
         # get the last row's stuff

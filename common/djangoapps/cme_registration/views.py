@@ -429,7 +429,8 @@ def validate_required_fields_set2(post_vars):
     """
 
     #Add additional required fields here
-    required_fields_list = [{'address_1': 'Enter your Address 1'},
+    required_fields_list = [{'affiliation': 'Choose your affiliation'},
+                            {'address_1': 'Enter your Address 1'},
                             {'city': 'Enter your city'},
                             {'country': 'Choose your country'},
                             {'postal_code': 'Enter your postal code'},

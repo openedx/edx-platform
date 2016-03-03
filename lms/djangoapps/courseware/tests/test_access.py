@@ -162,6 +162,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         with self.assertRaises(ValueError):
             access._has_access_error_desc(self.course_instructor, 'not_load_or_staff', descriptor, self.course.course_key)
 
+    @patch('student.models.UserProfile.has_registered', Mock(return_value=True))
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         user = Mock()

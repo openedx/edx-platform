@@ -1839,6 +1839,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
     @XBlock.register_temp_plugin(PureXBlock, identifier='xblock')
     @XBlock.register_temp_plugin(EmptyXModuleDescriptor, identifier='xmodule')
     @patch.object(render, 'make_track_function')
+    @patch('student.models.UserProfile.has_registered', Mock(return_value=True))
     def test_event_publishing(self, block_type, mock_track_function):
         request = self.request_factory.get('')
         request.user = self.mock_user

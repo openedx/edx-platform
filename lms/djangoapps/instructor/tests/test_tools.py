@@ -365,26 +365,26 @@ class TestGenerateD3CourseForums(unittest.TestCase):
         """
         Test Generating d3 usable csvs
         """
-        data_string = """ Date,Type,Number,Up Votes,Down Votes,Net Points
-2014-10-8,CommentThread,2,3,0,3
-2014-10-10,CommentThread,1,4,0,4
-2014-10-10,Response,1,3,0,3
-2014-10-11,CommentThread,1,0,0,0
-2014-10-11,Response,5,2,0,2
-2014-10-11,Comment,2,0,0,0
-2014-10-12,CommentThread,1,0,0,0
-2014-10-12,Response,1,0,0,0
-2014-10-12,Comment,1,0,0,0
-2014-10-13,CommentThread,16,5,0,5
-2014-10-13,Response,23,5,0,5
-2014-10-13,Comment,9,0,0,0
-2014-10-14,CommentThread,20,6,0,6
-2014-10-14,Response,51,4,0,4
-2014-10-14,Comment,17,0,0,0
-2014-10-15,CommentThread,18,1,0,1
-2014-10-15,Response,43,13,0,13
-2014-10-15,Comment,18,0,0,0
-2014-10-16,CommentThread,10,3,0,3 """
+        data_string = """ Date,Activity Type,Number New,Votes
+2014-10-8,CommentThread,2,3
+2014-10-10,CommentThread,1,4
+2014-10-10,Response,1,3
+2014-10-11,CommentThread,1,0
+2014-10-11,Response,5,2
+2014-10-11,Comment,2,0
+2014-10-12,CommentThread,1,0
+2014-10-12,Response,1,0
+2014-10-12,Comment,1,0
+2014-10-13,CommentThread,16,5
+2014-10-13,Response,23,5
+2014-10-13,Comment,9,0
+2014-10-14,CommentThread,20,6
+2014-10-14,Response,51,4
+2014-10-14,Comment,17,0
+2014-10-15,CommentThread,18,1
+2014-10-15,Response,43,13
+2014-10-15,Comment,18,0
+2014-10-16,CommentThread,10,3"""
         memfile = StringIO.StringIO(data_string)
         output = tools.generate_course_forums_d3(memfile)
         to_match = """Date,New Threads,Responses,Comments
@@ -398,11 +398,23 @@ class TestGenerateD3CourseForums(unittest.TestCase):
 2014-10-16,10,0,0"""
         self.assertEquals(output, to_match)
 
+    def test_edge_case(self):
+        """
+        Test Generating d3 usable csvs
+        """
+        data_string = """ Date,Activity Type,Number New,Votes
+2014-10-8,CommentThread,2,3"""
+        memfile = StringIO.StringIO(data_string)
+        output = tools.generate_course_forums_d3(memfile)
+        to_match = """Date,New Threads,Responses,Comments
+2014-10-8,2,0,0"""
+        self.assertEquals(output, to_match)
+
     def test_no_data(self):
         """
         Test Generating d3 usable csvs
         """
-        data_string = "Date,Type,Number,Up Votes,Down Votes,Net Points"
+        data_string = "Date,Activity Type,Number New,Votes"
         memfile = StringIO.StringIO(data_string)
         output = tools.generate_course_forums_d3(memfile)
         self.assertIsNone(output)

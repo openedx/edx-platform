@@ -1,6 +1,7 @@
 """ Tests for tab functions (just primitive). """
 
 import json
+
 from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url

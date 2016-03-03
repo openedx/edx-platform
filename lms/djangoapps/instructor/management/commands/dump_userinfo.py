@@ -135,11 +135,20 @@ class Command(BaseCommand):
             default=False,
             help='The file path to which to write the output.',
         ),
+        make_option(
+            '-n',
+            '--number-of-credits',
+            metavar='NUM_CREDITS',
+            dest='num_credits',
+            default=False,
+            help='The amount of credits awarded for course completion.',
+        ),
     )
 
     def handle(self, *args, **options):
         course_id = options['course']
         course_code = options['code']
+        num_credits = options['num_credits']
         start_date = datetime.strptime(options['start_date'], '%Y-%m-%d').replace(tzinfo=UTC)
         end_date = datetime.strptime(options['end_date'], '%Y-%m-%d').replace(tzinfo=UTC)
         outfile_name = options['outfile']
@@ -210,13 +219,13 @@ class Command(BaseCommand):
                     student_dict['Payment Type'] = 'MC'
 
             if 'Date Registered' not in student_dict:
-                student_dict['Date Registered'] = unpaid_registration_table[user_id].created.strftime("%m/%d/%Y")
+                student_dict['Date Registered'] = unpaid_registration_table[user_id].created
 
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
 
             # If the user has received a certificate, adjust their credits issued and course completion flag.
             if student_dict['Credit Date']:
-                student_dict['Credits Issued'] = 23.5
+                student_dict['Credits Issued'] = num_credits
                 student_dict['Certif'] = True
 
             student_dict['System ID'] = course_code
@@ -235,6 +244,9 @@ class Command(BaseCommand):
 
             for item in student_dict:
                 student_dict[item] = self.preprocess(student_dict[item])
+
+            # CME requires uppercase gender characters, but upstream provides lowercase
+            student_dict['Gender'] = student_dict['Gender'].upper()
 
             csvwriter.writerow(student_dict)
 

@@ -670,6 +670,8 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
+ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG', [{}])
+
 # Facebook app
 FACEBOOK_API_VERSION = AUTH_TOKENS.get("FACEBOOK_API_VERSION")
 FACEBOOK_APP_SECRET = AUTH_TOKENS.get("FACEBOOK_APP_SECRET")
