@@ -142,6 +142,8 @@ ddt==0.8.0
 diff-cover==0.9.0
 django-crum==0.5
 django_nose==1.4.1
+django-pipeline==1.5.3
+edx-lint==0.4.3
 factory_boy==2.5.1
 flaky==2.4.0
 freezegun==0.1.11
@@ -158,6 +160,7 @@ python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
 rednose==0.4.3
+rfc6266==0.0.4
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
