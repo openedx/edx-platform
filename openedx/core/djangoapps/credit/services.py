@@ -50,7 +50,7 @@ class CreditService(object):
 
         return is_credit_course(course_key)
 
-    def get_credit_state(self, user_id, course_key_or_id, return_course_name=False, return_is_self_paced_course=False):
+    def get_credit_state(self, user_id, course_key_or_id, return_course_info=False):
         """
         Return all information about the user's credit state inside of a given
         course.
@@ -58,8 +58,7 @@ class CreditService(object):
         ARGS:
             - user_id: The PK of the User in question
             - course_key: The course ID (as string or CourseKey)
-            - return_course_name: if True, returns the course_name
-            - return_is_self_paced_course: if True, returns whether the course if self-paced
+            - return_course_info: if True, returns course info
 
         RETURNS:
             NONE (user not found or is not enrolled or is not credit course)
@@ -104,15 +103,10 @@ class CreditService(object):
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
 
-        if return_course_name:
+        if return_course_info:
             course = modulestore().get_course(course_key, depth=0)
             result.update({
                 'course_name': course.display_name,
-            })
-
-        if return_is_self_paced_course:
-            course = modulestore().get_course(course_key, depth=0)
-            result.update({
                 'is_self_paced_course': course and course.self_paced and SelfPacedConfiguration.current().enabled
             })
 
