@@ -29,7 +29,7 @@ define([
         beforeEach(function() {
             customMatchers(this);
             TemplateHelpers.installTemplate('templates/edxnotes/note-item');
-            spyOn(Logger, 'log').andCallThrough();
+            spyOn(Logger, 'log').and.callThrough();
         });
 
         it('can be rendered properly', function() {
