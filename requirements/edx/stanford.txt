@@ -1,7 +1,7 @@
 xblock-image-modal==0.3.0
 -e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
 -e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@653400485196f8bb05b859c9d89de378a22e0503#egg=xblock-qualtrics-survey
--e git+https://github.com/Stanford-Online/xblock-free-text-response@46e082437246a058dc80c10570316f3a3a3bcc2b#egg=xblock-free-text-response
+-e git+https://github.com/Stanford-Online/xblock-free-text-response@b734b0f841fda3814858c853ff20e63235e6b3ca#egg=xblock-free-text-response
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
 -e git+https://github.com/Stanford-Online/DoneXBlock.git@0a38297377c262313b4677ec44deb9fac4db5afb#egg=done-xblock
