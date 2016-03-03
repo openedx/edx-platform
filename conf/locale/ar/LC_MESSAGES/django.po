@@ -142,7 +142,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:30+0000\n"
+"POT-Creation-Date: 2016-02-24 18:02+0000\n"
 "PO-Revision-Date: 2015-12-07 09:55+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -2376,11 +2376,12 @@ msgstr "الترتيب الأبجدي للنقاشات"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
-"يُرجى إدخال ’true‘ أو ’false‘ .تشير القيمة ’true‘ إلى ترتيب فئات النقاشات "
-"وكل من فئاتها الفرعية بحسب الأحرف الأبجدية، بينما يسمح اختيار ’false‘ "
-"بترتيبها زمنيًّا."
+"يُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بترتيب فئات النقاشات وفئاتها "
+"الفرعية بحسب الأبجدية، بينما يساعد اختيارك لخاطئ على ترتيبها زمنيًّا تبعًا "
+"للتاريخ والتوقيت."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
@@ -2439,19 +2440,6 @@ msgid ""
 msgstr ""
 "يُرجى إدخال الرقم التعريفي الفريد من نوعه لملفّات الفيديو الخاصة بمساقك "
 "والتي زوّدتك بها edX. "
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the URL for the official course Facebook group. If you provide a URL, "
-"the mobile app includes a button that students can tap to access the group."
-msgstr ""
-"أدخل رابِط المجموعة الرسمية للمساق على موقع فيسبوك. في حال قدّمت رابطًا، "
-"فسيعرض تطبيق الهاتف المحمول زرًّا يخوّل الطلاب، بمجرّد الضغط عليه، الوصول "
-"إلى المجموعة."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Facebook URL"
-msgstr "الرابط لموقع فيسبوك"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -5008,10 +4996,14 @@ msgstr "المساق {course_id} غير موجود"
 #: lms/djangoapps/commerce/models.py
 msgid "Use the checkout page hosted by the E-Commerce service."
 msgstr ""
+"استخدم صفحة ’السحب لفحص المراجعة‘ المُستضافة من قبل خدمة التجارة "
+"الإلكترونية."
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr ""
+"مسار صفحة ’السحب لفحص المراجعة‘ الخاصة بمساق واحد، والمُستضافة من قبل خدمة "
+"التجارة الإلكترونية."
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -8371,26 +8363,28 @@ msgid ""
 "    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
 "  "
 msgstr ""
+"\n"
+"يرغب التطبيق <strong> %(application_name)s</strong> بالوصول إلى بياناتك باستخدام السماحيات التالية:"
 
 #: lms/templates/provider/authorize.html
 msgid "Read your user ID"
-msgstr ""
+msgstr "اقرأ الرمز التعريفي للمستخدم الخاص بك"
 
 #: lms/templates/provider/authorize.html
 msgid "Read your user profile"
-msgstr ""
+msgstr "اقرأ معلومات الصفحة الشخصية للمستخدم الخاص بك"
 
 #: lms/templates/provider/authorize.html
 msgid "Read your email address"
-msgstr ""
+msgstr "اقرأ عنوان بريدك الإلكتروني"
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are a staff member."
-msgstr ""
+msgstr "اقرأ قائمة المساقات التي عُيّنت كأحد أعضاء فريقها."
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are an instructor."
-msgstr ""
+msgstr "إقرأ قائمة المساقات التي عُيّنت كمدرّس فيها."
 
 #: lms/templates/provider/authorize.html
 msgid "To see if you are a global staff user"
@@ -10916,7 +10910,6 @@ msgid "Dashboard for:"
 msgstr "لوحة المعلومات لـ:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr "صورة الصفحة الشخصية للمستخدم {username}"
 
@@ -12529,12 +12522,6 @@ msgstr "أنت الآن تستعرض المساق بصفتك <i>{user_name}</i>.
 msgid "Course Material"
 msgstr "مواد المساق"
 
-#. Translators: 'needs attention' is an alternative string for the
-#. notification image that indicates the tab "needs attention".
-#: lms/templates/courseware/course_navigation.html
-msgid "needs attention"
-msgstr "يستدعي الانتباه"
-
 #: lms/templates/courseware/course_navigation.html
 msgid "Course is not yet visible to students."
 msgstr "المساق غير مرئي للطلّاب بعد"
@@ -12829,6 +12816,12 @@ msgstr "لا توجد درجات للمسائل في هذا القسم"
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
 msgstr "معلومات المساق {course.display_number_with_default}   "
+
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/tabs.html
+msgid "needs attention"
+msgstr "يستدعي الانتباه"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -17341,7 +17334,7 @@ msgstr "هذه الوحدة غير مفعَّلة."
 
 #: cms/templates/certificates.html
 msgid "This course does not use a mode that offers certificates."
-msgstr ""
+msgstr "لا يستخدم هذا المساق وضعًا يسمح بتقديم شهادات."
 
 #: cms/templates/certificates.html
 msgid "Working with Certificates"
@@ -17475,6 +17468,8 @@ msgid ""
 "Select a component type under {strong_start}Add New Component{strong_end}. "
 "Then select a template."
 msgstr ""
+"إختر نوع مكوّن مُدرج تحت {strong_start}أضف مكوّنًا جديدًا{strong_end}. ثمّ "
+"اختر نموذجًا."
 
 #: cms/templates/container.html
 msgid ""
@@ -17493,6 +17488,8 @@ msgid ""
 "Click the {strong_start}Edit{strong_end} icon in a component to edit its "
 "content."
 msgstr ""
+"إنقر على أيقونة {strong_start}تعديل{strong_end} لمكوّن معيّن لتتمكّن من "
+"تعديل محتواه."
 
 #: cms/templates/container.html
 msgid "Reorganizing components"
@@ -17935,6 +17932,9 @@ msgid ""
 "(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
 " custom pages that you create."
 msgstr ""
+"ستجد الصفحات مسرودة أفقيًّا في أعلى مساقك، بحيث تُدرَج الصفحات الافتراضية "
+"(الصفحة الرئيسية،  والمساق، والنقاشات، والويكي، والعلامات) قبل الكتب "
+"والصفحات المخصّصة التي تنشئها."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -17979,6 +17979,9 @@ msgid ""
 "Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
 " pages."
 msgstr ""
+"تظهر الصفحات في الركن العلوي لشريط التصفّح في مساقك، بحيث تُدرَج الصفحات "
+"الافتراضية (الصفحة الرئيسية، والمساق، والنقاشات، والويكي، والعلامات) قبل "
+"الكتب والصفحات المخصّصة."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
@@ -18904,37 +18907,35 @@ msgstr ""
 "عرض مختلف من خلال ’الإعدادات المتقدّمة‘."
 
 #: cms/templates/index.html
-msgid "The name of the organization sponsoring the course."
-msgstr "اسم المؤسّسة الراعية للمساق"
-
-#: cms/templates/index.html
-msgid "Note: The organization name is part of the course URL"
-msgstr "ملاحظة: اسم المؤسّسة جزء من رابط المساق."
-
-#: cms/templates/index.html
 msgid ""
-"This cannot be changed, but you can set a different display name in Advanced"
-" Settings later."
+"The name of the organization sponsoring the course. {strong_start}Note: The "
+"organization name is part of the course URL.{strong_end} This cannot be "
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
-"لا يمكن تغيير هذا ولكن يمكنك لاحقًا تحديد اسم عرض مختلف من خلال ’الإعدادات "
-"المتقدّمة‘."
+"اسم المؤسسة الراعية للمساق. {strong_start}ملاحظة: اسم المؤسسة هو جزء من رابط"
+" المساق.{strong_end} لا يمكن تغيير هذا إلا أنه يمكنك تعيين اسم عرض مختلف، في"
+" وقتٍ لاحق، من خلال قسم الإعدادات المتقدّمة."
 
 #: cms/templates/index.html
 msgid ""
-"The unique number that identifies your course within your organization."
-msgstr "الرقم الفريد الذي يعرّف عن مساقك في المؤسّسة."
-
-#: cms/templates/index.html
-msgid ""
-"Note: This is part of your course URL, so no spaces or special characters "
-"are allowed and it cannot be changed."
+"The unique number that identifies your course within your organization. "
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
-"ملاحظة: هذا جزء من رابط مساقك، فلا يُسمح بإدخال فراغات أو استخدام أحرف "
-"خاصّة، ولا يمكن تغييره."
+"يُعرّف الرقم الفريد مساقك ضمن منظمتك. {strong_start} ملاحظة: هذا جزء من رابط"
+" مساقك، لذا لا يُسمح باستخدام فراغات أو محارف خاصةـ كما ولا يمكن "
+"تغييره.{strong_end}"
 
 #: cms/templates/index.html
-msgid "The term in which your course will run."
-msgstr "الفترة التي سيجري فيها تشغيل مساقك"
+msgid ""
+"The term in which your course will run. {strong_start}Note: This is part of "
+"your course URL, so no spaces or special characters are allowed and it "
+"cannot be changed.{strong_end}"
+msgstr ""
+"يُعرّف الرقم الفريد مساقك ضمن منظمتك. {strong_start} ملاحظة: هذا جزء من رابط"
+" مساقك، لذا لا يُسمح باستخدام فراغات أو محارف خاصةـ كما ولا يمكن "
+"تغييره.{strong_end}"
 
 #: cms/templates/index.html
 msgid "Create"
@@ -18985,16 +18986,14 @@ msgid "e.g. CSPROB"
 msgstr "مثلًا، CSPROB"
 
 #: cms/templates/index.html
-msgid "The unique code that identifies this library."
-msgstr "الرمز التعريفي الفريد لتحديد المكتبة."
-
-#: cms/templates/index.html
 msgid ""
-"Note: This is part of your library URL, so no spaces or special characters "
-"are allowed."
+"The unique code that identifies this library. {strong_start}Note: This is "
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
 msgstr ""
-"ملاحظة: هذا جزء من الرابط الخاص بمكتبتك، وبالتالي لا يُسمح بإدخال فراغات أو "
-"أحرف خاصّة."
+"يُعرف الرمز الفريد هذه المكتبة. {strong_start} ملاحظة: هذا جزء من رابط "
+"مكتبتك، بل يُسمح باستخدام الفراغات أو المحارف الخاصّة.{strong_end} لا يمكن "
+"تغيير هذا الجزء."
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -19246,23 +19245,22 @@ msgstr ""
 "{link_start}الاتّصال بطاقم {platform_name} للمزيد من الاستفسار{link_end}."
 
 #: cms/templates/index.html
-#, python-format
-msgid "Thanks for signing up, %(name)s!"
-msgstr "نشكرك على تسجيل عضويتك، %(name)s!"
+msgid "Thanks for signing up, {name}!"
+msgstr "نشكرك على تسجيل اشتراكك، {name}!"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
 msgstr "نحتاج إلى التحقّق من عنوان بريدك الإلكتروني لو سمحت. "
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
-"email address (%(email)s). An activation message and next steps should be "
+"email address ({email}). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
-"أوشكت على الانتهاء! نرجو منك التأكيد على عنوان بريدك الإلكتروني (%(email)s) "
-"لتستكمل تسجيل عضويتك، ثمّ ستجد رسالة تفعيل وخطوات تالية بانتظارك."
+"أوشكت على الانتهاء من تقديم الطلب! من أجل استكمال الطلب يجب عليك تأكيد بريدك"
+" الإلكتروني ({email}). ستجد رسالة التفعيل مع الخطوات القادمة التي يجب "
+"اتخاذها بانتظارك هناك."
 
 #: cms/templates/index.html
 msgid "Need help?"
@@ -20159,15 +20157,15 @@ msgstr "تحتوي هذه الكتلة على عدة مكوِّنات."
 
 #: cms/templates/temp-course-landing.html
 msgid "Circuits and Electronics"
-msgstr ""
+msgstr "الدارات والإلكترونيات"
 
 #: cms/templates/temp-course-landing.html
 msgid "Massachusetts Institute of Technology"
-msgstr ""
+msgstr "معهد ماساتشوستس للتكنولوجيا"
 
 #: cms/templates/temp-course-landing.html
 msgid "Forgot?"
-msgstr ""
+msgstr "نسيت؟"
 
 #: cms/templates/temp-course-landing.html
 msgid ""
@@ -20537,7 +20535,7 @@ msgstr "تشغيل مترجم مصادر لاتخ Latex"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Heading"
-msgstr ""
+msgstr "عنوان رئيسي"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Insert a heading"
