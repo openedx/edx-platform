@@ -79,9 +79,9 @@
             ]
         },
         {
-            'display_name': gettext('Rescind a single certificate'),
+            'display_name': gettext('Update certificate status'),
             'method': 'update_cert_status',
-            'description': gettext('Rescind a certificate for a particular user in a particular course'),
+            'description': gettext('Update the status of a certificate for a particular user in a particular course'),
             'kwargs': [
                 {
                     'argument': 'course_id',
@@ -95,7 +95,7 @@
                 },
                 {
                     'argument': 'status',
-                    'display_name': gettext('status'),
+                    'display_name': gettext('status (defaults to `unavailable`)'),
                     'required': false,
                 },
             ],
