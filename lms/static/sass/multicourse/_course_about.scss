@@ -43,7 +43,7 @@
         width: flex-grid(8) + flex-gutter();
         z-index: 2;
 
-        > hgroup {
+        > .heading-group {
           border-bottom: 1px solid $border-color-2;
           box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
           margin-bottom: $baseline;

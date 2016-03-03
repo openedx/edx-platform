@@ -303,7 +303,7 @@ class CourseFields(object):
         scope=Scope.settings, default=False,
         help=_(
             "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically."
+            "If false, they are sorted chronologically by creation date and time."
         )
     )
     announcement = Date(
@@ -336,15 +336,6 @@ class CourseFields(object):
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
         help=_("Enter the unique identifier for your course's video files provided by edX."),
-        scope=Scope.settings
-    )
-    facebook_url = String(
-        help=_(
-            "Enter the URL for the official course Facebook group. "
-            "If you provide a URL, the mobile app includes a button that students can tap to access the group."
-        ),
-        default=None,
-        display_name=_("Facebook URL"),
         scope=Scope.settings
     )
     no_grade = Boolean(

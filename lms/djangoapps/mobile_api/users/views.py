@@ -236,7 +236,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             it is enabled, otherwise null.
           * end: The end date of the course.
           * id: The unique ID of the course.
-          * latest_updates: Reserved for future use.
           * name: The name of the course.
           * number: The course number.
           * org: The organization that created the course.

@@ -96,7 +96,7 @@ def container_handler(request, usage_key_string):
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
-            action = request.REQUEST.get('action', 'view')
+            action = request.GET.get('action', 'view')
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None

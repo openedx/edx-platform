@@ -1,113 +1,34 @@
 .. _Browsers:
 
-.. Doc team! Be sure that when you make any changes to this file that you also make them to the mirrored file in the edx-analytics-dashboard/docs repository. - Alison 19 Sep 14
-
 ####################
 edX Browser Support
 ####################
 
-The edX Platform runs on the following browsers:
+.. Doc team! Be sure that when you make any changes to this file that you also make them to the mirrored files in these other locations.
+.. edx-analytics-dashboard/docs/en_us/dashboard/source/front_matter
+.. edx-platform/docs/en_us/shared
+.. Alison 19 Aug 14
 
-* `Internet Explorer <https://microsoft.com/ie>`_
-* `Chrome <https://www.google.com/chrome>`_
-* `Safari <https://www.apple.com/safari>`_
-* `Firefox <https://mozilla.org/firefox>`_
 
-The edX Platform is routinely tested and verified on the current
-and previous version of each of these browsers. We generally encourage the
-use of and fully support only the latest version.
+The edX platform runs on the following browsers.
 
-This information is updated as new major operating system and browser versions
-are released. All point releases are supported unless noted; occasional
-exceptions are based on specific bug fixes or feature updates.
+* `Chrome`_
+* `Safari`_
+* `Firefox`_
+* `Microsoft Edge`_ and `Microsoft Internet Explorer`_ 11
 
-***********************************
-edX Learning Management System
-***********************************
+The edX platform is routinely tested and verified on the current version and
+the previous version of each of these browsers. We generally encourage the use
+of, and fully support only, the latest version.
 
-The following table shows operating system and browser support for the edX
-Learning Management System, which students and course staff use to interact
-with course content.
+.. note:: If you use the Safari browser, be aware that it does not support the
+ search feature for the guides on `docs.edx.org`_. This is a known limitation.
 
-.. list-table::
-   :widths: 20 10 10 10 10 10
-   :header-rows: 1
 
-   * -
-     - Chrome
-     - Safari
-     - Firefox
-     - IE 9
-     - IE 10
-   * - Windows 7
-     - Yes
-     - N/A
-     - Yes
-     - Yes
-     - Yes
-   * - Mac OSX 10.8 or 10.9
-     - Yes
-     - Yes
-     - Yes
-     - N/A
-     - N/A
-
-***********************************
-edX Studio
-***********************************
-
-The following table shows operating system and browser support for edX Studio, which staff use to build a course.
-
-.. list-table::
-   :widths: 20 10 10 10 10 10
-   :header-rows: 1
-
-   * -
-     - Chrome
-     - Safari
-     - Firefox
-     - IE 9
-     - IE 10
-   * - Windows 7
-     - Yes
-     - N/A
-     - Yes
-     - Provisional
-     - Provisional
-   * - Mac OSX 10.8 or 10.9
-     - Yes
-     - Yes
-     - Yes
-     - N/A
-     - N/A
-
-***********************************
-edX Insights
-***********************************
-
-The following table shows operating system and browser support for edX
-Insights, which staff use to review and download data about their courses and
-students.
-
-.. list-table::
-   :widths: 20 10 10 10 10 10
-   :header-rows: 1
-
-   * -
-     - Chrome
-     - Safari
-     - Firefox
-     - IE 9
-     - IE 10
-   * - Windows 7
-     - Yes
-     - N/A
-     - Yes
-     - Provisional
-     - Provisional
-   * - Mac OSX 10.8 or 10.9
-     - Yes
-     - Yes
-     - Yes
-     - N/A
-     - N/A
+.. _docs.edx.org: http://docs.edx.org
+.. Browsers
+.. _Chrome: https://www.google.com/chrome
+.. _Safari: https://www.apple.com/safari
+.. _Firefox: https://mozilla.org/firefox
+.. _Microsoft Edge: https://www.microsoft.com/microsoft-edge
+.. _Microsoft Internet Explorer: http://windows.microsoft.com/internet-explorer/download-ie

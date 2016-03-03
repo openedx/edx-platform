@@ -94,7 +94,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:53+0000\n"
+"POT-Creation-Date: 2016-02-17 21:29+0000\n"
 "PO-Revision-Date: 2016-02-12 08:07+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -8618,7 +8618,6 @@ msgstr ""
 "نُشرت آخر مرّة في %(last_published_date)s من قِبل %(publish_username)s."
 
 #: cms/templates/js/publish-history.underscore
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
 msgstr "رسالة"

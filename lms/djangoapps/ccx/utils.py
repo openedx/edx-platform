@@ -23,6 +23,7 @@ from instructor.enrollment import (
 from instructor.access import allow_access
 from instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
@@ -125,6 +126,30 @@ def get_ccx_for_coach(course, coach):
     if ccxs.exists():
         return ccxs[0]
     return None
+
+
+def get_ccx_by_ccx_id(course, coach, ccx_id):
+    """
+    Finds a CCX of given coach on given master course.
+
+    Arguments:
+        course (CourseDescriptor): Master course
+        coach (User): Coach to ccx
+        ccx_id (long): Id of ccx
+
+    Returns:
+     ccx (CustomCourseForEdX): Instance of CCX.
+    """
+    try:
+        ccx = CustomCourseForEdX.objects.get(
+            id=ccx_id,
+            course_id=course.id,
+            coach=coach
+        )
+    except CustomCourseForEdX.DoesNotExist:
+        return None
+
+    return ccx
 
 
 def get_valid_student_email(identifier):
@@ -260,3 +285,29 @@ def is_email(identifier):
     except ValidationError:
         return False
     return True
+
+
+def get_course_chapters(course_key):
+    """
+    Extracts the chapters from a course structure.
+    If the course does not exist returns None.
+    If the structure does not contain 1st level children,
+    it returns an empty list.
+
+    Args:
+        course_key (CourseLocator): the course key
+    Returns:
+        list (string): a list of string representing the chapters modules
+            of the course
+    """
+    if course_key is None:
+        return
+    try:
+        course_obj = CourseStructure.objects.get(course_id=course_key)
+    except CourseStructure.DoesNotExist:
+        return
+    course_struct = course_obj.structure
+    try:
+        return course_struct['blocks'][course_struct['root']].get('children', [])
+    except KeyError:
+        return []

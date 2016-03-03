@@ -1,3 +1,0 @@
-"""
-Friends API
-"""

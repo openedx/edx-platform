@@ -9,7 +9,7 @@
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Daniel Le Berre, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
-# Eric Fortin, 2014
+# Eric Fortin, 2014,2016
 # francoisedocq, 2014
 # Françoise Docq, 2014
 # Françoise Docq, 2014
@@ -67,6 +67,7 @@
 # Translators:
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
+# Eric Fortin, 2016
 # francoisedocq, 2014
 # Françoise Docq, 2014
 # Françoise Docq, 2014
@@ -187,7 +188,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:54+0000\n"
+"POT-Creation-Date: 2016-02-17 21:30+0000\n"
 "PO-Revision-Date: 2016-01-12 23:32+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -4459,6 +4460,14 @@ msgstr ""
 msgid "Course {course_id} does not exist."
 msgstr ""
 
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -7391,6 +7400,43 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "Passer au contenu de cette vue"
 
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid ""
+"\n"
+"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
+"  "
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid "Manage your data: %(permission)s"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "Votre mot de passe a été réinitialisé"
@@ -8283,6 +8329,16 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -16665,12 +16721,9 @@ msgstr "Quelles sont les pages ?"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
-"Les pages sont répertoriés horizontalement en haut de votre cours. Les pages"
-" par défaut (Cours, Infos,  Discussions, Wiki, et Progression) sont suivies "
-"par les manuels et les pages personnalisées que vous créez."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -16713,13 +16766,10 @@ msgstr "Aperçu des pages de votre cours"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
-"Les pages apparaissent dans la barre de navigation en haut de votre cours. "
-"Les pages par défaut (Cours, Infos, Discussions, Wiki, et Progression)  sont"
-" suivies par les manuels et les pages personnalisées."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"

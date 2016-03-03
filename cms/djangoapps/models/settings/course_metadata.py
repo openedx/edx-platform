@@ -73,10 +73,6 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
             filtered_list.append('video_upload_pipeline')
 
-        # Do not show facebook_url if the feature is disabled.
-        if not settings.FEATURES.get('ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES'):
-            filtered_list.append('facebook_url')
-
         # Do not show social sharing url field if the feature is disabled.
         if (not hasattr(settings, 'SOCIAL_SHARING_SETTINGS') or
                 not getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get("CUSTOM_COURSE_URLS")):

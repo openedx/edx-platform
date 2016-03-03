@@ -7,7 +7,9 @@ doesn't expose settings to enforce this.
 """
 import logging
 
+from django.conf import settings
 import jwt
+from rest_framework import exceptions
 from rest_framework_jwt.settings import api_settings
 
 
@@ -19,6 +21,10 @@ def decode(token):
     Ensure InvalidTokenErrors are logged for diagnostic purposes, before
     failing authentication.
     """
+    if not settings.FEATURES.get('ENABLE_JWT_AUTH', False):
+        msg = 'JWT auth not supported.'
+        log.error(msg)
+        raise exceptions.AuthenticationFailed(msg)
 
     options = {
         'verify_exp': api_settings.JWT_VERIFY_EXPIRATION,

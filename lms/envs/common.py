@@ -271,10 +271,6 @@ FEATURES = {
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
-    'ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES': False,
-
-    # Enable temporary APIs required for xBlocks on Mobile
-    'ENABLE_COURSE_BLOCKS_NAVIGATION_API': False,
 
     # Enable the combined login/registration form
     'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
@@ -2146,6 +2142,14 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
+
+################ Enable JWT auth ####################
+# When this feature flag is set to False, API endpoints using
+# JSONWebTokenAuthentication will reject requests using JWT to authenticate,
+# even if those tokens are valid. Set this to True only if you need those
+# endpoints, and have configured settings 'JWT_AUTH' to override its default
+# values with secure values.
+FEATURES['ENABLE_JWT_AUTH'] = False
 
 ######################## CAS authentication ###########################
 

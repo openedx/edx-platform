@@ -231,6 +231,11 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'name': 'Public Profiles',
                     'description': 'Description for topic 6.'
                 },
+                {
+                    'id': 'Topic_6.5',
+                    'name': 'Test Accessibility Topic',
+                    'description': 'Description for Topic_6.5'
+                },
             ],
             'max_team_size': 1
         }
@@ -1192,6 +1197,9 @@ class TestDetailTopicAPI(TeamAPITestCase):
 
     def test_invalid_topic_id(self):
         self.get_topic_detail('no_such_topic', self.test_course_1.id, 404)
+
+    def test_topic_detail_with_caps_and_dot_in_id(self):
+        self.get_topic_detail('Topic_6.5', self.test_course_2.id, user='student_enrolled_public_profile')
 
     def test_team_count(self):
         """Test that team_count is included with a topic"""

@@ -17,6 +17,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
     start = serializers.CharField(allow_blank=True)
     due = serializers.CharField(allow_blank=True)
     max_students_allowed = serializers.IntegerField(source='max_student_enrollments_allowed')
+    course_modules = serializers.SerializerMethodField()
 
     class Meta(object):
         model = CustomCourseForEdX
@@ -28,6 +29,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
             "start",
             "due",
             "max_students_allowed",
+            "course_modules",
         )
         read_only_fields = (
             "ccx_course_id",
@@ -42,3 +44,10 @@ class CCXCourseSerializer(serializers.ModelSerializer):
         Getter for the CCX Course ID
         """
         return unicode(CCXLocator.from_course_locator(obj.course.id, obj.id))
+
+    @staticmethod
+    def get_course_modules(obj):
+        """
+        Getter for the Course Modules. The list is stored in a compressed field.
+        """
+        return obj.structure or []

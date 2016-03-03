@@ -5,7 +5,7 @@ LMS index (home) page.
 from bok_choy.page_object import PageObject
 from . import BASE_URL
 
-BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title hgroup h1'
+BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title .heading-group h1'
 INTRO_VIDEO_SELECTOR = 'div.play-intro'
 VIDEO_MODAL_SELECTOR = 'section#video-modal.modal.home-page-video-modal.video-modal'
 

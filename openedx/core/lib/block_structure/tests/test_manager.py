@@ -3,6 +3,7 @@ Tests for manager.py
 """
 from unittest import TestCase
 
+from ..exceptions import UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
@@ -126,6 +127,19 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         self.assert_block_structure(block_structure, self.children_map)
         TestTransformer1.assert_collected(block_structure)
         TestTransformer1.assert_transformed(block_structure)
+
+    def test_get_transformed_with_starting_block(self):
+        with mock_registered_transformers(self.registered_transformers):
+            block_structure = self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=1)
+        substructure_of_children_map = [[], [3, 4], [], [], []]
+        self.assert_block_structure(block_structure, substructure_of_children_map, missing_blocks=[0, 2])
+        TestTransformer1.assert_collected(block_structure)
+        TestTransformer1.assert_transformed(block_structure)
+
+    def test_get_transformed_with_nonexistent_starting_block(self):
+        with mock_registered_transformers(self.registered_transformers):
+            with self.assertRaises(UsageKeyNotInBlockStructure):
+                self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=100)
 
     def test_get_collected_cached(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)

@@ -45,7 +45,7 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 亚仑 <fl_meng@163.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
-# 周歆荷 <lotus351@outlook.com>, 2015
+# 周歆荷 <zhxh401@126.com>, 2015
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 汤和果 <hgtang93@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -138,7 +138,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:53+0000\n"
+"POT-Creation-Date: 2016-02-17 21:29+0000\n"
 "PO-Revision-Date: 2016-02-04 20:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -7979,7 +7979,6 @@ msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
 msgstr ""

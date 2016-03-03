@@ -186,7 +186,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             '<form action=".+create_ccx"',
             response.content))
 
-    def test_create_ccx(self):
+    def test_create_ccx(self, ccx_name='New CCX'):
         """
         Create CCX. Follow redirect to coach dashboard, confirm we see
         the coach dashboard for the new CCX.
@@ -197,7 +197,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             'create_ccx',
             kwargs={'course_id': unicode(self.course.id)})
 
-        response = self.client.post(url, {'name': 'New CCX'})
+        response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
         url = response.get('location')  # pylint: disable=no-member
         response = self.client.get(url)
@@ -221,6 +221,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # assert ccx creator has role=ccx_coach
         role = CourseCcxCoachRole(course_key)
         self.assertTrue(role.has_user(self.coach))
+
+    @ddt.data("CCX demo 1", "CCX demo 2", "CCX demo 3")
+    def test_create_multiple_ccx(self, ccx_name):
+        self.test_create_ccx(ccx_name)
 
     def test_get_date(self):
         """

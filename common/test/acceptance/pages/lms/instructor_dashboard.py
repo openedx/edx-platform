@@ -678,6 +678,7 @@ class MembershipPageAutoEnrollSection(PageObject):
 
     auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
     auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'
     NOTIFICATION_WARNING = 'warning'
     NOTIFICATION_SUCCESS = 'confirmation'
@@ -749,6 +750,31 @@ class MembershipPageAutoEnrollSection(PageObject):
         file_path = InstructorDashboardPage.get_asset_path(filename)
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
+
+    def fill_enrollment_batch_text_box(self, email):
+        """
+        Fill in the form with the provided email and submit it.
+        """
+        email_selector = "{} >p>textarea".format(self.batch_enrollment_selector)
+        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+
+        # Fill the email addresses after the email selector is visible.
+        self.wait_for_element_visibility(email_selector, 'Email field is visible')
+        self.q(css=email_selector).fill(email)
+
+        # Verify enrollment button is present before clicking
+        EmptyPromise(
+            lambda: self.q(css=enrollment_button).present, "Enrollment button"
+        ).fulfill()
+        self.q(css=enrollment_button).click()
+
+    def get_notification_text(self):
+        """
+        Check notification div is visible and have message.
+        """
+        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
+        self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
+        return self.q(css="{} h3".format(notification_selector)).text
 
 
 class SpecialExamsPageAllowanceSection(PageObject):

@@ -41,7 +41,7 @@
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # webslavic <webslavic@yahoo.com>, 2014
-# Weyedide <weyedide@gmail.com>, 2014-2015
+# Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
@@ -163,7 +163,7 @@
 # Toskira <toskira@gmail.com>, 2014
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # webslavic <webslavic@yahoo.com>, 2014
-# Weyedide <weyedide@gmail.com>, 2014-2015
+# Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -192,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:54+0000\n"
+"POT-Creation-Date: 2016-02-17 21:30+0000\n"
 "PO-Revision-Date: 2016-02-16 08:40+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -3946,8 +3946,6 @@ msgstr "Разрешено ли очное проведение"
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr ""
-"Эта настройка показывает, проводится ли данное испытание в наблюдаемой "
-"форме."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Software Secure Review Rules"
@@ -5111,6 +5109,14 @@ msgstr "{course_id} недействительный ключ курса."
 #: lms/djangoapps/commerce/api/v1/serializers.py
 msgid "Course {course_id} does not exist."
 msgstr "Курса {course_id} не существует."
+
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -8520,6 +8526,43 @@ msgstr "Подпишитесь на канал {platform_name} на YouTube"
 msgid "Skip to main content"
 msgstr "Перейти к основному содержимому"
 
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid ""
+"\n"
+"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
+"  "
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid "Manage your data: %(permission)s"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "Сброс пароля выполнен"
@@ -9448,6 +9491,16 @@ msgstr "Разрешить интерфейс авторизации Studio"
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
 msgstr "Разрешить выпуск сертификатов"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
+msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -12830,7 +12883,7 @@ msgstr "Добро пожаловать на {org} {course_name}!"
 
 #: lms/templates/courseware/info.html
 msgid "Resume Course"
-msgstr ""
+msgstr "Вернуться к курсу"
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -18227,12 +18280,9 @@ msgstr "Какие страницы?"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
 msgstr ""
-"Страницы формируют горизонтальное меню над содержимым курса. За страницами "
-"по умолчанию (Содержание, Новости и анонсы, Обсуждения, Вики и Прогресс) "
-"следуют созданные вами учебники и дополнительные страницы."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -18274,13 +18324,10 @@ msgstr "Предварительный просмотр страниц ваше�
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
-"Страницы отображаются на верхней навигационной панели курса. За страницами "
-"по умолчанию (Содержание, Новости и анонсы, Обсуждения, Вики и Прогресс) "
-"следуют созданные вами учебники и дополнительные страницы."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"

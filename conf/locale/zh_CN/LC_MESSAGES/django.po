@@ -275,7 +275,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-11 11:54+0000\n"
+"POT-Creation-Date: 2016-02-17 21:30+0000\n"
 "PO-Revision-Date: 2015-12-13 04:46+0000\n"
 "Last-Translator: riceball <snowyu.lee@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -4519,6 +4519,14 @@ msgstr ""
 msgid "Course {course_id} does not exist."
 msgstr ""
 
+#: lms/djangoapps/commerce/models.py
+msgid "Use the checkout page hosted by the E-Commerce service."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Path to single course checkout page hosted by the E-Commerce service."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -7459,6 +7467,43 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "跳至主要内容"
 
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid ""
+"\n"
+"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
+"  "
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+#, python-format
+msgid "Manage your data: %(permission)s"
+msgstr ""
+
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "您的密码重置已完成"
@@ -8316,6 +8361,16 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Maximum Certification Retries"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"When making requests to award certificates, make at most this many attempts "
+"to retry a failing request."
 msgstr ""
 
 #: openedx/core/djangoapps/self_paced/models.py
@@ -16198,9 +16253,9 @@ msgstr "什么是页面？"
 #: cms/templates/edit-tabs.html
 msgid ""
 "Pages are listed horizontally at the top of your course. Default pages "
-"(Courseware, Course info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages that you create."
-msgstr "课程页面链接水平列于课程主页的上方。默认页面 (课件，课程信息，讨论，维基和进度)，之后是教材和自定义页面。"
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -16237,10 +16292,10 @@ msgstr "课程页面预览"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages "
-"(Courseware, Course Info, Discussion, Wiki, and Progress) are followed by "
-"textbooks and custom pages."
-msgstr "课程页面链接位于课程主页上方的导航条。首先是缺省页面链接(课件、课程信息、论坛、维基和进度)，之后是参考教材及自定义页面。"
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
+msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"

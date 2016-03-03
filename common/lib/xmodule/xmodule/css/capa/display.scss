@@ -376,7 +376,7 @@ div.problem {
         display: inline-block;
         width: 25px;
         height: 20px;
-        background: url('../images/partially-correct-icon.png') center center no-repeat;
+        background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
       }
 
       input {
@@ -1201,7 +1201,7 @@ div.problem {
         }
 
         .result-partially-correct {
-          background: url('../images/partially-correct-icon.png') left 20px no-repeat;
+          background: url('#{$static-path}/images/partially-correct-icon.png') left 20px no-repeat;
 
           .result-actual-output {
             color: #090;
@@ -1461,7 +1461,7 @@ div.problem .imageinput.capa_inputtype {
   }
 
   .partially-correct {
-    background: url('../images/partially-correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
 
@@ -1480,15 +1480,15 @@ div.problem .annotation-input {
   }
 
   .correct {
-    background: url('../images/correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
   }
 
   .incorrect {
-    background: url('../images/incorrect-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
   }
 
   .partially-correct {
-    background: url('../images/partially-correct-icon.png') center center no-repeat;
+    background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
 

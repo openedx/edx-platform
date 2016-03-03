@@ -1795,6 +1795,7 @@ def create_account_with_params(request, params):
             log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
     else:
         registration.activate()
+        _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -1822,6 +1823,25 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def _enroll_user_in_pending_courses(student):
+    """
+    Enroll student in any pending courses he/she may have.
+    """
+    ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
+    for cea in ceas:
+        if cea.auto_enroll:
+            enrollment = CourseEnrollment.enroll(student, cea.course_id)
+            manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
+            if manual_enrollment_audit is not None:
+                # get the enrolled by user and reason from the ManualEnrollmentAudit table.
+                # then create a new ManualEnrollmentAudit table entry for the same email
+                # different transition state.
+                ManualEnrollmentAudit.create_manual_enrollment_audit(
+                    manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
+                    manual_enrollment_audit.reason, enrollment
+                )
 
 
 @csrf_exempt
@@ -2020,21 +2040,7 @@ def activate_account(request, key):
             already_active = False
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=regs[0].user_id)
-        if student:
-            ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
-            for cea in ceas:
-                if cea.auto_enroll:
-                    enrollment = CourseEnrollment.enroll(student[0], cea.course_id)
-                    manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student[0].email)
-                    if manual_enrollment_audit is not None:
-                        # get the enrolled by user and reason from the ManualEnrollmentAudit table.
-                        # then create a new ManualEnrollmentAudit table entry for the same email
-                        # different transition state.
-                        ManualEnrollmentAudit.create_manual_enrollment_audit(
-                            manual_enrollment_audit.enrolled_by, student[0].email, ALLOWEDTOENROLL_TO_ENROLLED,
-                            manual_enrollment_audit.reason, enrollment
-                        )
+        _enroll_user_in_pending_courses(regs[0].user)
 
         resp = render_to_response(
             "registration/activation_complete.html",

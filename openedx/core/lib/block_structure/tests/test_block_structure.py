@@ -37,10 +37,10 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         for child, parents in enumerate(self.get_parents_map(children_map)):
             self.assertSetEqual(set(block_structure.get_parents(child)), set(parents))
 
-        # has_block
+        # __contains__
         for node in range(len(children_map)):
-            self.assertTrue(block_structure.has_block(node))
-        self.assertFalse(block_structure.has_block(len(children_map) + 1))
+            self.assertIn(node, block_structure)
+        self.assertNotIn(len(children_map) + 1, block_structure)
 
 
 @ddt.ddt

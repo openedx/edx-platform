@@ -161,7 +161,7 @@ if os.environ.get('QUEUE') == 'high_mem':
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
-    ENV_TOKENS = yaml.load(env_file)
+    ENV_TOKENS = yaml.safe_load(env_file)
 
 # Works around an Ansible bug
 ENV_TOKENS = convert_tokens(ENV_TOKENS)
@@ -266,7 +266,7 @@ STATIC_ROOT = path(STATIC_ROOT_BASE)
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.yaml") as auth_file:
-    AUTH_TOKENS = yaml.load(auth_file)
+    AUTH_TOKENS = yaml.safe_load(auth_file)
 
 # Works around an Ansible bug
 AUTH_TOKENS = convert_tokens(AUTH_TOKENS)

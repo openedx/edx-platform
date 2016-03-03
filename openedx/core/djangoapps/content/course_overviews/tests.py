@@ -91,7 +91,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             'display_number_with_default',
             'display_org_with_default',
             'advertised_start',
-            'facebook_url',
             'social_sharing_url',
             'certificates_display_behavior',
             'certificates_show_before_end',
