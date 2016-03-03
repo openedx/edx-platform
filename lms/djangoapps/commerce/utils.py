@@ -4,7 +4,7 @@ from urlparse import urljoin
 
 from django.conf import settings
 
-from commerce.models import CommerceConfiguration
+from .models import CommerceConfiguration
 from openedx.core.djangoapps.theming import helpers
 
 log = logging.getLogger(__name__)

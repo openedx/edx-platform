@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from commerce.models import CommerceConfiguration
+from .models import CommerceConfiguration
 from config_models.admin import ConfigurationModelAdmin
 
 admin.site.register(CommerceConfiguration, ConfigurationModelAdmin)
