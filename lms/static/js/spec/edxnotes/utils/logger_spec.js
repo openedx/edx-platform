@@ -94,11 +94,11 @@ define([
         it('can use timers', function() {
             var logger = getLogger('id', 1), logs, log;
 
-            spyOn(performance, 'now').andReturn(1);
-            spyOn(Date, 'now').andReturn(1);
+            spyOn(performance, 'now').and.returnValue(1);
+            spyOn(Date, 'now').and.returnValue(1);
             logger.time('timer');
-            performance.now.andReturn(201);
-            Date.now.andReturn(201);
+            performance.now.and.returnValue(201);
+            Date.now.and.returnValue(201);
             logger.timeEnd('timer');
 
             logs = logger.getHistory();

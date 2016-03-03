@@ -1,7 +1,7 @@
 define(['jquery'], function($) {
     'use strict';
     return function (that) {
-        that.addMatchers({
+        jasmine.addMatchers({
             toContainText: function (text) {
                 var trimmedText = $.trim($(this.actual).text());
 

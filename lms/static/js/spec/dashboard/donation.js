@@ -29,7 +29,7 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // This function gets passed the dynamically constructed
                 // form with signed payment parameters from the LMS server,
                 // so we can verify that the form is constructed correctly.
-                spyOn(view, 'submitPaymentForm').andCallFake(function() {});
+                spyOn(view, 'submitPaymentForm').and.callFake(function() {});
 
                 // Stub the analytics event tracker
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);

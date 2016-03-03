@@ -127,7 +127,7 @@ define(['js/student_account/account'],
                 view = new edx.student.account.AccountView().render();
 
                 // Stub Ajax calls to return success/failure
-                spyOn($, "ajax").andCallFake(function() {
+                spyOn($, "ajax").and.callFake(function() {
                     return $.Deferred(function(defer) {
                         if (ajaxSuccess) {
                             defer.resolve();

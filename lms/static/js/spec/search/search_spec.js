@@ -280,8 +280,8 @@ define([
                 this.model.collection = new SearchCollection([this.model], { course_id: 'edx101' });
                 this.item.render();
                 // Mock the redirect call
-                spyOn(this.item, 'redirect').andCallFake( function() {} );
-                spyOn(Logger, 'log').andReturn($.Deferred().resolve());
+                spyOn(this.item, 'redirect').and.callFake( function() {} );
+                spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
                 this.item.$el.find('a').trigger('click');
                 expect(this.item.redirect).toHaveBeenCalled();
                 this.item.$el.trigger('click');

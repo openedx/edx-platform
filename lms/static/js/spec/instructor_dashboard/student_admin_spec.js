@@ -17,7 +17,7 @@ define(['jquery', 'coffee/src/instructor_dashboard/student_admin', 'common/js/sp
                 dashboard_api_url = '/courses/PU/FSc/2014_T4/instructor/api';
                 unique_student_identifier = "test@example.com";
                 alert_msg = '';
-                spyOn(window, 'alert').andCallFake(function(message) {
+                spyOn(window, 'alert').and.callFake(function(message) {
                     alert_msg = message;
                 });
 

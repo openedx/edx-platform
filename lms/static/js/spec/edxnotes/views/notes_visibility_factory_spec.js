@@ -32,7 +32,7 @@ define([
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
-            spyOn(this.toggleNotes, 'toggleHandler').andCallThrough();
+            spyOn(this.toggleNotes, 'toggleHandler').and.callThrough();
         });
 
         afterEach(function () {

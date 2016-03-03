@@ -24,8 +24,8 @@ define(['backbone',
                         'templates/bookmarks/bookmarks-list'
                     ]
                 );
-                spyOn(Logger, 'log').andReturn($.Deferred().resolve());
-                this.addMatchers({
+                spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
+                jasmine.addMatchers({
                    toHaveBeenCalledWithUrl: function (expectedUrl) {
                        return expectedUrl === this.actual.argsForCall[0][0].target.pathname;
                    }
@@ -117,7 +117,7 @@ define(['backbone',
             it("has correct behavior for bookmarks button", function () {
                 var requests = AjaxHelpers.requests(this);
 
-                spyOn(bookmarksButtonView, 'toggleBookmarksListView').andCallThrough();
+                spyOn(bookmarksButtonView, 'toggleBookmarksListView').and.callThrough();
 
                 bookmarksButtonView.delegateEvents();
 

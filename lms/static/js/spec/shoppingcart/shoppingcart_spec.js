@@ -13,7 +13,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
                     el: $('.confirm-enrollment.cart-view form')
                 });
 
-                spyOn(view, 'responseFromServer').andCallFake(function() {});
+                spyOn(view, 'responseFromServer').and.callFake(function() {});
 
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(this);
