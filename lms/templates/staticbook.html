@@ -88,7 +88,7 @@ $("#open_close_accordion a").click(function(){
                   % if len(entry) > 0:
                       <ul>
                           % for child in entry:
-                              ${print_entry(child)}
+                              ${print_entry(child) | n, unicode}
                           % endfor
                       </ul>
                   % endif
