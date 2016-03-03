@@ -101,6 +101,8 @@ def prereq_cache(cache_name, paths, install_func):
     # If they do not match (either the cache hasn't been created, or the files have changed),
     # then execute the code within the block.
     new_hash = compute_fingerprint(paths)
+    print 'DEBUG: new hash is "{}"'.format(new_hash)
+    print 'DEBUG: old hash is "{}"'.format(old_hash)
     if new_hash != old_hash:
         install_func()
 
@@ -234,6 +236,7 @@ def install_python_prereqs():
     """
     Installs Python prerequisites.
     """
+    print 'DEBUG: running install_python_prereqs'
     if no_prereq_install():
         print NO_PREREQ_MESSAGE
         return
