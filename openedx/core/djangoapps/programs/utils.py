@@ -61,7 +61,7 @@ def get_programs_for_dashboard(user, course_keys):
     # Reindex the result returned by the Programs API from:
     #     program -> course code -> course run
     # to:
-    #     course run -> program
+    #     course run -> program_array
     # Ignore course runs not present in the user's active enrollments.
     for program in programs:
         try:
@@ -69,7 +69,7 @@ def get_programs_for_dashboard(user, course_keys):
                 for run in course_code['run_modes']:
                     course_key = run['course_key']
                     if course_key in course_keys:
-                        course_programs[course_key] = program
+                        course_programs.setdefault(course_key, []).append(program)
         except KeyError:
             log.exception('Unable to parse Programs API response: %r', program)
 

@@ -2421,26 +2421,29 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
             the given user has active enrollments.
 
     Returns:
-        dict, containing programs keyed by course. Empty if programs cannot be retrieved.
+        dict, containing programs keyed by course.
     """
     course_programs = get_programs_for_dashboard(user, user_enrolled_courses)
     programs_data = {}
 
-    for course_key, program in course_programs.viewitems():
-        if program.get('status') == 'active' and program.get('category') == 'xseries':
-            try:
-                programs_data[course_key] = {
-                    'course_count': len(program['course_codes']),
-                    'display_name': program['name'],
-                    'category': program.get('category'),
-                    'program_id': program['id'],
-                    'program_marketing_url': urljoin(
-                        settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
-                    ).format(program['marketing_slug']),
-                    'display_category': 'XSeries'
-                }
-            except KeyError:
-                log.warning('Program structure is invalid, skipping display: %r', program)
+    for course_key, programs in course_programs.viewitems():
+        for program in programs:
+            if program.get('status') == 'active' and program.get('category') == 'xseries':
+                try:
+                    programs_for_course = programs_data.setdefault(course_key, {})
+                    programs_for_course.setdefault('course_program_list', []).append({
+                        'course_count': len(program['course_codes']),
+                        'display_name': program['name'],
+                        'program_id': program['id'],
+                        'program_marketing_url': urljoin(
+                            settings.MKTG_URLS.get('ROOT'),
+                            'xseries' + '/{}'
+                        ).format(program['marketing_slug'])
+                    })
+                    programs_for_course['display_category'] = 'XSeries'
+                    programs_for_course['category'] = program.get('category')
+                except KeyError:
+                    log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
 
