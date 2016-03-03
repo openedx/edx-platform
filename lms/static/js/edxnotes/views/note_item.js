@@ -60,7 +60,9 @@ define([
 
         tagHandler: function (event) {
             event.preventDefault();
-            this.options.scrollToTag(event.currentTarget.text);
+            if (!_.isUndefined(this.options.scrollToTag)) {
+                this.options.scrollToTag(event.currentTarget.text);
+            }
         },
 
         redirectTo: function (uri) {
