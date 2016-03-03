@@ -45,7 +45,7 @@ define([
         describe('destroy', function () {
             it('should unbind all events', function () {
                 spyOn($.fn, 'off');
-                spyOn(this.annotator, 'unsubscribe').andCallThrough();
+                spyOn(this.annotator, 'unsubscribe').and.callThrough();
                 this.plugin.destroy();
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationViewerTextField', this.plugin.addAriaAttributes
@@ -116,9 +116,9 @@ define([
                     highlights: [highlight.get(0)]
                 };
                 highlight.data('annotation', annotation);
-                spyOn(this.annotator, 'showViewer').andCallThrough();
-                spyOn(this.annotator.viewer, 'hide').andCallThrough();
-                spyOn(this.plugin, 'focusOnGrabber').andCallThrough();
+                spyOn(this.annotator, 'showViewer').and.callThrough();
+                spyOn(this.annotator.viewer, 'hide').and.callThrough();
+                spyOn(this.plugin, 'focusOnGrabber').and.callThrough();
             });
 
             it('should open the viewer on SPACE keydown and focus on note', function () {
@@ -175,7 +175,7 @@ define([
                 edit= this.annotator.element.find('.annotator-edit').first();
                 del = this.annotator.element.find('.annotator-delete').first();
                 close = this.annotator.element.find('.annotator-close').first();
-                spyOn(this.annotator.viewer, 'hide').andCallThrough();
+                spyOn(this.annotator.viewer, 'hide').and.callThrough();
             });
 
             it('should give focus to Note on Listing TAB keydown', function () {
@@ -243,8 +243,8 @@ define([
                 tags = annotatorItems.first().next().children('input');
                 save  = this.annotator.element.find('.annotator-save');
                 cancel = this.annotator.element.find('.annotator-cancel');
-                spyOn(this.annotator.editor, 'submit').andCallThrough();
-                spyOn(this.annotator.editor, 'hide').andCallThrough();
+                spyOn(this.annotator.editor, 'submit').and.callThrough();
+                spyOn(this.annotator.editor, 'hide').and.callThrough();
             });
 
             it('should give focus to TextArea on Form TAB keydown', function () {

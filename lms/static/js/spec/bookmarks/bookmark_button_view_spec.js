@@ -80,7 +80,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     var bookmarkButtonView = createBookmarkButtonView(firstActionData.bookmarked);
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
 
-                    spyOn(bookmarkButtonView, firstActionData.handler).andCallThrough();
+                    spyOn(bookmarkButtonView, firstActionData.handler).and.callThrough();
                     spyOnEvent(bookmarkButtonView.$el, firstActionData.event);
 
                     bookmarkButtonView.$el.click();
@@ -101,7 +101,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                     verifyBookmarkButtonState(bookmarkButtonView, secondActionData.bookmarked);
 
-                    spyOn(bookmarkButtonView, secondActionData.handler).andCallThrough();
+                    spyOn(bookmarkButtonView, secondActionData.handler).and.callThrough();
                     spyOnEvent(bookmarkButtonView.$el, secondActionData.event);
 
                     bookmarkButtonView.$el.click();

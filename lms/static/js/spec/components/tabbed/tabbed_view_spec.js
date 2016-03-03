@@ -46,7 +46,7 @@
                        // will cause tests to fail, so we'll instead
                        // make _.defer() immediately invoke its
                        // argument.
-                       spyOn(_, 'defer').andCallFake(function (func) {
+                       spyOn(_, 'defer').and.callFake(function (func) {
                            func();
                        });
                    });
@@ -87,7 +87,7 @@
 
                    describe('history', function() {
                        beforeEach(function () {
-                           spyOn(Backbone.history, 'navigate').andCallThrough();
+                           spyOn(Backbone.history, 'navigate').and.callThrough();
                            view = new TabbedView({
                                tabs: [{
                                    url: 'test 1',

@@ -37,7 +37,7 @@ define([
                 }).render();
 
                 // Stub the payment form submission
-                spyOn( view, 'submitForm' ).andCallFake( function() {} );
+                spyOn( view, 'submitForm' ).and.callFake( function() {} );
                 return view;
             };
 

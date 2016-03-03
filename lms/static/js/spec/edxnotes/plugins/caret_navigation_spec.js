@@ -87,10 +87,10 @@ define([
                 this.mockSubscriber = jasmine.createSpy();
                 this.annotator.subscribe('annotationCreated', this.mockSubscriber);
 
-                spyOn($.fn, 'position').andReturn(this.mockOffset);
-                spyOn(this.annotator, 'createAnnotation').andReturn(this.annotation);
-                spyOn(this.annotator, 'setupAnnotation').andReturn(this.annotation);
-                spyOn(this.annotator, 'getSelectedRanges').andReturn([{}]);
+                spyOn($.fn, 'position').and.returnValue(this.mockOffset);
+                spyOn(this.annotator, 'createAnnotation').and.returnValue(this.annotation);
+                spyOn(this.annotator, 'setupAnnotation').and.returnValue(this.annotation);
+                spyOn(this.annotator, 'getSelectedRanges').and.returnValue([{}]);
                 spyOn(this.annotator, 'deleteAnnotation');
                 spyOn(this.annotator, 'showEditor');
                 spyOn(Annotator.Util, 'readRangeViaSelection');
@@ -111,7 +111,7 @@ define([
             });
 
             it('should display the Annotation#editor correctly if the Annotation#adder is hidden', function () {
-                spyOn($.fn, 'is').andReturn(false);
+                spyOn($.fn, 'is').and.returnValue(false);
                 triggerEvent(this.element);
                 expect($('annotator-hl-temporary').position.callCount).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ define([
             });
 
             it('should display the Annotation#editor in the same place as the Annotation#adder', function () {
-                spyOn($.fn, 'is').andReturn(true);
+                spyOn($.fn, 'is').and.returnValue(true);
                 triggerEvent(this.element);
                 expect(this.annotator.adder.position.callCount).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
@@ -129,7 +129,7 @@ define([
             });
 
             it('should hide the Annotation#adder', function () {
-                spyOn($.fn, 'is').andReturn(true);
+                spyOn($.fn, 'is').and.returnValue(true);
                 spyOn($.fn, 'hide');
                 triggerEvent(this.element);
                 expect(this.annotator.adder.hide).toHaveBeenCalled();
@@ -187,13 +187,13 @@ define([
             });
 
             it('should do nothing if empty selection', function () {
-                this.annotator.getSelectedRanges.andReturn([]);
+                this.annotator.getSelectedRanges.and.returnValue([]);
                 triggerEvent(this.element);
                 expect(this.annotator.showEditor).not.toHaveBeenCalled();
             });
 
             it('should do nothing if selection is in Annotator', function () {
-                spyOn(this.annotator, 'isAnnotator').andReturn(true);
+                spyOn(this.annotator, 'isAnnotator').and.returnValue(true);
                 triggerEvent(this.element);
                 expect(this.annotator.showEditor).not.toHaveBeenCalled();
             });

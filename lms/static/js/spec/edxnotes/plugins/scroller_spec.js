@@ -31,9 +31,9 @@ define([
             ];
 
             highlights = _.map(annotators, function(annotator) {
-                spyOn(annotator, 'onHighlightClick').andCallThrough();
-                spyOn(annotator, 'onHighlightMouseover').andCallThrough();
-                spyOn(annotator, 'startViewerHideTimer').andCallThrough();
+                spyOn(annotator, 'onHighlightClick').and.callThrough();
+                spyOn(annotator, 'onHighlightMouseover').and.callThrough();
+                spyOn(annotator, 'startViewerHideTimer').and.callThrough();
                 return $('<span></span>', {
                     'class': 'annotator-hl',
                     'tabindex': -1,
@@ -41,8 +41,8 @@ define([
                 }).appendTo(annotator.element);
             });
 
-            spyOn(annotators[0].plugins.Scroller, 'getIdFromLocationHash').andReturn('abc123');
-            spyOn($.fn, 'unbind').andCallThrough();
+            spyOn(annotators[0].plugins.Scroller, 'getIdFromLocationHash').and.returnValue('abc123');
+            spyOn($.fn, 'unbind').and.callThrough();
         });
 
         afterEach(function () {
