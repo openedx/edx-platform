@@ -159,12 +159,10 @@ TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
-# This modulestore definition below will not load any xml courses.
 TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
-# This modulestore definition below will not load any xml courses.
 TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
     mkdtemp_clean(),
     {},
