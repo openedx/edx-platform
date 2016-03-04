@@ -9,6 +9,14 @@ from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
 
 
+def update_commerce_config(enabled=False, checkout_page='/test_basket/'):
+    """ Enable / Disable CommerceConfiguration model """
+    CommerceConfiguration.objects.create(
+        checkout_on_ecommerce_service=enabled,
+        single_course_checkout_page=checkout_page
+    )
+
+
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
     @patch('commerce.utils.log')
@@ -31,10 +39,7 @@ class EcommerceServiceTests(TestCase):
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page='/test_basket/'
-        )
+        update_commerce_config(enabled=True)
         super(EcommerceServiceTests, self).setUp()
 
     def test_is_enabled(self):
