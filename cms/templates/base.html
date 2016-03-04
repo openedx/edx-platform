@@ -1,7 +1,8 @@
 ## coding=utf-8
 <%namespace name='static' file='static_content.html'/>
 <%!
-from openedx.core.djangolib.markup import ugettext as _
+from django.utils.translation import ugettext as _
+
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
