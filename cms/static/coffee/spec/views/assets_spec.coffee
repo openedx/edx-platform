@@ -10,16 +10,16 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
             appendSetFixtures(sandbox({id: "page-prompt"}))
 
             @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.andReturn(@promptSpies)
-            @promptSpies.show.andReturn(@promptSpies)
+            @promptSpies.constructor.and.returnValue(@promptSpies)
+            @promptSpies.show.and.returnValue(@promptSpies)
 
             @confirmationSpies = jasmine.createSpyObj('Notification.Confirmation', ["constructor", "show"])
-            @confirmationSpies.constructor.andReturn(@confirmationSpies)
-            @confirmationSpies.show.andReturn(@confirmationSpies)
+            @confirmationSpies.constructor.and.returnValue(@confirmationSpies)
+            @confirmationSpies.show.and.returnValue(@confirmationSpies)
 
             @savingSpies = jasmine.createSpyObj('Notification.Mini', ["constructor", "show", "hide"])
-            @savingSpies.constructor.andReturn(@savingSpies)
-            @savingSpies.show.andReturn(@savingSpies)
+            @savingSpies.constructor.and.returnValue(@savingSpies)
+            @savingSpies.show.and.returnValue(@savingSpies)
 
             @injector = new Squire()
             @injector.mock("common/js/components/views/feedback_prompt", {
@@ -39,8 +39,8 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                         date_added: 'date'
                         thumbnail: null
                         id: 'id'
-                    spyOn(@model, "destroy").andCallThrough()
-                    spyOn(@model, "save").andCallThrough()
+                    spyOn(@model, "destroy").and.callThrough()
+                    spyOn(@model, "save").and.callThrough()
 
                     @collection = new AssetCollection([@model])
                     @collection.url = "assets-url"
@@ -65,7 +65,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView()
                 @view.render().$(".remove-asset-button").click()
                 expect(@promptSpies.constructor).toHaveBeenCalled()
-                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
                 expect(ctorOptions.title).toMatch('Delete File Confirmation')
                 # hasn't actually been removed
                 expect(@model.destroy).not.toHaveBeenCalled()
@@ -76,7 +76,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
@@ -88,7 +88,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 requests[0].respond(204)
                 expect(@confirmationSpies.constructor).toHaveBeenCalled()
                 expect(@confirmationSpies.show).toHaveBeenCalled()
-                savingOptions = @confirmationSpies.constructor.mostRecentCall.args[0]
+                savingOptions = @confirmationSpies.constructor.calls.mostRecent().args[0]
                 expect(savingOptions.title).toMatch("Your file has been deleted.")
                 expect(@collection.contains(@model)).toBeFalsy()
 
@@ -96,7 +96,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
@@ -115,7 +115,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(requests.length).toEqual(1)
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
-                savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
+                savingOptions = @savingSpies.constructor.calls.mostRecent().args[0]
                 expect(savingOptions.title).toMatch("Saving")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
@@ -142,8 +142,8 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
             appendSetFixtures(sandbox({id: "asset_table_body"}))
 
             @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.andReturn(@promptSpies)
-            @promptSpies.show.andReturn(@promptSpies)
+            @promptSpies.constructor.and.returnValue(@promptSpies)
+            @promptSpies.show.and.returnValue(@promptSpies)
 
             @injector = new Squire()
             @injector.mock("common/js/components/views/feedback_prompt", {
@@ -294,7 +294,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 setup.call(this, requests)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
+                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
                 AjaxHelpers.respondWithNoContent(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
@@ -304,7 +304,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 setup.call(this, requests)
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
+                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
                 AjaxHelpers.respondWithError(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
@@ -319,7 +319,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
             it "does not add an asset if asset already exists", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
                 setup.call(this, requests)
-                spyOn(@collection, "add").andCallThrough()
+                spyOn(@collection, "add").and.callThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)
                 expect(@collection.add).not.toHaveBeenCalled()

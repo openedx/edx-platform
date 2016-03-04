@@ -47,7 +47,7 @@ define(
 
             it("should render created timestamp correctly", function() {
                 var fakeDate = "fake formatted date";
-                spyOn(Date.prototype, "toLocaleString").andCallFake(
+                spyOn(Date.prototype, "toLocaleString").and.callFake(
                     function(locales, options) {
                         expect(locales).toEqual([]);
                         expect(options.timeZone).toEqual("UTC");

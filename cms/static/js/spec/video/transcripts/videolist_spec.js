@@ -70,9 +70,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                 ).text(videoListEntryTemplate)
             );
 
-            spyOn(Utils, 'command').andCallThrough();
-            spyOn(abstractEditor, 'initialize').andCallThrough();
-            spyOn(abstractEditor, 'render').andCallThrough();
+            // create mock server
+            this.mockServer = createMockAjaxServer();
+
+            spyOn(Utils, 'command').and.callThrough();
+            spyOn(abstractEditor, 'initialize').and.callThrough();
+            spyOn(abstractEditor, 'render').and.callThrough();
             spyOn(console, 'error');
 
             messenger = jasmine.createSpyObj('MessageManager',[
@@ -80,7 +83,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
             ]);
 
             $.each(messenger, function(index, method) {
-                 method.andReturn(messenger);
+                 method.and.returnValue(messenger);
             });
 
             MessageManager = function () {
@@ -89,7 +92,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                 return messenger;
             };
 
-            this.addMatchers({
+            jasmine.addMatchers({
                 assertValueInView: function(expected) {
                     var actualValue = this.actual.getValueFromEditor();
                     return this.env.equals_(actualValue, expected);
@@ -111,9 +114,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
             });
         });
 
-        var createMockAjaxServer = function (test) {
+        afterEach(function () {
+            // restore mock server
+            this.mockServer.restore();
+        });
+
+        var createMockAjaxServer = function () {
             var mockServer = AjaxHelpers.server(
-                test,
                 [
                     200,
                     { 'Content-Type': 'application/json'},
@@ -133,37 +140,33 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
             });
         };
 
-        var waitsForResponse = function (mockServer, expectFunc, prep) {
-            var flag = false;
-
-            if (prep) {
-                runs(prep);
-            }
-
-            waitsFor(function() {
+        var waitsForResponse = function (mockServer) {
+            var deferred = $.Deferred();
+            var fn = function() {
                 var requests = mockServer.requests,
                     len = requests.length;
 
                 if (len && requests[0].readyState === 4) {
-                    flag = true;
+                    deferred.resolve();
+                } else {
+                    setTimeout(fn, 50);
                 }
+            };
 
-                return flag;
-            }, 'Ajax Timeout', 750);
-
-            runs(expectFunc);
+            setTimeout(fn, 50);
+            return deferred.promise();
         };
 
 
-        it('Initialize', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                expect(abstractEditor.initialize).toHaveBeenCalled();
-                expect(messenger.initialize).toHaveBeenCalled();
-                expect(view.component_locator).toBe(component_locator);
-                expect(view.$el).toHandle('input');
-            });
+        it('Initialize', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(abstractEditor.initialize).toHaveBeenCalled();
+                  expect(messenger.initialize).toHaveBeenCalled();
+                  expect(view.component_locator).toBe(component_locator);
+                  expect(view.$el).toHandle('input');
+              }).always(done);
         });
 
         describe('Render', function () {
@@ -184,17 +187,17 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     mockServer.requests.length = 0;
                 };
 
-            it('is rendered in correct way', function () {
-                var mockServer = createMockAjaxServer(this);
+            it('is rendered in correct way', function (done) {
                 createVideoListView();
-                waitsForResponse(mockServer, function () {
-                    assertToHaveBeenRendered(videoList);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      assertToHaveBeenRendered(videoList);
+                  })
+                  .always(done);
             });
 
-            it('is rendered with opened extra videos bar', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView();
+            it('is rendered with opened extra videos bar', function (done) {
+                var view = createVideoListView();
                 var videoListLength = [
                         {
                             mode: 'youtube',
@@ -215,41 +218,32 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                         }
                     ];
 
-                spyOn(view, 'getVideoObjectsList').andReturn(videoListLength);
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoListLength);
                 spyOn(view, 'openExtraVideosBar');
 
-                waitsForResponse(
-                    mockServer,
-                    function () {
-                        assertToHaveBeenRendered(videoListLength);
-                        view.getVideoObjectsList.andReturn(videoListLength);
-                        expect(view.openExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies(mockServer);
-                        view.render();
-                    }
-                );
+                resetSpies(this.mockServer);
+                view.render();
 
-                waitsForResponse(
-                    mockServer,
-                    function () {
-                        assertToHaveBeenRendered(videoListHtml5mode);
-                        expect(view.openExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies(mockServer);
-                        view.openExtraVideosBar.reset();
-                        view.getVideoObjectsList.andReturn(videoListHtml5mode);
-                        view.render();
-                    }
-                );
+                waitsForResponse(this.mockServer).then(function () {
+                    assertToHaveBeenRendered(videoListLength);
+                    view.getVideoObjectsList.and.returnValue(videoListLength);
+                    expect(view.openExtraVideosBar).toHaveBeenCalled();
+                });
+
+                resetSpies(this.mockServer);
+                view.openExtraVideosBar.reset();
+                view.getVideoObjectsList.and.returnValue(videoListHtml5mode);
+                view.render();
+
+                waitsForResponse(this.mockServer).then(function () {
+                    assertToHaveBeenRendered(videoListHtml5mode);
+                    expect(view.openExtraVideosBar).toHaveBeenCalled();
+                });
 
             });
 
-            it('is rendered without opened extra videos bar', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('is rendered without opened extra videos bar', function (done) {
+                var view = createVideoListView(),
                     videoList = [
                         {
                             mode: 'youtube',
@@ -258,44 +252,41 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                         }
                     ];
 
-                spyOn(view, 'getVideoObjectsList').andReturn(videoList);
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
                 spyOn(view, 'closeExtraVideosBar');
 
-                waitsForResponse(
-                    mockServer,
-                    function () {
-                        assertToHaveBeenRendered(videoList);
-                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies(mockServer);
-                        view.render();
-                    }
-                );
+                resetSpies(this.mockServer);
+                view.render();
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      assertToHaveBeenRendered(videoList);
+                      expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                  })
+                  .always(done);
             });
 
         });
 
         describe('isUniqOtherVideos', function () {
-            it('Unique data - return true', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('Unique data - return true', function (done) {
+                var view = createVideoListView(),
                     data = videoList.concat([{
                         mode: 'html5',
                         type: 'other',
                         video: 'pxxZrg'
                     }]);
-                waitsForResponse(mockServer, function () {
-                    var result = view.isUniqOtherVideos(data);
 
-                    expect(result).toBe(true);
-                });
-
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqOtherVideos(data);
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
 
-            it('Not Unique data - return false', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('Not Unique data - return false', function (done) {
+                var view = createVideoListView(),
                     data = [
                         {
                             mode: 'html5',
@@ -323,30 +314,31 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                             video: '12345678901'
                         }
                     ];
-                waitsForResponse(mockServer, function () {
-                    var result = view.isUniqOtherVideos(data);
 
-                    expect(result).toBe(false);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqOtherVideos(data);
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
         });
 
         describe('isUniqVideoTypes', function () {
-
-            it('Unique data - return true', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('Unique data - return true', function (done) {
+                var view = createVideoListView(),
                     data = videoList;
-                waitsForResponse(mockServer, function () {
-                    var result = view.isUniqVideoTypes(data);
-                    expect(result).toBe(true);
-                });
 
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqVideoTypes(data);
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
 
-            it('Not Unique data - return false', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('Not Unique data - return false', function (done) {
+                var view = createVideoListView(),
                     data = [
                         {
                             mode: 'html5',
@@ -369,18 +361,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                             video: '12345678901'
                         }
                     ];
-                waitsForResponse(mockServer, function () {
-                    var result = view.isUniqVideoTypes(data);
 
-                    expect(result).toBe(false);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqVideoTypes(data);
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
         });
 
         describe('checkIsUniqVideoTypes', function () {
-            it('Error is shown', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('Error is shown', function (done) {
+                var view = createVideoListView(),
                     data = [
                         {
                             mode: 'html5',
@@ -404,125 +397,137 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                         }
                     ];
 
-                waitsForResponse(mockServer, function () {
-                    var result = view.checkIsUniqVideoTypes(data);
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.checkIsUniqVideoTypes(data);
 
-                    expect(messenger.showError).toHaveBeenCalled();
-                    expect(result).toBe(false);
-                });
+                      expect(messenger.showError).toHaveBeenCalled();
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
 
-            it('All works okay if arguments are not passed', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView();
-                spyOn(view, 'getVideoObjectsList').andReturn(videoList);
-                waitsForResponse(mockServer, function () {
-                    var result = view.checkIsUniqVideoTypes();
+            it('All works okay if arguments are not passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
 
-                    expect(view.getVideoObjectsList).toHaveBeenCalled();
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.checkIsUniqVideoTypes();
+
+                      expect(view.getVideoObjectsList).toHaveBeenCalled();
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
         });
 
         describe('checkValidity', function () {
-            it('Error message is shown', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView();
-                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
-                waitsForResponse(mockServer, function () {
-                    var data = { mode: 'incorrect' },
+            it('Error message is shown', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = {mode: 'incorrect'},
                         result = view.checkValidity(data, true);
 
-                    expect(messenger.showError).toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(false);
-                });
+                      expect(messenger.showError).toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
 
-            it('Error message is shown when flag is not passed', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView();
-                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
-                waitsForResponse(mockServer, function () {
-                    var data = { mode: 'incorrect' },
+            it('Error message is shown when flag is not passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = {mode: 'incorrect'},
                         result = view.checkValidity(data);
 
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  }).always(done);
             });
 
-            it('All works okay if correct data is passed', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView();
-                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
-                waitsForResponse(mockServer, function () {
-                    var data = videoList,
+            it('All works okay if correct data is passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = videoList,
                         result = view.checkValidity(data);
 
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
         });
 
-        it('openExtraVideosBar', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                view.$extraVideosBar.removeClass('is-visible');
-
-                view.openExtraVideosBar();
-                expect(view.$extraVideosBar).toHaveClass('is-visible');
-            });
+        it('openExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.removeClass('is-visible');
+                  view.openExtraVideosBar();
+                  expect(view.$extraVideosBar).toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('closeExtraVideosBar', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                view.$extraVideosBar.addClass('is-visible');
-                view.closeExtraVideosBar();
+        it('closeExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.addClass('is-visible');
+                  view.closeExtraVideosBar();
 
-                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
-            });
+                  expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('toggleExtraVideosBar', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                view.$extraVideosBar.addClass('is-visible');
-                view.toggleExtraVideosBar();
-                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
-                view.toggleExtraVideosBar();
-                expect(view.$extraVideosBar).toHaveClass('is-visible');
-            });
+        it('toggleExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.addClass('is-visible');
+                  view.toggleExtraVideosBar();
+                  expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+                  view.toggleExtraVideosBar();
+                  expect(view.$extraVideosBar).toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('getValueFromEditor', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                expect(view).assertValueInView(modelStub.value);
-            });
+        it('getValueFromEditor', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(view).assertValueInView(modelStub.value);
+              })
+              .always(done);
         });
 
-        it('setValueInEditor', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
-            waitsForResponse(mockServer, function () {
-                expect(view).assertCanUpdateView(['abc.mp4']);
-            });
+        it('setValueInEditor', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(view).assertCanUpdateView(['abc.mp4']);
+              })
+              .always(done);
         });
 
-        it('getVideoObjectsList', function () {
-            var mockServer = createMockAjaxServer(this),
-                view = createVideoListView();
+        it('getVideoObjectsList', function (done) {
+            var view = createVideoListView();
             var value = [
                 {
                     mode: 'youtube',
@@ -541,36 +546,39 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                 }
             ];
 
-            waitsForResponse(mockServer, function () {
-                view.setValueInEditor([
-                    'http://youtu.be/12345678901',
-                    'video.mp4',
-                    'http://goo.gl/pxxZrg',
-                    'video'
-                ]);
-                expect(view).assertIsCorrectVideoList(value);
-            });
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.setValueInEditor([
+                      'http://youtu.be/12345678901',
+                      'video.mp4',
+                      'http://goo.gl/pxxZrg',
+                      'video'
+                  ]);
+                  expect(view).assertIsCorrectVideoList(value);
+              })
+              .always(done);
         });
 
         describe('getPlaceholders', function () {
 
-            it('All works okay if empty values are passed', function () {
-                var mockServer = createMockAjaxServer(this),
-                    view = createVideoListView(),
+            it('All works okay if empty values are passed', function (done) {
+                var view = createVideoListView(),
                     defaultPlaceholders = view.placeholders;
-                waitsForResponse(mockServer, function () {
-                    var result = view.getPlaceholders([]),
-                    expectedResult = _.values(defaultPlaceholders).reverse();
 
-                    expect(result).toEqual(expectedResult);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.getPlaceholders([]),
+                        expectedResult = _.values(defaultPlaceholders).reverse();
+
+                      expect(result).toEqual(expectedResult);
+                  })
+                  .always(done);
             });
 
             it('On filling less than 3 fields, remaining fields should have ' +
 'placeholders for video types that were not filled yet',
-                function () {
-                    var mockServer = createMockAjaxServer(this),
-                        view = createVideoListView(),
+                function (done) {
+                    var view = createVideoListView(),
                         defaultPlaceholders = view.placeholders;
                     var dataDict = {
                         youtube: {
@@ -598,14 +606,17 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                             ]
                         }
                     };
-                defaultPlaceholders = view.placeholders;
-                    waitsForResponse(mockServer, function () {
-                        $.each(dataDict, function(index, val) {
-                            var result = view.getPlaceholders(val.value);
 
-                            expect(result).toEqual(val.expectedResult);
-                        });
-                    });
+                    defaultPlaceholders = view.placeholders;
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          $.each(dataDict, function (index, val) {
+                              var result = view.getPlaceholders(val.value);
+
+                              expect(result).toEqual(val.expectedResult);
+                          });
+                      })
+                      .always(done);
                 }
             );
         });
@@ -628,100 +639,104 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                 spyOn($.fn, 'hasClass');
                 spyOn($.fn, 'addClass');
                 spyOn($.fn, 'removeClass');
-                spyOn($.fn, 'prop').andCallThrough();
+                spyOn($.fn, 'prop').and.callThrough();
                 spyOn(_, 'isEqual');
 
                 resetSpies(view);
             };
 
             it('Field has invalid value - nothing should happen',
-                function () {
-                    var mockServer = createMockAjaxServer(this),
-                        view = createVideoListView();
+                function (done) {
+                    var view = createVideoListView();
                     setUp(view);
-                    $.fn.hasClass.andReturn(false);
-                    view.checkValidity.andReturn(false);
+                    $.fn.hasClass.and.returnValue(false);
+                    view.checkValidity.and.returnValue(false);
 
-                    waitsForResponse(mockServer, function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          view.inputHandler(eventObject);
+                          expect(messenger.hideError).not.toHaveBeenCalled();
+                          expect(view.updateModel).not.toHaveBeenCalled();
+                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                          expect($.fn.prop).toHaveBeenCalledWith(
                             'disabled', true
-                        );
-                        expect($.fn.addClass).toHaveBeenCalledWith(
+                          );
+                          expect($.fn.addClass).toHaveBeenCalledWith(
                             'is-disabled'
-                        );
-                    });
+                          );
+                      })
+                      .always(done);
                 }
             );
 
             it('Main field has invalid value - extra Videos Bar is closed',
-                function () {
-                    var mockServer = createMockAjaxServer(this),
-                        view = createVideoListView();
+                function (done) {
+                    var view = createVideoListView();
                     setUp(view);
-                    $.fn.hasClass.andReturn(true);
-                    view.checkValidity.andReturn(false);
+                    $.fn.hasClass.and.returnValue(true);
+                    view.checkValidity.and.returnValue(false);
 
-                    waitsForResponse(mockServer, function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          view.inputHandler(eventObject);
+                          expect(messenger.hideError).not.toHaveBeenCalled();
+                          expect(view.updateModel).not.toHaveBeenCalled();
+                          expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                          expect($.fn.prop).toHaveBeenCalledWith(
                             'disabled', true
-                        );
-                        expect($.fn.addClass).toHaveBeenCalledWith(
+                          );
+                          expect($.fn.addClass).toHaveBeenCalledWith(
                             'is-disabled'
-                        );
-                    });
+                          );
+                      })
+                      .always(done);
                 }
             );
 
             it('Model is updated if value is valid',
-                function () {
-                    var mockServer = createMockAjaxServer(this),
-                        view = createVideoListView();
+                function (done) {
+                    var view = createVideoListView();
                     setUp(view);
-                    view.checkValidity.andReturn(true);
-                    _.isEqual.andReturn(false);
+                    view.checkValidity.and.returnValue(true);
+                    _.isEqual.and.returnValue(false);
 
-                    waitsForResponse(mockServer, function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          view.inputHandler(eventObject);
+                          expect(messenger.hideError).not.toHaveBeenCalled();
+                          expect(view.updateModel).toHaveBeenCalled();
+                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                          expect($.fn.prop).toHaveBeenCalledWith(
                             'disabled', false
-                        );
-                        expect($.fn.removeClass).toHaveBeenCalledWith(
+                          );
+                          expect($.fn.removeClass).toHaveBeenCalledWith(
                             'is-disabled'
-                        );
-                    });
+                          );
+                      })
+                      .always(done);
                 }
             );
 
             it('Corner case: Error is hided',
-                function () {
-                    var mockServer = createMockAjaxServer(this),
-                        view = createVideoListView();
+                function (done) {
+                    var view = createVideoListView();
                     setUp(view);
-                    view.checkValidity.andReturn(true);
-                    _.isEqual.andReturn(true);
-                    waitsForResponse(mockServer, function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
+                    view.checkValidity.and.returnValue(true);
+                    _.isEqual.and.returnValue(true);
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          view.inputHandler(eventObject);
+                          expect(messenger.hideError).toHaveBeenCalled();
+                          expect(view.updateModel).not.toHaveBeenCalled();
+                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                          expect($.fn.prop).toHaveBeenCalledWith(
                             'disabled', false
-                        );
-                        expect($.fn.removeClass).toHaveBeenCalledWith(
+                          );
+                          expect($.fn.removeClass).toHaveBeenCalledWith(
                             'is-disabled'
-                        );
-                    });
+                          );
+                      })
+                      .always(done);
                 }
             );
 

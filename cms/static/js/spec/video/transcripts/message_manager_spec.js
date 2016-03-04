@@ -70,7 +70,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
         xdescribe('Render', function () {
 
             beforeEach(function () {
-                spyOn(_,'template').andCallThrough();
+                spyOn(_,'template').and.callThrough();
                 spyOn(fileUploader, 'render');
             });
 
@@ -101,7 +101,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             beforeEach(function () {
                 view.render('found');
                 spyOn(view, 'hideError');
-                spyOn($.fn, 'html').andCallThrough();
+                spyOn($.fn, 'html').and.callThrough();
                 $error = view.$el.find('.transcripts-error-message');
                 $buttons = view.$el.find('.wrapper-transcripts-buttons');
             });
@@ -147,10 +147,10 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
         $.each(handlers, function(key, value) {
              it(key, function () {
                 var eventObj = jasmine.createSpyObj('event', ['preventDefault']);
-                spyOn($.fn, 'data').andReturn('video_id');
+                spyOn($.fn, 'data').and.returnValue('video_id');
                 spyOn(view, 'processCommand');
                 view[key](eventObj);
-                expect(view.processCommand.mostRecentCall.args).toEqual(value);
+                expect(view.processCommand.calls.mostRecent().args).toEqual(value);
              });
         });
 
@@ -162,7 +162,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
 
             beforeEach(function () {
                 view.render('found');
-                spyOn(Utils, 'command').andCallThrough();
+                spyOn(Utils, 'command').and.callThrough();
                 spyOn(view, 'render');
                 spyOn(view, 'showError');
 
@@ -222,7 +222,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                             void(0)
                         );
                         expect(view.showError).not.toHaveBeenCalled();
-                        expect(view.render.mostRecentCall.args[0])
+                        expect(view.render.calls.mostRecent().args[0])
                             .toEqual('found');
                         expect(Utils.Storage.set).toHaveBeenCalled();
                     }
@@ -254,7 +254,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                             }
                         );
                         expect(view.showError).not.toHaveBeenCalled();
-                        expect(view.render.mostRecentCall.args[0])
+                        expect(view.render.calls.mostRecent().args[0])
                             .toEqual('found');
                         expect(Utils.Storage.set).toHaveBeenCalled();
                     }

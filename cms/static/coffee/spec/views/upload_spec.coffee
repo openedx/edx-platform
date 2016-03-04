@@ -18,16 +18,16 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
               onSuccess: (response) =>
                 dialogResponse.push(response.response)
             )
-            spyOn(@view, 'remove').andCallThrough()
+            spyOn(@view, 'remove').and.callThrough()
 
             # create mock file input, so that we aren't subject to browser restrictions
             @mockFiles = []
             mockFileInput = jasmine.createSpy('mockFileInput')
             mockFileInput.files = @mockFiles
             jqMockFileInput = jasmine.createSpyObj('jqMockFileInput', ['get', 'replaceWith'])
-            jqMockFileInput.get.andReturn(mockFileInput)
+            jqMockFileInput.get.and.returnValue(mockFileInput)
             realMethod = @view.$
-            spyOn(@view, "$").andCallFake (selector) ->
+            spyOn(@view, "$").and.callFake (selector) ->
                 if selector == "input[type=file]"
                     jqMockFileInput
                 else
@@ -75,7 +75,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
                 expect(@view.$(".action-upload")).not.toHaveClass("disabled")
 
                 realMethod = @model.set
-                spyOn(@model, "set").andCallFake (data) ->
+                spyOn(@model, "set").and.callFake (data) ->
                   if data.selectedFile != undefined
                     this.attributes.selectedFile = data.selectedFile
                     this.changed = {}

@@ -91,7 +91,7 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                     var requests = AjaxHelpers.requests(this),
                         missingJavaScriptUrl = "no_such_file.js",
                         promise;
-                    spyOn(ViewUtils, 'loadJavaScript').andReturn($.Deferred().reject().promise());
+                    spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().reject().promise());
                     promise = postXBlockRequest(requests, [
                         ["hash5", { mimetype: "application/javascript", kind: "url", data: missingJavaScriptUrl }]
                     ]);
@@ -99,7 +99,7 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                 });
 
                 it('Triggers an event to the runtime when a notification-action-button is clicked', function () {
-                    var notifySpy = spyOn(xblockView, "notifyRuntime").andCallThrough();
+                    var notifySpy = spyOn(xblockView, "notifyRuntime").and.callThrough();
 
                     postXBlockRequest(AjaxHelpers.requests(this), []);
                     xblockView.$el.find(".notification-action-button").click();

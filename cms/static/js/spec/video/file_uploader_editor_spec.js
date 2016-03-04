@@ -30,9 +30,9 @@ function ($, _, Squire) {
 
         var createPromptSpy = function (name) {
             var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
-            spy.constructor.andReturn(spy);
-            spy.show.andReturn(spy);
-            spy.extend = jasmine.createSpy().andReturn(spy.constructor);
+            spy.constructor.and.returnValue(spy);
+            spy.show.and.returnValue(spy);
+            spy.extend = jasmine.createSpy().and.returnValue(spy.constructor);
 
             return spy;
         };
@@ -40,51 +40,99 @@ function ($, _, Squire) {
         beforeEach(function () {
             self = this;
 
-            this.addMatchers({
-                assertValueInView: function(expected) {
-                    var value = this.actual.getValueFromEditor();
-                    return this.env.equals_(value, expected);
+            jasmine.addMatchers({
+                assertValueInView: function() {
+                    return {
+                        compare: function (actual, expected) {
+                            var value = actual.getValueFromEditor(),
+                            passed = this.env.equals_(value, expected);
+
+                            return {
+                                pass: passed,
+                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            };
+                        }
+                    };
                 },
-                assertCanUpdateView: function (expected) {
-                    var view = this.actual,
-                        value;
+                assertCanUpdateView: function () {
+                    return {
+                        compare: function (actual, expected) {
+                            var view = actual,
+                                value,
+                                passed;
 
-                    view.setValueInEditor(expected);
-                    value = view.getValueFromEditor();
+                            view.setValueInEditor(expected);
+                            value = view.getValueFromEditor();
 
-                    return this.env.equals_(value, expected);
+                            passed = this.env.equals_(value, expected);
+
+                            return {
+                                pass: passed,
+                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            };
+                        }
+                    };
                 },
-                assertClear: function (modelValue) {
-                    var env = this.env,
-                        view = this.actual,
-                        model = view.model;
+                assertClear: function () {
+                    return {
+                        compare: function (actual, modelValue) {
+                            var env = this.env,
+                                view = actual,
+                                model = view.model,
+                                passed;
 
-                    return model.getValue() === null &&
-                           env.equals_(model.getDisplayValue(), modelValue) &&
-                           env.equals_(view.getValueFromEditor(), modelValue);
+                            passed = model.getValue() === null &&
+                                env.equals_(model.getDisplayValue(), modelValue) &&
+                                env.equals_(view.getValueFromEditor(), modelValue);
+
+                            return {
+                                pass: passed,
+                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            };
+                        }
+                    };
                 },
                 assertUpdateModel: function (originalValue, newValue) {
-                    var env = this.env,
-                        view = this.actual,
-                        model = view.model,
-                        expectOriginal;
+                    return {
+                        compare: function (actual, originalValue, newValue) {
+                            var env = this.env,
+                                view = actual,
+                                model = view.model,
+                                expectOriginal,
+                                passed;
 
-                    view.setValueInEditor(newValue);
-                    expectOriginal = env.equals_(model.getValue(), originalValue);
-                    view.updateModel();
+                            view.setValueInEditor(newValue);
+                            expectOriginal = env.equals_(model.getValue(), originalValue);
+                            view.updateModel();
 
-                    return expectOriginal &&
-                           env.equals_(model.getValue(), newValue);
+                            passed = expectOriginal &&
+                                env.equals_(model.getValue(), newValue);
+
+                            return {
+                                pass: passed,
+                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            };
+                        }
+                    };
                 },
-                verifyButtons: function (upload, download, index) {
-                    var view = this.actual,
-                        uploadBtn = view.$('.upload-setting'),
-                        downloadBtn = view.$('.download-setting');
+                verifyButtons: function () {
+                    return {
+                        compare: function (actual, upload, download, index) {
+                            var view = actual,
+                                uploadBtn = view.$('.upload-setting'),
+                                downloadBtn = view.$('.download-setting'),
+                                passed;
 
-                    upload = upload ? uploadBtn.length : !uploadBtn.length;
-                    download = download ? downloadBtn.length : !downloadBtn.length;
+                            upload = upload ? uploadBtn.length : !uploadBtn.length;
+                            download = download ? downloadBtn.length : !downloadBtn.length;
+                            passed = upload && download;
 
-                    return upload && download;
+                            return {
+                                pass: passed,
+                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            };
+                        }
+                    };
                 }
             });
 
@@ -150,7 +198,7 @@ function ($, _, Squire) {
             expect(this.uploadSpies.constructor).toHaveBeenCalled();
             expect(this.uploadSpies.show).toHaveBeenCalled();
 
-            options = this.uploadSpies.constructor.mostRecentCall.args[0];
+            options = this.uploadSpies.constructor.calls.mostRecent().args[0];
             options.onSuccess({
                 'asset': {
                     'url': 'http://example.org/test_3'
