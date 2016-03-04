@@ -870,13 +870,6 @@ urlpatterns += (
     url(r'^debug/show_parameters$', 'debug.views.show_parameters'),
 )
 
-# Crowdsourced hinting instructor manager.
-if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
-    urlpatterns += (
-        url(r'^courses/{}/hint_manager$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.hint_manager.hint_manager', name="hint_manager"),
-    )
-
 # enable automatic login
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (

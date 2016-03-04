@@ -35,7 +35,6 @@ from xmodule.discussion_module import DiscussionDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
-from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
 #from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
@@ -66,7 +65,6 @@ LEAF_XMODULES = {
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
-    CrowdsourceHinterDescriptor: [{}],
     RandomizeDescriptor: [{}],
     SequenceDescriptor: [{}],
     VerticalBlock: [{}],
@@ -75,8 +73,7 @@ CONTAINER_XMODULES = {
 
 # These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    CrowdsourceHinterDescriptor,
-    PollDescriptor
+    PollDescriptor,
 )
 
 
