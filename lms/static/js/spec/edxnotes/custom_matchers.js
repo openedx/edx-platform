@@ -2,30 +2,55 @@ define(['jquery'], function($) {
     'use strict';
     return function (that) {
         jasmine.addMatchers({
-            toContainText: function (text) {
-                var trimmedText = $.trim($(this.actual).text());
+            toContainText: function () {
+                return {
+                    compare: function (actual, text) {
+                        var result = {},
+                            trimmedText = $.trim($(actual).text());
 
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
+                        if (text && $.isFunction(text.test)) {
+                            result.pass = text.test(trimmedText);
+                        } else {
+                            result.pass = trimmedText.indexOf(text) !== -1;
+                        }
+
+                        return result;
+                    }
+                };
             },
 
-            toHaveLength: function (number) {
-                return $(this.actual).length === number;
+            toHaveLength: function () {
+                return {
+                    compare: function (actual, expected) {
+                        return {
+                            pass: $(actual).length === expected
+                        }
+                    }
+                };
             },
 
-            toHaveIndex: function (number) {
-                return $(this.actual).index() === number;
+            toHaveIndex: function () {
+                return {
+                    compare: function (actual, expected) {
+                        return {
+                            pass: $(actual).index() === expected
+                        }
+                    }
+                };
             },
 
-            toBeInRange: function (min, max) {
-                return min <= this.actual && this.actual <= max;
-            },
+            //toBeInRange: function (min, max) {
+            //    return min <= this.actual && this.actual <= max;
+            //},
 
             toBeFocused: function () {
-                return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
+                return {
+                    compare: function (actual, expected) {
+                        return {
+                            pass: $(actual)[0] === $(actual)[0].ownerDocument.activeElement
+                        }
+                    }
+                };
             }
         });
     };

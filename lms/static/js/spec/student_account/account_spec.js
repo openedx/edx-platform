@@ -104,7 +104,7 @@ define(['js/student_account/account'],
 
             var assertAjax = function(url, method, data) {
                 expect($.ajax).toHaveBeenCalled();
-                var ajaxArgs = $.ajax.mostRecentCall.args[0];
+                var ajaxArgs = $.ajax.calls.mostRecent().args[0];
                 expect(ajaxArgs.url).toEqual(url);
                 expect(ajaxArgs.type).toEqual(method);
                 expect(ajaxArgs.data).toEqual(data);

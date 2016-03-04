@@ -34,7 +34,7 @@ define([
     describe('discovery.views.CoursesListing', function () {
 
         beforeEach(function () {
-            jasmine.Clock.useMock();
+            jasmine.clock().install();
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplate('templates/discovery/course_card');
             var collection = new Backbone.Collection(
@@ -46,6 +46,10 @@ define([
                 latest: function () { return this.collection.last(20); }
             }
             this.view = new CoursesListing({ model: mock });
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
         });
 
         it('renders search results', function () {

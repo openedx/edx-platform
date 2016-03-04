@@ -91,7 +91,7 @@ define([
                 var form;
 
                 expect(view.submitForm).toHaveBeenCalled();
-                form = view.submitForm.mostRecentCall.args[0];
+                form = view.submitForm.calls.mostRecent().args[0];
 
                 expect(form.serialize()).toEqual($.param(params));
                 expect(form.attr('method')).toEqual("POST");

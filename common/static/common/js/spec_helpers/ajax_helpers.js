@@ -74,7 +74,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
-        expect(request.requestBody).toEqual(body);
+        expect(request.requestBody).toEqual(body === undefined ? null : body);
     };
 
     /**
@@ -89,7 +89,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
-        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest);
+        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest === undefined ? null : jsonRequest);
     };
 
     /**

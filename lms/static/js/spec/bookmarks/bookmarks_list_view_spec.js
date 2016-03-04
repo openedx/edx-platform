@@ -26,8 +26,14 @@ define(['backbone',
                 );
                 spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
                 jasmine.addMatchers({
-                   toHaveBeenCalledWithUrl: function (expectedUrl) {
-                       return expectedUrl === this.actual.argsForCall[0][0].target.pathname;
+                   toHaveBeenCalledWithUrl: function () {
+                       return {
+                         compare: function (actual, expectedUrl) {
+                             return {
+                                 pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname
+                             };
+                         }
+                       };
                    }
                 });
 
