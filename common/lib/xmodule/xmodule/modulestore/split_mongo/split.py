@@ -68,6 +68,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseSummary
 from xmodule.errortracker import null_error_tracker
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
@@ -1160,8 +1161,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 False - if we want only those items which are in the course tree. This would ensure no orphans are
                 fetched.
         """
-        if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
+            # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
             return []
 
         course = self._lookup_course(course_locator)
