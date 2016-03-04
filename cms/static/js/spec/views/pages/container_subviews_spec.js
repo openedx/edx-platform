@@ -135,7 +135,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Confirm the discard.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
+                    promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
 
                     AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
@@ -153,7 +153,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                 beforeEach(function() {
                     promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
-                    promptSpies.show.andReturn(this.promptSpies);
+                    promptSpies.show.and.returnValue(this.promptSpies);
                 });
 
                 it('renders correctly with private content', function () {
@@ -268,7 +268,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
                     notificationSpy = EditHelpers.createNotificationSpy();
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
                     sendDiscardChangesToServer();
                     numRequests = requests.length;
@@ -287,7 +287,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 it('does not fetch if discard changes fails', function () {
                     var renderPageSpy, numRequests;
                     createContainerPage(this);
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
                     sendDiscardChangesToServer();
 
@@ -309,7 +309,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Click cancel to confirmation.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpies);
+                    promptSpies.constructor.calls.mostRecent().args[0].actions.secondary.click(promptSpies);
                     AjaxHelpers.expectNoRequests(requests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                 });

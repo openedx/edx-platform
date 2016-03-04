@@ -176,7 +176,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
             });
             describe("onDragMove", function () {
                 beforeEach(function () {
-                    this.redirectSpy = spyOn(window, 'scrollBy').andCallThrough();
+                    this.redirectSpy = spyOn(window, 'scrollBy').and.callThrough();
                 });
                 it("adds the correct CSS class to the drop destination", function () {
                     var $ele, dragX, dragY;
@@ -239,7 +239,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     this.reorderSpy = spyOn(ContentDragger, 'handleReorder');
                 });
                 afterEach(function () {
-                    this.reorderSpy.reset();
+                    this.reorderSpy.calls.reset();
                 });
                 it("calls handleReorder on a successful drag", function () {
                     ContentDragger.dragState.dropDestination = $('#unit-2');
@@ -279,7 +279,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
                 });
                 it("expands a collapsed element when something is dropped in it", function () {
-                    expandElementSpy = spyOn(ContentDragger, 'expandElement').andCallThrough();
+                    expandElementSpy = spyOn(ContentDragger, 'expandElement').and.callThrough();
                     expect(expandElementSpy).not.toHaveBeenCalled();
                     expect($('#subsection-2').data('ensureChildrenRendered')).not.toHaveBeenCalled();
 
@@ -302,7 +302,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
             describe("AJAX", function () {
                 beforeEach(function () {
                     this.savingSpies = spyOnConstructor(Notification, "Mini", ["show", "hide"]);
-                    this.savingSpies.show.andReturn(this.savingSpies);
+                    this.savingSpies.show.and.returnValue(this.savingSpies);
                     this.clock = sinon.useFakeTimers();
                 });
                 afterEach(function () {
@@ -327,7 +327,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect(this.savingSpies.constructor).toHaveBeenCalled();
                     expect(this.savingSpies.show).toHaveBeenCalled();
                     expect(this.savingSpies.hide).not.toHaveBeenCalled();
-                    savingOptions = this.savingSpies.constructor.mostRecentCall.args[0];
+                    savingOptions = this.savingSpies.constructor.calls.mostRecent().args[0];
                     expect(savingOptions.title).toMatch(/Saving/);
                     expect($('#unit-1')).toHaveClass('was-dropped');
                     expect(request.requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');

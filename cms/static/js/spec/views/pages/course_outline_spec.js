@@ -346,8 +346,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('can start reindex of a course', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
                     reindexButton.attr('href', test_url)
@@ -360,11 +360,11 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('shows an error message when reindexing fails', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var errorSpy = spyOn(outlinePage, 'onIndexError').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var errorSpy = spyOn(outlinePage, 'onIndexError').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
-                    reindexButton.attr('href', test_url)
+                    reindexButton.attr('href', test_url);
                     reindexButton.trigger('click');
                     AjaxHelpers.expectJsonRequest(requests, 'GET', test_url);
                     AjaxHelpers.respondWithError(requests, 500, createMockIndexJSON(false));

@@ -29,7 +29,7 @@ define(
 
             it("should trigger file selection when either the upload button or the drop zone is clicked", function() {
                 var clickSpy = jasmine.createSpy();
-                clickSpy.andCallFake(function(event) { event.preventDefault(); });
+                clickSpy.and.callFake(function(event) { event.preventDefault(); });
                 this.view.$(".js-file-input").on("click", clickSpy);
                 this.view.$(".file-drop-area").click();
                 expect(clickSpy).toHaveBeenCalled();
@@ -71,7 +71,7 @@ define(
                             // security reasons, so we must mock the access mechanism
                             // that jQuery-File-Upload uses to retrieve it.
                             var realProp = $.prop;
-                            spyOn($, "prop").andCallFake(function(el, propName) {
+                            spyOn($, "prop").and.callFake(function(el, propName) {
                                 if (arguments.length == 2 && propName == "files") {
                                     return _.map(
                                         fileNames,
