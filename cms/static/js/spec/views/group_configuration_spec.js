@@ -153,36 +153,73 @@ define([
             revision: 'course_rev'
         });
 
-        this.addMatchers({
-            toContainText: function(text) {
-                var trimmedText = $.trim(this.actual.text());
+        jasmine.addMatchers({
+            toContainText: function() {
+                return {
+                    compare: function (actual, text) {
+                        var trimmedText = $.trim(actual.text()),
+                            passed;
 
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
-            },
-            toBeCorrectValuesInInputs: function (values) {
-                var expected = {
-                    name: this.actual.$(SELECTORS.inputName).val(),
-                    description: this.actual
-                        .$(SELECTORS.inputDescription).val()
+                        if (text && $.isFunction(text.test)) {
+                            passed = text.test(trimmedText);
+                        } else {
+                            passed = trimmedText.indexOf(text) !== -1;
+                        }
+
+                        return {
+                            pass: passed,
+                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                        };
+                    }
                 };
-
-                return _.isEqual(values, expected);
             },
-            toBeCorrectValuesInModel: function (values) {
-                return _.every(values, function (value, key) {
-                    return this.actual.get(key) === value;
-                }.bind(this));
-            },
-            toHaveDefaultNames: function (values) {
-                var actualValues = $.map(this.actual, function (item) {
-                    return $(item).val();
-                });
+            toBeCorrectValuesInInputs: function () {
+                return {
+                    compare: function (actual, values) {
+                        var expected = {
+                            name: actual.$(SELECTORS.inputName).val(),
+                            description: actual
+                                .$(SELECTORS.inputDescription).val()
+                        };
 
-                return _.isEqual(actualValues, values);
+                        var passed =  _.isEqual(values, expected);
+
+                        return {
+                            pass: passed,
+                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                        };
+                    }
+                };
+            },
+            toBeCorrectValuesInModel: function () {
+                return {
+                    compare: function (actual, values) {
+                        var passed = _.every(values, function (value, key) {
+                            return actual.get(key) === value;
+                        }.bind(this));
+
+                        return {
+                            pass: passed,
+                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                        };
+                    }
+                };
+            },
+            toHaveDefaultNames: function () {
+                return {
+                    compare: function (actual, values) {
+                        var actualValues = $.map(actual, function (item) {
+                            return $(item).val();
+                        });
+
+                        var passed = _.isEqual(actualValues, values);
+
+                        return {
+                            pass: passed,
+                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                        };
+                    }
+                };
             }
         });
     });
@@ -421,7 +458,7 @@ define([
         });
 
         it('should be removed on cancel if it is a new item', function() {
-            spyOn(this.model, 'isNew').andReturn(true);
+            spyOn(this.model, 'isNew').and.returnValue(true);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'

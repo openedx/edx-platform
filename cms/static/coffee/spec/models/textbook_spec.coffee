@@ -2,7 +2,7 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
 (Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) ->
 
     beforeEach ->
-        @addMatchers
+        jasmine.addMatchers
             toBeInstanceOf: (expected) ->
                 return @actual instanceof expected
 

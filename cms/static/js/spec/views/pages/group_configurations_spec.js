@@ -40,7 +40,7 @@ define([
                 'content-group-editor', 'group-edit', 'list'
             ]);
 
-            this.addMatchers({
+            jasmine.addMatchers({
                 toBeExpanded: function () {
                     return Boolean($('a.group-toggle.hide-groups', $(this.actual)).length);
                 }
@@ -67,7 +67,7 @@ define([
             });
 
             it('should focus and expand if its id is part of url hash', function() {
-                spyOn(this.view, 'getLocationHash').andReturn('#0');
+                spyOn(this.view, 'getLocationHash').and.returnValue('#0');
                 this.view.render();
                 // We cannot use .toBeFocused due to flakiness.
                 expect($.fn.focus).toHaveBeenCalled();
@@ -75,14 +75,14 @@ define([
             });
 
             it('should not focus on any experiment configuration if url hash is empty', function() {
-                spyOn(this.view, 'getLocationHash').andReturn('');
+                spyOn(this.view, 'getLocationHash').and.returnValue('');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
                 expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
             });
 
             it('should not focus on any experiment configuration if url hash contains wrong id', function() {
-                spyOn(this.view, 'getLocationHash').andReturn('#1');
+                spyOn(this.view, 'getLocationHash').and.returnValue('#1');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
                 expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();

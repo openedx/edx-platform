@@ -28,10 +28,10 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * Get a reference to the mocked server, and respond
      * to all requests with the specified statusCode.
      */
-    fakeServer = function (that, response) {
+    fakeServer = function (response) {
         var server = sinon.fakeServer.create();
         afterEach(function() {
-            server.restore();
+            server && server.restore();
         });
         server.respondWith(response);
         return server;
@@ -43,16 +43,17 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * to respond for individual requests.
      */
     fakeRequests = function (that) {
-        var requests = [];
-        that.xhr = sinon.useFakeXMLHttpRequest();
+        var requests = [],
+          xhr = sinon.useFakeXMLHttpRequest();
+
         requests.currentIndex = 0;
-        that.xhr.onCreate = function(request) {
+        xhr.onCreate = function(request) {
             requests.push(request);
         };
 
         afterEach(function() {
-            if(_.has(that.xhr, 'restore')){
-                that.xhr.restore();
+            if (xhr && xhr.hasOwnProperty('restore')) {
+                xhr.restore();
             }
         });
         return requests;

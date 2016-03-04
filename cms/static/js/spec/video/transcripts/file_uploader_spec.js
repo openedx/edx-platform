@@ -43,7 +43,7 @@ function ($, _, Utils, FileUploader) {
                 .append('<div class="transcripts-file-uploader" />')
                 .append('<a class="setting-upload" href="#">Upload</a>');
 
-            spyOn(FileUploader.prototype, 'render').andCallThrough();
+            spyOn(FileUploader.prototype, 'render').and.callThrough();
 
             view = new FileUploader({
                 el: $container,
@@ -61,7 +61,7 @@ function ($, _, Utils, FileUploader) {
         describe('Render', function () {
 
             beforeEach(function () {
-                spyOn(_, 'template').andCallThrough();
+                spyOn(_, 'template').and.callThrough();
             });
 
             it('Template doesn\'t exist', function () {
@@ -138,7 +138,7 @@ function ($, _, Utils, FileUploader) {
             });
 
             it('Valid File Type - error should be hided', function () {
-                spyOn(view, 'checkExtValidity').andReturn(true);
+                spyOn(view, 'checkExtValidity').and.returnValue(true);
 
                 view.$input.change();
 
@@ -148,7 +148,7 @@ function ($, _, Utils, FileUploader) {
             });
 
             it('Invalid File Type - error should be shown', function () {
-                spyOn(view, 'checkExtValidity').andReturn(false);
+                spyOn(view, 'checkExtValidity').and.returnValue(false);
 
                 view.$input.change();
 
@@ -189,7 +189,7 @@ function ($, _, Utils, FileUploader) {
         it('xhrProgressHandler', function () {
             var percent = 26;
 
-            spyOn($.fn, 'width').andCallThrough();
+            spyOn($.fn, 'width').and.callThrough();
 
             view.xhrProgressHandler(null, null, null, percent);
             expect(view.$progress.width).toHaveBeenCalledWith(percent + '%');
@@ -209,7 +209,7 @@ function ($, _, Utils, FileUploader) {
                 view.xhrCompleteHandler(xhr);
 
                 expect(view.$progress).toHaveClass('is-invisible');
-                expect(view.options.messenger.render.mostRecentCall.args[0])
+                expect(view.options.messenger.render.calls.mostRecent().args[0])
                     .toEqual('uploaded');
                 expect(Utils.Storage.set)
                     .toHaveBeenCalledWith('sub', 'test');
