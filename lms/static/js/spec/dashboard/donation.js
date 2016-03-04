@@ -64,7 +64,7 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // We stub out the actual submission of the form to avoid
                 // leaving the current page during the test.
                 expect(view.submitPaymentForm).toHaveBeenCalled();
-                var form = view.submitPaymentForm.mostRecentCall.args[0];
+                var form = view.submitPaymentForm.calls.mostRecent().args[0];
                 expect(form.serialize()).toEqual($.param(PAYMENT_PARAMS));
                 expect(form.attr('method')).toEqual("post");
                 expect(form.attr('action')).toEqual(PAYMENT_URL);
