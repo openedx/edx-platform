@@ -345,7 +345,6 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
             (user, previous_cohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
             info = {
                 'username': user.username,
-                'name': user.profile.name,
                 'email': user.email,
             }
             if previous_cohort:
