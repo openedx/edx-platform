@@ -4,6 +4,8 @@ from common.test.acceptance.pages.lms.oauth2_confirmation import OAuth2Confirmat
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from bok_choy.web_app_test import WebAppTest
 
+from flaky import flaky
+
 from urlparse import urlparse, parse_qsl
 
 
@@ -50,6 +52,7 @@ class OAuth2PermissionDelegationTests(WebAppTest):
             query = self._qs(self.browser.current_url)
             self.assertIn('access_denied', query['error'])
 
+    @flaky      # TODO, fix this: TNL-4190
     def test_accepting_redirects(self):
         """
         If you accept the request, you're redirected to the redirect_url with

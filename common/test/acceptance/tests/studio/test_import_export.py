@@ -4,6 +4,8 @@ Acceptance tests for the Import and Export pages
 from nose.plugins.attrib import attr
 from datetime import datetime
 
+from flaky import flaky
+
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
 
@@ -180,6 +182,7 @@ class ImportTestMixin(object):
         """
         return []
 
+    @flaky      # TODO, fix this: TNL-4191
     def test_upload(self):
         """
         Scenario: I want to upload a course or library for import.
