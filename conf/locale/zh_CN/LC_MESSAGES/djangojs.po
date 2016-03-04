@@ -110,6 +110,7 @@
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # viztor <viztor@outlook.com>, 2015
 # Zihui Cheng <z7cheng@ucsd.edu>, 2015
+# 代 兴旺 <525224259@qq.com>, 2016
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 成羽丰 <onetwogoo@gmail.com>, 2015
 # 汤和果 <hgtang93@163.com>, 2015
@@ -138,7 +139,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:29+0000\n"
+"POT-Creation-Date: 2016-02-24 18:01+0000\n"
 "PO-Revision-Date: 2016-02-04 20:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
