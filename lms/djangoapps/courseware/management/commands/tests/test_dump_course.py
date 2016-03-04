@@ -3,7 +3,7 @@
 """Tests for Django management commands"""
 
 import json
-from nose.plugins.attrib import attr
+import pytest
 from path import Path as path
 import shutil
 from StringIO import StringIO
@@ -35,7 +35,7 @@ TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
 )
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CommandsTestBase(ModuleStoreTestCase):
     """
     Base class for testing different django commands.

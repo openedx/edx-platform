@@ -3,7 +3,7 @@ import random
 import unittest
 import uuid
 
-from nose.plugins.attrib import attr
+import pytest
 import mock
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOS
 from xmodule.modulestore.tests.utils import MemoryCache
 
 
-@attr('mongo')
+@pytest.mark.mongo
 class SplitWMongoCourseBootstrapper(unittest.TestCase):
     """
     Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.

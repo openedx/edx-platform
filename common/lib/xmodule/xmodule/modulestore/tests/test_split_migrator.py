@@ -6,14 +6,14 @@ import random
 import uuid
 
 import mock
-from nose.plugins.attrib import attr
+import pytest
 
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 
 
-@attr('mongo')
+@pytest.mark.mongo
 class TestMigration(SplitWMongoCourseBootstrapper):
     """
     Test the split migrator

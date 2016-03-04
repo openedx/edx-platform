@@ -9,9 +9,7 @@ from shutil import rmtree
 from bson.code import Code
 import datetime
 import ddt
-#from nose.plugins.attrib import attr
 
-from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -60,9 +58,9 @@ ASSET_XSD_PATH = PLATFORM_ROOT / "common" / "lib" / "xmodule" / "xmodule" / "ass
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class CrossStoreXMLRoundtrip(unittest.TestCase):
     """
@@ -84,13 +82,14 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
         ASSET_AMOUNT_PER_TEST
     ))
     @ddt.unpack
+    @unittest.skipIf(
+        CodeBlockTimer is None,
+        "CodeBlockTimer undefined."
+    )
     def test_generate_import_export_timings(self, source_ms, dest_ms, num_assets):
         """
         Generate timings for different amounts of asset metadata and different modulestores.
         """
-        if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
-
         desc = "XMLRoundTrip:{}->{}:{}".format(
             SHORT_NAME_MAP[source_ms],
             SHORT_NAME_MAP[dest_ms],
@@ -144,9 +143,9 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class FindAssetTest(unittest.TestCase):
     """
@@ -167,13 +166,14 @@ class FindAssetTest(unittest.TestCase):
         ASSET_AMOUNT_PER_TEST,
     ))
     @ddt.unpack
+    @unittest.skipif(
+        CodeBlockTimer is None,
+        "CodeBlockTimer undefined."
+    )
     def test_generate_find_timings(self, source_ms, num_assets):
         """
         Generate timings for different amounts of asset metadata and different modulestores.
         """
-        if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
-
         desc = "FindAssetTest:{}:{}".format(
             SHORT_NAME_MAP[source_ms],
             num_assets,
@@ -227,9 +227,9 @@ class FindAssetTest(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
+# Eventually, exclude this from regular unittests while running *only* tests
+# with this marker during regular performance tests.
+# @pytest.mark.perf_test
 @unittest.skip
 class TestModulestoreAssetSize(unittest.TestCase):
     """

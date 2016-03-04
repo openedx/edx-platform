@@ -5,7 +5,7 @@ tests for overrides
 import datetime
 import mock
 import pytz
-from nose.plugins.attrib import attr
+import pytest
 
 from courseware.field_overrides import OverrideFieldData
 from django.test.utils import override_settings
@@ -23,7 +23,7 @@ from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 class TestFieldOverrides(SharedModuleStoreTestCase):

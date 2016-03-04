@@ -4,7 +4,7 @@ too.
 """
 from datetime import datetime, timedelta
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 import pytz
 import unittest
 
@@ -82,7 +82,7 @@ class TestSortedAssetList(unittest.TestCase):
         )
 
 
-@attr('mongo')
+@pytest.mark.mongo
 @ddt.ddt
 class TestMongoAssetMetadataStorage(unittest.TestCase):
     """

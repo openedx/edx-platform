@@ -7,7 +7,7 @@ that the view is conditionally available when Course Auth is turned on.
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from bulk_email.models import CourseAuthorization
@@ -18,7 +18,7 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
@@ -106,7 +106,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertFalse(self.email_link in response.content)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard

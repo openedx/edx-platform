@@ -2,7 +2,7 @@
 Tests for `field_overrides` module.
 """
 import unittest
-from nose.plugins.attrib import attr
+import pytest
 
 from django.test.utils import override_settings
 from xblock.field_data import DictFieldData
@@ -20,7 +20,7 @@ from ..field_overrides import (
 TESTUSER = "testuser"
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'courseware.tests.test_field_overrides.TestOverrideProvider',))
 class OverrideFieldDataTests(SharedModuleStoreTestCase):
@@ -100,7 +100,7 @@ class OverrideFieldDataTests(SharedModuleStoreTestCase):
         self.assertIsInstance(data, DictFieldData)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class ResolveDottedTests(unittest.TestCase):
     """
     Tests for `resolve_dotted`.

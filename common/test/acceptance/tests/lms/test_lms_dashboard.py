@@ -3,7 +3,7 @@
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
-from nose.plugins.attrib import attr
+import pytest
 
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture
@@ -220,7 +220,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertEqual(course_date, expected_course_date)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class LmsDashboardA11yTest(BaseLmsDashboardTest):
     """
     Class to test lms student dashboard accessibility.

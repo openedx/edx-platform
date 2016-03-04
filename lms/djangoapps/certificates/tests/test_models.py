@@ -5,7 +5,7 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
+import pytest
 from path import Path as path
 
 from certificates.models import (
@@ -34,7 +34,7 @@ PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class ExampleCertificateTest(TestCase):
     """Tests for the ExampleCertificate model. """
 
@@ -100,7 +100,7 @@ class ExampleCertificateTest(TestCase):
         self.assertIs(result, None)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CertificateHtmlViewConfigurationTest(TestCase):
     """
     Test the CertificateHtmlViewConfiguration model.
@@ -167,7 +167,7 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.assertEquals(self.config.get_config(), {})
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.
@@ -216,7 +216,7 @@ class BadgeImageConfigurationTest(TestCase):
         )
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CertificateTemplateAssetTest(TestCase):
     """
     Test Assets are uploading/saving successfully for CertificateTemplateAsset.
@@ -244,7 +244,7 @@ class CertificateTemplateAssetTest(TestCase):
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
     Test the GeneratedCertificate model's object manager for filtering

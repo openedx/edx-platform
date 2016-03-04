@@ -3,7 +3,7 @@ Test courseware search
 """
 import json
 
-from nose.plugins.attrib import attr
+import pytest
 
 from ..helpers import UniqueCourseTest, remove_file
 from ...pages.common.logout import LogoutPage
@@ -16,7 +16,7 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class CoursewareSearchTest(UniqueCourseTest):
     """
     Test courseware search.

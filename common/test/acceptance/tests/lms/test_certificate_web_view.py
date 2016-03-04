@@ -2,7 +2,7 @@
 Acceptance tests for the certificate web view feature.
 """
 from ..helpers import UniqueCourseTest, EventsTestMixin, load_data_str, get_element_padding
-from nose.plugins.attrib import attr
+import pytest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 from ...fixtures.certificates import CertificateConfigFixture
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -13,7 +13,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.progress import ProgressPage
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
     """
     Tests for verifying certificate web view features
@@ -94,7 +94,7 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
         self.assert_events_match(expected_events, actual_events)
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class CertificateProgressPageTest(UniqueCourseTest):
     """
     Tests for verifying Certificate info on Progress tab of course page.

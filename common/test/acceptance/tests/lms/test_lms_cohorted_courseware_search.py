@@ -12,7 +12,7 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...pages.lms.staff_view import StaffPage
 from ...fixtures.course import XBlockFixtureDesc
 
-from nose.plugins.attrib import attr
+import pytest
 
 from ..studio.base_studio_test import ContainerBase
 
@@ -25,7 +25,7 @@ from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CoursewareSearchCohortTest(ContainerBase):
     """
     Test courseware search.

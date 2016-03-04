@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 from django.utils.timezone import UTC
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory,
@@ -23,7 +23,7 @@ from .factories import (
 from ..overrides import override_field_for_ccx
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """

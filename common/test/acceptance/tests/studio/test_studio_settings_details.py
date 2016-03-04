@@ -2,7 +2,7 @@
 Acceptance tests for Studio's Settings Details pages
 """
 from datetime import datetime, timedelta
-from nose.plugins.attrib import attr
+import pytest
 from unittest import skip
 
 from .base_studio_test import StudioCourseTest
@@ -19,7 +19,7 @@ from ..helpers import (
 )
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
 
@@ -37,7 +37,7 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.assertTrue(self.settings_detail.is_browser_on_page())
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
@@ -204,7 +204,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
 

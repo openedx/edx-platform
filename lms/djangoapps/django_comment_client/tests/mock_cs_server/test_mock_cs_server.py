@@ -1,9 +1,9 @@
+import pytest
 import unittest
 import threading
 import json
 import urllib2
 from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
-from nose.plugins.skip import SkipTest
 
 
 class MockCommentServiceServerTest(unittest.TestCase):
@@ -18,7 +18,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
         # This is a test of the test setup,
         # so it does not need to run as part of the unit test suite
         # You can re-enable it by commenting out the line below
-        raise SkipTest
+        pytest.skip("It is not necessary to run this test with every build.")
 
         # Create the server
         server_port = 4567

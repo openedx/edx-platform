@@ -3,7 +3,7 @@ Test for split test XModule
 """
 from django.core.urlresolvers import reverse
 from mock import MagicMock
-from nose.plugins.attrib import attr
+import pytest
 
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
@@ -14,7 +14,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class SplitTestBase(SharedModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -272,7 +272,7 @@ class TestSplitTestVert(SplitTestBase):
         html1 = self._html(cond1vert, 1)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined

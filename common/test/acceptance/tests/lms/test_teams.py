@@ -7,7 +7,7 @@ import time
 
 from dateutil.parser import parse
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 from selenium.common.exceptions import TimeoutException
 from uuid import uuid4
 
@@ -157,7 +157,7 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
 
 
 @ddt.ddt
-@attr('shard_5')
+@pytest.mark.shard_5
 class TeamsTabTest(TeamsTabBase):
     """
     Tests verifying when the Teams tab is present.
@@ -303,7 +303,7 @@ class TeamsTabTest(TeamsTabBase):
         self.assertTrue(self.teams_page.q(css=selector).visible)
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class MyTeamsTest(TeamsTabBase):
     """
     Tests for the "My Teams" tab of the Teams page.
@@ -367,7 +367,7 @@ class MyTeamsTest(TeamsTabBase):
         self.assertEqual(self.my_teams_page.team_memberships[0], '4 / 10 Members')
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 @ddt.ddt
 class BrowseTopicsTest(TeamsTabBase):
     """
@@ -585,7 +585,7 @@ class BrowseTopicsTest(TeamsTabBase):
             self.topics_page.visit()
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 @ddt.ddt
 class BrowseTeamsWithinTopicTest(TeamsTabBase):
     """
@@ -889,7 +889,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             alert.accept()
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class TeamFormActions(TeamsTabBase):
     """
     Base class for create, edit, and delete team.
@@ -1602,7 +1602,7 @@ class EditMembershipTest(TeamFormActions):
         self.edit_membership_helper(role, cancel=True)
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""

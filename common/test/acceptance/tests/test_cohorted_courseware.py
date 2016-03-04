@@ -3,7 +3,7 @@ End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
 import json
-from nose.plugins.attrib import attr
+import pytest
 
 from studio.base_studio_test import ContainerBase
 
@@ -20,7 +20,7 @@ from ..tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 class EndToEndCohortedCoursewareTest(ContainerBase):
 
     def setUp(self, is_staff=True):

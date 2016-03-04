@@ -2,7 +2,7 @@
 Tests for the django comment client integration models
 """
 from django.test.testcases import TestCase
-from nose.plugins.attrib import attr
+import pytest
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
@@ -10,7 +10,7 @@ import django_comment_common.models as models
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
@@ -52,7 +52,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
         self.TA_role_2.inherit_permissions(self.TA_role)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class PermissionClassTestCase(TestCase):
     """
     Tests for permissions of the comment client service integration

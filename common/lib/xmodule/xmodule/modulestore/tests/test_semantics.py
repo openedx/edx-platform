@@ -23,7 +23,7 @@ DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 TESTABLE_BLOCK_TYPES = set(DIRECT_ONLY_CATEGORIES)
 TESTABLE_BLOCK_TYPES.discard('course')
 
-TestField = namedtuple('TestField', ['field_name', 'initial', 'updated'])
+Field = namedtuple('Field', ['field_name', 'initial', 'updated'])
 
 
 @ddt.ddt
@@ -36,11 +36,11 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     __test__ = False
 
     DATA_FIELDS = {
-        'about': TestField('data', '<div>test data</div>', '<div>different test data</div>'),
-        'chapter': TestField('is_entrance_exam', True, False),
-        'sequential': TestField('is_entrance_exam', True, False),
-        'static_tab': TestField('data', '<div>test data</div>', '<div>different test data</div>'),
-        'course_info': TestField('data', '<div>test data</div>', '<div>different test data</div>'),
+        'about': Field('data', '<div>test data</div>', '<div>different test data</div>'),
+        'chapter': Field('is_entrance_exam', True, False),
+        'sequential': Field('is_entrance_exam', True, False),
+        'static_tab': Field('data', '<div>test data</div>', '<div>different test data</div>'),
+        'course_info': Field('data', '<div>test data</div>', '<div>different test data</div>'),
     }
 
     def setUp(self):

@@ -96,7 +96,7 @@ class NoseTestSuite(TestSuite):
         )
 
         if self.fail_fast or env_fail_fast_set:
-            opts += " --stop"
+            opts += " -x"
 
         if self.pdb:
             opts += " --pdb"
@@ -119,11 +119,10 @@ class SystemTestSuite(NoseTestSuite):
     @property
     def cmd(self):
         cmd = (
-            './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {extra} '
-            '--with-xunit --xunit-file={xunit_report}'.format(
+            'py.test {system}.envs.test '
+            '{test_id} {test_opts} --ds==test {extra} '
+            '--junitxml={xunit_report}'.format(
                 system=self.root,
-                verbosity=self.verbosity,
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 extra=self.extra_args,
@@ -168,7 +167,7 @@ class SystemTestSuite(NoseTestSuite):
 
 class LibTestSuite(NoseTestSuite):
     """
-    TestSuite for edx-platform/common/lib nosetests
+    TestSuite for edx-platform/common/lib tests
     """
     def __init__(self, *args, **kwargs):
         super(LibTestSuite, self).__init__(*args, **kwargs)
@@ -178,16 +177,12 @@ class LibTestSuite(NoseTestSuite):
     @property
     def cmd(self):
         cmd = (
-            "nosetests --id-file={test_ids} {test_id} {test_opts} "
-            "--with-xunit --xunit-file={xunit_report} {extra} "
-            "--verbosity={verbosity}".format(
-                test_ids=self.test_ids,
+            "py.test {test_id} {test_opts} -p no:flaky "
+            "--junitxml={xunit_report} {extra}".format(
                 test_id=self.test_id,
                 test_opts=self.test_options_flags,
                 xunit_report=self.xunit_report,
-                verbosity=self.verbosity,
                 extra=self.extra_args,
             )
         )
-
         return self._under_coverage_cmd(cmd)

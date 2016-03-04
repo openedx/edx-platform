@@ -7,8 +7,6 @@ import random
 import textwrap
 import unittest
 
-from nose.plugins.skip import SkipTest
-
 from capa.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
 from codejail.jail_code import is_configured
@@ -73,11 +71,11 @@ class TestSafeExec(unittest.TestCase):
 
 
 class TestSafeOrNot(unittest.TestCase):
+    @unittest.skipIf(
+        not is_configured("python"),
+        "Can't test for forbiddenness if CodeJail isn't configured for python."
+    )
     def test_cant_do_something_forbidden(self):
-        # Can't test for forbiddenness if CodeJail isn't configured for python.
-        if not is_configured("python"):
-            raise SkipTest
-
         g = {}
         with self.assertRaises(SafeExecException) as cm:
             safe_exec("import os; files = os.listdir('/')", g)

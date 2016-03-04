@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.http import Http404
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 
 import courseware.courses as courses
 from courseware.middleware import RedirectUnenrolledMiddleware
@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 

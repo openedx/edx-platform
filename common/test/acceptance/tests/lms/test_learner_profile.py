@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from datetime import datetime
 from bok_choy.web_app_test import WebAppTest
-from nose.plugins.attrib import attr
+import pytest
 
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.account_settings import AccountSettingsPage
@@ -178,7 +178,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         return username, user_id
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify a student's own profile page.
@@ -693,7 +693,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
 
 
-@attr('shard_4')
+@pytest.mark.shard_4
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify viewing the profile page of a different user.
@@ -751,7 +751,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
         self.verify_profile_page_view_event(username, different_user_id, visibility=self.PRIVACY_PUBLIC)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
     """
     Class to test learner profile accessibility.

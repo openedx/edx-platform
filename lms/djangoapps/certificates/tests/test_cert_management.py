@@ -2,7 +2,7 @@
 import ddt
 from contextlib import contextmanager
 from django.core.management.base import CommandError
-from nose.plugins.attrib import attr
+import pytest
 from django.test.utils import override_settings
 from mock import patch
 
@@ -58,7 +58,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, expected_status)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
@@ -146,7 +146,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._assert_cert_status(phantom_course, self.user, CertificateStatuses.error)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class RegenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for regenerating certificates.
@@ -209,7 +209,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertFalse(mock_send_to_queue.called)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class UngenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for generating certificates.

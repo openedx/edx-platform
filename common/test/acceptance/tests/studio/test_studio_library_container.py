@@ -2,7 +2,7 @@
 Acceptance tests for Library Content in LMS
 """
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 import textwrap
 
 from .base_studio_test import StudioLibraryTest
@@ -17,7 +17,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr('shard_5')
+@pytest.mark.shard_5
 @ddt.ddt
 class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """

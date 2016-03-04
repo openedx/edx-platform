@@ -4,7 +4,7 @@ Acceptance tests for Studio's Setting pages
 import re
 import uuid
 
-from nose.plugins.attrib import attr
+import pytest
 
 from .base_studio_test import StudioCourseTest
 from ...pages.lms.create_mode import ModeCreationPage
@@ -13,7 +13,7 @@ from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ..helpers import skip_if_browser
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.

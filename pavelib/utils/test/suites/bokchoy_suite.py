@@ -132,9 +132,7 @@ class BokChoyTestSuite(TestSuite):
 
         else:
             substring = [
-                "--with-xunit",
-                "--xunit-file={}".format(self.xunit_report),
-                "--verbosity={}".format(self.verbosity),
+                "--junitxml={}".format(self.xunit_report),
             ]
 
         return " ".join(substring)
@@ -215,7 +213,7 @@ class BokChoyTestSuite(TestSuite):
         if self.serversonly:
             return ""
 
-        # Construct the nosetests command, specifying where to save
+        # Construct the test runner command, specifying where to save
         # screenshots and XUnit XML reports
         cmd = [
             "DEFAULT_STORE={}".format(self.default_store),
@@ -223,7 +221,7 @@ class BokChoyTestSuite(TestSuite):
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
-            "nosetests",
+            "py.test",
             test_spec,
             "{}".format(self.verbosity_processes_string())
         ]

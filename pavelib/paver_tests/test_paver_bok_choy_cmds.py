@@ -27,10 +27,8 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log{shard_str}/hars' "
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{repo_dir}/{a11y_custom_file}' "
             "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log{shard_str}' "
-            "nosetests {repo_dir}/common/test/acceptance/{exp_text} "
-            "--with-xunit "
-            "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml "
-            "--verbosity=2 "
+            "py.test {repo_dir}/common/test/acceptance/{exp_text} "
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml "
         ).format(
             default_store=store,
             repo_dir=REPO_DIR,
@@ -102,7 +100,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         Using 1 process means paver should ask for the traditional xunit plugin for plugin results
         """
         expected_verbosity_string = (
-            "--with-xunit --xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml --verbosity=2".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml --verbosity=2".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else ''
             )

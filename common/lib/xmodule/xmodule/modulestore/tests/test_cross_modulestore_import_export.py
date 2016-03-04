@@ -19,7 +19,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 from mock import patch
 
 from xmodule.tests import CourseComparisonTest
@@ -46,7 +46,7 @@ EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
 
 
 @ddt.ddt
-@attr('mongo')
+@pytest.mark.mongo
 class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     """
     This class exists to test XML import and export between different modulestore

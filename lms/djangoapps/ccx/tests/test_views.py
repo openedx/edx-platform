@@ -8,7 +8,7 @@ import pytz
 import ddt
 import urlparse
 from mock import patch, MagicMock
-from nose.plugins.attrib import attr
+import pytest
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
@@ -190,7 +190,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -787,7 +787,7 @@ def patched_get_children(self, usage_key_filter=None):
     return list(iter_children())
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 @patch('xmodule.x_module.XModuleMixin.get_children', patched_get_children, spec=True)

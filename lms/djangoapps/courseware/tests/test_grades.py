@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from mock import patch, MagicMock
-from nose.plugins.attrib import attr
+import pytest
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
@@ -45,7 +45,7 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     return grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student gradesets.

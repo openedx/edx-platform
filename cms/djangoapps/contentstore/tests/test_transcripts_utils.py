@@ -10,7 +10,6 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.utils import translation
 
-from nose.plugins.skip import SkipTest
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.contentstore.content import StaticContent
@@ -251,13 +250,11 @@ class TestDownloadYoutubeSubs(SharedModuleStoreTestCase):
 
         self.clear_sub_content(bad_youtube_sub)
 
+    # Disabled 11/14/13
+    # This test is flaky because it performs an HTTP request on an external service
+    # Re-enable when `requests.get` is patched using `mock.patch`
+    @unittest.skip(True, reason="performs an HTTP request on an external service")
     def test_success_downloading_chinese_transcripts(self):
-
-        # Disabled 11/14/13
-        # This test is flakey because it performs an HTTP request on an external service
-        # Re-enable when `requests.get` is patched using `mock.patch`
-        raise SkipTest
-
         good_youtube_sub = 'j_jEn79vS3g'  # Chinese, utf-8
         self.clear_sub_content(good_youtube_sub)
 

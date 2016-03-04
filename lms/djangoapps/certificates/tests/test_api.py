@@ -7,7 +7,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.conf import settings
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -85,7 +85,7 @@ class WebCertificateTestMixin(object):
         self.store.update_item(self.course, self.user.id)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
 
@@ -200,7 +200,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -275,7 +275,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assertEqual(url, "")
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -343,7 +343,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class GenerateExampleCertificatesTest(TestCase):
     """Test generation of example certificates. """
 
@@ -431,7 +431,7 @@ def set_microsite(domain):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-@attr('shard_1')
+@pytest.mark.shard_1
 class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 

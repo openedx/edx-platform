@@ -8,13 +8,13 @@ from django.conf import settings
 from student.tests.factories import UserFactory
 
 from mock import patch, Mock
-from nose.plugins.attrib import attr
+import pytest
 
 from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
@@ -61,7 +61,7 @@ class CourseEmailTest(TestCase):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class NoCourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model without loading the template data."""
 
@@ -70,7 +70,7 @@ class NoCourseEmailTemplateTest(TestCase):
             CourseEmailTemplate.get_template()
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
@@ -140,7 +140,7 @@ class CourseEmailTemplateTest(TestCase):
         template.render_plaintext("My new plain text.", context)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 

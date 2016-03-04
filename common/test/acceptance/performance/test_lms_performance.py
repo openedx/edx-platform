@@ -11,10 +11,10 @@ from ..pages.lms.progress import ProgressPage
 from ..pages.common.logout import LogoutPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 from ..tests.helpers import UniqueCourseTest, load_data_str
-from nose.plugins.attrib import attr
+import pytest
 
 
-@attr(har_mode='explicit')
+@pytest.mark.har_mode_explicit
 class LmsPerformanceTest(UniqueCourseTest):
     """
     Base class to capture LMS performance with HTTP Archives.

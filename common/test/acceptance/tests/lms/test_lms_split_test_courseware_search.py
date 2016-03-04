@@ -14,14 +14,14 @@ from ..helpers import create_user_partition_json
 
 from xmodule.partitions.partitions import Group
 
-from nose.plugins.attrib import attr
+import pytest
 
 from ..studio.base_studio_test import ContainerBase
 
 from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class SplitTestCoursewareSearchTest(ContainerBase):
     """
     Test courseware search on Split Test Module.

@@ -6,7 +6,7 @@ from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
+import pytest
 
 from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory
@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """

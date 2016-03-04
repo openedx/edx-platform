@@ -3,7 +3,7 @@
 Acceptance tests for Studio's Setting pages
 """
 from __future__ import unicode_literals
-from nose.plugins.attrib import attr
+import pytest
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
@@ -18,7 +18,7 @@ from textwrap import dedent
 from xmodule.partitions.partitions import Group
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -230,7 +230,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         ).fulfill()
 
 
-@attr('shard_8')
+@pytest.mark.shard_8
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -403,7 +403,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertEquals(set(displayed_fields), set(expected_fields))
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class ContentLicenseTest(StudioCourseTest):
     """
     Tests for course-level licensing (that is, setting the license,

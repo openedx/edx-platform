@@ -5,7 +5,7 @@ import json
 
 from django.test.client import RequestFactory
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -13,7 +13,7 @@ from class_dashboard import views
 from student.tests.factories import AdminFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py

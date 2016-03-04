@@ -3,7 +3,7 @@
 import json
 import ddt
 from uuid import uuid4
-from nose.plugins.attrib import attr
+import pytest
 from mock import patch
 
 from django.conf import settings
@@ -45,7 +45,7 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class UpdateExampleCertificateViewTest(TestCase):
     """Tests for the XQueue callback that updates example certificates. """
@@ -187,7 +187,7 @@ class UpdateExampleCertificateViewTest(TestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the microsite certificates web/html views

@@ -11,7 +11,7 @@ from shoppingcart.models import (
 )
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
-from nose.plugins.attrib import attr
+import pytest
 import json
 from student.tests.factories import UserFactory, CourseModeFactory
 from django.core.urlresolvers import reverse
@@ -19,7 +19,7 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """

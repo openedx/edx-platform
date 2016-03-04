@@ -1,7 +1,7 @@
 """ Tests for commerce views. """
 import json
 from uuid import uuid4
-from nose.plugins.attrib import attr
+import pytest
 
 import ddt
 from django.conf import settings
@@ -25,7 +25,7 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password='test')
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class ReceiptViewTests(UserMixin, TestCase):
     """ Tests for the receipt view. """

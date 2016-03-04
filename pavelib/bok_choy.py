@@ -100,7 +100,7 @@ def test_a11y(options):
     - path/to/test.py:TestFoo
     - path/to/test.py:TestFoo.test_bar
     It can also be left blank to run all tests in the suite that are tagged
-    with `@attr("a11y")`.
+    with `@pytest.mark.a11y`.
     """
     opts = parse_bokchoy_opts(options)
     opts['report_dir'] = Env.BOK_CHOY_A11Y_REPORT_DIR

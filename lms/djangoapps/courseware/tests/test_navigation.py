@@ -3,7 +3,7 @@ This test file will run through some LMS test scenarios regarding access and nav
 """
 import time
 from mock import patch
-from nose.plugins.attrib import attr
+import pytest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.

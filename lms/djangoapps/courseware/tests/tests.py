@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from django.core.urlresolvers import reverse
 import mock
-from nose.plugins.attrib import attr
+import pytest
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -18,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -122,7 +122,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from XML.
@@ -140,7 +140,7 @@ class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
@@ -164,7 +164,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
@@ -177,7 +177,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         # not allowed to be passed in (i.e. was throwing exception)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 class TestLmsFieldData(TestCase):
     """
     Tests of the LmsFieldData class

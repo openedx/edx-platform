@@ -10,7 +10,7 @@ import json
 from uuid import uuid4
 from itertools import cycle, chain, repeat
 from mock import patch, Mock
-from nose.plugins.attrib import attr
+import pytest
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
 from boto.ses.exceptions import (
     SESAddressNotVerifiedError,
@@ -75,7 +75,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""

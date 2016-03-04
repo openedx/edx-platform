@@ -16,7 +16,7 @@ from mock import patch, Mock, call
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 # This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
-from nose.plugins.attrib import attr
+import pytest
 import pymongo
 from pytz import UTC
 from shutil import rmtree
@@ -297,7 +297,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
 
 
 @ddt.ddt
-@attr('mongo')
+@pytest.mark.mongo
 class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     """
     Tests of the MixedModulestore interface methods.
@@ -2653,7 +2653,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
 
 @ddt.ddt
-@attr('mongo')
+@pytest.mark.mongo
 class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
     """
     Tests which publish (or don't publish) items - and then export/import the course,

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import ddt
 from django.core.urlresolvers import reverse
 import freezegun
-from nose.plugins.attrib import attr
+import pytest
 import pytz
 
 from course_modes.tests.factories import CourseModeFactory
@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@pytest.mark.shard_1
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
