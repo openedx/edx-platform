@@ -27,8 +27,10 @@ def send_login_to_AMC(sender, instance, update_fields, **kwargs):
             url_suffix = settings.APPSEMBLER_FIRST_LOGIN_API
             if not url_base:
                 logger.warning("APPSEMBLER_AMC_API_BASE is not set")
+                return
             if not url_suffix:
                 logger.warning("APPSEMBLER_FIRST_LOGIN_API is not set")
+                return
             url = url_base + url_suffix
             datetime_to_send = instance.last_login.isoformat()
             payload = {
