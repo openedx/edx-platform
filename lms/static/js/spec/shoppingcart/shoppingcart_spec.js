@@ -36,7 +36,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
-                var data = view.responseFromServer.mostRecentCall.args[0]
+                var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(true);
 
             });
@@ -50,7 +50,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
-                var data = view.responseFromServer.mostRecentCall.args[0]
+                var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(false);
 
             });

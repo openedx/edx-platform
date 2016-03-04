@@ -185,7 +185,7 @@ define([
             });
 
             it('should setup the default text field', function () {
-                var args = mockViewer.addField.mostRecentCall.args[0];
+                var args = mockViewer.addField.calls.mostRecent().args[0];
 
                 expect(mockViewer.addField.callCount).toBe(1);
                 expect(_.isFunction(args.load)).toBeTruthy();

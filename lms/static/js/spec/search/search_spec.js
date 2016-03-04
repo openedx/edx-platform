@@ -77,14 +77,14 @@ define([
                 var collection = new SearchCollection([]);
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
-                expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/');
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/');
             });
 
             it('sends a request with course ID', function () {
                 var collection = new SearchCollection([], { courseId: 'edx101' });
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
-                expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/edx101');
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/edx101');
             });
 
             it('sends a request and parses the json result', function () {
@@ -139,10 +139,10 @@ define([
                 AjaxHelpers.respondWithJson(requests, response);
                 spyOn($, 'ajax');
                 this.collection.loadNextPage();
-                expect($.ajax.mostRecentCall.args[0].url).toEqual(this.collection.url);
-                expect($.ajax.mostRecentCall.args[0].data.search_string).toEqual(searchString);
-                expect($.ajax.mostRecentCall.args[0].data.page_size).toEqual(this.collection.pageSize);
-                expect($.ajax.mostRecentCall.args[0].data.page_index).toEqual(2);
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual(this.collection.url);
+                expect($.ajax.calls.mostRecent().args[0].data.search_string).toEqual(searchString);
+                expect($.ajax.calls.mostRecent().args[0].data.page_size).toEqual(this.collection.pageSize);
+                expect($.ajax.calls.mostRecent().args[0].data.page_index).toEqual(2);
             });
 
             it('has next page', function () {
