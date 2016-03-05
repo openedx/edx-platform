@@ -33,7 +33,8 @@ from xmodule.modulestore.django import _get_modulestore_branch_setting, modulest
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+    ModuleStoreTestCase,
+    TEST_DATA_MIXED_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import (
     CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
