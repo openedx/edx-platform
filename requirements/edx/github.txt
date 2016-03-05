@@ -61,7 +61,8 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
-
+git+https://github.com/marcgibbons/django-rest-swagger.git@0.3.5
+git+https://github.com/yaml/pyyaml.git@3.10
 # custom opaque-key implementations for CCX
 git+https://github.com/edx/ccx-keys.git@0.1.1#egg=ccx-keys==0.1.1
 

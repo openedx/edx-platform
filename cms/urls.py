@@ -60,6 +60,9 @@ urlpatterns = patterns(
 
     # Update session view
     url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
+
+    # Swagger documentation location
+    url(r'^docs/', include('rest_framework_swagger.urls')),
 )
 
 # User creation and updating views

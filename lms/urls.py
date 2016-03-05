@@ -110,6 +110,7 @@ urlpatterns = (
     # TODO Namespace these!
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^docs/', include('rest_framework_swagger.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
