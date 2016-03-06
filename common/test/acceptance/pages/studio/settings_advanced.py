@@ -3,6 +3,7 @@ Course Advanced Settings page
 """
 
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import coordinates_for_scrolling
 from .course_page import CoursePage
 from .utils import press_the_notification_button, type_in_codemirror, get_codemirror_value
 
@@ -48,26 +49,13 @@ class AdvancedSettingsPage(CoursePage):
         self.browser.refresh()
         self.wait_for_page()
 
-    def coordinates_for_scrolling(self, coordinates_for):
-        """
-        Get the x and y coordinates of elements
-        """
-        cordinates_dict = self.browser.find_element_by_css_selector(coordinates_for)
-        location = cordinates_dict.location
-        for key, val in location.iteritems():
-            if key == 'x':
-                x_axis = val
-            elif key == 'y':
-                y_axis = val
-        return x_axis, y_axis
-
     def undo_changes_via_modal(self):
         """
         Trigger clicking event of the undo changes button in the modal.
         Wait for the undoing process to load via ajax call.
         Before that Scroll so the button is clickable on all browsers
         """
-        self.browser.execute_script("window.scrollTo" + str(self.coordinates_for_scrolling(UNDO_BUTTON_SELECTOR)))
+        self.browser.execute_script("window.scrollTo" + str(coordinates_for_scrolling(self, UNDO_BUTTON_SELECTOR)))
         self.q(css=UNDO_BUTTON_SELECTOR).click()
         self.wait_for_ajax()
 
@@ -77,7 +65,7 @@ class AdvancedSettingsPage(CoursePage):
         No need to wait for any ajax.
         Before that Scroll so the button is clickable on all browsers
         """
-        self.browser.execute_script("window.scrollTo" + str(self.coordinates_for_scrolling(MANUAL_BUTTON_SELECTOR)))
+        self.browser.execute_script("window.scrollTo" + str(coordinates_for_scrolling(self, MANUAL_BUTTON_SELECTOR)))
         self.q(css=MANUAL_BUTTON_SELECTOR).click()
 
     def is_validation_modal_present(self):

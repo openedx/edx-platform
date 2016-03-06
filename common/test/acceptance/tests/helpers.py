@@ -199,6 +199,20 @@ def enable_css_animations(page):
     """)
 
 
+def coordinates_for_scrolling(page, css_selector):
+    """
+    Get the x and y coordinates of elements
+    """
+    coordinates_dict = page.browser.find_element_by_css_selector(css_selector)
+    location = coordinates_dict.location
+    for key, val in location.iteritems():
+        if key == 'x':
+            x_axis = val
+        elif key == 'y':
+            y_axis = val
+    return x_axis, y_axis
+
+
 def select_option_by_text(select_browser_query, option_text):
     """
     Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
