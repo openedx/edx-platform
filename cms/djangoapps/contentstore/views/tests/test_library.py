@@ -97,7 +97,7 @@ class UnitTestLibraries(ModuleStoreTestCase):
         response = self.client.ajax_post(LIBRARY_REST_URL, {
             'org': 'org', 'library': 'lib', 'display_name': "New Library",
         })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     @ddt.data(
         {},

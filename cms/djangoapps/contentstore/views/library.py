@@ -119,6 +119,11 @@ def _create_library(request):
         display_name = request.json['display_name']
         org = request.json['org']
         library = request.json.get('number', None)
+
+        user_perms = get_user_permissions(request.user, None, org=org)
+        if not user_perms & STUDIO_VIEW_USERS:
+            raise PermissionDenied()
+
         if library is None:
             library = request.json['library']
         store = modulestore()

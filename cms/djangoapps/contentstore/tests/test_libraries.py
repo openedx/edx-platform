@@ -39,7 +39,7 @@ class LibraryTestCase(ModuleStoreTestCase):
 
         self.session_data = {}  # Used by _bind_module
 
-    def _create_library(self, org="org", library="lib", display_name="Test Library"):
+    def _create_library(self, org="org", library="lib", display_name="Test Library", expected_code=200):
         """
         Helper method used to create a library. Uses the REST API.
         """
@@ -48,7 +48,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             'library': library,
             'display_name': display_name,
         })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, expected_code)
         lib_info = parse_json(response)
         lib_key = CourseKey.from_string(lib_info['library_key'])
         self.assertIsInstance(lib_key, LibraryLocator)
@@ -527,9 +527,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self._login_as_non_staff_user(logout_first=False)
         self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
-            lib_key2 = self._create_library(library="lib2", display_name="Test Library 2")
-            library2 = modulestore().get_library(lib_key2)
-            self.assertIsNotNone(library2)
+            lib_key2 = self._create_library(library="lib2", display_name="Test Library 2", expected_code=403)
 
     @ddt.data(
         CourseInstructorRole,
