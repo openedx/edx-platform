@@ -44,7 +44,7 @@ define([
             var mock = {
                 collection: collection,
                 latest: function () { return this.collection.last(20); }
-            }
+            };
             this.view = new CoursesListing({ model: mock });
         });
 
@@ -66,13 +66,13 @@ define([
             this.view.render();
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
-            jasmine.Clock.tick(500);
+            jasmine.clock().tick(500);
             expect(this.onNext).toHaveBeenCalled();
 
             // should not be triggered again (while it is loading)
             $(window).trigger('scroll');
-            jasmine.Clock.tick(500);
-            expect(this.onNext.calls.length).toEqual(1);
+            jasmine.clock().tick(500);
+            expect(this.onNext.calls.count()).toEqual(1);
         });
 
     });

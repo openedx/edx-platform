@@ -100,7 +100,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(bookmarkButtonView[firstActionData.handler]).toHaveBeenCalled();
                     AjaxHelpers.respondWithJson(requests, {});
                     expect(firstActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
-                    bookmarkButtonView[firstActionData.handler].reset();
+                    bookmarkButtonView[firstActionData.handler].calls.reset();
 
                     expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                     verifyBookmarkButtonState(bookmarkButtonView, secondActionData.bookmarked);
@@ -158,7 +158,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
 
-                jasmine.Clock.tick(5001);
+                jasmine.clock().tick(5001);
                 expect($messageBanner.text().trim()).toBe('');
             });
         });

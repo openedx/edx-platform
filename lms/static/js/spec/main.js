@@ -43,7 +43,6 @@
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
-            'jasmine-jquery': 'xmodule_js/common_static/js/vendor/jasmine-jquery',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
             'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
@@ -251,9 +250,6 @@
             },
             'sinon': {
                 exports: 'sinon'
-            },
-            'jasmine-jquery': {
-                deps: ['jasmine']
             },
             'jasmine-imagediff': {
                 deps: ['jasmine']

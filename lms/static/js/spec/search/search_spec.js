@@ -164,18 +164,18 @@ define([
                 this.collection.performSearch('new search');
                 AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
-                expect(this.onSearch.calls.length).toEqual(1);
+                expect(this.onSearch.calls.count()).toEqual(1);
 
                 this.collection.performSearch('old search');
                 this.collection.cancelSearch();
                 AjaxHelpers.skipResetRequest(requests);
-                expect(this.onSearch.calls.length).toEqual(1);
+                expect(this.onSearch.calls.count()).toEqual(1);
 
                 this.collection.loadNextPage();
                 this.collection.loadNextPage();
                 AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
-                expect(this.onNext.calls.length).toEqual(1);
+                expect(this.onNext.calls.count()).toEqual(1);
             });
 
             describe('reset state', function () {
@@ -261,7 +261,7 @@ define([
             function rendersItem() {
                 expect(this.item.$el).toHaveAttr('role', 'region');
                 expect(this.item.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.item.$el).toContain('a[href="' + this.model.get('url') + '"]');
+                expect(this.item.$el).toContainElement('a[href="' + this.model.get('url') + '"]');
                 expect(this.item.$el.find('.result-type')).toContainHtml(this.model.get('content_type'));
                 expect(this.item.$el.find('.result-excerpt')).toContainHtml(this.model.get('excerpt'));
                 expect(this.item.$el.find('.result-location')).toContainHtml('section ▸ subsection ▸ unit');
@@ -270,7 +270,7 @@ define([
             function rendersSequentialItem() {
                 expect(this.seqItem.$el).toHaveAttr('role', 'region');
                 expect(this.seqItem.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.seqItem.$el).toContain('a[href="' + this.seqModel.get('url') + '"]');
+                expect(this.seqItem.$el).toContainElement('a[href="' + this.seqModel.get('url') + '"]');
                 expect(this.seqItem.$el.find('.result-type')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-excerpt')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-location')).toContainHtml('section ▸ subsection');
@@ -498,7 +498,6 @@ define([
                     'templates/search/dashboard_search_item',
                     'templates/search/course_search_results',
                     'templates/search/dashboard_search_results',
-                    'templates/search/search_list',
                     'templates/search/search_loading',
                     'templates/search/search_error'
                 ]);
@@ -601,9 +600,9 @@ define([
             function updatesNavigationHistory () {
                 $('.search-field').val('edx');
                 $('.search-button').trigger('click');
-                expect(Backbone.history.navigate.calls[0].args).toContain('search/edx');
+                expect(Backbone.history.navigate.calls.mostRecent().args[0]).toContain('search/edx');
                 $('.cancel-button').trigger('click');
-                expect(Backbone.history.navigate.calls[1].args).toContain('');
+                expect(Backbone.history.navigate.calls.argsFor(1)[0]).toBe('');
             }
 
             function cancelsSearchRequest () {
