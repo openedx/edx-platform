@@ -137,10 +137,26 @@ class DOPAccessTokenExchangeViewTestGoogle(
         TestCase
 ):
     """
-    Tests for AccessTokenExchangeView used with Google
+    Tests for AccessTokenExchangeView used with Google using
+    django-oauth2-provider backend.
     """
     pass
 
+
+# This is necessary because cms does not implement third party auth
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@httpretty.activate
+class DOTAccessTokenExchangeViewTestGoogle(
+        mixins.DOTAdapterMixin,
+        AccessTokenExchangeViewTest,
+        ThirdPartyOAuthTestMixinGoogle,
+        TestCase
+):
+    """
+    Tests for AccessTokenExchangeView used with Google using
+    django-oauth-toolkit backend.
+    """
+    pass
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestLoginWithAccessTokenView(TestCase):
