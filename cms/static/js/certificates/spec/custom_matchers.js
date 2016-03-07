@@ -3,29 +3,52 @@
 
 define(['jquery'], function($) { // jshint ignore:line
     'use strict';
-    return function (that) {
-        that.addMatchers({
+    return function () {
+        jasmine.addMatchers({
+            toContainText: function () {
+                return {
+                    compare: function (actual, text) {
+                        // Assert the value being tested has text which matches the provided text
+                        var trimmedText = $.trim($(actual).text()),
+                            passed;
 
-            toContainText: function (text) {
-                // Assert the value being tested has text which matches the provided text
-                var trimmedText = $.trim($(this.actual).text());
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
+                        if (text && $.isFunction(text.test)) {
+                            passed = text.test(trimmedText);
+                        } else {
+                            passed = trimmedText.indexOf(text) !== -1;
+                        }
+
+                        return {
+                            pass: passed
+                        };
+                    }
+                };
             },
 
-            toBeCorrectValuesInModel: function (values) {
+            toBeCorrectValuesInModel: function () {
                 // Assert the value being tested has key values which match the provided values
-                return _.every(values, function (value, key) {
-                    return this.actual.get(key) === value;
-                }.bind(this));
+                return {
+                    compare: function (actual, values) {
+                        var passed = _.every(values, function (value, key) {
+                            return actual.get(key) === value;
+                        }.bind(this));
+
+                        return {
+                            pass: passed
+                        };
+                    }
+                };
             },
 
-            toBeInstanceOf: function(expected) {
+            toBeInstanceOf: function() {
                 // Assert the type of the value being tested matches the provided type
-                return this.actual instanceof expected;
+                return {
+                    compare: function (actual, expected) {
+                        return {
+                            pass: actual instanceof expected
+                        };
+                    }
+                };
             }
         });
     };

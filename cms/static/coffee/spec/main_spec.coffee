@@ -7,8 +7,12 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
     describe "main helper", ->
         beforeEach ->
             @previousAjaxSettings = $.extend(true, {}, $.ajaxSettings)
-            spyOn($, "cookie")
-            $.cookie.when("csrftoken").thenReturn("stubCSRFToken")
+            spyOn($, "cookie").and.callFake(
+              (param) ->
+                  if param == "csrftoken"
+                    return "stubCSRFToken"
+            )
+
             main()
 
         afterEach ->
@@ -43,7 +47,7 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             $.ajax("/test")
             server.respond()
             expect($("#page-notification")).not.toBeEmpty()
-            expect($("#page-notification")).toContain('div.wrapper-notification-error')
+            expect($("#page-notification")).toContainElement('div.wrapper-notification-error')
 
         it "can override AJAX request with error so it does not pop an error notification", ->
             server = AjaxHelpers.server([500, {}, ''])

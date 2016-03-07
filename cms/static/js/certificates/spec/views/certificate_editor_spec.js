@@ -118,7 +118,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this); // jshint ignore:line
+            CustomMatchers(); // jshint ignore:line
         });
 
         afterEach(function() {
@@ -272,7 +272,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 var signatory = this.model.get('signatories').at(0);
                 var signatory_url = '/certificates/signatory';
                 signatory.url = signatory_url;
-                spyOn(signatory, "isNew").andReturn(false);
+                spyOn(signatory, "isNew").and.returnValue(false);
                 var text = 'Delete "'+ signatory.get('name') +'" from the list of signatories?';
                 clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first', signatory_url);
                 expect(this.model.get('signatories').length).toEqual(total_signatories - 1);
@@ -281,7 +281,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             it('can cancel deletion of signatories', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 var signatory = this.model.get('signatories').at(0);
-                spyOn(signatory, "isNew").andReturn(false);
+                spyOn(signatory, "isNew").and.returnValue(false);
                 // add one more signatory
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 var total_signatories = this.model.get('signatories').length;

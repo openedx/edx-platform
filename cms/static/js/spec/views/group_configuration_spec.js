@@ -167,8 +167,7 @@ define([
                         }
 
                         return {
-                            pass: passed,
-                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            pass: passed
                         };
                     }
                 };
@@ -185,8 +184,7 @@ define([
                         var passed =  _.isEqual(values, expected);
 
                         return {
-                            pass: passed,
-                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            pass: passed
                         };
                     }
                 };
@@ -199,8 +197,7 @@ define([
                         }.bind(this));
 
                         return {
-                            pass: passed,
-                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            pass: passed
                         };
                     }
                 };
@@ -215,8 +212,7 @@ define([
                         var passed = _.isEqual(actualValues, values);
 
                         return {
-                            pass: passed,
-                            message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                            pass: passed
                         };
                     }
                 };
@@ -495,12 +491,15 @@ define([
             AjaxHelpers.expectNoRequests(requests);
         });
 
-        it('should have appropriate class names on focus/blur', function () {
+        it('should have appropriate class names on focus/blur', function (done) {
             var groupInput = this.view.$(SELECTORS.inputGroupName).first(),
                 groupFields = this.view.$(SELECTORS.groupFields);
 
             groupInput.focus();
-            expect(groupFields).toHaveClass('is-focused');
+            setTimeout(function () {
+                expect(groupFields).toHaveClass('is-focused');
+                done();
+            }, 100);
 
             // The blur event handler is only being called when the test is run in dev mode
             // (after JQuery upgrade).
@@ -1003,7 +1002,7 @@ define([
         it('does not hide saving message if failure', function() {
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
-            this.view.$(SELECTORS.inputName).val('New Content Group')
+            this.view.$(SELECTORS.inputName).val('New Content Group');
 
             ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy)
         });

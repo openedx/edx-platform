@@ -42,7 +42,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * return a reference to the Array. This allows tests
      * to respond for individual requests.
      */
-    fakeRequests = function (that) {
+    fakeRequests = function () {
         var requests = [],
           xhr = sinon.useFakeXMLHttpRequest();
 
@@ -86,6 +86,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     };
 
     expectJsonRequest = function(requests, method, url, jsonRequest) {
+        jsonRequest = jsonRequest || null;
         var request = currentRequest(requests);
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);

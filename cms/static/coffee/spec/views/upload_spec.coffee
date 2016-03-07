@@ -41,7 +41,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
         describe "Basic", ->
             it "should render without a file selected", ->
                 @view.render()
-                expect(@view.$el).toContain("input[type=file]")
+                expect(@view.$el).toContainElement("input[type=file]")
                 expect(@view.$(".action-upload")).toHaveClass("disabled")
 
             it "should render with a PDF selected", ->
@@ -49,8 +49,8 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
                 @mockFiles.push(file)
                 @model.set("selectedFile", file)
                 @view.render()
-                expect(@view.$el).toContain("input[type=file]")
-                expect(@view.$el).not.toContain("#upload_error")
+                expect(@view.$el).toContainElement("input[type=file]")
+                expect(@view.$el).not.toContainElement("#upload_error")
                 expect(@view.$(".action-upload")).not.toHaveClass("disabled")
 
             it "should render an error with an invalid file type selected", ->
@@ -58,8 +58,8 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
                 @mockFiles.push(file)
                 @model.set("selectedFile", file)
                 @view.render()
-                expect(@view.$el).toContain("input[type=file]")
-                expect(@view.$el).toContain("#upload_error")
+                expect(@view.$el).toContainElement("input[type=file]")
+                expect(@view.$el).toContainElement("#upload_error")
                 expect(@view.$(".action-upload")).toHaveClass("disabled")
 
             it "should render an error with an invalid file type after a correct file type selected", ->
@@ -70,8 +70,8 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
 
                 event.target = {"files": [correctFile]}
                 @view.selectFile(event)
-                expect(@view.$el).toContain("input[type=file]")
-                expect(@view.$el).not.toContain("#upload_error")
+                expect(@view.$el).toContainElement("input[type=file]")
+                expect(@view.$el).not.toContainElement("#upload_error")
                 expect(@view.$(".action-upload")).not.toHaveClass("disabled")
 
                 realMethod = @model.set
@@ -84,8 +84,8 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
 
                 event.target = {"files": [inCorrectFile]}
                 @view.selectFile(event)
-                expect(@view.$el).toContain("input[type=file]")
-                expect(@view.$el).toContain("#upload_error")
+                expect(@view.$el).toContainElement("input[type=file]")
+                expect(@view.$el).toContainElement("#upload_error")
                 expect(@view.$(".action-upload")).toHaveClass("disabled")
 
         describe "Uploads", ->

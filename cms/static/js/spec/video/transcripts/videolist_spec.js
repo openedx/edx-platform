@@ -5,7 +5,7 @@ define(
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
         'common/js/spec_helpers/ajax_helpers',
-        'xmodule', 'jasmine-jquery'
+        'xmodule'
     ],
 function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
     'use strict';
@@ -93,23 +93,45 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
             };
 
             jasmine.addMatchers({
-                assertValueInView: function(expected) {
-                    var actualValue = this.actual.getValueFromEditor();
-                    return this.env.equals_(actualValue, expected);
+                assertValueInView: function() {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue = actual.getValueFromEditor(),
+                            passed = _.isEqual(actualValue, expected);
+
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 },
-                assertCanUpdateView: function (expected) {
-                    var actual = this.actual,
-                        actualValue;
+                assertCanUpdateView: function () {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue,
+                                passed;
 
-                    actual.setValueInEditor(expected);
-                    actualValue = actual.getValueFromEditor();
+                            actual.setValueInEditor(expected);
+                            actualValue = actual.getValueFromEditor();
+                            passed = _.isEqual(actualValue, expected);
 
-                    return this.env.equals_(actualValue, expected);
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 },
-                assertIsCorrectVideoList: function (expected) {
-                    var actualValue = this.actual.getVideoObjectsList();
+                assertIsCorrectVideoList: function () {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue = actual.getVideoObjectsList(),
+                            passed = _.isEqual(actualValue, expected);
 
-                    return this.env.equals_(actualValue, expected);
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 }
             });
         });
@@ -181,9 +203,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     expect(messenger.render).toHaveBeenCalled();
                 },
                 resetSpies = function(mockServer) {
-                    abstractEditor.render.reset();
-                    Utils.command.reset();
-                    messenger.render.reset();
+                    abstractEditor.render.calls.reset();
+                    Utils.command.calls.reset();
+                    messenger.render.calls.reset();
                     mockServer.requests.length = 0;
                 };
 
@@ -224,22 +246,25 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                 resetSpies(this.mockServer);
                 view.render();
 
-                waitsForResponse(this.mockServer).then(function () {
-                    assertToHaveBeenRendered(videoListLength);
-                    view.getVideoObjectsList.and.returnValue(videoListLength);
-                    expect(view.openExtraVideosBar).toHaveBeenCalled();
-                });
+                waitsForResponse(this.mockServer)
+                    .then(function () {
+                        assertToHaveBeenRendered(videoListLength);
+                        view.getVideoObjectsList.and.returnValue(videoListLength);
+                        expect(view.openExtraVideosBar).toHaveBeenCalled();
+                    })
+                    .then(_.bind(function () {
+                        resetSpies(this.mockServer);
+                        view.openExtraVideosBar.calls.reset();
+                        view.getVideoObjectsList.and.returnValue(videoListHtml5mode);
+                        view.render();
 
-                resetSpies(this.mockServer);
-                view.openExtraVideosBar.reset();
-                view.getVideoObjectsList.and.returnValue(videoListHtml5mode);
-                view.render();
-
-                waitsForResponse(this.mockServer).then(function () {
-                    assertToHaveBeenRendered(videoListHtml5mode);
-                    expect(view.openExtraVideosBar).toHaveBeenCalled();
-                });
-
+                        return waitsForResponse(this.mockServer)
+                            .then(function () {
+                                assertToHaveBeenRendered(videoListHtml5mode);
+                                expect(view.openExtraVideosBar).toHaveBeenCalled();
+                            });
+                    }, this))
+                    .then(done);
             });
 
             it('is rendered without opened extra videos bar', function (done) {
@@ -265,7 +290,6 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                   })
                   .always(done);
             });
-
         });
 
         describe('isUniqOtherVideos', function () {
@@ -625,9 +649,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
             var eventObject;
 
             var resetSpies = function (view) {
-                messenger.hideError.reset();
-                view.updateModel.reset();
-                view.closeExtraVideosBar.reset();
+                messenger.hideError.calls.reset();
+                view.updateModel.calls.reset();
+                view.closeExtraVideosBar.calls.reset();
             };
 
             var setUp = function (view) {
@@ -653,19 +677,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     view.checkValidity.and.returnValue(false);
 
                     waitsForResponse(this.mockServer)
-                      .then(function () {
-                          view.inputHandler(eventObject);
-                          expect(messenger.hideError).not.toHaveBeenCalled();
-                          expect(view.updateModel).not.toHaveBeenCalled();
-                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                          expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', true
-                          );
-                          expect($.fn.addClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                          );
-                      })
-                      .always(done);
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', true
+                            );
+                            expect($.fn.addClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
@@ -677,19 +701,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     view.checkValidity.and.returnValue(false);
 
                     waitsForResponse(this.mockServer)
-                      .then(function () {
-                          view.inputHandler(eventObject);
-                          expect(messenger.hideError).not.toHaveBeenCalled();
-                          expect(view.updateModel).not.toHaveBeenCalled();
-                          expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                          expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', true
-                          );
-                          expect($.fn.addClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                          );
-                      })
-                      .always(done);
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', true
+                            );
+                            expect($.fn.addClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
@@ -701,19 +725,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     _.isEqual.and.returnValue(false);
 
                     waitsForResponse(this.mockServer)
-                      .then(function () {
-                          view.inputHandler(eventObject);
-                          expect(messenger.hideError).not.toHaveBeenCalled();
-                          expect(view.updateModel).toHaveBeenCalled();
-                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                          expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', false
-                          );
-                          expect($.fn.removeClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                          );
-                      })
-                      .always(done);
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', false
+                            );
+                            expect($.fn.removeClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
@@ -724,19 +748,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                     view.checkValidity.and.returnValue(true);
                     _.isEqual.and.returnValue(true);
                     waitsForResponse(this.mockServer)
-                      .then(function () {
-                          view.inputHandler(eventObject);
-                          expect(messenger.hideError).toHaveBeenCalled();
-                          expect(view.updateModel).not.toHaveBeenCalled();
-                          expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                          expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', false
-                          );
-                          expect($.fn.removeClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                          );
-                      })
-                      .always(done);
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', false
+                            );
+                            expect($.fn.removeClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
