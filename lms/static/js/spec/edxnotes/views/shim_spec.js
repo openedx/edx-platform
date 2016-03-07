@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Shim', function() {
@@ -76,7 +76,7 @@ define([
             // in turn calls onHighlightMouseover.
             // To test if onHighlightMouseover is called or not on
             // mouseover, we'll have to reset onHighlightMouseover.
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             // Check that both instances of annotator are frozen
             _.invoke(highlights, 'mouseover');
             _.invoke(highlights, 'mouseout');
@@ -86,7 +86,7 @@ define([
         it('clicking twice reverts to default behavior', function() {
             highlights[0].click();
             $(document).click();
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
 
             // Check that both instances of annotator are unfrozen
             _.invoke(highlights, 'mouseover');
@@ -116,7 +116,7 @@ define([
            'and unbinds one document click.edxnotes:freeze event handlers', function() {
             // Freeze all instances
             highlights[0].click();
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             // Destroy second instance
             annotators[1].destroy();
 
@@ -183,13 +183,13 @@ define([
             });
 
             it('should hide the annotator on creation', function () {
-                expect(mockViewer.hide.callCount).toBe(1);
+                expect(mockViewer.hide.calls.count()).toBe(1);
             });
 
             it('should setup the default text field', function () {
                 var args = mockViewer.addField.calls.mostRecent().args[0];
 
-                expect(mockViewer.addField.callCount).toBe(1);
+                expect(mockViewer.addField.calls.count()).toBe(1);
                 expect(_.isFunction(args.load)).toBeTruthy();
             });
 

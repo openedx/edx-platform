@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/edxnotes/views/search_box',
-    'js/edxnotes/collections/notes', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+    'js/edxnotes/collections/notes', 'js/spec/edxnotes/custom_matchers'
 ], function($, _, AjaxHelpers, SearchBoxView, NotesCollection, customMatchers) {
     'use strict';
     describe('EdxNotes SearchBoxView', function() {

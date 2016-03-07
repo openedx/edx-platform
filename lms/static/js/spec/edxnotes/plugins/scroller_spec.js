@@ -56,7 +56,7 @@ define([
                 id: 'abc123',
                 highlights: [highlights[0]]
             }]);
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             expect(highlights[0]).toBeFocused();
             highlights[0].mouseover();
             highlights[0].mouseout();

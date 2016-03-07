@@ -1,7 +1,7 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/notes',
     'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
-    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+    'js/spec/edxnotes/custom_matchers'
 ], function(
     $, TemplateHelpers, NotesCollection, TabsCollection, RecentActivityView, customMatchers
 ) {

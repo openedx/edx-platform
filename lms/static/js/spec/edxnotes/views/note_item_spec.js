@@ -36,7 +36,7 @@ define([
             var view = getView(),
                 unitLink = view.$('.reference-unit-link').get(0);
 
-            expect(view.$el).toContain('.note-excerpt-more-link');
+            expect(view.$el).toContainElement('.note-excerpt-more-link');
             expect(view.$el).toContainText(Helpers.PRUNED_TEXT);
             expect(view.$el).toContainText('More');
             view.$('.note-excerpt-more-link').click();
