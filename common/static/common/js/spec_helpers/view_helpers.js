@@ -19,7 +19,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
 
         createFeedbackSpy = function(type, intent) {
             var feedbackSpy = spyOnConstructor(type, intent, ['show', 'hide']);
-            feedbackSpy.show.andReturn(feedbackSpy);
+            feedbackSpy.show.and.returnValue(feedbackSpy);
             return feedbackSpy;
         };
 
@@ -28,7 +28,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             expect(feedbackSpy.constructor).toHaveBeenCalled();
             expect(feedbackSpy.show).toHaveBeenCalled();
             expect(feedbackSpy.hide).not.toHaveBeenCalled();
-            options = feedbackSpy.constructor.mostRecentCall.args[0];
+            options = feedbackSpy.constructor.calls.mostRecent().args[0];
             expect(options.title).toMatch(text);
         };
 
@@ -55,9 +55,9 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
         confirmPrompt = function(promptSpy, pressSecondaryButton) {
             expect(promptSpy.constructor).toHaveBeenCalled();
             if (pressSecondaryButton) {
-                promptSpy.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpy);
+                promptSpy.constructor.calls.mostRecent().args[0].actions.secondary.click(promptSpy);
             } else {
-                promptSpy.constructor.mostRecentCall.args[0].actions.primary.click(promptSpy);
+                promptSpy.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpy);
             }
         };
 

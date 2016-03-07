@@ -37,7 +37,7 @@ function ($, _, Squire) {
             return spy;
         };
 
-        beforeEach(function () {
+        beforeEach(function (done) {
             self = this;
 
             jasmine.addMatchers({
@@ -45,7 +45,7 @@ function ($, _, Squire) {
                     return {
                         compare: function (actual, expected) {
                             var value = actual.getValueFromEditor(),
-                            passed = this.env.equals_(value, expected);
+                            passed = _.isEqual(value, expected);
 
                             return {
                                 pass: passed,
@@ -64,7 +64,7 @@ function ($, _, Squire) {
                             view.setValueInEditor(expected);
                             value = view.getValueFromEditor();
 
-                            passed = this.env.equals_(value, expected);
+                            passed = _.isEqual(value, expected);
 
                             return {
                                 pass: passed,
@@ -86,31 +86,28 @@ function ($, _, Squire) {
                                 env.equals_(view.getValueFromEditor(), modelValue);
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
                 },
-                assertUpdateModel: function (originalValue, newValue) {
+                assertUpdateModel: function () {
                     return {
                         compare: function (actual, originalValue, newValue) {
-                            var env = this.env,
-                                view = actual,
+                            var view = actual,
                                 model = view.model,
                                 expectOriginal,
                                 passed;
 
                             view.setValueInEditor(newValue);
-                            expectOriginal = env.equals_(model.getValue(), originalValue);
+                            expectOriginal = _.isEqual(model.getValue(), originalValue);
                             view.updateModel();
 
                             passed = expectOriginal &&
-                                env.equals_(model.getValue(), newValue);
+                                _.isEqual(model.getValue(), newValue);
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -128,8 +125,7 @@ function ($, _, Squire) {
                             passed = upload && download;
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -155,22 +151,18 @@ function ($, _, Squire) {
             injector.mock('js/views/video/transcripts/metadata_videolist');
             injector.mock('js/views/video/translations_editor');
 
-            runs(function() {
-                injector.require([
+            injector.require([
                     'js/models/metadata', 'js/views/metadata'
                 ],
-                function(MetadataModel, MetadataView) {
+                function (MetadataModel, MetadataView) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new MetadataView.FileUploader({
                         model: model,
                         locator: locator
                     });
-                });
-            });
 
-            waitsFor(function() {
-                return self.view;
-            }, 'FileUploader was not created', 2000);
+                    done();
+                });
         });
 
         afterEach(function () {

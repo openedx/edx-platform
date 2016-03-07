@@ -151,8 +151,11 @@ jasmine.Ajax = {
 
   useMock: function() {
     if (!jasmine.Ajax.isInstalled()) {
-      var spec = jasmine.getEnv().currentSpec;
-      spec.after(jasmine.Ajax.uninstallMock);
+      afterEach(function () {
+        if (jasmine.Ajax && jasmine.Ajax.isInstalled()) {
+          jasmine.Ajax.uninstallMock();
+        }
+      });
 
       jasmine.Ajax.installMock();
     }

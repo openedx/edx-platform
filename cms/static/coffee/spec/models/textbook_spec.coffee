@@ -3,8 +3,13 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
 
     beforeEach ->
         jasmine.addMatchers
-            toBeInstanceOf: (expected) ->
-                return @actual instanceof expected
+            toBeInstanceOf: () ->
+                return {
+                    compare: (actual, expected) ->
+                        return {
+                            pass: actual instanceof expected
+                        }
+                }
 
 
     describe "Textbook model", ->

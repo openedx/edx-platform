@@ -27,8 +27,7 @@
             'backbone': 'js/vendor/backbone-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
-            "backbone-super": "js/vendor/backbone-super",
-            'jasmine-jquery': 'js/vendor/jasmine-jquery',
+            'backbone-super': "js/vendor/backbone-super",
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'js/vendor/jasmine-stealth',
             'jasmine.async': 'js/vendor/jasmine.async',
@@ -133,9 +132,6 @@
             },
             'URI': {
                 exports: 'URI'
-            },
-            'jasmine-jquery': {
-                deps: ['jasmine']
             },
             'jasmine-imagediff': {
                 deps: ['jasmine']

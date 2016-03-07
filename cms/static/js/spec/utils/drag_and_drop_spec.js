@@ -40,7 +40,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#unit-2'));
+                    expect(destination.ele[0]).toBe($('#unit-2')[0]);
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drag and drop across section boundaries, with special handling for single sibling", function () {
@@ -52,17 +52,17 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele[0]).toBe($unit4[0]);
                     expect(destination.attachMethod).toBe('after');
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele[0]).toBe($unit4[0]);
                     expect(destination.attachMethod).toBe('before');
                     $ele.offset({
                         top: $unit4.offset().top + $unit4.height() + 1,
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 0);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele[0]).toBe($unit4[0]);
                     expect(destination.attachMethod).toBe('after');
                     $unit0 = $('#unit-0');
                     $ele.offset({
@@ -70,7 +70,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 0);
-                    expect(destination.ele).toBe($unit0);
+                    expect(destination.ele[0]).toBe($unit0[0]);
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drop before the first element, even if element being dragged is\nslightly before the first element", function () {
@@ -81,7 +81,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#subsection-0'));
+                    expect(destination.ele[0]).toBe($('#subsection-0')[0]);
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drag and drop across section boundaries, with special handling for last element", function () {
@@ -92,14 +92,14 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#unit-3'));
+                    expect(destination.ele[0]).toBe($('#unit-3')[0]);
                     expect(destination.attachMethod).toBe('after');
                     $ele.offset({
                         top: $('#unit-3').offset().top + 4,
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#unit-3'));
+                    expect(destination.ele[0]).toBe($('#unit-3')[0]);
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drop past the last element, even if element being dragged is\nslightly before/taller then the last element", function () {
@@ -110,7 +110,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-4'));
+                    expect(destination.ele[0]).toBe($('#subsection-4')[0]);
                     expect(destination.attachMethod).toBe('after');
                 });
                 it("can drag into an empty list", function () {
@@ -121,7 +121,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-list-3'));
+                    expect(destination.ele[0]).toBe($('#subsection-list-3')[0]);
                     expect(destination.attachMethod).toBe('prepend');
                 });
                 it("reports a null destination on a failed drag", function () {
@@ -146,8 +146,8 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-list-2'));
-                    expect(destination.parentList).toBe($('#subsection-2'));
+                    expect(destination.ele[0]).toBe($('#subsection-list-2')[0]);
+                    expect(destination.parentList[0]).toBe($('#subsection-2')[0]);
                     expect(destination.attachMethod).toBe('prepend');
                 });
             });

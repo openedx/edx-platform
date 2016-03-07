@@ -2,7 +2,7 @@ define(
     [
         "jquery", "underscore",
         "js/views/video/transcripts/utils", "js/views/video/transcripts/file_uploader",
-        "xmodule", "jquery.form", "jasmine-jquery"
+        "xmodule", "jquery.form"
     ],
 function ($, _, Utils, FileUploader) {
     // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests

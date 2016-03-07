@@ -51,7 +51,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['certificate-editor', 'certificate-edit', 'list']
+                ['certificate-editor', 'list']
             );
 
             this.model = new CertificateModel({
@@ -65,7 +65,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 collection: this.collection
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this); // jshint ignore:line
+            CustomMatchers(); // jshint ignore:line
         });
 
         describe('empty template', function () {

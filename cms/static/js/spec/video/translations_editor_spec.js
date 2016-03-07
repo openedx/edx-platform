@@ -52,7 +52,7 @@ function ($, _, Squire) {
             return spy;
         };
 
-        beforeEach(function () {
+        beforeEach(function (done) {
             self = this;
 
             jasmine.addMatchers({
@@ -60,7 +60,7 @@ function ($, _, Squire) {
                     return {
                         compare: function (actual, expected) {
                             var value = actual.getValueFromEditor();
-                            var passed = this.env.equals_(value, expected);
+                            var passed = _.isEqual(value, expected);
 
                             return {
                                 pass: passed,
@@ -90,18 +90,16 @@ function ($, _, Squire) {
                 assertClear: function () {
                     return {
                         compare: function (actual, modelValue) {
-                            var env = this.env,
-                                view = actual,
+                            var view = actual,
                                 model = view.model,
                                 passed;
 
                             passed = model.getValue() === null &&
-                                env.equals_(model.getDisplayValue(), modelValue) &&
-                                env.equals_(view.getValueFromEditor(), modelValue);
+                                _.isEqual(model.getDisplayValue(), modelValue) &&
+                                _.isEqual(view.getValueFromEditor(), modelValue);
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -123,8 +121,7 @@ function ($, _, Squire) {
                                 env.equals_(model.getValue(), newValue);
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -132,8 +129,7 @@ function ($, _, Squire) {
                 verifyKeysUnique: function () {
                     return {
                         compare: function (actual, initial, expected, testData) {
-                            var env = this.env,
-                                view = this.actual,
+                            var view = this.actual,
                                 item,
                                 value,
                                 passed;
@@ -146,11 +142,10 @@ function ($, _, Squire) {
                             item.find('input:hidden').val(testData.value);
                             value = view.getValueFromEditor();
 
-                            passed = env.equals_(value, expected);
+                            passed = _.isEqual(value, expected);
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -174,8 +169,7 @@ function ($, _, Squire) {
                             passed = upload && download && remove;
 
                             return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
+                                pass: passed
                             };
                         }
                     };
@@ -199,19 +193,15 @@ function ($, _, Squire) {
                 return self.uploadSpies;
             });
 
-            runs(function() {
-                injector.require([
+            injector.require([
                     'js/models/metadata', 'js/views/video/translations_editor'
                 ],
-                function(MetadataModel, Translations) {
+                function (MetadataModel, Translations) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new Translations({model: model});
-                });
-            });
 
-            waitsFor(function() {
-                return self.view;
-            }, 'VideoTranslations was not created', 1000);
+                    done();
+                });
         });
 
         afterEach(function () {
