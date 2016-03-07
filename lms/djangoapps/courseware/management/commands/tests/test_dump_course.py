@@ -25,14 +25,6 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['toy', 'simple']
-MAPPINGS = {
-    'edX/toy/2012_Fall': 'xml',
-    'edX/simple/2012_Fall': 'xml',
-}
-
-TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
-    DATA_DIR, MAPPINGS, include_xml=True, xml_source_dirs=XML_COURSE_DIRS,
-)
 
 
 @attr('shard_1')
@@ -59,6 +51,7 @@ class CommandsTestBase(ModuleStoreTestCase):
         # Add a course with a unicode name.
         unique_org = factory.Sequence(lambda n: u'ëḋẌ.%d' % n)
         CourseFactory.create(
+            emit_signals=True,
             org=unique_org,
             course=u'śíḿṕĺé',
             display_name=u'2012_Fáĺĺ',
@@ -82,10 +75,8 @@ class CommandsTestBase(ModuleStoreTestCase):
         return out.read()
 
     def test_dump_course_ids(self):
-        kwargs = {'modulestore': 'default'}
-        output = self.call_command('dump_course_ids', **kwargs)
+        output = self.call_command('dump_course_ids')
         dumped_courses = output.decode('utf-8').strip().split('\n')
-
         course_ids = {unicode(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
@@ -203,15 +194,6 @@ class CommandsTestBase(ModuleStoreTestCase):
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
-
-
-class CommandsXMLTestCase(CommandsTestBase):
-    """
-    Test case for management commands with the xml modulestore present.
-
-    """
-    MODULESTORE = TEST_DATA_MIXED_XML_MODULESTORE
-    __test__ = True
 
 
 class CommandsMongoTestCase(CommandsTestBase):
