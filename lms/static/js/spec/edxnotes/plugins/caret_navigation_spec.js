@@ -98,7 +98,7 @@ define([
 
             it('should create a new annotation', function () {
                 triggerEvent(this.element);
-                expect(this.annotator.createAnnotation.callCount).toBe(1);
+                expect(this.annotator.createAnnotation.calls.count()).toBe(1);
             });
 
             it('should set up the annotation', function () {
@@ -111,7 +111,7 @@ define([
             it('should display the Annotation#editor correctly if the Annotation#adder is hidden', function () {
                 spyOn($.fn, 'is').and.returnValue(false);
                 triggerEvent(this.element);
-                expect($('annotator-hl-temporary').position.callCount).toBe(1);
+                expect($('annotator-hl-temporary').position.calls.count()).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
                     this.annotation, this.mockOffset
                 );
@@ -120,7 +120,7 @@ define([
             it('should display the Annotation#editor in the same place as the Annotation#adder', function () {
                 spyOn($.fn, 'is').and.returnValue(true);
                 triggerEvent(this.element);
-                expect(this.annotator.adder.position.callCount).toBe(1);
+                expect(this.annotator.adder.position.calls.count()).toBe(1);
                 expect(this.annotator.showEditor).toHaveBeenCalledWith(
                     this.annotation, this.mockOffset
                 );

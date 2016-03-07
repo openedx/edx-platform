@@ -80,7 +80,7 @@ define([
                 this.annotator.viewer.load([annotation]);
                 note = $('.annotator-note');
                 expect(note).toExist();
-                expect(note).toHaveAttr('tabindex', -1);
+                expect(note).toHaveAttr('tabindex', "-1");
                 expect(note).toHaveAttr('role', 'note');
                 expect(note).toHaveAttr('class', 'annotator-note');
             });
@@ -219,7 +219,7 @@ define([
                     control.focus();
                     control.trigger(keyDownEvent(this.KEY.ESCAPE));
                 }, this);
-                expect(this.annotator.viewer.hide.callCount).toBe(5);
+                expect(this.annotator.viewer.hide.calls.count()).toBe(5);
             });
         });
 
@@ -285,7 +285,7 @@ define([
                 save.focus();
                 save.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
-                this.annotator.editor.submit.reset();
+                this.annotator.editor.submit.calls.reset();
                 save.focus();
                 save.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
@@ -295,7 +295,7 @@ define([
                 textArea.focus();
                 textArea.trigger(enterMetaKeyEvent());
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
-                this.annotator.editor.submit.reset();
+                this.annotator.editor.submit.calls.reset();
                 textArea.focus();
                 textArea.trigger(enterControlKeyEvent());
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
@@ -305,7 +305,7 @@ define([
                 cancel.focus();
                 cancel.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.editor.hide).toHaveBeenCalled();
-                this.annotator.editor.hide.reset();
+                this.annotator.editor.hide.calls.reset();
                 cancel.focus();
                 save.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.editor.hide).toHaveBeenCalled();
@@ -318,7 +318,7 @@ define([
                     control.focus();
                     control.trigger(keyDownEvent(this.KEY.ESCAPE));
                 }, this);
-                expect(this.annotator.editor.hide.callCount).toBe(3);
+                expect(this.annotator.editor.hide.calls.count()).toBe(3);
             });
         });
     });

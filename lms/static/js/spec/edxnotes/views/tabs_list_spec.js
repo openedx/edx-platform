@@ -1,6 +1,6 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+    'js/edxnotes/views/tabs_list', 'js/spec/edxnotes/custom_matchers'
 ], function($, TemplateHelpers, TabsCollection, TabsListView, customMatchers) {
     'use strict';
     describe('EdxNotes TabsListView', function() {
