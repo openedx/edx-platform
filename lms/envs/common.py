@@ -184,9 +184,6 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
-    # Allow use of the hint managment instructor view.
-    'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
-
     # for load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
