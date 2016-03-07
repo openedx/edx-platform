@@ -12,6 +12,8 @@ from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
 log = logging.getLogger(__name__)
 
 
@@ -48,7 +50,7 @@ class CreditService(object):
 
         return is_credit_course(course_key)
 
-    def get_credit_state(self, user_id, course_key_or_id, return_course_name=False):
+    def get_credit_state(self, user_id, course_key_or_id, return_course_info=False):
         """
         Return all information about the user's credit state inside of a given
         course.
@@ -56,6 +58,7 @@ class CreditService(object):
         ARGS:
             - user_id: The PK of the User in question
             - course_key: The course ID (as string or CourseKey)
+            - return_course_info: if True, returns course info
 
         RETURNS:
             NONE (user not found or is not enrolled or is not credit course)
@@ -66,6 +69,7 @@ class CreditService(object):
                 'is_credit_course': if the course has been marked as a credit bearing course
                 'credit_requirement_status': the user's status in fulfilling those requirements
                 'course_name': optional display name of the course
+                'is_self_paced_course': optional boolean to indicate if the course is self-paced
             }
         """
 
@@ -99,11 +103,13 @@ class CreditService(object):
             'credit_requirement_status': get_credit_requirement_status(course_key, user.username)
         }
 
-        if return_course_name:
+        if return_course_info:
             course = modulestore().get_course(course_key, depth=0)
             result.update({
                 'course_name': course.display_name,
+                'is_self_paced_course': course and course.self_paced and SelfPacedConfiguration.current().enabled
             })
+
         return result
 
     def set_credit_requirement_status(self, user_id, course_key_or_id, req_namespace,
