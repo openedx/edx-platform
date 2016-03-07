@@ -22,7 +22,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         describe("read-write access", function() {
             var mockHTML = readFixtures('mock/mock-manage-users-lib.underscore');
 
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
@@ -37,9 +37,16 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     10000,
                     true
                 );
-                waitsFor(function(){
-                   return $(".ui-loading").length === 0;
-                }, "Waiting for backbone render to happen", 1000);
+
+                var wait = function () {
+                    if ($(".ui-loading").length === 0) {
+                        done();
+                    } else {
+                        setTimeout(wait, 50);
+                    }
+                };
+
+                setTimeout(wait, 50);
             });
 
             afterEach(function () {

@@ -8,12 +8,19 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     beforeEach ->
         # remove this when we upgrade jasmine-jquery
         jasmine.addMatchers
-            toContainText: (text) ->
-                trimmedText = $.trim(@actual.text())
-                if text and $.isFunction(text.test)
-                    return text.test(trimmedText)
-                else
-                    return trimmedText.indexOf(text) != -1;
+            toContainText: () ->
+                return {
+                    compare: (actual, text) ->
+                        trimmedText = $.trim(@actual.text())
+                        if text and $.isFunction(text.test)
+                            passed = text.test(trimmedText)
+                        else
+                            passed = trimmedText.indexOf(text) != -1;
+
+                        return {
+                            pass: passed
+                        }
+                }
 
     describe "ShowTextbook", ->
         tpl = readFixtures('show-textbook.underscore')
@@ -213,8 +220,14 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
         it "should focus first input element of newly added textbook", ->
             spyOn(jQuery.fn, 'focus').and.callThrough()
             jasmine.addMatchers
-                toHaveBeenCalledOnJQueryObject: (actual, expected) ->
-                        pass: actual.calls && actual.calls.mostRecent() && actual.calls.mostRecent().object[0] == expected[0]
+                toHaveBeenCalledOnJQueryObject: () ->
+                    return {
+                        compare: (actual, expected) ->
+                            return {
+                                pass: actual.calls && actual.calls.mostRecent() &&
+                                  actual.calls.mostRecent().object[0] == expected[0]
+                            }
+                        }
             @view.$(".new-button").click()
             $inputEl = @view.$el.find('section:last input:first')
             expect($inputEl.length).toEqual(1)

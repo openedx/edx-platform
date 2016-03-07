@@ -41,7 +41,13 @@ define([
 
             jasmine.addMatchers({
                 toBeExpanded: function () {
-                    return Boolean($('a.group-toggle.hide-groups', $(this.actual)).length);
+                    return {
+                        compare: function (actual, expected) {
+                            return {
+                                pass: Boolean($('a.group-toggle.hide-groups', $(actual)).length)
+                            };
+                        }
+                    };
                 }
             });
         });

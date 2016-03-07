@@ -1,5 +1,11 @@
 define(
-    ["jquery", "js/models/active_video_upload", "js/views/active_video_upload_list", "common/js/spec_helpers/template_helpers", "mock-ajax", "jasmine-jquery"],
+    [
+        "jquery",
+        "js/models/active_video_upload",
+        "js/views/active_video_upload_list",
+        "common/js/spec_helpers/template_helpers",
+        "mock-ajax"
+    ],
     function($, ActiveVideoUpload, ActiveVideoUploadListView, TemplateHelpers) {
         "use strict";
         var concurrentUploadLimit = 2;
@@ -33,7 +39,7 @@ define(
                 this.view.$(".js-file-input").on("click", clickSpy);
                 this.view.$(".file-drop-area").click();
                 expect(clickSpy).toHaveBeenCalled();
-                clickSpy.reset();
+                clickSpy.calls.reset();
                 this.uploadButton.click();
                 expect(clickSpy).toHaveBeenCalled();
             });
@@ -154,7 +160,7 @@ define(
                                             ActiveVideoUpload.STATUS_QUEUED :
                                             ActiveVideoUpload.STATUS_UPLOADING
                                     );
-                                    expect($uploadElem.find(".video-detail-progress").attr("value")).toEqual(0);
+                                    expect($uploadElem.find(".video-detail-progress").attr("value")).toEqual("0");
                                     expect($uploadElem).not.toHaveClass("success");
                                     expect($uploadElem).not.toHaveClass("error");
                                     expect($uploadElem.hasClass("queued")).toEqual(queued);
@@ -187,7 +193,7 @@ define(
                                         progressValue: 0,
                                         presentClass: "error",
                                         absentClass: "success"
-                                    },
+                                    }
                                 ],
                                 function(subCaseInfo) {
                                     describe("and upload " + subCaseInfo.desc, function() {
@@ -203,7 +209,7 @@ define(
                                             );
                                             expect(
                                                 $uploadElem.find(".video-detail-progress").attr("value")
-                                            ).toEqual(subCaseInfo.progressValue);
+                                            ).toEqual(subCaseInfo.progressValue.toString());
                                             expect($uploadElem).toHaveClass(subCaseInfo.presentClass);
                                             expect($uploadElem).not.toHaveClass(subCaseInfo.absentClass);
                                         });
