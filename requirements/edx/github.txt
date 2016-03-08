@@ -40,6 +40,7 @@
 #     repos before picking a version number. Don't use 0.0 on master, only for
 #     tight-loop work in progress.
 
+# THIS IS A NO-OP!
 
 # Python libraries to install directly from github
 
