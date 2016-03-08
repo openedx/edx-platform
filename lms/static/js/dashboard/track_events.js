@@ -34,9 +34,7 @@ var edx = edx || {};
     // Emit an event when the 'course title link' is clicked.
     edx.dashboard.trackCourseTitleClicked = function($courseTitleLink, properties){
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
-        if (!window.analytics) {
-            return;
-        }
+
         window.analytics.trackLink(
             $courseTitleLink,
             'edx.bi.dashboard.course_title.clicked',
@@ -105,9 +103,6 @@ var edx = edx || {};
     };
 
     edx.dashboard.xseriesTrackMessages = function() {
-        if (!window.analytics) {
-            return;
-        }
 
         $('.xseries-action .btn').each(function(i, element) {
             var data = edx.dashboard.generateProgramProperties($(element));
@@ -117,6 +112,9 @@ var edx = edx || {};
     };
 
     $(document).ready(function() {
+        if (!window.analytics) {
+            return;
+        }
         edx.dashboard.trackCourseTitleClicked($('.course-title > a'));
         edx.dashboard.trackCourseImageLinkClicked($('.cover'));
         edx.dashboard.trackEnterCourseLinkClicked($('.enter-course'));

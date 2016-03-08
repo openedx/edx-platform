@@ -6,14 +6,13 @@ import random
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest
+from ..helpers import UniqueCourseTest, EventsTestMixin
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
-from ..helpers import EventsTestMixin
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -535,6 +534,57 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertIn(
             "You have not made any notes in this course yet. Other students in this course are using notes to:",
             notes_page_empty.no_content_text)
+
+    def test_notes_works_correctly_with_xss(self):
+        """
+        Scenario: Note text & tags should be HTML and JS escaped
+        Given I am enrolled in a course with notes enabled
+        When I visit the Notes page, with a Notes text and tag containing HTML characters like < and >
+        Then the text and tags appear as expected due to having been properly escaped
+        """
+        xblocks = self.course_fixture.get_nested_xblocks(category="html")
+        self._add_notes([
+            Note(
+                usage_id=xblocks[0].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,  # pylint: disable=protected-access
+                text='<script>alert("XSS")</script>',
+                quote="quote",
+                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
+                tags=['<script>alert("XSS")</script>']
+            ),
+            Note(
+                usage_id=xblocks[1].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,  # pylint: disable=protected-access
+                text='<b>bold</b>',
+                quote="quote",
+                updated=datetime(2014, 2, 1, 1, 1, 1, 1).isoformat(),
+                tags=['<i>bold</i>']
+            )
+        ])
+        self.notes_page.visit()
+
+        notes = self.notes_page.notes
+        self.assertEqual(len(notes), 2)
+
+        self.assertNoteContent(
+            notes[0],
+            quote=u"quote",
+            text='<b>bold</b>',
+            unit_name="Test Unit 1",
+            time_updated="Feb 01, 2014 at 01:01 UTC",
+            tags=['<i>bold</i>']
+        )
+
+        self.assertNoteContent(
+            notes[1],
+            quote=u"quote",
+            text='<script>alert("XSS")</script>',
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2014 at 01:01 UTC",
+            tags=['<script>alert("XSS")</script>']
+        )
 
     def test_recent_activity_view(self):
         """

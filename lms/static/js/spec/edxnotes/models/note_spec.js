@@ -46,7 +46,7 @@ define([
 
         it('can return appropriate `text`', function () {
             var model = this.collection.at(0);
-            expect(model.getText()).toBe('text<br> with<br>line<br>breaks <br>');
+            expect(model.get('text')).toBe('text\n with\r\nline\n\rbreaks \r');
         });
     });
 });

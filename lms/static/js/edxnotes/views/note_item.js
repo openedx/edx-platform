@@ -31,8 +31,7 @@ define([
 
         getContext: function () {
             return $.extend({}, this.model.toJSON(), {
-                message: this.model.getQuote(),
-                text: this.model.getText()
+                message: this.model.getQuote()
             });
         },
 
@@ -60,7 +59,9 @@ define([
 
         tagHandler: function (event) {
             event.preventDefault();
-            this.options.scrollToTag(event.currentTarget.text);
+            if (!_.isUndefined(this.options.scrollToTag)) {
+                this.options.scrollToTag(event.currentTarget.text);
+            }
         },
 
         redirectTo: function (uri) {

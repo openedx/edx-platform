@@ -387,7 +387,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     },
                 ]
             },
-            json.loads(helpers.get_notes(self.request, self.course))
+            helpers.get_notes(self.request, self.course)
         )
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -493,7 +493,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     },
                 ]
             },
-            json.loads(helpers.get_notes(self.request, self.course))
+            helpers.get_notes(self.request, self.course)
         )
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -520,7 +520,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
         self.assertItemsEqual(
             NOTES_VIEW_EMPTY_RESPONSE,
-            json.loads(helpers.get_notes(self.request, self.course))
+            helpers.get_notes(self.request, self.course)
         )
 
     def test_preprocess_collection_no_item(self):
@@ -989,14 +989,14 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
-    @patch("edxnotes.views.get_notes", return_value=json.dumps({'results': []}))
+    @patch("edxnotes.views.get_notes", return_value={'results': []})
     def test_edxnotes_view_is_enabled(self, mock_get_notes):
         """
         Tests that appropriate view is received if EdxNotes feature is enabled.
         """
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_page_url)
-        self.assertContains(response, 'Highlights and notes you\'ve made in course content')
+        self.assertContains(response, 'Highlights and notes you&#39;ve made in course content')
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):
@@ -1012,7 +1012,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         Tests that search notes successfully respond if EdxNotes feature is enabled.
         """
-        mock_search.return_value = json.dumps(NOTES_VIEW_EMPTY_RESPONSE)
+        mock_search.return_value = NOTES_VIEW_EMPTY_RESPONSE
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
         self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
