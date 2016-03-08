@@ -439,12 +439,6 @@ FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_U
 # function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
 
-# Enable automatic transaction management on all databases
-# https://docs.djangoproject.com/en/1.8/topics/db/transactions/#tying-transactions-to-http-requests
-# This needs to be true for all databases
-for database_name in DATABASES:
-    DATABASES[database_name]['ATOMIC_REQUESTS'] = True
-
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
@@ -759,6 +753,11 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
 # Course Content Bookmarks Settings
 MAX_BOOKMARKS_PER_COURSE = ENV_TOKENS.get('MAX_BOOKMARKS_PER_COURSE', MAX_BOOKMARKS_PER_COURSE)
 
+# Offset for pk of courseware.StudentModuleHistoryExtended
+STUDENTMODULEHISTORYEXTENDED_OFFSET = ENV_TOKENS.get(
+    'STUDENTMODULEHISTORYEXTENDED_OFFSET', STUDENTMODULEHISTORYEXTENDED_OFFSET
+)
+
 # Cutoff date for granting audit certificates
 if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
     AUDIT_CERT_CUTOFF_DATE = dateutil.parser.parse(ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE'))
@@ -766,3 +765,7 @@ if ENV_TOKENS.get('AUDIT_CERT_CUTOFF_DATE', None):
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# The extended StudentModule history table
+if FEATURES.get('ENABLE_CSMH_EXTENDED'):
+    INSTALLED_APPS += ('coursewarehistoryextended',)

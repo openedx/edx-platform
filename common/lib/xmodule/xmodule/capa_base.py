@@ -399,6 +399,7 @@ class CapaMixin(CapaFields):
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
+            'content': self.get_problem_html(encapsulate=False)
         })
 
     def check_button_name(self):

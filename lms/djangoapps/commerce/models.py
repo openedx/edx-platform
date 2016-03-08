@@ -10,6 +10,9 @@ from config_models.models import ConfigurationModel
 class CommerceConfiguration(ConfigurationModel):
     """ Commerce configuration """
 
+    class Meta(object):
+        app_label = "commerce"
+
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
         help_text=_('Use the checkout page hosted by the E-Commerce service.')

@@ -53,6 +53,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from openedx.core.djangoapps.credit.api import set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 
 
 @attr('shard_1')
@@ -907,9 +909,43 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
 
-    def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, course_id=unicode(self.course.id))
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_unenrolled_student_progress_for_credit_course(self, default_store):
+        """
+         Test that student progress page does not break while checking for an unenrolled student.
 
+         Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
+         It should return 200 response.
+        """
+        # Create a new course, a user which will not be enrolled in course, admin user for staff access
+        course = CourseFactory.create(default_store=default_store)
+        not_enrolled_user = UserFactory.create()
+        self.request.user = AdminFactory.create()
+
+        # Create and enable Credit course
+        CreditCourse.objects.create(course_key=course.id, enabled=True)
+
+        # Configure a credit provider for the course
+        CreditProvider.objects.create(
+            provider_id="ASU",
+            enable_integration=True,
+            provider_url="https://credit.example.com/request"
+        )
+
+        requirements = [{
+            "namespace": "grade",
+            "name": "grade",
+            "display_name": "Grade",
+            "criteria": {"min_grade": 0.52},
+        }]
+        # Add a single credit requirement (final grade)
+        set_credit_requirements(course.id, requirements)
+
+        resp = views.progress(self.request, course_id=unicode(course.id), student_id=not_enrolled_user.id)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_non_ascii_grade_cutoffs(self):
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertEqual(resp.status_code, 200)
 
     def test_generate_cert_config(self):

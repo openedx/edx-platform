@@ -933,7 +933,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         _id = 0
 
         for course, program_status in data:
-            programs[unicode(course)] = {
+            programs[unicode(course)] = [{
                 'id': _id,
                 'category': self.category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
@@ -958,7 +958,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 ],
                 'subtitle': 'sub',
                 'name': self.program_name
-            }
+            }]
 
             _id += 1
 
@@ -975,7 +975,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         """Verify that program data is parsed correctly for a given course"""
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = {
-                u'edx/demox/Run_1': {
+                u'edx/demox/Run_1': [{
                     'id': 0,
                     'category': self.category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
@@ -984,7 +984,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                     'course_codes': course_codes,
                     'subtitle': 'sub',
                     'name': self.program_name
-                }
+                }]
             }
             parse_data = _get_course_programs(
                 self.user, [
@@ -998,14 +998,16 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 self.assertEqual(
                     {
                         u'edx/demox/Run_1': {
-                            'program_id': 0,
                             'category': 'xseries',
-                            'course_count': len(course_codes),
-                            'display_name': self.program_name,
-                            'program_marketing_url': urljoin(
-                                settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
-                            ).format(marketing_slug),
-                            'display_category': 'XSeries'
+                            'display_category': 'XSeries',
+                            'course_program_list': [{
+                                'program_id': 0,
+                                'course_count': len(course_codes),
+                                'display_name': self.program_name,
+                                'program_marketing_url': urljoin(
+                                    settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
+                                ).format(marketing_slug)
+                            }]
                         }
                     },
                     parse_data
@@ -1122,8 +1124,9 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.create_programs_config()
 
         program_data = self._create_program_data([(self.course_1.id, 'active')])
-        if key_remove and key_remove in program_data[unicode(self.course_1.id)]:
-            del program_data[unicode(self.course_1.id)][key_remove]
+        for program in program_data[unicode(self.course_1.id)]:
+            if key_remove and key_remove in program:
+                del program[key_remove]
 
         with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = program_data
@@ -1135,7 +1138,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 log_warn.assert_called_with(
                     'Program structure is invalid, skipping display: %r', program_data[
                         unicode(self.course_1.id)
-                    ]
+                    ][0]
                 )
                 # verify that no programs related upsell messages appear on the
                 # student dashboard.

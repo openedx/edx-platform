@@ -55,9 +55,9 @@ def see_a_multi_step_component(step, category):
         if category == 'HTML':
             html_matcher = {
                 'Text': '\n    \n',
-                'Announcement': '<h3>Announcement Date</h3>',
-                'Zooming Image Tool': '<h3>Zooming Image Tool</h3>',
-                'E-text Written in LaTeX': '<h3>Example: E-text page</h3>',
+                'Announcement': '<h3 class="hd hd-2">Announcement Date</h3>',
+                'Zooming Image Tool': '<h3 class="hd hd-2">Zooming Image Tool</h3>',
+                'E-text Written in LaTeX': '<h3 class="hd hd-2">Example: E-text page</h3>',
                 'Raw HTML': '<p>This template is similar to the Text template. The only difference is',
             }
             actual_html = world.css_html(selector, index=idx)

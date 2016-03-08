@@ -23,7 +23,11 @@ from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from student.roles import CourseCcxCoachRole
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole
+)
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -117,6 +121,75 @@ def setup_students_and_grades(context):
                     )
 
 
+class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
+    """
+    Tests for Custom Courses views.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def make_staff(self):
+        """
+        create staff user
+        """
+        staff = AdminFactory.create(password="test")
+        role = CourseStaffRole(self.course.id)
+        role.add_users(staff)
+
+        return staff
+
+    def make_instructor(self):
+        """
+        create staff instructor
+        """
+        instructor = AdminFactory.create(password="test")
+        role = CourseInstructorRole(self.course.id)
+        role.add_users(instructor)
+
+        return instructor
+
+    def test_staff_access_coach_dashboard(self):
+        """
+        User is staff, should access coach dashboard.
+        """
+        staff = self.make_staff()
+        self.client.login(username=staff.username, password="test")
+        self.make_coach()
+        ccx = self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_instructor_access_coach_dashboard(self):
+        """
+        User is instructor, should access coach dashboard.
+        """
+        instructor = self.make_instructor()
+        self.client.login(username=instructor.username, password="test")
+        self.make_coach()
+        ccx = self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_forbidden_user_access_coach_dashboard(self):
+        """
+        Assert user with no access must not see dashboard.
+        """
+        user = UserFactory.create(password="test")
+        self.client.login(username=user.username, password="test")
+        self.make_coach()
+        ccx = self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+
 @attr('shard_1')
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
@@ -165,7 +238,12 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         User is not a coach, should get Forbidden response.
         """
+        self.make_coach()
         ccx = self.make_ccx()
+
+        # create session of non-coach user
+        user = UserFactory.create(password="test")
+        self.client.login(username=user.username, password="test")
         url = reverse(
             'ccx_coach_dashboard',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})

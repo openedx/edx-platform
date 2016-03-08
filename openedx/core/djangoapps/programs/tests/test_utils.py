@@ -107,7 +107,7 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
             for course_code in program['course_codes']:
                 for run in course_code['run_modes']:
                     course_key = run['course_key']
-                    expected[course_key] = program
+                    expected.setdefault(course_key, []).append(program)
 
         self.assertEqual(actual, expected)
 

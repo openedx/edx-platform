@@ -281,6 +281,21 @@ class XQueueCertInterface(object):
         if forced_grade:
             grade['grade'] = forced_grade
 
+        LOGGER.info(
+            (
+                u"Certificate generated for student %s in the course: %s with template: %s. "
+                u"given template: %s, "
+                u"user is verified: %s, "
+                u"mode is verified: %s"
+            ),
+            student.username,
+            unicode(course_id),
+            template_pdf,
+            template_file,
+            user_is_verified,
+            mode_is_verified
+        )
+
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # pylint: disable=no-member
 
         cert.mode = cert_mode

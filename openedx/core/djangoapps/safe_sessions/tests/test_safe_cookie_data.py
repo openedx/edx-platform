@@ -102,7 +102,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
 
     @ddt.data(None, '')
     def test_create_no_user_id(self, user_id):
-        with self.assert_logged('SafeCookieData received empty user_id', 'warning'):
+        with self.assert_logged('SafeCookieData received empty user_id', 'debug'):
             safe_cookie_data = SafeCookieData.create(self.session_id, user_id)
             self.assertTrue(safe_cookie_data.verify(user_id))
 

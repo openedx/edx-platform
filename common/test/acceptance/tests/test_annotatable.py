@@ -115,7 +115,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         self.courseware_page.visit()
         annotation_component_page = AnnotationComponentPage(self.browser)
         self.assertEqual(
-            annotation_component_page.component_name, 'TEST ANNOTATION MODULE'.format()
+            annotation_component_page.component_name, 'Test Annotation Module'.format()
         )
         return annotation_component_page
 

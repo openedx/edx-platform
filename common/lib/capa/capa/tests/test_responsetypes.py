@@ -946,6 +946,13 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         hint = correct_map.get_hint('1_2_1')
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
+    def test_empty_answer_graded_as_incorrect(self):
+        """
+        Tests that problem should be graded incorrect if blank space is chosen as answer
+        """
+        problem = self.build_problem(answer=" ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u" ", "incorrect")
+
 
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = CodeResponseXMLFactory

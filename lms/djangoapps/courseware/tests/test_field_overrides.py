@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from xblock.field_data import DictFieldData
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from ..field_overrides import (
     disable_overrides,
@@ -23,14 +23,21 @@ TESTUSER = "testuser"
 @attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'courseware.tests.test_field_overrides.TestOverrideProvider',))
-class OverrideFieldDataTests(ModuleStoreTestCase):
+class OverrideFieldDataTests(SharedModuleStoreTestCase):
     """
     Tests for `OverrideFieldData`.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        """
+        Course is created here and shared by all the class's tests.
+        """
+        super(OverrideFieldDataTests, cls).setUpClass()
+        cls.course = CourseFactory.create(enable_ccx=True)
+
     def setUp(self):
         super(OverrideFieldDataTests, self).setUp()
-        self.course = CourseFactory.create(enable_ccx=True)
         OverrideFieldData.provider_classes = None
 
     def tearDown(self):

@@ -4,6 +4,7 @@ Modulestore configuration for test cases.
 """
 import functools
 from uuid import uuid4
+from contextlib import contextmanager
 
 from mock import patch
 
@@ -265,16 +266,53 @@ class SharedModuleStoreTestCase(TestCase):
     for Django ORM models that will get cleaned up properly.
     """
     MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+    # Tell Django to clean out all databases, not just default
+    multi_db = True
 
     @classmethod
-    def setUpClass(cls):
-        super(SharedModuleStoreTestCase, cls).setUpClass()
-
+    def _setUpModuleStore(cls):  # pylint: disable=invalid-name
+        """
+        Set up the modulestore for an entire test class.
+        """
         cls._settings_override = override_settings(MODULESTORE=cls.MODULESTORE)
         cls._settings_override.__enter__()
         XMODULE_FACTORY_LOCK.enable()
         clear_existing_modulestores()
         cls.store = modulestore()
+
+    @classmethod
+    @contextmanager
+    def setUpClassAndTestData(cls):  # pylint: disable=invalid-name
+        """
+        For use when the test class has a setUpTestData() method that uses variables
+        that are setup during setUpClass() of the same test class.
+
+        Use it like so:
+
+        @classmethod
+        def setUpClass(cls):
+            with super(MyTestClass, cls).setUpClassAndTestData():
+                <all the cls.setUpClass() setup code that performs modulestore setup...>
+
+        @classmethod
+        def setUpTestData(cls):
+            <all the setup code that creates Django models per test class...>
+            <these models can use variables (courses) setup in setUpClass() above>
+        """
+        cls._setUpModuleStore()
+        # Now yield to allow the test class to run its setUpClass() setup code.
+        yield
+        # Now call the base class, which calls back into the test class's setUpTestData().
+        super(SharedModuleStoreTestCase, cls).setUpClass()
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        For use when the test class has no setUpTestData() method -or-
+        when that method does not use variable set up in setUpClass().
+        """
+        super(SharedModuleStoreTestCase, cls).setUpClass()
+        cls._setUpModuleStore()
 
     @classmethod
     def tearDownClass(cls):
@@ -392,6 +430,8 @@ class ModuleStoreTestCase(TestCase):
     """
 
     MODULESTORE = mixed_store_config(mkdtemp_clean(), {}, include_xml=False)
+    # Tell Django to clean out all databases, not just default
+    multi_db = True
 
     def setUp(self, **kwargs):
         """

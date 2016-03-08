@@ -192,8 +192,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:30+0000\n"
-"PO-Revision-Date: 2016-02-16 08:40+0000\n"
+"POT-Creation-Date: 2016-02-24 18:02+0000\n"
+"PO-Revision-Date: 2016-02-29 15:22+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -354,7 +354,7 @@ msgstr "Вы зачислены на курс, ваша личность под�
 #: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
-msgstr "Подтверждённые"
+msgstr "Подтверждено"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "ID Verified Ribbon/Badge"
@@ -2431,11 +2431,9 @@ msgstr "Сортировать обсуждения по алфавиту"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
-"Введите true или false.  Если введено значение true, категории и "
-"подкатегории обсуждений будут показаны в алфавитном порядке. Если введено "
-"значение false, они будут показаны в хронологическом порядке."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
@@ -2494,19 +2492,6 @@ msgid ""
 msgstr ""
 "Введите уникальный идентификатор видео-файлов вашего курса, предоставленный "
 "edX."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the URL for the official course Facebook group. If you provide a URL, "
-"the mobile app includes a button that students can tap to access the group."
-msgstr ""
-"Введите ссылку на официальную группу курса в Facebook. Если вы укажете "
-"ссылку, мобильное приложение будет иметь кнопку с помощью которой слушатели "
-"смогут присоединиться к вашей группе."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Facebook URL"
-msgstr "Facebook URL"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -3816,7 +3801,7 @@ msgstr ""
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Group Configurations"
-msgstr "Конфигурации групп"
+msgstr "Группы"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -4528,7 +4513,7 @@ msgstr ""
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
-msgstr "Powered by Open edX"
+msgstr "На основе Open edX"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
 msgid "Blog"
@@ -4553,7 +4538,7 @@ msgstr "Контакты"
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
-msgstr "Успехи"
+msgstr "Вакансии"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
 msgid "Donate"
@@ -5618,7 +5603,7 @@ msgstr "Учебные курсы загружены в хранилище мо�
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
 msgid "username"
-msgstr "Имя пользователя"
+msgstr "имя пользователя"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email"
@@ -6547,7 +6532,7 @@ msgstr "Группы"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
-msgstr "Данные слушателей"
+msgstr "Данные обучающихся"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
@@ -6747,7 +6732,7 @@ msgstr "Наименование компании"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
 msgid "Title"
-msgstr "Обращение"
+msgstr "Заголовок"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
@@ -6944,7 +6929,7 @@ msgstr "Сообщение {action} {succeeded} из {attempted} получат�
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Status: {action} {succeeded} of {attempted}"
-msgstr "Статус: {action} {succeeded} из {attempted}"
+msgstr "Состояние: {action} {succeeded} из {attempted}"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
@@ -6985,10 +6970,10 @@ msgid ""
 "\"accordion\" -- to use the accordion only; or \n"
 "\"tabs,accordion\" -- to use tabs and the accordion."
 msgstr ""
-"Выберите инструменты навигации по X-блокам в LMS. Допустимые значения: \n"
+"Выберите способ навигации по курсу. Допустимые значения: \n"
 "\"chromeless\" — не использовать вкладки или меню-аккордеон; \n"
 "\"tabs\" — использовать только вкладки; \n"
-"\"accordion\" — использовать только меню-аккордеон; или \n"
+"\"accordion\" — использовать только меню-аккордеон; \n"
 "\"tabs,accordion\" — использовать вкладки и меню-аккордеон."
 
 #: lms/djangoapps/lms_xblock/mixin.py
@@ -8215,7 +8200,7 @@ msgstr "Просмотреть и обновить зачисления слуш
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
-msgstr "Адрес электронной почты"
+msgstr "E-mail адрес"
 
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -9623,7 +9608,7 @@ msgstr "Ваша Фамилия, Имя, Отчество для официал�
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Public username"
-msgstr "Общедоступное имя пользователя"
+msgstr "Имя пользователя"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -9766,8 +9751,8 @@ msgid ""
 "If using http urls, you must provide the username and password in the url. "
 "Similar to https://user:pass@github.com/user/course."
 msgstr ""
-"При использовании указателей http, вы должны предоставить имя пользователя и"
-" пароль в ссылке, например, https://user:pass@github.com/user/course."
+"При использовании URL, вы должны предоставить имя пользователя и пароль в "
+"ссылке, например, https://user:pass@github.com/user/course."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
@@ -10286,7 +10271,7 @@ msgstr "образец: Мария Иванова"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
-msgstr "Публичное имя пользователя"
+msgstr "Имя пользователя"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
@@ -10523,7 +10508,7 @@ msgstr "Очистить поиск"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
-msgstr "Сведения о статусе учётной записи"
+msgstr "Сведения об учётной записи"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
@@ -11113,7 +11098,6 @@ msgid "Dashboard for:"
 msgstr "Панель управления для:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr "Фото {username}"
 
@@ -12750,12 +12734,6 @@ msgstr "Вы просматриваете курс под именем <i>{user_
 msgid "Course Material"
 msgstr "Материалы курса"
 
-#. Translators: 'needs attention' is an alternative string for the
-#. notification image that indicates the tab "needs attention".
-#: lms/templates/courseware/course_navigation.html
-msgid "needs attention"
-msgstr "обратите внимание"
-
 #: lms/templates/courseware/course_navigation.html
 msgid "Course is not yet visible to students."
 msgstr "Курс еще не виден слушателям."
@@ -13056,6 +13034,12 @@ msgstr "Нет баллов за выполненные в этом раздел
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
 msgstr "{course.display_number_with_default} Новости и анонсы"
+
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/tabs.html
+msgid "needs attention"
+msgstr "обратите внимание"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -14661,7 +14645,7 @@ msgstr "Создать образец Сертификата"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Status:"
-msgstr "Статус:"
+msgstr "Состояние:"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generating example {name} certificate"
@@ -16193,7 +16177,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
-msgstr "Показать историю фоновых задач для слушателя"
+msgstr "Показать историю фоновых задач"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Entrance Exam Adjustment"
@@ -16267,7 +16251,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Problem"
-msgstr "Показать историю фоновых заданий для задачи"
+msgstr "Показать историю фоновых задач"
 
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
@@ -18640,7 +18624,7 @@ msgstr "Группы по изучаемому материалу"
 
 #: cms/templates/group_configurations.html
 msgid "Experiment Group Configurations"
-msgstr "Экспериментальные конфигурации групп"
+msgstr "Экспериментальные группы"
 
 #: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
@@ -19267,37 +19251,26 @@ msgstr ""
 "название в расширенных настройках."
 
 #: cms/templates/index.html
-msgid "The name of the organization sponsoring the course."
-msgstr "Название организации, спонсирующей курс."
-
-#: cms/templates/index.html
-msgid "Note: The organization name is part of the course URL"
-msgstr "Обратите внимание: название организации является частью URL курса"
-
-#: cms/templates/index.html
 msgid ""
-"This cannot be changed, but you can set a different display name in Advanced"
-" Settings later."
+"The name of the organization sponsoring the course. {strong_start}Note: The "
+"organization name is part of the course URL.{strong_end} This cannot be "
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
-"Его нельзя будет изменить, но позже вы сможете установить новое отображаемое"
-" название в расширенных настройках."
 
 #: cms/templates/index.html
 msgid ""
-"The unique number that identifies your course within your organization."
-msgstr "Уникальный номер, который индентифицирует курс в организации"
-
-#: cms/templates/index.html
-msgid ""
-"Note: This is part of your course URL, so no spaces or special characters "
-"are allowed and it cannot be changed."
+"The unique number that identifies your course within your organization. "
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
-"Примечание: это часть URL вашего курса, здесь не разрешается использовать "
-"пробелы и специальные символы; ее нельзя будет изменить позже."
 
 #: cms/templates/index.html
-msgid "The term in which your course will run."
-msgstr "Семестр, в котором ваш курс будет запущен"
+msgid ""
+"The term in which your course will run. {strong_start}Note: This is part of "
+"your course URL, so no spaces or special characters are allowed and it "
+"cannot be changed.{strong_end}"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Create"
@@ -19348,16 +19321,11 @@ msgid "e.g. CSPROB"
 msgstr "например, ZpoINF"
 
 #: cms/templates/index.html
-msgid "The unique code that identifies this library."
-msgstr "Уникальный идентификационный код этой библиотеки."
-
-#: cms/templates/index.html
 msgid ""
-"Note: This is part of your library URL, so no spaces or special characters "
-"are allowed."
+"The unique code that identifies this library. {strong_start}Note: This is "
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
 msgstr ""
-"Примечание: это часть ссылки URL на вашу библиотеку, поэтому нельзя "
-"использовать пробелы и специальные символы."
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -19615,24 +19583,19 @@ msgstr ""
 "процесса{link_end}."
 
 #: cms/templates/index.html
-#, python-format
-msgid "Thanks for signing up, %(name)s!"
-msgstr "Спасибо за регистрацию, %(name)s!"
+msgid "Thanks for signing up, {name}!"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
 msgstr "Необходимо подтвердить ваш адрес электронной почты"
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
-"email address (%(email)s). An activation message and next steps should be "
+"email address ({email}). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
-"Почти готов! Для завершения регистрации нам нужно подтвердить ваш адрес "
-"электронной почты (%(email)s). Письмо с инструкциями по активации уже было "
-"туда отправлено."
 
 #: cms/templates/index.html
 msgid "Need help?"

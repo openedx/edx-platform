@@ -13,18 +13,27 @@ from .aws import *
 import os
 from django.core.exceptions import ImproperlyConfigured
 
-DB_OVERRIDES = dict(
-    PASSWORD=os.environ.get('DB_MIGRATION_PASS', None),
-    ENGINE=os.environ.get('DB_MIGRATION_ENGINE', DATABASES['default']['ENGINE']),
-    USER=os.environ.get('DB_MIGRATION_USER', DATABASES['default']['USER']),
-    NAME=os.environ.get('DB_MIGRATION_NAME', DATABASES['default']['NAME']),
-    HOST=os.environ.get('DB_MIGRATION_HOST', DATABASES['default']['HOST']),
-    PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES['default']['PORT']),
-)
 
-if DB_OVERRIDES['PASSWORD'] is None:
-    raise ImproperlyConfigured("No database password was provided for running "
-                               "migrations.  This is fatal.")
+def get_db_overrides(db_name):
+    """
+    Now that we have multiple databases, we want to look up from the environment
+    for both databases.
+    """
+    db_overrides = dict(
+        PASSWORD=os.environ.get('DB_MIGRATION_PASS', None),
+        ENGINE=os.environ.get('DB_MIGRATION_ENGINE', DATABASES[db_name]['ENGINE']),
+        USER=os.environ.get('DB_MIGRATION_USER', DATABASES[db_name]['USER']),
+        NAME=os.environ.get('DB_MIGRATION_NAME', DATABASES[db_name]['NAME']),
+        HOST=os.environ.get('DB_MIGRATION_HOST', DATABASES[db_name]['HOST']),
+        PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES[db_name]['PORT']),
+    )
 
-for override, value in DB_OVERRIDES.iteritems():
-    DATABASES['default'][override] = value
+    if db_overrides['PASSWORD'] is None:
+        raise ImproperlyConfigured("No database password was provided for running "
+                                   "migrations.  This is fatal.")
+    return db_overrides
+
+for db in DATABASES:
+    # You never migrate a read_replica
+    if db != 'read_replica':
+        DATABASES[db].update(get_db_overrides(db))

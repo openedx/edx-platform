@@ -363,6 +363,18 @@ FEATURES = {
 
     # Show Language selector.
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Write new CSM history to the extended table.
+    # This will eventually default to True and may be
+    # removed since all installs should have the separate
+    # extended history table.
+    'ENABLE_CSMH_EXTENDED': False,
+
+    # Read from both the CSMH and CSMHE history tables.
+    # This is the default, but can be disabled if all history
+    # lives in the Extended table, saving the frontend from
+    # making multiple queries.
+    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True
 }
 
 # Ignore static asset files on import which match this pattern
@@ -412,6 +424,12 @@ GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
+
+############################ Global Database Configuration #####################
+
+DATABASE_ROUTERS = [
+    'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+]
 
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
@@ -2758,6 +2776,13 @@ REGISTRATION_EXTENSION_FORM = None
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
+
+# Offset for courseware.StudentModuleHistoryExtended which is used to
+# calculate the starting primary key for the underlying table.  This gap
+# should be large enough that you do not generate more than N courseware.StudentModuleHistory
+# records before you have deployed the app to write to coursewarehistoryextended.StudentModuleHistoryExtended
+# if you want to avoid an overlap in ids while searching for history across the two tables.
+STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
 # Deprecated xblock types
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []

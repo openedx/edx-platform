@@ -114,9 +114,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:29+0000\n"
-"PO-Revision-Date: 2016-02-22 16:02+0000\n"
-"Last-Translator: Weyedide <weyedide@gmail.com>\n"
+"POT-Creation-Date: 2016-02-24 18:01+0000\n"
+"PO-Revision-Date: 2016-02-29 15:27+0000\n"
+"Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -274,7 +274,7 @@ msgstr "Сохранить"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
-msgstr "Дополнительные типы заданий"
+msgstr "Дополнительно"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -3270,7 +3270,7 @@ msgid ""
 msgstr ""
 "Запущена задача повторной оценки для задания '<%= problem_id %>' для '<%= "
 "student_id %>'. Чтобы просмотреть состояние задачи, щёлкните на кнопке "
-"'Показать историю фоновых задач'."
+"«Показать историю фоновых задач»."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3379,7 +3379,7 @@ msgid ""
 msgstr ""
 "Задача по сбросу количества попыток выполнения задания '<%= problem_id %>' "
 "запущена успешно. Чтобы просмотреть статус выполнения задания, нажмите "
-"«Показать историю фоновых задач для задания»."
+"«Показать историю фоновых задач»."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -3402,7 +3402,7 @@ msgid ""
 " the status of the task."
 msgstr ""
 "Успешно запущена задача переоценки задания '<%= problem_id %>' для всех "
-"слушателей. Нажмите 'Показать историю фоновых задач' чтобы увидеть статус "
+"слушателей. Нажмите «Показать историю фоновых задач» чтобы увидеть статус "
 "задачи."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -4259,13 +4259,12 @@ msgid ""
 "exactly as it appears on your government-issued photo ID, including any non-"
 "Roman characters."
 msgstr ""
-"Имя, которое будет указано на сертификатах. Убедитесь в правильности ввода "
-"вашего имени. Оно должно быть написано именно так, как указано в вашем "
-"удостоверении личности."
+"Имя, которое будет указано на сертификатах. Оно должно быть написано именно "
+"так, как указано в вашем паспорте или удостоверении личности."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
-msgstr "Адрес электронной почты"
+msgstr "E-mail адрес"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -5865,7 +5864,7 @@ msgstr "Предыдущее"
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
-msgstr "Статус"
+msgstr "Состояние"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -6792,7 +6791,7 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
-msgstr "Адрес электронной почты"
+msgstr "E-mail адрес"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
@@ -7177,8 +7176,8 @@ msgstr "Данные действительны"
 #, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
-msgstr[0] "Загрузить следующие %(num_items)s результат"
-msgstr[1] "Загрузить следующие %(num_items)s результаты"
+msgstr[0] "Загрузить %(num_items)s результат"
+msgstr[1] "Загрузить следующие %(num_items)s результата"
 msgstr[2] ""
 msgstr[3] "Загрузить следующие %(num_items)s результаты"
 
@@ -8041,7 +8040,7 @@ msgstr "Активные загрузки"
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "status"
-msgstr "статус"
+msgstr "cостояние"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
@@ -8394,7 +8393,7 @@ msgstr "всего упражнений, не подлежащих оценке"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr "Дополнительные материалы по курсу"
+msgstr "Дополнительные материалы"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
@@ -8802,7 +8801,7 @@ msgstr "Имя представителя в форме, которая долж
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title "
-msgstr "Обращение"
+msgstr "Заголовок"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Title of the signatory"

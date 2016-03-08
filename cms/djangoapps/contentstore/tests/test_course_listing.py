@@ -8,6 +8,7 @@ from chrono import Timer
 from mock import patch, Mock
 import ddt
 
+from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
 
@@ -28,8 +29,9 @@ from opaque_keys.edx.locations import CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
-TOTAL_COURSES_COUNT = 500
-USER_COURSES_COUNT = 50
+
+TOTAL_COURSES_COUNT = 10
+USER_COURSES_COUNT = 1
 
 
 @ddt.ddt
@@ -99,6 +101,15 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assert_no_xss(response, escaping_content)
 
+    def test_empty_course_listing(self):
+        """
+        Test on empty course listing, studio name is properly displayed
+        """
+        message = "Are you staff on an existing {studio_name} course?".format(studio_name=settings.STUDIO_SHORT_NAME)
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(message, response.content)
+
     def test_get_course_list(self):
         """
         Test getting courses with new access group format e.g. 'instructor_edx.course.run'
@@ -147,8 +158,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
                 self.assertEqual(courses_list_by_groups, [])
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5),
-        (ModuleStoreEnum.Type.mongo, 3)
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -255,8 +266,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 150, 505),
-        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 3)
+        (ModuleStoreEnum.Type.split, 3, 13),
+        (ModuleStoreEnum.Type.mongo, USER_COURSES_COUNT, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):

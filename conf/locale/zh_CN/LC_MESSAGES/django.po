@@ -275,7 +275,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:30+0000\n"
+"POT-Creation-Date: 2016-02-24 18:02+0000\n"
 "PO-Revision-Date: 2015-12-13 04:46+0000\n"
 "Last-Translator: riceball <snowyu.lee@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2271,7 +2271,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2320,16 +2321,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the unique identifier for your course's video files provided by edX."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the URL for the official course Facebook group. If you provide a URL, "
-"the mobile app includes a button that students can tap to access the group."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Facebook URL"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -9881,7 +9872,6 @@ msgid "Dashboard for:"
 msgstr "课程面板："
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr ""
 
@@ -11399,12 +11389,6 @@ msgstr ""
 msgid "Course Material"
 msgstr "课程资料"
 
-#. Translators: 'needs attention' is an alternative string for the
-#. notification image that indicates the tab "needs attention".
-#: lms/templates/courseware/course_navigation.html
-msgid "needs attention"
-msgstr "需要注意"
-
 #: lms/templates/courseware/course_navigation.html
 msgid "Course is not yet visible to students."
 msgstr ""
@@ -11688,6 +11672,12 @@ msgstr "本章没有回答问题得分"
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
 msgstr "{course.display_number_with_default}课程信息"
+
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/tabs.html
+msgid "needs attention"
+msgstr "需要注意"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -17105,33 +17095,26 @@ msgid ""
 msgstr "课程的公开显示名称，无法修改。但您可以稍后在高级设置中设置一个不同的显示名称。"
 
 #: cms/templates/index.html
-msgid "The name of the organization sponsoring the course."
-msgstr "资助本课程的机构名称。"
-
-#: cms/templates/index.html
-msgid "Note: The organization name is part of the course URL"
+msgid ""
+"The name of the organization sponsoring the course. {strong_start}Note: The "
+"organization name is part of the course URL.{strong_end} This cannot be "
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"This cannot be changed, but you can set a different display name in Advanced"
-" Settings later."
-msgstr "这将不能被更改，但是您可以稍后在高级设置中设置不同的显示名称。"
+"The unique number that identifies your course within your organization. "
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"The unique number that identifies your course within your organization."
-msgstr "在您的机构中能够标识您课程的唯一编号。"
-
-#: cms/templates/index.html
-msgid ""
-"Note: This is part of your course URL, so no spaces or special characters "
-"are allowed and it cannot be changed."
-msgstr "注意：这是课程URL的一部分，请勿使用空格或特殊字符，一旦设定不可更改。"
-
-#: cms/templates/index.html
-msgid "The term in which your course will run."
-msgstr " 您课程开设的学期。"
+"The term in which your course will run. {strong_start}Note: This is part of "
+"your course URL, so no spaces or special characters are allowed and it "
+"cannot be changed.{strong_end}"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Create"
@@ -17182,14 +17165,11 @@ msgid "e.g. CSPROB"
 msgstr "例如，CSPROB"
 
 #: cms/templates/index.html
-msgid "The unique code that identifies this library."
-msgstr "可以标识该知识库的唯一代码。"
-
-#: cms/templates/index.html
 msgid ""
-"Note: This is part of your library URL, so no spaces or special characters "
-"are allowed."
-msgstr "注意：这是知识库URL的一部分，请勿使用空格或特殊字符。"
+"The unique code that identifies this library. {strong_start}Note: This is "
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -17414,21 +17394,19 @@ msgstr ""
 "您在{studio_name}上申请成为课程创建者的请求已被拒绝，请{link_start}联系{platform_name}工作人员进一步了解问题{link_end}。"
 
 #: cms/templates/index.html
-#, python-format
-msgid "Thanks for signing up, %(name)s!"
-msgstr "感谢注册，%(name)s！"
+msgid "Thanks for signing up, {name}!"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
 msgstr "我们需要验证您的电子邮箱地址"
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
-"email address (%(email)s). An activation message and next steps should be "
+"email address ({email}). An activation message and next steps should be "
 "waiting for you there."
-msgstr "快完成了！为了完成您的注册，我们需要验证您的邮箱地址(%(email)s)。一封激活信息以及接下来的步骤应该已经送达您的邮箱。"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Need help?"

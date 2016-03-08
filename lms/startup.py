@@ -12,8 +12,11 @@ from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 import analytics
-from monkey_patch import third_party_auth
-
+from monkey_patch import (
+    third_party_auth,
+    django_db_models_options,
+    django_utils_http_is_safe_url
+)
 
 import xmodule.x_module
 import lms_xblock.runtime
@@ -29,6 +32,8 @@ def run():
     Executed during django startup
     """
     third_party_auth.patch()
+    django_db_models_options.patch()
+    django_utils_http_is_safe_url.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):

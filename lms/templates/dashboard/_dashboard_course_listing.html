@@ -50,7 +50,7 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
- % if course_program_info and course_program_info['category']=='xseries':
+ % if course_program_info and course_program_info.get('category')=='xseries':
   <div class="label-xseries-association">
     <i class="xseries-icon"></i>
     <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
@@ -345,8 +345,10 @@ from student.helpers import (
           </div>
         %endif
 
-        % if course_program_info and course_program_info['category']=='xseries':
-            <%include file = "_dashboard_xseries_info.html" args="course_program_info=course_program_info, enrollment_mode=enrollment.mode" />
+        % if course_program_info and course_program_info.get('category')=='xseries':
+          %for program_data in course_program_info.get('course_program_list', []):
+            <%include file = "_dashboard_xseries_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, display_category=course_program_info['display_category']" />
+          %endfor
         % endif
 
         % if is_course_blocked:

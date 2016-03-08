@@ -26,6 +26,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 
+from courseware.access import has_access
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
@@ -85,20 +86,25 @@ def coach_dashboard(view):
             ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
             course_key = ccx.course_id
 
-        role = CourseCcxCoachRole(course_key)
-        if not role.has_user(request.user):
-            return HttpResponseForbidden(
-                _('You must be a CCX Coach to access this view.'))
-
         course = get_course_by_id(course_key, depth=None)
+        is_staff = has_access(request.user, 'staff', course)
+        is_instructor = has_access(request.user, 'instructor', course)
 
-        # if there is a ccx, we must validate that it is the ccx for this coach
-        if ccx is not None:
-            coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
-            if coach_ccx is None:
-                return HttpResponseForbidden(
-                    _('You must be the coach for this ccx to access this view')
-                )
+        if is_staff or is_instructor:
+            # if user is staff or instructor then he can view ccx coach dashboard.
+            return view(request, course, ccx)
+        else:
+            role = CourseCcxCoachRole(course_key)
+            if not role.has_user(request.user):
+                return HttpResponseForbidden(_('You must be a CCX Coach to access this view.'))
+
+            # if there is a ccx, we must validate that it is the ccx for this coach
+            if ccx is not None:
+                coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.id)
+                if coach_ccx is None:
+                    return HttpResponseForbidden(
+                        _('You must be the coach for this ccx to access this view')
+                    )
 
         return view(request, course, ccx)
     return wrapper

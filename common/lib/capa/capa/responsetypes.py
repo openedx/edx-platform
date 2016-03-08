@@ -2134,6 +2134,10 @@ class StringResponse(LoncapaResponse):
         Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
         Should be removed soon. When to remove it, is up to Lyla Fisher.
         """
+        # if given answer is empty.
+        if not given:
+            return False
+
         _ = self.capa_system.i18n.ugettext
         # backward compatibility, should be removed in future.
         if self.backward:
