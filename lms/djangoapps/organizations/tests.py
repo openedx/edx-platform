@@ -152,10 +152,12 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['contact_email'], self.test_organization_contact_email)
         self.assertEqual(response.data['contact_phone'], self.test_organization_contact_phone)
         self.assertEqual(response.data['logo_url'], self.test_organization_logo_url)
-        self.assertIsNotNone(response.data['workgroups'])
-        self.assertEqual(len(response.data['users']), len(users))
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
+
+        users_get_uri = "{}users/?view=ids".format(confirm_uri)
+        response = self.do_get(users_get_uri)
+        self.assertEqual(len(response.data), len(users))
 
     def test_organizations_detail_get(self):
         data = {
@@ -178,8 +180,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['contact_name'], self.test_organization_contact_name)
         self.assertEqual(response.data['contact_email'], self.test_organization_contact_email)
         self.assertEqual(response.data['contact_phone'], self.test_organization_contact_phone)
-        self.assertIsNotNone(response.data['workgroups'])
-        self.assertIsNotNone(response.data['users'])
+        # we have separate api for groups and users organization so that data should not be returned
+        self.assertFalse("users" in response.data)
+        self.assertFalse("groups" in response.data)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -230,7 +233,13 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         }
         response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(len(response.data['groups']), len(groups))
+        organization_id = response.data['id']
+        groups_get_uri = "{base_url}{organization_id}/groups/?view=ids".format(
+            base_url=self.base_organizations_uri,
+            organization_id=organization_id,
+        )
+        response = self.do_get(groups_get_uri)
+        self.assertEqual(len(response.data), len(groups))
 
     def test_organizations_users_post(self):
         data = {
@@ -247,9 +256,11 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
         self.assertEqual(response.status_code, 201)
-        response = self.do_get(test_uri)
+
+        users_get_uri = '{}users/?view=ids'.format(test_uri)
+        response = self.do_get(users_get_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users'][0], self.test_user.id)
+        self.assertEqual(response.data[0], self.test_user.id)
 
     def test_organizations_users_post_invalid_user(self):
         data = {

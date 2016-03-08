@@ -23,5 +23,6 @@ class BasicOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = Organization
-        fields = ('url', 'id', 'name', 'created', 'display_name', 'logo_url')
+        fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone',
+                  'logo_url', 'created', 'modified')
         read_only = ('url', 'id', 'created',)
