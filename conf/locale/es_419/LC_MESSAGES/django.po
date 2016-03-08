@@ -183,7 +183,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-17 21:30+0000\n"
+"POT-Creation-Date: 2016-02-24 18:02+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2429,11 +2429,12 @@ msgstr "Ordenar discusiones alfabéticamente"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically."
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
 msgstr ""
-"Ingrese true o false. Si se ingresa true, las categorías y subcategorías de "
-"las discusiones se ordenarán alfabéticamente, de lo contrario se ordenarán "
-"cronológicamente."
+"Ingrese cierto o falso. Si se ingresa cierto, las categorías y subcategorías"
+" de las discusiones se ordenarán alfabéticamente. De lo contrario, se "
+"ordenarán cronológicamente por las fechas y horas en que fueron creadas."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
@@ -2493,19 +2494,6 @@ msgid ""
 msgstr ""
 "Introduzca el identificador único para los archivos de vídeo del curso "
 "proporcionados por edx."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the URL for the official course Facebook group. If you provide a URL, "
-"the mobile app includes a button that students can tap to access the group."
-msgstr ""
-"Ingrese la URL del grupo oficial de Facebook para el curso. Si usted "
-"suministra una URL, la aplicación móvil incluirá un botón que los "
-"estudiantes podrán usar para acceder al grupo."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Facebook URL"
-msgstr "URL de Facebook"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -5123,10 +5111,13 @@ msgstr "El curso {course_id} no existe."
 #: lms/djangoapps/commerce/models.py
 msgid "Use the checkout page hosted by the E-Commerce service."
 msgstr ""
+"Use la página de compra proveída por el servicio de comercio electrónico."
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to single course checkout page hosted by the E-Commerce service."
 msgstr ""
+"Camino a la página de compra de cursos individuales proveída por el servicio"
+" de comercio electrónico."
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -8580,6 +8571,10 @@ msgid ""
 "    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
 "  "
 msgstr ""
+"\n"
+"     <strong>%(application_name)s</strong> quiere acceder a sus datos con los siguientes permisos:\n"
+"\n"
+"  "
 
 #: lms/templates/provider/authorize.html
 msgid "Read your user ID"
@@ -8595,15 +8590,15 @@ msgstr "Leer su dirección de correo electrónico"
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are a staff member."
-msgstr ""
+msgstr "Leer la lista de cursos en los que usted es miembro del personal."
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are an instructor."
-msgstr ""
+msgstr "Leer la lista de cursos en los que usted es instructor."
 
 #: lms/templates/provider/authorize.html
 msgid "To see if you are a global staff user"
-msgstr ""
+msgstr "Para ver si usted es usuario global del personal"
 
 #: lms/templates/provider/authorize.html
 #, python-format
@@ -9551,13 +9546,15 @@ msgstr "Activar generación de certificados de programa"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Maximum Certification Retries"
-msgstr ""
+msgstr "Número máximo de reintentos para la certificación"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "When making requests to award certificates, make at most this many attempts "
 "to retry a failing request."
 msgstr ""
+"Al solicitar que se emitan los certificados, haga como máximo este número de"
+" reintentos por pedido fallido."
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -11169,7 +11166,6 @@ msgid "Dashboard for:"
 msgstr "Panel de Control para:"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
 msgid "Profile image for {username}"
 msgstr "Foto de perfil para {username}"
 
@@ -12821,12 +12817,6 @@ msgstr "Ahora está viendo el curso como <i>{user_name}</i>."
 msgid "Course Material"
 msgstr "Material del curso"
 
-#. Translators: 'needs attention' is an alternative string for the
-#. notification image that indicates the tab "needs attention".
-#: lms/templates/courseware/course_navigation.html
-msgid "needs attention"
-msgstr "Necesita atención"
-
 #: lms/templates/courseware/course_navigation.html
 msgid "Course is not yet visible to students."
 msgstr "El curso aun no está visible para los estudiantes."
@@ -13130,6 +13120,12 @@ msgstr "No hay puntuación de problemas en esta sección"
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
 msgstr "Información del curso {course.display_number_with_default}"
+
+#. Translators: 'needs attention' is an alternative string for the
+#. notification image that indicates the tab "needs attention".
+#: lms/templates/courseware/tabs.html
+msgid "needs attention"
+msgstr "Necesita atención"
 
 #: lms/templates/courseware/welcome-back.html
 msgid ""
@@ -19387,37 +19383,26 @@ msgstr ""
 "posteriormente."
 
 #: cms/templates/index.html
-msgid "The name of the organization sponsoring the course."
-msgstr "El nombre de la organización que respalda el curso."
-
-#: cms/templates/index.html
-msgid "Note: The organization name is part of the course URL"
-msgstr "Nota: El nombre de la organización es parte del URL del curso"
-
-#: cms/templates/index.html
 msgid ""
-"This cannot be changed, but you can set a different display name in Advanced"
-" Settings later."
+"The name of the organization sponsoring the course. {strong_start}Note: The "
+"organization name is part of the course URL.{strong_end} This cannot be "
+"changed, but you can set a different display name in Advanced Settings "
+"later."
 msgstr ""
-"Este campo no puede ser cambiado, pero puede cambiar el nombre para mostrar "
-"mas tarde en la opción de Configuración Avanzada."
 
 #: cms/templates/index.html
 msgid ""
-"The unique number that identifies your course within your organization."
-msgstr "El código único que identifica a su curso dentro de la organización."
-
-#: cms/templates/index.html
-msgid ""
-"Note: This is part of your course URL, so no spaces or special characters "
-"are allowed and it cannot be changed."
+"The unique number that identifies your course within your organization. "
+"{strong_start}Note: This is part of your course URL, so no spaces or special"
+" characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
-"Nota: Esto hará parte de la URL de su curso, por lo tanto no se permiten "
-"espacios ni caracteres especiales y no puede ser cambiado."
 
 #: cms/templates/index.html
-msgid "The term in which your course will run."
-msgstr "El periodo en el que su curso se dictará."
+msgid ""
+"The term in which your course will run. {strong_start}Note: This is part of "
+"your course URL, so no spaces or special characters are allowed and it "
+"cannot be changed.{strong_end}"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Create"
@@ -19468,16 +19453,11 @@ msgid "e.g. CSPROB"
 msgstr "ej: PROBCC"
 
 #: cms/templates/index.html
-msgid "The unique code that identifies this library."
-msgstr "El código único que identifica a su librería."
-
-#: cms/templates/index.html
 msgid ""
-"Note: This is part of your library URL, so no spaces or special characters "
-"are allowed."
+"The unique code that identifies this library. {strong_start}Note: This is "
+"part of your library URL, so no spaces or special characters are "
+"allowed.{strong_end} This cannot be changed."
 msgstr ""
-"Nota: esto hará parte de la URL de su librería, así que no se permiten "
-"espacios ni caracteres especiales. "
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -19738,24 +19718,19 @@ msgstr ""
 "inquietud{link_end}."
 
 #: cms/templates/index.html
-#, python-format
-msgid "Thanks for signing up, %(name)s!"
-msgstr "Gracias por registrarse, %(name)s"
+msgid "Thanks for signing up, {name}!"
+msgstr "¡Gracias por registrarse, {name}!"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
 msgstr "Necesitamos verificar su dirección de correo electrónico"
 
 #: cms/templates/index.html
-#, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
-"email address (%(email)s). An activation message and next steps should be "
+"email address ({email}). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
-"¡Ya casi terminamos! Para completar su registro necesitamos verificar su "
-"dirección de correo electrónico (%(email)s). Un mensaje de activación y los "
-"pasos a seguir le estarán esperando allí."
 
 #: cms/templates/index.html
 msgid "Need help?"

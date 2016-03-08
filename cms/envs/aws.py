@@ -176,6 +176,14 @@ SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
+for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+    oldvalue = CODE_JAIL.get(name)
+    if isinstance(oldvalue, dict):
+        for subname, subvalue in value.items():
+            oldvalue[subname] = subvalue
+    else:
+        CODE_JAIL[name] = value
+
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
@@ -273,12 +281,6 @@ else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 DATABASES = AUTH_TOKENS['DATABASES']
-
-# Enable automatic transaction management on all databases
-# https://docs.djangoproject.com/en/1.8/topics/db/transactions/#tying-transactions-to-http-requests
-# This needs to be true for all databases
-for database_name in DATABASES:
-    DATABASES[database_name]['ATOMIC_REQUESTS'] = True
 
 MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']

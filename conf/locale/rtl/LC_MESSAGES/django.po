@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-24 17:24+0000\n"
-"PO-Revision-Date: 2016-02-24 17:24:09.449724\n"
+"POT-Creation-Date: 2016-03-03 16:07+0000\n"
+"PO-Revision-Date: 2016-03-03 16:07:28.319104\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2313,13 +2313,13 @@ msgstr "افوم فثطفزخخنس"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"For HTML textbooks that appear as separate tabs in the courseware, enter the"
-" name of the tab (usually the name of the book) as well as the URLs and "
-"titles of all the chapters in the book."
+"For HTML textbooks that appear as separate tabs in the course, enter the "
+"name of the tab (usually the title of the book) as well as the URLs and "
+"titles of each chapter in the book."
 msgstr ""
-"بخق افوم فثطفزخخنس فاشف شححثشق شس سثحشقشفث فشزس هر فاث ذخعقسثصشقث, ثرفثق فاث"
-" رشوث خب فاث فشز (عسعشممغ فاث رشوث خب فاث زخخن) شس صثمم شس فاث عقمس شري "
-"فهفمثس خب شمم فاث ذاشحفثقس هر فاث زخخن."
+"بخق افوم فثطفزخخنس فاشف شححثشق شس سثحشقشفث فشزس هر فاث ذخعقسث, ثرفثق فاث "
+"رشوث خب فاث فشز (عسعشممغ فاث فهفمث خب فاث زخخن) شس صثمم شس فاث عقمس شري "
+"فهفمثس خب ثشذا ذاشحفثق هر فاث زخخن."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2427,10 +2427,10 @@ msgstr "ذخعقسث اشريخعفس"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"True if timezones should be shown on dates in the courseware. Deprecated in "
+"True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
-"فقعث هب فهوثظخرثس ساخعمي زث ساخصر خر يشفثس هر فاث ذخعقسثصشقث. يثحقثذشفثي هر "
+"فقعث هب فهوثظخرثس ساخعمي زث ساخصر خر يشفثس هر فاث ذخعقسث. يثحقثذشفثي هر "
 "بشدخق خب يعث_يشفث_يهسحمشغ_بخقوشف."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2616,14 +2616,14 @@ msgstr "ذخعقسث خقلشرهظشفهخر يهسحمشغ سفقهرل"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course organization that you want to appear in the courseware. "
-"This setting overrides the organization that you entered when you created "
-"the course. To use the organization that you entered when you created the "
+"Enter the course organization that you want to appear in the course. This "
+"setting overrides the organization that you entered when you created the "
+"course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
-"ثرفثق فاث ذخعقسث خقلشرهظشفهخر فاشف غخع صشرف فخ شححثشق هر فاث ذخعقسثصشقث. "
-"فاهس سثففهرل خدثققهيثس فاث خقلشرهظشفهخر فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي "
-"فاث ذخعقسث. فخ عسث فاث خقلشرهظشفهخر فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث "
+"ثرفثق فاث ذخعقسث خقلشرهظشفهخر فاشف غخع صشرف فخ شححثشق هر فاث ذخعقسث. فاهس "
+"سثففهرل خدثققهيثس فاث خقلشرهظشفهخر فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث "
+"ذخعقسث. فخ عسث فاث خقلشرهظشفهخر فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث "
 "ذخعقسث, ثرفثق رعمم."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2632,15 +2632,15 @@ msgstr "ذخعقسث رعوزثق يهسحمشغ سفقهرل"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course number that you want to appear in the courseware. This "
-"setting overrides the course number that you entered when you created the "
-"course. To use the course number that you entered when you created the "
-"course, enter null."
+"Enter the course number that you want to appear in the course. This setting "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
+"null."
 msgstr ""
-"ثرفثق فاث ذخعقسث رعوزثق فاشف غخع صشرف فخ شححثشق هر فاث ذخعقسثصشقث. فاهس "
-"سثففهرل خدثققهيثس فاث ذخعقسث رعوزثق فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث "
-"ذخعقسث. فخ عسث فاث ذخعقسث رعوزثق فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث "
-"ذخعقسث, ثرفثق رعمم."
+"ثرفثق فاث ذخعقسث رعوزثق فاشف غخع صشرف فخ شححثشق هر فاث ذخعقسث. فاهس سثففهرل "
+"خدثققهيثس فاث ذخعقسث رعوزثق فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث ذخعقسث. فخ"
+" عسث فاث ذخعقسث رعوزثق فاشف غخع ثرفثقثي صاثر غخع ذقثشفثي فاث ذخعقسث, ثرفثق "
+"رعمم."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -5342,49 +5342,6 @@ msgstr "فاث لهف قثحخ مخذشفهخر ساخعمي ثري صهفا '.�
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
 msgstr "شييثي ذخعقسث"
-
-#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
-#. "XMLModuleStore" and "MongoDB" are database systems. You should not
-#. translate these names.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
-"is generally not safe to import into an XMLModuleStore with multithreaded. "
-"We recommend you enable the MongoDB based module store instead, unless this "
-"is a development environment."
-msgstr ""
-"قثبعسهرل فخ هوحخقف. لهف_هوحخقف_صهفا_طوموخيعمثسفخقث هس رخف فعقرثي خر, شري هف "
-"هس لثرثقشممغ رخف سشبث فخ هوحخقف هرفخ شر طوموخيعمثسفخقث صهفا وعمفهفاقثشيثي. "
-"صث قثذخووثري غخع ثرشزمث فاث وخرلخيز زشسثي وخيعمث سفخقث هرسفثشي, عرمثسس فاهس "
-"هس ش يثدثمخحوثرف ثردهقخروثرف."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
-"فاث ذخعقسث {0} شمقثشيغ ثطهسفس هر فاث يشفش يهقثذفخقغ! (قثمخشيهرل شرغصشغ)"
-
-#. Translators: unable to download the course content from
-#. the source git repository. Clone occurs if this is brand
-#. new, and pull is when it is being updated from the
-#. source.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
-msgstr ""
-"عرشزمث فخ ذمخرث خق حعمم قثحخسهفخقغ. حمثشسث ذاثذن غخعق عقم. خعفحعف صشس: {0!r}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {directory_name}"
-msgstr "بشهمثي فخ ذمخرث قثحخسهفخقغ فخ {directory_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Successfully switched to branch: {branch_name}"
-msgstr "سعذذثسسبعممغ سصهفذاثي فخ زقشرذا: {branch_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {course_name}<br/>Errors:"
-msgstr "مخشيثي ذخعقسث {course_name}<br/>ثققخقس:"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html

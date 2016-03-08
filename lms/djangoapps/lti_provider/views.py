@@ -14,6 +14,7 @@ from lti_provider.users import authenticate_lti_user
 from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
+from util.views import add_p3p_header
 
 log = logging.getLogger("edx.lti_provider")
 
@@ -32,6 +33,7 @@ OPTIONAL_PARAMETERS = [
 
 
 @csrf_exempt
+@add_p3p_header
 def lti_launch(request, course_id, usage_id):
     """
     Endpoint for all requests to embed edX content via the LTI protocol. This

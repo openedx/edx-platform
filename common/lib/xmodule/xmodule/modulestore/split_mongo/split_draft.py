@@ -544,9 +544,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 block_id = self.DEFAULT_ROOT_LIBRARY_BLOCK_ID
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
-            # Only the course import process calls import_xblock(). If the branch setting is published_only,
-            # then the non-draft blocks are being imported.
-            if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+            # Both the course and library import process calls import_xblock().
+            # If importing a course -and- the branch setting is published_only,
+            # then the non-draft course blocks are being imported.
+            is_course = isinstance(course_key, CourseLocator)
+            if is_course and self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
                 # Override any existing drafts (PLAT-297, PLAT-299). This import/publish step removes
                 # any local changes during the course import.
                 draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)

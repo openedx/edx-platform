@@ -80,18 +80,19 @@ class ChooseModeView(View):
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
+        ecommerce_service = EcommerceService()
 
-        # We assume that, if 'professional' is one of the modes, it is the *only* mode.
-        # If we offer more modes alongside 'professional' in the future, this will need to route
-        # to the usual "choose your track" page same is true for no-id-professional mode.
+        # We assume that, if 'professional' is one of the modes, it should be the *only* mode.
+        # If there are both modes, default to non-id-professional.
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
-            return redirect(
-                reverse(
-                    'verify_student_start_flow',
-                    kwargs={'course_id': unicode(course_key)}
-                )
-            )
+            redirect_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
+            if ecommerce_service.is_enabled(request):
+                professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
+                if professional_mode.sku:
+                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
+
+            return redirect(redirect_url)
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
@@ -150,7 +151,6 @@ class ChooseModeView(View):
             context["verified_description"] = verified_mode.description
 
             if verified_mode.sku:
-                ecommerce_service = EcommerceService()
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
