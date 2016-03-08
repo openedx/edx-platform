@@ -15,7 +15,7 @@ urlpatterns = patterns(
     url(r'^access_token/?$', csrf_exempt(views.AccessTokenView.as_view()), name='access_token'),
     url(
         r'^exchange_access_token/(?P<backend>[^/]+)/$',
-        views.AccessTokenExchangeView.as_view(),
+        csrf_exempt(views.AccessTokenExchangeView.as_view()),
         name='exchange_access_token'
     )
 )

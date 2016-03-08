@@ -23,11 +23,14 @@ class _DispatchingView(View):
     dot_adapter = adapters.DOTAdapter()
     dop_adapter = adapters.DOPAdapter()
 
-    def _get_client_id(self, request):
+    def dispatch(self, request, *args, **kwargs):
         """
-        Return the client_id from the provided request
+        Dispatch the request to the selected backend's view.
         """
-        return request.POST.get('client_id')
+        print "Dispatching view"
+        backend = self.select_backend(request)
+        view = self.get_view_for_backend(backend)
+        return view(request, *args, **kwargs)
 
     def select_backend(self, request):
         """
@@ -54,13 +57,11 @@ class _DispatchingView(View):
         else:
             raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
 
-    def dispatch(self, request, *args, **kwargs):
+    def _get_client_id(self, request):
         """
-        Dispatch the request to the selected backend's view.
+        Return the client_id from the provided request
         """
-        backend = self.select_backend(request)
-        view = self.get_view_for_backend(backend)
-        return view(request, *args, **kwargs)
+        return request.POST.get('client_id')
 
 
 class AccessTokenView(_DispatchingView):
@@ -81,7 +82,7 @@ class AuthorizationView(_DispatchingView):
 
 class AccessTokenExchangeView(_DispatchingView):
     """
-    Exchange a third party auth token
+    Exchange a third party auth token.
     """
     dop_view = auth_exchange_views.DOPAccessTokenExchangeView
     dot_view = auth_exchange_views.DOTAccessTokenExchangeView
