@@ -2,10 +2,9 @@
 // VideoCaption module.
     'use strict';
 
-    define(
-    'video/09_video_caption.js',
-    ['video/00_sjson.js', 'video/00_async_process.js'],
-    function (Sjson, AsyncProcess) {
+    define('video/09_video_caption.js',
+    ['underscore', 'gettext', 'video/00_sjson.js', 'video/00_async_process.js', 'text!common/templates/video/languages.underscore', 'text!common/templates/video/captions.underscore'],
+    function (_, gettext, Sjson, AsyncProcess, languagesMenu, closedCaptions) {
 
         /**
          * @desc VideoCaption module exports a function.
@@ -106,8 +105,8 @@
                 if (this.availableTranslationsXHR && this.availableTranslationsXHR.abort) {
                     this.availableTranslationsXHR.abort();
                 }
-                this.subtitlesEl.remove();
-                this.container.remove();
+                $(this.subtitlesEl).remove();
+                $(this.container).remove();
                 delete this.state.videoCaption;
             },
             /**
@@ -118,13 +117,23 @@
                 var languages = this.state.config.transcriptLanguages;
 
                 this.loaded = false;
+<<<<<<< HEAD
                 this.subtitlesEl = $(this.template);
                 this.subtitlesMenuEl = this.subtitlesEl.find('.subtitles-menu');
                 this.container = $(this.langTemplate);
                 this.captionControlEl = this.container.find('.toggle-captions');
+=======
+                this.subtitles = _.template(closedCaptions, {
+                    id: this.state.id
+                });
+                this.subtitlesEl = $(this.subtitles);
+                this.subtitlesMenuEl = $(this.subtitlesEl).find('.subtitles-menu');
+                this.container = _.template(languagesMenu, null);
+                this.captionControlEl = $(this.container).find('.toggle-captions');
+>>>>>>> b6c941b... Converting inline templates to underscore templates
                 this.captionDisplayEl = this.state.el.find('.closed-captions');
-                this.transcriptControlEl = this.container.find('.toggle-transcript');
-                this.languageChooserEl = this.container.find('.lang');
+                this.transcriptControlEl = $(this.container).find('.toggle-transcript');
+                this.languageChooserEl = $(this.container).find('.lang');
                 this.menuChooserEl = this.languageChooserEl.parent();
 
                 if (_.keys(languages).length) {
@@ -161,7 +170,7 @@
                     DOMMouseScroll: this.onMovement
                 })
                 .on(events, 'li[data-index]', this.onCaptionHandler);
-                this.container.on({
+                $(this.container).on({
                     mouseenter: this.onContainerMouseEnter,
                     mouseleave: this.onContainerMouseLeave
                 });
@@ -535,7 +544,7 @@
                             }
                         } else {
                             if (state.isTouch) {
-                                self.subtitlesEl.find('.subtitles-menu').html(
+                                $(self.subtitlesEl).find('.subtitles-menu').html(
                                     gettext(
                                         '<li>Transcript will be displayed when ' +
                                         'you start playing the video.</li>'
@@ -545,7 +554,7 @@
                                 self.renderCaption(start, captions);
                             }
                             self.hideCaptions(state.hide_captions, false);
-                            self.state.el.find('.video-wrapper').after(self.subtitlesEl);
+                            self.state.el.find('.video-wrapper').after($(self.subtitlesEl));
                             self.state.el.find('.secondary-controls').append(self.container);
                             self.bindHandlers();
                         }
@@ -572,7 +581,7 @@
                             self.hideCaptions(true, false);
                             self.state.el.find('.lang').hide();
                             self.state.el.find('.transcript-control').hide();
-                            self.subtitlesEl.hide();
+                            $(self.subtitlesEl).hide();
                         }
                     }
                 });
@@ -600,7 +609,7 @@
                         // Update property with available currently translations.
                         state.config.transcriptLanguages = newLanguages;
                         // Remove an old language menu.
-                        self.container.find('.langs-list').remove();
+                        $(self.container).find('.langs-list').remove();
 
                         if (_.keys(newLanguages).length) {
                             // And try again to fetch transcript.
@@ -612,7 +621,7 @@
                         self.hideCaptions(true, false);
                         self.state.el.find('.lang').hide();
                         self.state.el.find('.transcript-control').hide();
-                        self.subtitlesEl.hide();
+                        $(self.subtitlesEl).hide();
                     }
                 });
 
@@ -624,7 +633,7 @@
             *
             */
             onResize: function () {
-                this.subtitlesEl
+                $(this.subtitlesEl)
                     .find('.spacing').first()
                     .height(this.topSpacingHeight()).end()
                     .find('.spacing').last()
@@ -650,7 +659,7 @@
 
                 if (_.keys(languages).length < 2) {
                     // Remove the menu toggle button
-                    self.container.find('.lang').remove();
+                    $(self.container).find('.lang').remove();
                     return false;
                 }
 
@@ -701,7 +710,6 @@
             buildCaptions: function  (container, start, captions) {
                 var process = function(text, index) {
                         var liEl = $('<li>', {
-                            'role': 'link',
                             'data-index': index,
                             'data-start': start[index],
                             'tabindex': 0
@@ -711,6 +719,7 @@
                     };
 
                 return AsyncProcess.array(captions, process).done(function (list) {
+                    $(container).append(list);
                     container.append(list);
                 });
             },
@@ -896,7 +905,7 @@
             *
             */
             scrollCaption: function () {
-                var el = this.subtitlesEl.find('.current:first');
+                var el = $(this.subtitlesEl).find('.current:first');
 
                 // Automatic scrolling gets disabled if one of the captions has
                 // received focus through tabbing.
@@ -905,7 +914,7 @@
                     el.length &&
                     this.autoScrolling
                 ) {
-                    this.subtitlesEl.scrollTo(
+                    $(this.subtitlesEl).scrollTo(
                         el,
                         {
                             offset: -1 * this.calculateOffset(el)
@@ -970,17 +979,17 @@
                         this.currentIndex !== newIndex
                     ) {
                         if (typeof this.currentIndex !== 'undefined') {
-                            this.subtitlesEl
+                            $(this.subtitlesEl)
                                 .find('li.current')
                                 .removeClass('current');
                         }
 
-                        this.subtitlesEl
+                        $(this.subtitlesEl)
                             .find("li[data-index='" + newIndex + "']")
                             .addClass('current');
 
                         this.currentIndex = newIndex;
-                        this.captionDisplayEl.text(this.subtitlesEl.find("li[data-index='" + newIndex + "']").text());
+                        this.captionDisplayEl.text($(this.subtitlesEl).find("li[data-index='" + newIndex + "']").text());
                         this.scrollCaption();
                     }
                 }
@@ -1030,7 +1039,7 @@
             */
             topSpacingHeight: function () {
                 return this.calculateOffset(
-                    this.subtitlesEl.find('li:not(.spacing)').first()
+                    $(this.subtitlesEl).find('li:not(.spacing)').first()
                 );
             },
 
@@ -1042,7 +1051,7 @@
             */
             bottomSpacingHeight: function () {
                 return this.calculateOffset(
-                    this.subtitlesEl.find('li:not(.spacing)').last()
+                    $(this.subtitlesEl).find('li:not(.spacing)').last()
                 );
             },
 
@@ -1103,9 +1112,9 @@
                     .find('.control-text')
                         .text(gettext('Hide closed captions'));
 
-                if (this.subtitlesEl.find('.current').text()) {
+                if ($(this.subtitlesEl).find('.current').text()) {
                     this.captionDisplayEl
-                        .text(this.subtitlesEl.find('.current').text());
+                        .text($(this.subtitlesEl).find('.current').text());
                 } else {
                     this.captionDisplayEl
                         .text(gettext('(Caption will be displayed when you start playing the video.)'));
@@ -1233,7 +1242,7 @@
                     // autochanges its height.
                 }
 
-                this.subtitlesEl.css({
+                $(this.subtitlesEl).css({
                     maxHeight: this.captionHeight() - height
                 });
             }

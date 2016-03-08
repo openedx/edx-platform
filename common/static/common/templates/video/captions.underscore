@@ -1,0 +1,6 @@
+<div class="subtitles" id="closedCaptions" role="region" aria-label="<%= gettext("Video transcript: activating an item in this group will spool the video to the corresponding time point.") %>" id="transcript-<%= id %>">
+    <a href="#transcript-end-<%= id %>" id="transcript-start-<%= id %>">Start of transcript. Skip to the end.</a>
+    <h3 id="transcript-label-<%= id %>" class="sr"><%= gettext("Video transcript") %></h3>
+    <ol id="transcript-captions" class="subtitles-menu"></ol>
+    <a href="#transcript-start-<%= id %>" id="transcript-end-<%= id %>">End of transcript. Skip to the start.</a>
+</div>

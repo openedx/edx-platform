@@ -1,0 +1,22 @@
+<div class="grouped-controls" id="languagesMenu">
+    <button class="control toggle-captions" aria-disabled="false">
+        <span class="icon-fallback-img">
+            <span class="icon fa fa-cc" aria-hidden="true"></span>
+            <span class="sr control-text"><%= gettext("Turn on closed captioning") %></span>
+        </span>
+    </button>
+    <button class="control toggle-transcript" aria-disabled="false">
+        <span class="icon-fallback-img">
+            <span class="icon fa fa-quote-left" aria-hidden="true"></span>
+            <span class="sr control-text"><%= gettext("Turn off transcript") %></span>
+        </span>
+    </button>
+    <div class="lang menu-container" role="application">
+        <button class="control language-menu" aria-label="<%= gettext("Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to select the desired language.") %>" aria-disabled="false">
+            <span class="icon-fallback-img">
+                <span class="icon fa fa-caret-left" aria-hidden="true"></span>
+                <span class="sr control-text"><%= gettext("Open language menu") %></span>
+            </span>
+        </button>
+    </div>
+</div>
