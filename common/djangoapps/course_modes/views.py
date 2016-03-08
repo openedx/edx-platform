@@ -3,14 +3,16 @@ Views for the course_mode module
 """
 
 import decimal
+import urllib
 
+from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, to_locale, ugettext as _
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
@@ -108,6 +110,11 @@ class ChooseModeView(View):
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
         course = modulestore().get_course(course_key)
+        if CourseEnrollment.is_enrollment_closed(request.user, course):
+            locale = to_locale(get_language())
+            enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
+            params = urllib.urlencode({'course_closed': enrollment_end_date})
+            return redirect('{0}?{1}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.

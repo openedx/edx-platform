@@ -2,12 +2,13 @@
 """
 End-to-end tests for the LMS.
 """
-
-from datetime import datetime
+from datetime import datetime, timedelta
 from flaky import flaky
 from textwrap import dedent
 from unittest import skip
 from nose.plugins.attrib import attr
+import pytz
+import urllib
 
 from bok_choy.promise import EmptyPromise
 from ..helpers import (
@@ -1154,6 +1155,95 @@ class NotLiveRedirectTest(UniqueCourseTest):
             'The course you are looking for does not start until',
             page.banner_text
         )
+
+
+@attr('shard_1')
+class EnrollmentClosedRedirectTest(UniqueCourseTest):
+    """
+    Test that a banner is shown when the user is redirected to the
+    dashboard after trying to view the track selection page for a
+    course after enrollment has ended.
+    """
+
+    def setUp(self):
+        """Create a course that is closed for enrollment, and sign in as a user."""
+        super(EnrollmentClosedRedirectTest, self).setUp()
+        course = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        now = datetime.now(pytz.UTC)
+        course.add_course_details({
+            'enrollment_start': (now - timedelta(days=30)).isoformat(),
+            'enrollment_end': (now - timedelta(days=1)).isoformat()
+        })
+        course.install()
+
+        # Add an honor mode to the course
+        ModeCreationPage(self.browser, self.course_id).visit()
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser,
+            self.course_id,
+            mode_slug=u'verified',
+            mode_display_name=u'Verified Certificate',
+            min_price=10,
+            suggested_prices='10,20'
+        ).visit()
+
+    def _assert_dashboard_message(self):
+        """
+        Assert that the 'closed for enrollment' text is present on the
+        dashboard.
+        """
+        page = DashboardPage(self.browser)
+        page.wait_for_page()
+        self.assertIn(
+            'The course you are looking for is closed for enrollment',
+            page.banner_text
+        )
+
+    def test_redirect_banner(self):
+        """
+        Navigate to the course info page, then check that we're on the
+        dashboard page with the appropriate message.
+        """
+        AutoAuthPage(self.browser).visit()
+        url = BASE_URL + "/course_modes/choose/" + self.course_id
+        self.browser.get(url)
+        self._assert_dashboard_message()
+
+    def test_login_redirect(self):
+        """
+        Test that the user is correctly redirected after logistration when
+        attempting to enroll in a closed course.
+        """
+        url = '{base_url}/register?{params}'.format(
+            base_url=BASE_URL,
+            params=urllib.urlencode({
+                'course_id': self.course_id,
+                'enrollment_action': 'enroll',
+                'email_opt_in': 'false'
+            })
+        )
+        self.browser.get(url)
+        register_page = CombinedLoginAndRegisterPage(
+            self.browser,
+            start_page="register",
+            course_id=self.course_id
+        )
+        register_page.wait_for_page()
+        register_page.register(
+            email="email@example.com",
+            password="password",
+            username="username",
+            full_name="Test User",
+            country="US",
+            favorite_movie="Mad Max: Fury Road",
+            terms_of_service=True
+        )
+        self._assert_dashboard_message()
 
 
 @attr('shard_1')

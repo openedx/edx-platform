@@ -1,6 +1,12 @@
+"""
+Tests for course_modes views.
+"""
+
+from datetime import datetime
 import unittest
 import decimal
 import ddt
+import freezegun
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -9,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -339,6 +346,21 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotContains(response, "How it Works")
         self.assertNotContains(response, "Find courses")
         self.assertNotContains(response, "Schools & Partners")
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @freezegun.freeze_time('2015-01-02')
+    def test_course_closed(self):
+        for mode in ["honor", "verified"]:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        self.course.enrollment_end = datetime(2015, 01, 01)
+        modulestore().update_item(self.course, self.user.id)
+
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        # URL-encoded version of 1/1/15, 12:00 AM
+        redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
+        self.assertRedirects(response, redirect_url)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

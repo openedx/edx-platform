@@ -1,4 +1,5 @@
 """ Commerce API v0 view tests. """
+from datetime import datetime, timedelta
 import json
 import itertools
 from uuid import uuid4
@@ -10,6 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import mock
 from nose.plugins.attrib import attr
+import pytz
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -25,6 +27,7 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
+from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
@@ -344,6 +347,16 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             response = self._post_to_view(marketing_email_opt_in=is_opt_in)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
+
+    def test_closed_course(self):
+        """
+        Ensure that the view does not attempt to create a basket for closed
+        courses.
+        """
+        self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
+        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
+        with mock_create_basket(expect_called=False):
+            self.assertEqual(self._post_to_view().status_code, 406)
 
 
 @attr('shard_1')
