@@ -311,7 +311,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'clean_headers.middleware.CleanHeadersMiddleware',
+    'header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

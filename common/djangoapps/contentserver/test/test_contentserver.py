@@ -16,12 +16,13 @@ from mock import patch
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory, AdminFactory
 
 log = logging.getLogger(__name__)
 
@@ -33,39 +34,44 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class ContentStoreToyCourseTest(ModuleStoreTestCase):
+class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
     """
     Tests that use the toy course.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        super(ContentStoreToyCourseTest, cls).setUpClass()
+
+        cls.contentstore = contentstore()
+        cls.modulestore = modulestore()
+
+        cls.course_key = cls.modulestore.make_course_key('edX', 'toy', '2012_Fall')
+
+        import_course_from_xml(
+            cls.modulestore, 1, TEST_DATA_DIR, ['toy'],
+            static_content_store=cls.contentstore, verbose=True
+        )
+
+        # A locked asset
+        cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.txt')
+        cls.url_locked = unicode(cls.locked_asset)
+        cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
+
+        # An unlocked asset
+        cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
+        cls.url_unlocked = unicode(cls.unlocked_asset)
+        cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
 
     def setUp(self):
         """
         Create user and login.
         """
-        self.staff_pwd = super(ContentStoreToyCourseTest, self).setUp()
-        self.staff_usr = self.user
-        self.non_staff_usr, self.non_staff_pwd = self.create_non_staff_user()
+        super(ContentStoreToyCourseTest, self).setUp()
+        self.staff_usr = AdminFactory.create()
+        self.non_staff_usr = UserFactory.create()
 
         self.client = Client()
-        self.contentstore = contentstore()
-        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # pylint: disable=protected-access
-
-        self.course_key = store.make_course_key('edX', 'toy', '2012_Fall')
-
-        import_course_from_xml(
-            store, self.user.id, TEST_DATA_DIR, ['toy'],
-            static_content_store=self.contentstore, verbose=True
-        )
-
-        # A locked asset
-        self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
-        self.url_locked = unicode(self.locked_asset)
-        self.contentstore.set_attr(self.locked_asset, 'locked', True)
-
-        # An unlocked asset
-        self.unlocked_asset = self.course_key.make_asset_key('asset', 'another_static.txt')
-        self.url_unlocked = unicode(self.unlocked_asset)
-        self.length_unlocked = self.contentstore.get_attr(self.unlocked_asset, 'length')
 
     def test_unlocked_asset(self):
         """
@@ -89,7 +95,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that locked assets behave appropriately in case user is logged in
         in but not registered for the course.
         """
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 403)
 
@@ -101,7 +107,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
 
@@ -109,7 +115,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Test that locked assets behave appropriately in case user is staff.
         """
-        self.client.login(username=self.staff_usr, password=self.staff_pwd)
+        self.client.login(username=self.staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
 
@@ -191,6 +197,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=(self.length_unlocked), last=(self.length_unlocked)))
         self.assertEqual(resp.status_code, 416)
 
+    def test_vary_header_sent(self):
+        """
+        Tests that we're properly setting the Vary header to ensure browser requests don't get
+        cached in a way that breaks XHR requests to the same asset.
+        """
+        resp = self.client.get(self.url_unlocked)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEquals('Origin', resp['Vary'])
+
     @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_unlocked(self, mock_get_cache_ttl):
         """
@@ -215,7 +230,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
@@ -245,7 +260,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
         self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
+        self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
@@ -255,20 +270,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
         self.assertEqual("Thu, 01 Dec 1983 20:00:55 GMT", near_expire_dt)
-
-    def test_response_no_vary_header_unlocked(self):
-        resp = self.client.get(self.url_unlocked)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Vary', resp)
-
-    def test_response_no_vary_header_locked(self):
-        CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
-
-        self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
-        resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Vary', resp)
 
 
 @ddt.ddt
