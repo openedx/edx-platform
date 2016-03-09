@@ -98,7 +98,7 @@ define([
                     return deepAttributes(obj.attributes);
                 } else if (obj instanceof Backbone.Collection) {
                     return obj.map(deepAttributes);
-                } else if (_.isObject(obj)) {
+                } else if ($.isPlainObject(obj)) {
                     var attributes = {};
 
                     for (var prop in obj) {
@@ -159,7 +159,7 @@ define([
                     );
 
                 expect(deepAttributes(model)).toEqual(clientModelSpec);
-                expect(model.toJSON()).toEqual(serverModelSpec);
+                expect(JSON.parse(JSON.stringify(model))).toEqual(serverModelSpec);
             });
         });
 
@@ -318,10 +318,13 @@ define([
                         expect(collection.getGroupId(1)).toBe('11');
                         expect(collection.getGroupId(5)).toBe('111111');
                     })
-                    .always(_.compose(cleanUp, done));
+                    .always(function () {
+                        cleanUp();
+                        done();
+                    });
             });
 
-            it('allow to use unicode characters in the dict', function () {
+            it('allow to use unicode characters in the dict', function (done) {
                 initializeGroupModel('ö诶úeœ')
                     .then(function (collection) {
                         expect(collection.getGroupId(0)).toBe('ö');
@@ -331,17 +334,23 @@ define([
                         expect(collection.getGroupId(30)).toBe('ööö');
                         expect(collection.getGroupId(43)).toBe('öúe');
                     })
-                    .always(_.compose(cleanUp, done));
+                    .always(function () {
+                        cleanUp();
+                        done();
+                    });
             });
 
-            it('return initial value if dictionary is empty', function () {
+            it('return initial value if dictionary is empty', function (done) {
                 initializeGroupModel('')
                     .then(function (collection) {
                         expect(collection.getGroupId(0)).toBe('0');
                         expect(collection.getGroupId(5)).toBe('5');
                         expect(collection.getGroupId(30)).toBe('30');
                     })
-                    .always(_.compose(cleanUp, done));
+                    .always(function () {
+                        cleanUp();
+                        done();
+                    });
             });
         });
     });
