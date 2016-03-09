@@ -69,19 +69,21 @@ case "$TEST_SUITE" in
         paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
         echo "[DEBUG] INSTALLED: "
-        cat .prereqs_cache/Python_uninstall.sha1; echo ""
-        cat .prereqs_cache/Python_prereqs.sha1; echo ""
         pip show edx-oauth2-provider
         pip show django-oauth-toolkit
+        ls -la .prereqs_cache
+        cat .prereqs_cache/Python_prereqs.sha1 || EXIT=1; echo ""
+        cat .prereqs_cache/Python_uninstall.sha1 || EXIT=1; echo ""
 
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
         echo "[DEBUG] INSTALLED: "
-        cat .prereqs_cache/Python_uninstall.sha1; echo ""
-        cat .prereqs_cache/Python_prereqs.sha1; echo ""
         pip show edx-oauth2-provider
         pip show django-oauth-toolkit
+        ls -la .prereqs_cache
+        cat .prereqs_cache/Python_prereqs.sha1 || EXIT=1; echo ""
+        cat .prereqs_cache/Python_uninstall.sha1 || EXIT=1; echo ""
 
         exit $EXIT
         ;;
@@ -93,9 +95,10 @@ case "$TEST_SUITE" in
         paver install_prereqs
 
         echo "[DEBUG] INSTALLED: "
-        cat .prereqs_cache/Python_uninstall.sha1; echo ""
-        cat .prereqs_cache/Python_prereqs.sha1; echo ""
         pip show edx-oauth2-provider
         pip show django-oauth-toolkit
+        ls -la .prereqs_cache
+        cat .prereqs_cache/Python_prereqs.sha1 || EXIT=1; echo ""
+        cat .prereqs_cache/Python_uninstall.sha1 || EXIT=1; echo ""
         ;;
 esac
