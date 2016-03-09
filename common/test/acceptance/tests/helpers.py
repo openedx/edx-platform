@@ -641,8 +641,7 @@ class UniqueCourseTest(WebAppTest):
             'org': 'test_org',
             'number': self.unique_id,
             'run': 'test_run',
-            'display_name': 'Test Course' + self.unique_id
-            # 'display_name': 'Test Course' + XSS_INJECTION + self.unique_id
+            'display_name': 'Test Course' + XSS_INJECTION + self.unique_id
         }
 
     @property

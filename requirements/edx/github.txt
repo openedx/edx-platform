@@ -98,4 +98,4 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.0.3#egg=xblock-lti-consume
 -e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.2#egg=xblock-drag-and-drop-v2==2.0.2
 
--e git+https://github.com/edx/bok-choy@2a5cca7e0bd053bbbae64f3a0cec58987a2bf77b#egg=bok-choy
+-e git+https://github.com/edx/bok-choy@d4e0e91378e06796297244f0334fbd3b69d5082e#egg=bok-choy

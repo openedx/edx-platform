@@ -34,19 +34,19 @@ class StudioCourseTest(UniqueCourseTest):
             self.course_info['run'],
             self.course_info['display_name'],
         )
-        # if self.test_xss:
-        #     xss_injected_unique_id = XSS_INJECTION + self.unique_id
-        #     test_improper_escaping = {u"value": xss_injected_unique_id}
-        #     self.course_fixture.add_advanced_settings({
-        #         "advertised_start": test_improper_escaping,
-        #         "info_sidebar_name": test_improper_escaping,
-        #         "cert_name_short": test_improper_escaping,
-        #         "cert_name_long": test_improper_escaping,
-        #         "display_organization": test_improper_escaping,
-        #         "display_coursenumber": test_improper_escaping,
-        #     })
-        #     self.course_info['display_organization'] = xss_injected_unique_id
-        #     self.course_info['display_coursenumber'] = xss_injected_unique_id
+        if self.test_xss:
+            xss_injected_unique_id = XSS_INJECTION + self.unique_id
+            test_improper_escaping = {u"value": xss_injected_unique_id}
+            self.course_fixture.add_advanced_settings({
+                "advertised_start": test_improper_escaping,
+                "info_sidebar_name": test_improper_escaping,
+                "cert_name_short": test_improper_escaping,
+                "cert_name_long": test_improper_escaping,
+                "display_organization": test_improper_escaping,
+                "display_coursenumber": test_improper_escaping,
+            })
+            self.course_info['display_organization'] = xss_injected_unique_id
+            self.course_info['display_coursenumber'] = xss_injected_unique_id
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
         self.user = self.course_fixture.user
