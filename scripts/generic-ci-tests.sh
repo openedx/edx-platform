@@ -62,19 +62,37 @@ git clean -qxfd
 case "$TEST_SUITE" in
 
     "quality")
-        echo "git show -1"
-        git show -1
+        echo "git log -1 --pretty=one"
+        git log -1 --pretty=one
+
         echo "Finding fixme's and storing report..."
         paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+
+        echo "[DEBUG] REQUIREMENTS: "
+        grep oauth requirements/edx/*.txt
+        echo "[DEBUG] INSTALLED: "
         pip freeze | grep oauth
+
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+
+        echo "[DEBUG] REQUIREMENTS: "
+        grep oauth requirements/edx/*.txt
+        echo "[DEBUG] INSTALLED: "
         pip freeze | grep oauth
+
         exit $EXIT
         ;;
 
     "*")
+        echo "git log -1 --pretty=one"
+        git log -1 --pretty=one
+
         paver install_prereqs
+
+        echo "[DEBUG] REQUIREMENTS: "
+        grep oauth requirements/edx/*.txt
+        echo "[DEBUG] INSTALLED: "
         pip freeze | grep oauth
         ;;
 esac
