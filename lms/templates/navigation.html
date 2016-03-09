@@ -168,6 +168,3 @@ site_status_msg = get_site_status_msg(course_id)
 %endif
 
 <%include file="help_modal.html"/>
-% if course and settings.FEATURES.get('ENABLE_PROBLEM_REPORTING'):
-  <%include file="report_modal.html"/>
-% endif
