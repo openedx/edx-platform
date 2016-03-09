@@ -86,7 +86,8 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     def test_missing_username(self):
         self.setup_user(self.honor_user)
-        self.verify_response(expected_status_code=400)
+        response_to_missing_username = self.verify_response(expected_status_code=200)
+        self.assertIsNotNone(response_to_missing_username.data)  # pylint: disable=no-member
 
     @SharedModuleStoreTestCase.modifies_courseware
     def test_filter_by_org(self):
