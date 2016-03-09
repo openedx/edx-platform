@@ -13,7 +13,7 @@ jasmine.stubbedCaption =
   text: ['Caption at 0', 'Caption at 10000', 'Caption at 20000', 'Caption at 30000']
 
 jasmine.stubRequests = ->
-  spyOn($, 'ajax').andCallFake (settings) ->
+  spyOn($, 'ajax').and.callFake (settings) ->
     if match = settings.url.match /youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/
       settings.success data: jasmine.stubbedMetadata[match[1]]
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
