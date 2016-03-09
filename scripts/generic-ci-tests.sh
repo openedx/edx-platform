@@ -68,18 +68,20 @@ case "$TEST_SUITE" in
         echo "Finding fixme's and storing report..."
         paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
-        echo "[DEBUG] REQUIREMENTS: "
-        grep oauth requirements/edx/*.txt
         echo "[DEBUG] INSTALLED: "
-        pip freeze | grep oauth
+        cat .prereqs_cache/Python_uninstall.sha1; echo ""
+        cat .prereqs_cache/Python_prereqs.sha1; echo ""
+        pip show edx-oauth2-provider
+        pip show django-oauth-toolkit
 
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
-        echo "[DEBUG] REQUIREMENTS: "
-        grep oauth requirements/edx/*.txt
         echo "[DEBUG] INSTALLED: "
-        pip freeze | grep oauth
+        cat .prereqs_cache/Python_uninstall.sha1; echo ""
+        cat .prereqs_cache/Python_prereqs.sha1; echo ""
+        pip show edx-oauth2-provider
+        pip show django-oauth-toolkit
 
         exit $EXIT
         ;;
@@ -90,9 +92,10 @@ case "$TEST_SUITE" in
 
         paver install_prereqs
 
-        echo "[DEBUG] REQUIREMENTS: "
-        grep oauth requirements/edx/*.txt
         echo "[DEBUG] INSTALLED: "
-        pip freeze | grep oauth
+        cat .prereqs_cache/Python_uninstall.sha1; echo ""
+        cat .prereqs_cache/Python_prereqs.sha1; echo ""
+        pip show edx-oauth2-provider
+        pip show django-oauth-toolkit
         ;;
 esac
