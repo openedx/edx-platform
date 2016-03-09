@@ -8,8 +8,10 @@ from util.json_request import JsonResponse
 class DetailResponse(JsonResponse):
     """ JSON response that simply contains a detail field. """
 
-    def __init__(self, message, status=HTTP_200_OK):
+    def __init__(self, message, status=HTTP_200_OK, redirect_url=None):
         data = {'detail': message}
+        if redirect_url:
+            data['redirect_url'] = redirect_url
         super(DetailResponse, self).__init__(resp_obj=data, status=status)
 
 

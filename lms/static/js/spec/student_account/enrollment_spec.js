@@ -7,7 +7,8 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
             var COURSE_KEY = 'edX/DemoX/Fall',
                 ENROLL_URL = '/api/commerce/v0/baskets/',
                 FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/',
-                EMBARGO_MSG_URL = '/embargo/blocked-message/enrollment/default/';
+                EMBARGO_MSG_URL = '/embargo/blocked-message/enrollment/default/',
+                DASHBOARD = '/dashboard';
 
             beforeEach(function() {
                 // Mock the redirect call
@@ -68,6 +69,25 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
 
                 // Verify that the user was redirected
                 expect(EnrollmentInterface.redirect).toHaveBeenCalledWith( EMBARGO_MSG_URL );
+
+            });
+            it('redirects the user to dashboard if course is closed', function() {
+                // Spy on Ajax requests
+                var requests = AjaxHelpers.requests( this );
+
+                // Attempt to enroll the user
+                EnrollmentInterface.enroll( COURSE_KEY, FORWARD_URL );
+
+                // Simulate an error response (406) from the server
+                // with a "redirect_url" parameter for the redirect.
+                // Verify that the user was redirected to dashboard
+                AjaxHelpers.respondWithError(
+                    requests, 406,
+                    { 'redirect_url': DASHBOARD }
+                );
+
+                // Verify that the user was redirected
+                expect(EnrollmentInterface.redirect).toHaveBeenCalledWith( DASHBOARD );
 
             });
 

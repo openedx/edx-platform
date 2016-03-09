@@ -6,6 +6,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
@@ -43,7 +44,7 @@ class BasketsView(APIView):
             request -- HTTP request
 
         Returns
-            Tuple (data_is_valid, course_key, error_msg)
+            Tuple (data_is_valid, course, error_msg)
         """
         course_id = request.data.get('course_id')
 
@@ -52,12 +53,12 @@ class BasketsView(APIView):
 
         try:
             course_key = CourseKey.from_string(course_id)
-            courses.get_course(course_key)
+            course = courses.get_course(course_key)
         except (InvalidKeyError, ValueError)as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
             return False, None, ex.message
 
-        return True, course_key, None
+        return True, course, None
 
     def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
@@ -84,24 +85,35 @@ class BasketsView(APIView):
         Attempt to create the basket and enroll the user.
         """
         user = request.user
-        valid, course_key, error = self._is_data_valid(request)
+        valid, course, error = self._is_data_valid(request)
         if not valid:
             return DetailResponse(error, status=HTTP_406_NOT_ACCEPTABLE)
 
-        embargo_response = embargo_api.get_embargo_response(request, course_key, user)
+        embargo_response = embargo_api.get_embargo_response(request, course.id, user)
 
         if embargo_response:
             return embargo_response
 
         # Don't do anything if an enrollment already exists
-        course_id = unicode(course_key)
-        enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        if enrollment and enrollment.is_active:
+        course_id = unicode(course.id)
+        enrollment_closed = CourseEnrollment.is_enrollment_closed(user, course)
+        user_enrollment = CourseEnrollment.get_enrollment(user, course.id)
+        if user_enrollment and user_enrollment.is_active:
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
             return DetailResponse(msg, status=HTTP_409_CONFLICT)
 
+        # Do not create order when course is closed
+        if enrollment_closed:
+            msg = Messages.ENROLLMENT_CLOSED.format(course_id=course_id)
+            log.info(msg)
+            return DetailResponse(
+                message=msg,
+                status=HTTP_406_NOT_ACCEPTABLE,
+                redirect_url=reverse('dashboard'),
+            )
+
         # Check to see if enrollment for this course is closed.
-        course = courses.get_course(course_key)
+        course = courses.get_course(course.id)
         if CourseEnrollment.is_enrollment_closed(user, course):
             msg = Messages.ENROLLMENT_CLOSED.format(course_id=course_id)
             log.info(u'Unable to enroll user %s in closed course %s.', user.id, course_id)
@@ -110,8 +122,8 @@ class BasketsView(APIView):
         # If there is no audit or honor course mode, this most likely
         # a Prof-Ed course. Return an error so that the JS redirects
         # to track selection.
-        honor_mode = CourseMode.mode_for_course(course_key, CourseMode.HONOR)
-        audit_mode = CourseMode.mode_for_course(course_key, CourseMode.AUDIT)
+        honor_mode = CourseMode.mode_for_course(course.id, CourseMode.HONOR)
+        audit_mode = CourseMode.mode_for_course(course.id, CourseMode.AUDIT)
 
         # Accept either honor or audit as an enrollment mode to
         # maintain backwards compatibility with existing courses
@@ -128,17 +140,16 @@ class BasketsView(APIView):
                 username=user.username
             )
             log.info(msg)
-            self._enroll(course_key, user, default_enrollment_mode.slug)
-            self._handle_marketing_opt_in(request, course_key, user)
+            self._enroll(course.id, user, default_enrollment_mode.slug)
+            self._handle_marketing_opt_in(request, course.id, user)
             return DetailResponse(msg)
 
         # Setup the API
-
         try:
             api = ecommerce_api_client(user)
         except ValueError:
-            self._enroll(course_key, user)
-            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
+            self._enroll(course.id, user)
+            msg = Messages.NO_ECOM_API.format(username=user.username, course_id=course_id)
             log.debug(msg)
             return DetailResponse(msg)
 
@@ -179,7 +190,7 @@ class BasketsView(APIView):
                 user_id=user.id
             )
 
-        self._handle_marketing_opt_in(request, course_key, user)
+        self._handle_marketing_opt_in(request, course.id, user)
         return response
 
 
