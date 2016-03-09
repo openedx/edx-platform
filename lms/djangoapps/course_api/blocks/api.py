@@ -20,7 +20,7 @@ def get_blocks(
         block_counts=None,
         student_view_data=None,
         return_type='dict',
-        block_types=None,
+        block_type_filter=None,
 ):
     """
     Return a serialized representation of the course blocks.
@@ -45,8 +45,8 @@ def get_blocks(
             which blocks to return their student_view_data.
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
-        block_types (list): Optional list of names of block types which to
-            return blocks.
+        block_type_filter (list): Optional list of block type names used to filter 
+            the final result of returned blocks.
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
@@ -65,14 +65,14 @@ def get_blocks(
     blocks = get_course_blocks(user, usage_key, transformers)
 
     # filter blocks by types
-    if block_types:
+    if block_type_filter:
         block_keys_to_remove = []
         for block_key in blocks:
             block_type = blocks.get_xblock_field(block_key, 'category')
-            if block_type not in block_types:
+            if block_type not in block_type_filter:
                 block_keys_to_remove.append(block_key)
         for block_key in block_keys_to_remove:
-            blocks.remove_block(block_key, True)
+            blocks.remove_block(block_key, keep_descendants=True)
 
     # serialize
     serializer_context = {

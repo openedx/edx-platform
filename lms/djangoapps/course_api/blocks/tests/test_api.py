@@ -12,6 +12,8 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory
 
 from ..api import get_blocks
 
+import re
+
 
 class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
@@ -35,6 +37,7 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
 
     def test_basic(self):
         blocks = get_blocks(self.request, self.course.location, self.user)
+        self.assertEquals(blocks['root'], unicode(self.course.location))
 
         # subtract for (1) the orphaned course About block and (2) the hidden Html block
         self.assertEquals(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
@@ -62,6 +65,7 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         blocks = get_blocks(self.request, sequential_block.location, self.user)
+        self.assertEquals(blocks['root'], unicode(sequential_block.location))
         self.assertEquals(len(blocks['blocks']), 5)
 
         for block_type, block_name, is_inside_of_structure in (
@@ -79,13 +83,17 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     def test_filtering_by_block_types(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
-        block_types = ['problem']
-        blocks = get_blocks(self.request, sequential_block.location, self.user, block_types=block_types)
+        # not filtered blocks
+        blocks = get_blocks(self.request, sequential_block.location, self.user)
+        self.assertEquals(len(blocks['blocks']), 5)
+        found_not_problem = False
+        for key in blocks['blocks']:
+            if not re.search(r'/problem/', key):
+                found_not_problem = True
+        self.assertTrue(found_not_problem)
 
-        for block_type, block_name in (
-                ('problem', 'problem_y1a_1'),
-                ('problem', 'problem_y1a_2'),
-                ('problem', 'problem_y1a_3'),
-        ):
-            block = self.store.get_item(self.course.id.make_usage_key(block_type, block_name))
-            self.assertIn(unicode(block.location), blocks['blocks'])
+        # filtered blocks
+        blocks = get_blocks(self.request, sequential_block.location, self.user, block_type_filter=['problem'])
+        self.assertEquals(len(blocks['blocks']), 3)
+        for key in blocks['blocks']:
+            self.assertTrue(re.search(r'/problem/', key))

@@ -31,7 +31,7 @@ class BlockListGetForm(Form):
     student_view_data = MultiValueField(required=False)
     usage_key = CharField(required=True)
     username = CharField(required=False)
-    block_types = MultiValueField(required=False)
+    block_type_filter = MultiValueField(required=False)
 
     def clean_depth(self):
         """
@@ -89,7 +89,7 @@ class BlockListGetForm(Form):
             'student_view_data',
             'block_counts',
             'nav_depth',
-            'block_types',
+            'block_type_filter',
         ]
         for additional_field in additional_requested_fields:
             field_value = cleaned_data.get(additional_field)

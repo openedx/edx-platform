@@ -118,8 +118,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
-        for serialized_block in serializer.data:
-            self.assert_extended_block(serialized_block)
+        self.assertEqual(5, len(serializer.data))
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
@@ -137,6 +136,9 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
 
     def test_basic(self):
         serializer = self.create_serializer()
+
+        # verify root
+        self.assertEquals(serializer.data['root'], unicode(self.block_structure.root_block_usage_key))
 
         # verify blocks
         for block_key_string, serialized_block in serializer.data['blocks'].iteritems():

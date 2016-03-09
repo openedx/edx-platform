@@ -77,6 +77,7 @@ class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     Serializer that formats a BlockStructure object to a dictionary, rather
     than a list, of blocks
     """
+    root = serializers.CharField(source='root_block_usage_key')
     blocks = serializers.SerializerMethodField()
 
     def get_blocks(self, structure):
