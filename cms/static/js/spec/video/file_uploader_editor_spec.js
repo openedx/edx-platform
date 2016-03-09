@@ -76,14 +76,13 @@ function ($, _, Squire) {
                 assertClear: function () {
                     return {
                         compare: function (actual, modelValue) {
-                            var env = this.env,
-                                view = actual,
+                            var view = actual,
                                 model = view.model,
                                 passed;
 
                             passed = model.getValue() === null &&
-                                env.equals_(model.getDisplayValue(), modelValue) &&
-                                env.equals_(view.getValueFromEditor(), modelValue);
+                                _.isEqual(model.getDisplayValue(), modelValue) &&
+                                _.isEqual(view.getValueFromEditor(), modelValue);
 
                             return {
                                 pass: passed

@@ -5,7 +5,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
     assetTpl = readFixtures('asset.underscore')
 
     describe "Asset view", ->
-        beforeEach ->
+        beforeEach (done) ->
             setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
             appendSetFixtures(sandbox({id: "page-prompt"}))
 
@@ -29,8 +29,8 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 "Confirmation": @confirmationSpies.constructor,
                 "Mini": @savingSpies.constructor
             })
-            runs =>
-                @injector.require ["js/models/asset", "js/collections/asset", "js/views/asset"],
+
+            @injector.require ["js/models/asset", "js/collections/asset", "js/views/asset"],
                 (AssetModel, AssetCollection, AssetView) =>
                     @model = new AssetModel
                         display_name: "test asset"
@@ -48,8 +48,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                         view = new AssetView({model: @model})
                         requests = if test then AjaxHelpers["requests"](test) else null
                         return {view: view, requests: requests}
-
-            waitsFor (=> @createAssetView), "AssetsView Creation function was not initialized", 1000
+                    done()
 
         afterEach ->
             @injector.clean()
@@ -134,7 +133,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(@model.get("locked")).toBeFalsy()
 
     describe "Assets view", ->
-        beforeEach ->
+        beforeEach (done) ->
             setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
             appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
@@ -175,8 +174,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                 totalCount: 2
             }
 
-            runs =>
-                @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
+            @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
                 (AssetModel, AssetCollection, AssetsView) =>
                     @AssetModel = AssetModel
                     @collection = new AssetCollection();
@@ -188,9 +186,7 @@ define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
                             el: $('#asset_table_body')
                         view.render()
                         return {view: view, requests: requests}
-
-
-            waitsFor (=> @createAssetsView), "AssetsView Creation function was not initialized", 2000
+                    done()
 
             $.ajax()
 

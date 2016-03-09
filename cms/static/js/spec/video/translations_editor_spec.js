@@ -78,7 +78,7 @@ function ($, _, Squire) {
 
                             view.setValueInEditor(expected);
                             value = view.getValueFromEditor();
-                            passed = this.env.equals_(value, expected);
+                            passed = _.isEqual(value, expected);
 
                             return {
                                 pass: passed,
@@ -107,18 +107,17 @@ function ($, _, Squire) {
                 assertUpdateModel: function () {
                     return {
                         compare: function (actual, originalValue, newValue) {
-                            var env = this.env,
-                                view = actual,
+                            var view = actual,
                                 model = view.model,
                                 expectOriginal,
                                 passed;
 
                             view.setValueInEditor(newValue);
-                            expectOriginal = env.equals_(model.getValue(), originalValue);
+                            expectOriginal = _.isEqual(model.getValue(), originalValue);
                             view.updateModel();
 
                             passed = expectOriginal &&
-                                env.equals_(model.getValue(), newValue);
+                                _.isEqual(model.getValue(), newValue);
 
                             return {
                                 pass: passed
