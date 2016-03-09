@@ -5,13 +5,16 @@ import itertools
 from uuid import uuid4
 
 import ddt
+import mock
+from nose.plugins.attrib import attr
+from pytz import UTC
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
-from nose.plugins.attrib import attr
 import pytz
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -53,10 +56,11 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             payload["email_opt_in"] = True
         return self.client.post(self.url, payload)
 
-    def assertResponseMessage(self, response, expected_msg):
+    def assertResponseMessage(self, response, expected_msg, key='detail'):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
-        actual = json.loads(response.content)['detail']
-        self.assertEqual(actual, expected_msg)
+        actual = json.loads(response.content)
+        self.assertIn(key, actual)
+        self.assertEqual(actual[key], expected_msg)
 
     def assertResponsePaymentData(self, response):
         """ Asserts correctness of a JSON body containing payment information. """
@@ -133,6 +137,37 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         self.assertEqual(406, self.client.post(self.url, {}).status_code)
         self.assertEqual(406, self.client.post(self.url, {'not_course_id': ''}).status_code)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_enrollment_has_ended(self):
+        """
+        Test that if the course is closed,the view should enroll the user.
+        """
+        # Make courses start in the future
+        now = datetime.now(tz=UTC).replace(microsecond=0)
+        last_week = now - timedelta(days=7)
+        last_month = now - timedelta(days=30)
+        redirect_url = reverse('dashboard')
+
+        # Update the course
+        self.course.enrollment_end = last_week
+        self.course.start = last_month
+        self.course = self.update_course(self.course, self.user.id)  # pylint:disable=no-member
+
+        with mock_create_basket(expect_called=False):
+            response = self._post_to_view()
+
+        # Verify system responds with 406 and response data have `redirect_url` key.
+        self.assertEqual(406, response.status_code)
+        msg = Messages.ENROLLMENT_CLOSED.format(
+            username=self.user.username,
+            course_id=self.course.id
+        )
+        self.assertResponseMessage(response, msg)
+        self.assertResponseMessage(response, redirect_url, key='redirect_url')
+
+        # Verify user is not enrolled in the course
+        self.assertUserNotEnrolled()
 
     def test_ecommerce_api_timeout(self):
         """

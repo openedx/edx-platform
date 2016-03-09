@@ -36,6 +36,10 @@
                         // If so, redirect to a page explaining to the user
                         // why they were blocked.
                         this.redirect( responseData.user_message_url );
+                    } else if ( jqXHR.status === 406 && responseData.redirect_url ) {
+                        // Check if server responds with HTTP406 and redirect_url
+                        //is given, redirect the user to the `redirect_url`.
+                        this.redirect( responseData.redirect_url );
                     } else {
                         // Otherwise, redirect the user to the next page.
                         if ( redirectUrl ) {
