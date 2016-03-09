@@ -70,6 +70,7 @@ def find_fixme(options):
             "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
     print "Number of pylint fixmes: " + str(num_fixme)
+    raise Exception("why, why, why?")
 
 
 @task

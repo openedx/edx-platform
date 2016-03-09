@@ -1,9 +1,8 @@
 """
 Test utilities for OAuth access token exchange
 """
-import provider.constants
-from social.apps.django_app.default.models import UserSocialAuth
 
+from social.apps.django_app.default.models import UserSocialAuth
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
 
 
@@ -61,12 +60,12 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         )
 
     def test_confidential_client(self):
-        self.oauth_client.client_type = provider.constants.CONFIDENTIAL
-        self.oauth_client.save()
+        self.data['client_id'] += '_confidential'
+        self.oauth_client = self.oauth2_adapter.create_confidential_client(self.user, self.data['client_id'])
         self._assert_error(
             self.data,
             "invalid_client",
-            "test_client_id is not a public client"
+            "%s is not a public client" % (self.client_id + '_confidential')
         )
 
     def test_inactive_user(self):
