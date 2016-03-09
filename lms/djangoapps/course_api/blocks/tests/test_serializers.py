@@ -118,7 +118,8 @@ class TestBlockSerializer(TestBlockSerializerBase):
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
-        self.assertEqual(5, len(serializer.data))
+        for serialized_block in serializer.data:
+            self.assert_extended_block(serialized_block)
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
