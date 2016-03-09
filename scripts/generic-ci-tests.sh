@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -exv
 
 ###############################################################################
 #
@@ -84,7 +84,7 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "*")
+    *)
         echo "git log -1 --pretty=one"
         git log -1 --pretty=one
 
