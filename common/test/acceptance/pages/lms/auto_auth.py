@@ -43,8 +43,7 @@ class AutoAuthPage(PageObject):
         if username is not None:
             self._params['username'] = username
 
-        if full_name is not None:
-            self._params['full_name'] = XSS_INJECTION
+        self._params['full_name'] = full_name if full_name is not None else XSS_INJECTION
 
         if email is not None:
             self._params['email'] = email
