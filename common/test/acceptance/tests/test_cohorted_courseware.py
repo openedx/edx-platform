@@ -29,8 +29,11 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         super(EndToEndCohortedCoursewareTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
 
-        self.content_group_a = "Content Group A" + XSS_INJECTION
-        self.content_group_b = "Content Group B" + XSS_INJECTION
+        # self.content_group_a = "Content Group A" + XSS_INJECTION
+        # self.content_group_b = "Content Group B" + XSS_INJECTION
+
+        self.content_group_a = "Content Group A"
+        self.content_group_b = "Content Group B"
 
         # Create a student who will be in "Cohort A"
         self.cohort_a_student_username = "cohort_a_student"
