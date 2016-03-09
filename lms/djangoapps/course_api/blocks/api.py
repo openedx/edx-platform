@@ -45,7 +45,7 @@ def get_blocks(
             which blocks to return their student_view_data.
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
-        block_type_filter (list): Optional list of block type names used to filter 
+        block_type_filter (list): Optional list of block type names used to filter
             the final result of returned blocks.
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
