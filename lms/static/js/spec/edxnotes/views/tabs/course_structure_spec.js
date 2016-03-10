@@ -40,7 +40,7 @@ define([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
-            this.collection = new NotesCollection(notes);
+            this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
             this.tabsCollection = new TabsCollection();
         });
 
