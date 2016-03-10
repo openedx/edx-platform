@@ -2230,6 +2230,8 @@ BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
 
 ###################### Grade Downloads ######################
+# These keys are used for all of our asynchronous downloadable files, including
+# the ones that contain information other than grades.
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = {
@@ -2243,7 +2245,6 @@ FINANCIAL_REPORTS = {
     'BUCKET': 'edx-financial-reports',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
-
 
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8

@@ -636,6 +636,20 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.verify_report_requested_event(report_name)
         self.verify_report_download(report_name)
 
+    def test_ora2_response_report_download(self):
+        """
+        Scenario: Verify that an instructor can download an ORA2 grade report
+
+        Given that I am an instructor
+        And I visit the instructor dashboard's "Data Downloads" tab
+        And I click on the "Download ORA2 Responses" button
+        Then a report should be generated
+        """
+        report_name = u"ORA_data"
+        self.data_download_section.generate_ora2_response_report_button.click()
+        self.data_download_section.wait_for_available_report()
+        self.verify_report_download(report_name)
+
 
 @attr('shard_7')
 class CertificatesTest(BaseInstructorDashboardTest):

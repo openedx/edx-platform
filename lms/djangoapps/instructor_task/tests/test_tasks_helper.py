@@ -3,10 +3,18 @@
 """
 Unit tests for LMS instructor-initiated background tasks helper functions.
 
-Tests that CSV grade report generation works with unicode emails.
+- Tests that CSV grade report generation works with unicode emails.
+- Tests all of the existing reports.
 
 """
+
+import os
+import shutil
+from datetime import datetime
+import urllib
+
 import ddt
+from freezegun import freeze_time
 from mock import Mock, patch
 import tempfile
 import json
@@ -22,6 +30,15 @@ from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
+from django.conf import settings
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from pytz import UTC
+
+from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions import Group, UserPartition
+
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -45,6 +62,9 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     upload_course_survey_report,
     generate_students_certificates,
+    upload_ora2_data,
+    UPDATE_STATUS_FAILED,
+    UPDATE_STATUS_SUCCEEDED,
 )
 from instructor_analytics.basic import UNAVAILABLE
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
@@ -2012,3 +2032,56 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             },
             result
         )
+
+
+class TestInstructorOra2Report(SharedModuleStoreTestCase):
+    """
+    Tests that ORA2 response report generation works.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorOra2Report, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super(TestInstructorOra2Report, self).setUp()
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def tearDown(self):
+        super(TestInstructorOra2Report, self).tearDown()
+        if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
+            shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
+
+    def test_report_fails_if_error(self):
+        with patch('instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+            mock_collect_data.side_effect = KeyError
+
+            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+                mock_current_task.return_value = self.current_task
+
+                response = upload_ora2_data(None, None, self.course.id, None, 'generated')
+                self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    @freeze_time('2001-01-01 00:00:00')
+    def test_report_stores_results(self):
+        test_header = ['field1', 'field2']
+        test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+
+            with patch('instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+                mock_collect_data.return_value = (test_header, test_rows)
+
+                with patch('instructor_task.models.LocalFSReportStore.store_rows') as mock_store_rows:
+                    return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+
+                    # pylint: disable=maybe-no-member
+                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+                    course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
+                    filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
+
+                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+                    mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
