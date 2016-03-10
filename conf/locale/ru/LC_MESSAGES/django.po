@@ -192,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-24 18:02+0000\n"
+"POT-Creation-Date: 2016-03-04 14:18+0000\n"
 "PO-Revision-Date: 2016-02-29 15:22+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -691,7 +691,7 @@ msgstr "Другое/Предпочитаю не указывать"
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr "Докторская степень"
+msgstr "Учёная степень"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
@@ -2527,13 +2527,10 @@ msgstr "Учебники в формате HTML"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"For HTML textbooks that appear as separate tabs in the courseware, enter the"
-" name of the tab (usually the name of the book) as well as the URLs and "
-"titles of all the chapters in the book."
+"For HTML textbooks that appear as separate tabs in the course, enter the "
+"name of the tab (usually the title of the book) as well as the URLs and "
+"titles of each chapter in the book."
 msgstr ""
-"Для HTML учебников, которые появляются в виде отдельных вкладок в курсах, "
-"введите название вкладки (как правило, название книги), а также URL-адреса и"
-" названия всех глав в книге."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2642,11 +2639,9 @@ msgstr "Дополнительные материалы"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"True if timezones should be shown on dates in the courseware. Deprecated in "
+"True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
-"Если ввести значение true, часовые пояса будут показаны рядом с датами "
-"курсов. При наличии due_date_display_format этот параметр не используется."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2835,15 +2830,11 @@ msgstr "Отображаемое название организации"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course organization that you want to appear in the courseware. "
-"This setting overrides the organization that you entered when you created "
-"the course. To use the organization that you entered when you created the "
+"Enter the course organization that you want to appear in the course. This "
+"setting overrides the organization that you entered when you created the "
+"course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
-"Введите название организации, которое должно появиться в описании и "
-"содержании курса. Данное значение замещает название организации, введённое "
-"при создании курса. Для использования названия, заданного при создании "
-"курса, введите null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2851,14 +2842,11 @@ msgstr "Отображаемый номер курса"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course number that you want to appear in the courseware. This "
-"setting overrides the course number that you entered when you created the "
-"course. To use the course number that you entered when you created the "
-"course, enter null."
+"Enter the course number that you want to appear in the course. This setting "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
+"null."
 msgstr ""
-"Введите номер курса, который должен появиться в описании и содержании курса."
-" Данное значение переопределяет номер курса, введённый при созданни курса. "
-"Для использования номера, заданного при создании курса, введите null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -5629,50 +5617,6 @@ msgstr ""
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
 msgstr "Добавлен Курс"
-
-#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
-#. "XMLModuleStore" and "MongoDB" are database systems. You should not
-#. translate these names.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
-"is generally not safe to import into an XMLModuleStore with multithreaded. "
-"We recommend you enable the MongoDB based module store instead, unless this "
-"is a development environment."
-msgstr ""
-"Отказ в импортировании. Режим GIT_IMPORT_WITH_XMLMODULESTORE не включен, и в"
-" целом небезопасно импортировать в XMLModuleStore в многопоточном режиме. "
-"Вместо этого мы рекомендуем включить модуль хранения на базе MongoDB, если "
-"это не система разработки."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
-"Учебный курс {0} уже существует в каталоге данных! (повторная загрузка)"
-
-#. Translators: unable to download the course content from
-#. the source git repository. Clone occurs if this is brand
-#. new, and pull is when it is being updated from the
-#. source.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
-msgstr ""
-"Невозможно клонировать или обновитьрепозиторий. Пожалуйста, проверьте вашу "
-"ссылку. Выходными данными были: {0!r}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {directory_name}"
-msgstr "Не удалось клонировать хранилище в {directory_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Successfully switched to branch: {branch_name}"
-msgstr "Успешно переключено на узел: {branch_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {course_name}<br/>Errors:"
-msgstr "Загружен курс {course_name}<br/>Ошибки:"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
@@ -9625,7 +9569,7 @@ msgstr ""
 #. a field on the registration form meant to hold the user's username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "JaneDoe"
-msgstr "Мария Иванова"
+msgstr "maria_ivanova"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's highest completed level of education.
@@ -10280,7 +10224,7 @@ msgstr "Имя пользователя"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
-msgstr "образец: Мария Иванова"
+msgstr "образец: maria_ivanova"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -16098,7 +16042,7 @@ msgstr "Раздел послаблений"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
-msgstr "Количество попыток сдачи контрольного испытания"
+msgstr "Попытки сдачи контрольных испытаний"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"

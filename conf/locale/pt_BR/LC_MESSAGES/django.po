@@ -29,6 +29,7 @@
 # javiercencig <javier@jecnet.com.br>, 2014
 # JhonatannSilva <jhonatannpereiradasilva@hotmail.com>, 2014
 # Joao Marcello Macedo Leme <joaoleme925@hotmail.com>, 2015
+# José Rodrigues <jrsf19@gmail.com>, 2016
 # katia04 <katia.csmiao@gmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
@@ -130,6 +131,7 @@
 # Joao Marcello Macedo Leme <joaoleme925@hotmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
+# Kelly Parada <kellcparada@gmail.com>, 2016
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -243,7 +245,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-24 18:02+0000\n"
+"POT-Creation-Date: 2016-03-04 14:18+0000\n"
 "PO-Revision-Date: 2016-01-19 18:08+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -2552,13 +2554,10 @@ msgstr "Livros Didáticos em HTML"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"For HTML textbooks that appear as separate tabs in the courseware, enter the"
-" name of the tab (usually the name of the book) as well as the URLs and "
-"titles of all the chapters in the book."
+"For HTML textbooks that appear as separate tabs in the course, enter the "
+"name of the tab (usually the title of the book) as well as the URLs and "
+"titles of each chapter in the book."
 msgstr ""
-"Para acessar os livros didáticos em HTML que aparecem como guias separadas "
-"no material didático, digite o nome da guia (geralmente o nome do livro), "
-"bem como as URLs e títulos de todos os capítulos do livro."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2665,11 +2664,9 @@ msgstr "Apostilas do curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"True if timezones should be shown on dates in the courseware. Deprecated in "
+"True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
-"Marque Verdadeiro se os Fuso Horários devem ser indicados nas datas dos "
-"Materiais de curso. É preferível usar o modo formato_exibição_data_entrega"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2855,15 +2852,11 @@ msgstr "Exibição da Organização do Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course organization that you want to appear in the courseware. "
-"This setting overrides the organization that you entered when you created "
-"the course. To use the organization that you entered when you created the "
+"Enter the course organization that you want to appear in the course. This "
+"setting overrides the organization that you entered when you created the "
+"course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
-"Digite a organização do curso que você quer que apareça no material "
-"didático. Esta definição substitui a organização que você digitou quando "
-"criou o curso. Para usar a organização que você digitou quando criou o "
-"curso, digite nulo."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2871,15 +2864,11 @@ msgstr "Exibição do Número do Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course number that you want to appear in the courseware. This "
-"setting overrides the course number that you entered when you created the "
-"course. To use the course number that you entered when you created the "
-"course, enter null."
+"Enter the course number that you want to appear in the course. This setting "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
+"null."
 msgstr ""
-"Digite o número do curso que você quer que apareça no material didático. "
-"Essa configuração substitui o número do curso que você digitou quando criou "
-"o curso. Para usar o número do curso que você digitou quando criou o curso, "
-"digite nulo."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -5642,50 +5631,6 @@ msgstr ""
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
 msgstr "Curso adicionado"
-
-#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
-#. "XMLModuleStore" and "MongoDB" are database systems. You should not
-#. translate these names.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
-"is generally not safe to import into an XMLModuleStore with multithreaded. "
-"We recommend you enable the MongoDB based module store instead, unless this "
-"is a development environment."
-msgstr ""
-"O sistema recusou a importação. GIT_IMPORT_WITH_XMLMODULESTORE não está "
-"ativo e, geralmente, não é  seguro importar para dentro de um XMLModuleStore"
-" com vários segmentos. Em vez disso, a nossa recomendação é habilitar a loja"
-" do módulo do MongoDB, a menos que este seja um ambiente de desenvolvimento."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
-"O curso {0} já existe no diretório de dados! (recarregando mesmo assim)"
-
-#. Translators: unable to download the course content from
-#. the source git repository. Clone occurs if this is brand
-#. new, and pull is when it is being updated from the
-#. source.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
-msgstr ""
-"Não foi possível clonar ou baixar o repositório. Por favor, verifique o url."
-" A resposta foi: {0!r}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {directory_name}"
-msgstr "Falha ao clonar o repositório para {directory_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Successfully switched to branch: {branch_name}"
-msgstr "Alternou corretamente para o ramo: {branch_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {course_name}<br/>Errors:"
-msgstr "Curso {course_name} carregado<br/>Erros:"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
