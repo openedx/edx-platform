@@ -60,7 +60,7 @@ class TestBlockListGetForm(EnableTransformerRegistryMixin, FormTestMixin, Shared
             'usage_key': usage_key,
             'username': self.student.username,
             'user': self.student,
-            'block_type_filter': set(),
+            'block_types_filter': set(),
         }
 
     def assert_raises_permission_denied(self):

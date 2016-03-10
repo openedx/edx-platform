@@ -12,8 +12,6 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory
 
 from ..api import get_blocks
 
-import re
-
 
 class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
@@ -84,16 +82,17 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         # not filtered blocks
-        blocks = get_blocks(self.request, sequential_block.location, self.user)
+        blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 5)
         found_not_problem = False
         for key in blocks['blocks']:
-            if not re.search(r'/problem/', key):
+            if blocks['blocks'][key]['type'] != 'problem':
                 found_not_problem = True
         self.assertTrue(found_not_problem)
 
         # filtered blocks
-        blocks = get_blocks(self.request, sequential_block.location, self.user, block_type_filter=['problem'])
+        blocks = get_blocks(self.request, sequential_block.location, self.user,
+                            block_types_filter=['problem'], requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 3)
         for key in blocks['blocks']:
-            self.assertTrue(re.search(r'/problem/', key))
+            self.assertEqual(blocks['blocks'][key]['type'], 'problem')
