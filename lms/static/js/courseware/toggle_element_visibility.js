@@ -9,14 +9,18 @@
                 var toggleActionElements = $('.toggle-visibility-button');
 
                 var updateToggleActionText = function (elementIsHidden, actionElement) {
-                    var show_text = actionElement.data('show');
-                    var hide_text = actionElement.data('hide');
+                    var show_text = actionElement.data('show'),
+                        hide_text = actionElement.data('hide'),
+                        first_hidden_update = $('.old-updates .toggle-visibility-button').first();
+
+                    actionElement.attr('aria-expanded', elementIsHidden);
 
                     if (elementIsHidden) {
                         if (hide_text) {
                             actionElement.html(actionElement.data('hide'));
                         } else {
                             actionElement.hide();
+                            first_hidden_update.focus();
                         }
                     } else {
                         if (show_text) {
