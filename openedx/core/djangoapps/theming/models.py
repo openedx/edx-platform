@@ -1,5 +1,5 @@
 """
-Comprehensive Theme related models.
+Django models supporting the Comprehensive Theming subsystem
 """
 from django.db import models
 from django.contrib.sites.models import Site
