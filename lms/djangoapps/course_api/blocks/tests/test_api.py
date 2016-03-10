@@ -85,8 +85,8 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 5)
         found_not_problem = False
-        for key in blocks['blocks']:
-            if blocks['blocks'][key]['type'] != 'problem':
+        for block in blocks['blocks'].itervalues():
+            if block['type'] != 'problem':
                 found_not_problem = True
         self.assertTrue(found_not_problem)
 
@@ -94,5 +94,5 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user,
                             block_types_filter=['problem'], requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 3)
-        for key in blocks['blocks']:
-            self.assertEqual(blocks['blocks'][key]['type'], 'problem')
+        for block in blocks['blocks'].itervalues():
+            self.assertEqual(block['type'], 'problem')
