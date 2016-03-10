@@ -1,5 +1,6 @@
 import sys
 import logging
+
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
@@ -7,6 +8,7 @@ from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.fields import ScopeIds
 from xblock.core import XBlock
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
+
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
@@ -263,6 +265,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         module.update_version = edit_info.update_version
         module.source_version = edit_info.source_version
         module.definition_locator = DefinitionLocator(block_key.type, definition_id)
+
+        for wrapper in self.modulestore.xblock_field_data_wrappers:
+            module._field_data = wrapper(module, module._field_data)  # pylint: disable=protected-access
+
         # decache any pending field settings
         module.save()
 
