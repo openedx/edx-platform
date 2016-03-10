@@ -331,7 +331,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/j
                     success: function() {
                         self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
                         temporaryView.unbind();  // Remove the temporary view
-                    }
+                    },
+                    initRuntimeData: this
                 });
             },
 
