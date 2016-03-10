@@ -159,11 +159,10 @@ case "$TEST_SUITE" in
 
     "bok-choy")
 
-        curl -o ff42.tar.bz2 -L https://ftp.mozilla.org/pub/firefox/releases/42.0/linux-x86_64/en-US/firefox-42.0.tar.bz2
-        tar -xjf ff42.tar.bz2
-        echo "firefox version is..."
-        firefox/firefox --version
-        export SELENIUM_FIREFOX_PATH=firefox/firefox
+        # Set custom firefox path to override system default location
+        # This setting will be removed after folks have had sufficient
+        # time upgrading their various branches
+        export SELENIUM_FIREFOX_PATH=$HOME/firefox/firefox
 
         case "$SHARD" in
 
