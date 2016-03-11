@@ -25,7 +25,7 @@
                             <%- gettext('Cohort Name') %> *
                             <span class="sr"><%- gettext('(Required Field)')%></span>
                     </label>
-                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name" id="cohort-name"
+                    <input name="cohort-name" value="<%= cohort_name_value %>" class="input cohort-name" id="cohort-name"
                            placeholder="<%- placeholder_value %>" required="required" type="text">
                 </div>
                 <hr class="divider divider-lv1">
@@ -78,13 +78,13 @@
                                             foundSelected = true;
                                         }
                                     %>
-                                        <option value="<%- contentGroupId %>:<%- contentGroupUserPartitionId %>" <%- isSelected ? 'selected="selected"' : '' %>><%- contentGroup.get('name') %></option>
+                                        <option value="<%= contentGroupId %>:<%= contentGroupUserPartitionId %>" <%- isSelected ? 'selected="selected"' : '' %>><%- contentGroup.get('name') %></option>
                                     <%
                                     }
                                     %>
 
                                     <% if (hasSelectedContentGroup && !foundSelected) { %>
-                                        <option value="<%- selectedContentGroupId %>:<%- selectedUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
+                                        <option value="<%= selectedContentGroupId %>:<%= selectedUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
                                     <% } %>
                                 </select>
 
