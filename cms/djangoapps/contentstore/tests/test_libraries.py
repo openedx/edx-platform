@@ -82,11 +82,6 @@ class LibraryTestCase(ModuleStoreTestCase):
         Helper method: Uses the REST API to call the 'refresh_children' handler
         of a LibraryContent block
         """
-        if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            mocked_user_service = Mock(user_id=self.user.id)
-            mocked_user_service.get_current_user.return_value = XBlockUser(is_current_user=True)
-            lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
-
         handler_url = reverse_usage_url(
             'component_handler',
             lib_content_block.location,
@@ -724,8 +719,6 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
         # Try updating our library content block:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        # We must use the CMS's module system in order to get permissions checks.
-        self._bind_module(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 

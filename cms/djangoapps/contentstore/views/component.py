@@ -22,7 +22,7 @@ from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import create_xblock_info, add_container_page_publishing_info
+from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
 
 from opaque_keys.edx.keys import UsageKey
 
@@ -332,6 +332,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     usage_key = UsageKey.from_string(usage_key_string)
 
     descriptor = modulestore().get_item(usage_key)
+    descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
