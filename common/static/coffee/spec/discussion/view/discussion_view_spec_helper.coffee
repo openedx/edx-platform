@@ -42,7 +42,7 @@ class @DiscussionViewSpecHelper
 
     triggerVoteEvent = (view, event, expectedUrl) ->
         deferred = $.Deferred()
-        spyOn($, "ajax").andCallFake((params) =>
+        spyOn($, "ajax").and.callFake((params) =>
             expect(params.url.toString()).toEqual(expectedUrl)
             return deferred
         )
@@ -72,10 +72,10 @@ class @DiscussionViewSpecHelper
 
         button.click()
         expect(spy).toHaveBeenCalled()
-        spy.reset()
+        spy.calls.reset()
         button.trigger($.Event("keydown", {which: 13}))
         expect(spy).not.toHaveBeenCalled()
-        spy.reset()
+        spy.calls.reset()
         button.trigger($.Event("keydown", {which: 32}))
         expect(spy).toHaveBeenCalled()
 
@@ -83,7 +83,7 @@ class @DiscussionViewSpecHelper
         @checkButtonEvents(view, "toggleVote", ".action-vote")
 
     @setNextResponseContent = (content) ->
-        $.ajax.andCallFake(
+        $.ajax.and.callFake(
             (params) =>
                 params.success({"content": content})
                 {always: ->}
