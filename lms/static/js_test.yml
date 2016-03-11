@@ -119,6 +119,7 @@ fixture_paths:
     - support/templates
     - js/fixtures/bookmarks
     - templates/bookmarks
+    - templates/learner_dashboard
 
 requirejs:
   paths:

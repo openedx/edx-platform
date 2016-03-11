@@ -1,0 +1,77 @@
+// +Imports
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+.program-list-wrapper{
+  @include outer-container;
+  padding: $baseline $baseline;
+  .clearflow{
+	  clear:both;
+  }
+}
+
+.program-cards-container{
+  @include outer-container;
+  @include span-columns(12);
+}
+.sidebar{
+  @include outer-container;
+  @include span-columns(12);
+  .program-advertise{
+    padding: $baseline;
+    background-color: $body-bg;
+    box-sizing: border-box;
+    border: 1px solid $border-color-l3;
+    .advertise-message{
+      font-size:12px;
+      color: $gray-d4;
+      margin-bottom: $baseline;
+    }
+    .ad-link{
+      padding:$baseline * 0.5; 
+      border: 1px solid $blue-t1;
+      font-size: 16px;
+      a{
+        text-decoration: none;
+        &:hover, &:focus, &:active{
+          background-color: $button-bg-hover-color;
+        }
+      }
+    }
+  }
+}
+
+
+
+@include media($bp-medium) {
+  .program-cards-container{
+    @include span-columns(6);
+  }
+  .sidebar{
+    @include omega(n);
+	  @include span-columns(2);
+  }
+}
+
+
+
+@include media($bp-large) {
+  .program-cards-container{
+    @include span-columns(9);
+  }
+  .sidebar{
+    @include omega(n);
+	  @include span-columns(3);
+  }
+}
+
+@include media($bp-huge) {
+  .program-cards-container{
+    @include span-columns(9);
+  }
+  .sidebar{
+    @include omega(n);
+	  @include span-columns(3);
+  }
+}

@@ -1,9 +1,10 @@
 """Tests covering Programs utilities."""
 import unittest
+from urlparse import urljoin
 
 from django.conf import settings
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import TestCase, override_settings
 import httpretty
 import mock
 from nose.plugins.attrib import attr
@@ -14,7 +15,7 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.utils import (
-    get_programs, get_programs_for_credentials, get_programs_for_dashboard
+    get_programs, get_programs_for_credentials, get_programs_for_dashboard, get_user_enrolled_programs
 )
 from student.tests.factories import UserFactory
 
@@ -185,3 +186,32 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         ]
         actual = get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
+
+    @httpretty.activate
+    @override_settings(MKTG_URLS={'ROOT': 'www.edx.org'})
+    def test_get_user_enrolled_programs(self):
+        self.create_programs_config()
+        self.mock_programs_api()
+
+        actual = get_user_enrolled_programs(self.user, self.COURSE_KEYS)
+        for program in self.PROGRAMS_API_RESPONSE['results']:
+            program['marketing_url'] = urljoin(
+                settings.MKTG_URLS.get('ROOT'),
+                'xseries' + '/{}'
+            ).format(program['marketing_slug'])
+
+            self.assertIn(program, actual)
+
+    @httpretty.activate
+    def test_get_user_enrolled_programs_no_data(self):
+        self.create_programs_config()
+        self.mock_programs_api(data={'results': []})
+        actual = get_user_enrolled_programs(self.user, self.COURSE_KEYS)
+        self.assertEqual([], actual)
+
+    @httpretty.activate
+    def test_get_user_enrolled_programs_no_course_keys(self):
+        self.create_programs_config()
+        self.mock_programs_api()
+        actual = get_user_enrolled_programs(self.user, [])
+        self.assertEqual([], actual)

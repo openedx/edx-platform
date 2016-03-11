@@ -1,5 +1,7 @@
 """Helper functions for working with Programs."""
+from django.conf import settings
 import logging
+from urlparse import urljoin
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -25,7 +27,6 @@ def get_programs(user):
     # Bypass caching for staff users, who may be creating Programs and want
     # to see them displayed immediately.
     cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
-
     return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 
 
@@ -102,3 +103,35 @@ def get_programs_for_credentials(user, programs_credentials):
                 certificate_programs.append(program)
 
     return certificate_programs
+
+
+def get_user_enrolled_programs(user, course_keys):
+    '''
+    The helper function that takes in user enrollment information,
+    and returns the list of programs the user is enrolled in.
+    Arguments:
+        user (User): The user to authenticate as for requesting programs.
+        course_key (list): List of courses keys of courses user is enrolled in
+
+    Returns:
+        list, contains programs enrolled
+    '''
+    # Get the programs by courses dictionary from the get_programs_for_dashboard function call
+    programs_dict = get_programs_for_dashboard(
+        user,
+        course_keys)
+    program_list = []
+    # Extract all the programs from the dictionary above
+    for programs_by_courses in programs_dict.values():
+        for program in programs_by_courses:
+            #Remove duplicate programs through the if check below
+            if program not in program_list:
+                program_list.append(program)
+
+    for program in program_list:
+        program['marketing_url'] = urljoin(
+            settings.MKTG_URLS.get('ROOT'),
+            'xseries' + '/{}'
+        ).format(program['marketing_slug'])
+
+    return program_list

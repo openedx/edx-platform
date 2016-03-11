@@ -20,6 +20,7 @@ class ProgramsApiConfigMixin(object):
         'enable_student_dashboard': True,
         'enable_studio_tab': True,
         'enable_certification': True,
+        'xseries_ad_enabled': True,
     }
 
     def create_programs_config(self, **kwargs):
@@ -56,7 +57,7 @@ class ProgramsDataMixin(object):
                 'subtitle': 'A program used for testing purposes',
                 'category': 'xseries',
                 'status': 'unpublished',
-                'marketing_slug': '',
+                'marketing_slug': '{}_test_url'.format(PROGRAM_NAMES[0].replace(' ', '_')),
                 'organizations': [
                     {
                         'display_name': 'Test Organization A',
@@ -122,7 +123,7 @@ class ProgramsDataMixin(object):
                 'subtitle': 'Another program used for testing purposes',
                 'category': 'xseries',
                 'status': 'unpublished',
-                'marketing_slug': '',
+                'marketing_slug': '{}_test_url'.format(PROGRAM_NAMES[1].replace(' ', '_')),
                 'organizations': [
                     {
                         'display_name': 'Test Organization B',
