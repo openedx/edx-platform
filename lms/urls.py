@@ -112,6 +112,10 @@ urlpatterns = (
     url(r'^verify_student/', include('verify_student.urls')),
 )
 
+urlpatterns += (
+    url(r'^dashboard/', include('learner_dashboard.urls')),
+)
+
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
