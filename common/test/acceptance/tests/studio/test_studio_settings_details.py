@@ -2,6 +2,7 @@
 Acceptance tests for Studio's Settings Details pages
 """
 from datetime import datetime, timedelta
+from flaky import flaky
 from nose.plugins.attrib import attr
 from unittest import skip
 
@@ -174,6 +175,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             text='Entrance Exam'
         ))
 
+    @flaky  # TODO: SOL-1595
     def test_entrance_exam_has_unit_button(self):
         """
         Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
