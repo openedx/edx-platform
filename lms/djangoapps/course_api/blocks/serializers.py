@@ -44,6 +44,13 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
             ),
         }
 
+        if 'lti_url' in self.context['requested_fields']:
+            data['lti_url'] = reverse(
+                'lti_provider_launch',
+                kwargs={'course_id': unicode(block_key.course_key), 'usage_id': unicode(block_key)},
+                request=self.context['request'],
+            )
+
         # add additional requested fields that are supported by the various transformers
         for supported_field in SUPPORTED_FIELDS:
             if supported_field.requested_field_name in self.context['requested_fields']:
