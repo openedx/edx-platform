@@ -196,7 +196,7 @@ describe "DiscussionUserProfileView", ->
             spyOn($, "ajax")
 
         it "causes updated rendering", ->
-            $.ajax.andCallFake(
+            $.ajax.and.callFake(
                 (params) =>
                     params.success(
                         discussion_data: [{id: "on_page_42", body: "dummy body"}]
@@ -211,7 +211,7 @@ describe "DiscussionUserProfileView", ->
 
         it "handles AJAX errors", ->
             spyOn(DiscussionUtil, "discussionAlert")
-            $.ajax.andCallFake(
+            $.ajax.and.callFake(
                 (params) =>
                     params.error()
                     {always: ->}

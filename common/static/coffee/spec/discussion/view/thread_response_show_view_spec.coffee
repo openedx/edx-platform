@@ -196,7 +196,7 @@ describe "ThreadResponseShowView", ->
                 "username": "test_endorser",
                 "time": new Date().toISOString()
             })
-            spyOn(DiscussionUtil, 'urlFor').andReturn('test_endorser_url')
+            spyOn(DiscussionUtil, 'urlFor').and.returnValue('test_endorser_url')
 
         checkUserLink = (element, is_ta, is_staff) ->
             expect(element.find('a.username').length).toEqual(1)
@@ -214,11 +214,11 @@ describe "ThreadResponseShowView", ->
             checkUserLink($el, false, false)
 
         it "renders correctly for a community TA-endorsed response", ->
-            spyOn(DiscussionUtil, 'isTA').andReturn(true)
+            spyOn(DiscussionUtil, 'isTA').and.returnValue(true)
             $el = $('#fixture-element').html(@view.getEndorserDisplay())
             checkUserLink($el, true, false)
 
         it "renders correctly for a staff-endorsed response", ->
-            spyOn(DiscussionUtil, 'isStaff').andReturn(true)
+            spyOn(DiscussionUtil, 'isStaff').and.returnValue(true)
             $el = $('#fixture-element').html(@view.getEndorserDisplay())
             checkUserLink($el, false, true)

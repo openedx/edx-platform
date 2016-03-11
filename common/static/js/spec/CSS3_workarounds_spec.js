@@ -12,7 +12,7 @@ describe("CSS3 workarounds", function() {
 			var mockBodyStyle = document.body.style;
 			if (!("pointerEvents" in mockBodyStyle)) {
 				mockBodyStyle["pointerEvents"] = "";
-			};
+			}
 
 			pointerEventsNone(".is-disabled", mockBodyStyle);
 			spyOnEvent(".is-disabled", "click");
@@ -22,16 +22,11 @@ describe("CSS3 workarounds", function() {
 
 		it("should prevent default when pointerEvents is not Supported", function() {
 			// mock document.body.style so it does not include 'pointerEvents'
-			var mockBodyStyle = {},
-			    bodyStyleKeys = Object.keys(document.body.style);
-			for (var index = 0; index < bodyStyleKeys.length; index++) {
-				var key = bodyStyleKeys[index];
-				if (key !== "pointerEvents") {
-					mockBodyStyle[key] = document.body.style[key];
-				};
-			};
+			if ("pointerEvents" in document.body.style) {
+				delete document.body.style.pointerEvents;
+			}
 
-			pointerEventsNone(".is-disabled", mockBodyStyle);
+			pointerEventsNone(".is-disabled", document.body.style);
 			spyOnEvent(".is-disabled", "click");
 			$(".is-disabled").click();
 			expect("click").toHaveBeenPreventedOn(".is-disabled");

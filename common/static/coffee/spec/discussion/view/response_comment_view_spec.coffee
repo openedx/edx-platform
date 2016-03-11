@@ -25,14 +25,14 @@ describe 'ResponseCommentView', ->
             spyOn(@view.$el, "remove")
 
         setAjaxResult = (isSuccess) ->
-            spyOn($, "ajax").andCallFake(
+            spyOn($, "ajax").and.callFake(
                 (params) =>
                     (if isSuccess then params.success else params.error) {}
                     {always: ->}
             )
 
         it 'requires confirmation before deleting', ->
-            spyOn(window, "confirm").andReturn(false)
+            spyOn(window, "confirm").and.returnValue(false)
             setAjaxResult(true)
             @view._delete(@event)
             expect(window.confirm).toHaveBeenCalled()
@@ -50,7 +50,7 @@ describe 'ResponseCommentView', ->
             @view._delete(@event)
             expect(@event.preventDefault).toHaveBeenCalled()
             expect($.ajax).toHaveBeenCalled()
-            expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/delete')
+            expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/delete')
 
         it 'handles ajax errors', ->
             spyOn(DiscussionUtil, "discussionAlert")
@@ -125,7 +125,7 @@ describe 'ResponseCommentView', ->
                 @view.$el.find(".edit-comment-body").html($("<textarea></textarea>"))
                 @view.$el.find(".edit-comment-body textarea").val(@updatedBody)
                 spyOn(@view, 'cancelEdit')
-                spyOn($, "ajax").andCallFake(
+                spyOn($, "ajax").and.callFake(
                     (params) =>
                         if @ajaxSucceed
                             params.success()
@@ -138,8 +138,8 @@ describe 'ResponseCommentView', ->
                 @ajaxSucceed = true
                 @view.update(DiscussionSpecHelper.makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
-                expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
-                expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)
+                expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
+                expect($.ajax.calls.mostRecent().args[0].data.body).toEqual(@updatedBody)
                 expect(@view.model.get("body")).toEqual(@updatedBody)
                 expect(@view.cancelEdit).toHaveBeenCalled()
 
@@ -148,8 +148,8 @@ describe 'ResponseCommentView', ->
                 @ajaxSucceed = false
                 @view.update(DiscussionSpecHelper.makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
-                expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
-                expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)
+                expect($.ajax.calls.mostRecent().args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
+                expect($.ajax.calls.mostRecent().args[0].data.body).toEqual(@updatedBody)
                 expect(@view.model.get("body")).toEqual(originalBody)
                 expect(@view.cancelEdit).not.toHaveBeenCalled()
                 expect(@view.$(".edit-comment-form-errors *").length).toEqual(1)
