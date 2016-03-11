@@ -2,16 +2,18 @@ var waitForInputAjax = function (conditionalFn) {
     var deferred = $.Deferred(),
         timeout;
 
-    var fn = function fn() {
+    var fn = function () {
         if (conditionalFn()) {
             timeout && clearTimeout(timeout);
+            console.log('condition met');
             deferred.resolve();
         } else {
+            console.log('condition not met');
             timeout = setTimeout(fn, 50);
         }
     };
 
-    fn();
+    setTimeout(fn, 50);
     return deferred.promise();
 };
 
@@ -56,7 +58,7 @@ describe("Formula Equation Preview", function () {
         this.oldProblem = window.Problem;
 
         window.Problem = {};
-        Problem.inputAjax = jasmine.createSpy(Problem, 'inputAjax')
+        Problem.inputAjax = jasmine.createSpy('Problem.inputAjax')
             .and.callFake(function () {
                 ajaxTimes.push(Date.now());
             });
@@ -79,9 +81,6 @@ describe("Formula Equation Preview", function () {
         MathJax.Hub.Startup.signal.Interest = function (callback) {
             callback('End');
         };
-
-        oldJasmineDEFAULT_TIMEOUT_INTERVAL = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
     });
 
     it('(the test) is able to swap out the behavior of $', function () {
@@ -107,6 +106,7 @@ describe("Formula Equation Preview", function () {
             waitForInputAjax(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
+                //debugger;
                 done();
             });
         });
@@ -313,7 +313,7 @@ describe("Formula Equation Preview", function () {
                 expect($img.css('visibility')).toEqual('visible');
             }).then(function () {
                 return waitForInputAjax(function () {
-                    return MathJax.Hub.Queue.wasCalled;
+                    return MathJax.Hub.Queue.calls.count() > 0;
                 });
             }).then(function () {
                 // Refresh the MathJax.
@@ -431,7 +431,5 @@ describe("Formula Equation Preview", function () {
         if (MathJax === undefined) {
             delete MathJax;
         }
-
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = oldJasmineDEFAULT_TIMEOUT_INTERVAL;
     });
 });
