@@ -42,6 +42,7 @@ describe('TooltipManager', function () {
 
     afterEach(function () {
         this.tooltip.destroy();
+        jasmine.clock().uninstall();
     });
 
     showTooltip = function (element) {
