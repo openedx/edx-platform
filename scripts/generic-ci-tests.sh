@@ -159,10 +159,11 @@ case "$TEST_SUITE" in
 
     "bok-choy")
 
-        # Set custom firefox path to override system default location
-        # This setting will be removed after folks have had sufficient
-        # time upgrading their various branches
-        export SELENIUM_FIREFOX_PATH=$HOME/firefox/firefox
+        # Back compatibility support for firefox upgrade:
+        # Copy newer firefox version to project root,
+        # set that as the path for bok-choy to use.
+        cp -R $HOME/firefox/ firefox/
+        export SELENIUM_FIREFOX_PATH=firefox/firefox
 
         case "$SHARD" in
 
