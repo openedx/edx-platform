@@ -54,7 +54,6 @@ $card-height: 150px;
       font-size:em(30);
       color: $gray-l1;
       margin-bottom: 10px;
-      line-height: 100%;
     }
   }
 }
@@ -62,7 +61,9 @@ $card-height: 150px;
 
 @include media($bp-medium) {
   .program-card{
-    @include span-columns(8);
+    @include omega(2n);
+    @include span-columns(4);
+    display:inline;
   }
 }
 

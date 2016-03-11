@@ -44,10 +44,11 @@
 
 @include media($bp-medium) {
   .program-cards-container{
-    @include span-columns(8);
+    @include span-columns(6);
   }
   .sidebar{
-    @include span-columns(8);
+    @include omega(n);
+    @include span-columns(2);
   }
 }
 
