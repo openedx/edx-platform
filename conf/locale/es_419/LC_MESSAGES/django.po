@@ -183,7 +183,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-24 18:02+0000\n"
+"POT-Creation-Date: 2016-03-04 14:18+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2530,13 +2530,10 @@ msgstr "Libros de texto en HTML"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"For HTML textbooks that appear as separate tabs in the courseware, enter the"
-" name of the tab (usually the name of the book) as well as the URLs and "
-"titles of all the chapters in the book."
+"For HTML textbooks that appear as separate tabs in the course, enter the "
+"name of the tab (usually the title of the book) as well as the URLs and "
+"titles of each chapter in the book."
 msgstr ""
-"Para los textos en HTML que aparecen como una pestaña separada en el curso, "
-"ingrese el nombre de la pestaña (usualmente, el nombre del libro) y la URL "
-"con los títulos de todos los capítulos del libro."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2646,11 +2643,9 @@ msgstr "Apuntes del curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"True if timezones should be shown on dates in the courseware. Deprecated in "
+"True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
-"Verdadero si las zonas horarias deben mostrarse en fechas del material del "
-"curso. Desaprobado en favor de due_date_display_format."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2842,14 +2837,11 @@ msgstr "Nombre de la organización para mostrar"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course organization that you want to appear in the courseware. "
-"This setting overrides the organization that you entered when you created "
-"the course. To use the organization that you entered when you created the "
+"Enter the course organization that you want to appear in the course. This "
+"setting overrides the organization that you entered when you created the "
+"course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
-"Ingrese el nombre de la organización que desea que sea mostrado en el curso."
-" Esta opción sobreescribe lo que haya ingresado al crear el curso. Para "
-"reutilizar el mismo nombre que uso al crear el curso, ingrese null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2857,14 +2849,11 @@ msgstr "Número para mostrar del curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the course number that you want to appear in the courseware. This "
-"setting overrides the course number that you entered when you created the "
-"course. To use the course number that you entered when you created the "
-"course, enter null."
+"Enter the course number that you want to appear in the course. This setting "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
+"null."
 msgstr ""
-"Ingrese el número de curso que desea sea mostrado. Esta configuración "
-"sobreescribe el número que haya ingresado al crear el curso. Para reutilizar"
-" dicho número, ingrese null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -5643,50 +5632,6 @@ msgstr ""
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
 msgstr "Curso añadido"
-
-#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
-#. "XMLModuleStore" and "MongoDB" are database systems. You should not
-#. translate these names.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
-"is generally not safe to import into an XMLModuleStore with multithreaded. "
-"We recommend you enable the MongoDB based module store instead, unless this "
-"is a development environment."
-msgstr ""
-"No se permite la importación. GIT_IMPORT_WITH_XMLMODULESTORE no está "
-"encendido, y en general no es seguro importar en un XMLModuleStore  con "
-"multiples hilos 'multithreaded'.  Le recomendamos habilitar el 'module "
-"store' basado en MongoDB, a menos que este sea un ambiente de desarrollo."
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"The course {0} already exists in the data directory! (reloading anyway)"
-msgstr ""
-"El curso {0} ya existe en el directorio de datos! (Se cargará nuevamente)"
-
-#. Translators: unable to download the course content from
-#. the source git repository. Clone occurs if this is brand
-#. new, and pull is when it is being updated from the
-#. source.
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid ""
-"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
-msgstr ""
-"No fue posible clonar o halar el repositorio. Por favor verifique la url. La"
-" respuesta fue: {0!r}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {directory_name}"
-msgstr "No pude clonar el repositorio en {directory_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Successfully switched to branch: {branch_name}"
-msgstr "Se cambió exitosamente la rama: {branch_name}"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {course_name}<br/>Errors:"
-msgstr "Curso cargado {course_name}<br/>Errores:"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html

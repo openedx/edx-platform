@@ -55,6 +55,15 @@ def no_prereq_install():
         return False
 
 
+def create_prereqs_cache_dir():
+    """Create the directory for storing the hashes, if it doesn't exist already."""
+    try:
+        os.makedirs(PREREQS_STATE_DIR)
+    except OSError:
+        if not os.path.isdir(PREREQS_STATE_DIR):
+            raise
+
+
 def compute_fingerprint(path_list):
     """
     Hash the contents of all the files and directories in `path_list`.
@@ -107,12 +116,7 @@ def prereq_cache(cache_name, paths, install_func):
         # Update the cache with the new hash
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
-        try:
-            os.makedirs(PREREQS_STATE_DIR)
-        except OSError:
-            if not os.path.isdir(PREREQS_STATE_DIR):
-                raise
-
+        create_prereqs_cache_dir()
         with open(cache_file_path, "w") as cache_file:
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
@@ -162,7 +166,6 @@ PACKAGES_TO_UNINSTALL = [
 ]
 
 
-@task
 def uninstall_python_packages():
     """
     Uninstall Python packages that need explicit uninstallation.
@@ -179,6 +182,7 @@ def uninstall_python_packages():
     hasher.update(repr(PACKAGES_TO_UNINSTALL))
     expected_version = hasher.hexdigest()
     state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
+    create_prereqs_cache_dir()
 
     if os.path.isfile(state_file_path):
         with open(state_file_path) as state_file:
@@ -238,6 +242,8 @@ def install_python_prereqs():
         print NO_PREREQ_MESSAGE
         return
 
+    uninstall_python_packages()
+
     # Include all of the requirements files in the fingerprint.
     files_to_fingerprint = list(PYTHON_REQ_FILES)
 
@@ -270,5 +276,4 @@ def install_prereqs():
         return
 
     install_node_prereqs()
-    uninstall_python_packages()
     install_python_prereqs()

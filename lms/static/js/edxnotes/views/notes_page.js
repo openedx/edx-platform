@@ -15,17 +15,19 @@ define([
             this.options = options;
             this.tabsCollection = new TabsCollection();
 
-            // Must create the Tags view first to get the "scrollToTag" method.
-            this.tagsView = new TagsView({
-                el: this.el,
-                collection: this.collection,
-                tabsCollection: this.tabsCollection
-            });
+            if (!_.contains(this.options.disabledTabs, 'tags')) {
+                // Must create the Tags view first to get the "scrollToTag" method.
+                this.tagsView = new TagsView({
+                    el: this.el,
+                    collection: this.collection,
+                    tabsCollection: this.tabsCollection
+                });
 
-            scrollToTag = this.tagsView.scrollToTag;
+                scrollToTag = this.tagsView.scrollToTag;
 
-            // Remove the Tags model from the tabs collection because it should not appear first.
-            tagsModel = this.tabsCollection.shift();
+                // Remove the Tags model from the tabs collection because it should not appear first.
+                tagsModel = this.tabsCollection.shift();
+            }
 
             this.recentActivityView = new RecentActivityView({
                 el: this.el,
@@ -34,20 +36,25 @@ define([
                 scrollToTag: scrollToTag
             });
 
-            this.courseStructureView = new CourseStructureView({
-                el: this.el,
-                collection: this.collection,
-                tabsCollection: this.tabsCollection,
-                scrollToTag: scrollToTag
-            });
-
-            // Add the Tags model after the Course Structure model.
-            this.tabsCollection.push(tagsModel);
+            if (!_.contains(this.options.disabledTabs, 'course_structure')) {
+                this.courseStructureView = new CourseStructureView({
+                    el: this.el,
+                    collection: this.collection,
+                    tabsCollection: this.tabsCollection,
+                    scrollToTag: scrollToTag
+                });
+            }
+            
+            if (!_.contains(this.options.disabledTabs, 'tags')) {
+                // Add the Tags model after the Course Structure model.
+                this.tabsCollection.push(tagsModel);
+            }
 
             this.searchResultsView = new SearchResultsView({
                 el: this.el,
                 tabsCollection: this.tabsCollection,
                 debug: this.options.debug,
+                perPage: this.options.perPage,
                 createTabOnInitialization: false,
                 scrollToTag: scrollToTag
             });

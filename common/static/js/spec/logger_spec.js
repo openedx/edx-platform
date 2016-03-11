@@ -6,6 +6,8 @@
         });
 
         describe('log', function() {
+            // Note that log is used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
             it('can send a request to log event', function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
                 Logger.log('example', 'data');
@@ -106,6 +108,8 @@
         });
 
         describe('listen', function() {
+            // Note that listen is used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
             beforeEach(function () {
                 spyOn(jQuery, 'ajaxWithPrefix');
                 this.callbacks = _.map(_.range(4), function () {
@@ -146,6 +150,8 @@
         });
 
         describe('bind', function() {
+            // Note that bind may be used by external XBlocks, and the API cannot change without
+            // proper deprecation and notification for external authors.
             beforeEach(function() {
                 this.initialPostWithPrefix = jQuery.postWithPrefix;
                 this.initialGetWithPrefix = jQuery.getWithPrefix;

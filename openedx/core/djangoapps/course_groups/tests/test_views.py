@@ -849,7 +849,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         self.assertEqual(
             response_dict.get("added"),
             [
-                {"username": user.username, "name": user.profile.name, "email": user.email}
+                {"username": user.username, "email": user.email}
                 for user in expected_added
             ]
         )
@@ -858,7 +858,6 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             [
                 {
                     "username": user.username,
-                    "name": user.profile.name,
                     "email": user.email,
                     "previous_cohort": previous_cohort
                 }

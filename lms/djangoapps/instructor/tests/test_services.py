@@ -67,7 +67,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            self.problem_urlname
+            self.problem_urlname,
+            requesting_user=self.student,
         )
 
         # make sure the module has been deleted
@@ -88,7 +89,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            'foo/bar/baz'
+            'foo/bar/baz',
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 
@@ -100,7 +102,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             'bad_student',
             unicode(self.course.id),
-            'foo/bar/baz'
+            'foo/bar/baz',
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 
@@ -112,7 +115,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            self.other_problem_urlname
+            self.other_problem_urlname,
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 

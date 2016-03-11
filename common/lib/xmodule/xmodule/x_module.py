@@ -24,6 +24,7 @@ from xblock.fields import (
     String, Dict, ScopeIds, Reference, ReferenceList,
     ReferenceValueDict, UserScope
 )
+
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule import course_metadata_utils
@@ -298,6 +299,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._asides = []
 
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
@@ -381,6 +383,18 @@ class XModuleMixin(XModuleFields, XBlock):
         the LmsFieldData or OverrideFieldData classes.
         """
         return self._field_data
+
+    def add_aside(self, aside):
+        """
+        save connected asides
+        """
+        self._asides.append(aside)
+
+    def get_asides(self):
+        """
+        get the list of connected asides
+        """
+        return self._asides
 
     def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
@@ -1194,7 +1208,7 @@ class ConfigurableFragmentWrapper(object):
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
-    def __init__(self, wrappers=None, **kwargs):
+    def __init__(self, wrappers=None, wrappers_asides=None, **kwargs):
         """
         :param wrappers: A list of wrappers, where each wrapper is:
 
@@ -1207,6 +1221,10 @@ class ConfigurableFragmentWrapper(object):
             self.wrappers = wrappers
         else:
             self.wrappers = []
+        if wrappers_asides is not None:
+            self.wrappers_asides = wrappers_asides
+        else:
+            self.wrappers_asides = []
 
     def wrap_xblock(self, block, view, frag, context):
         """
@@ -1214,6 +1232,15 @@ class ConfigurableFragmentWrapper(object):
         """
         for wrapper in self.wrappers:
             frag = wrapper(block, view, frag, context)
+
+        return frag
+
+    def wrap_aside(self, block, aside, view, frag, context):    # pylint: disable=unused-argument
+        """
+        See :func:`Runtime.wrap_child`
+        """
+        for wrapper in self.wrappers_asides:
+            frag = wrapper(aside, view, frag, context)
 
         return frag
 
@@ -1524,12 +1551,18 @@ class XMLParsingSystem(DescriptorSystem):
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
 
-        self.parse_asides(node, def_id, usage_id, id_generator)
+        aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
+        asides_tags = [x.tag for x in aside_children]
 
         block = block_class.parse_xml(node, self, keys, id_generator)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
+
+        asides = self.get_asides(block)
+        for asd in asides:
+            if asd.scope_ids.block_type in asides_tags:
+                block.add_aside(asd)
 
         return block
 
@@ -1547,6 +1580,7 @@ class XMLParsingSystem(DescriptorSystem):
         for child in aside_children:
             self._aside_from_xml(child, def_id, usage_id, id_generator)
             node.remove(child)
+        return aside_children
 
     def _make_usage_key(self, course_key, value):
         """
@@ -1742,6 +1776,28 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
 
     def publish(self, block, event_type, event):
         pass
+
+    def service(self, block, service_name):
+        """
+        Runtime-specific override for the XBlock service manager.  If a service is not currently
+        instantiated and is declared as a critical requirement, an attempt is made to load the
+        module.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+        """
+        # getting the service from parent module. making sure of block service declarations.
+        service = super(ModuleSystem, self).service(block=block, service_name=service_name)
+        # Passing the block to service if it is callable e.g. ModuleI18nService. It is the responsibility of calling
+        # service to handle the passing argument.
+        if callable(service):
+            return service(block)
+        return service
 
 
 class CombinedSystem(object):

@@ -7,9 +7,11 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 
 from importlib import import_module
+import gettext
 import logging
-
+from pkg_resources import resource_filename
 import re
+
 from django.conf import settings
 
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
@@ -20,6 +22,7 @@ if not settings.configured:
 from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
+from django.utils.translation import get_language, to_locale
 
 from pymongo import ReadPreference
 from xmodule.contentstore.django import contentstore
@@ -27,7 +30,6 @@ from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
-
 
 try:
     # We may not always have the request_cache module available
@@ -243,9 +245,35 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+    def __init__(self, block=None):
+        """
+        Attempt to load an XBlock-specific GNU gettext translator using the XBlock's own domain
+        translation catalog, currently expected to be found at:
+            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po|mo
+        If we can't locate the domain translation catalog then we fall-back onto
+        django.utils.translation, which will point to the system's own domain translation catalog
+        This effectively achieves translations by coincidence for an XBlock which does not provide
+        its own dedicated translation catalog along with its implementation.
+        """
+        self.translator = django.utils.translation
+        if block:
+            xblock_resource = block.unmixed_class.__module__
+            xblock_locale_dir = '/translations'
+            xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
+            xblock_domain = 'text'
+            selected_language = get_language()
+            try:
+                self.translator = gettext.translation(
+                    xblock_domain,
+                    xblock_locale_path,
+                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
+                )
+            except IOError:
+                # Fall back to the default Django translator if the XBlock translator is not found.
+                pass
 
     def __getattr__(self, name):
-        return getattr(django.utils.translation, name)
+        return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):
         """

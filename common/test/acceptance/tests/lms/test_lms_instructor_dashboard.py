@@ -290,7 +290,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
 
-    @flaky  # TODO: fix this.  See SOL-1654, SOL-1183, and SOL-1182
     def test_can_add_remove_allowance(self):
         """
         Make sure that allowances can be added and removed.
@@ -635,6 +634,20 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.generate_problem_report_button.click()
         self.data_download_section.wait_for_available_report()
         self.verify_report_requested_event(report_name)
+        self.verify_report_download(report_name)
+
+    def test_ora2_response_report_download(self):
+        """
+        Scenario: Verify that an instructor can download an ORA2 grade report
+
+        Given that I am an instructor
+        And I visit the instructor dashboard's "Data Downloads" tab
+        And I click on the "Download ORA2 Responses" button
+        Then a report should be generated
+        """
+        report_name = u"ORA_data"
+        self.data_download_section.generate_ora2_response_report_button.click()
+        self.data_download_section.wait_for_available_report()
         self.verify_report_download(report_name)
 
 

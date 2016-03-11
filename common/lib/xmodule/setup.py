@@ -35,7 +35,6 @@ XMODULES = [
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
-    "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 XBLOCKS = [

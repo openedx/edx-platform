@@ -17,7 +17,10 @@ from openedx.core.lib.courses import course_image_url
 </%block>
 
 <%block name="js_extra">
-
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
+  % endif
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
@@ -207,15 +210,6 @@ from openedx.core.lib.courses import course_image_url
         </div>
       % endif
 
-      <nav aria-label="${_('Course About')}">
-        <a href="#" class="active">${_("Overview")}</a>
-      ##  <a href="#">${_("FAQ")}</a>
-      ##  <a href="#">${_("Requirements")}</a>
-      ##  <a href="#">${_("Text-book")}</a>
-      ##  <a href="#">${_("Syllabus")}</a>
-      ##  <a href="#">${_("Reviews")}</a>
-      </nav>
-
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
@@ -283,6 +277,12 @@ from openedx.core.lib.courses import course_image_url
         </ol>
       </section>
 
+      ## CourseTalk widget
+      % if show_coursetalk_widget:
+      <div class="coursetalk-read-reviews">
+          <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
+      </div>
+      % endif
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):
@@ -298,6 +298,7 @@ from openedx.core.lib.courses import course_image_url
         </section>
       </section>
       %endif
+
     </section>
 
   </section>

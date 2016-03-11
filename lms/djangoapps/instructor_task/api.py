@@ -28,7 +28,8 @@ from instructor_task.tasks import (
     exec_summary_report_csv,
     course_survey_report_csv,
     generate_certificates,
-    proctored_exam_results_csv
+    proctored_exam_results_csv,
+    export_ora2_data,
 )
 
 from certificates.models import CertificateGenerationHistory
@@ -420,6 +421,18 @@ def submit_cohort_students(request, course_key, file_name):
     task_class = cohort_students
     task_input = {'file_name': file_name}
     task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_export_ora2_data(request, course_key):
+    """
+    AlreadyRunningError is raised if an ora2 report is already being generated.
+    """
+    task_type = 'export_ora2_data'
+    task_class = export_ora2_data
+    task_input = {}
+    task_key = ''
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
