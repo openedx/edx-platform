@@ -1633,7 +1633,11 @@ REQUIRE_ENVIRONMENT = "node"
 # then you need to add the js urls in this list.
 REQUIRE_JS_PATH_OVERRIDES = [
     'js/bookmarks/views/bookmark_button.js',
-    'js/views/message_banner.js'
+    'js/views/message_banner.js',
+    'js/vendor/moment.min.js',
+    'js/vendor/url.min.js',
+    'js/courseware/course_home_events.js',
+    'js/courseware/toggle_element_visibility.js'
 ]
 ################################# CELERY ######################################
 
