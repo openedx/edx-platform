@@ -15,7 +15,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
     Paver Bok Choy Command test cases
     """
 
-    def _expected_command(self, name, store=None):
+    def _expected_command(self, name, store=None, verify_xss=False):
         """
         Returns the command that is expected to be run for the given test spec
         and store.
@@ -27,6 +27,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log{shard_str}/hars' "
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{repo_dir}/{a11y_custom_file}' "
             "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log{shard_str}' "
+            "VERIFY_XSS='{verify_xss}' "
             "nosetests {repo_dir}/common/test/acceptance/{exp_text} "
             "--with-xunit "
             "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml "
@@ -37,6 +38,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             shard_str='/shard_' + self.shard if self.shard else '',
             exp_text=name,
             a11y_custom_file='node_modules/edx-custom-a11y-rules/lib/custom_a11y_rules.js',
+            verify_xss=verify_xss
         )
         return expected_statement
 
@@ -88,6 +90,11 @@ class TestPaverBokChoyCmd(unittest.TestCase):
     def test_serversonly(self):
         suite = BokChoyTestSuite('', serversonly=True)
         self.assertEqual(suite.cmd, "")
+
+    def test_verify_xss(self):
+        suite = BokChoyTestSuite('', verify_xss=True)
+        name = 'tests'
+        self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=True))
 
     def test_test_dir(self):
         test_dir = 'foo'
