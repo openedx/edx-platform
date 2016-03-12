@@ -3,8 +3,16 @@
  */
 (function(define) {
     'use strict';
-    define(['backbone', 'underscore', 'gettext', 'js/components/card/views/card'],
-        function(Backbone, _, gettext, CardView) {
+    define(
+        [
+            'underscore',
+            'backbone',
+            'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'edx-ui-toolkit/js/utils/string-utils',
+            'js/components/card/views/card'
+        ],
+        function(_, Backbone, gettext, HtmlUtils, StringUtils, CardView) {
             var TeamCountDetailView = Backbone.View.extend({
                 tagName: 'p',
                 className: 'team-count',
@@ -14,12 +22,13 @@
                 },
 
                 render: function() {
-                    var team_count = this.model.get('team_count');
-                    this.$el.html(_.escape(interpolate(
-                        ngettext('%(team_count)s Team', '%(team_count)s Teams', team_count),
-                        {team_count: team_count},
-                        true
-                    )));
+                    var teamCount = this.model.get('team_count');
+                    this.$el.text(
+                        StringUtils.interpolate(
+                            ngettext('{team_count} Team', '{team_count} Teams', teamCount),
+                            {team_count: teamCount}
+                        )
+                    );
                     return this;
                 }
             });
@@ -41,12 +50,16 @@
                 description: function() { return this.model.get('description'); },
                 details: function() { return this.detailViews; },
                 actionClass: 'action-view',
-                actionContent: function() {
-                    var screenReaderText = _.escape(interpolate(
-                        gettext('View Teams in the %(topic_name)s Topic'),
-                        {topic_name: this.model.get('name')}, true
-                    ));
-                    return '<span class="sr">' + screenReaderText + '</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>';  // eslint-disable-line max-len
+                actionContentHtml: function() {
+                    return HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<span class="sr">'),
+                        StringUtils.interpolate(
+                            gettext('View Teams in the {topic_name} Topic'),
+                            {topic_name: this.model.get('name')}
+                        ),
+                        HtmlUtils.HTML('</span>'),
+                        HtmlUtils.HTML('<span class="icon fa fa-arrow-right" aria-hidden="true"></span>')
+                    );
                 }
             });
 

@@ -13,15 +13,16 @@
  *      is automatically added to each rendered child view to ensure appropriate styling. Defaults to an empty list.
  * - actionClass (string or function): Class name for the action DOM element. Defaults to the empty string.
  * - actionUrl (string or function): URL to navigate to when the action button is clicked. Defaults to the empty string.
- * - actionContent: Content of the action button. This may include HTML. Default to the empty string.
+ * - actionContentHtml: Content of the action button. This may include HTML. Default to the empty string.
  */
 (function(define) {
     'use strict';
     define(['jquery',
             'underscore',
             'backbone',
+            'edx-ui-toolkit/js/utils/html-utils',
             'text!templates/components/card/card.underscore'],
-        function($, _, Backbone, cardTemplate) {
+        function($, _, Backbone, HtmlUtils, cardTemplate) {
             var CardView = Backbone.View.extend({
                 tagName: 'li',
 
@@ -46,11 +47,11 @@
                     this.render();
                 },
 
-                template: _.template(cardTemplate),
+                template: HtmlUtils.template(cardTemplate),
 
-                switchOnConfiguration: function(square_result, list_result) {
+                switchOnConfiguration: function(squareResult, listResult) {
                     return this.callIfFunction(this.configuration) === 'square_card' ?
-                        square_result : list_result;
+                        squareResult : listResult;
                 },
 
                 callIfFunction: function(value) {
@@ -63,8 +64,8 @@
 
                 className: function() {
                     var result = 'card ' +
-                                 this.switchOnConfiguration('square-card', 'list-card') + ' ' +
-                                 this.callIfFunction(this.cardClass);
+                        this.switchOnConfiguration('square-card', 'list-card') + ' ' +
+                        this.callIfFunction(this.cardClass);
                     if (this.callIfFunction(this.pennant)) {
                         result += ' has-pennant';
                     }
@@ -73,26 +74,30 @@
 
                 render: function() {
                     var maxLength = 72,
-                        description = this.callIfFunction(this.description);
+                        description = this.callIfFunction(this.description),
+                        $details;
                     if (description.length > maxLength) {
                         description = description.substring(0, maxLength).trim() + '...';
                     }
-                    this.$el.html(this.template({
-                        pennant: this.callIfFunction(this.pennant),
-                        title: this.callIfFunction(this.title),
-                        description: description,
-                        action_class: this.callIfFunction(this.actionClass),
-                        action_url: this.callIfFunction(this.actionUrl),
-                        action_content: this.callIfFunction(this.actionContent),
-                        configuration: this.callIfFunction(this.configuration),
-                        srInfo: this.srInfo
-                    }));
-                    var detailsEl = this.$el.find('.card-meta');
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        this.template({
+                            pennant: this.callIfFunction(this.pennant),
+                            title: this.callIfFunction(this.title),
+                            description: description,
+                            action_class: this.callIfFunction(this.actionClass),
+                            action_url: this.callIfFunction(this.actionUrl),
+                            action_content_html: this.callIfFunction(this.actionContentHtml),
+                            configuration: this.callIfFunction(this.configuration),
+                            srInfo: this.srInfo
+                        })
+                    );
+                    $details = this.$('.card-meta');
                     _.each(this.callIfFunction(this.details), function(detail) {
                         // Call setElement to rebind event handlers
                         detail.setElement(detail.el).render();
                         detail.$el.addClass('meta-detail');
-                        detailsEl.append(detail.el);
+                        $details.append(detail.el);
                     });
                     return this;
                 },
@@ -105,7 +110,7 @@
                 details: [],
                 actionClass: '',
                 actionUrl: '',
-                actionContent: ''
+                actionContentHtml: ''
             });
 
             return CardView;

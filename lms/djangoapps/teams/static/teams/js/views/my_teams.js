@@ -1,19 +1,28 @@
 (function(define) {
     'use strict';
 
-    define(['backbone', 'gettext', 'teams/js/views/teams'],
-        function(Backbone, gettext, TeamsView) {
+    define(['backbone', 'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'teams/js/views/teams'],
+        function(Backbone, gettext, HtmlUtils, TeamsView) {
             var MyTeamsView = TeamsView.extend({
                 render: function() {
                     var view = this;
                     if (this.collection.isStale) {
-                        this.$el.html('');
+                        HtmlUtils.setHtml(this.$el, '');
                     }
                     this.collection.refresh()
                         .done(function() {
                             TeamsView.prototype.render.call(view);
                             if (view.collection.length === 0) {
-                                view.$el.append('<p>' + gettext('You are not currently a member of any team.') + '</p>');
+                                HtmlUtils.append(
+                                    view.$el,
+                                    HtmlUtils.joinHtml(
+                                        HtmlUtils.HTML('<p>'),
+                                        gettext('You are not currently a member of any team.'),
+                                        HtmlUtils.HTML('</p>')
+                                    )
+                                );
                             }
                         });
                     return this;

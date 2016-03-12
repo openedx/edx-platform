@@ -1,24 +1,26 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/fields/message_banner.underscore'
-    ], function(gettext, $, _, Backbone, messageBannerTemplate) {
+        'gettext', 'jquery', 'underscore', 'backbone',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!templates/fields/message_banner.underscore'
+    ], function(gettext, $, _, Backbone, HtmlUtils, messageBannerTemplate) {
         var MessageBannerView = Backbone.View.extend({
 
             initialize: function(options) {
-                if (_.isUndefined(options)) {
-                    options = {};
-                }
-                this.options = _.defaults(options, {urgency: 'high', type: ''});
+                this.options = _.defaults(options || {}, {urgency: 'high', type: ''});
             },
 
             render: function() {
                 if (_.isUndefined(this.message) || _.isNull(this.message)) {
-                    this.$el.html('');
+                    HtmlUtils.setHtml(this.$el, '');
                 } else {
-                    this.$el.html(_.template(messageBannerTemplate)(_.extend(this.options, {
-                        message: this.message
-                    })));
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(messageBannerTemplate)(
+                            _.extend(this.options, {message: this.message})
+                        )
+                    );
                 }
                 return this;
             },

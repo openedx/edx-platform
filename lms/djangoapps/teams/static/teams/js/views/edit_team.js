@@ -4,11 +4,12 @@
     define(['backbone',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
             'js/views/fields',
             'teams/js/models/team',
             'common/js/components/utils/view_utils',
             'text!teams/templates/edit-team.underscore'],
-        function(Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
+        function(Backbone, _, gettext, HtmlUtils, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
@@ -51,7 +52,7 @@
                         valueAttribute: 'description',
                         editable: 'always',
                         showMessages: false,
-                        helpMessage: gettext('A short description of the team to help other learners understand the goals or direction of the team (maximum 300 characters).')
+                        helpMessage: gettext('A short description of the team to help other learners understand the goals or direction of the team (maximum 300 characters).')  // jshint ignore:line
                     });
 
                     this.teamLanguageField = new FieldViews.DropdownFieldView({
@@ -62,7 +63,7 @@
                         showMessages: false,
                         titleIconName: 'fa-comment-o',
                         options: this.context.languages,
-                        helpMessage: gettext('The language that team members primarily use to communicate with each other.')
+                        helpMessage: gettext('The language that team members primarily use to communicate with each other.')  // jshint ignore:line
                     });
 
                     this.teamCountryField = new FieldViews.DropdownFieldView({
@@ -78,11 +79,14 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({
-                        primaryButtonTitle: this.primaryButtonTitle,
-                        action: this.action,
-                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
-                    }));
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(editTeamTemplate)({
+                            primaryButtonTitle: this.primaryButtonTitle,
+                            action: this.action,
+                            totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
+                        })
+                    );
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');

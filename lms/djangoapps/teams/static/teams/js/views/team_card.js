@@ -8,6 +8,7 @@
         'moment-with-locales',
         'js/components/card/views/card',
         'teams/js/views/team_utils',
+        'edx-ui-toolkit/js/utils/html-utils',
         'text!teams/templates/team-membership-details.underscore',
         'text!teams/templates/team-country-language.underscore',
         'text!teams/templates/date.underscore'
@@ -19,6 +20,7 @@
         moment,
         CardView,
         TeamUtils,
+        HtmlUtils,
         teamMembershipDetailsTemplate,
         teamCountryLanguageTemplate,
         dateTemplate
@@ -28,7 +30,7 @@
         TeamMembershipView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-members',
-            template: _.template(teamMembershipDetailsTemplate),
+            template: HtmlUtils.template(teamMembershipDetailsTemplate),
 
             initialize: function(options) {
                 this.maxTeamSize = options.maxTeamSize;
@@ -41,19 +43,23 @@
                     }).reverse(),
                     displayableMemberships = allMemberships.slice(0, 5),
                     maxMemberCount = this.maxTeamSize;
-                this.$el.html(this.template({
-                    membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
-                    memberships: displayableMemberships,
-                    has_additional_memberships: displayableMemberships.length < allMemberships.length,
-                    // Translators: "and others" refers to fact that additional members of a team exist that are not displayed.
-                    sr_message: gettext('and others')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        membership_message: TeamUtils.teamCapacityText(allMemberships.length, maxMemberCount),
+                        memberships: displayableMemberships,
+                        has_additional_memberships: displayableMemberships.length < allMemberships.length,
+                        // Translators: "and others" refers to fact that additional members
+                        // of a team exist that are not displayed.
+                        sr_message: gettext('and others')
+                    })
+                );
                 return this;
             }
         });
 
         TeamCountryLanguageView = Backbone.View.extend({
-            template: _.template(teamCountryLanguageTemplate),
+            template: HtmlUtils.template(teamCountryLanguageTemplate),
 
             initialize: function(options) {
                 this.countries = options.countries;
@@ -62,17 +68,19 @@
 
             render: function() {
                 // this.$el should be the card meta div
-                this.$el.append(this.template({
-                    country: this.countries[this.model.get('country')],
-                    language: this.languages[this.model.get('language')]
-                }));
+                HtmlUtils.append(this.$el,
+                    this.template({
+                        country: this.countries[this.model.get('country')],
+                        language: this.languages[this.model.get('language')]
+                    })
+                );
             }
         });
 
         TeamActivityView = Backbone.View.extend({
             tagName: 'div',
             className: 'team-activity',
-            template: _.template(dateTemplate),
+            template: HtmlUtils.template(dateTemplate),
 
             initialize: function(options) {
                 this.date = options.date;
@@ -82,12 +90,13 @@
                 var lastActivity = moment(this.date),
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);
-                this.$el.html(
-                    interpolate(
-                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see: http://momentjs.com/)
-                        gettext('Last activity %(date)s'),
-                        {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})},
-                        true
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.interpolateHtml(
+                        // Translators: 'date' is a placeholder for a fuzzy, relative timestamp
+                        // (see: http://momentjs.com/)
+                        gettext('Last activity {date}'),
+                        {date: this.template({date: lastActivity.format('MMMM Do YYYY, h:mm:ss a')})}
                     )
                 );
                 this.$('abbr').text(lastActivity.fromNow());
@@ -118,11 +127,14 @@
             description: function() { return this.model.get('description'); },
             details: function() { return this.detailViews; },
             actionClass: 'action-view',
-            actionContent: function() {
-                return interpolate(
-                    gettext('View %(span_start)s %(team_name)s %(span_end)s'),
-                    {span_start: '<span class="sr">', team_name: _.escape(this.model.get('name')), span_end: '</span>'},
-                    true
+            actionContentHtml: function() {
+                return HtmlUtils.interpolateHtml(
+                    gettext('View {span_start}{team_name}{span_end}'),
+                    {
+                        team_name: this.model.get('name'),
+                        span_start: HtmlUtils.HTML('<span class="sr">'),
+                        span_end: HtmlUtils.HTML('</span>')
+                    }
                 );
             },
             actionUrl: function() {

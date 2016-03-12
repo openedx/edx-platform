@@ -40,7 +40,6 @@ define([
             setFixtures('<div id="page-prompt"></div>');
             PageHelpers.preventBackboneChangingUrl();
             spyOn(Backbone.history, 'navigate');
-            spyOn(TeamUtils, 'showMessage');
             view = createInstructorTools().render();
             spyOn(view.teamEvents, 'trigger');
         });
@@ -66,7 +65,7 @@ define([
                     team: view.team
                 }
             );
-            expectSuccessMessage(view.team);
+            expectSuccessMessage(view);
         });
 
         it('can cancel team deletion', function() {
@@ -80,7 +79,11 @@ define([
             var requests = AjaxHelpers.requests(this);
             deleteTeam(view, true);
             AjaxHelpers.respondWithError(requests, 404);
+<<<<<<< 719dff66fb473b380cee40011e38322004514e72
             expectSuccessMessage(view.team);
+=======
+            expectSuccessMessage(view);
+>>>>>>> Convert LMS features to use safe templates
         });
 
         it('can trigger the edit membership view', function() {

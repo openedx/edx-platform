@@ -60,20 +60,20 @@
                         description: 'A test description',
                         actionClass: 'test-action',
                         actionUrl: 'www.example.com',
-                        actionContent: 'A test action'
+                        actionContentHtml: 'A test action'
                     }))();
                     verifyContent(view);
                 });
 
                 it('can have functions for cardClass, pennant, title, description, and action', function() {
                     var view = new (CardView.extend({
-                        cardClass: function() { return 'test-card'; },
-                        pennant: function() { return 'Pennant'; },
-                        title: function() { return 'A test title'; },
-                        description: function() { return 'A test description'; },
-                        actionClass: function() { return 'test-action'; },
-                        actionUrl: function() { return 'www.example.com'; },
-                        actionContent: function() { return 'A test action'; }
+                        cardClass: function () { return 'test-card'; },
+                        pennant: function () { return 'Pennant'; },
+                        title: function () { return 'A test title'; },
+                        description: function () { return 'A test description'; },
+                        actionClass: function () { return 'test-action'; },
+                        actionUrl: function () { return 'www.example.com'; },
+                        actionContentHtml: function () { return 'A test action'; }
                     }));
                     verifyContent(view);
                 });

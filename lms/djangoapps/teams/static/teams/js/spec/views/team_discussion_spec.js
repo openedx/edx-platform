@@ -3,8 +3,9 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/discussion_spec_helper',
     'teams/js/spec_helpers/team_spec_helpers',
-    'teams/js/views/team_discussion'
-], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
+    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper',
+    'edx-ui-toolkit/js/utils/string-utils'
+], function(_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper, StringUtils) {
     'use strict';
     xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
@@ -25,14 +26,12 @@ define([
             discussionView.render();
             AjaxHelpers.expectRequest(
                 requests, 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/inline?page=1&ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{discussionID}/inline?page=1&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
-
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse(threads));
@@ -49,16 +48,15 @@ define([
             view.$('.submit').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/{discussionID}/threads/create?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 ),
-                interpolate(
-                    'thread_type=discussion&title=%(title)s&body=%(body)s&anonymous=false&anonymous_to_peers=false&auto_subscribe=true',
+                StringUtils.interpolate(
+                    'thread_type=discussion&title={title}&body={body}&anonymous=false&anonymous_to_peers=false&auto_subscribe=true',  // eslint-disable-line max-len
                     {
                         title: title.replace(/ /g, '+'),
                         body: body.replace(/ /g, '+')
@@ -80,14 +78,13 @@ define([
             view.$('.forum-thread-expand').first().click();
             AjaxHelpers.expectRequest(
                 requests, 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/threads/%(threadID)s?ajax=1&resp_skip=0&resp_limit=25',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{discussionID}/threads/{threadID}?ajax=1&resp_skip=0&resp_limit=25',  // eslint-disable-line max-len
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID,
                         threadID: threadID || '999'
-                    },
-                    true
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, {
@@ -102,13 +99,12 @@ define([
             replyForm.find('.discussion-submit-post').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/threads/%(threadID)s/reply?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/threads/{threadID}/reply?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         threadID: threadID || '999'
-                    },
-                    true
+                    }
                 ),
                 'body=' + reply.replace(/ /g, '+')
             );
@@ -179,15 +175,14 @@ define([
             view.$('.submit').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/{discussionID}/threads/create?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 ),
-                'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
+                'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'  // eslint-disable-line max-len
             );
             AjaxHelpers.respondWithJson(requests, {
                 content: TeamSpecHelpers.createMockPostResponse({

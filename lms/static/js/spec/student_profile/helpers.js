@@ -6,7 +6,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         var fieldTitle = $element.find('.u-field-title').text().trim();
 
         if (!_.isUndefined(view.options.title)) {
-            expect(fieldTitle).toBe(view.options.title);
+            expect(fieldTitle).toEqual(view.options.title);
         }
 
         if ('fieldValue' in view || 'imageUrl' in view) {

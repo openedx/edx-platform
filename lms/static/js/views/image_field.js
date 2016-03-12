@@ -3,13 +3,15 @@
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields',
         'text!templates/fields/field_image.underscore',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/string-utils',
         'backbone-super', 'jquery.fileupload'
-    ], function(gettext, $, _, Backbone, FieldViews, field_image_template) {
+    ], function(gettext, $, _, Backbone, FieldViews, fieldImageTemplate, HtmlUtils, StringUtils) {
         var ImageFieldView = FieldViews.FieldView.extend({
 
             fieldType: 'image',
 
-            fieldTemplate: field_image_template,
+            fieldTemplate: fieldImageTemplate,
             uploadButtonSelector: '.upload-button-input',
 
             titleAdd: gettext('Upload an image'),
@@ -22,9 +24,9 @@
             titleImageAlt: '',
             screenReaderTitle: gettext('Image'),
 
-            iconUpload: '<span class="icon fa fa-camera" aria-hidden="true"></span>',
-            iconRemove: '<span class="icon fa fa-remove" aria-hidden="true"></span>',
-            iconProgress: '<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>',
+            iconUploadHtml: HtmlUtils.HTML('<span class="icon fa fa-camera" aria-hidden="true"></span>'),
+            iconRemoveHtml: HtmlUtils.HTML('<span class="icon fa fa-remove" aria-hidden="true"></span>'),
+            iconProgressHtml: HtmlUtils.HTML('<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>'),
 
             errorMessage: gettext('An error has occurred. Refresh the page, and then try again.'),
 
@@ -40,21 +42,24 @@
                 this.options = _.extend({}, options);
                 this._super(options);
                 _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
-                          'watchForPageUnload', 'onBeforeUnload');
+                    'watchForPageUnload', 'onBeforeUnload');
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    id: this.options.valueAttribute,
-                    inputName: (this.options.inputName || 'file'),
-                    imageUrl: _.result(this, 'imageUrl'),
-                    imageAltText: _.result(this, 'imageAltText'),
-                    uploadButtonIcon: _.result(this, 'iconUpload'),
-                    uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
-                    removeButtonIcon: _.result(this, 'iconRemove'),
-                    removeButtonTitle: _.result(this, 'removeButtonTitle'),
-                    screenReaderTitle: _.result(this, 'screenReaderTitle')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        id: this.options.valueAttribute,
+                        inputName: (this.options.inputName || 'file'),
+                        imageUrl: _.result(this, 'imageUrl'),
+                        imageAltText: _.result(this, 'imageAltText'),
+                        uploadButtonIconHtml: _.result(this, 'iconUploadHtml'),
+                        uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
+                        removeButtonIconHtml: _.result(this, 'iconRemoveHtml', ''),
+                        removeButtonTitle: _.result(this, 'removeButtonTitle'),
+                        screenReaderTitle: _.result(this, 'screenReaderTitle')
+                    })
+                );
                 this.delegateEvents();
                 this.updateButtonsVisibility();
                 this.watchForPageUnload();
@@ -70,7 +75,7 @@
             },
 
             showErrorMessage: function(message) {
-                return message;
+                throw('showErrorMessage not implemented for error: ' + message);
             },
 
             imageUrl: function() {
@@ -144,10 +149,10 @@
                 this.render();
             },
 
-            imageChangeFailed: function(e, data) {
+            imageChangeFailed: function() {
             },
 
-            showImageChangeFailedMessage: function(status, responseText) {
+            showImageChangeFailedMessage: function() {
             },
 
             fileSelected: function(e, data) {
@@ -164,7 +169,7 @@
                 if (imageBytes < this.options.imageMinBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
                     this.showErrorMessage(
-                        interpolate_text(
+                        StringUtils.interpolate(
                             gettext('The file must be at least {size} in size.'), {size: humanReadableSize}
                         )
                     );
@@ -172,7 +177,7 @@
                 } else if (imageBytes > this.options.imageMaxBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
                     this.showErrorMessage(
-                        interpolate_text(
+                        StringUtils.interpolate(
                             gettext('The file must be smaller than {size} in size.'), {size: humanReadableSize}
                         )
                     );
@@ -183,14 +188,14 @@
 
             showUploadInProgressMessage: function() {
                 this.$('.u-field-upload-button').css('opacity', 1);
-                this.$('.upload-button-icon').html(this.iconProgress);
-                this.$('.upload-button-title').html(this.titleUploading);
+                HtmlUtils.setHtml(this.$('.upload-button-icon'), this.iconProgressHtml);
+                this.$('.upload-button-title').text(this.titleUploading);
             },
 
             showRemovalInProgressMessage: function() {
                 this.$('.u-field-remove-button').css('opacity', 1);
-                this.$('.remove-button-icon').html(this.iconProgress);
-                this.$('.remove-button-title').html(this.titleRemoving);
+                HtmlUtils.setHtml(this.$('.remove-button-icon'), this.iconProgressHtml);
+                this.$('.remove-button-title').text(this.titleRemoving);
             },
 
             setCurrentStatus: function(status) {
@@ -208,9 +213,9 @@
             onBeforeUnload: function() {
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
-                    return gettext('Upload is in progress. To avoid errors, stay on this page until the process is complete.');
+                    return gettext('Upload is in progress. To avoid errors, stay on this page until the process is complete.');  // eslint-disable-line max-len
                 } else if (status === 'removing') {
-                    return gettext('Removal is in progress. To avoid errors, stay on this page until the process is complete.');
+                    return gettext('Removal is in progress. To avoid errors, stay on this page until the process is complete.');  // eslint-disable-line max-len
                 }
             },
 

@@ -4,13 +4,13 @@
         <% if (breadcrumbs !== null && breadcrumbs.length > 0) { %>
             <nav class="breadcrumbs" aria-label="<%- nav_aria_label %>">
             <% _.each(breadcrumbs, function (breadcrumb) { %>
-                <a class="nav-item" href="<%= breadcrumb.url %>"><%- breadcrumb.title %></a>
+                <a class="nav-item" href="<%- breadcrumb.url %>"><%= HtmlUtils.ensureHtml(breadcrumb.title) %></a>
                 <span class="icon fa-angle-right" aria-hidden="true"></span>
             <% }) %>
             </nav>
         <% } %>
-        <h3 class="hd hd-2 page-title"><%- title %></h3>
-        <p class="page-description"><%- description %></p>
+        <h3 class="hd hd-2 page-title"><%= HtmlUtils.ensureHtml(title) %></h3>
+        <p class="page-description"><%= HtmlUtils.ensureHtml(description) %></p>
     </div>
     <div class="page-header-secondary"></div>
 </header>

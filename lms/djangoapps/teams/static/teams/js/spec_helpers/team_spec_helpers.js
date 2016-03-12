@@ -30,7 +30,7 @@ define([
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             var id = 'id' + i;
             return {
-                name: 'team ' + i,
+                name: 'Team <' + i + '>',
                 id: id,
                 language: testLanguages[i % 4][0],
                 country: testCountries[i % 4][0],
@@ -151,30 +151,30 @@ define([
             ];
         }
         return {
-            'num_pages': 1,
-            'page': 1,
-            'discussion_data': threads,
-            'user_info': {
-                'username': testUser,
-                'follower_ids': [],
-                'default_sort_key': 'date',
-                'downvoted_ids': [],
-                'subscribed_thread_ids': [],
-                'upvoted_ids': [],
-                'external_id': '9',
-                'id': '9',
-                'subscribed_user_ids': [],
-                'subscribed_commentable_ids': []
+            num_pages: 1,
+            page: 1,
+            discussion_data: threads,
+            user_info: {
+                username: testUser,
+                follower_ids: [],
+                default_sort_key: 'date',
+                downvoted_ids: [],
+                subscribed_thread_ids: [],
+                upvoted_ids: [],
+                external_id: '9',
+                id: '9',
+                subscribed_user_ids: [],
+                subscribed_commentable_ids: []
             },
-            'annotated_content_info': {
+            annotated_content_info: {
             },
-            'roles': {'Moderator': [], 'Administrator': [], 'Community TA': []},
-            'course_settings': {
-                'is_cohorted': false,
-                'allow_anonymous_to_peers': false,
-                'allow_anonymous': true,
-                'category_map': {'subcategories': {}, 'children': [], 'entries': {}},
-                'cohorts': []
+            roles: {Moderator: [], Administrator: [], 'Community TA': []},
+            course_settings: {
+                is_cohorted: false,
+                allow_anonymous_to_peers: false,
+                allow_anonymous: true,
+                category_map: {subcategories: {}, children: [], entries: {}},
+                cohorts: []
             }
         };
     };
@@ -207,7 +207,7 @@ define([
                 resp_skip: 0,
                 id: '55c1323c56c02ce921000001',
                 pinned: false,
-                votes: {'count': 0, 'down_count': 0, 'point': 0, 'up_count': 0},
+                votes: {count: 0, down_count: 0, point: 0, up_count: 0},
                 resp_limit: 25,
                 abuse_flaggers: [],
                 closed: false,
@@ -229,10 +229,10 @@ define([
     createMockTopicData = function(startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             return {
-                'description': 'Test description ' + i,
-                'name': 'Test Topic ' + i,
-                'id': 'test-topic-' + i,
-                'team_count': 0
+                description: 'Test description ' + i,
+                name: 'Test Topic ' + i,
+                id: 'test-topic-' + i,
+                team_count: 0
             };
         });
     };
