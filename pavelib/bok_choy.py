@@ -21,6 +21,7 @@ BOKCHOY_OPTS = [
     ('fasttest', 'a', 'Skip some setup'),
     ('serversonly', 'r', 'Prepare suite and leave servers running'),
     ('testsonly', 'o', 'Assume servers are running and execute tests only'),
+    ('skip_youtube_tests', 'y', 'Skips the youtube tests'),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
     ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
@@ -50,6 +51,7 @@ def parse_bokchoy_opts(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'pdb': getattr(options, 'pdb', False),
         'test_dir': getattr(options, 'test_dir', 'tests'),
+        'skip_youtube_tests': getattr(options, 'skip_youtube_tests', False),
     }
 
 
