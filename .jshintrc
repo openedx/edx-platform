@@ -142,6 +142,7 @@
         // Django i18n catalog globals
         "interpolate",
         "gettext",
+        "ngettext",
 
         // Miscellaneous globals
         "JSON"

@@ -1,16 +1,17 @@
-;(function (define, undefined) {
+;(function(define, undefined) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
+        'edx-ui-toolkit/js/utils/string-utils',
         'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view'
-    ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
-                 AccountSettingsFieldViews, AccountSettingsView) {
+    ], function(gettext, $, _, Backbone, Logger, StringUtils, FieldViews, UserAccountModel, UserPreferencesModel,
+                AccountSettingsFieldViews, AccountSettingsView) {
 
-        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
+        return function(fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -29,8 +30,9 @@
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
-                                helpMessage: interpolate_text(
-                                    gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'), {platform_name: platformName}
+                                helpMessage: StringUtils.interpolate(
+                                    gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'),  // jshint ignore:line
+                                    {platform_name: platformName}
                                 )
                             })
                         },
@@ -40,7 +42,7 @@
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
                                 helpMessage: gettext(
-                                    'The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.' /* jshint ignore:line */
+                                    'The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.'  // jshint ignore:line
                                 ),
                                 persistChanges: true
                             })
@@ -50,8 +52,9 @@
                                 model: userAccountModel,
                                 title: gettext('Email Address'),
                                 valueAttribute: 'email',
-                                helpMessage: interpolate_text(
-                                    gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
+                                helpMessage: StringUtils.interpolate(
+                                    gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'),  // jshint ignore:line
+                                    {platform_name: platformName}
                                 ),
                                 persistChanges: true
                             })
@@ -65,7 +68,7 @@
                                 emailAttribute: 'email',
                                 linkTitle: gettext('Reset Password'),
                                 linkHref: fieldsData.password.url,
-                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
+                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')  // jshint ignore:line
                             })
                         },
                         {
@@ -75,8 +78,9 @@
                                 valueAttribute: 'pref-lang',
                                 required: true,
                                 refreshPageOnSave: true,
-                                helpMessage: interpolate_text(
-                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages.'), {platform_name: platformName}
+                                helpMessage: StringUtils.interpolate(
+                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages.'),  // jshint ignore:line
+                                    {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options,
                                 persistChanges: true
@@ -144,8 +148,9 @@
                         return {
                             'view': new AccountSettingsFieldViews.AuthFieldView({
                                 title: provider.name,
-                                screenReaderTitle: interpolate_text(
-                                    gettext("Connect your {accountName} account"), {accountName: provider['name']}
+                                screenReaderTitle: StringUtils.interpolate(
+                                    gettext('Connect your {accountName} account'),
+                                    {accountName: provider.name}
                                 ),
                                 valueAttribute: 'auth-' + provider.id,
                                 helpMessage: '',
@@ -176,7 +181,7 @@
             var showAccountFields = function () {
                 // Record that the account settings page was viewed.
                 Logger.log('edx.user.settings.viewed', {
-                    page: "account",
+                    page: 'account',
                     visibility: null,
                     user_id: accountUserId
                 });
@@ -186,7 +191,7 @@
             };
 
             userAccountModel.fetch({
-                success: function () {
+                success: function() {
                     // Fetch the user preferences model
                     userPreferencesModel.fetch({
                         success: showAccountFields,

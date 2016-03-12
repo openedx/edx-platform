@@ -1,10 +1,11 @@
 define([
     'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/models/team',
     'teams/js/views/team_profile', 'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper',
+    'edx-ui-toolkit/js/utils/string-utils'
+], function(_, AjaxHelpers, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper, StringUtils) {
     'use strict';
-    describe('TeamProfileView', function () {
+    describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
             teamModel,
             leaveTeamLinkSelector = '.leave-team-link',
@@ -20,17 +21,17 @@ define([
                 }
             ];
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures('<div id="page-prompt"></div>' +
                 '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>' +
                 '<div class="profile-view"></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
-        createTeamModelData = function (options) {
+        createTeamModelData = function(options) {
             return {
-                id: "test-team",
-                name: "Test Team",
+                id: 'test-team',
+                name: 'Test Team',
                 discussion_topic_id: TeamSpecHelpers.testTeamDiscussionID,
                 country: options.country || '',
                 language: options.language || '',
@@ -40,7 +41,7 @@ define([
         };
 
         createTeamProfileView = function(requests, options) {
-            teamModel = new TeamModel(createTeamModelData(options), { parse: true });
+            teamModel = new TeamModel(createTeamModelData(options), {parse: true});
             profileView = new TeamProfileView({
                 el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
@@ -55,13 +56,12 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline?page=1&ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{topicID}/inline?page=1&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         topicID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
@@ -95,13 +95,13 @@ define([
         };
 
         describe('DiscussionsView', function() {
-            it('can render itself', function () {
+            it('can render itself', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
                 expect(view.$('.discussion-thread').length).toEqual(3);
             });
 
-            it('shows New Post button when user joins a team', function () {
+            it('shows New Post button when user joins a team', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
@@ -187,7 +187,7 @@ define([
                     assertTeamDetails(view, 0, false);
                 });
 
-                it("wouldn't do anything if user click on Cancel button on dialog", function() {
+                it('should not do anything if user clicks on Cancel button on dialog', function() {
                     var requests = AjaxHelpers.requests(this);
 
                     var view = createTeamProfileView(
@@ -198,10 +198,10 @@ define([
                     assertTeamDetails(view, 1, true);
                 });
 
-                it('shows correct error messages', function () {
+                it('shows correct error messages', function() {
                     var requests = AjaxHelpers.requests(this);
 
-                    var verifyErrorMessage = function (requests, errorMessage, expectedMessage) {
+                    var verifyErrorMessage = function(requests, errorMessage, expectedMessage) {
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );

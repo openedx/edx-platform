@@ -1,37 +1,40 @@
-;(function (define, undefined) {
+;(function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'js/views/image_field', 'backbone-super'
-    ], function (gettext, $, _, Backbone, FieldViews, ImageFieldView) {
+        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields', 'js/views/image_field',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'backbone-super'
+    ], function(gettext, $, _, Backbone, FieldViews, ImageFieldView, HtmlUtils) {
 
         var LearnerProfileFieldViews = {};
 
         LearnerProfileFieldViews.AccountPrivacyFieldView = FieldViews.DropdownFieldView.extend({
 
-            render: function () {
+            render: function() {
                 this._super();
                 this.showNotificationMessage();
                 this.updateFieldValue();
                 return this;
             },
 
-            showNotificationMessage: function () {
-                var accountSettingsLink = '<a href="' + this.options.accountSettingsPageUrl + '">' + gettext('Account Settings page.') + '</a>';
+            showNotificationMessage: function() {
+                var accountSettingsPageUrl = this.options.accountSettingsPageUrl,
+                    accountSettingsLink = HtmlUtils.HTML(
+                        '<a href="' + accountSettingsPageUrl + '">' + gettext('Account Settings page.') + '</a>'
+                    );
                 if (this.profileIsPrivate) {
-                    this._super(interpolate_text(
-                        gettext("You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}"),
+                    this._super(HtmlUtils.interpolateHtml(
+                        gettext('You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}'),  // jshint ignore:line
                         {'account_settings_page_link': accountSettingsLink}
                     ));
                 } else if (this.requiresParentalConsent) {
-                    this._super(interpolate_text(
-                        gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'),
+                    this._super(HtmlUtils.interpolateHtml(
+                        gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'),  // jshint ignore:line
                         {'account_settings_page_link': accountSettingsLink}
                     ));
-                }
-                else {
+                } else {
                     this._super('');
                 }
-                return this._super();
             },
 
             updateFieldValue: function() {
@@ -46,39 +49,39 @@
 
             screenReaderTitle: gettext('Profile Image'),
 
-            imageUrl: function () {
+            imageUrl: function() {
                 return this.model.profileImageUrl();
             },
 
-            imageAltText: function () {
-                return interpolate_text(
-                    gettext("Profile image for {username}"), {username: this.model.get('username')}
+            imageAltText: function() {
+                return HtmlUtils.interpolateHtml(
+                    gettext('Profile image for {username}'),
+                    {username: this.model.get('username')}
                 );
             },
 
-            imageChangeSucceeded: function (e, data) {
+            imageChangeSucceeded: function() {
                 var view = this;
                 // Update model to get the latest urls of profile image.
-                this.model.fetch().done(function () {
+                this.model.fetch().done(function() {
                     view.setCurrentStatus('');
                     view.render();
                     view.$('.u-field-upload-button').focus();
-                }).fail(function () {
+                }).fail(function() {
                     view.setCurrentStatus('');
                     view.showErrorMessage(view.errorMessage);
                 });
             },
 
-            imageChangeFailed: function (e, data) {
+            imageChangeFailed: function(e, data) {
                 this.setCurrentStatus('');
                 this.showImageChangeFailedMessage(data.jqXHR.status, data.jqXHR.responseText);
             },
 
-            showImageChangeFailedMessage: function (status, responseText) {
+            showImageChangeFailedMessage: function(status, responseText) {
                 if (_.contains([400, 404], status)) {
                     try {
-                        var errors = JSON.parse(responseText);
-                        this.showErrorMessage(errors.user_message);
+                        this.showErrorMessage(JSON.parse(responseText).user_message);
                     } catch (error) {
                         this.showErrorMessage(this.errorMessage);
                     }
@@ -87,24 +90,24 @@
                 }
             },
 
-            showErrorMessage: function (message) {
+            showErrorMessage: function(message) {
                 this.options.messageView.showMessage(message);
             },
 
-            isEditingAllowed: function () {
+            isEditingAllowed: function() {
                 return this.model.isAboveMinimumAge();
             },
 
-            isShowingPlaceholder: function () {
+            isShowingPlaceholder: function() {
                 return !this.model.hasProfileImage();
             },
 
-            clickedRemoveButton: function (e, data) {
+            clickedRemoveButton: function(e, data) {
                 this.options.messageView.hideMessage();
                 this._super(e, data);
             },
 
-            fileSelected: function (e, data) {
+            fileSelected: function(e, data) {
                 this.options.messageView.hideMessage();
                 this._super(e, data);
             }

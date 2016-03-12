@@ -1,4 +1,4 @@
-;(function (define) {
+;(function(define) {
     'use strict';
 
     define(['backbone',
@@ -6,8 +6,10 @@
             'gettext',
             'teams/js/views/team_utils',
             'common/js/components/utils/view_utils',
-            'text!teams/templates/instructor-tools.underscore'],
-        function (Backbone, _, gettext, TeamUtils, ViewUtils, instructorToolbarTemplate) {
+            'edx-ui-toolkit/js/utils/html-utils',
+            'text!teams/templates/instructor-tools.underscore'
+        ],
+        function(Backbone, _, gettext, TeamUtils, ViewUtils, HtmlUtils, instructorToolbarTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -26,42 +28,41 @@
                     return this;
                 },
 
-                deleteTeam: function (event) {
+                deleteTeam: function(event) {
                     event.preventDefault();
                     ViewUtils.confirmThenRunOperation(
                         gettext('Delete this team?'),
-                        gettext('Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.'),
+                        gettext('Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.'),  // jshint ignore:line
                         gettext('Delete'),
                         _.bind(this.handleDelete, this)
                     );
                 },
 
-                editMembership: function (event) {
+                editMembership: function(event) {
                     event.preventDefault();
                     Backbone.history.navigate(
-                        'teams/' + this.team.get('topic_id') + '/' + this.team.id +'/edit-team/manage-members',
+                        'teams/' + this.team.get('topic_id') + '/' + this.team.id + '/edit-team/manage-members',
                         {trigger: true}
                     );
                 },
 
-                handleDelete: function () {
+                handleDelete: function() {
                     var self = this,
-                        postDelete = function () {
+                        postDelete = function() {
                             self.teamEvents.trigger('teams:update', {
                                 action: 'delete',
                                 team: self.team
                             });
                             Backbone.history.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
                             TeamUtils.showMessage(
-                                interpolate(
-                                    gettext('Team "%(team)s" successfully deleted.'),
-                                    {team: self.team.get('name')},
-                                    true
+                                HtmlUtils.interpolateHtml(
+                                    gettext('Team "{team}" successfully deleted.'),
+                                    {team: self.team.get('name')}
                                 ),
                                 'success'
                             );
                         };
-                    this.team.destroy().then(postDelete).fail(function (response) {
+                    this.team.destroy().then(postDelete).fail(function(response) {
                         // In the 404 case, this team has already been
                         // deleted by someone else. Since the team was
                         // successfully deleted anyway, just show a
