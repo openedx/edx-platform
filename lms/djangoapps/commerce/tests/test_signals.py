@@ -22,16 +22,17 @@ from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_
 from commerce.tests.mocks import mock_create_refund
 from course_modes.models import CourseMode
 
-ZENDESK_URL = 'http://zendesk.example.com/'
-ZENDESK_USER = 'test@example.com'
-ZENDESK_API_KEY = 'abc123'
+HELPDESK = 'Zendesk'
+HELPDESK_URL = 'http://zendesk.example.com/'
+HELPDESK_USER = 'test@example.com'
+HELPDESK_API_KEY = 'abc123'
 
 
 @ddt.ddt
 @override_settings(
     ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
     ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
-    ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY
+    HELPDESK=HELPDESK, HELPDESK_URL=HELPDESK_URL, HELPDESK_USER=HELPDESK_USER, HELPDESK_API_KEY=HELPDESK_API_KEY
 )
 class TestRefundSignal(TestCase):
     """
@@ -219,7 +220,7 @@ class TestRefundSignal(TestCase):
 
     def _mock_zendesk_api(self, status=201):
         """ Mock Zendesk's ticket creation API. """
-        httpretty.register_uri(httpretty.POST, urljoin(ZENDESK_URL, '/api/v2/tickets.json'), status=status,
+        httpretty.register_uri(httpretty.POST, urljoin(HELPDESK_URL, '/api/v2/tickets.json'), status=status,
                                body='{}', content_type=JSON)
 
     def call_create_zendesk_ticket(self, name=u'Test user', email=u'user@example.com', subject=u'Test Ticket',
@@ -228,7 +229,7 @@ class TestRefundSignal(TestCase):
         tags = tags or [u'auto_refund']
         create_zendesk_ticket(name, email, subject, body, tags)
 
-    @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=None, ZENDESK_API_KEY=None)
+    @override_settings(HELPDESK=HELPDESK, HELPDESK_URL=HELPDESK_URL, HELPDESK_USER=None, HELPDESK_API_KEY=None)
     def test_create_zendesk_ticket_no_settings(self):
         """ Verify the Zendesk API is not called if the settings are not all set. """
         with mock.patch('requests.post') as mock_post:
@@ -262,7 +263,7 @@ class TestRefundSignal(TestCase):
         expected = {
             'content-type': JSON,
             'Authorization': 'Basic ' + base64.b64encode(
-                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY))
+                '{user}/token:{pwd}'.format(user=HELPDESK_USER, pwd=HELPDESK_API_KEY))
         }
         self.assertDictContainsSubset(expected, last_request.headers)
 

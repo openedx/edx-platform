@@ -15,7 +15,7 @@ from student.tests.test_microsite import fake_microsite_get_value
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
-@override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
+@override_settings(HELPDESK="zendesk", HELPDESK_URL="dummy", HELPDESK_USER="dummy", HELPDESK_API_KEY="dummy")
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
 class SubmitFeedbackTest(TestCase):
@@ -350,6 +350,7 @@ class SubmitFeedbackTest(TestCase):
                 with self.assertRaises(Exception):
                     self._build_and_run_request(self._anon_user, self._anon_fields)
 
-        test_case("django.conf.settings.ZENDESK_URL")
-        test_case("django.conf.settings.ZENDESK_USER")
-        test_case("django.conf.settings.ZENDESK_API_KEY")
+        test_case("django.conf.settings.HELPDESK")
+        test_case("django.conf.settings.HELPDESK_URL")
+        test_case("django.conf.settings.HELPDESK_USER")
+        test_case("django.conf.settings.HELPDESK_API_KEY")
