@@ -30,6 +30,7 @@ from util.db import NoOpMigrationModules
 from lms.envs.test import (
     WIKI_ENABLED,
     PLATFORM_NAME,
+    SITE_ID,
     SITE_NAME,
     DEFAULT_FILE_STORAGE,
     MEDIA_ROOT,
@@ -280,6 +281,8 @@ MICROSITE_CONFIGURATION = {
 }
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
+
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
