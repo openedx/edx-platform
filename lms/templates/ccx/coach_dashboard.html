@@ -22,26 +22,26 @@ from django.core.urlresolvers import reverse
     <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content">
       <h1>${_("CCX Coach Dashboard")}</h1>
 
-      % if messages:
-      <ul class="messages">
-        % for message in messages:
-          % if message.tags:
-          <li class="${message.tags}">${message}</li>
-          % else:
-          <li>${message}</li>
-          % endif
-        % endfor
-        </ul>
-      % endif
-
       %if not ccx:
-      <section>
-        <form action="${create_ccx_url}" method="POST">
-          <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
-          <input name="name" placeholder="Name your CCX"/><br/>
-          <button id="create-ccx">Coach a new Custom Course for EdX</button>
-        </form>
-      </section>
+        % if messages:
+          <ul class="messages">
+            % for message in messages:
+              % if message.tags:
+                <li class="${message.tags}">${message}</li>
+              % else:
+                <li>${message}</li>
+              % endif
+            % endfor
+          </ul>
+        % endif
+        <section>
+          <form action="${create_ccx_url}" method="POST">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+            <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+            <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}"/><br/>
+            <button id="create-ccx">Coach a new Custom Course for EdX</button>
+          </form>
+        </section>
       %endif
 
       %if ccx:
@@ -150,5 +150,9 @@ from django.core.urlresolvers import reverse
 
   $(setup_tabs);
   $(setup_management_form)
-
+  $( document ).ready(function() {
+    if ($('#ccx_std_list_messages').length) {
+      $('#ccx_std_list_messages')[0].focus();
+    }
+  });
 </script>

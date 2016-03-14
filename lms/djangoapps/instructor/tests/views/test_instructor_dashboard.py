@@ -8,11 +8,15 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from edxmako.shortcuts import render_to_response
 
+from ccx.tests.test_views import setup_students_and_grades
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from instructor.views.gradebook_api import calculate_page_info
 
+from common.test.utils import XssTestMixin
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -22,8 +26,22 @@ from student.roles import CourseFinanceAdminRole
 from student.models import CourseEnrollment
 
 
+def intercept_renderer(path, context):
+    """
+    Intercept calls to `render_to_response` and attach the context dict to the
+    response for examination in unit tests.
+    """
+    # I think Django already does this for you in their TestClient, except
+    # we're bypassing that by using edxmako.  Probably edxmako should be
+    # integrated better with Django's rendering and event system.
+    response = render_to_response(path, context)
+    response.mako_context = context
+    response.mako_template = path
+    return response
+
+
 @ddt.ddt
-class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
     Tests for the instructor dashboard (not legacy).
     """
@@ -33,12 +51,17 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super(TestInstructorDashboard, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
+            display_name='<script>alert("XSS")</script>'
+        )
 
-        self.course_mode = CourseMode(course_id=self.course.id,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=40)
+        self.course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE.name,
+            min_price=40
+        )
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -54,11 +77,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
-    def get_dashboard_demographic_message(self):
+    def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return 'Demographic data is now available in <a href="http://example.com/courses/{}" ' \
+        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
     def test_instructor_tab(self):
@@ -84,6 +107,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
         self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+
+    def test_course_name_xss(self):
+        """Test that the instructor dashboard correctly escapes course names
+        with script tags.
+        """
+        response = self.client.get(self.url)
+        self.assert_xss(response, '<script>alert("XSS")</script>')
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_override_currency_settings_in_the_html_response(self):
@@ -157,38 +187,28 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_message = self.get_dashboard_enrollment_message()
         self.assertTrue(expected_message in response.content)
 
-    @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_DEMOGRAPHICS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
-    def test_show_dashboard_demographic_data(self):
+    def test_dashboard_analytics_tab_not_shown(self):
         """
-        Test enrollment demographic data is shown.
+        Test dashboard analytics tab isn't shown if insights isn't configured.
         """
         response = self.client.get(self.url)
-        # demographic information displayed
-        self.assertTrue('data-feature="year_of_birth"' in response.content)
-        self.assertTrue('data-feature="gender"' in response.content)
-        self.assertTrue('data-feature="level_of_education"' in response.content)
+        analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
+        self.assertFalse(analytics_section in response.content)
 
-        # dashboard link hidden
-        self.assertFalse(self.get_dashboard_demographic_message() in response.content)
-
-    @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_DEMOGRAPHICS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
-    def test_show_dashboard_demographic_message(self):
+    def test_dashboard_analytics_points_at_insights(self):
         """
-        Test enrollment demographic dashboard message is shown and data is hidden.
+        Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-
-        # demographics are hidden
-        self.assertFalse('data-feature="year_of_birth"' in response.content)
-        self.assertFalse('data-feature="gender"' in response.content)
-        self.assertFalse('data-feature="level_of_education"' in response.content)
+        analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
+        self.assertTrue(analytics_section in response.content)
 
         # link to dashboard shown
-        expected_message = self.get_dashboard_demographic_message()
+        expected_message = self.get_dashboard_analytics_message()
         self.assertTrue(expected_message in response.content)
 
     def add_course_to_user_cart(self, cart, course_key):
@@ -244,3 +264,32 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 expected_result,
                 'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
             )
+
+    def test_grade_cutoffs(self):
+        """
+        Verify that grade cutoffs are displayed in the correct order.
+        """
+        response = self.client.get(self.url)
+        self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
+
+    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
+    def test_calculate_page_info(self):
+        page = calculate_page_info(offset=0, total_students=2)
+        self.assertEqual(page["offset"], 0)
+        self.assertEqual(page["page_num"], 1)
+        self.assertEqual(page["next_offset"], None)
+        self.assertEqual(page["previous_offset"], None)
+        self.assertEqual(page["total_pages"], 1)
+
+    @patch('instructor.views.gradebook_api.render_to_response', intercept_renderer)
+    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    def test_spoc_gradebook_pages(self):
+        setup_students_and_grades(self)
+        url = reverse(
+            'spoc_gradebook',
+            kwargs={'course_id': self.course.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
+        self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member

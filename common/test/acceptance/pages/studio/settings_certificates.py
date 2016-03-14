@@ -12,6 +12,7 @@ import os
 
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 class CertificatesPage(CoursePage):
@@ -26,6 +27,12 @@ class CertificatesPage(CoursePage):
     ################
     # Helpers
     ################
+
+    def refresh(self):
+        """
+        Refresh the certificate page
+        """
+        self.browser.refresh()
 
     def is_browser_on_page(self):
         """
@@ -43,6 +50,24 @@ class CertificatesPage(CoursePage):
 
         return True
 
+    def get_first_signatory_title(self):
+        """
+        Return signatory title for the first signatory in certificate.
+        """
+        return self.q(css='.signatory-title-value').first.html[0]
+
+    def get_course_number(self):
+        """
+        Return Course Number
+        """
+        return self.q(css='.actual-course-number .certificate-value').first.text[0]
+
+    def get_course_number_override(self):
+        """
+        Return Course Number Override
+        """
+        return self.q(css='.course-number-override .certificate-value').first.text[0]
+
     ################
     # Properties
     ################
@@ -53,7 +78,7 @@ class CertificatesPage(CoursePage):
         Return list of the certificates for the course.
         """
         css = self.certficate_css + ' .wrapper-collection'
-        return [Certificate(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
+        return [CertificateSectionPage(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
 
     @property
     def no_certificates_message_shown(self):
@@ -69,6 +94,13 @@ class CertificatesPage(CoursePage):
         """
         return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content').text[0]
 
+    @property
+    def new_certificate_link_text(self):
+        """
+        Returns text of new-button link .
+        """
+        return self.q(css='.wrapper-content ' + self.certficate_css + ' .no-content a.new-button').text[0]
+
     ################
     # Wait Actions
     ################
@@ -79,8 +111,18 @@ class CertificatesPage(CoursePage):
         We can't use confirm_prompt because its wait_for_notification is flaky when asynchronous operation
         completed very quickly.
         """
-        self.wait_for_element_visibility('.prompt', 'Prompt is visible')
-        self.wait_for_element_visibility('.prompt .action-primary', 'Confirmation button is visible')
+        EmptyPromise(
+            lambda: self.q(css='.prompt').present,
+            'Confirmation prompt is displayed'
+        ).fulfill()
+        EmptyPromise(
+            lambda: self.q(css='.prompt .action-primary').present,
+            'Primary button is displayed'
+        ).fulfill()
+        EmptyPromise(
+            lambda: self.q(css='.prompt .action-primary').visible,
+            'Primary button is visible'
+        ).fulfill()
 
     def wait_for_first_certificate_button(self):
         """
@@ -108,28 +150,62 @@ class CertificatesPage(CoursePage):
         """
         Clicks the 'Create your first certificate' button, which is only displayed at zero state
         """
+        self.wait_for_first_certificate_button()
         self.q(css=self.certficate_css + " .new-button").first.click()
 
     def click_add_certificate_button(self):
         """
         Clicks the 'Add new certificate' button, which is displayed when certificates already exist
         """
+        self.wait_for_add_certificate_button()
         self.q(css=self.certficate_css + " .action-add").first.click()
 
-    ################
-    # Workflows
-    ################
+    def click_confirmation_prompt_primary_button(self):
+        """
+        Clicks the main action presented by the prompt (such as 'Delete')
+        """
+        disable_animations(self)
+        self.wait_for_confirmation_prompt()
+        self.q(css='.prompt button.action-primary').first.click()
+        self.wait_for_element_invisibility('.prompt', 'wait for pop up to disappear')
+        self.wait_for_ajax()
 
 
-class Certificate(object):
+class CertificateSectionPage(CertificatesPage):
     """
-    Certificate page object wrapper
+    CertificateSectionPage is the certificate section within Certificates page, There might be multiple certificates
+    in a Certificates Page so this section object can be used to used to identify unique certificate and apply
+    operations on it.
     """
 
-    def __init__(self, page, prefix, index):
-        self.page = page
+    def __init__(self, container, prefix, index):
+        """
+        Initialize CertificateSection Page
+
+        :param container: Container Page Object of the certificate section
+        :param prefix: css selector of the container element
+        :param index: index of section in the certificate list on the page
+
+        :return:
+        """
         self.selector = prefix + ' .certificates-list-item-{}'.format(index)
         self.index = index
+
+        super(CertificateSectionPage, self).__init__(container.browser, **container.course_info)
+
+    def is_browser_on_page(self):
+        """
+        Verify that the browser is on the page and it is not still loading.
+        """
+        return self.q(css=".certificates").present
+
+    @property
+    def url(self):
+        """
+        Construct a URL to the page section within the certificate page.
+        """
+        # This is a page section and can not be accessed directly
+        return None
 
     ################
     # Helpers
@@ -145,7 +221,7 @@ class Certificate(object):
         """
         Find elements as defined by css locator.
         """
-        return self.page.q(css=self.get_selector(css=css_selector))
+        return self.q(css=self.get_selector(css=css_selector))
 
     def get_text(self, css):
         """
@@ -230,7 +306,7 @@ class Certificate(object):
         Return list of the signatories for the certificate.
         """
         css = self.selector + ' .signatory-' + self.mode
-        return [Signatory(self, self.selector, self.mode, index) for index in xrange(len(self.page.q(css=css)))]
+        return [SignatorySectionPage(self, self.selector, self.mode, index) for index in xrange(len(self.q(css=css)))]
 
     ################
     # Wait Actions
@@ -240,13 +316,19 @@ class Certificate(object):
         """
         Returns whether or not the certificate delete icon is present.
         """
-        return self.find_css('.actions .delete').present
+        EmptyPromise(
+            lambda: self.find_css('.actions .delete.action-icon').present,
+            'Certificate delete button is displayed'
+        ).fulfill()
 
     def wait_for_hide_details_toggle(self):
         """
         Certificate details are expanded.
         """
-        return self.find_css('a.detail-toggle.hide-details').present
+        EmptyPromise(
+            lambda: self.find_css('a.detail-toggle.hide-details').present,
+            'Certificate details are expanded'
+        ).fulfill()
 
     ################
     # Click Actions
@@ -256,15 +338,16 @@ class Certificate(object):
         """
         Create a new certificate.
         """
+        disable_animations(self)
         self.find_css('.action-primary').first.click()
-        self.page.wait_for_ajax()
+        self.wait_for_ajax()
 
     def click_save_certificate_button(self):
         """
         Save certificate.
         """
         self.find_css('.action-primary').first.click()
-        self.page.wait_for_ajax()
+        self.wait_for_ajax()
 
     def click_add_signatory_button(self):
         """
@@ -290,32 +373,50 @@ class Certificate(object):
         """
         self.find_css('a.detail-toggle').first.click()
 
-    ################
-    # Workflows
-    ################
-
-    def delete_certificate(self):
+    def click_delete_certificate_button(self):
         """
-        Delete the certificate
+        Remove the first (possibly the only) certificate from the set
         """
         self.wait_for_certificate_delete_button()
-
-        self.find_css('.actions .delete').first.click()
-        self.page.wait_for_confirmation_prompt()
-        self.page.q(css='a.button.action-primary').first.click()
-        self.page.q(css='a.button.action-primary').first.click()
-        self.page.wait_for_ajax()
+        self.find_css('.actions .delete.action-icon').first.click()
 
 
-class Signatory(object):
+class SignatorySectionPage(CertificatesPage):
     """
-    Signatory page object wrapper
+    SignatorySectionPage is the signatory section within CertificatesSection, There might be multiple signatories
+    in a certificate section so this section object can be used to used to identify unique section and apply
+    operations on it.
     """
-    def __init__(self, certificate, prefix, mode, index):
-        self.certificate = certificate
+    def __init__(self, container, prefix, mode, index):
+        """
+        Initialize SignatorySection Page
+
+        :param container: Container Section Page Object of the Signatory section
+        :param prefix: css selector of the container element
+        :param index: index of section in the signatory list on the page
+        :param mode: 'details' or 'edit', showing whether signatory is being displayed or edited
+
+        :return:
+        """
         self.prefix = prefix
         self.index = index
         self.mode = mode
+
+        super(SignatorySectionPage, self).__init__(container.browser, **container.course_info)
+
+    def is_browser_on_page(self):
+        """
+        Verify that the browser is on the page and it is not still loading.
+        """
+        return self.q(css=self.prefix + " .signatory-details-list, .signatory-edit-list").present
+
+    @property
+    def url(self):
+        """
+        Construct a URL to the page section within the certificate section page.
+        """
+        # This is a page section and can not be accessed directly
+        return None
 
     ################
     # Helpers
@@ -344,7 +445,7 @@ class Signatory(object):
         """
         Find elements as defined by css locator.
         """
-        return self.certificate.page.q(css=self.get_selector(css=css_selector))
+        return self.q(css=self.get_selector(css=css_selector))
 
     ################
     # Properties
@@ -408,32 +509,28 @@ class Signatory(object):
         """
         Delete the signatory
         """
-        # pylint: disable=pointless-statement
         self.wait_for_signatory_delete_icon()
         self.click_signatory_delete_icon()
         self.wait_for_signatory_delete_prompt()
 
-        self.certificate.page.q(css='#prompt-warning a.button.action-primary').first.click()
-        self.certificate.page.wait_for_ajax()
+        self.q(css='#prompt-warning a.button.action-primary').first.click()
+        self.wait_for_ajax()
 
     def save(self):
         """
         Save signatory.
         """
-        # Move focus from input to save button and then click it
-        self.certificate.page.browser.execute_script(
-            "$('{} .signatory-panel-save').focus()".format(self.get_selector())
-        )
-        self.find_css('.signatory-panel-save').first.click()
+        # Click on the save button.
+        self.q(css='button.signatory-panel-save').click()
         self.mode = 'details'
-        self.certificate.page.wait_for_ajax()
+        self.wait_for_ajax()
         self.wait_for_signatory_detail_view()
 
     def close(self):
         """
         Cancel signatory editing.
         """
-        self.find_css('.signatory-panel-close').first.click()
+        self.q(css='button.signatory-panel-close').click()
         self.mode = 'details'
         self.wait_for_signatory_detail_view()
 
@@ -443,24 +540,23 @@ class Signatory(object):
         """
         self.wait_for_signature_image_upload_button()
         self.find_css('.action-upload-signature').first.click()
-        self.find_css('.action-upload-signature').first.click()
         self.wait_for_signature_image_upload_prompt()
 
         asset_file_path = self.file_path(image_filename)
-        self.certificate.page.q(
+        self.q(
             css='.assetupload-modal .upload-dialog input[type="file"]'
         )[0].send_keys(asset_file_path)
 
         EmptyPromise(
-            lambda: not self.certificate.page.q(
+            lambda: not self.q(
                 css='.assetupload-modal a.action-upload.disabled'
             ).present,
             'Upload button is not disabled anymore'
         ).fulfill()
 
-        self.certificate.page.q(css='.assetupload-modal a.action-upload').first.click()
+        self.q(css='.assetupload-modal a.action-upload').first.click()
         EmptyPromise(
-            lambda: not self.certificate.page.q(css='.assetupload-modal .upload-dialog').visible,
+            lambda: not self.q(css='.assetupload-modal .upload-dialog').visible,
             'Upload dialog is removed after uploading image'
         ).fulfill()
 
@@ -474,7 +570,7 @@ class Signatory(object):
         Returns whether or not the delete icon is present.
         """
         EmptyPromise(
-            lambda: self.certificate.page.q(css='.signatory-panel-delete').present,
+            lambda: self.q(css='.signatory-panel-delete').present,
             'Delete icon is displayed'
         ).fulfill()
 
@@ -483,7 +579,7 @@ class Signatory(object):
         Promise to wait until signatory delete prompt is visible
         """
         EmptyPromise(
-            lambda: self.certificate.page.q(css='a.button.action-primary').present,
+            lambda: self.q(css='a.button.action-primary').present,
             'Delete prompt is displayed'
         ).fulfill()
 
@@ -510,7 +606,7 @@ class Signatory(object):
         Promise to wait until signatory image upload prompt is visible
         """
         EmptyPromise(
-            lambda: self.certificate.page.q(css='.assetupload-modal .action-upload').present,
+            lambda: self.q(css='.assetupload-modal .action-upload').present,
             'Signature image upload dialog opened'
         ).fulfill()
 
@@ -519,7 +615,7 @@ class Signatory(object):
         Promise to wait until signatory image upload button is visible
         """
         EmptyPromise(
-            lambda: self.certificate.page.q(css=".action-upload-signature").first.present,
+            lambda: self.q(css=".action-upload-signature").first.present,
             'Signature image upload button available'
         ).fulfill()
 
@@ -529,7 +625,7 @@ class Signatory(object):
         Promise for the signature image to be displayed
         """
         EmptyPromise(
-            lambda: self.certificate.page.q(css=".current-signature-image .signature-image").present,
+            lambda: self.q(css=".current-signature-image .signature-image").present,
             'Signature image available'
         ).fulfill()
 

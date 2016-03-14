@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
@@ -252,7 +253,7 @@ class LoginTest(TestCase):
         self._assert_response(response, success=True)
 
         # Reload the user from the database
-        self.user = UserFactory.FACTORY_FOR.objects.get(pk=self.user.pk)
+        self.user = User.objects.get(pk=self.user.pk)
 
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 
@@ -282,6 +283,9 @@ class LoginTest(TestCase):
 
         response = client1.post(self.url, creds)
         self._assert_response(response, success=True)
+
+        # Reload the user from the database
+        self.user = User.objects.get(pk=self.user.pk)
 
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 
@@ -500,7 +504,7 @@ class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
         self._setup_provider_response(success=True)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)  # pylint: disable=no-member
 
     def test_invalid_token(self):
         self._setup_provider_response(success=False)

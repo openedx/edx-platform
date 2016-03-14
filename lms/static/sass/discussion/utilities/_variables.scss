@@ -1,4 +1,8 @@
-$forum-color-active-thread: tint($blue, 85%);
+// discussion - utilities - variables
+// ====================
+
+// color variables
+$forum-color-active-thread: $white;
 $forum-color-pinned: $pink;
 $forum-color-reported: $pink;
 $forum-color-closed: $black;
@@ -6,3 +10,8 @@ $forum-color-following: $blue;
 $forum-color-staff: $blue;
 $forum-color-community-ta: $green-d1;
 $forum-color-marked-answer: $green-d1;
+
+// post images
+$post-image-dimension: ($baseline*3);  // image size  + margin
+$response-image-dimension: ($baseline*2.5); // image size  + margin
+$comment-image-dimension: ($baseline*2); // image size  + margin

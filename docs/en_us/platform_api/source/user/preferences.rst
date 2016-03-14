@@ -1,14 +1,15 @@
 .. _User Preferences API:
 
 ##################################################
-User Preferences API
+User API User Preferences Resource
 ##################################################
 
-This page contains information on using the User Preferences API to
-complete the following actions.
+With the User API **User Preferences** resource, you can complete the
+following tasks.
 
-* `Get and Update the User's Preferences Information`_
-* `Get, Update, or Delete a Specific Preference`_
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get and Update the User's Preferences Information:
 

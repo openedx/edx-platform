@@ -6,6 +6,7 @@ from django import template
 from django.conf import settings
 from microsite_configuration import microsite
 from django.templatetags.static import static
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 register = template.Library()
 
@@ -48,7 +49,7 @@ def favicon_path(default=getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')
     Django template tag that outputs the configured favicon:
     {% favicon_path %}
     """
-    return static(microsite.get_value('favicon_path', default))
+    return staticfiles_storage.url(microsite.get_value('favicon_path', default))
 
 
 @register.simple_tag(name="microsite_css_overrides_file")

@@ -1,3 +1,6 @@
+"""
+Django ORM model specifications for the Course Structures sub-application
+"""
 import json
 import logging
 
@@ -5,13 +8,20 @@ from collections import OrderedDict
 from model_utils.models import TimeStampedModel
 
 from util.models import CompressedTextField
-from xmodule_django.models import CourseKeyField
+from xmodule_django.models import CourseKeyField, UsageKey
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class CourseStructure(TimeStampedModel):
+    """
+    The CourseStructure model is an aggregated representation of the course content tree
+    """
+
+    class Meta(object):
+        app_label = 'course_structures'
+
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
 
     # Right now the only thing we do with the structure doc is store it and
@@ -21,8 +31,14 @@ class CourseStructure(TimeStampedModel):
     # we'd have to be careful about caching.
     structure_json = CompressedTextField(verbose_name='Structure JSON', blank=True, null=True)
 
+    # JSON mapping of discussion ids to usage keys for the corresponding discussion modules
+    discussion_id_map_json = CompressedTextField(verbose_name='Discussion ID Map JSON', blank=True, null=True)
+
     @property
     def structure(self):
+        """
+        Deserializes a course structure JSON object
+        """
         if self.structure_json:
             return json.loads(self.structure_json)
         return None
@@ -36,6 +52,19 @@ class CourseStructure(TimeStampedModel):
             ordered_blocks = OrderedDict()
             self._traverse_tree(self.structure['root'], self.structure['blocks'], ordered_blocks)
             return ordered_blocks
+
+    @property
+    def discussion_id_map(self):
+        """
+        Return a mapping of discussion ids to usage keys of the corresponding discussion modules.
+        """
+        if self.discussion_id_map_json:
+            result = json.loads(self.discussion_id_map_json)
+            for discussion_id in result:
+                # Usage key strings might not include the course run, so we add it back in with map_into_course
+                result[discussion_id] = UsageKey.from_string(result[discussion_id]).map_into_course(self.course_id)
+            return result
+        return None
 
     def _traverse_tree(self, block, unordered_structure, ordered_blocks, parent=None):
         """

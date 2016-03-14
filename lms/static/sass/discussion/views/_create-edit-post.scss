@@ -8,10 +8,8 @@
   box-sizing: border-box;
   margin: 0;
   border-radius: 3px;
-  padding: ($baseline*2);
-  min-width: 760px;
+  padding: ($baseline);
   max-width: 1180px;
-  background: $gray-l5;
 
   .post-field {
     margin-bottom: $baseline;
@@ -180,7 +178,7 @@
     margin-bottom: $baseline;
     border-radius: 3px;
     padding: 0;
-    background: $error-red;
+    background: $error-color;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
     color: $white;
     list-style: none;
@@ -188,7 +186,7 @@
     .post-error {
       padding: ($baseline/2) $baseline 12px 45px;
       border-bottom: 1px solid $red;
-      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+      background: url('#{$static-path}/images/white-error-icon.png') no-repeat 15px 14px;
 
       &:last-child {
         border-bottom: none;

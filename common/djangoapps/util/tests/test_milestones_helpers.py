@@ -2,6 +2,7 @@
 Tests for the milestones helpers library, which is the integration point for the edx_milestones API
 """
 
+import ddt
 from mock import patch
 
 from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
@@ -11,6 +12,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': False})
+@ddt.ddt
 class MilestonesHelpersTestCase(ModuleStoreTestCase):
     """
     Main test suite for Milestones API client library
@@ -34,6 +36,24 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             'namespace': 'doesnt.matter',
             'description': 'Testing Milestones Helpers Library',
         }
+
+    @ddt.data(
+        (False, False, False),
+        (True, False, False),
+        (False, True, False),
+        (True, True, True),
+    )
+    def test_pre_requisite_courses_enabled(self, feature_flags):
+        """
+        Tests is_prerequisite_courses_enabled function with a set of possible values for
+        ENABLE_PREREQUISITE_COURSES and MILESTONES_APP feature flags.
+        """
+
+        with patch.dict("django.conf.settings.FEATURES", {
+            'ENABLE_PREREQUISITE_COURSES': feature_flags[0],
+            'MILESTONES_APP': feature_flags[1]
+        }):
+            self.assertEqual(feature_flags[2], milestones_helpers.is_prerequisite_courses_enabled())
 
     def test_add_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_milestone(milestone_data=self.milestone)

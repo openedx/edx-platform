@@ -10,7 +10,8 @@ if Backbone?
             {
                 cid: @model.cid,
                 author_display: @getAuthorDisplay(),
-                endorser_display: @getEndorserDisplay()
+                endorser_display: @getEndorserDisplay(),
+                readOnly: $('.discussion-module').data('read-only')
             },
             @model.attributes
         )

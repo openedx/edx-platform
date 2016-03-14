@@ -1,4 +1,4 @@
-define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_textbook", "js/views/utils/view_utils"],
+define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_textbook", "common/js/components/utils/view_utils"],
         function(BaseView, $, EditTextbookView, ShowTextbookView, ViewUtils) {
     var ListTextbooks = BaseView.extend({
         initialize: function() {

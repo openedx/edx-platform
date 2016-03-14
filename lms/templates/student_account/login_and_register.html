@@ -1,4 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+    import json
+    from django.utils.translation import ugettext as _
+    from openedx.core.lib.js_utils import escape_json_dumps
+%>
 <%namespace name='static' file='/static_content.html'/>
 
 <%inherit file="../main.html" />
@@ -6,12 +10,10 @@
 <%block name="pagetitle">${_("Sign in or Register")}</%block>
 
 <%block name="js_extra">
-    <script src="${static.url('js/vendor/underscore-min.js')}"></script>
-    <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
-    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
-    <script src="${static.url('js/vendor/url.min.js')}"></script>
-    <script src="${static.url('js/vendor/history.js')}"></script>
-    <%static:js group='student_account'/>
+    <%static:require_module module_name="js/student_account/logistration_factory" class_name="LogistrationFactory">
+        var options = ${ escape_json_dumps(data) | n };
+        LogistrationFactory(options);
+    </%static:require_module>
 </%block>
 
 <%block name="header_extras">
@@ -23,22 +25,5 @@
 </%block>
 
 <div class="section-bkg-wrapper">
-    <div id="login-and-registration-container"
-        class="login-register"
-        data-initial-mode="${initial_mode}"
-        data-third-party-auth='${third_party_auth|h}'
-        data-third-party-auth-hint='${third_party_auth_hint}'
-        data-next-url='${login_redirect_url|h}'
-        data-platform-name='${platform_name}'
-        data-login-form-desc='${login_form_desc|h}'
-        data-registration-form-desc='${registration_form_desc|h}'
-        data-password-reset-form-desc='${password_reset_form_desc|h}'
-    />
+    <div id="login-and-registration-container" class="login-register" />
 </div>
-
-% if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-    ## This overwrites the "footer" block declared in main.html
-    ## with an empty block, effectively hiding the footer
-    ## from logistration pages.
-    <%block name="footer"/>
-% endif

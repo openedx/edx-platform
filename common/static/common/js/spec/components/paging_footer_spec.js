@@ -1,10 +1,11 @@
 define([
+    'jquery',
     'URI',
     'underscore',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/components/views/paging_footer',
     'common/js/components/collections/paging_collection'
-], function (URI, _, AjaxHelpers, PagingFooter, PagingCollection) {
+], function ($, URI, _, AjaxHelpers, PagingFooter, PagingCollection) {
     'use strict';
     describe("PagingFooter", function () {
         var pagingFooter,

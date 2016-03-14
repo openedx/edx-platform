@@ -87,13 +87,6 @@ class InstructorTask(models.Model):
     def create(cls, course_id, task_type, task_key, task_input, requester):
         """
         Create an instance of InstructorTask.
-
-        The InstructorTask.save_now method makes sure the InstructorTask entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, an autocommit buried within here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
         """
         # create the task_id here, and pass it into celery:
         task_id = str(uuid4())
@@ -120,17 +113,10 @@ class InstructorTask(models.Model):
 
         return instructor_task
 
-    @transaction.autocommit
+    @transaction.atomic
     def save_now(self):
         """
         Writes InstructorTask immediately, ensuring the transaction is committed.
-
-        Autocommit annotation makes sure the database entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, this autocommit here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
         """
         self.save()
 

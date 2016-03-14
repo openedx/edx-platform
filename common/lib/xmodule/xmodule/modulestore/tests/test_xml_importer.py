@@ -3,7 +3,6 @@ Tests for XML importer.
 """
 import mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xblock.core import XBlock
 from xblock.fields import String, Scope, ScopeIds, List
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin

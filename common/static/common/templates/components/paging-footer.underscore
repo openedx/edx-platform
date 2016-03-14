@@ -3,7 +3,8 @@
     <div class="nav-item page">
         <div class="pagination-form">
             <label class="page-number-label" for="page-number-input"><%= gettext("Page number") %></label>
-            <input id="page-number-input" class="page-number-input" name="page-number" type="text" size="4" autocomplete="off" />
+            <input id="page-number-input" class="page-number-input" name="page-number" type="text" size="4" autocomplete="off" aria-describedby="page-number-input-helper"/>
+            <span class="sr field-helper" id="page-number-input-helper"><%= gettext("Enter the page number you'd like to quickly navigate to.") %></span>
         </div>
 
         <span class="current-page"><%= current_page %></span>

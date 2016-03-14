@@ -9,12 +9,12 @@ if Backbone?
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
       "click .discussion-paginator a": "navigateToPage"
 
-    paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
     page_re: /\?discussion_page=(\d+)/
-    initialize: ->
+    initialize: (options) ->
       @toggleDiscussionBtn = @$(".discussion-show")
       # Set the page if it was set in the URL. This is used to allow deep linking to pages
       match = @page_re.exec(window.location.href)
+      @context = options.context or "course"  # allowed values are "course" or "standalone"
       if match
         @page = parseInt(match[1])
       else
@@ -91,7 +91,10 @@ if Backbone?
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
 
-      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
+      $discussion = _.template($("#inline-discussion-template").html())(
+        'threads': response.discussion_data,
+        'discussionId': discussionId
+      )
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
@@ -103,6 +106,7 @@ if Backbone?
           el: @$("article#thread_#{thread.id}"),
           model: thread,
           mode: "inline",
+          context: @context,
           course_settings: @course_settings,
           topicId: discussionId
         )
@@ -139,6 +143,7 @@ if Backbone?
         el: article,
         model: thread,
         mode: "inline",
+        context: @context,
         course_settings: @course_settings,
         topicId: @$el.data("discussion-id")
       )
@@ -149,8 +154,8 @@ if Backbone?
       pageUrl = (number) ->
         "?discussion_page=#{number}"
       params = DiscussionUtil.getPaginationParams(@page, numPages, pageUrl)
-      thing = Mustache.render @paginationTemplate(), params
-      @$('section.pagination').html(thing)
+      pagination = _.template($("#pagination-template").html())(params)
+      @$('section.discussion-pagination').html(pagination)
 
     navigateToPage: (event) =>
       event.preventDefault()

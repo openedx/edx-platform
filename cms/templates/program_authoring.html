@@ -1,0 +1,16 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%inherit file="base.html" />
+<%block name="title">${_("Program Administration")}</%block>
+
+<%block name="header_extras">
+<link rel="stylesheet" href=${authoring_app_config.css_url}>
+</%block>
+
+<%block name="requirejs">
+  require(['${authoring_app_config.js_url}'], function () {});
+</%block>
+
+<%block name="content">
+<div class="js-program-admin program-app layout-1q3q layout-reversed" data-api-url=${programs_api_url} data-auth-url=${programs_token_url} data-home-url=${studio_home_url}></div>
+</%block>

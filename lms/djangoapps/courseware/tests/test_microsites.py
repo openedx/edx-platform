@@ -34,7 +34,11 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # IMPORTANT: For these tests to work, this domain must be defined via
         # DNS configuration (either local or published)
 
-        self.course = CourseFactory.create(display_name='Robot_Super_Course', org='TestMicrositeX')
+        self.course = CourseFactory.create(
+            display_name='Robot_Super_Course',
+            org='TestMicrositeX',
+            emit_signals=True,
+        )
         self.chapter0 = ItemFactory.create(parent_location=self.course.location,
                                            display_name='Overview')
         self.chapter9 = ItemFactory.create(parent_location=self.course.location,
@@ -44,13 +48,18 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
                                            display_name='factory_section')
 
-        self.course_outside_microsite = CourseFactory.create(display_name='Robot_Course_Outside_Microsite', org='FooX')
+        self.course_outside_microsite = CourseFactory.create(
+            display_name='Robot_Course_Outside_Microsite',
+            org='FooX',
+            emit_signals=True,
+        )
 
         # have a course which explicitly sets visibility in catalog to False
         self.course_hidden_visibility = CourseFactory.create(
             display_name='Hidden_course',
             org='TestMicrositeX',
             catalog_visibility=CATALOG_VISIBILITY_NONE,
+            emit_signals=True,
         )
 
         # have a course which explicitly sets visibility in catalog and about to true
@@ -59,6 +68,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             org='TestMicrositeX',
             course="foo",
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+            emit_signals=True,
         )
 
     def setup_users(self):
@@ -201,8 +211,8 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         course_mode = CourseMode(
             course_id=self.course_with_visibility.id,
-            mode_slug="honor",
-            mode_display_name="honor cert",
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             min_price=10,
         )
         course_mode.save()
@@ -212,13 +222,15 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn("Enroll in {}".format(self.course_with_visibility.id.course), resp.content)
         self.assertNotIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
 
         # now try on the microsite
         url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
-        self.assertIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+        self.assertNotIn("Enroll in {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn("Add {} to Cart <span>($10 USD)</span>".format(
+            self.course_with_visibility.id.course
+        ), resp.content)
         self.assertIn('$("#add_to_cart_post").click', resp.content)

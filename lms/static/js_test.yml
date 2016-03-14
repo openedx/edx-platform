@@ -39,6 +39,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
+    - xmodule_js/common_static/js/vendor/jquery.timeago.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
@@ -49,7 +50,7 @@ lib_paths:
     - xmodule_js/common_static/js/xblock
     - xmodule_js/common_static/coffee/src/xblock
     - coffee/src/instructor_dashboard
-    - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
+    - xmodule_js/common_static/js/vendor/sinon-1.17.0.js
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
@@ -62,17 +63,26 @@ lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/moment.min.js
+    - xmodule_js/common_static/js/vendor/moment-with-locales.min.js
+    - xmodule_js/common_static/common/js/utils/edx.utils.validate.js
+    - xmodule_js/common_static/js/vendor/slick.core.js
+    - xmodule_js/common_static/js/vendor/slick.grid.js
+    - xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js
 
 # Paths to source JavaScript files
 src_paths:
     - js
+    - coffee/src
     - common/js
     - teams/js
+    - xmodule_js/common_static/coffee
+    - support/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - js/spec
     - teams/js/spec
+    - support/js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -96,12 +106,14 @@ fixture_paths:
     - templates/components/header
     - templates/components/tabbed
     - templates/components/card
+    - templates/financial-assistance/
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search
     - templates/discovery
     - common/templates
     - teams/templates
+    - support/templates
 
 requirejs:
   paths:

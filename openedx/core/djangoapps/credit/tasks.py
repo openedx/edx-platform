@@ -2,16 +2,16 @@
 This file contains celery tasks for credit course views.
 """
 
-from django.conf import settings
-
 from celery import task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from .api import set_credit_requirements
+from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.utils import get_course_blocks
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -19,11 +19,8 @@ LOGGER = get_task_logger(__name__)
 
 
 # XBlocks that can be added as credit requirements
-CREDIT_REQUIREMENT_XBLOCKS = [
-    {
-        "category": "edx-reverification-block",
-        "requirement-namespace": "reverification"
-    }
+CREDIT_REQUIREMENT_XBLOCK_CATEGORIES = [
+    "edx-reverification-block",
 ]
 
 
@@ -57,6 +54,9 @@ def _get_course_credit_requirements(course_key):
     """
     Returns the list of credit requirements for the given course.
 
+    This will also call into the edx-proctoring subsystem to also
+    produce proctored exam requirements for credit bearing courses
+
     It returns the minimum_grade_credit and also the ICRV checkpoints
     if any were added in the course
 
@@ -69,7 +69,17 @@ def _get_course_credit_requirements(course_key):
     """
     credit_xblock_requirements = _get_credit_course_requirement_xblocks(course_key)
     min_grade_requirement = _get_min_grade_requirement(course_key)
-    credit_requirements = min_grade_requirement + credit_xblock_requirements
+    proctored_exams_requirements = _get_proctoring_requirements(course_key)
+    block_requirements = credit_xblock_requirements + proctored_exams_requirements
+    # sort credit requirements list based on start date and put all the
+    # requirements with no start date at the end of requirement list.
+    sorted_block_requirements = sorted(
+        block_requirements, key=lambda x: (x['start_date'] is None, x['start_date'], x['display_name'])
+    )
+
+    credit_requirements = (
+        min_grade_requirement + sorted_block_requirements
+    )
     return credit_requirements
 
 
@@ -90,9 +100,9 @@ def _get_min_grade_requirement(course_key):
             {
                 "namespace": "grade",
                 "name": "grade",
-                "display_name": "Grade",
+                "display_name": "Minimum Grade",
                 "criteria": {
-                    "min_grade": getattr(course, "minimum_grade_credit")
+                    "min_grade": course.minimum_grade_credit
                 },
             }
         ]
@@ -117,22 +127,31 @@ def _get_credit_course_requirement_xblocks(course_key):  # pylint: disable=inval
     # Retrieve all XBlocks from the course that we know to be credit requirements.
     # For performance reasons, we look these up by their "category" to avoid
     # loading and searching the entire course tree.
-    for desc in CREDIT_REQUIREMENT_XBLOCKS:
+    for category in CREDIT_REQUIREMENT_XBLOCK_CATEGORIES:
         requirements.extend([
             {
-                "namespace": desc["requirement-namespace"],
+                "namespace": block.get_credit_requirement_namespace(),
                 "name": block.get_credit_requirement_name(),
                 "display_name": block.get_credit_requirement_display_name(),
+                'start_date': block.start,
                 "criteria": {},
             }
-            for block in modulestore().get_items(
-                course_key,
-                qualifiers={"category": desc["category"]}
-            )
+            for block in _get_xblocks(course_key, category)
             if _is_credit_requirement(block)
         ])
 
     return requirements
+
+
+def _get_xblocks(course_key, category):
+    """
+    Retrieve all XBlocks in the course for a particular category.
+
+    Returns only XBlocks that are published and haven't been deleted.
+    """
+    xblocks = get_course_blocks(course_key, category)
+
+    return xblocks
 
 
 def _is_credit_requirement(xblock):
@@ -146,18 +165,69 @@ def _is_credit_requirement(xblock):
         True if XBlock is a credit requirement else False
 
     """
-    if not callable(getattr(xblock, "get_credit_requirement_namespace", None)):
-        LOGGER.error(
-            "XBlock %s is marked as a credit requirement but does not "
-            "implement get_credit_requirement_namespace()", unicode(xblock)
-        )
-        return False
+    required_methods = [
+        "get_credit_requirement_namespace",
+        "get_credit_requirement_name",
+        "get_credit_requirement_display_name"
+    ]
 
-    if not callable(getattr(xblock, "get_credit_requirement_name", None)):
-        LOGGER.error(
-            "XBlock %s is marked as a credit requirement but does not "
-            "implement get_credit_requirement_name()", unicode(xblock)
-        )
-        return False
+    for method_name in required_methods:
+        if not callable(getattr(xblock, method_name, None)):
+            LOGGER.error(
+                "XBlock %s is marked as a credit requirement but does not "
+                "implement %s", unicode(xblock), method_name
+            )
+            return False
 
     return True
+
+
+def _get_proctoring_requirements(course_key):
+    """
+    Will return list of requirements regarding any exams that have been
+    marked as proctored exams. For credit-bearing courses, all
+    proctored exams must be validated and confirmed from a proctoring
+    standpoint. The passing grade on an exam is not enough.
+
+    Args:
+        course_key: The key of the course in question
+
+    Returns:
+        list of requirements dictionary, one per active proctored exam
+
+    """
+
+    # Note: Need to import here as there appears to be
+    # a circular reference happening when launching Studio
+    # process
+    from edx_proctoring.api import get_all_exams_for_course
+
+    requirements = []
+    for exam in get_all_exams_for_course(unicode(course_key)):
+        if exam['is_proctored'] and exam['is_active'] and not exam['is_practice_exam']:
+            try:
+                usage_key = UsageKey.from_string(exam['content_id'])
+                proctor_block = modulestore().get_item(usage_key)
+            except (InvalidKeyError, ItemNotFoundError):
+                LOGGER.info("Invalid content_id '%s' for proctored block '%s'", exam['content_id'], exam['exam_name'])
+                proctor_block = None
+
+            if proctor_block:
+                requirements.append(
+                    {
+                        'namespace': 'proctored_exam',
+                        'name': exam['content_id'],
+                        'display_name': exam['exam_name'],
+                        'start_date': proctor_block.start if proctor_block.start else None,
+                        'criteria': {},
+                    })
+
+    if requirements:
+        log_msg = (
+            'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
+                log_msg=requirements
+            )
+        )
+        LOGGER.info(log_msg)
+
+    return requirements

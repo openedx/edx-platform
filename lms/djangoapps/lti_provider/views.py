@@ -3,9 +3,6 @@ LTI Provider view functions
 """
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import redirect_to_login
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -33,8 +30,6 @@ OPTIONAL_PARAMETERS = [
     'tool_consumer_instance_guid'
 ]
 
-LTI_SESSION_KEY = 'lti_provider_parameters'
-
 
 @csrf_exempt
 def lti_launch(request, course_id, usage_id):
@@ -48,38 +43,32 @@ def lti_launch(request, course_id, usage_id):
         - The launch contains all the required parameters
         - The launch data is correctly signed using a known client key/secret
           pair
-        - The user is logged into the edX instance
-
-    Authentication in this view is a little tricky, since clients use a POST
-    with parameters to fetch it. We can't just use @login_required since in the
-    case where a user is not logged in it will redirect back after login using a
-    GET request, which would lose all of our LTI parameters.
-
-    Instead, we verify the LTI launch in this view before checking if the user
-    is logged in, and store the required LTI parameters in the session. Then we
-    do the authentication check, and if login is required we redirect back to
-    the lti_run view. If the user is already logged in, we just call that view
-    directly.
     """
-
     if not settings.FEATURES['ENABLE_LTI_PROVIDER']:
         return HttpResponseForbidden()
 
-    # Check the OAuth signature on the message
-    try:
-        if not SignatureValidator().verify(request):
-            return HttpResponseForbidden()
-    except LtiConsumer.DoesNotExist:
-        return HttpResponseForbidden()
-
+    # Check the LTI parameters, and return 400 if any required parameters are
+    # missing
     params = get_required_parameters(request.POST)
     if not params:
         return HttpResponseBadRequest()
     params.update(get_optional_parameters(request.POST))
 
-    # Store the course, and usage ID in the session to prevent privilege
-    # escalation if a staff member in one course tries to access material in
-    # another.
+    # Get the consumer information from either the instance GUID or the consumer
+    # key
+    try:
+        lti_consumer = LtiConsumer.get_or_supplement(
+            params.get('tool_consumer_instance_guid', None),
+            params['oauth_consumer_key']
+        )
+    except LtiConsumer.DoesNotExist:
+        return HttpResponseForbidden()
+
+    # Check the OAuth signature on the message
+    if not SignatureValidator(lti_consumer).verify(request):
+        return HttpResponseForbidden()
+
+    # Add the course and usage keys to the parameters array
     try:
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
@@ -93,57 +82,13 @@ def lti_launch(request, course_id, usage_id):
     params['course_key'] = course_key
     params['usage_key'] = usage_key
 
-    try:
-        lti_consumer = LtiConsumer.get_or_supplement(
-            params.get('tool_consumer_instance_guid', None),
-            params['oauth_consumer_key']
-        )
-    except LtiConsumer.DoesNotExist:
-        return HttpResponseForbidden()
-
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.
     authenticate_lti_user(request, params['user_id'], lti_consumer)
 
-    request.session[LTI_SESSION_KEY] = params
-
-    return lti_run(request)
-
-
-@login_required
-def lti_run(request):
-    """
-    This method can be reached in two ways, and must always follow a POST to
-    lti_launch:
-     - The user was logged in, so this method was called by lti_launch
-     - The user was not logged in, so the login process redirected them back here.
-
-    In either case, the session was populated by lti_launch, so all the required
-    LTI parameters will be stored there. Note that the request passed here may
-    or may not contain the LTI parameters (depending on how the user got here),
-    and so we should only use LTI parameters from the session.
-
-    Users should never call this view directly; if a user attempts to call it
-    without having first gone through lti_launch (and had the LTI parameters
-    stored in the session) they will get a 403 response.
-    """
-
-    # Check the parameters to make sure that the session is associated with a
-    # valid LTI launch
-    params = restore_params_from_session(request)
-    if not params:
-        # This view has been called without first setting the session
-        return HttpResponseForbidden()
-    # Remove the parameters from the session to prevent replay
-    del request.session[LTI_SESSION_KEY]
-
     # Store any parameters required by the outcome service in order to report
     # scores back later. We know that the consumer exists, since the record was
     # used earlier to verify the oauth signature.
-    lti_consumer = LtiConsumer.get_or_supplement(
-        params.get('tool_consumer_instance_guid', None),
-        params['oauth_consumer_key']
-    )
     store_outcome_parameters(params, request.user, lti_consumer)
 
     return render_courseware(request, params['usage_key'])
@@ -182,26 +127,6 @@ def get_optional_parameters(dictionary):
         were present.
     """
     return {key: dictionary[key] for key in OPTIONAL_PARAMETERS if key in dictionary}
-
-
-def restore_params_from_session(request):
-    """
-    Fetch the parameters that were stored in the session by an LTI launch, and
-    verify that all required parameters are present. Missing parameters could
-    indicate that a user has directly called the lti_run endpoint, rather than
-    going through the LTI launch.
-
-    :return: A dictionary of all LTI parameters from the session, or None if
-             any parameters are missing.
-    """
-    if LTI_SESSION_KEY not in request.session:
-        return None
-    session_params = request.session[LTI_SESSION_KEY]
-    additional_params = ['course_key', 'usage_key']
-    for key in REQUIRED_PARAMETERS + additional_params:
-        if key not in session_params:
-            return None
-    return session_params
 
 
 def render_courseware(request, usage_key):

@@ -13,18 +13,26 @@ from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr('shard_1')
-class TestECommerceDashboardViews(ModuleStoreTestCase):
+class TestECommerceDashboardViews(SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestECommerceDashboardViews, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
+        # URL for instructor dash
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+        cls.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
+
     def setUp(self):
         super(TestECommerceDashboardViews, self).setUp()
-        self.course = CourseFactory.create()
 
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -34,9 +42,6 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
             mode_display_name='honor', min_price=10, currency='usd'
         )
         mode.save()
-        # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        self.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 
     def test_pass_e_commerce_tab_in_instructor_dashboard(self):
@@ -265,7 +270,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(self.url)
         self.assertTrue('<td>AS452</td>' in response.content)
         data = {
-            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=no-member
+            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',
             'course_id': coupon.course_id.to_deprecated_string()
         }
         # URL for update_coupon

@@ -32,6 +32,11 @@ define(["backbone"], function (Backbone) {
                     return -1;
                 } else if (isPrimaryBlankTemplate(b)) {
                     return 1;
+                // Hinted problems should be shown at the end
+                } else if (a.hinted && !b.hinted) {
+                    return 1;
+                } else if (!a.hinted && b.hinted) {
+                    return -1;
                 } else if (a.display_name > b.display_name) {
                     return 1;
                 } else if (a.display_name < b.display_name) {

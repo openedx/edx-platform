@@ -59,9 +59,9 @@ def cmd_log(cmd, cwd):
     command doesn't return 0, and returns the command's output.
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-    log.debug('Command was: {0!r}. '
-              'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
-    log.debug('Command output was: {0!r}'.format(output))
+
+    log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
+    log.debug(u'Command output was: %r', output)
     return output
 
 
@@ -152,7 +152,7 @@ def add_repo(repo, rdir_in, branch=None):
         rdir = os.path.basename(rdir_in)
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
-    log.debug('rdir = {0}'.format(rdir))
+    log.debug('rdir = %s', rdir)
 
     rdirp = '{0}/{1}'.format(GIT_REPO_DIR, rdir)
     if os.path.exists(rdirp):
@@ -239,7 +239,7 @@ def add_repo(repo, rdir_in, branch=None):
         except InvalidKeyError:
             course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         cdir = '{0}/{1}'.format(GIT_REPO_DIR, course_key.course)
-        log.debug('Studio course dir = {0}'.format(cdir))
+        log.debug('Studio course dir = %s', cdir)
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug('   -> exists, but is not symlink')
@@ -251,7 +251,7 @@ def add_repo(repo, rdir_in, branch=None):
                 log.exception('Failed to remove course directory')
 
         if not os.path.exists(cdir):
-            log.debug('   -> creating symlink between {0} and {1}'.format(rdirp, cdir))
+            log.debug('   -> creating symlink between %s and %s', rdirp, cdir)
             try:
                 os.symlink(os.path.abspath(rdirp), os.path.abspath(cdir))
             except OSError:
@@ -280,5 +280,5 @@ def add_repo(repo, rdir_in, branch=None):
     )
     cil.save()
 
-    log.debug('saved CourseImportLog for {0}'.format(cil.course_id))
+    log.debug('saved CourseImportLog for %s', cil.course_id)
     mdb.disconnect()

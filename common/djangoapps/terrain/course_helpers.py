@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 import urllib
 from lettuce import world

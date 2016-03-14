@@ -12,11 +12,11 @@ from django.conf import settings
   <section class="message">
     <h1>${_("Unsubscribe Successful!")}</h1>
     <hr class="horizontal-divider">
-    
+
     <p>
       ${_("You will no longer receive forum notification emails from {platform_name}. "
-          "Click {dashboard_link_start}here{link_end} to return to your dashboard. "
-          "If you did not mean to do this, click {undo_link_start}here{link_end} to re-subscribe.").format(
+          "You may {dashboard_link_start}return to your dashboard{link_end}. "
+          "If you did not mean to do this, {undo_link_start}you can re-subscribe{link_end}.").format(
              platform_name=settings.PLATFORM_NAME,
              dashboard_link_start="<a href='{}'>".format(reverse('dashboard')),
              undo_link_start="<a id='resub_link' href='{}'>".format(reverse('resubscribe_forum_update', args=[token])),

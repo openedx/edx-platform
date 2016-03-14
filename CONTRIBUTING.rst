@@ -6,7 +6,7 @@ Contributions to Open edX are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
 
-.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/userdocs/en/latest/process/overview.html
+.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/index.html
 
 Step 0: Join the Conversation
 =============================
@@ -17,6 +17,9 @@ it's a good idea to discuss your idea with other interested developers and/or th
 edX product team. You may get some valuable feedback that changes how you think
 about your idea, or you may find other developers who have the same idea and want
 to work together.
+
+JIRA
+----
 
 If you've got an idea for a new feature or new functionality for an existing feature,
 please start a discussion on the `edx-code`_ mailing list to get feedback from
@@ -38,14 +41,27 @@ pull request.
 .. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
 .. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
 
-For real-time conversation, we use `IRC`_: we all hang out in the
-`#edx-code channel on Freenode`_. Come join us! The channel tends to be most
-active Monday through Friday between 13:00 and 21:00 UTC
-(9am to 5pm US Eastern time), but interesting conversations can happen
-at any time.
+Slack
+-----
 
-.. _IRC: http://www.irchelp.org/
-.. _#edx-code channel on Freenode: http://webchat.freenode.net/?channels=edx-code
+To talk with others in the Open edX community, join us on `Slack`_.
+`Sign up for a free account`_ and join the conversation!
+The group tends to be most active Monday through Friday
+between 13:00 and 21:00 UTC (9am to 5pm US Eastern time),
+but interesting conversations can happen at any time.
+There are many different channels available for different topics, including:
+
+* ``#ops`` for installation help
+* ``#events`` for upcoming events related to Open edX
+* ``#content`` for discussions about course content and creating the best courses
+
+And lots more! You can also make your own channels to discuss new topics.
+
+.. _Slack: https://slack.com/
+.. _Sign up for a free account: https://openedx-slack-invite.herokuapp.com/
+
+Mailing Lists
+-------------
 
 For asynchronous conversation, we have several mailing lists on Google Groups:
 
@@ -122,7 +138,8 @@ requests must meet in order to be reviewed by a core committer. These requiremen
 include things like documentation and passing tests: see the
 `contributor documentation`_ page for the full list.
 
-.. _contributor documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/process/contributor.html
+.. _contributor documentation: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
+
 
 Areas of particular concern with their own detailed guidelines are:
 

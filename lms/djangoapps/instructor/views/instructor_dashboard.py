@@ -37,8 +37,15 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import CertificateGenerationConfiguration
+from certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateWhitelist,
+    GeneratedCertificate,
+    CertificateStatuses,
+    CertificateGenerationHistory,
+)
 from certificates import api as certs_api
+from util.date_utils import get_default_time_display
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
@@ -58,11 +65,11 @@ class InstructorDashboardTab(CourseTab):
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument,redefined-outer-name
+    def is_enabled(cls, course, user=None):
         """
         Returns true if the specified user has staff access.
         """
-        return user and has_access(user, 'staff', course, course.id)
+        return bool(user and has_access(user, 'staff', course, course.id))
 
 
 @ensure_csrf_cookie
@@ -79,10 +86,10 @@ def instructor_dashboard_2(request, course_id):
 
     access = {
         'admin': request.user.is_staff,
-        'instructor': has_access(request.user, 'instructor', course),
+        'instructor': bool(has_access(request.user, 'instructor', course)),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
-        'staff': has_access(request.user, 'staff', course),
+        'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
 
@@ -97,10 +104,24 @@ def instructor_dashboard_2(request, course_id):
         _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
-        _section_analytics(course, access),
     ]
 
-    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    analytics_dashboard_message = None
+    if settings.ANALYTICS_DASHBOARD_URL:
+        # Construct a URL to the external analytics dashboard
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+        analytics_dashboard_message = _(
+            "To gain insights into student enrollment and participation {link_start}"
+            "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
+        )
+        analytics_dashboard_message = analytics_dashboard_message.format(
+            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+
+        # Temporarily show the "Analytics" section until we have a better way of linking to Insights
+        sections.append(_section_analytics(course, access))
+
+    # Check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
     course_mode_has_price = False
     paid_modes = CourseMode.paid_modes_for_course(course_key)
     if len(paid_modes) == 1:
@@ -112,7 +133,7 @@ def instructor_dashboard_2(request, course_id):
             unicode(course_key), len(paid_modes)
         )
 
-    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
+    if settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']:
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -127,6 +148,19 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
+    # Gate access to Special Exam tab depending if either timed exams or proctored exams
+    # are enabled in the course
+
+    # NOTE: For now, if we only have procotred exams enabled, then only platform Staff
+    # (user.is_staff) will be able to view the special exams tab. This may
+    # change in the future
+    can_see_special_exams = (
+        ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
+    )
+    if can_see_special_exams:
+        sections.append(_section_special_exams(course, access))
+
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
@@ -136,23 +170,33 @@ def instructor_dashboard_2(request, course_id):
 
     disable_buttons = not _is_small_course(course_key)
 
-    analytics_dashboard_message = None
-    if settings.ANALYTICS_DASHBOARD_URL:
-        # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
-        analytics_dashboard_message = _("To gain insights into student enrollment and participation {link_start}visit {analytics_dashboard_name}, our new course analytics product{link_end}.")
-        analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+    certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
+    generate_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+        'generate_certificate_exceptions',
+        kwargs={'course_id': unicode(course_key), 'generate_for': ''}
+    )
+    generate_bulk_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+        'generate_bulk_certificate_exceptions',
+        kwargs={'course_id': unicode(course_key)}
+    )
+    certificate_exception_view_url = reverse(
+        'certificate_exception_view',
+        kwargs={'course_id': unicode(course_key)}
+    )
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
-        'analytics_dashboard_message': analytics_dashboard_message
+        'analytics_dashboard_message': analytics_dashboard_message,
+        'certificate_white_list': certificate_white_list,
+        'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
+        'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
+        'certificate_exception_view_url': certificate_exception_view_url
     }
+    if settings.FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD']:
+        context['old_dashboard_url'] = reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)})
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
@@ -217,6 +261,19 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
     return section_data
 
 
+def _section_special_exams(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+
+    section_data = {
+        'section_key': 'special_exams',
+        'section_display_name': _('Special Exams'),
+        'access': access,
+        'course_id': unicode(course_key)
+    }
+    return section_data
+
+
 def _section_certificates(course):
     """Section information for the certificates panel.
 
@@ -231,21 +288,30 @@ def _section_certificates(course):
         dict
 
     """
-    example_cert_status = certs_api.example_certificates_status(course.id)
+    example_cert_status = None
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    if html_cert_enabled:
+        can_enable_for_course = True
+    else:
+        example_cert_status = certs_api.example_certificates_status(course.id)
 
-    # Allow the user to enable self-generated certificates for students
-    # *only* once a set of example certificates has been successfully generated.
-    # If certificates have been misconfigured for the course (for example, if
-    # the PDF template hasn't been uploaded yet), then we don't want
-    # to turn on self-generated certificates for students!
-    can_enable_for_course = (
-        example_cert_status is not None and
-        all(
-            cert_status['status'] == 'success'
-            for cert_status in example_cert_status
+        # Allow the user to enable self-generated certificates for students
+        # *only* once a set of example certificates has been successfully generated.
+        # If certificates have been misconfigured for the course (for example, if
+        # the PDF template hasn't been uploaded yet), then we don't want
+        # to turn on self-generated certificates for students!
+        can_enable_for_course = (
+            example_cert_status is not None and
+            all(
+                cert_status['status'] == 'success'
+                for cert_status in example_cert_status
+            )
         )
-    )
     instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
+    certificate_statuses_with_count = {
+        certificate['status']: certificate['count']
+        for certificate in GeneratedCertificate.get_unique_statuses(course_key=course.id)
+    }
 
     return {
         'section_key': 'certificates',
@@ -254,6 +320,11 @@ def _section_certificates(course):
         'can_enable_for_course': can_enable_for_course,
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
         'instructor_generation_enabled': instructor_generation_enabled,
+        'html_cert_enabled': html_cert_enabled,
+        'active_certificate': certs_api.get_active_web_certificate(course),
+        'certificate_statuses_with_count': certificate_statuses_with_count,
+        'status': CertificateStatuses,
+        'certificate_generation_history': CertificateGenerationHistory.objects.filter(course_id=course.id),
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
@@ -265,6 +336,10 @@ def _section_certificates(course):
             ),
             'start_certificate_generation': reverse(
                 'start_certificate_generation',
+                kwargs={'course_id': course.id}
+            ),
+            'start_certificate_regeneration': reverse(
+                'start_certificate_regeneration',
                 kwargs={'course_id': course.id}
             ),
             'list_instructor_tasks_url': reverse(
@@ -301,7 +376,7 @@ def set_course_mode_price(request, course_id):
 
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
-        min_price=getattr(course_honor_mode[0], 'min_price'), currency=getattr(course_honor_mode[0], 'currency'),
+        min_price=course_honor_mode[0].min_price, currency=course_honor_mode[0].currency,
         expiration_datetime=datetime.datetime.now(pytz.utc), expiration_date=datetime.date.today()
     )
     course_honor_mode.update(
@@ -323,6 +398,9 @@ def _section_course_info(course, access):
         'course_display_name': course.display_name,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
+        'start_date': get_default_time_display(course.start),
+        'end_date': get_default_time_display(course.end) or _('No end date set'),
+        'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
 
@@ -338,8 +416,9 @@ def _section_course_info(course, access):
         section_data['detailed_gitlogs_url'] = reverse('gitlogs_detail', kwargs={'course_id': unicode(course_key)})
 
     try:
+        sorted_cutoffs = sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True)
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
-        section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
+        section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_key)
@@ -451,20 +530,34 @@ def _section_extensions(course):
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+
+    show_proctored_report_button = (
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+        course.enable_proctored_exams
+    )
+
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
+        'show_generate_proctored_exam_report_button': show_proctored_report_button,
+        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
+        'get_issued_certificates_url': reverse(
+            'get_issued_certificates', kwargs={'course_id': unicode(course_key)}
+        ),
         'get_students_who_may_enroll_url': reverse(
             'get_students_who_may_enroll', kwargs={'course_id': unicode(course_key)}
         ),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': unicode(course_key)}),
+        'list_proctored_results_url': reverse('get_proctored_exam_results', kwargs={'course_id': unicode(course_key)}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
+        'course_has_survey': True if course.course_survey_name else False,
+        'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -530,18 +623,19 @@ def _get_dashboard_link(course_key):
 def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+    insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
+
+    insights_message = insights_message.format(
+        analytics_dashboard_name=u'{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
+    )
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'get_distribution_url': reverse('get_distribution', kwargs={'course_id': unicode(course_key)}),
-        'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': unicode(course_key)}),
+        'insights_message': insights_message,
     }
-
-    if settings.ANALYTICS_DASHBOARD_URL:
-        dashboard_link = _get_dashboard_link(course_key)
-        message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
-        section_data['demographic_message'] = message
 
     return section_data
 

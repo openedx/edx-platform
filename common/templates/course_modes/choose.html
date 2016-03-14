@@ -68,6 +68,9 @@ from django.core.urlresolvers import reverse
                     </header>
 
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        <%
+                        b_tag_kwargs = {'b_start': '<b>', 'b_end': '</b>'}
+                        %>
                         % if "verified" in modes:
                             <div class="register-choice register-choice-certificate">
                                 <div class="wrapper-copy">
@@ -76,22 +79,22 @@ from django.core.urlresolvers import reverse
                                     <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
 
                                     <div class="copy">
-                                        <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit from {org}, advance your career, or strengthen your school applications.").format(org=course_org)}</p>
+                                        <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit, advance your career, or strengthen your school applications.")}</p>
                                         <p>
                                             <div class="wrapper-copy-inline">
                                                 <div class="copy-inline">
                                                     <h4>${_("Benefits of a Verified Certificate")}</h4>
                                                     <ul>
-                                                        <li>${_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn").format(**b_tag_kwargs)}</li>
                                                     </ul>
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
                                                         <li class="action action-select">
                                                             <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price})" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -108,16 +111,19 @@ from django.core.urlresolvers import reverse
                                                 <div class="copy-inline">
                                                     <h4>${_("Benefits of a Verified Certificate")}</h4>
                                                     <ul>
-                                                        <li>${_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(b_start='<b>', b_end='</b>')}</li>
-                                                        <li>${_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course").format(b_start='<b>', b_end='</b>')}</li>
+                                                        <li>${_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn").format(**b_tag_kwargs)}</li>
+                                                        <li>${_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course").format(**b_tag_kwargs)}</li>
+                                                        % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+                                                        <li>${_("{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified certificates to help fund free education for everyone globally").format(**b_tag_kwargs)}</li>
+                                                        % endif
                                                     </ul>
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
                                                         <li class="action action-select">
                                                             <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price})" />
+                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -139,13 +145,34 @@ from django.core.urlresolvers import reverse
                                     <span class="deco-ribbon"></span>
                                     <h4 class="title">${_("Audit This Course")}</h4>
                                     <div class="copy">
-                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums. If your work is satisfactory and you abide by the Honor Code, you'll receive a personalized Honor Code Certificate to showcase your achievement.")}</p>
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.")}</p>
                                     </div>
                                 </div>
 
                                 <ul class="list-actions">
                                     <li class="action action-select">
                                         <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % elif "audit" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>
+                                    <div class="copy">
+                                        ## Translators: b_start notes the beginning of a section of text bolded for emphasis, and b_end marks the end of the bolded text.
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  {b_start}Please note that this track does not offer a certificate for learners who earn a passing grade.{b_end}".format(**b_tag_kwargs))}</p>
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="audit_mode" value="${_('Audit This Course')}" />
                                     </li>
                                 </ul>
                             </div>

@@ -3,7 +3,9 @@ Run and manage servers for local development.
 """
 from __future__ import print_function
 import argparse
-from paver.easy import *
+import sys
+
+from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
 from .utils.cmd import django_cmd
@@ -135,6 +137,7 @@ def devstack(args):
     if args.optimized:
         settings = OPTIMIZED_SETTINGS
         asset_settings = OPTIMIZED_ASSETS_SETTINGS
+    sh(django_cmd('cms', settings, 'reindex_course', '--setup'))
     run_server(
         args.system[0],
         fast=args.fast,
@@ -244,14 +247,16 @@ def run_all_servers(options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
     ("settings=", "s", "Django settings"),
+    ("fake-initial", None, "Fake the initial migrations"),
 ])
-def update_db():
+def update_db(options):
     """
     Runs syncdb and then migrate.
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
+    fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
-        sh(django_cmd(system, settings, 'syncdb', '--migrate', '--traceback', '--pythonpath=.'))
+        sh(django_cmd(system, settings, 'migrate', fake, '--traceback', '--pythonpath=.'))
 
 
 @task
@@ -274,5 +279,5 @@ def check_settings(args):
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
         sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
-    except:
+    except:  # pylint: disable=bare-except
         print("Failed to import settings", file=sys.stderr)

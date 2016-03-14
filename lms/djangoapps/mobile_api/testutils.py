@@ -20,6 +20,11 @@ from rest_framework.test import APITestCase
 
 from opaque_keys.edx.keys import CourseKey
 
+from courseware.access_response import (
+    MobileAvailabilityError,
+    StartDateError,
+    VisibilityError
+)
 from courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
@@ -79,7 +84,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
             self.assertEqual(response.status_code, expected_response_code)
         return response
 
-    def reverse_url(self, reverse_args=None, **kwargs):  # pylint: disable=unused-argument
+    def reverse_url(self, reverse_args=None, **kwargs):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
@@ -134,14 +139,17 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = False  # pylint: disable=invalid-name
+    ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = False  # pylint: disable=invalid-name
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
         self.assertEqual(response.status_code, 200)
 
-    def verify_failure(self, response):
+    def verify_failure(self, response, error_type=None):
         """Base implementation of verifying a failed response."""
         self.assertEqual(response.status_code, 404)
+        if error_type:
+            self.assertEqual(response.data, error_type.to_json())
 
     def init_course_access(self, course_id=None):
         """Base implementation of initializing the user for each test."""
@@ -164,12 +172,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_unreleased_course(self):
         self.init_course_access()
-
-        response = self.api_response(expected_response_code=None)
-        if self.ALLOW_ACCESS_TO_UNRELEASED_COURSE:
-            self.verify_success(response)
-        else:
-            self.verify_failure(response)
+        self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))
 
     # A tuple of Role Types and Boolean values that indicate whether access should be given to that role.
     @ddt.data(
@@ -181,24 +184,41 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     @ddt.unpack
     def test_non_mobile_available(self, role, should_succeed):
         self.init_course_access()
-
         # set mobile_available to False for the test course
         self.course.mobile_available = False
         self.store.update_item(self.course, self.user.id)
-
-        # set user's role in the course
-        if role:
-            role(self.course.id).add_users(self.user)
-
-        # call API and verify response
-        response = self.api_response(expected_response_code=None)
-        if should_succeed:
-            self.verify_success(response)
-        else:
-            self.verify_failure(response)
+        self._verify_response(should_succeed, MobileAvailabilityError(), role)
 
     def test_unenrolled_user(self):
         self.login()
         self.unenroll()
         response = self.api_response(expected_response_code=None)
         self.verify_failure(response)
+
+    @ddt.data(
+        (auth.CourseStaffRole, True),
+        (None, False)
+    )
+    @ddt.unpack
+    def test_visible_to_staff_only_course(self, role, should_succeed):
+        self.init_course_access()
+        self.course.visible_to_staff_only = True
+        self.store.update_item(self.course, self.user.id)
+        if self.ALLOW_ACCESS_TO_NON_VISIBLE_COURSE:
+            should_succeed = True
+        self._verify_response(should_succeed, VisibilityError(), role)
+
+    def _verify_response(self, should_succeed, error_type, role=None):
+        """
+        Calls API and verifies the response
+        """
+        # set user's role in the course
+        if role:
+            role(self.course.id).add_users(self.user)
+
+        response = self.api_response(expected_response_code=None)
+
+        if should_succeed:
+            self.verify_success(response)
+        else:
+            self.verify_failure(response, error_type)

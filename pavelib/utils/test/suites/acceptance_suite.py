@@ -51,6 +51,9 @@ class AcceptanceTest(TestSuite):
         return cmd
 
     def _update_assets(self):
+        """
+        Internal helper method to manage asset compilation
+        """
         args = [self.system, '--settings=acceptance']
 
         if self.fasttest:
@@ -123,12 +126,10 @@ class AcceptanceTestSuite(TestSuite):
             sh("cp {db_cache} {db}".format(db_cache=self.db_cache, db=self.db))
 
             # Run migrations to update the db, starting from its cached state
-            sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
-            sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
+            sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial")
+            sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial")
         else:
             # If no cached database exists, syncdb before migrating, then create the cache
-            sh("./manage.py lms --settings acceptance syncdb --traceback --noinput")
-            sh("./manage.py cms --settings acceptance syncdb --traceback --noinput")
             sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
             sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
 

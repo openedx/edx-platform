@@ -118,6 +118,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             LogoutPage(self.browser).visit()
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
+
         subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
@@ -156,9 +157,10 @@ class LibraryContentTest(LibraryContentTestBase):
             XBlockFixtureDesc("html", "Html1", data='html1'),
             XBlockFixtureDesc("html", "Html2", data='html2'),
             XBlockFixtureDesc("html", "Html3", data='html3'),
+            XBlockFixtureDesc("html", "Html4", data='html4'),
         )
 
-    @ddt.data(1, 2, 3)
+    @ddt.data(2, 3, 4)
     def test_shows_random_xblocks_from_configured(self, count):
         """
         Scenario: Ensures that library content shows {count} random xblocks from library in LMS
@@ -190,7 +192,7 @@ class LibraryContentTest(LibraryContentTestBase):
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self._goto_library_block_page()
         children_contents = self.library_content_page.children_contents
-        self.assertEqual(len(children_contents), 3)
+        self.assertEqual(len(children_contents), 4)
         self.assertEqual(children_contents, self.library_xblocks_texts)
 
 

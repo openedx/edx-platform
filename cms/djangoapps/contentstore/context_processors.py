@@ -15,7 +15,7 @@ config.readfp(config_file)
 
 def doc_url(request=None):  # pylint: disable=unused-argument
     """
-    This function is added in the list of TEMPLATE_CONTEXT_PROCESSORS, which is a django setting for
+    This function is added in the list of TEMPLATES 'context_processors' OPTION, which is a django setting for
     a tuple of callables that take a request object as their argument and return a dictionary of items
     to be merged into the RequestContext.
 

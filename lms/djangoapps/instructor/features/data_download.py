@@ -7,7 +7,7 @@ acceptance tests.
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_regexp_matches
 from terrain.steps import reload_the_page
 from django.utils import http
 
@@ -18,7 +18,7 @@ def find_student_profile_table(step):  # pylint: disable=unused-argument
     world.wait_for_visible('#data-student-profiles-table')
 
     # Wait for the data table to be populated
-    world.wait_for(lambda _: world.css_text('#data-student-profiles-table') not in [u'', u'Loading...'])
+    world.wait_for(lambda _: world.css_text('#data-student-profiles-table') not in [u'', u'Loading'])
 
     if world.role == 'instructor':
         expected_data = [

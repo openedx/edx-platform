@@ -10,37 +10,8 @@ import ddt
 from django.http import QueryDict
 
 from opaque_keys.edx.locator import CourseLocator
-
+from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from discussion_api.forms import CommentListGetForm, ThreadListGetForm
-
-
-class FormTestMixin(object):
-    """A mixin for testing forms"""
-    def get_form(self, expected_valid):
-        """
-        Return a form bound to self.form_data, asserting its validity (or lack
-        thereof) according to expected_valid
-        """
-        form = self.FORM_CLASS(self.form_data)
-        self.assertEqual(form.is_valid(), expected_valid)
-        return form
-
-    def assert_error(self, expected_field, expected_message):
-        """
-        Create a form bound to self.form_data, assert its invalidity, and assert
-        that its error dictionary contains one entry with the expected field and
-        message
-        """
-        form = self.get_form(expected_valid=False)
-        self.assertEqual(form.errors, {expected_field: [expected_message]})
-
-    def assert_field_value(self, field, expected_value):
-        """
-        Create a form bound to self.form_data, assert its validity, and assert
-        that the given field in the cleaned data has the expected value
-        """
-        form = self.get_form(expected_valid=True)
-        self.assertEqual(form.cleaned_data[field], expected_value)
 
 
 class PaginationTestMixin(object):
@@ -92,9 +63,12 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "course_id": CourseLocator.from_string("Foo/Bar/Baz"),
                 "page": 2,
                 "page_size": 13,
-                "topic_id": [],
+                "topic_id": set(),
                 "text_search": "",
                 "following": None,
+                "view": "",
+                "order_by": "last_activity_at",
+                "order_direction": "desc",
             }
         )
 
@@ -103,7 +77,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         form = self.get_form(expected_valid=True)
         self.assertEqual(
             form.cleaned_data["topic_id"],
-            ["example topic_id", "example 2nd topic_id"],
+            {"example topic_id", "example 2nd topic_id"},
         )
 
     def test_text_search(self):
@@ -142,6 +116,24 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             "The following query parameters are mutually exclusive: topic_id, text_search, following"
         )
 
+    def test_invalid_view_choice(self):
+        self.form_data["view"] = "not_a_valid_choice"
+        self.assert_error("view", "Select a valid choice. not_a_valid_choice is not one of the available choices.")
+
+    def test_invalid_sort_by_choice(self):
+        self.form_data["order_by"] = "not_a_valid_choice"
+        self.assert_error(
+            "order_by",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
+        )
+
+    def test_invalid_sort_direction_choice(self):
+        self.form_data["order_direction"] = "not_a_valid_choice"
+        self.assert_error(
+            "order_direction",
+            "Select a valid choice. not_a_valid_choice is not one of the available choices."
+        )
+
 
 class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for CommentListGetForm"""
@@ -164,7 +156,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "thread_id": "deadbeef",
                 "endorsed": False,
                 "page": 2,
-                "page_size": 13,
+                "page_size": 13
             }
         )
 

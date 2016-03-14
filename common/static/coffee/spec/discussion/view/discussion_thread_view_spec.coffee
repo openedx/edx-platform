@@ -80,16 +80,16 @@ describe "DiscussionThreadView", ->
             expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)
 
         _.each(["tab", "inline"], (mode) =>
-                it 'Test that in #{mode} mode when a closed thread is opened the comment form is displayed', ->
+                it "Test that in #{mode} mode when a closed thread is opened the comment form is displayed", ->
                         checkCommentForm(true, mode)
 
-                it 'Test that in #{mode} mode when a open thread is closed the comment form is hidden', ->
+                it "Test that in #{mode} mode when a open thread is closed the comment form is hidden", ->
                         checkCommentForm(false, mode)
 
-                it 'Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden', ->
+                it "Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden", ->
                         checkVoteDisplay(true, mode)
 
-                it 'Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed', ->
+                it "Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed", ->
                         checkVoteDisplay(false, mode)
         )
 
@@ -157,6 +157,18 @@ describe "DiscussionThreadView", ->
                 @view.render()
                 expect($.ajax).not.toHaveBeenCalled()
                 expect(@view.$el.find(".responses li").length).toEqual(0)
+
+        describe "focus", ->
+            it "sends focus to the conversation when opened", ->
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})
+                @view.render()
+                @view.expand()
+                waitsFor (->
+                    # This is the implementation of "toBeFocused". However, simply calling that method
+                    # with no wait seems to be flaky.
+                    article = @view.$el.find('.discussion-article')
+                    return article[0] == article[0].ownerDocument.activeElement
+                ), "conversation did not receive focus", 3000
 
         describe "expand/collapse", ->
             it "shows/hides appropriate content", ->

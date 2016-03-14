@@ -5,16 +5,16 @@
             closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, playButton;
 
         openMenu = function () {
-            var container = $('div.video');
+            var container = $('.video');
             jasmine.Clock.useMock();
             container.find('video').trigger('contextmenu');
-            menu = container.children('ol.contextmenu');
-            menuItems = menu.children('li.menu-item').not('.submenu-item');
-            menuSubmenuItem = menu.children('li.menu-item.submenu-item');
-            submenu = menuSubmenuItem.children('ol.submenu');
-            submenuItems = submenu.children('li.menu-item');
-            overlay = container.children('div.overlay');
-            playButton = $('a.video_control.play');
+            menu = container.children('.contextmenu');
+            menuItems = menu.children('.menu-item').not('.submenu-item');
+            menuSubmenuItem = menu.children('.menu-item.submenu-item');
+            submenu = menuSubmenuItem.children('.submenu');
+            submenuItems = submenu.children('.menu-item');
+            overlay = container.children('.overlay');
+            playButton = $('.video_control.play');
         };
 
         keyPressEvent = function(key) {

@@ -2,7 +2,7 @@
 Tests for paver quality tasks
 """
 import os
-from path import path  # pylint: disable=no-name-in-module
+from path import Path as path
 import tempfile
 import unittest
 from mock import patch, MagicMock, mock_open
@@ -57,13 +57,13 @@ class TestPaverQualityViolations(unittest.TestCase):
         self.assertEqual(num, 2)
 
 
-class TestPaverJsHintViolationsCounts(unittest.TestCase):
+class TestPaverReportViolationsCounts(unittest.TestCase):
     """
-    For testing run_jshint
+    For testing run_jshint and run_complexity utils
     """
 
     def setUp(self):
-        super(TestPaverJsHintViolationsCounts, self).setUp()
+        super(TestPaverReportViolationsCounts, self).setUp()
 
         # Mock the paver @needs decorator
         self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
@@ -77,16 +77,16 @@ class TestPaverJsHintViolationsCounts(unittest.TestCase):
         self.addCleanup(self._mock_paver_needs.stop)
         self.addCleanup(os.remove, self.f.name)
 
-    def test_get_violations_count(self):
+    def test_get_jshint_violations_count(self):
         with open(self.f.name, 'w') as f:
             f.write("3000 violations found")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, 3000)
 
     def test_get_violations_no_number_found(self):
         with open(self.f.name, 'w') as f:
             f.write("Not expected string regex")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
     def test_get_violations_count_truncated_report(self):
@@ -95,7 +95,41 @@ class TestPaverJsHintViolationsCounts(unittest.TestCase):
         """
         with open(self.f.name, 'w') as f:
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name)  # pylint: disable=protected-access
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "jshint")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_complexity_value(self):
+        with open(self.f.name, 'w') as f:
+            f.write("Average complexity: A (1.93953443446)")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 1.93953443446)
+
+    def test_truncated_complexity_report(self):
+        with open(self.f.name, 'w') as f:
+            f.write("M 110:4 FooBar.default - A")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, None)
+
+    def test_no_complexity_report(self):
+        with self.assertRaises(BuildFailure):
+            pavelib.quality._get_count_from_last_line("non-existent-file", "python_complexity")  # pylint: disable=protected-access
+
+    def test_generic_value(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
+        self.assertEqual(actual_count, 5)
+
+    def test_generic_value_none_found(self):
+        """
+        Default behavior is to look for an integer appearing at head of line
+        """
+        with open(self.f.name, 'w') as f:
+            f.write("hello 5.777 good to see you")
+        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
 
 
@@ -153,7 +187,7 @@ class TestPaverRunQuality(unittest.TestCase):
     @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pep8(self):
         """
-        If pep8 finds errors, pylint should still be run
+        If pep8 finds errors, pylint and jshint should still be run
         """
         # Mock _get_pep8_violations to return a violation
         _mock_pep8_violations = MagicMock(
@@ -164,10 +198,10 @@ class TestPaverRunQuality(unittest.TestCase):
                 pavelib.quality.run_quality("")
                 self.assertRaises(BuildFailure)
 
-        # Test that both pep8 and pylint were called by counting the calls to _get_pep8_violations
-        # (for pep8) and sh (for diff-quality pylint)
+        # Test that pep8, pylint, and jshint were called by counting the calls to
+        # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & jshint)
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
     def test_failure_on_diffquality_pylint(self):
@@ -185,8 +219,28 @@ class TestPaverRunQuality(unittest.TestCase):
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the call to "pylint")
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        # And assert that sh was called twice (for the calls to pylint & jshint). This means that even in
+        # the event of a diff-quality pylint failure, jshint is still called.
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
+
+    @patch('__builtin__.open', mock_open())
+    def test_failure_on_diffquality_jshint(self):
+        """
+        If diff-quality fails on jshint, the paver task should also fail
+        """
+
+        # Underlying sh call must fail when it is running the jshint diff-quality task
+        self._mock_paver_sh.side_effect = CustomShMock().fail_on_jshint
+        _mock_pep8_violations = MagicMock(return_value=(0, []))
+        with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
+            with self.assertRaises(SystemExit):
+                pavelib.quality.run_quality("")
+                self.assertRaises(BuildFailure)
+        # Test that both pep8 and pylint were called by counting the calls
+        # Assert that _get_pep8_violations (which calls "pep8") is called once
+        self.assertEqual(_mock_pep8_violations.call_count, 1)
+        # And assert that sh was called twice (for the calls to pep8 and pylint)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
     def test_other_exception(self):
@@ -209,8 +263,8 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
-        # And assert that sh was called once (for the call to "pylint")
-        self.assertEqual(self._mock_paver_sh.call_count, 1)
+        # And assert that sh was called twice (for the call to "pylint" & "jshint")
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
 
 class CustomShMock(object):
@@ -225,6 +279,17 @@ class CustomShMock(object):
         is going to fail when we pass in a percentage ("p") requirement.
         """
         if "pylint" in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
+
+    def fail_on_jshint(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "jshint" in arg:
             # Essentially mock diff-quality exiting with 1
             paver.easy.sh("exit 1")
         else:

@@ -14,6 +14,7 @@ from xblock.core import XBlock
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
+from opaque_keys.edx.locator import CourseLocator
 
 from .transcripts_utils import (
     get_or_create_sjson,
@@ -125,7 +126,7 @@ class VideoStudentViewHandlers(object):
 
             try:
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
-            except (NotFoundError):
+            except NotFoundError:
                 log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
                 generate_sjson_for_all_speeds(
                     self,
@@ -164,6 +165,10 @@ class VideoStudentViewHandlers(object):
         response = Response(status=404)
         # Only do redirect for English
         if not self.transcript_language == 'en':
+            return response
+
+        # If this video lives in library, the code below is not relevant and will error.
+        if not isinstance(self.course_id, CourseLocator):
             return response
 
         video_id = request.GET.get('videoId', None)

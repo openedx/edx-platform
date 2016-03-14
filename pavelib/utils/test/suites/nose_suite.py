@@ -2,7 +2,6 @@
 Classes used for defining and running nose test suites
 """
 import os
-from paver.easy import call_task
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
@@ -121,7 +120,7 @@ class SystemTestSuite(NoseTestSuite):
     def cmd(self):
         cmd = (
             './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --traceback --settings=test {extra} '
+            '{test_id} {test_opts} --settings=test {extra} '
             '--with-xunit --xunit-file={xunit_report}'.format(
                 system=self.root,
                 verbosity=self.verbosity,
@@ -146,20 +145,23 @@ class SystemTestSuite(NoseTestSuite):
         # django-nose will import them early in the test process,
         # thereby making sure that we load any django models that are
         # only defined in test files.
-        default_test_id = "{system}/djangoapps/* common/djangoapps/* openedx/core/djangoapps/*".format(
-            system=self.root
+        default_test_id = (
+            "{system}/djangoapps/*"
+            " common/djangoapps/*"
+            " openedx/core/djangoapps/*"
+            " openedx/tests/*"
         )
 
         if self.root in ('lms', 'cms'):
-            default_test_id += " {system}/lib/*".format(system=self.root)
+            default_test_id += " {system}/lib/*"
 
         if self.root == 'lms':
-            default_test_id += " {system}/tests.py".format(system=self.root)
+            default_test_id += " {system}/tests.py"
 
         if self.root == 'cms':
-            default_test_id += " {system}/tests/*".format(system=self.root)
+            default_test_id += " {system}/tests/*"
 
-        return default_test_id
+        return default_test_id.format(system=self.root)
 
 
 class LibTestSuite(NoseTestSuite):

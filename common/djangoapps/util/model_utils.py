@@ -41,9 +41,9 @@ def get_changed_fields_dict(instance, model_class):
         # an empty dict as a default value.
         return {}
     else:
-        field_names = [
-            field[0].name for field in model_class._meta.get_fields_with_model()
-        ]
+        # We want to compare all of the scalar fields on the model, but none of
+        # the relations.
+        field_names = [f.name for f in model_class._meta.get_fields() if not f.is_relation]     # pylint: disable=protected-access
         changed_fields = {
             field_name: getattr(old_model, field_name) for field_name in field_names
             if getattr(old_model, field_name) != getattr(instance, field_name)
@@ -99,6 +99,35 @@ def emit_field_changed_events(instance, user, db_table, excluded_fields=None, hi
         del instance._changed_fields
 
 
+def truncate_fields(old_value, new_value):
+    """
+    Truncates old_value and new_value for analytics event emission if necessary.
+
+    Args:
+        old_value(obj): the value before the change
+        new_value(obj): the new value being saved
+
+    Returns:
+        a dictionary with the following fields:
+            'old': the truncated old value
+            'new': the truncated new value
+            'truncated': the list of fields that have been truncated
+    """
+    # Compute the maximum value length so that two copies can fit into the maximum event size
+    # in addition to all the other fields recorded.
+    max_value_length = settings.TRACK_MAX_EVENT / 4
+
+    serialized_old_value, old_was_truncated = _get_truncated_setting_value(old_value, max_length=max_value_length)
+    serialized_new_value, new_was_truncated = _get_truncated_setting_value(new_value, max_length=max_value_length)
+    truncated_values = []
+    if old_was_truncated:
+        truncated_values.append("old")
+    if new_was_truncated:
+        truncated_values.append("new")
+
+    return {'old': serialized_old_value, 'new': serialized_new_value, 'truncated': truncated_values}
+
+
 def emit_setting_changed_event(user, db_table, setting_name, old_value, new_value):
     """Emits an event for a change in a setting.
 
@@ -112,27 +141,15 @@ def emit_setting_changed_event(user, db_table, setting_name, old_value, new_valu
     Returns:
         None
     """
-    # Compute the maximum value length so that two copies can fit into the maximum event size
-    # in addition to all the other fields recorded.
-    max_value_length = settings.TRACK_MAX_EVENT / 4
+    truncated_fields = truncate_fields(old_value, new_value)
 
-    serialized_old_value, old_was_truncated = _get_truncated_setting_value(old_value, max_length=max_value_length)
-    serialized_new_value, new_was_truncated = _get_truncated_setting_value(new_value, max_length=max_value_length)
-    truncated_values = []
-    if old_was_truncated:
-        truncated_values.append("old")
-    if new_was_truncated:
-        truncated_values.append("new")
+    truncated_fields['setting'] = setting_name
+    truncated_fields['user_id'] = user.id
+    truncated_fields['table'] = db_table
+
     tracker.emit(
         USER_SETTINGS_CHANGED_EVENT_NAME,
-        {
-            "setting": setting_name,
-            "old": serialized_old_value,
-            "new": serialized_new_value,
-            "truncated": truncated_values,
-            "user_id": user.id,
-            "table": db_table,
-        }
+        truncated_fields
     )
 
 
@@ -165,30 +182,3 @@ def slugify(value):
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub(r'[-\s]+', '-', value))
-
-
-def generate_unique_readable_id(name, queryset, lookup_field):
-    """Generates a unique readable id from name by appending a numeric suffix.
-
-    Args:
-        name (string): Name to generate the id from. May include spaces.
-        queryset (QuerySet): QuerySet to check for uniqueness within.
-        lookup_field (string): Field name on the model that corresponds to the
-            unique identifier.
-
-    Returns:
-        string: generated unique identifier
-    """
-    candidate = slugify(name)
-    conflicts = queryset.filter(**{lookup_field + '__startswith': candidate}).values_list(lookup_field, flat=True)
-
-    if conflicts and candidate in conflicts:
-        suffix = 2
-        while True:
-            new_id = candidate + '-' + str(suffix)
-            if new_id not in conflicts:
-                candidate = new_id
-                break
-            suffix += 1
-
-    return candidate

@@ -1,7 +1,7 @@
 <problem>
     <p>Select all the fruits from the list. In retrospect, the wordiness of these tests increases the dizziness!</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the fruits from the list" direction="vertical">
+      <checkboxgroup label="Select all the fruits from the list">
         <choice correct="true" id="alpha">Apple
                    <choicehint selected="TrUe">You are right that apple is a fruit.
                    </choicehint>
@@ -35,7 +35,7 @@
     </choiceresponse>
     <p>Select all the vegetables from the list</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+      <checkboxgroup label="Select all the vegetables from the list">
         <choice correct="false">Banana
                    <choicehint selected="true">No, sorry, a banana is a fruit.
                    </choicehint>
@@ -68,7 +68,7 @@
     </choiceresponse>
     <p>Compoundhint vs. correctness</p>
     <choiceresponse>
-      <checkboxgroup direction="vertical">
+      <checkboxgroup>
         <choice correct="true">A</choice>
         <choice correct="false">B</choice>
         <choice correct="true">C</choice>
@@ -78,7 +78,7 @@
     </choiceresponse>
     <p>If one label matches we use it, otherwise go with the default, and whitespace scattered around.</p>
     <choiceresponse>
-      <checkboxgroup direction="vertical">
+      <checkboxgroup>
         <choice correct="true">
         
               A      
@@ -97,7 +97,7 @@
 
     <p>Blank labels</p>
     <choiceresponse>
-      <checkboxgroup direction="vertical">
+      <checkboxgroup>
         <choice correct="true">A <choicehint selected="true" label="">aa</choicehint></choice>
         <choice correct="true">B <choicehint selected="true">bb</choicehint></choice>
         <compoundhint value="A B" label="">compoundo</compoundhint>
@@ -106,7 +106,7 @@
 
     <p>Case where the student selects nothing, but there's feedback</p>
     <choiceresponse>
-      <checkboxgroup direction="vertical">
+      <checkboxgroup>
         <choice correct="true">A <choicehint selected="true">aa</choicehint></choice>
         <choice correct="false">B <choicehint selected="false">bb</choicehint></choice>
       </checkboxgroup>

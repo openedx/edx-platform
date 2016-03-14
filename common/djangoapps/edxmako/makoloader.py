@@ -1,10 +1,11 @@
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.template.base import TemplateDoesNotExist
-from django.template.loader import make_origin, get_template_from_string
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
+from django.template import Engine
 
 from edxmako.template import Template
 
@@ -50,14 +51,17 @@ class MakoLoader(object):
             return template, None
         else:
             # This is a regular template
-            origin = make_origin(file_path, self.load_template_source, template_name, template_dirs)
             try:
-                template = get_template_from_string(source, origin, template_name)
+                template = Engine.get_default().from_string(source)
                 return template, None
+            except ImproperlyConfigured:
+                # Either no DjangoTemplates engine was configured -or- multiple engines
+                # were configured, making the get_default() call above fail.
+                raise
             except TemplateDoesNotExist:
-                # If compiling the template we found raises TemplateDoesNotExist, back off to
-                # returning the source and display name for the template we were asked to load.
-                # This allows for correct identification (later) of the actual template that does
+                # If compiling the loaded template raises TemplateDoesNotExist, back off to
+                # returning the source and display name for the requested template.
+                # This allows for eventual correct identification of the actual template that does
                 # not exist.
                 return source, file_path
 
@@ -71,13 +75,15 @@ class MakoLoader(object):
 
 class MakoFilesystemLoader(MakoLoader):
     is_usable = True
+    _accepts_engine_in_init = True
 
-    def __init__(self):
-        MakoLoader.__init__(self, FilesystemLoader())
+    def __init__(self, *args):
+        MakoLoader.__init__(self, FilesystemLoader(*args))
 
 
 class MakoAppDirectoriesLoader(MakoLoader):
     is_usable = True
+    _accepts_engine_in_init = True
 
-    def __init__(self):
-        MakoLoader.__init__(self, AppDirectoriesLoader())
+    def __init__(self, *args):
+        MakoLoader.__init__(self, AppDirectoriesLoader(*args))

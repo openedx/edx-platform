@@ -1,4 +1,4 @@
-<%page args="cert_status, course, enrollment" />
+<%page args="cert_status, course_overview, enrollment" />
 
 <%!
 from django.utils.translation import ugettext as _
@@ -7,11 +7,11 @@ from course_modes.models import CourseMode
 <%namespace name='static' file='../static_content.html'/>
 
 <%
-  cert_name_short = course.cert_name_short
+  cert_name_short = course_overview.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
 
-  cert_name_long = course.cert_name_long
+  cert_name_long = course_overview.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
 %>
@@ -27,15 +27,18 @@ else:
     status_css_class = 'course-status-processing'
 %>
 <div class="message message-status ${status_css_class} is-shown">
-
 % if cert_status['status'] == 'processing':
   <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
-% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
+% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted', 'auditing'):
   <p class="message-copy">${_("Your final grade:")}
   <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-    % if cert_status['status'] == 'notpassing' and enrollment.mode != 'audit':
-       ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
-         ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+    % if cert_status['status'] == 'notpassing':
+      % if enrollment.mode != 'audit':
+        ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
+      % else:
+        ${_("Grade required to pass this course:")} <span class="grade-value">
+      % endif
+      ${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
     % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
     <p class="message-copy">
       ${_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
@@ -59,7 +62,7 @@ else:
         <a class="btn" href="${cert_status['cert_web_view_url']}" target="_blank"
            title="${_('This link will open the certificate web view')}">
            ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}</a></li>
-      % elif cert_status['show_download_url'] and (enrollment.mode == 'honor' or enrollment.mode == 'audit'):
+      % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
         <li class="action action-certificate">
         <a class="btn" href="${cert_status['download_url']}"
            title="${_('This link will open/download a PDF document')}">
@@ -88,7 +91,7 @@ else:
       <li class="action action-share">
         <a class="action-linkedin-profile" target="_blank" href="${cert_status['linked_in_url']}"
          title="${_('Add Certificate to LinkedIn Profile')}"
-         data-course-id="${unicode(course.id)}"
+         data-course-id="${unicode(course_overview.id)}"
          data-certificate-mode="${cert_status['mode']}"
         >
           <img class="action-linkedin-profile-img"

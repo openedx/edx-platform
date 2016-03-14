@@ -1,0 +1,19 @@
+<% // Using div here instead of label because we are using a non-native control %>
+<div class="field-label">
+    <span class="field-label-text"><%- gettext("Topic Area:") %></span><div class="field-input post-topic">
+        <a href="#" class="post-topic-button">
+            <span class="sr"><%- gettext("Discussion topics; current selection is: ") %></span>
+            <span class="js-selected-topic"></span>
+            <span class="drop-arrow" aria-hidden="true">▾</span>
+        </a>
+        <div class="topic-menu-wrapper">
+            <label class="topic-filter-label">
+                <span class="sr"><%- gettext("Filter topics") %></span>
+                <input aria-describedby="field_help_topic_area" type="text" class="topic-filter-input" placeholder="<%- gettext('Filter topics') %>">
+            </label>
+            <ul class="topic-menu" role="menu"><%= topics_html %></ul>
+       </div>
+   </div>
+</div><span class="field-help" id="field_help_topic_area">
+    <%- gettext("Add your post to a relevant topic to help others find it.") %>
+</span>

@@ -1,6 +1,7 @@
 """
 Module to define url helpers functions
 """
+from urllib import urlencode
 from xmodule.modulestore.search import path_to_location, navigation_index
 from xmodule.modulestore.django import modulestore
 from django.core.urlresolvers import reverse
@@ -20,7 +21,10 @@ def get_redirect_url(course_key, usage_key):
         Redirect url string
     """
 
-    (course_key, chapter, section, position) = path_to_location(modulestore(), usage_key)
+    (
+        course_key, chapter, section, vertical_unused,
+        position, final_target_id
+    ) = path_to_location(modulestore(), usage_key)
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.
@@ -43,4 +47,7 @@ def get_redirect_url(course_key, usage_key):
             'courseware_position',
             args=(unicode(course_key), chapter, section, navigation_index(position))
         )
+
+    redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
+
     return redirect_url

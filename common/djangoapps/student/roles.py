@@ -27,7 +27,7 @@ def register_access_role(cls):
 
     """
     try:
-        role_name = getattr(cls, 'ROLE')
+        role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
         log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
@@ -62,7 +62,7 @@ class AccessRole(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def has_user(self, user):  # pylint: disable=unused-argument
+    def has_user(self, user):
         """
         Return whether the supplied django user has access to this role.
         """
@@ -99,7 +99,7 @@ class GlobalStaff(AccessRole):
 
     def add_users(self, *users):
         for user in users:
-            if (user.is_authenticated() and user.is_active):
+            if user.is_authenticated() and user.is_active:
                 user.is_staff = True
                 user.save()
 
@@ -308,6 +308,17 @@ class CourseCreatorRole(RoleBase):
 
     def __init__(self, *args, **kwargs):
         super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
+class SupportStaffRole(RoleBase):
+    """
+    Student support team members.
+    """
+    ROLE = "support"
+
+    def __init__(self, *args, **kwargs):
+        super(SupportStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class UserBasedRole(object):

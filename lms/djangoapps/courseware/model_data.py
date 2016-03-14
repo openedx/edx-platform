@@ -23,7 +23,7 @@ DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 
 import json
 from abc import abstractmethod, ABCMeta
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from .models import (
     StudentModule,
     XModuleUserStateSummaryField,
@@ -44,6 +44,7 @@ from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 from courseware.user_state_client import DjangoXBlockUserStateClient
+
 
 log = logging.getLogger(__name__)
 
@@ -368,8 +369,8 @@ class UserStateCache(object):
             self.user.username,
             _all_usage_keys(xblocks, aside_types),
         )
-        for usage_key, field_state in block_field_state:
-            self._cache[usage_key] = field_state
+        for user_state in block_field_state:
+            self._cache[user_state.block_key] = user_state.state
 
     @contract(kvs_key=DjangoKeyValueStore.Key)
     def set(self, kvs_key, value):
@@ -392,11 +393,14 @@ class UserStateCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        return self._client.get_mod_date(
-            self.user.username,
-            kvs_key.block_scope_id,
-            fields=[kvs_key.field_name],
-        ).get(kvs_key.field_name)
+        try:
+            return self._client.get(
+                self.user.username,
+                kvs_key.block_scope_id,
+                fields=[kvs_key.field_name],
+            ).updated
+        except self._client.DoesNotExist:
+            return None
 
     @contract(kv_dict="dict(DjangoKeyValueStore_Key: *)")
     def set_many(self, kv_dict):
@@ -479,27 +483,6 @@ class UserStateCache(object):
             cache_key in self._cache and
             kvs_key.field_name in self._cache[cache_key]
         )
-
-    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
-    def set_score(self, user_id, usage_key, score, max_score):
-        """
-        UNSUPPORTED METHOD
-
-        Set the score and max_score for the specified user and xblock usage.
-        """
-        student_module, created = StudentModule.objects.get_or_create(
-            student_id=user_id,
-            module_state_key=usage_key,
-            course_id=usage_key.course_key,
-            defaults={
-                'grade': score,
-                'max_grade': max_score,
-            }
-        )
-        if not created:
-            student_module.grade = score
-            student_module.max_grade = max_score
-            student_module.save()
 
     def __len__(self):
         return len(self._cache)
@@ -741,6 +724,7 @@ class FieldDataCache(object):
                 self.course_id,
             ),
         }
+        self.scorable_locations = set()
         self.add_descriptors_to_cache(descriptors)
 
     def add_descriptors_to_cache(self, descriptors):
@@ -748,6 +732,7 @@ class FieldDataCache(object):
         Add all `descriptors` to this FieldDataCache.
         """
         if self.user.is_authenticated():
+            self.scorable_locations.update(desc.location for desc in descriptors if desc.has_score)
             for scope, fields in self._fields_to_cache(descriptors).items():
                 if scope not in self.cache:
                     continue
@@ -921,18 +906,6 @@ class FieldDataCache(object):
 
         return self.cache[key.scope].has(key)
 
-    # @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
-    def set_score(self, user_id, usage_key, score, max_score):
-        """
-        UNSUPPORTED METHOD
-
-        Set the score and max_score for the specified user and xblock usage.
-        """
-        assert not self.user.is_anonymous()
-        assert user_id == self.user.id
-        assert usage_key.course_key == self.course_id
-        self.cache[Scope.user_state].set_score(user_id, usage_key, score, max_score)
-
     @contract(key=DjangoKeyValueStore.Key, returns="datetime|None")
     def last_modified(self, key):
         """
@@ -955,3 +928,83 @@ class FieldDataCache(object):
 
     def __len__(self):
         return sum(len(cache) for cache in self.cache.values())
+
+
+class ScoresClient(object):
+    """
+    Basic client interface for retrieving Score information.
+
+    Eventually, this should read and write scores, but at the moment it only
+    handles the read side of things.
+    """
+    Score = namedtuple('Score', 'correct total')
+
+    def __init__(self, course_key, user_id):
+        """Basic constructor. from_field_data_cache() is more appopriate for most uses."""
+        self.course_key = course_key
+        self.user_id = user_id
+        self._locations_to_scores = {}
+        self._has_fetched = False
+
+    def __contains__(self, location):
+        """Return True if we have a score for this location."""
+        return location in self._locations_to_scores
+
+    def fetch_scores(self, locations):
+        """Grab score information."""
+        scores_qset = StudentModule.objects.filter(
+            student_id=self.user_id,
+            course_id=self.course_key,
+            module_state_key__in=set(locations),
+        )
+        # Locations in StudentModule don't necessarily have course key info
+        # attached to them (since old mongo identifiers don't include runs).
+        # So we have to add that info back in before we put it into our lookup.
+        self._locations_to_scores.update({
+            UsageKey.from_string(location).map_into_course(self.course_key): self.Score(correct, total)
+            for location, correct, total
+            in scores_qset.values_list('module_state_key', 'grade', 'max_grade')
+        })
+        self._has_fetched = True
+
+    def get(self, location):
+        """
+        Get the score for a given location, if it exists.
+
+        If we don't have a score for that location, return `None`. Note that as
+        convention, you should be passing in a location with full course run
+        information.
+        """
+        if not self._has_fetched:
+            raise ValueError(
+                "Tried to fetch location {} from ScoresClient before fetch_scores() has run."
+                .format(location)
+            )
+        return self._locations_to_scores.get(location)
+
+    @classmethod
+    def from_field_data_cache(cls, fd_cache):
+        """Create a ScoresClient from a populated FieldDataCache."""
+        client = cls(fd_cache.course_id, fd_cache.user.id)
+        client.fetch_scores(fd_cache.scorable_locations)
+        return client
+
+
+# @contract(user_id=int, usage_key=UsageKey, score="number|None", max_score="number|None")
+def set_score(user_id, usage_key, score, max_score):
+    """
+    Set the score and max_score for the specified user and xblock usage.
+    """
+    student_module, created = StudentModule.objects.get_or_create(
+        student_id=user_id,
+        module_state_key=usage_key,
+        course_id=usage_key.course_key,
+        defaults={
+            'grade': score,
+            'max_grade': max_score,
+        }
+    )
+    if not created:
+        student_module.grade = score
+        student_module.max_grade = max_score
+        student_module.save()

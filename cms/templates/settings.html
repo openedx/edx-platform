@@ -5,10 +5,10 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  import json
   import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="header_extras">
@@ -31,7 +31,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}", ${json.dumps(show_min_grade_warning)});
+        SettingsFactory("${details_url}", ${escape_json_dumps(show_min_grade_warning) | n});
     });
 </%block>
 
@@ -112,8 +112,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <p>${_(
                 'Your course summary page will not be viewable until your course '
                 'has been announced. To provide content for the page and preview '
-                'it, follow the instructions provided by your Program Manager.')
-              }</p>
+                'it, follow the instructions provided by your Program Manager.')}
+              </p>
             </div>
           </div>
           % endif
@@ -123,16 +123,18 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         % if credit_eligibility_enabled and is_credit_course:
           <section class="group-settings basic">
             <header>
-              <h2 class="title-2">${_("Credit Eligibility Requirements")}</h2>
-              <span class="tip">${_("Steps needed for credit eligibility")}</span>
+              <h2 class="title-2">${_("Course Credit Requirements")}</h2>
+              <span class="tip">${_("Steps required to earn course credit")}</span>
             </header>
+            <span class="header-help tip">A requirement appears in this list when you publish the unit that contains the requirement.</span>
+
               % if credit_requirements:
                 <ol class="list-input">
                   % if 'grade' in credit_requirements:
                     <li class="field text is-not-editable" id="credit-minimum-passing-grade">
-                      <label>${_("Minimum Passing Grade")}</label>
+                      <label>${_("Minimum Grade")}</label>
                         % for requirement in credit_requirements['grade']:
-                          <label for="${requirement['name']}" class="sr">${_("Minimum Passing Grade")}</label>
+                          <label for="${requirement['name']}" class="sr">${_("Minimum Grade")}</label>
                           <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                               class="long" id="${requirement['name']}" value="${'{0:.0f}%'.format(float(requirement['criteria']['min_grade'] or 0)*100)}" readonly />
                         % endfor
@@ -152,12 +154,11 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
                   % if 'reverification' in credit_requirements:
                     <li class="field text is-not-editable" id="credit-reverification-requirements">
-                      <label>${_("Successful In-Course Reverification")}</label>
+                      <label>${_("ID Verification")}</label>
                         % for requirement in credit_requirements['reverification']:
-                          ## Translators: 'Access to Assessment 1' means the access for a requirement with name 'Assessment 1'
                           <label for="${requirement['name']}" class="sr">${_('In-Course Reverification {number}').format(number=loop.index+1)}</label>
                           <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
-                              class="long" id="${requirement['name']}" value="${_('Access to {display_name}').format(display_name=requirement['display_name'])}" readonly />
+                              class="long" id="${requirement['name']}" value="${requirement['display_name']}" readonly />
                         % endfor
                     </li>
                   % endif
@@ -219,17 +220,25 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
-
+            <%
+              enrollment_end_readonly = "readonly aria-readonly=\"true\"" if not enrollment_end_editable else ""
+              enrollment_end_editable_class = "is-not-editable" if not enrollment_end_editable else ""
+            %>
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
-              <div class="field date" id="field-enrollment-end-date">
+              <div class="field date ${enrollment_end_editable_class}" id="field-enrollment-end-date">
                 <label for="course-enrollment-end-date">${_("Enrollment End Date")}</label>
-                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">${_("Last day students can enroll")}</span>
+                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" ${enrollment_end_readonly} />
+                <span class="tip tip-stacked">
+                  ${_("Last day students can enroll.")}
+                % if not enrollment_end_editable:
+                  ${_("Contact your edX Partner Manager to update these settings.")}
+                % endif
+                </span>
               </div>
 
-              <div class="field time" id="field-enrollment-end-time">
+              <div class="field time ${enrollment_end_editable_class}" id="field-enrollment-end-time">
                 <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
-                <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+                <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" ${enrollment_end_readonly} />
                 <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
@@ -352,7 +361,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
 
-          % if about_page_editable:
+          % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
             <section class="group-settings requirements">
@@ -362,12 +371,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </header>
 
               <ol class="list-input">
+                % if about_page_editable:
                 <li class="field text" id="field-course-effort">
                   <label for="course-effort">${_("Hours of Effort per Week")}</label>
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
-                % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
+                % endif
+                % if is_prerequisite_courses_enabled:
                 <li class="field field-select" id="field-pre-requisite-course">
                     <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
                     <select class="input" id="pre-requisite-course">
@@ -380,7 +391,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
                 </li>
                 % endif
-                % if settings.FEATURES.get('ENTRANCE_EXAMS'):
+                % if is_entrance_exams_enabled:
                 <li>
                     <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
                     <div class="show-data">
@@ -399,6 +410,33 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 % endif
               </ol>
             </section>
+          % endif
+
+          % if self_paced_enabled:
+
+            <hr class="divide" />
+
+            <section class="group-settings pacing">
+              <header>
+                <h2 class="title-2">${_("Course Pacing")}</h2>
+                <span class="tip">${_("Set the pacing for this course")}</span>
+              </header>
+              <span class="msg" id="course-pace-toggle-tip"></span>
+
+              <ol class="list-input">
+                <li class="field">
+                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-paced" value="false"/>
+                  <label class="course-pace-label" for="course-pace-instructor-paced">Instructor-Paced</label>
+                  <span class="tip">${_("Instructor-paced courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
+                </li>
+                <li class="field">
+                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true"/>
+                  <label class="course-pace-label" for="course-pace-self-paced">Self-Paced</label>
+                  <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
+                </li>
+              </ol>
+            </section>
+
           % endif
 
           % if settings.FEATURES.get("LICENSING", False):

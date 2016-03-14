@@ -20,7 +20,6 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
         defaults: {
             // Metadata fields currently displayed in web forms
             course_title: '',
-            org_logo_path: '',
 
             // Metadata fields not currently displayed in web forms
             name: 'Name of the certificate',
@@ -62,6 +61,10 @@ function (_, str, Backbone, BackboneRelational, BackboneAssociations, gettext, C
         setOriginalAttributes: function() {
             // Remember the current state of this model (enables edit->cancel use cases)
             this._originalAttributes = this.parse(this.toJSON());
+
+            this.get("signatories").each(function (modelSignatory) {
+                modelSignatory.setOriginalAttributes();
+            });
 
             // If no url is defined for the signatories child collection we'll need to create that here as well
             if(!this.isNew() && !this.get('signatories').url) {

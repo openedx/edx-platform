@@ -3,7 +3,7 @@ Tests for the django comment client integration models
 """
 from django.test.testcases import TestCase
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 import django_comment_common.models as models
@@ -23,7 +23,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
         # For course ID, syntax edx/classname/classdate is important
         # because xmodel.course_module.id_to_location looks for a string to split
 
-        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course_id = CourseKey.from_string("edX/toy/2012_Fall")
         self.student_role = models.Role.objects.get_or_create(name="Student",
                                                               course_id=self.course_id)[0]
         self.student_role.add_permission("delete_thread")
@@ -31,7 +31,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
                                                                 course_id=self.course_id)[0]
         self.TA_role = models.Role.objects.get_or_create(name="Community TA",
                                                          course_id=self.course_id)[0]
-        self.course_id_2 = SlashSeparatedCourseKey("edx", "6.002x", "2012_Fall")
+        self.course_id_2 = CourseKey.from_string("edX/6.002x/2012_Fall")
         self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",
                                                            course_id=self.course_id_2)[0]
 

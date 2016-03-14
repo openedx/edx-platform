@@ -24,12 +24,6 @@ def apply_settings(django_settings):
     # Params not in this whitelist will be silently dropped.
     django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
 
-    # Register and configure python-social-auth with Django.
-    django_settings.INSTALLED_APPS += (
-        'social.apps.django_app.default',
-        'third_party_auth',
-    )
-
     # Inject exception middleware to make redirects fire.
     django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
 
@@ -73,15 +67,20 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
     # Allow users to login using social auth even if their account is not verified yet
-    # The 'ensure_user_information' step controls this and only allows brand new users
-    # to login without verification. Repeat logins are not permitted until the account
-    # gets verified.
-    django_settings.INACTIVE_USER_LOGIN = True
-    django_settings.INACTIVE_USER_URL = '/auth/inactive'
+    # This is required since we [ab]use django's 'is_active' flag to indicate verified
+    # accounts; without this set to True, python-social-auth won't allow us to link the
+    # user's account to the third party account during registration (since the user is
+    # not verified at that point).
+    # We also generally allow unverified third party auth users to login (see the logic
+    # in ensure_user_information in pipeline.py) because otherwise users who use social
+    # auth to register with an invalid email address can become "stuck".
+    # TODO: Remove the following if/when email validation is separated from the is_active flag.
+    django_settings.SOCIAL_AUTH_INACTIVE_USER_LOGIN = True
+    django_settings.SOCIAL_AUTH_INACTIVE_USER_URL = '/auth/inactive'
 
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
-    django_settings.TEMPLATE_CONTEXT_PROCESSORS += (
+    django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )

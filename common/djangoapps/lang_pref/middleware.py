@@ -4,9 +4,7 @@ Middleware for Language Preferences
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
-# TODO PLAT-671 Import from Django 1.8
-# from django.utils.translation import LANGUAGE_SESSION_KEY
-from django_locale.trans_real import LANGUAGE_SESSION_KEY
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 class LanguagePreferenceMiddleware(object):

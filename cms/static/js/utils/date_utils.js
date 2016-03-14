@@ -35,9 +35,29 @@ define(["jquery", "date", "jquery.ui", "jquery.timepicker"], function($, date) {
         );
     };
 
+    var parseDateFromString = function(stringDate){
+        if (stringDate && typeof stringDate === "string"){
+            return new Date(stringDate);
+        }
+        else {
+            return stringDate;
+        }
+    };
+
+    var convertDateStringsToObjects = function(obj, dateFields){
+        for (var i = 0; i < dateFields.length; i++){
+            if (obj[dateFields[i]]){
+                obj[dateFields[i]] = parseDateFromString(obj[dateFields[i]]);
+            }
+        }
+        return obj;
+    };
+
     return {
         getDate: getDate,
         setDate: setDate,
-        renderDate: renderDate
+        renderDate: renderDate,
+        convertDateStringsToObjects: convertDateStringsToObjects,
+        parseDateFromString: parseDateFromString
     };
 });

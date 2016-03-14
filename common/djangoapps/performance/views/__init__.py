@@ -19,9 +19,11 @@ def _get_request_header(request, header_name, default=''):
 
 
 def _get_request_value(request, value_name, default=''):
-    """Helper method to get header values from a request's REQUEST dict, if present."""
-    if request is not None and hasattr(request, 'REQUEST') and value_name in request.REQUEST:
-        return request.REQUEST[value_name]
+    """Helper method to get header values from a request's GET or POST dicts, if present."""
+    if request is not None and hasattr(request, 'GET') and value_name in request.GET:
+        return request.GET[value_name]
+    elif request is not None and hasattr(request, 'POST') and value_name in request.POST:
+        return request.POST[value_name]
     else:
         return default
 

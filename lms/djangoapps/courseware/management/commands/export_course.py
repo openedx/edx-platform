@@ -12,7 +12,7 @@ import tarfile
 from tempfile import mktemp, mkdtemp
 from textwrap import dedent
 
-from path import path
+from path import Path as path
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         results = self._get_results(filename) if pipe_results else None
 
-        return results
+        self.stdout.write(results, ending="")
 
     def _parse_arguments(self, args):
         """Parse command line arguments"""

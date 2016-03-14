@@ -2,12 +2,11 @@
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_false
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

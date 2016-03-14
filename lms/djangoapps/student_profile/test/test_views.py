@@ -40,8 +40,9 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
         Verify learner profile page context data.
         """
         request = RequestFactory().get('/url')
+        request.user = self.user
 
-        context = learner_profile_context(self.user, self.USERNAME, self.user.is_staff, request.build_absolute_uri)
+        context = learner_profile_context(request, self.USERNAME, self.user.is_staff)
 
         self.assertEqual(
             context['data']['default_public_account_fields'],

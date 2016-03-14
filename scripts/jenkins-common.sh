@@ -34,3 +34,6 @@ fi
 
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
+
+# add the node_js packages dir to PATH
+PATH=$PATH:node_modules/.bin

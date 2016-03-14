@@ -4,7 +4,6 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
-  from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
 %>
 <%page args="online_help_token"/>
 
@@ -13,18 +12,13 @@
 
     <div class="wrapper wrapper-l">
       <h1 class="branding"><a href="/">
-      % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
-        <img src="${static.url("images/edx-theme/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
-      % else:
-        <img src="${static.url("images/default-theme/logo.png")}" alt="${settings.STUDIO_NAME}" />
-      % endif
+        <img src="${static.url("images/studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
       </a></h1>
 
       % if context_course:
       <%
             course_key = context_course.id
             index_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
-            checklists_url = reverse('contentstore.views.checklists_handler', kwargs={'course_key_string': unicode(course_key)})
             course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
             assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
             textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -36,12 +30,10 @@
             grading_url = reverse('contentstore.views.grading_handler', kwargs={'course_key_string': unicode(course_key)})
             advanced_settings_url = reverse('contentstore.views.advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': unicode(course_key)})
+            certificates_url = ''
+            if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
+                certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
       %>
-      % if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course:
-        <%
-          certificates_url = reverse('contentstore.views.certificates.certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
-        %>
-      % endif
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${index_url}">
@@ -105,11 +97,7 @@
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
-                  % if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False) and \
-                    (user.is_superuser or user.is_staff or \
-                    CourseCreatorRole(course_key).has_user(user) or \
-                    CourseInstructorRole(course_key).has_user(user) or \
-                    CourseStaffRole(course_key).has_user(user)):
+                  % if certificates_url:
                   <li class="nav-item nav-course-settings-certificates">
                     <a href="${certificates_url}">${_("Certificates")}</a>
                   </li>
@@ -124,9 +112,6 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-tools-checklists">
-                    <a href="${checklists_url}">${_("Checklists")}</a>
-                  </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${import_url}">${_("Import")}</a>
                   </li>
@@ -194,6 +179,11 @@
           </li>
         </ol>
       </nav>
+      % elif show_programs_header:
+      <h2 class="info-course">
+        <span class="course-org">${settings.PLATFORM_NAME}</span><span class="course-number">${_("Programs")}</span>
+        <span class="course-title">${_("Program Administration")}</span>
+      </h2>
       % endif
     </div>
 

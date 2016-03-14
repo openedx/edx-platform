@@ -6,11 +6,15 @@ import time
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.common.logout import LogoutPage
+from ...pages.lms.track_selection import TrackSelectionPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.dashboard import DashboardPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
@@ -63,14 +67,6 @@ class CoursewareTest(UniqueCourseTest):
         self.problem_page = ProblemPage(self.browser)
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 1')
 
-    def _change_problem_release_date_in_studio(self):
-        """
-
-        """
-        self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
-        self.course_outline.q(css="#start_date").fill("01/01/2030")
-        self.course_outline.q(css=".action-save").first.click()
-
     def _auto_auth(self, username, email, staff):
         """
         Logout and login with given credentials.
@@ -94,10 +90,7 @@ class CoursewareTest(UniqueCourseTest):
         self.course_outline.visit()
 
         # Set release date for subsection in future.
-        self._change_problem_release_date_in_studio()
-
-        # Wait for 2 seconds to save new date.
-        time.sleep(2)
+        self.course_outline.change_problem_release_date_in_studio()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -107,6 +100,238 @@ class CoursewareTest(UniqueCourseTest):
         self.courseware_page.visit()
         # Problem name should be "TEST PROBLEM 2".
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
+
+
+class ProctoredExamTest(UniqueCourseTest):
+    """
+    Test courseware.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(ProctoredExamTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        self.course_outline = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        course_fix.add_advanced_settings({
+            "enable_proctored_exams": {"value": "true"}
+        })
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 1')
+                )
+            )
+        ).install()
+
+        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
+        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
+        self.immediate_verification_page = PaymentAndVerificationFlow(
+            self.browser, self.course_id, entry_point='verify-now'
+        )
+        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
+        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
+        self.dashboard_page = DashboardPage(self.browser)
+        self.problem_page = ProblemPage(self.browser)
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            min_price=10, suggested_prices='10,20'
+        ).visit()
+
+        # Auto-auth register for the course.
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+    def _auto_auth(self, username, email, staff):
+        """
+        Logout and login with given credentials.
+        """
+        AutoAuthPage(self.browser, username=username, email=email,
+                     course_id=self.course_id, staff=staff).visit()
+
+    def _login_as_a_verified_user(self):
+        """
+        login as a verififed user
+        """
+
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+
+        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
+        # Navigate to the track selection page
+        self.track_selection_page.visit()
+
+        # Enter the payment and verification flow by choosing to enroll as verified
+        self.track_selection_page.enroll('verified')
+
+        # Proceed to the fake payment page
+        self.payment_and_verification_flow.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
+
+    def test_can_create_proctored_exam_in_studio(self):
+        """
+        Test that Proctored exam settings are visible in Studio.
+        """
+
+        # Given that I am a staff member
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+
+        # When I visit the course outline page in studio.
+        self.course_outline.visit()
+
+        # And open the subsection edit dialog
+        self.course_outline.open_exam_settings_dialog()
+
+        # Then I can view all settings related to Proctored and timed exams
+        self.assertTrue(self.course_outline.proctoring_items_are_displayed())
+
+    def test_proctored_exam_flow(self):
+        """
+        Test that staff can create a proctored exam.
+        """
+
+        # Given that I am a staff member on the exam settings section
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I Make the exam proctored.
+        self.course_outline.make_exam_proctored()
+
+        # And I login as a verified student.
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+
+        # And visit the courseware as a verified student.
+        self.courseware_page.visit()
+
+        # Then I can see an option to take the exam as a proctored exam.
+        self.assertTrue(self.courseware_page.can_start_proctored_exam)
+
+    def test_timed_exam_flow(self):
+        """
+        Test that staff can create a timed exam.
+        """
+
+        # Given that I am a staff member on the exam settings section
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I Make the exam timed.
+        self.course_outline.make_exam_timed()
+
+        # And I login as a verified student.
+        LogoutPage(self.browser).visit()
+        self._login_as_a_verified_user()
+
+        # And visit the courseware as a verified student.
+        self.courseware_page.visit()
+
+        # And I start the timed exam
+        self.courseware_page.start_timed_exam()
+
+        # Then I am taken to the exam with a timer bar showing
+        self.assertTrue(self.courseware_page.is_timer_bar_present)
+
+    def test_time_allotted_field_is_not_visible_with_none_exam(self):
+        """
+        Test that the time allotted text field is not shown if 'none' radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the 'None' exams radio button
+        self.course_outline.select_none_exam()
+
+        # Then the time allotted text field becomes invisible
+        self.assertFalse(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_timed_exam(self):
+        """
+        Test that the time allotted text field is shown if timed exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the timed exams radio button
+        self.course_outline.select_timed_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_proctored_exam(self):
+        """
+        Test that the time allotted text field is shown if proctored exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the proctored exams radio button
+        self.course_outline.select_proctored_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_practice_exam(self):
+        """
+        Test that the time allotted text field is shown if practice exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the practice exams radio button
+        self.course_outline.select_practice_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
 
 
 class CoursewareMultipleVerticalsTest(UniqueCourseTest):

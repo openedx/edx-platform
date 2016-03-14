@@ -1,7 +1,7 @@
 // LMS -- modules -- calculator
 // ====================
 
-div.calc-main {
+.calc-main {
   @extend %ui-print-excluded;
 
   bottom: -126px;
@@ -17,7 +17,7 @@ div.calc-main {
 
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
-    background: url("../images/calc-icon.png") $black-t1 no-repeat center;
+    background: url("#{$static-path}/images/calc-icon.png") $black-t1 no-repeat center;
     border-bottom: 0;
     color: $white;
     float: right;
@@ -29,22 +29,28 @@ div.calc-main {
     width: ($baseline*0.75);
 
     &:hover, &:focus {
-      background-color: $gray-d1;
+      background: url("../images/calc-icon.png") $gray-d1 no-repeat center;
     }
 
     &.closed {
-      background-image: url("../images/close-calc-icon.png");
+      background-image: url("#{$static-path}/images/close-calc-icon.png");
       background-color: $black;
       top: -36px;
     }
+
+    .utility-control-label {
+      background: $black;
+      color: $white;
+    }
   }
 
-  div#calculator_wrapper {
-    background: $black;
+  #calculator_wrapper {
     clear: both;
-    max-height: 90px;
     position: relative;
     top: -36px;
+    max-height: 90px;
+    background: $black;
+    color: $white;
 
     // UI: input help table
     .calculator-input-help-table {
@@ -62,7 +68,11 @@ div.calc-main {
       @include box-sizing(border-box);
       padding: lh();
 
-      button#calculator_button {
+      .calc-output-label {
+        color: $white;
+      }
+
+      #calculator_button {
         background: #111;
         border: 1px solid $black;
         border-radius: 0;
@@ -80,11 +90,16 @@ div.calc-main {
         width: flex-grid(.5) + flex-gutter();
 
         &:hover, &:focus {
-          color: #333;
+          color: $link-color;
+        }
+
+        .calc-button-label {
+          background: $black;
+          color: $white;
         }
       }
 
-      input#calculator_output {
+      #calculator_output {
         background: #111;
         border: 0;
         box-shadow: none;
@@ -99,14 +114,19 @@ div.calc-main {
         width: flex-grid(4);
       }
 
-      div.input-wrapper {
+      .input-wrapper {
         @extend .clearfix;
         float: left;
         margin: 0;
         position: relative;
         width: flex-grid(7.5);
 
-        input#calculator_input {
+        .label-calc-input {
+          background: $black;
+          color: $white;
+        }
+
+        #calculator_input {
           border: none;
           box-shadow: none;
           @include box-sizing(border-box);
@@ -120,23 +140,33 @@ div.calc-main {
           }
         }
 
-        div.help-wrapper {
+        .help-wrapper {
           position: absolute;
           right: 0;
           top: 0;
 
+          #hint-instructions {
+            color: $white;
+          }
+
           #calculator_hint {
-            background: url("../images/info-icon.png") center center no-repeat;
-            height: 35px;
             @include hide-text;
-            width: 35px;
             display: block;
+            height: 35px;
+            width: 35px;
             border: none;
+            background: url("#{$static-path}/images/info-icon.png") center center no-repeat;
+            color: $white;
 
             &:focus {
               outline: 5px auto #5b9dd9;
               box-shadow: none;
               border: none;
+            }
+
+            .calc-hint {
+              background: $black;
+              color: $white;
             }
           }
 

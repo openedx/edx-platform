@@ -2,95 +2,58 @@
   import json
   from django.utils.translation import ugettext as _
   from microsite_configuration import microsite
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%inherit file="../main.html" />
+<%
+  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+%>
 
 <%namespace name='static' file='../static_content.html'/>
 
+% if course_discovery_enabled:
 <%block name="header_extras">
-  % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-  % for template_name in ["result_item", "filter_bar", "filter", "search_facets_list", "search_facets_section", "search_facet", "more_less_links"]:
+  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
   <script type="text/template" id="${template_name}-tpl">
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
   % endfor
-  <script type="text/javascript">;(function (define) {{
-      define('course_discovery_meanings', function() {{
-          'use strict';
-          return ${json.dumps(course_discovery_meanings)};
-        }});
-      }})(define || RequireJS.define);
-  </script>
-  % endif
+  <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
+    DiscoveryFactory(
+      ${ escape_json_dumps(course_discovery_meanings) | n },
+      getParameterByName('search_query')
+    );
+  </%static:require_module>
 </%block>
-
-<%block name="js_extra">
-  % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-  <%static:js group='discovery'/>
-  % endif
-</%block>
+% endif
 
 <%block name="pagetitle">${_("Courses")}</%block>
-<%
-  platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
-  if self.stanford_theme_enabled():
-    course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
-    logo_file = static.url('themes/stanford/images/seal.png')
-    logo_alt_text = "Stanford Seal Logo"
-
-  else:
-    course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
-
-    if settings.FEATURES.get('IS_EDX_DOMAIN', False):
-      # For some reason, `static.url('images/edx-theme/edx-logo-bw.png')` breaks template rendering.
-      default_image_url = settings.STATIC_URL + 'images/edx-theme/edx-logo-bw.png'
-    else:
-      default_image_url = settings.STATIC_URL + 'images/default-theme/logo-large.png'
-
-    logo_file = microsite.get_value(
-      'course_index_overlay_logo_file', default_image_url
-    )
-
-    logo_alt_text = _("{platform_name} Logo").format(platform_name=platform_name)
-%>
 
 <section class="find-courses">
-
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-      </hgroup>
-    </div>
-  </header>
-
   <section class="courses-container">
-
     % if course_discovery_enabled:
-    <div id="discovery-form" role="search" aria-label="course">
-      <form>
-        <input class="discovery-input" placeholder="${_('Search for a course')}" type="text"/><!-- removes spacing
-        --><button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
+    <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
+      <div id="discovery-message" class="search-status-label"></div>
+      <form class="wrapper-search-input">
+        <label for="discovery-input" class="sr">${_('Search for a course')}</label>
+        <input id="discovery-input" class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
+        <button type="submit" class="button postfix discovery-submit" aria-label="${_('Search')}">
           <i class="icon fa fa-search" aria-hidden="true"></i>
+          <div aria-live="polite" aria-relevant="all">
+            <div id="loading-indicator" class="loading-spinner hidden">
+              <i class="icon fa fa-spinner fa-spin"></i>
+              <span class="sr">${_('Loading')}</span>
+            </div>
+          </div>
         </button>
       </form>
-      <div id="discovery-message"></div>
-      <div aria-live="polite" aria-relevant="all">
-        <div id="loading-indicator" class="hidden">
-          <i class="icon fa fa-spinner fa-spin"></i> ${_('Loading')}
-        </div>
-      </div>
     </div>
 
-    <div id="filter-bar" class="filters hide-phone">
+    <div id="filter-bar" class="filters hide-phone is-collapsed">
     </div>
     % endif
 
-    <section class="courses${'' if course_discovery_enabled else ' no-course-discovery'}">
+    <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
       <ul class="courses-listing">
         %for course in courses:
         <li class="courses-listing-item">
@@ -98,11 +61,14 @@
         </li>
         %endfor
       </ul>
-    </section>
+    </div>
 
 
     % if course_discovery_enabled:
-    <aside aria-label="${_('Refine your search')}" class="search-facets phone-menu">
+    <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
+      <h2 class="header-search-facets">${_('Refine Your Search')}</h2>
+      <section class="search-facets-lists">
+      </section>
     </aside>
     % endif
 

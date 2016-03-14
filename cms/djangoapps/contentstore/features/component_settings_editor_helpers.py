@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring
 
 from lettuce import world
-from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_in
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
@@ -59,28 +59,28 @@ def click_new_component_button(step, component_button_css):
 
 
 def _click_advanced():
-    css = 'ul.problem-type-tabs a[href="#tab3"]'
+    css = 'ul.problem-type-tabs a[href="#tab2"]'
     world.css_click(css)
 
     # Wait for the advanced tab items to be displayed
-    tab3_css = 'div.ui-tabs-panel#tab3'
-    world.wait_for_visible(tab3_css)
+    tab2_css = 'div.ui-tabs-panel#tab2'
+    world.wait_for_visible(tab2_css)
 
 
-def _find_matching_link(category, component_type):
+def _find_matching_button(category, component_type):
     """
-    Find the link with the specified text. There should be one and only one.
+    Find the button with the specified text. There should be one and only one.
     """
 
-    # The tab shows links for the given category
-    links = world.css_find('div.new-component-{} a'.format(category))
+    # The tab shows buttons for the given category
+    buttons = world.css_find('div.new-component-{} button'.format(category))
 
-    # Find the link whose text matches what you're looking for
-    matched_links = [link for link in links if link.text == component_type]
+    # Find the button whose text matches what you're looking for
+    matched_buttons = [btn for btn in buttons if btn.text == component_type]
 
     # There should be one and only one
-    assert_equal(len(matched_links), 1)
-    return matched_links[0]
+    assert_equal(len(matched_buttons), 1)
+    return matched_buttons[0]
 
 
 def click_component_from_menu(category, component_type, is_advanced):
@@ -100,7 +100,7 @@ def click_component_from_menu(category, component_type, is_advanced):
 
     # Retry this in case the list is empty because you tried too fast.
     link = world.retry_on_exception(
-        lambda: _find_matching_link(category, component_type),
+        lambda: _find_matching_button(category, component_type),
         ignored_exceptions=AssertionError
     )
 

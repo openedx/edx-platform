@@ -2,12 +2,11 @@
 <%block name="review_highlight">class="active"</%block>
 
 <%!
-from courseware.courses import course_image_url, get_course_about_section
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-
+from openedx.core.lib.courses import course_image_url
 %>
 
 <section class="wrapper confirm-enrollment shopping-cart cart-view">
@@ -15,7 +14,7 @@ from django.utils.translation import ungettext
 
   % if is_course_enrollment_closed:
     <%
-      # Translators: course_names is a comma-separated list of one or more course names
+      ## Translators: course_names is a comma-separated list of one or more course names
       expiry_message = ungettext(
           "{course_names} has been removed because the enrollment period has closed.",
           "{course_names} have been removed because the enrollment period has closed.",
@@ -67,7 +66,7 @@ from django.utils.translation import ungettext
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default | h} ${course.display_name_with_default} ${_('Cover Image')}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name

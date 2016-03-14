@@ -1,26 +1,28 @@
 """
 Signal handling functions for use with external commerce service.
 """
+import json
 import logging
 from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from ecommerce_api_client.exceptions import HttpClientError
+from edx_rest_api_client.exceptions import HttpClientError
+import requests
+
 from microsite_configuration import microsite
 from request_cache.middleware import RequestCache
 from student.models import UNENROLL_DONE
-
-from commerce import ecommerce_api_client, is_commerce_service_configured
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 
 log = logging.getLogger(__name__)
 
 
 @receiver(UNENROLL_DONE)
-def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=unused-argument
+def handle_unenroll_done(sender, course_enrollment=None, skip_refund=False,
+                         **kwargs):  # pylint: disable=unused-argument
     """
     Signal receiver for unenrollments, used to automatically initiate refunds
     when applicable.
@@ -140,33 +142,77 @@ def refund_seat(course_enrollment, request_user):
     return refund_ids
 
 
-def send_refund_notification(course_enrollment, refund_ids):
-    """
-    Issue an email notification to the configured email recipient about a
-    newly-initiated refund request.
+def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=None):
+    """ Create a Zendesk ticket via API. """
+    if not (settings.ZENDESK_URL and settings.ZENDESK_USER and settings.ZENDESK_API_KEY):
+        log.debug('Zendesk is not configured. Cannot create a ticket.')
+        return
 
-    This function does not do any exception handling; callers are responsible
-    for capturing and recovering from any errors.
-    """
+    # Copy the tags to avoid modifying the original list.
+    tags = list(tags or [])
+    tags.append('LMS')
+
+    # Remove duplicates
+    tags = list(set(tags))
+
+    data = {
+        'ticket': {
+            'requester': {
+                'name': requester_name,
+                'email': requester_email
+            },
+            'subject': subject,
+            'comment': {'body': body},
+            'tags': tags
+        }
+    }
+
+    # Encode the data to create a JSON payload
+    payload = json.dumps(data)
+
+    # Set the request parameters
+    url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
+    user = '{}/token'.format(settings.ZENDESK_USER)
+    pwd = settings.ZENDESK_API_KEY
+    headers = {'content-type': 'application/json'}
+
+    try:
+        response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
+
+        # Check for HTTP codes other than 201 (Created)
+        if response.status_code != 201:
+            log.error(u'Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
+        else:
+            log.debug('Successfully created ticket.')
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Failed to create ticket.')
+        return
+
+
+def generate_refund_notification_body(student, refund_ids):  # pylint: disable=invalid-name
+    """ Returns a refund notification message body. """
+    msg = _(
+        "A refund request has been initiated for {username} ({email}). "
+        "To process this request, please visit the link(s) below."
+    ).format(username=student.username, email=student.email)
+
+    refund_urls = [urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, '/dashboard/refunds/{}/'.format(refund_id))
+                   for refund_id in refund_ids]
+
+    return '{msg}\n\n{urls}'.format(msg=msg, urls='\n'.join(refund_urls))
+
+
+def send_refund_notification(course_enrollment, refund_ids):
+    """ Notify the support team of the refund request. """
+
+    tags = ['auto_refund']
+
     if microsite.is_request_in_microsite():
         # this is not presently supported with the external service.
         raise NotImplementedError("Unable to send refund processing emails to microsite teams.")
 
-    for_user = course_enrollment.user
+    student = course_enrollment.user
     subject = _("[Refund] User-Requested Refund")
-    message = _(
-        "A refund request has been initiated for {username} ({email}). "
-        "To process this request, please visit the link(s) below."
-    ).format(username=for_user.username, email=for_user.email)
-
-    refund_urls = [
-        urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, '/dashboard/refunds/{}/'.format(refund_id))
-        for refund_id in refund_ids
-    ]
-    text_body = '\r\n'.join([message] + refund_urls + [''])
-    refund_links = ['<a href="{0}">{0}</a>'.format(url) for url in refund_urls]
-    html_body = '<p>{}</p>'.format('<br>'.join([message] + refund_links))
-
-    email_message = EmailMultiAlternatives(subject, text_body, for_user.email, [settings.PAYMENT_SUPPORT_EMAIL])
-    email_message.attach_alternative(html_body, "text/html")
-    email_message.send()
+    body = generate_refund_notification_body(student, refund_ids)
+    requester_name = student.profile.name or student.username
+    create_zendesk_ticket(requester_name, student.email, subject, body, tags)

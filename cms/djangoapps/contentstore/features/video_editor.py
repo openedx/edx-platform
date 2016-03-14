@@ -4,7 +4,7 @@
 
 import requests
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_equal, assert_in, assert_not_equal
 from terrain.steps import reload_the_page
 from django.conf import settings
 from common import upload_file, attach_file

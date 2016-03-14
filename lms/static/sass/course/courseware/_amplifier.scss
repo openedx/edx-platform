@@ -231,7 +231,7 @@ section.tool-wrapper {
         }
 
         .ui-slider-handle {
-          background: lighten( #586e75, 5% ) url('../images/amplifier-slider-handle.png') center no-repeat;
+          background: lighten( #586e75, 5% ) url('#{$static-path}/images/amplifier-slider-handle.png') center no-repeat;
           border: 1px solid darken(#002b36, 8%);
           box-shadow: inset 0 1px 0 lighten( #586e75, 20% );
           margin-top: -.3em;

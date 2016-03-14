@@ -1,7 +1,6 @@
 """
 Common utility functions useful throughout the contentstore
 """
-# pylint: disable=no-member
 
 import logging
 import re
@@ -9,12 +8,11 @@ from datetime import datetime
 from pytz import UTC
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
-from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -87,7 +85,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, UsageKey))
+    assert isinstance(location, UsageKey)
 
     if settings.LMS_BASE is None:
         return None
@@ -109,7 +107,7 @@ def get_lms_link_for_about_page(course_key):
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_key, CourseKey))
+    assert isinstance(course_key, CourseKey)
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
@@ -158,13 +156,6 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     )
 
 
-def course_image_url(course):
-    """Returns the image url for the course."""
-    loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-    path = StaticContent.serialize_asset_key_with_slash(loc)
-    return path
-
-
 # pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """
@@ -211,12 +202,11 @@ def is_visible_to_specific_content_groups(xblock):
     """
     if not xblock.group_access:
         return False
-    for __, value in xblock.group_access.iteritems():
-        # value should be a list of group IDs. If it is an empty list or None, the xblock is visible
-        # to all groups in that particular partition. So if value is a truthy value, the xblock is
-        # restricted in some way.
-        if value:
+
+    for partition in get_user_partition_info(xblock):
+        if any(g["selected"] for g in partition["groups"]):
             return True
+
     return False
 
 
@@ -310,3 +300,158 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
+
+
+def get_user_partition_info(xblock, schemes=None, course=None):
+    """
+    Retrieve user partition information for an XBlock for display in editors.
+
+    * If a partition has been disabled, it will be excluded from the results.
+
+    * If a group within a partition is referenced by the XBlock, but the group has been deleted,
+      the group will be marked as deleted in the results.
+
+    Arguments:
+        xblock (XBlock): The courseware component being edited.
+
+    Keyword Arguments:
+        schemes (iterable of str): If provided, filter partitions to include only
+            schemes with the provided names.
+
+        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+            instead of loading the course.  This is useful if we're calling this function multiple
+            times for the same course want to minimize queries to the modulestore.
+
+    Returns: list
+
+    Example Usage:
+    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    [
+        {
+            "id": 12345,
+            "name": "Cohorts"
+            "scheme": "cohort",
+            "groups": [
+                {
+                    "id": 7890,
+                    "name": "Foo",
+                    "selected": True,
+                    "deleted": False,
+                }
+            ]
+        },
+        {
+            "id": 7292,
+            "name": "Midterm A",
+            "scheme": "verification",
+            "groups": [
+                {
+                    "id": 1,
+                    "name": "Completed verification at Midterm A",
+                    "selected": False,
+                    "deleted": False
+                },
+                {
+                    "id": 0,
+                    "name": "Did not complete verification at Midterm A",
+                    "selected": False,
+                    "deleted": False,
+                }
+            ]
+        }
+    ]
+
+    """
+    course = course or modulestore().get_course(xblock.location.course_key)
+
+    if course is None:
+        log.warning(
+            "Could not find course %s to retrieve user partition information",
+            xblock.location.course_key
+        )
+        return []
+
+    if schemes is not None:
+        schemes = set(schemes)
+
+    partitions = []
+    for p in sorted(course.user_partitions, key=lambda p: p.name):
+
+        # Exclude disabled partitions, partitions with no groups defined
+        # Also filter by scheme name if there's a filter defined.
+        if p.active and p.groups and (schemes is None or p.scheme.name in schemes):
+
+            # First, add groups defined by the partition
+            groups = []
+            for g in p.groups:
+
+                # Falsey group access for a partition mean that all groups
+                # are selected.  In the UI, though, we don't show the particular
+                # groups selected, since there's a separate option for "all users".
+                selected_groups = set(xblock.group_access.get(p.id, []) or [])
+                groups.append({
+                    "id": g.id,
+                    "name": g.name,
+                    "selected": g.id in selected_groups,
+                    "deleted": False,
+                })
+
+            # Next, add any groups set on the XBlock that have been deleted
+            all_groups = set(g.id for g in p.groups)
+            missing_group_ids = selected_groups - all_groups
+            for gid in missing_group_ids:
+                groups.append({
+                    "id": gid,
+                    "name": _("Deleted group"),
+                    "selected": True,
+                    "deleted": True,
+                })
+
+            # Put together the entire partition dictionary
+            partitions.append({
+                "id": p.id,
+                "name": p.name,
+                "scheme": p.scheme.name,
+                "groups": groups,
+            })
+
+    return partitions
+
+
+def get_visibility_partition_info(xblock):
+    """
+    Retrieve user partition information for the component visibility editor.
+
+    This pre-processes partition information to simplify the template.
+
+    Arguments:
+        xblock (XBlock): The component being edited.
+
+    Returns: dict
+
+    """
+    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+    cohort_partitions = []
+    verification_partitions = []
+    has_selected_groups = False
+    selected_verified_partition_id = None
+
+    # Pre-process the partitions to make it easier to display the UI
+    for p in user_partitions:
+        has_selected = any(g["selected"] for g in p["groups"])
+        has_selected_groups = has_selected_groups or has_selected
+
+        if p["scheme"] == "cohort":
+            cohort_partitions.append(p)
+        elif p["scheme"] == "verification":
+            verification_partitions.append(p)
+            if has_selected:
+                selected_verified_partition_id = p["id"]
+
+    return {
+        "user_partitions": user_partitions,
+        "cohort_partitions": cohort_partitions,
+        "verification_partitions": verification_partitions,
+        "has_selected_groups": has_selected_groups,
+        "selected_verified_partition_id": selected_verified_partition_id,
+    }

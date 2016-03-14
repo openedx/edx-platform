@@ -61,7 +61,7 @@ def test_js_run(options):
     """
     Run the JavaScript tests and print results to the console
     """
-    setattr(options, 'mode', 'run')
+    options.mode = 'run'
     test_js(options)
 
 
@@ -74,5 +74,5 @@ def test_js_dev(options):
     """
     Run the JavaScript tests in your default browsers
     """
-    setattr(options, 'mode', 'dev')
+    options.mode = 'dev'
     test_js(options)

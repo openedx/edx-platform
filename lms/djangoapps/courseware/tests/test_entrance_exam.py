@@ -4,10 +4,12 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from mock import patch, Mock
 
 from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module
+from courseware.module_render import toc_for_course, get_module, handle_xblock_callback
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
@@ -115,10 +117,16 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category='vertical',
             display_name='Exam Vertical - Unit 1'
         )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
         self.problem_1 = ItemFactory.create(
             parent=subsection,
             category="problem",
-            display_name="Exam Problem - Problem 1"
+            display_name="Exam Problem - Problem 1",
+            data=problem_xml
         )
         self.problem_2 = ItemFactory.create(
             parent=subsection,
@@ -155,7 +163,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1'
+                    'display_name': u'Entrance Exam Section - Chapter 1',
+                    'display_id': u'entrance-exam-section-chapter-1',
                 }
             ]
         )
@@ -182,19 +191,22 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Overview',
-                    'display_name': u'Overview'
+                    'display_name': u'Overview',
+                    'display_id': u'overview'
                 },
                 {
                     'active': False,
                     'sections': [],
                     'url_name': u'Week_1',
-                    'display_name': u'Week 1'
+                    'display_name': u'Week 1',
+                    'display_id': u'week-1'
                 },
                 {
                     'active': False,
                     'sections': [],
                     'url_name': u'Instructor',
-                    'display_name': u'Instructor'
+                    'display_name': u'Instructor',
+                    'display_id': u'instructor'
                 },
                 {
                     'active': True,
@@ -209,7 +221,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
                         }
                     ],
                     'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1'
+                    'display_name': u'Entrance Exam Section - Chapter 1',
+                    'display_id': u'entrance-exam-section-chapter-1'
                 }
             ]
         )
@@ -283,13 +296,15 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
         """
-        exam_score = get_entrance_exam_score(self.request, self.course)
+        with self.assertNumQueries(1):
+            exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
-        exam_score = get_entrance_exam_score(self.request, self.course)
+        with self.assertNumQueries(1):
+            exam_score = get_entrance_exam_score(self.request, self.course)
         # 50 percent exam score should be achieved.
         self.assertGreater(exam_score * 100, 50)
 
@@ -308,6 +323,28 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('To access course materials, you must score', resp.content)
+
+    def test_entrance_exam_requirement_message_with_correct_percentage(self):
+        """
+        Unit Test: entrance exam requirement message should be present in response
+        and percentage of required score should be rounded as expected
+        """
+        minimum_score_pct = 29
+        self.course.entrance_exam_minimum_score_pct = float(minimum_score_pct) / 100
+        modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': self.entrance_exam.location.name,
+                'section': self.exam_1.location.name
+            }
+        )
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('To access course materials, you must score {required_score}% or higher'.format(
+            required_score=minimum_score_pct
+        ), resp.content)
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -504,6 +541,28 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         self.assertTrue(user_has_passed_entrance_exam(self.request, course))
 
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
+    def test_entrance_exam_xblock_response(self):
+        """
+        Tests entrance exam xblock has `entrance_exam_passed` key in json response.
+        """
+        request_factory = RequestFactory()
+        data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
+        request = request_factory.post(
+            'problem_check',
+            data=data
+        )
+        request.user = self.user
+        response = handle_xblock_callback(
+            request,
+            unicode(self.course.id),
+            unicode(self.problem_1.location),
+            'xmodule_handler',
+            'problem_check',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('entrance_exam_passed', response.content)
+
     def _assert_chapter_loaded(self, course, chapter):
         """
         Asserts courseware chapter load successfully.
@@ -528,6 +587,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.entrance_exam
         )
         return toc_for_course(
+            self.request.user,
             self.request,
             self.course,
             self.entrance_exam.url_name,
@@ -549,7 +609,6 @@ def answer_entrance_exam_problem(course, request, problem, user=None):
     if not user:
         user = request.user
 
-    # pylint: disable=maybe-no-member,no-member
     grade_dict = {'value': 1, 'max_value': 1, 'user_id': user.id}
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id,

@@ -108,14 +108,6 @@
             }
         }
     },
-    "OPEN_ENDED_GRADING_INTERFACE": {
-        "grading_controller": "grading_controller",
-        "password": "password",
-        "peer_grading": "peer_grading",
-        "staff_grading": "staff_grading",
-        "url": "** OVERRIDDEN **",
-        "username": "lms"
-    },
     "SECRET_KEY": "",
     "DJFS": {
             "type": "s3fs",

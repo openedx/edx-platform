@@ -1,4 +1,4 @@
-.. _edX Platform Enrollment API Version 1.0:
+.. _edX Platform Enrollment API:
 
 ########################################
 Enrollment API Version 1.0
@@ -8,5 +8,4 @@ Enrollment API Version 1.0
     :maxdepth: 2
     
     overview
-    endpoints
     enrollment

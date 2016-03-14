@@ -9,11 +9,9 @@ html { font-size: 100%; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 10
 html, button, input, select, textarea { font-family: sans-serif; color: #222; }
 body { margin: 0; font-size: 1em; line-height: 1.4; }
 
-a { color: #00e; }
-a:visited { color: #551a8b; }
-a:hover, a:focus { color: #06e; }
-a:focus { outline: thin dotted; }
-a:hover, a:active { outline: 0; }
+a { color: #005584; } // from the Pattern Library http://ux.edx.org/elements/colors/
+a:visited { color: #003655; } // from the Pattern Library http://ux.edx.org/elements/colors/
+a:hover, a:focus { color: #0079BC; } // from the Pattern Library http://ux.edx.org/elements/colors/
 abbr[title] { border-bottom: 1px dotted; }
 b, strong { font-weight: bold; }
 blockquote { margin: 1em 40px; }
@@ -52,6 +50,7 @@ input[type="checkbox"], input[type="radio"] { box-sizing: border-box; padding: 0
 input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
 input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
+button:-moz-focusring { outline: 1px dotted black; }
 textarea { overflow: auto; vertical-align: top; resize: vertical; }
 input:valid, textarea:valid {  }
 

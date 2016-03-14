@@ -20,7 +20,7 @@ STUDIO_VIEW_CONTENT = 1
 # In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
 
 
-def has_access(user, role):
+def user_has_role(user, role):
     """
     Check whether this user has access to this role (either direct or implied)
     :param user:
@@ -64,14 +64,14 @@ def get_user_permissions(user, course_key, org=None):
     # global staff, org instructors, and course instructors have all permissions:
     if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
         return all_perms
-    if course_key and has_access(user, CourseInstructorRole(course_key)):
+    if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
     # Staff have all permissions except EDIT_ROLES:
-    if OrgStaffRole(org=org).has_user(user) or (course_key and has_access(user, CourseStaffRole(course_key))):
+    if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
     if course_key and isinstance(course_key, LibraryLocator):
-        if OrgLibraryUserRole(org=org).has_user(user) or has_access(user, LibraryUserRole(course_key)):
+        if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
     return 0
 
@@ -151,5 +151,5 @@ def _check_caller_authority(caller, role):
     if isinstance(role, (GlobalStaff, CourseCreatorRole)):
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
-        if not has_access(caller, CourseInstructorRole(role.course_key)):
+        if not user_has_role(caller, CourseInstructorRole(role.course_key)):
             raise PermissionDenied

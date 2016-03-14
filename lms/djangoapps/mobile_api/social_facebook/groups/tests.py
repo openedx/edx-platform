@@ -108,7 +108,7 @@ class TestGroups(SocialFacebookTestCase):
             status=status_code
         )
         response = self.delete_group(response.data['id'])  # pylint: disable=E1101
-        self.assertTrue(response.status_code, status_code)  # pylint: disable=E1101
+        self.assertTrue(response.status_code, status_code)
 
     @httpretty.activate
     def test_delete(self):
@@ -153,7 +153,7 @@ class TestGroups(SocialFacebookTestCase):
         self.set_facebook_interceptor_for_members({'success': 'True'}, status_code, group_id, member_id)
         response = self.invite_to_group(group_id, member_id)
         self.assertEqual(response.status_code, status_code)
-        self.assertTrue('success' in response.data[member_id])  # pylint: disable=E1103
+        self.assertTrue('success' in response.data[member_id])
 
     @httpretty.activate
     def test_invite_multiple_members_successfully(self):
@@ -166,7 +166,7 @@ class TestGroups(SocialFacebookTestCase):
         response = self.invite_to_group(group_id, member_ids)
         self.assertEqual(response.status_code, status_code)
         for member_id in member_ids.split(','):
-            self.assertTrue('success' in response.data[member_id])  # pylint: disable=E1103
+            self.assertTrue('success' in response.data[member_id])
 
     @httpretty.activate
     def test_invite_single_member_unsuccessfully(self):
@@ -180,7 +180,7 @@ class TestGroups(SocialFacebookTestCase):
         )
         response = self.invite_to_group(group_id, member_id)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('error message' in response.data[member_id])  # pylint: disable=E1103
+        self.assertTrue('error message' in response.data[member_id])
 
     @httpretty.activate
     def test_invite_multiple_members_unsuccessfully(self):
@@ -196,4 +196,4 @@ class TestGroups(SocialFacebookTestCase):
         response = self.invite_to_group(group_id, member_ids)
         self.assertEqual(response.status_code, 200)
         for member_id in member_ids.split(','):
-            self.assertTrue('error message' in response.data[member_id])  # pylint: disable=E1103
+            self.assertTrue('error message' in response.data[member_id])

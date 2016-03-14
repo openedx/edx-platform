@@ -4,9 +4,10 @@ define(
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
-        'sinon', 'xmodule', 'jasmine-jquery'
+        'common/js/spec_helpers/ajax_helpers',
+        'xmodule', 'jasmine-jquery'
     ],
-function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
+function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
     'use strict';
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
@@ -50,24 +51,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 status: 'Success',
                 subs: 'video_id'
             }),
-            view, sinonXhr, MessageManager, messenger;
+            MessageManager, messenger;
 
         beforeEach(function () {
-            sinonXhr = sinon.fakeServer.create();
-            sinonXhr.respondWith([
-                200,
-                { 'Content-Type': 'application/json'},
-                response
-            ]);
-
-            sinonXhr.autoRespond = true;
-
             var tpl = sandbox({
                     'class': 'component',
                     'data-locator': component_locator
-                }),
-                model = new MetadataModel(modelStub),
-                $el;
+                });
 
             setFixtures(tpl);
 
@@ -99,14 +89,6 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 return messenger;
             };
 
-            $el = $('.component');
-
-            view = new VideoList({
-                el: $el,
-                model: model,
-                MessageManager: MessageManager
-            });
-
             this.addMatchers({
                 assertValueInView: function(expected) {
                     var actualValue = this.actual.getValueFromEditor();
@@ -129,11 +111,29 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
         });
 
-        afterEach(function () {
-            sinonXhr.restore();
-        });
+        var createMockAjaxServer = function (test) {
+            var mockServer = AjaxHelpers.server(
+                test,
+                [
+                    200,
+                    { 'Content-Type': 'application/json'},
+                    response
+                ]
+            );
+            mockServer.autoRespond = true;
+            return mockServer;
+        };
 
-        var waitsForResponse = function (expectFunc, prep) {
+        var createVideoListView = function () {
+            var model = new MetadataModel(modelStub);
+            return new VideoList({
+                el: $('.component'),
+                model: model,
+                MessageManager: MessageManager
+            });
+        };
+
+        var waitsForResponse = function (mockServer, expectFunc, prep) {
             var flag = false;
 
             if (prep) {
@@ -141,10 +141,10 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             }
 
             waitsFor(function() {
-                var req = sinonXhr.requests,
-                    len = req.length;
+                var requests = mockServer.requests,
+                    len = requests.length;
 
-                if (len && req[0].readyState === 4) {
+                if (len && requests[0].readyState === 4) {
                     flag = true;
                 }
 
@@ -156,7 +156,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
 
         it('Initialize', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 expect(abstractEditor.initialize).toHaveBeenCalled();
                 expect(messenger.initialize).toHaveBeenCalled();
                 expect(view.component_locator).toBe(component_locator);
@@ -175,20 +177,24 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
                     expect(messenger.render).toHaveBeenCalled();
                 },
-                resetSpies = function() {
+                resetSpies = function(mockServer) {
                     abstractEditor.render.reset();
                     Utils.command.reset();
                     messenger.render.reset();
-                    sinonXhr.requests.length = 0;
+                    mockServer.requests.length = 0;
                 };
 
             it('is rendered in correct way', function () {
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this);
+                createVideoListView();
+                waitsForResponse(mockServer, function () {
                     assertToHaveBeenRendered(videoList);
                 });
             });
 
             it('is rendered with opened extra videos bar', function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView();
                 var videoListLength = [
                         {
                             mode: 'youtube',
@@ -213,24 +219,26 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 spyOn(view, 'openExtraVideosBar');
 
                 waitsForResponse(
+                    mockServer,
                     function () {
                         assertToHaveBeenRendered(videoListLength);
                         view.getVideoObjectsList.andReturn(videoListLength);
                         expect(view.openExtraVideosBar).toHaveBeenCalled();
                     },
                     function () {
-                        resetSpies();
+                        resetSpies(mockServer);
                         view.render();
                     }
                 );
 
                 waitsForResponse(
+                    mockServer,
                     function () {
                         assertToHaveBeenRendered(videoListHtml5mode);
                         expect(view.openExtraVideosBar).toHaveBeenCalled();
                     },
                     function () {
-                        resetSpies();
+                        resetSpies(mockServer);
                         view.openExtraVideosBar.reset();
                         view.getVideoObjectsList.andReturn(videoListHtml5mode);
                         view.render();
@@ -240,7 +248,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
 
             it('is rendered without opened extra videos bar', function () {
-                var videoList = [
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    videoList = [
                         {
                             mode: 'youtube',
                             type: 'youtube',
@@ -252,12 +262,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 spyOn(view, 'closeExtraVideosBar');
 
                 waitsForResponse(
+                    mockServer,
                     function () {
                         assertToHaveBeenRendered(videoList);
                         expect(view.closeExtraVideosBar).toHaveBeenCalled();
                     },
                     function () {
-                        resetSpies();
+                        resetSpies(mockServer);
                         view.render();
                     }
                 );
@@ -267,13 +278,14 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
         describe('isUniqOtherVideos', function () {
             it('Unique data - return true', function () {
-                var data = videoList.concat([{
-                    mode: 'html5',
-                    type: 'other',
-                    video: 'pxxZrg'
-                }]);
-
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    data = videoList.concat([{
+                        mode: 'html5',
+                        type: 'other',
+                        video: 'pxxZrg'
+                    }]);
+                waitsForResponse(mockServer, function () {
                     var result = view.isUniqOtherVideos(data);
 
                     expect(result).toBe(true);
@@ -282,7 +294,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
 
             it('Not Unique data - return false', function () {
-                var data = [
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -309,8 +323,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                             video: '12345678901'
                         }
                     ];
-
-                waitsForResponse(function () {
+                waitsForResponse(mockServer, function () {
                     var result = view.isUniqOtherVideos(data);
 
                     expect(result).toBe(false);
@@ -321,18 +334,20 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         describe('isUniqVideoTypes', function () {
 
             it('Unique data - return true', function () {
-                var data = videoList;
-
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    data = videoList;
+                waitsForResponse(mockServer, function () {
                     var result = view.isUniqVideoTypes(data);
-
                     expect(result).toBe(true);
                 });
 
             });
 
             it('Not Unique data - return false', function () {
-                var data = [
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -354,8 +369,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                             video: '12345678901'
                         }
                     ];
-
-                waitsForResponse(function () {
+                waitsForResponse(mockServer, function () {
                     var result = view.isUniqVideoTypes(data);
 
                     expect(result).toBe(false);
@@ -365,7 +379,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
         describe('checkIsUniqVideoTypes', function () {
             it('Error is shown', function () {
-                var data = [
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -388,7 +404,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                waitsForResponse(function () {
+                waitsForResponse(mockServer, function () {
                     var result = view.checkIsUniqVideoTypes(data);
 
                     expect(messenger.showError).toHaveBeenCalled();
@@ -397,9 +413,10 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
 
             it('All works okay if arguments are not passed', function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView();
                 spyOn(view, 'getVideoObjectsList').andReturn(videoList);
-
-                waitsForResponse(function () {
+                waitsForResponse(mockServer, function () {
                     var result = view.checkIsUniqVideoTypes();
 
                     expect(view.getVideoObjectsList).toHaveBeenCalled();
@@ -410,12 +427,11 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         describe('checkValidity', function () {
-            beforeEach(function () {
-                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
-            });
-
             it('Error message is shown', function () {
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
+                waitsForResponse(mockServer, function () {
                     var data = { mode: 'incorrect' },
                         result = view.checkValidity(data, true);
 
@@ -426,7 +442,10 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
 
             it('Error message is shown when flag is not passed', function () {
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
+                waitsForResponse(mockServer, function () {
                     var data = { mode: 'incorrect' },
                         result = view.checkValidity(data);
 
@@ -437,7 +456,10 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             });
 
             it('All works okay if correct data is passed', function () {
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
+                waitsForResponse(mockServer, function () {
                     var data = videoList,
                         result = view.checkValidity(data);
 
@@ -449,7 +471,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         it('openExtraVideosBar', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 view.$extraVideosBar.removeClass('is-visible');
 
                 view.openExtraVideosBar();
@@ -458,7 +482,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         it('closeExtraVideosBar', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 view.$extraVideosBar.addClass('is-visible');
                 view.closeExtraVideosBar();
 
@@ -467,7 +493,9 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         it('toggleExtraVideosBar', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 view.$extraVideosBar.addClass('is-visible');
                 view.toggleExtraVideosBar();
                 expect(view.$extraVideosBar).not.toHaveClass('is-visible');
@@ -477,18 +505,24 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         it('getValueFromEditor', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 expect(view).assertValueInView(modelStub.value);
             });
         });
 
         it('setValueInEditor', function () {
-            waitsForResponse(function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
+            waitsForResponse(mockServer, function () {
                 expect(view).assertCanUpdateView(['abc.mp4']);
             });
         });
 
         it('getVideoObjectsList', function () {
+            var mockServer = createMockAjaxServer(this),
+                view = createVideoListView();
             var value = [
                 {
                     mode: 'youtube',
@@ -507,7 +541,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 }
             ];
 
-            waitsForResponse(function () {
+            waitsForResponse(mockServer, function () {
                 view.setValueInEditor([
                     'http://youtu.be/12345678901',
                     'video.mp4',
@@ -519,14 +553,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         });
 
         describe('getPlaceholders', function () {
-            var defaultPlaceholders;
-
-            beforeEach(function () {
-                defaultPlaceholders = view.placeholders;
-            });
 
             it('All works okay if empty values are passed', function () {
-                waitsForResponse(function () {
+                var mockServer = createMockAjaxServer(this),
+                    view = createVideoListView(),
+                    defaultPlaceholders = view.placeholders;
+                waitsForResponse(mockServer, function () {
                     var result = view.getPlaceholders([]),
                     expectedResult = _.values(defaultPlaceholders).reverse();
 
@@ -534,10 +566,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 });
             });
 
-
             it('On filling less than 3 fields, remaining fields should have ' +
 'placeholders for video types that were not filled yet',
                 function () {
+                    var mockServer = createMockAjaxServer(this),
+                        view = createVideoListView(),
+                        defaultPlaceholders = view.placeholders;
                     var dataDict = {
                         youtube: {
                             value: [modelStub.value[0]],
@@ -564,8 +598,8 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                             ]
                         }
                     };
-
-                    waitsForResponse(function () {
+                defaultPlaceholders = view.placeholders;
+                    waitsForResponse(mockServer, function () {
                         $.each(dataDict, function(index, val) {
                             var result = view.getPlaceholders(val.value);
 
@@ -579,13 +613,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         describe('inputHandler', function () {
             var eventObject;
 
-            var resetSpies = function () {
+            var resetSpies = function (view) {
                 messenger.hideError.reset();
                 view.updateModel.reset();
                 view.closeExtraVideosBar.reset();
             };
 
-            beforeEach(function () {
+            var setUp = function (view) {
                 eventObject = jQuery.Event('input');
 
                 spyOn(view, 'updateModel');
@@ -597,15 +631,18 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 spyOn($.fn, 'prop').andCallThrough();
                 spyOn(_, 'isEqual');
 
-                resetSpies();
-            });
+                resetSpies(view);
+            };
 
             it('Field has invalid value - nothing should happen',
                 function () {
+                    var mockServer = createMockAjaxServer(this),
+                        view = createVideoListView();
+                    setUp(view);
                     $.fn.hasClass.andReturn(false);
                     view.checkValidity.andReturn(false);
 
-                    waitsForResponse(function () {
+                    waitsForResponse(mockServer, function () {
                         view.inputHandler(eventObject);
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();
@@ -622,10 +659,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
             it('Main field has invalid value - extra Videos Bar is closed',
                 function () {
+                    var mockServer = createMockAjaxServer(this),
+                        view = createVideoListView();
+                    setUp(view);
                     $.fn.hasClass.andReturn(true);
                     view.checkValidity.andReturn(false);
 
-                    waitsForResponse(function () {
+                    waitsForResponse(mockServer, function () {
                         view.inputHandler(eventObject);
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();
@@ -642,10 +682,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
             it('Model is updated if value is valid',
                 function () {
+                    var mockServer = createMockAjaxServer(this),
+                        view = createVideoListView();
+                    setUp(view);
                     view.checkValidity.andReturn(true);
                     _.isEqual.andReturn(false);
 
-                    waitsForResponse(function () {
+                    waitsForResponse(mockServer, function () {
                         view.inputHandler(eventObject);
                         expect(messenger.hideError).not.toHaveBeenCalled();
                         expect(view.updateModel).toHaveBeenCalled();
@@ -662,10 +705,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
             it('Corner case: Error is hided',
                 function () {
+                    var mockServer = createMockAjaxServer(this),
+                        view = createVideoListView();
+                    setUp(view);
                     view.checkValidity.andReturn(true);
                     _.isEqual.andReturn(true);
-
-                    waitsForResponse(function () {
+                    waitsForResponse(mockServer, function () {
                         view.inputHandler(eventObject);
                         expect(messenger.hideError).toHaveBeenCalled();
                         expect(view.updateModel).not.toHaveBeenCalled();

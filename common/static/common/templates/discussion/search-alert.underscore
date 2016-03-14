@@ -1,0 +1,9 @@
+<div class="search-alert" id="search-alert-<%- cid %>">
+    <div class="search-alert-content">
+      <p class="message"><%= message %></p>
+    </div>
+
+    <div class="search-alert-controls">
+      <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
+    </div>
+</div>

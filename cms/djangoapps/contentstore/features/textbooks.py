@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from django.conf import settings

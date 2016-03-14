@@ -28,7 +28,7 @@ from django.views.decorators.http import condition
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
-from path import path
+from path import Path as path
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
@@ -107,7 +107,7 @@ class SysadminDashboardView(TemplateView):
                 writer.writerow(row)
             csv_data = read_and_flush()
             yield csv_data
-        response = HttpResponse(csv_data(), mimetype='text/csv')
+        response = HttpResponse(csv_data(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(
             filename)
         return response
@@ -387,7 +387,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        log.debug('Adding course using git repo {0}'.format(gitloc))
+        log.debug('Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -619,7 +619,7 @@ class Staffing(SysadminDashboardView):
             raise Http404
         data = []
 
-        for course in self.get_courses():  # pylint: disable=unused-variable
+        for course in self.get_courses():
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
@@ -653,7 +653,7 @@ class Staffing(SysadminDashboardView):
             data = []
             roles = [CourseInstructorRole, CourseStaffRole, ]
 
-            for course in self.get_courses():  # pylint: disable=unused-variable
+            for course in self.get_courses():
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
@@ -722,8 +722,8 @@ class GitLogs(TemplateView):
         else:
             try:
                 course = get_course_by_id(course_id)
-            except Exception:  # pylint: disable=broad-except
-                log.info('Cannot find course {0}'.format(course_id))
+            except Exception:
+                log.info('Cannot find course %s', course_id)
                 raise Http404
 
             # Allow only course team, instructors, and staff
@@ -731,11 +731,11 @@ class GitLogs(TemplateView):
                     CourseInstructorRole(course.id).has_user(request.user) or
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
-            log.debug('course_id={0}'.format(course_id))
+            log.debug('course_id=%s', course_id)
             cilset = CourseImportLog.objects.filter(
                 course_id=course_id
             ).order_by('-created')
-            log.debug('cilset length={0}'.format(len(cilset)))
+            log.debug('cilset length=%s', len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)

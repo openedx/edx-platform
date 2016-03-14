@@ -14,7 +14,6 @@ from ...pages.lms.dashboard import DashboardPage
 from ..helpers import EventsTestMixin
 
 
-@attr('shard_5')
 class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     """
     Mixin with helper methods to test the account settings page.
@@ -23,6 +22,16 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
+
+    def visit_account_settings_page(self):
+        """
+        Visit the account settings page for the current user, and store the page instance
+        as self.account_settings_page.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.account_settings_page = AccountSettingsPage(self.browser)
+        self.account_settings_page.visit()
+        self.account_settings_page.wait_for_ajax()
 
     def log_in_as_unique_user(self, email=None):
         """
@@ -85,19 +94,19 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
     """
     def test_link_on_dashboard_works(self):
         """
-        Scenario: Verify that the "Account Settings" link works from the dashboard.
+        Scenario: Verify that the "Account" link works from the dashboard.
 
 
         Given that I am a registered user
         And I visit my dashboard
-        And I click on "Account Settings" in the top drop down
+        And I click on "Account" in the top drop down
         Then I should see my account settings page
         """
         self.log_in_as_unique_user()
         dashboard_page = DashboardPage(self.browser)
         dashboard_page.visit()
         dashboard_page.click_username_dropdown()
-        self.assertIn('Account Settings', dashboard_page.username_dropdown_link_text)
+        self.assertIn('Account', dashboard_page.username_dropdown_link_text)
         dashboard_page.click_account_settings_link()
 
 
@@ -115,14 +124,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         super(AccountSettingsPageTest, self).setUp()
         self.username, self.user_id = self.log_in_as_unique_user()
         self.visit_account_settings_page()
-
-    def visit_account_settings_page(self):
-        """
-        Visit the account settings page for the current user.
-        """
-        self.account_settings_page = AccountSettingsPage(self.browser)
-        self.account_settings_page.visit()
-        self.account_settings_page.wait_for_ajax()
 
     def test_page_view_event(self):
         """
@@ -444,3 +445,24 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         for field_id, title, link_title in providers:
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
+
+
+@attr('a11y')
+class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Class to test account settings accessibility.
+    """
+
+    def test_account_settings_a11y(self):
+        """
+        Test the accessibility of the account settings page.
+        """
+        self.log_in_as_unique_user()
+        self.visit_account_settings_page()
+        self.account_settings_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'link-href',  # TODO: AC-233, AC-238
+                'skip-link',  # TODO: AC-179
+            ],
+        })
+        self.account_settings_page.a11y_audit.check_for_accessibility_errors()

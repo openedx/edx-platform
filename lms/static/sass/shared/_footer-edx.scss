@@ -139,6 +139,24 @@ footer#footer-edx-v3 {
     }
   }
 
+  .site-nav,
+  .legal-notices,
+  .footer-logo,
+  .external-links {
+    @extend %ui-print-excluded;
+  }
+
+  @media print {
+    .site-details p {
+      @include float(left);
+    }
+
+    .openedx-link {
+      margin: 0;
+      @include float(right);
+    }
+  }
+
   @include media( $edx-bp-large ) {
     padding: 20px 10px;
 

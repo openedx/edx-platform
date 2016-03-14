@@ -62,6 +62,27 @@
     margin-top: ($baseline);
   }
 
+  // specific fields - settings details
+  .settings-details {
+
+    // course details that should appear more like content than elements to change
+    .is-not-editable {
+
+      label {
+
+      }
+
+      input, textarea {
+        @extend %t-copy-lead1;
+        @extend %t-strong;
+        box-shadow: none;
+        border: none;
+        background: none;
+        margin: 0;
+      }
+    }
+  }
+
 
   // in form - elements
   .group-settings {
@@ -97,6 +118,10 @@
     }
 
     // in form  -UI hints/tips/messages
+    .header-help {
+      margin: 0 0 $baseline 0;
+    }
+
     .instructions {
       @extend %t-copy-sub1;
       margin: 0 0 $baseline 0;
@@ -222,6 +247,16 @@
           }
         }
 
+        .input-minimum-grade {
+          @include float(left);
+          @include size(92%,100%);
+        }
+
+        .minimum-grade-percentage-sign {
+          @include line-height(30);
+          padding-left: ($baseline/4);;
+        }
+
         textarea.long {
           height: ($baseline*5);
         }
@@ -291,21 +326,10 @@
         }
       }
 
-      // course details that should appear more like content than elements to change
-      .field.is-not-editable {
-
-        label {
-
-        }
+      .is-not-editable {
 
         input, textarea {
-          @extend %t-copy-lead1;
-          @extend %t-strong;
-          box-shadow: none;
-          border: none;
-          background: none;
           padding: 0;
-          margin: 0;
         }
       }
 
@@ -422,6 +446,13 @@
         &:last-child {
           border: none;
           padding-bottom: 0;
+        }
+
+        .is-not-editable {
+
+          input, textarea {
+            padding: 10px;
+          }
         }
 
         .field {
@@ -1004,6 +1035,31 @@
               outline: 0;
             }
           }
+        }
+      }
+    }
+  }
+
+  // UI: course pacing options
+  .group-settings.pacing {
+    .list-input {
+      margin-top: $baseline/2;
+      background-color: $gray-l6;
+      border-radius: 3px;
+      padding: ($baseline/2);
+    }
+
+    .field {
+      @include margin(0, 0, $baseline, 0);
+
+      .field-radio {
+        display: inline-block;
+        @include margin-right($baseline/4);
+        width: auto;
+        height: auto;
+
+        & + .course-pace-label {
+          display: inline-block;
         }
       }
     }

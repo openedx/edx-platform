@@ -22,18 +22,21 @@ invoked each time that changes have been made.
 
 from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-TEST_ROOT = REPO_ROOT / "test_root"  # pylint: disable=no-value-for-parameter
+TEST_ROOT = REPO_ROOT / "test_root"
 
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django
 DEBUG = True
 
+# Set REQUIRE_DEBUG to false so that it behaves like production
+REQUIRE_DEBUG = False
+
 #  Serve static files at /static directly from the staticfiles directory under test root.
 # Note: optimized files for testing are generated with settings from test_static_optimized
 STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
 )
 STATICFILES_DIRS = (
     (TEST_ROOT / "staticfiles" / "cms").abspath(),

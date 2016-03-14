@@ -1,57 +1,14 @@
 describe "DiscussionUserProfileView", ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures(
-            """
-            <script type="text/template" id="_user_profile">
-                <section class="discussion">
-                    {{#threads}}
-                        <article class="discussion-thread" id="thread_{{id}}"/>
-                    {{/threads}}
-                </section>
-                <section class="pagination"/>
-            </script>
-            <script type="text/template" id="_profile_thread">
-                <div class="profile-thread" id="thread_{{id}}"/>
-            </script>
-            <script type="text/template" id="_pagination">
-                <div class="discussion-paginator">
-                    <a href="#different-page"/>
-                </div>
-                <div
-                    class="pagination-params"
-                    data-leftdots="{{leftdots}}"
-                    data-page="{{page}}"
-                    data-rightdots="{{rightdots}}"
-                >
-                    {{#previous}}
-                        <div class="previous" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/previous}}
-                    {{#first}}
-                        <div class="first" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/first}}
-                    {{#lowPages}}
-                        <div class="lowPages" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/lowPages}}
-                    {{#highPages}}
-                        <div class="highPages" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/highPages}}
-                    {{#last}}
-                        <div class="last" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/last}}
-                    {{#next}}
-                        <div class="next" data-url="{{url}}" data-number="{{number}}"/>
-                    {{/next}}
-                </div>
-            </script>
-            <div class="user-profile-fixture"/>
-            """
-        )
+        DiscussionSpecHelper.setUnderscoreFixtures()
         spyOn(DiscussionThreadProfileView.prototype, "render")
 
+    makeThreads = (numThreads) ->
+        _.map(_.range(numThreads), (i) -> {id: i.toString(), body: "dummy body"})
+
     makeView = (threads, page, numPages) ->
-        return new DiscussionUserProfileView(
-            el: $(".user-profile-fixture")
+        new DiscussionUserProfileView(
             collection: threads
             page: page
             numPages: numPages
@@ -59,7 +16,7 @@ describe "DiscussionUserProfileView", ->
 
     describe "thread rendering should be correct", ->
         checkRender = (numThreads) ->
-            threads = _.map(_.range(numThreads), (i) -> {id: i.toString(), body: "dummy body"})
+            threads = makeThreads(numThreads)
             view = makeView(threads, 1, 1)
             expect(view.$(".discussion").children().length).toEqual(numThreads)
             _.each(threads, (thread) -> expect(view.$("#thread_#{thread.id}").length).toEqual(1))
@@ -80,28 +37,18 @@ describe "DiscussionUserProfileView", ->
 
         checkRender = (params) ->
             view = makeView([], params.page, params.numPages)
-            paramsQuery = view.$(".pagination-params")
-            expect(paramsQuery.length).toEqual(1)
-            _.each(
-                ["page", "leftdots", "rightdots"],
-                (param) ->
-                    expect(paramsQuery.data(param)).toEqual(params[param])
-            )
-            _.each(
-                ["previous", "first", "last", "next"],
-                (param) ->
-                    expected = params[param]
-                    expect(paramsQuery.find("." + param).data()).toEqual(
-                        if expected then pageInfo(expected) else null
-                    )
-            )
-            _.each(
-                ["lowPages", "highPages"]
-                (param) ->
-                    expect(paramsQuery.find("." + param).map(-> $(this).data()).get()).toEqual(
-                        _.map(params[param], pageInfo)
-                    )
-            )
+            paginator = view.$(".discussion-paginator")
+            expect(paginator.find(".current-page").text()).toEqual(params["page"].toString())
+            expect(paginator.find(".first-page").length).toBe(if params["first"] then 1 else 0);
+            expect(paginator.find(".previous-page").length).toBe(if params["previous"] then 1 else 0);
+            expect(paginator.find(".previous-ellipses").length).toBe(if params["leftdots"] then 1 else 0);
+            expect(paginator.find(".next-page").length).toBe(if params["next"] then 1 else 0);
+            expect(paginator.find(".next-ellipses").length).toBe(if params["rightdots"] then 1 else 0);
+            expect(paginator.find(".last-page").length).toBe(if params["last"] then 1 else 0);
+
+            get_page_number = (element) => parseInt($(element).text())
+            expect(_.map(paginator.find(".lower-page a"), get_page_number)).toEqual(params["lowPages"])
+            expect(_.map(paginator.find(".higher-page a"), get_page_number)).toEqual(params["highPages"])
 
         it "for one page", ->
             checkRender(
@@ -245,7 +192,7 @@ describe "DiscussionUserProfileView", ->
 
     describe "pagination interaction", ->
         beforeEach ->
-            @view = makeView([], 1, 1)
+            @view = makeView(makeThreads(3), 1, 2)
             spyOn($, "ajax")
 
         it "causes updated rendering", ->
@@ -258,10 +205,9 @@ describe "DiscussionUserProfileView", ->
                     )
                     {always: ->}
             )
-            @view.$(".pagination a").first().click()
-            expect(@view.$("#thread_on_page_42").length).toEqual(1)
-            expect(@view.$(".pagination-params").data("page")).toEqual(42)
-            expect(@view.$(".pagination-params .last").data("number")).toEqual(99)
+            @view.$(".discussion-pagination a").first().click()
+            expect(@view.$(".current-page").text()).toEqual("42")
+            expect(@view.$(".last-page").text()).toEqual("99")
 
         it "handles AJAX errors", ->
             spyOn(DiscussionUtil, "discussionAlert")
@@ -270,5 +216,5 @@ describe "DiscussionUserProfileView", ->
                     params.error()
                     {always: ->}
             )
-            @view.$(".pagination a").first().click()
+            @view.$(".discussion-pagination a").first().click()
             expect(DiscussionUtil.discussionAlert).toHaveBeenCalled()

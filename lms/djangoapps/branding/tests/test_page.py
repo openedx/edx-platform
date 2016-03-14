@@ -140,6 +140,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             org='edX',
             course='900',
             display_name='pre requisite course',
+            emit_signals=True,
         )
 
         pre_requisite_courses = [unicode(pre_requisite_course.id)]
@@ -155,6 +156,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             start=datetime.datetime(2013, 1, 1),
             end=datetime.datetime(2030, 1, 1),
             pre_requisite_courses=pre_requisite_courses,
+            emit_signals=True,
         )
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
@@ -180,7 +182,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=4),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=3),
-            }
+            },
+            emit_signals=True,
         )
         self.starting_earlier = CourseFactory.create(
             org='MITx',
@@ -189,12 +192,14 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
-            }
+            },
+            emit_signals=True,
         )
         self.course_with_default_start_date = CourseFactory.create(
             org='MITx',
             number='1002',
             display_name='Tech Beta Course',
+            emit_signals=True,
         )
         self.factory = RequestFactory()
 
@@ -217,10 +222,10 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
         # assert that the course discovery UI is not present
         self.assertNotIn('Search for a course', response.content)
-        self.assertNotIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
+        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
 
         # make sure we have the special css class on the section
-        self.assertIn('<section class="courses no-course-discovery">', response.content)
+        self.assertIn('<div class="courses no-course-discovery"', response.content)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
@@ -239,10 +244,10 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get(reverse('branding.views.courses'))
         self.assertEqual(response.status_code, 200)
 
-        # assert that the course discovery UI is not present
+        # assert that the course discovery UI is present
         self.assertIn('Search for a course', response.content)
-        self.assertIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
-        self.assertIn('<section class="courses">', response.content)
+        self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+        self.assertIn('<div class="courses"', response.content)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)

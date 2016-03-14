@@ -126,7 +126,7 @@ import pytz
           %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
           <div class="running-tasks-container action-type-container">
             <hr>
-            <h2> ${_("Pending Instructor Tasks")} </h2>
+            <h2> ${_("Pending Tasks")} </h2>
             <div class="running-tasks-section">
               <p>${_("The status for any active tasks appears in a table below.")} </p>
               <br/>
@@ -223,7 +223,7 @@ import pytz
                    collapsible: true
                });
 
-     $('a[rel*=leanModal]').leanModal();
+     $('a[rel*=leanModal]').leanModal({ top : -70, position: "absolute", closeButton: ".modal_close" });
      $.each($("a.edit-right"), function () {
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
          $(this).removeAttr('href')

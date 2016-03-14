@@ -1,4 +1,5 @@
 <%page args="section_data"/>
+<%namespace name='static' file='../../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from courseware.courses import get_studio_url
@@ -16,32 +17,23 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 </div>
 
 
-<%block name="headextra">
+<%block name="js_extra">
+<%static:require_module module_name="js/groups/views/cohorts_dashboard_factory" class_name="CohortsFactory">
     <%
-    cohorted_user_partition = get_cohorted_user_partition(course.id)
+    cohorted_user_partition = get_cohorted_user_partition(course)
     content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
     %>
-    <script type="text/javascript">
-        $(document).ready(function() {
-
-            var cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
-                contentGroups = [
-                    % for content_group in content_groups:
-                        new edx.groups.ContentGroupModel({
-                            id: ${content_group.id},
-                            name: "${content_group.name | h}",
-                            user_partition_id: cohortUserPartitionId
-                        }),
-                    % endfor
-                ];
-
-            (function (require) {
-                require(['js/groups/views/cohorts_dashboard_factory'], function (CohortsFactory) {
-                    CohortsFactory(contentGroups, '${get_studio_url(course, 'group_configurations') | h}');
-                });
-            }).call(this, require || RequireJS.require);
-        });
-    </script>
-
+    var cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+        contentGroups = [
+            % for content_group in content_groups:
+            {
+                id: ${content_group.id},
+                name: "${content_group.name | h}",
+                user_partition_id: cohortUserPartitionId
+            },
+            % endfor
+        ];
+    CohortsFactory(contentGroups, '${get_studio_url(course, 'group_configurations') | h}');
+</%static:require_module>
 </%block>
 <div class="cohort-state-message"></div>

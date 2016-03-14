@@ -30,7 +30,20 @@ class StaffPage(CoursewarePage):
         """
         Set the current view mode, e.g. "Staff", "Student" or a content group.
         """
-        self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text == view_mode).first.click()
+        self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text.strip() == view_mode).first.click()
+        self.wait_for_ajax()
+
+    def set_staff_view_mode_specific_student(self, username_or_email):
+        """
+        Set the current preview mode to "Specific Student" with the given username or email
+        """
+        required_mode = "Specific student"
+        if self.staff_view_mode != required_mode:
+            self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text == required_mode).first.click()
+        # Use a script here because .clear() + .send_keys() triggers unwanted behavior if a username is already set
+        self.browser.execute_script(
+            '$(".action-preview-username").val("{}").blur().change();'.format(username_or_email)
+        )
         self.wait_for_ajax()
 
     def open_staff_debug_info(self):

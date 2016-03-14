@@ -1,14 +1,17 @@
 ## mako
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.lib.json_utils import EscapedEdxJSONEncoder %>
+<%! from openedx.core.lib.js_utils import escape_json_dumps %>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
-<%block name="bodyclass">view-teams is-in-course course</%block>
+<%block name="bodyclass">view-teams view-in-course course js</%block>
 <%block name="pagetitle">${_("Teams")}</%block>
+
 <%block name="headextra">
+<%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<%include file="../discussion/_js_head_dependencies.html" />
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='teams'" />
@@ -21,11 +24,31 @@
 </div>
 
 <%block name="js_extra">
+
+<%include file="../discussion/_js_body_dependencies.html" />
+<%static:js group='discussion'/>
 <script type="text/javascript">
-    (function (require) {
-        require(['teams/js/teams_tab_factory'], function (TeamsTabFactory) {
-            new TeamsTabFactory(${ json.dumps(topics, cls=EscapedEdxJSONEncoder) }, '${ topics_url }', '${ unicode(course.id) }');
-        });
-    }).call(this, require || RequireJS.require);
+    RequireJS.define('DiscussionModuleView', [], function() {return window['DiscussionModuleView'];});
 </script>
+
+<%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
+    TeamsTabFactory({
+        courseID: '${ unicode(course.id) }',
+        topics: ${ escape_json_dumps(topics) | n },
+        userInfo: ${ escape_json_dumps(user_info) | n },
+        topicUrl: '${ topic_url }',
+        topicsUrl: '${ topics_url }',
+        teamsUrl: '${ teams_url }',
+        teamsDetailUrl: '${ teams_detail_url }',
+        teamMembershipsUrl: '${ team_memberships_url }',
+        teamMembershipDetailUrl: '${ team_membership_detail_url }',
+        myTeamsUrl: '${ my_teams_url }',
+        maxTeamSize: ${ course.teams_max_size },
+        languages: ${ escape_json_dumps(languages) | n },
+        countries: ${ escape_json_dumps(countries) | n },
+        teamsBaseUrl: '${ teams_base_url }'
+    });
+</%static:require_module>
 </%block>
+
+<%include file="../discussion/_underscore_templates.html" />

@@ -9,11 +9,13 @@ from django.utils.translation import ugettext as _
 from rest_framework import status, response
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import clone_request
 from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
 
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -22,7 +24,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl
-from util.milestones_helpers import any_unfulfilled_milestones
 
 
 class DeveloperErrorViewMixin(object):
@@ -61,10 +62,14 @@ class DeveloperErrorViewMixin(object):
             return self.make_error_response(400, validation_error.messages[0])
 
     def handle_exception(self, exc):
+        """
+        Generalized helper method for managing specific API exception workflows
+        """
+
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):
-            return self.make_error_response(404, "Not found.")
+            return self.make_error_response(404, exc.message or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)
         else:
@@ -77,7 +82,7 @@ class ExpandableFieldViewMixin(object):
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
         result = super(ExpandableFieldViewMixin, self).get_serializer_context()
-        result['expand'] = [x for x in self.request.QUERY_PARAMS.get('expand', '').split(',') if x]
+        result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
         return result
 
 
@@ -104,16 +109,8 @@ def view_course_access(depth=0, access_action='load', check_for_milestones=False
                         depth=depth,
                         check_if_enrolled=True,
                     )
-                except Http404:
-                    # any_unfulfilled_milestones called a second time since has_access returns a bool
-                    if check_for_milestones and any_unfulfilled_milestones(course_id, request.user.id):
-                        message = {
-                            "developer_message": "Cannot access content with unfulfilled "
-                                                 "pre-requisites or unpassed entrance exam."
-                        }
-                        return response.Response(data=message, status=status.HTTP_204_NO_CONTENT)
-                    else:
-                        raise
+                except CoursewareAccessException as error:
+                    return response.Response(data=error.to_json(), status=status.HTTP_404_NOT_FOUND)
                 return func(self, request, course=course, *args, **kwargs)
         return _wrapper
     return _decorator
@@ -141,8 +138,8 @@ def view_auth_classes(is_user=False):
 
 def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
-    if not serializer.is_valid():  # pylint: disable=maybe-no-member
-        errors = serializer.errors  # pylint: disable=maybe-no-member
+    if not serializer.is_valid():
+        errors = serializer.errors
         for key, error in errors.iteritems():
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
@@ -179,7 +176,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
 
     def patch(self, request, *args, **kwargs):
         """Checks for validation errors, then updates the model using the UpdateModelMixin."""
-        field_errors = self._validate_patch(request.DATA)
+        field_errors = self._validate_patch(request.data)
         if field_errors:
             return Response({'field_errors': field_errors}, status=status.HTTP_400_BAD_REQUEST)
         return self.partial_update(request, *args, **kwargs)
@@ -188,7 +185,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
         """Validates a JSON merge patch. Captures DRF serializer errors and converts them to edX's standard format."""
         field_errors = {}
         serializer = self.get_serializer(self.get_object_or_none(), data=patch, partial=True)
-        fields = self.get_serializer().get_fields()  # pylint: disable=maybe-no-member
+        fields = self.get_serializer().get_fields()
 
         for key in patch:
             if key in fields and fields[key].read_only:
@@ -200,3 +197,23 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
         add_serializer_errors(serializer, patch, field_errors)
 
         return field_errors
+
+    def get_object_or_none(self):
+        """
+        Retrieve an object or return None if the object can't be found.
+
+        NOTE: This replaces functionality that was removed in Django Rest Framework v3.1.
+        """
+        try:
+            return self.get_object()
+        except Http404:
+            if self.request.method == 'PUT':
+                # For PUT-as-create operation, we need to ensure that we have
+                # relevant permissions, as if this was a POST request.  This
+                # will either raise a PermissionDenied exception, or simply
+                # return None.
+                self.check_permissions(clone_request(self.request, 'POST'))
+            else:
+                # PATCH requests where the object does not exist should still
+                # return a 404 response.
+                raise

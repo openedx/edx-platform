@@ -1,181 +1,137 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+import provider.utils
+import django.db.models.deletion
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'OAuth2ProviderConfig'
-        db.create_table('third_party_auth_oauth2providerconfig', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('icon_class', self.gf('django.db.models.fields.CharField')(default='fa-sign-in', max_length=50)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('backend_name', self.gf('django.db.models.fields.CharField')(max_length=50, db_index=True)),
-            ('key', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('secret', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('other_settings', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal('third_party_auth', ['OAuth2ProviderConfig'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('oauth2', '0001_initial'),
+    ]
 
-        # Adding model 'SAMLProviderConfig'
-        db.create_table('third_party_auth_samlproviderconfig', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('icon_class', self.gf('django.db.models.fields.CharField')(default='fa-sign-in', max_length=50)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('backend_name', self.gf('django.db.models.fields.CharField')(default='tpa-saml', max_length=50)),
-            ('idp_slug', self.gf('django.db.models.fields.SlugField')(max_length=30)),
-            ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('metadata_source', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('attr_user_permanent_id', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('attr_full_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('attr_first_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('attr_last_name', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('attr_username', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('attr_email', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
-            ('other_settings', self.gf('django.db.models.fields.TextField')(blank=True)),
-        ))
-        db.send_create_signal('third_party_auth', ['SAMLProviderConfig'])
-
-        # Adding model 'SAMLConfiguration'
-        db.create_table('third_party_auth_samlconfiguration', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
-            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('private_key', self.gf('django.db.models.fields.TextField')()),
-            ('public_key', self.gf('django.db.models.fields.TextField')()),
-            ('entity_id', self.gf('django.db.models.fields.CharField')(default='http://saml.example.com', max_length=255)),
-            ('org_info_str', self.gf('django.db.models.fields.TextField')(default='{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}')),
-            ('other_config_str', self.gf('django.db.models.fields.TextField')(default='{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}')),
-        ))
-        db.send_create_signal('third_party_auth', ['SAMLConfiguration'])
-
-        # Adding model 'SAMLProviderData'
-        db.create_table('third_party_auth_samlproviderdata', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('fetched_at', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
-            ('expires_at', self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True)),
-            ('entity_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('sso_url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('public_key', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('third_party_auth', ['SAMLProviderData'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'OAuth2ProviderConfig'
-        db.delete_table('third_party_auth_oauth2providerconfig')
-
-        # Deleting model 'SAMLProviderConfig'
-        db.delete_table('third_party_auth_samlproviderconfig')
-
-        # Deleting model 'SAMLConfiguration'
-        db.delete_table('third_party_auth_samlconfiguration')
-
-        # Deleting model 'SAMLProviderData'
-        db.delete_table('third_party_auth_samlproviderdata')
-
-
-    models = {
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'third_party_auth.oauth2providerconfig': {
-            'Meta': {'object_name': 'OAuth2ProviderConfig'},
-            'backend_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
-            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
-            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'icon_class': ('django.db.models.fields.CharField', [], {'default': "'fa-sign-in'", 'max_length': '50'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'key': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'other_settings': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'secret': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        'third_party_auth.samlconfiguration': {
-            'Meta': {'object_name': 'SAMLConfiguration'},
-            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
-            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'entity_id': ('django.db.models.fields.CharField', [], {'default': "'http://saml.example.com'", 'max_length': '255'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'org_info_str': ('django.db.models.fields.TextField', [], {'default': '\'{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}\''}),
-            'other_config_str': ('django.db.models.fields.TextField', [], {'default': '\'{\\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\\n}\''}),
-            'private_key': ('django.db.models.fields.TextField', [], {}),
-            'public_key': ('django.db.models.fields.TextField', [], {})
-        },
-        'third_party_auth.samlproviderconfig': {
-            'Meta': {'object_name': 'SAMLProviderConfig'},
-            'attr_email': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'attr_first_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'attr_full_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'attr_last_name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'attr_user_permanent_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'attr_username': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'backend_name': ('django.db.models.fields.CharField', [], {'default': "'tpa-saml'", 'max_length': '50'}),
-            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
-            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'icon_class': ('django.db.models.fields.CharField', [], {'default': "'fa-sign-in'", 'max_length': '50'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'idp_slug': ('django.db.models.fields.SlugField', [], {'max_length': '30'}),
-            'metadata_source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'other_settings': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        'third_party_auth.samlproviderdata': {
-            'Meta': {'ordering': "('-fetched_at',)", 'object_name': 'SAMLProviderData'},
-            'entity_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'expires_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
-            'fetched_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'public_key': ('django.db.models.fields.TextField', [], {}),
-            'sso_url': ('django.db.models.fields.URLField', [], {'max_length': '200'})
-        }
-    }
-
-    complete_apps = ['third_party_auth']
+    operations = [
+        migrations.CreateModel(
+            name='LTIProviderConfig',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
+                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('icon_class', models.CharField(default=b'fa-sign-in', help_text=b'The Font Awesome (or custom) icon class to use on the login button for this provider. Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university', max_length=50)),
+                ('name', models.CharField(help_text=b'Name of this provider (shown to users)', max_length=50)),
+                ('secondary', models.BooleanField(default=False, help_text='Secondary providers are displayed less prominently, in a separate list of "Institution" login providers.')),
+                ('skip_registration_form', models.BooleanField(default=False, help_text='If this option is enabled, users will not be asked to confirm their details (name, email, etc.) during the registration process. Only select this option for trusted providers that are known to provide accurate user information.')),
+                ('skip_email_verification', models.BooleanField(default=False, help_text='If this option is selected, users will not be required to confirm their email, and their account will be activated immediately upon registration.')),
+                ('lti_consumer_key', models.CharField(help_text=b'The name that the LTI Tool Consumer will use to identify itself', max_length=255)),
+                ('lti_hostname', models.CharField(default=b'localhost', help_text=b'The domain that  will be acting as the LTI consumer.', max_length=255, db_index=True)),
+                ('lti_consumer_secret', models.CharField(default=provider.utils.long_token, help_text=b'The shared secret that the LTI Tool Consumer will use to authenticate requests. Only this edX instance and this tool consumer instance should know this value. For increased security, you can avoid storing this in your database by leaving this field blank and setting SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} in your instance\'s Django setttigs (or lms.auth.json)', max_length=255, blank=True)),
+                ('lti_max_timestamp_age', models.IntegerField(default=10, help_text=b'The maximum age of oauth_timestamp values, in seconds.')),
+                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
+            ],
+            options={
+                'verbose_name': 'Provider Configuration (LTI)',
+                'verbose_name_plural': 'Provider Configuration (LTI)',
+            },
+        ),
+        migrations.CreateModel(
+            name='OAuth2ProviderConfig',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
+                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('icon_class', models.CharField(default=b'fa-sign-in', help_text=b'The Font Awesome (or custom) icon class to use on the login button for this provider. Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university', max_length=50)),
+                ('name', models.CharField(help_text=b'Name of this provider (shown to users)', max_length=50)),
+                ('secondary', models.BooleanField(default=False, help_text='Secondary providers are displayed less prominently, in a separate list of "Institution" login providers.')),
+                ('skip_registration_form', models.BooleanField(default=False, help_text='If this option is enabled, users will not be asked to confirm their details (name, email, etc.) during the registration process. Only select this option for trusted providers that are known to provide accurate user information.')),
+                ('skip_email_verification', models.BooleanField(default=False, help_text='If this option is selected, users will not be required to confirm their email, and their account will be activated immediately upon registration.')),
+                ('backend_name', models.CharField(help_text=b'Which python-social-auth OAuth2 provider backend to use. The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting.', max_length=50, db_index=True)),
+                ('key', models.TextField(verbose_name=b'Client ID', blank=True)),
+                ('secret', models.TextField(help_text=b'For increased security, you can avoid storing this in your database by leaving  this field blank and setting SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} in your instance\'s Django settings (or lms.auth.json)', verbose_name=b'Client Secret', blank=True)),
+                ('other_settings', models.TextField(help_text=b'Optional JSON object with advanced settings, if any.', blank=True)),
+                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
+            ],
+            options={
+                'verbose_name': 'Provider Configuration (OAuth)',
+                'verbose_name_plural': 'Provider Configuration (OAuth)',
+            },
+        ),
+        migrations.CreateModel(
+            name='ProviderApiPermissions',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('provider_id', models.CharField(help_text=b'Uniquely identify a provider. This is different from backend_name.', max_length=255)),
+                ('client', models.ForeignKey(to='oauth2.Client')),
+            ],
+            options={
+                'verbose_name': 'Provider API Permission',
+                'verbose_name_plural': 'Provider API Permissions',
+            },
+        ),
+        migrations.CreateModel(
+            name='SAMLConfiguration',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
+                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('private_key', models.TextField(help_text=b'To generate a key pair as two files, run "openssl req -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.key". Paste the contents of saml.key here. For increased security, you can avoid storing this in your database by leaving this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PRIVATE_KEY setting in your instance\'s Django settings (or lms.auth.json).', blank=True)),
+                ('public_key', models.TextField(help_text=b"Public key certificate. For increased security, you can avoid storing this in your database by leaving this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting in your instance's Django settings (or lms.auth.json).", blank=True)),
+                ('entity_id', models.CharField(default=b'http://saml.example.com', max_length=255, verbose_name=b'Entity ID')),
+                ('org_info_str', models.TextField(default=b'{"en-US": {"url": "http://www.example.com", "displayname": "Example Inc.", "name": "example"}}', help_text=b"JSON dictionary of 'url', 'displayname', and 'name' for each language", verbose_name=b'Organization Info')),
+                ('other_config_str', models.TextField(default=b'{\n"SECURITY_CONFIG": {"metadataCacheDuration": 604800, "signMetadata": false}\n}', help_text=b'JSON object defining advanced settings that are passed on to python-saml. Valid keys that can be set here include: SECURITY_CONFIG and SP_EXTRA')),
+                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
+            ],
+            options={
+                'verbose_name': 'SAML Configuration',
+                'verbose_name_plural': 'SAML Configuration',
+            },
+        ),
+        migrations.CreateModel(
+            name='SAMLProviderConfig',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
+                ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
+                ('icon_class', models.CharField(default=b'fa-sign-in', help_text=b'The Font Awesome (or custom) icon class to use on the login button for this provider. Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university', max_length=50)),
+                ('name', models.CharField(help_text=b'Name of this provider (shown to users)', max_length=50)),
+                ('secondary', models.BooleanField(default=False, help_text='Secondary providers are displayed less prominently, in a separate list of "Institution" login providers.')),
+                ('skip_registration_form', models.BooleanField(default=False, help_text='If this option is enabled, users will not be asked to confirm their details (name, email, etc.) during the registration process. Only select this option for trusted providers that are known to provide accurate user information.')),
+                ('skip_email_verification', models.BooleanField(default=False, help_text='If this option is selected, users will not be required to confirm their email, and their account will be activated immediately upon registration.')),
+                ('backend_name', models.CharField(default=b'tpa-saml', help_text=b"Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.", max_length=50)),
+                ('idp_slug', models.SlugField(help_text=b'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30)),
+                ('entity_id', models.CharField(help_text=b'Example: https://idp.testshib.org/idp/shibboleth', max_length=255, verbose_name=b'Entity ID')),
+                ('metadata_source', models.CharField(help_text=b"URL to this provider's XML metadata. Should be an HTTPS URL. Example: https://www.testshib.org/metadata/testshib-providers.xml", max_length=255)),
+                ('attr_user_permanent_id', models.CharField(help_text=b'URN of the SAML attribute that we can use as a unique, persistent user ID. Leave blank for default.', max_length=128, verbose_name=b'User ID Attribute', blank=True)),
+                ('attr_full_name', models.CharField(help_text=b"URN of SAML attribute containing the user's full name. Leave blank for default.", max_length=128, verbose_name=b'Full Name Attribute', blank=True)),
+                ('attr_first_name', models.CharField(help_text=b"URN of SAML attribute containing the user's first name. Leave blank for default.", max_length=128, verbose_name=b'First Name Attribute', blank=True)),
+                ('attr_last_name', models.CharField(help_text=b"URN of SAML attribute containing the user's last name. Leave blank for default.", max_length=128, verbose_name=b'Last Name Attribute', blank=True)),
+                ('attr_username', models.CharField(help_text=b'URN of SAML attribute to use as a suggested username for this user. Leave blank for default.', max_length=128, verbose_name=b'Username Hint Attribute', blank=True)),
+                ('attr_email', models.CharField(help_text=b"URN of SAML attribute containing the user's email address[es]. Leave blank for default.", max_length=128, verbose_name=b'Email Attribute', blank=True)),
+                ('other_settings', models.TextField(help_text=b'For advanced use cases, enter a JSON object with addtional configuration. The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} which can be used to require the presence of a specific eduPersonEntitlement.', verbose_name=b'Advanced settings', blank=True)),
+                ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
+            ],
+            options={
+                'verbose_name': 'Provider Configuration (SAML IdP)',
+                'verbose_name_plural': 'Provider Configuration (SAML IdPs)',
+            },
+        ),
+        migrations.CreateModel(
+            name='SAMLProviderData',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('fetched_at', models.DateTimeField(db_index=True)),
+                ('expires_at', models.DateTimeField(null=True, db_index=True)),
+                ('entity_id', models.CharField(max_length=255, db_index=True)),
+                ('sso_url', models.URLField(verbose_name=b'SSO URL')),
+                ('public_key', models.TextField()),
+            ],
+            options={
+                'ordering': ('-fetched_at',),
+                'verbose_name': 'SAML Provider Data',
+                'verbose_name_plural': 'SAML Provider Data',
+            },
+        ),
+    ]

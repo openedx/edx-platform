@@ -5,14 +5,14 @@ Admin site models for managing :class:`.ConfigurationModel` subclasses
 from django.forms import models
 from django.contrib import admin
 from django.contrib.admin import ListFilter
-from django.core.cache import get_cache, InvalidCacheBackendError
+from django.core.cache import caches, InvalidCacheBackendError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 
 try:
-    cache = get_cache('configuration')  # pylint: disable=invalid-name
+    cache = caches['configuration']  # pylint: disable=invalid-name
 except InvalidCacheBackendError:
     from django.core.cache import cache
 
@@ -84,7 +84,7 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
             reverse(
                 'admin:{}_{}_change'.format(
                     self.model._meta.app_label,
-                    self.model._meta.module_name,
+                    self.model._meta.model_name,
                 ),
                 args=(target.id,),
             )
@@ -142,7 +142,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
     date_hierarchy = None
     list_filter = (ShowHistoryFilter, )
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Annote the queryset with an 'is_active' property that's true iff that row is the most
         recently added row for that particular set of KEY_FIELDS values.
@@ -180,7 +180,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
         """ Edit link for the change view """
         if not inst.is_active:
             return u'--'
-        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.module_name))
+        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
         update_url += "?source={}".format(inst.pk)
         return u'<a href="{}">{}</a>'.format(update_url, _('Update'))
     edit_link.allow_tags = True

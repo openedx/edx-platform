@@ -8,7 +8,7 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils", "js/views/utils/xblock_utils",
+define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components/utils/view_utils", "js/views/utils/xblock_utils",
         "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
@@ -140,9 +140,22 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             },
 
             editXBlock: function() {
+                var enable_proctored_exams = false;
+                var enable_timed_exams = false;
+                if (this.model.get('category') === 'sequential') {
+                    if (this.parentView.parentView.model.has('enable_proctored_exams')) {
+                        enable_proctored_exams = this.parentView.parentView.model.get('enable_proctored_exams');
+                    }
+                    if (this.parentView.parentView.model.has('enable_timed_exams')) {
+                        enable_timed_exams = this.parentView.parentView.model.get('enable_timed_exams');
+                    }
+                }
+
                 var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this),
                     parentInfo: this.parentInfo,
+                    enable_proctored_exams: enable_proctored_exams,
+                    enable_timed_exams: enable_timed_exams,
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )

@@ -1,0 +1,48 @@
+<h1><%- gettext('Financial Assistance Application') %></h1>
+
+<div class="intro">
+  <% _.each(header_text, function(copy) { %>
+	<p class="copy"><%- copy %></p>
+  <%  }); %>
+</div>
+
+<form class="financial-assistance-form">
+	<div class="status submission-error hidden" aria-live="polite">
+	    <h4 class="message-title"><%- gettext('Unable to submit application') %></h4>
+	    <ul class="message-copy"></ul>
+	</div>
+
+	<div class="user-info">
+		<h2><%- gettext('About You') %></h2>
+		<p><%- interpolate_text(
+			gettext('The following information is already a part of your {platform} profile. We\'ve included it here for your application.'),
+			{platform: platform_name} 
+		) %></p>
+		<div class="info-column">
+			<div class="title"><%- gettext('Username') %></div>
+			<div class="data"><%- username %></div>
+		</div>
+		<div class="info-column">
+			<div class="title"><%- gettext('Email address') %></div>
+			<div class="data"><%- email %></div>
+		</div>
+		<div class="info-column">
+			<div class="title"><%- gettext('Legal name') %></div>
+			<div class="data"><%- name %></div>
+		</div>
+		<div class="info-column">
+			<div id="user-country-title" class="title"><%- gettext('Country of residence') %></div>
+			<div class="data"><%- country %></div>
+		</div>
+	</div>
+
+	<%= fields %>
+
+	<div class="cta-wrapper clearfix">
+		<a href="<%- student_faq_url %>" class="nav-link"><%- interpolate_text(
+			gettext('Back to {platform} FAQs'),
+    		{platform: platform_name}
+    	) %></a>
+		<button type="submit" class="action action-primary action-update js-submit-form submit-form"><%- gettext("Submit Application") %></button>
+	</div>
+</form>

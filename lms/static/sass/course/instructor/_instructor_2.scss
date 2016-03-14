@@ -92,6 +92,20 @@
     }
   }
 
+  .msg-success{
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+    color: $confirm-color;
+  }
+
+  .multi-select {
+    min-width: 150px;
+
+    option {
+        padding: ($baseline/5) $baseline ($baseline/10) ($baseline/4);
+    }
+  }
+
   // inline copy
   .copy-confirm {
     color: $confirm-color;
@@ -120,19 +134,6 @@
       }
     }
   }
-
-  // UI: visual dividers
-  .divider-lv0 {
-    border-top: ($baseline/5) solid $gray-l4;
-  }
-
-  .divider-lv1 {
-    border-top: ($baseline/10) solid $gray-l4;
-  }
-
-  .divider-lv2 {
-    border-top: ($baseline/20) solid $gray-l4;
-  }
 }
 
 // instructor dashboard 2
@@ -150,12 +151,12 @@
   .request-response-error {
     margin: 0;
     padding-bottom: ($baseline);
-    color: $error-red;
+    color: $error-color;
   }
 
   .display-errors {
     line-height: 3em;
-    color: $error-red;
+    color: $error-color;
   }
 
   .slickgrid {
@@ -469,43 +470,6 @@
     }
     .enrollment_signup_button {
       @include margin-right($baseline/4);
-    }
-    // Custom File upload
-    .customBrowseBtn {
-      margin: ($baseline/2) 0;
-      display: inline-block;
-      .file-browse {
-        position:relative;
-        overflow:hidden;
-        display: inline;
-        @include margin-left(-5px);
-        span.browse{
-          @include button(simple, $blue);
-          @include margin-right($baseline);
-          padding: 6px ($baseline/2);
-          font-size: 12px;
-          border-radius: 0 3px 3px 0;
-        }
-        input.file_field {
-          position:absolute;
-          @include right(0);
-          top:0;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          opacity:0;
-          filter:alpha(opacity=0);
-        }
-      }
-      & > span, & input[disabled]{
-        vertical-align: middle;
-      }
-      input[disabled] {
-        @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
-        border: 1px solid $lightGrey1;
-        cursor: not-allowed;
-      }
     }
   }
 
@@ -1355,40 +1319,6 @@
   }
 }
 
-
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: $baseline * 2;
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
-}
-
 input[name="subject"] {
   width:600px;
 }
@@ -1409,7 +1339,6 @@ input[name="subject"] {
     }
   }
 }
-
 .ecommerce-wrapper{
   h2{
     height: 26px;
@@ -1448,6 +1377,7 @@ input[name="subject"] {
   input[name='list-order-sale-csv'] {
     @include margin-right(14px);
   }
+
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1533,7 +1463,7 @@ input[name="subject"] {
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        font-size: 16px;
+        font-size: 13px;
 
         &.c_code {
           width: 110px;
@@ -1635,7 +1565,6 @@ input[name="subject"] {
       font-size: 12px;
       color: #646464
     }
-    top:-95px !important;
     width: 650px;
     @include margin-left(-325px);
     border-radius: 2px;
@@ -1875,39 +1804,6 @@ input[name="subject"] {
 
 }
 
-.profile-distribution-widget {
-  margin-bottom: ($baseline * 2);
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 250px;
-  }
-
-  .display-table {
-    .slickgrid {
-      height: 250px;
-    }
-  }
-}
-
-.grade-distributions-widget {
-  margin-bottom: ($baseline * 2);
-
-  .last-updated {
-    line-height: 2.2em;
-    @include font-size(12);
-  }
-
-  .display-graph .graph-placeholder {
-    width: 750px;
-    height: 200px;
-  }
-
-  .display-text {
-    line-height: 2em;
-  }
-}
-
 input[name="subject"] {
   width:600px;
 }
@@ -1921,7 +1817,7 @@ input[name="subject"] {
   }
 }
 
-.ecommerce-wrapper{
+.ecommerce-wrapper, .proctoring-wrapper{
   h2{
     height: 26px;
     line-height: 26px;
@@ -1952,7 +1848,13 @@ input[name="subject"] {
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
+      line-height: 14px;
+      font-size: 0.7em;
     }
+  }
+  .content {
+    display: block;
+    width: 100%;
   }
   span.code_tip {
     display: block;
@@ -1990,9 +1892,435 @@ input[name="subject"] {
     }
   }
 }
+.special-allowance-container, .student-proctored-exam-container{
+  .allowance-table, .exam-attempts-table {
+    width: 100%;
+    tr:nth-child(even){
+        background-color: $gray-l6;
+        border-bottom: 1px solid #f3f3f3;
+      }
+    .allowance-headings, .exam-attempt-headings {
+      height: 40px;
+      border-bottom: 1px solid #BEBEBE;
+
+      th:nth-child(5), th:nth-child(4){
+        text-align: center;
+      }
+      th:first-child{
+        padding-left: $baseline;
+      }
+      th {
+        @extend %t-action2;
+        text-align: left;
+        border-bottom: 1px solid $border-color-1;
+        &.attempt-allowed-time {
+            width: 90px;
+        }
+        &.attempt-type {
+          width: 90px;
+        }
+        &.attempt-started-at {
+          width: 170px;
+        }
+        &.attempt-completed-at {
+          width: 160px;
+          text-align: center;
+        }
+        &.attempt-status {
+          width: 100px;
+          text-align: center;
+        }
+        &.exam-name {
+          width: 150px;
+        }
+        &.username {
+          width: 140px;
+        }
+        &.email {
+          @include text-align(center);
+          width: ($baseline*8);
+          word-wrap: break-word;
+        }
+        &.allowance-name {
+          width: ($baseline*5);
+          text-align: center;
+        }
+        &.allowance-value {
+          @include text-align(center);
+          width: ($baseline*5);
+        }
+        &.c_action {
+          @include text-align(center);
+          width: 60px;
+        }
+      }
+    }
+    // allowance-items style
+    .allowance-items {
+      td {
+        padding: ($baseline/2) 0;
+        position: relative;
+        line-height: normal;
+        font-size: 14px;
+      }
+      td:first-child{
+        @include padding-left($baseline);
+      }
+      td:nth-child(2){
+        line-height: 22px;
+        @include padding-right(0px);
+        word-wrap: break-word;
+      }
+      td:nth-child(5), td:nth-child(4), td:nth-child(6){
+        @include padding-left(0);
+        text-align: center;
+      }
+      td:nth-child(3){
+        word-wrap: break-word;
+        text-align: center;
+      }
+      td:nth-child(7){
+        word-wrap: break-word;
+        text-align: center;
+      }
+
+      td:last-child {
+        padding-left: 17px;
+      }
+    }
+  }
+  .exam-attempts-content, .exam-allowances-content {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .top-header {
+    margin-top: -30px;
+    margin-bottom: 20px;
+    .search-attempts {
+      border: 1px solid #ccc;
+      display: inline-block;
+      border-radius: 5px;
+      float: left;
+      input {
+        border: none;
+        box-shadow: none;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 285px;
+      }
+      span:first-child {
+        margin-right: -5px;
+      }
+      span {
+        background-color: #ccc;
+        display: inline-block;
+        padding: 7px 12px;
+        cursor: pointer;
+      }
+    }
+  }
+  .pagination {
+      display: inline-block;
+      padding-left: 0;
+      float: right;
+      margin: 0;
+      border-radius: 4px;
+      > li {
+        display: inline; // Remove list-style and block-level defaults
+        > a,
+        > span {
+          padding: 6px 12px;
+          line-height: 1.41;
+          text-decoration: none;
+          color: #00095f;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          margin-left: -1px;
+        }
+        > a.active {
+          background-color: #ccc;
+        }
+        &:first-child {
+          > a,
+          > span {
+            margin-left: 0;
+            @include border-left-radius(4px);
+          }
+        }
+        &:last-child {
+          > a,
+          > span {
+            @include border-right-radius(4px);
+          }
+        }
+      }
+
+      > li > a,
+      > li > span {
+        &:hover,
+        &:focus {
+          z-index: 3;
+          color: darken(#003a7d, 15%);
+          background-color: lighten(#000, 93.5%);
+          border-color: #ddd;
+        }
+      }
+
+      > .active > a,
+      > .active > span {
+        &,
+        &:hover,
+        &:focus {
+          z-index: 2;
+          color: #fff;
+          background-color: darken(#428bca, 6.5%);
+          border-color: darken(#428bca, 6.5%);
+          cursor: default;
+        }
+      }
+
+      > .disabled {
+        > span,
+        > span:hover,
+        > span:focus,
+        > a,
+        > a:hover,
+        > a:focus {
+          color: lighten(#000, 46.7%);
+          background-color: #fff;
+          border-color: #ddd;
+          cursor: not-allowed;
+        }
+      }
+    }
+}
 
 .rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
   @include left(2em);
   @include right(auto);
+}
+
+// view - certificates
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#certificates {
+
+  .btn-blue {
+    @extend %btn-primary-blue;
+    padding: ($baseline/2.5) ($baseline/2);
+    text-shadow: none;
+    margin-bottom: 10px;
+  }
+
+  %exception-message {
+        margin-top: 15px;
+        background-color: $gray-l4;
+        border-top-style: groove;
+        color: $black;
+      }
+  .certificates-wrapper{
+    .message{
+      @extend %exception-message;
+    }
+  }
+
+  p.under-heading {
+    margin: 12px 0 12px 0;
+    line-height: 23px;
+  }
+
+  hr.section-divider{
+    margin: 25px 0;
+    border-top: 7px solid #646464;
+  }
+
+  .certificate-generation-history{
+    table{
+      thead{
+        tr{
+          td.task-name{
+            width: 150px;
+          }
+          td.task-date{
+            width: 200px;
+          }
+        }
+      }
+
+      tbody{
+        tr{
+          td{
+            padding: 5px;
+            vertical-align: middle;
+            text-align: left;;
+          }
+        }
+      }
+    }
+  }
+
+  #certificate-white-list-editor {
+    padding-top: 5px;
+    .certificate-exception-inputs {
+      .student-username-or-email {
+        width: 300px;
+        margin-bottom: 10px;
+      }
+      .notes-field {
+        width: 400px;
+      }
+      p + p {
+        margin-top: 5px;
+      }
+      .message {
+        @extend %exception-message;
+      }
+    }
+  }
+
+  .white-listed-students {
+    margin-top: 10px;
+    padding-top: 5px;
+    table {
+      margin-top: 5px;
+      width: 100%;
+      word-wrap: break-word;
+
+      th {
+        @extend %t-copy-sub2;
+        background-color: $gray-l5;
+        padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+        color: $gray;
+
+        &.date{
+          width: 150px;
+        }
+
+        &.user-name {
+          width: 120px;
+        }
+        &.user-email {
+          width: 200px;
+        }
+
+        &.action {
+          width: 150px;
+        }
+
+      }
+
+      td {
+        padding: ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+      }
+
+      tbody {
+        box-shadow: 0 2px 2px $shadow-l1;
+        border: 1px solid $gray-l4;
+        background: $white;
+
+        tr {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border-top: 1px solid $gray-l4;
+
+          &:first-child {
+            border-top: none;
+          }
+
+          &:nth-child(odd) {
+            background-color: $gray-l6;
+          }
+
+          a {
+            color: $gray-d1;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+
+          &:hover {
+            background-color: $blue-l5;
+          }
+        }
+      }
+    }
+
+    .message {
+        @extend %exception-message;
+      }
+  }
+
+  .certificate-exception-container {
+    h3 {
+      border-bottom: 1px groove black;
+      display: inline-block;
+    }
+  }
+
+  .bulk-white-list-exception {
+    margin-top: 10px;
+    padding-top: 5px;
+    .white-list-csv {
+      .bulk-exception-results {
+        margin-top: 10px;
+        background-color: $gray-l4;
+        border-top-style: groove;
+        color: $black;
+        margin-bottom: 15px;
+
+        .message {
+          padding: 5px 10px;
+          margin: 2px;
+          border-top-style: none;
+        }
+
+      }
+      .arrow {
+        font-weight: bold;
+      }
+    }
+  }
+
+}
+
+// Custom File upload
+.customBrowseBtn {
+  margin: ($baseline/2) 0;
+  display: inline-block;
+  .file-browse {
+    position: relative;
+    overflow: hidden;
+    display: inline;
+    @include margin-left(-5px);
+    span.browse {
+      @include button(simple, $blue);
+      @include margin-right($baseline);
+      padding: 6px ($baseline/2);
+      font-size: 12px;
+      border-radius: 0 3px 3px 0;
+    }
+    input.file_field {
+      position: absolute;
+      @include right(0);
+      top: 0;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0;
+      filter: alpha(opacity=0);
+    }
+  }
+  & > span, & input[disabled] {
+    vertical-align: middle;
+  }
+  input[disabled] {
+    @include border-radius(4px 0 0 4px);
+    @include padding(6px 6px 5px);
+    border: 1px solid $lightGrey1;
+    cursor: not-allowed;
+  }
 }

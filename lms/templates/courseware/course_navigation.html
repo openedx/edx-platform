@@ -1,9 +1,10 @@
 ## mako
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from courseware.tabs import get_course_tab_list
-from courseware.views import notification_image_for_tab
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 from student.models import CourseEnrollment
 %>
@@ -18,14 +19,29 @@ def url_class(is_active):
   if is_active:
     return "active"
   return ""
-%>
-<%
-  cohorted_user_partition = get_cohorted_user_partition(course.id)
-  show_preview_menu = not disable_preview_menu and staff_access and active_page in ['courseware', 'info']
-  is_student_masquerade = masquerade and masquerade.role == 'student'
-  masquerade_group_id = masquerade.group_id if masquerade else None
+
+def selected(is_selected):
+  return "selected" if is_selected else ""
+
+show_preview_menu = not disable_preview_menu and staff_access and active_page in ["courseware", "info"]
+cohorted_user_partition = get_cohorted_user_partition(course)
+masquerade_user_name = masquerade.user_name if masquerade else None
+masquerade_group_id = masquerade.group_id if masquerade else None
+staff_selected = selected(not masquerade or masquerade.role != "student")
+specific_student_selected = selected(not staff_selected and masquerade.user_name)
+student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
 %>
 
+% if include_special_exams:
+  <%static:js group='proctoring'/>
+  % for template_name in ["proctored-exam-status"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="courseware/${template_name}.underscore" />
+    </script>
+  % endfor
+<div class="proctored_exam_status"></div>
+% endif
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">
@@ -34,20 +50,32 @@ def url_class(is_active):
                     <form action="#" class="action-preview-form" method="post">
                         <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
                         <select class="action-preview-select" id="action-preview-select" name="select">
-                            <option value="staff" ${"selected" if not is_student_masquerade else ""}>${_("Staff")}</option>
-                            <option value="student" ${"selected" if is_student_masquerade and not masquerade_group_id else ""}>${_("Student")}</option>
+                            <option value="staff" ${staff_selected}>${_("Staff")}</option>
+                            <option value="student" ${student_selected}>${_("Student")}</option>
+                            <option value="specific student" ${specific_student_selected}>${_("Specific student")}</option>
                             % if cohorted_user_partition:
                                 % for group in sorted(cohorted_user_partition.groups, key=lambda group: group.name):
-                                <option value="group.id" data-group-id="${group.id}" ${"selected" if masquerade_group_id == group.id else ""}>
+                                <option value="group.id" data-group-id="${group.id}" ${selected(masquerade_group_id == group.id)}>
                                     ${_("Student in {content_group}").format(content_group=group.name)}
                                 </option>
                                 % endfor
                             % endif
                         </select>
-                        <button type="submit" class="sr" name="submit" value="submit">${_("set preview mode")}</button>
+                        <div class="action-preview-username-container">
+                          <label for="action-preview-username" class="action-preview-label">${_("Username or email:")}</label>
+                          <input type="text" class="action-preview-username" id="action-preview-username">
+                        </div>
+                        <button type="submit" class="sr" name="submit" value="submit">${_("Set preview mode")}</button>
                     </form>
                 </li>
             </ol>
+            % if specific_student_selected:
+            <div class="preview-specific-student-notice">
+                <p>
+                    ${_("You are now viewing the course as <i>{user_name}</i>.").format(user_name=masquerade_user_name)}
+                </p>
+            </div>
+            % endif
         </div>
     </nav>
 % endif
@@ -59,7 +87,6 @@ def url_class(is_active):
       % for tab in get_course_tab_list(request, course):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
-            tab_image = notification_image_for_tab(tab, user, course)
         %>
           <li>
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
@@ -84,22 +111,55 @@ def url_class(is_active):
 % if show_preview_menu:
 <script type="text/javascript">
 (function() {
-    var element = $('.action-preview-select');
+    var selectElement = $('.action-preview-select');
+    var userNameElement = $('#action-preview-username');
+    var userNameContainer = $('.action-preview-username-container')
+
     % if disable_student_access:
-        element.attr("disabled", true);
-        element.attr("title", "${_("Course is not yet visible to students.")}");
+        selectElement.attr("disabled", true);
+        selectElement.attr("title", "${_("Course is not yet visible to students.")}");
     % endif
 
-    element.change(function() {
-        var selectedOption, data;
-        if (element.attr("disabled")) {
+    % if specific_student_selected:
+        userNameContainer.css('display', 'inline-block');
+        userNameElement.val('${masquerade_user_name}');
+    % endif
+
+    selectElement.change(function() {
+        var selectedOption;
+        if (selectElement.attr("disabled")) {
            return alert("${_("You cannot view the course as a student or beta tester before the course release date.")}");
         }
-        selectedOption = element.find('option:selected');
-        data = {
+        selectedOption = selectElement.find('option:selected');
+        if (selectedOption.val() === 'specific student') {
+            userNameContainer.css('display', 'inline-block');
+        } else {
+            userNameContainer.hide();
+            masquerade(selectedOption);
+        }
+    });
+
+    userNameElement.keypress(function(event) {
+        if (event.keyCode === 13) {
+            // Avoid submitting the form on enter, since the submit action isn't implemented.  Instead, blur the
+            // element to trigger a change event in case the value was edited, which in turn will trigger an AJAX
+            // request to update the masquerading data.
+            userNameElement.blur();
+            return false;
+        }
+        return true;
+    });
+
+    userNameElement.change(function() {
+        masquerade(selectElement.find('option:selected'));
+    });
+
+    function masquerade(selectedOption) {
+        var data = {
             role: selectedOption.val() === 'staff' ? 'staff' : 'student',
             user_partition_id: ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
-            group_id: selectedOption.data('group-id')
+            group_id: selectedOption.data('group-id'),
+            user_name: selectedOption.val() === 'specific student' ? userNameElement.val() : null
         };
         $.ajax({
             url: '/courses/${course.id}/masquerade',
@@ -108,13 +168,17 @@ def url_class(is_active):
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(result) {
-                location.reload();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.error);
+                }
             },
             error: function() {
                 alert('Error: cannot connect to server');
             }
         });
-    });
+    }
 }());
 </script>
 % endif

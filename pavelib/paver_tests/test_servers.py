@@ -12,14 +12,23 @@ EXPECTED_COFFEE_COMMAND = (
 )
 EXPECTED_SASS_COMMAND = (
     "sass --update --cache-location /tmp/sass-cache --default-encoding utf-8 --style compressed"
-    " --quiet --load-path common/static --load-path common/static/sass"
-    " --load-path lms/static/sass --load-path lms/static/certificates/sass"
+    " --quiet"
+    " --load-path ."
+    " --load-path common/static"
+    " --load-path common/static/sass"
+    " --load-path lms/static/sass"
+    " --load-path lms/static/themed_sass"
     " --load-path cms/static/sass --load-path common/static/sass"
-    " lms/static/sass:lms/static/css lms/static/certificates/sass:lms/static/certificates/css"
-    " cms/static/sass:cms/static/css common/static/sass:common/static/css"
+    " --load-path lms/static/certificates/sass"
+    " lms/static/sass:lms/static/css"
+    " lms/static/themed_sass:lms/static/css"
+    " cms/static/sass:cms/static/css"
+    " common/static/sass:common/static/css"
+    " lms/static/certificates/sass:lms/static/certificates/css"
 )
 EXPECTED_PREPROCESS_ASSETS_COMMAND = (
     "python manage.py {system} --settings={asset_settings} preprocess_assets"
+    " {system}/static/sass/*.scss {system}/static/themed_sass"
 )
 EXPECTED_COLLECT_STATIC_COMMAND = (
     "python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
@@ -29,6 +38,9 @@ EXPECTED_CELERY_COMMAND = (
 )
 EXPECTED_RUN_SERVER_COMMAND = (
     "python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
+)
+EXPECTED_INDEX_COURSE_COMMAND = (
+    "python manage.py {system} --settings={settings} reindex_course --setup"
 )
 
 
@@ -83,13 +95,27 @@ class TestPaverServerTasks(PaverTestCase):
         Test the "devstack" task.
         """
         options = server_options.copy()
+        is_optimized = options.get("optimized", False)
+        expected_settings = "devstack_optimized" if is_optimized else options.get("settings", "devstack")
 
         # First test with LMS
         options["system"] = "lms"
+        options["expected_messages"] = [
+            EXPECTED_INDEX_COURSE_COMMAND.format(
+                system="cms",
+                settings=expected_settings,
+            )
+        ]
         self.verify_server_task("devstack", options, contracts_default=True)
 
         # Then test with Studio
         options["system"] = "cms"
+        options["expected_messages"] = [
+            EXPECTED_INDEX_COURSE_COMMAND.format(
+                system="cms",
+                settings=expected_settings,
+            )
+        ]
         self.verify_server_task("devstack", options, contracts_default=True)
 
     @ddt.data(
@@ -132,7 +158,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack")
         call_task("pavelib.servers.update_db", options=options)
-        db_command = "python manage.py {server} --settings={settings} syncdb --migrate --traceback --pythonpath=."
+        db_command = "python manage.py {server} --settings={settings} migrate --traceback --pythonpath=."
         self.assertEquals(
             self.task_messages,
             [
@@ -196,7 +222,7 @@ class TestPaverServerTasks(PaverTestCase):
             call_task("pavelib.servers.devstack", args=args)
         else:
             call_task("pavelib.servers.{task_name}".format(task_name=task_name), options=options)
-        expected_messages = []
+        expected_messages = options.get("expected_messages", [])
         expected_settings = settings if settings else "devstack"
         expected_asset_settings = asset_settings if asset_settings else expected_settings
         if is_optimized:

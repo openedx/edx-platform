@@ -124,15 +124,16 @@
       // green button
       .add-xblock-component-button {
         @extend %t-action3;
+        @include margin-right($baseline*0.75);
         position: relative;
         display: inline-block;
         width: ($baseline*5);
         height: ($baseline*5);
-        margin-right: ($baseline*0.75);
         margin-bottom: ($baseline/2);
+        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
         border: 1px solid $green-d2;
         border-radius: ($baseline/4);
-        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, .4) inset;
+        padding: 0;
         background-color: $green-l1;
         text-align: center;
         color: $white;
@@ -164,7 +165,7 @@
 
     .cancel-button {
       @include white-button;
-      margin: $baseline 0 ($baseline/2) ($baseline/2);
+      @include margin($baseline, 0, ($baseline/2), ($baseline/2));
     }
 
     .problem-type-tabs {
@@ -195,16 +196,17 @@
       }
     }
 
-    a {
+  .button-component {
       @include clearfix();
       @include transition(none);
       @extend %t-demi-strong;
       display: block;
+      width: 100%;
       border: 0px;
       padding: 7px $baseline;
       background: $white;
       color: $gray-d3;
-
+      text-align: left;
 
       &:hover {
         @include transition(background-color $tmg-f2 linear 0s);
@@ -225,13 +227,13 @@
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
 
     li:first-child {
-      margin-left: $baseline;
+      @include margin-left($baseline);
     }
 
     li {
       @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
       opacity: 0.8;
-      float: left;
+      @include float(left);
       display: inline-block;
       width: auto;
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
@@ -247,6 +249,11 @@
         @include active;
         border: 0px;
         opacity: 1.0;
+      }
+
+      // reset to remove jquery-ui float
+      a.link-tab {
+        float: none;
       }
     }
 
@@ -286,7 +293,7 @@ $outline-indent-width: $baseline;
       .icon {
         display: inline-block;
         vertical-align: middle;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
       }
     }
   }
@@ -541,20 +548,24 @@ $outline-indent-width: $baseline;
       > .subsection-status .status-grading {
         opacity: 1.0;
       }
+
+      > .subsection-status .status-timed-proctored-exam {
+        opacity: 1.0;
+      }
     }
 
     // status - grading
-    .status-grading {
+    .status-grading, .status-timed-proctored-exam  {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
       opacity: 0.65;
     }
 
-    .status-grading-value {
+    .status-grading-value, .status-proctored-exam-value {
       display: inline-block;
       vertical-align: middle;
     }
 
-    .status-grading-date {
+    .status-grading-date, .status-due-date {
       display: inline-block;
       vertical-align: middle;
       margin-left: ($baseline/4);

@@ -5,7 +5,7 @@
 # pylint: disable=unused-argument
 
 import os
-from path import path
+from path import Path as path
 import sys
 import mock
 
@@ -13,59 +13,35 @@ MOCK_MODULES = [
     'lxml',
     'requests',
     'xblock',
-    'fields',
     'xblock.fields',
-    'frament',
     'xblock.fragment',
     'webob',
-    'multidict',
     'webob.multidict',
-    'core',
     'xblock.core',
-    'runtime',
     'xblock.runtime',
     'sortedcontainers',
     'contracts',
-    'plugin',
     'xblock.plugin',
     'opaque_keys.edx.asides',
-    'asides',
     'dogstats_wrapper',
     'fs',
     'fs.errors',
     'edxmako',
     'edxmako.shortcuts',
-    'shortcuts',
     'crum',
     'opaque_keys.edx.locator',
-    'LibraryLocator',
-    'Location',
     'ipware',
-    'ip',
     'ipware.ip',
-    'get_ip',
     'pygeoip',
     'ipaddr',
     'django_countries',
-    'fields',
     'django_countries.fields',
     'opaque_keys',
     'opaque_keys.edx',
     'opaque_keys.edx.keys',
-    'CourseKey',
-    'UsageKey',
-    'BlockTypeKey',
     'opaque_keys.edx.locations',
-    'SlashSeparatedCourseKey',
-    'Locator',
-    'south',
-    'modelsinspector',
-    'south.modelsinspector',
-    'add_introspection_rules',
     'courseware',
-    'access',
     'courseware.access',
-    'is_mobile_available_for_user',
     'courseware.model_data',
     'courseware.module_render',
     'courseware.views',
@@ -84,10 +60,8 @@ MOCK_MODULES = [
     'ratelimitbackend',
     'analytics',
     'courseware.courses',
-    'staticfiles',
-    'storage',
-    'staticfiles.storage',
-    'content',
+    'django.contrib.staticfiles',
+    'django.contrib.staticfiles.storage',
     'xmodule.contentstore',
     'xmodule.contentstore.content',
     'xblock.exceptions',
@@ -102,17 +76,12 @@ MOCK_MODULES = [
     'social.apps.django_app',
     'social.backends',
     'mako',
-    'exceptions',
     'mako.exceptions',
     'boto',
-    'exception',
     'boto.exception',
     'PIL',
     'reportlab',
-    'lib',
     'reportlab.lib',
-    'pdfgen',
-    'canvas',
     'pdfgen',
     'pdfgen.canvas',
     'reportlab.pdfgen',
@@ -122,9 +91,6 @@ MOCK_MODULES = [
     'reportlab.lib.styles',
     'reportlab.platypus',
     'reportlab.platypus.tables',
-    'boto',
-    's3',
-    'connection',
     'boto.s3',
     'boto.s3.connection',
     'boto.s3.key',
@@ -132,13 +98,9 @@ MOCK_MODULES = [
     'Crypto.Cipher',
     'Crypto.PublicKey',
     'openid',
-    'store',
-    'interface',
     'openid.store',
-    'store.interface',
     'openid.store.interface',
     'external_auth.views',
-    'html_to_text',
     'mail_utils',
     'ratelimitbackend.backends',
     'social.apps.django_app.default',
@@ -170,30 +132,42 @@ MOCK_MODULES = [
     'student.roles',
     'embargo.models',
     'xmodule.vertical_block',
-    'vertical_block',
-    'errors',
-    'UserNotFound',
-    'UserNotAuthorized',
-    'AccountUpdateError',
-    'AccountValidationError',
-    'transaction',
-    'parsers',
-    'MergePatchParser',
-    'get_account_settings',
-    'update_account_settings',
-    'serializers',
-    'profile_images.images',
-    'xmodule.course_module'
-
-
+    'xmodule.course_module',
+    'user_api.accounts.api',
+    'user_api.accounts.serializers',
+    'edx_rest_api_client',
+    'edx_rest_api_client.client',
+    'edx_rest_api_client.exceptions',
+    'student.auth',
+    'ccx_keys',
+    'ccx_keys.locator',
+    'user_api.preferences.api',
+    'rest_framework_oauth.authentication',
+    'certificates.api',
+    'courseware.date_summary',
 ]
 
 for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock(class_that_is_extended=object)
+    sys.modules[mod_name] = mock.Mock()
+
+if "DJANGO_SETTINGS_MODULE" not in os.environ:
+    docs_path = os.getcwd()
+    mezzanine_path_parts = (docs_path, "..")
+    sys.path.insert(0, docs_path)
+    sys.path.insert(0, os.path.realpath(os.path.join(*mezzanine_path_parts)))
+    os.environ["DJANGO_SETTINGS_MODULE"] = "docs_settings"
+    # Django 1.7's setup is required before touching translated strings.
+    import django
+    try:
+        django.setup()
+    except AttributeError:  # < 1.7
+        pass
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 sys.path.append('../../../../')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.dev")
 
 from docs.shared.conf import *
 
@@ -221,6 +195,7 @@ sys.path.insert(0, root)
 sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "lms/djangoapps")
+sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
 
 sys.path.insert(
@@ -249,7 +224,7 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = u'EdX Platform APIs'
+project = u'Open edX Platform APIs'
 copyright = u'2015, edX'
 
 exclude_patterns = ['build', 'links.rst']

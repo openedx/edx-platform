@@ -6,15 +6,38 @@ Used by Django and non-Django tests; must not have Django deps.
 
 from contextlib import contextmanager
 from django.conf import settings
+from django.contrib.auth.models import User
+from provider.oauth2.models import Client as OAuth2Client
+from provider import constants
 import django.test
+from mako.template import Template
 import mock
 import os.path
 
-from third_party_auth.models import OAuth2ProviderConfig, SAMLProviderConfig, SAMLConfiguration, cache as config_cache
+from third_party_auth.models import (
+    OAuth2ProviderConfig,
+    SAMLProviderConfig,
+    SAMLConfiguration,
+    LTIProviderConfig,
+    cache as config_cache,
+    ProviderApiPermissions,
+)
 
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
+
+
+def patch_mako_templates():
+    """ Patch mako so the django test client can access template context """
+    orig_render = Template.render_unicode
+
+    def wrapped_render(*args, **kwargs):
+        """ Render the template and send the context info to any listeners that want it """
+        django.test.signals.template_rendered.send(sender=None, template=None, context=kwargs)
+        return orig_render(*args, **kwargs)
+
+    return mock.patch.multiple(Template, render_unicode=wrapped_render, render=wrapped_render)
 
 
 class FakeDjangoSettings(object):
@@ -52,6 +75,13 @@ class ThirdPartyAuthTestMixin(object):
         obj.save()
         return obj
 
+    @staticmethod
+    def configure_lti_provider(**kwargs):
+        """ Update the settings for a LTI Tool Consumer third party auth provider """
+        obj = LTIProviderConfig(**kwargs)
+        obj.save()
+        return obj
+
     @classmethod
     def configure_google_provider(cls, **kwargs):
         """ Update the settings for the Google third party auth provider/backend """
@@ -82,37 +112,79 @@ class ThirdPartyAuthTestMixin(object):
         kwargs.setdefault("secret", "test")
         return cls.configure_oauth_provider(**kwargs)
 
+    @classmethod
+    def configure_twitter_provider(cls, **kwargs):
+        """ Update the settings for the Twitter third party auth provider/backend """
+        kwargs.setdefault("name", "Twitter")
+        kwargs.setdefault("backend_name", "twitter")
+        kwargs.setdefault("icon_class", "fa-twitter")
+        kwargs.setdefault("key", "test")
+        kwargs.setdefault("secret", "test")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
+    def configure_dummy_provider(cls, **kwargs):
+        """ Update the settings for the Twitter third party auth provider/backend """
+        kwargs.setdefault("name", "Dummy")
+        kwargs.setdefault("backend_name", "dummy")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
+    def verify_user_email(cls, email):
+        """ Mark the user with the given email as verified """
+        user = User.objects.get(email=email)
+        user.is_active = True
+        user.save()
+
+    @staticmethod
+    def configure_oauth_client():
+        """ Configure a oauth client for testing """
+        return OAuth2Client.objects.create(client_type=constants.CONFIDENTIAL)
+
+    @staticmethod
+    def configure_api_permission(client, provider_id):
+        """ Configure the client and provider_id pair. This will give the access to a client for that provider. """
+        return ProviderApiPermissions.objects.create(client=client, provider_id=provider_id)
+
+    @staticmethod
+    def read_data_file(filename):
+        """ Read the contents of a file in the data folder """
+        with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
+            return f.read()
+
 
 class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
     """Base class for auth test cases."""
-    pass
+    def setUp(self):
+        super(TestCase, self).setUp()
+        # Explicitly set a server name that is compatible with all our providers:
+        # (The SAML lib we use doesn't like the default 'testserver' as a domain)
+        self.client.defaults['SERVER_NAME'] = 'example.none'
+        self.url_prefix = 'http://example.none'
 
 
 class SAMLTestCase(TestCase):
     """
     Base class for SAML-related third_party_auth tests
     """
-
-    def setUp(self):
-        super(SAMLTestCase, self).setUp()
-        self.client.defaults['SERVER_NAME'] = 'example.none'  # The SAML lib we use doesn't like testserver' as a domain
-        self.url_prefix = 'http://example.none'
-
     @classmethod
     def _get_public_key(cls, key_name='saml_key'):
         """ Get a public key for use in the test. """
-        return cls._read_data_file('{}.pub'.format(key_name))
+        return cls.read_data_file('{}.pub'.format(key_name))
 
     @classmethod
     def _get_private_key(cls, key_name='saml_key'):
         """ Get a private key for use in the test. """
-        return cls._read_data_file('{}.key'.format(key_name))
+        return cls.read_data_file('{}.key'.format(key_name))
 
-    @staticmethod
-    def _read_data_file(filename):
-        """ Read the contents of a file in the data folder """
-        with open(os.path.join(os.path.dirname(__file__), 'data', filename)) as f:
-            return f.read()
+    def enable_saml(self, **kwargs):
+        """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
+        if 'private_key' not in kwargs:
+            kwargs['private_key'] = self._get_private_key()
+        if 'public_key' not in kwargs:
+            kwargs['public_key'] = self._get_public_key()
+        kwargs.setdefault('entity_id', "https://saml.example.none")
+        super(SAMLTestCase, self).enable_saml(**kwargs)
 
 
 @contextmanager

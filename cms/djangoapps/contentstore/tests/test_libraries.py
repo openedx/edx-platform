@@ -105,7 +105,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         if user not in self.session_data:
             self.session_data[user] = {}
         request = Mock(user=user, session=self.session_data[user])
-        _load_preview_module(request, descriptor)  # pylint: disable=protected-access
+        _load_preview_module(request, descriptor)
 
     def _update_item(self, usage_key, metadata):
         """
@@ -387,7 +387,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data2)
 
-    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None))
+    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"

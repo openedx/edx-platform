@@ -1,9 +1,8 @@
 
 from lettuce import world, steps
-from nose.tools import assert_in, assert_equals, assert_true
+from nose.tools import assert_equals
 
 from common import i_am_registered_for_the_course, visit_scenario_item
-from problems_setup import add_problem_to_course, answer_problem
 
 
 DEFAULT_DATA = """\

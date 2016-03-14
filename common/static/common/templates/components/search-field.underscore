@@ -1,0 +1,12 @@
+<div class="page-header-search wrapper-search-<%= type %>">
+    <form class="search-form">
+        <div class="wrapper-search-input">
+            <label for="search-<%= type %>" class="search-label"><%- searchLabel %></label>
+            <input id="search-<%= type %>" class="search-field" type="text" value="<%- searchString %>" placeholder="<%- searchLabel %>" />
+            <button type="button" class="action action-clear <%= searchLabel ? '' : 'is-hidden' %>" aria-label="<%- gettext('Clear search') %>">
+                <i class="icon fa fa-times-circle" aria-hidden="true"></i><span class="sr"><%- gettext('Search') %></span>
+            </button>
+        </div>
+        <button type="submit" class="action action-search"><span class="icon fa-search" aria-hidden="true"></span><span class="sr"><%- gettext('Search') %></span></button>
+    </form>
+</div>

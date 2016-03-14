@@ -2,7 +2,9 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from courseware.courses import get_course_info_section
+from courseware.courses import get_course_info_section, get_course_date_summary
+
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -20,7 +22,7 @@ from courseware.courses import get_course_info_section
         <h2 class="title">${_("You are not enrolled yet")}</h2>
         <div class="copy">
           <p class='enroll-message'>
-            ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
+            ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
             link_start=u"<a href={}>".format(url_to_enroll),
             link_end=u"</a>"
             )}
@@ -42,14 +44,16 @@ $(document).ready(function(){
   </script>
 </%block>
 
-<%block name="bodyclass">view-incourse view-course-info ${course.css_class or ''}</%block>
+<%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 <section class="container">
   <div class="info-wrapper">
     % if user.is_authenticated():
     <section class="updates">
       % if studio_url is not None and masquerade and masquerade.role == 'staff':
         <div class="wrap-instructor-info studio-view">
-          <a class="instructor-info-action" href="${studio_url}">${_("View Updates in Studio")}</a>
+          <a class="instructor-info-action" href="${studio_url}">
+            ${_("View Updates in Studio")}
+          </a>
         </div>
       % endif
 
@@ -57,6 +61,11 @@ $(document).ready(function(){
       ${get_course_info_section(request, course, 'updates')}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
+      % if False:
+        <h1>${_("Important Course Dates")}</h1>
+        ${get_course_date_summary(course, user)}
+      % endif
+
       <h1>${_(course.info_sidebar_name)}</h1>
       ${get_course_info_section(request, course, 'handouts')}
     </section>

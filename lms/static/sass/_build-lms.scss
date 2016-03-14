@@ -15,7 +15,6 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
-@import 'elements/system-feedback';
 @import 'elements/creative-commons';
 
 // shared - course
@@ -42,7 +41,6 @@
 @import 'multicourse/press_release';
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
-@import 'multicourse/edge';
 @import 'multicourse/survey-page';
 
 // base - specific views
@@ -53,16 +51,19 @@
 @import 'views/decoupled-verification';
 @import 'views/shoppingcart';
 @import 'views/homepage';
+@import 'views/support';
+@import "views/financial-assistance";
 @import 'course/auto-cert';
 
-// applications
+// app - discussion
 @import "discussion/utilities/variables";
 @import "discussion/mixins";
-@import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import 'discussion/discussion'; // Process old file after definitions but before everything else, partial is deprecated.
 @import "discussion/elements/actions";
 @import "discussion/elements/editor";
 @import "discussion/elements/labels";
 @import "discussion/elements/navigation";
+@import "discussion/views/home";
 @import "discussion/views/thread";
 @import "discussion/views/create-edit-post";
 @import "discussion/views/response";
@@ -70,10 +71,14 @@
 @import 'discussion/utilities/shame';
 
 // search
-@import 'search/_search';
+@import 'search/search';
 
 // news
 @import 'news';
+
+@import 'mixins';
+@import 'mixins-inherited';
+@import 'elements/system-feedback';
 
 // overrides
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring

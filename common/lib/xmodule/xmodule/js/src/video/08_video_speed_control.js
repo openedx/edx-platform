@@ -1,9 +1,9 @@
 (function (requirejs, require, define) {
+"use strict";
 define(
 'video/08_video_speed_control.js',
 ['video/00_iterator.js'],
 function (Iterator) {
-    "use strict";
     /**
      * Video speed control module.
      * @exports video/08_video_speed_control.js
@@ -29,13 +29,23 @@ function (Iterator) {
 
     SpeedControl.prototype = {
         template: [
-            '<div class="speeds menu-container">',
-                '<a class="speed-button" href="#" title="',
-                    gettext('Speeds'), '" role="button" aria-disabled="false">',
-                    '<span class="label">', gettext('Speed'), '</span>',
+            '<div class="speeds menu-container" role="application">',
+                '<button class="control speed-button" aria-label="',
+                    /* jshint maxlen:200 */
+                    gettext('Speed: Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),
+                    '" aria-disabled="false" aria-expanded="false">',
+                    '<span class="icon-fallback-img">',
+                        '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
+                        '<span class="sr control-text">',
+                            gettext('Speed'),
+                        '</span>',
+                    '</span>',
+                    '<span class="label" aria-hidden="true">',
+                        gettext('Speed'),
+                    '</span>',
                     '<span class="value"></span>',
-                '</a>',
-              '<ol class="video-speeds menu" role="menu"></ol>',
+                '</button>',
+              '<ol class="video-speeds menu"></ol>',
             '</div>'
         ].join(''),
 
@@ -88,16 +98,16 @@ function (Iterator) {
                 reversedSpeeds = speeds.concat().reverse(),
                 speedsList = $.map(reversedSpeeds, function (speed) {
                     return [
-                        '<li data-speed="', speed, '" role="presentation">',
-                            '<a class="speed-link" href="#" role="menuitem" tabindex="-1">',
+                        '<li data-speed="', speed, '">',
+                            '<button class="control speed-option" tabindex="-1">',
                                 speed, 'x',
-                            '</a>',
+                            '</button>',
                         '</li>'
                     ].join('');
                 });
 
             speedsContainer.html(speedsList.join(''));
-            this.speedLinks = new Iterator(speedsContainer.find('.speed-link'));
+            this.speedLinks = new Iterator(speedsContainer.find('.speed-option'));
             this.state.el.find('.secondary-controls').prepend(this.el);
         },
 
@@ -110,7 +120,7 @@ function (Iterator) {
             this.el.on({
                 'mouseenter': this.mouseEnterHandler,
                 'mouseleave': this.mouseLeaveHandler,
-                'click': this.clickMenuHandler,
+                'click': this.openMenu,
                 'keydown': this.keyDownMenuHandler
             });
 
@@ -119,7 +129,7 @@ function (Iterator) {
             this.speedsContainer.on({
                 click: this.clickLinkHandler,
                 keydown: this.keyDownLinkHandler
-            }, 'a.speed-link');
+            }, '.speed-option');
 
             this.state.el.on({
                 'speed:set': this.onSetSpeed,
@@ -169,7 +179,9 @@ function (Iterator) {
             }
 
             this.el.addClass('is-opened');
-            this.speedButton.attr('tabindex', -1);
+            this.speedButton
+                .attr('tabindex', -1)
+                .attr('aria-expanded', 'true');
         },
 
         /**
@@ -183,7 +195,9 @@ function (Iterator) {
             }
 
             this.el.removeClass('is-opened');
-            this.speedButton.attr('tabindex', 0);
+            this.speedButton
+                .attr('tabindex', 0)
+                .attr('aria-expanded', 'false');
         },
 
         /**
@@ -216,7 +230,7 @@ function (Iterator) {
          * Click event handler for the menu.
          * @param {jquery Event} event
          */
-        clickMenuHandler: function (event) {
+        clickMenuHandler: function () {
             this.closeMenu();
 
             return false;
@@ -239,7 +253,7 @@ function (Iterator) {
          * Mouseenter event handler for the menu.
          * @param {jquery Event} event
          */
-        mouseEnterHandler: function (event) {
+        mouseEnterHandler: function () {
             this.openMenu();
 
             return false;
@@ -249,7 +263,7 @@ function (Iterator) {
          * Mouseleave event handler for the menu.
          * @param {jquery Event} event
          */
-        mouseLeaveHandler: function (event) {
+        mouseLeaveHandler: function () {
             // Only close the menu is no speed entry has focus.
             if (!this.speedLinks.list.is(':focus')) {
                 this.closeMenu();

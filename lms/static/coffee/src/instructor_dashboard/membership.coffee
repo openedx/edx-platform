@@ -117,7 +117,7 @@ class AuthListWidget extends MemberListWidget
 
         # create revoke button and insert it into the row
         label_trans = gettext("Revoke access")
-        $revoke_btn = $ _.template('<div class="revoke"><i class="icon fa fa-times-circle"></i> <%= label %></div>', {label: label_trans}),
+        $revoke_btn = $ _.template('<div class="revoke"><i class="icon fa fa-times-circle" aria-hidden="true"></i> <%= label %></div>', {label: label_trans}),
           class: 'revoke'
         $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>

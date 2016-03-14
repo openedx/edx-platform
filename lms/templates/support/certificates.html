@@ -1,0 +1,26 @@
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+<%static:require_module module_name="support/js/certificates_factory" class_name="CertificatesFactory">
+    new CertificatesFactory({
+        userQuery: '${ user_query }'
+    });
+</%static:require_module>
+</%block>
+
+<%block name="pagetitle">
+${_("Student Support")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Certificates")}</h1>
+  <div class="certificates-content"></div>
+</section>
+</%block>

@@ -155,3 +155,13 @@ li[class*=forum-nav-thread-label-] {
     color: inherit;
   }
 }
+
+// -------
+// Inline Discussion Module Overrides
+// -------
+.discussion-module {
+  
+  .wrapper-post-header .post-title {
+    margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+  }
+}

@@ -109,13 +109,18 @@
     // The parameter "predef" should remain empty for this configuration file
     // to remain as general as possible.
     "predef": [
-        // jQuery library.
+        // jQuery globals
         "jQuery", "$",
 
-        // Underscore.js library.
+        // Underscore.js globals
         "_",
 
-        // Jasmine library.
+        // RequireJS globals
+        "define",
+        "require",
+        "RequireJS",
+
+        // Jasmine globals
         "jasmine",
         "describe", "xdescribe",
         "it", "xit",
@@ -126,12 +131,16 @@
         "waitsFor",
         "runs",
 
-        // jQuery-Jasmine library.
+        // jQuery-Jasmine globals
         "loadFixtures",
         "appendLoadFixtures",
         "readFixtures",
         "setFixtures",
         "appendSetFixtures",
-        "spyOnEvent"
+        "spyOnEvent",
+
+        // Miscellaneous globals
+        "JSON",
+        "gettext"
     ]
 }

@@ -34,6 +34,8 @@ var edx = edx || {};
         errorModel: errorView.model,
         displaySteps: el.data('display-steps'),
         currentStep: el.data('current-step'),
+        courseKey: el.data('course-key'),
+        checkpointLocation: el.data('checkpoint-location'),
         stepInfo: {
             'intro-step': {
                 courseName: el.data('course-name'),
@@ -53,6 +55,7 @@ var edx = edx || {};
                 ),
                 upgrade: el.data('msg-key') === 'upgrade',
                 minPrice: el.data('course-mode-min-price'),
+                sku: el.data('course-mode-sku'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(
                     (el.data('course-mode-suggested-prices').toString()).split(","),
@@ -63,7 +66,8 @@ var edx = edx || {};
                 verificationDeadline: el.data('verification-deadline'),
                 courseModeSlug: el.data('course-mode-slug'),
                 alreadyVerified: el.data('already-verified'),
-                verificationGoodUntil: el.data('verification-good-until')
+                verificationGoodUntil: el.data('verification-good-until'),
+                isABTesting:  el.data('is-ab-testing')
             },
             'payment-confirmation-step': {
                 courseKey: el.data('course-key'),

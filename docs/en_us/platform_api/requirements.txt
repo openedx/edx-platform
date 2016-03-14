@@ -1,9 +1,15 @@
 path.py
-Django >=1.4,<1.5
+Django >=1.8,<1.9
+django-simple-history==1.6.3
 pytz
--e git+https://github.com/edx/XBlock.git#egg=XBlock
+git+https://github.com/edx/XBlock.git#egg=XBlock
+git+https://github.com/edx/django-rest-framework-oauth.git@f0b503fda8c254a38f97fef802ded4f5fe367f7a#egg=djangorestframework_oauth-master
 lxml
+Babel
+lazy
 sphinxcontrib-napoleon==0.2.6
+sphinx_rtd_theme
 stevedore==0.14.1
-djangorestframework==2.3.14
+djangorestframework==3.2.3
 PyYAML>=3.10
+mock

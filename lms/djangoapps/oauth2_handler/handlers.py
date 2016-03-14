@@ -2,9 +2,9 @@
 
 from django.conf import settings
 from django.core.cache import cache
-from xmodule.modulestore.django import modulestore
 
 from courseware.access import has_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
@@ -73,7 +73,7 @@ class ProfileHandler(object):
 
         # If the user has no language specified, return the default one.
         if not language:
-            language = getattr(settings, 'LANGUAGE_CODE')
+            language = settings.LANGUAGE_CODE
 
         return language
 
@@ -200,13 +200,13 @@ class CourseAccessHandler(object):
         course_ids = cache.get(key)
 
         if not course_ids:
-            courses = _get_all_courses()
+            course_keys = CourseOverview.get_all_course_keys()
 
             # Global staff have access to all courses. Filter courses for non-global staff.
             if not GlobalStaff().has_user(user):
-                courses = [course for course in courses if has_access(user, access_type, course)]
+                course_keys = [course_key for course_key in course_keys if has_access(user, access_type, course_key)]
 
-            course_ids = [unicode(course.id) for course in courses]
+            course_ids = [unicode(course_key) for course_key in course_keys]
 
             cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
 
@@ -234,12 +234,3 @@ class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, Permiss
 class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, PermissionsHandler):
     """ Configure the UserInfo handler for the LMS. """
     pass
-
-
-def _get_all_courses():
-    """ Utility function to list all available courses. """
-
-    ms_courses = modulestore().get_courses()
-    courses = [course for course in ms_courses if course.scope_ids.block_type == 'course']
-
-    return courses

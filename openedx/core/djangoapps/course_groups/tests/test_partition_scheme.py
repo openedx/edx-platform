@@ -6,7 +6,6 @@ Test the partitions and partitions service
 import json
 from django.conf import settings
 import django.test
-from django.test.utils import override_settings
 from mock import patch
 from unittest import skipUnless
 
@@ -14,15 +13,15 @@ from courseware.masquerade import handle_ajax, setup_masquerade
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
-from ..cohorts import add_user_to_cohort, get_course_cohorts
+from ..cohorts import add_user_to_cohort, remove_user_from_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
 
@@ -101,7 +100,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         self.assert_student_in_group(self.groups[1])
 
         # move the student out of the cohort
-        second_cohort.users.remove(self.student)
+        remove_user_from_cohort(second_cohort, self.student.username)
         self.assert_student_in_group(None)
 
     def test_cohort_partition_group_assignment(self):
@@ -318,14 +317,14 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         self.course.user_partitions.append(self.random_user_partition)
         self.course.user_partitions.append(self.cohort_user_partition)
         self.course.user_partitions.append(self.second_cohort_user_partition)
-        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course_key))
+        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course))
 
     def test_no_cohort_user_partitions(self):
         """
         Test get_cohorted_user_partition returns None when there are no cohorted user partitions.
         """
         self.course.user_partitions.append(self.random_user_partition)
-        self.assertIsNone(get_cohorted_user_partition(self.course_key))
+        self.assertIsNone(get_cohorted_user_partition(self.course))
 
 
 class TestMasqueradedGroup(StaffMasqueradeTestCase):
@@ -362,7 +361,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
 
         # Now setup the masquerade for the test user
         setup_masquerade(request, self.test_user, True)
-        scheme = self.user_partition.scheme    # pylint: disable=no-member
+        scheme = self.user_partition.scheme
         self.assertEqual(
             scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
             group

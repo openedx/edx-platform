@@ -118,7 +118,7 @@
 
     .u-field-message-help,
     .u-field-message-notification {
-        color: $gray-l1;
+        color: $gray;
     }
 }
 
@@ -133,6 +133,8 @@
         padding: 0;
         box-shadow: none;
         font-size: inherit;
+        font-weight: inherit;
+        text-shadow: none;
     }
 
 

@@ -1,14 +1,14 @@
 """
 Test courseware search
 """
-import os
 import json
 
 from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest, remove_file
 from ...pages.common.logout import LogoutPage
-from ...pages.studio.utils import add_html_component, click_css, type_in_codemirror
+from ...pages.common.utils import click_css
+from ...pages.studio.utils import add_html_component, type_in_codemirror
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.container import ContainerPage

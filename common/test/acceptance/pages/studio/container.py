@@ -6,7 +6,9 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from .utils import click_css, confirm_prompt, type_in_codemirror
+from ..common.utils import click_css, confirm_prompt
+
+from .utils import type_in_codemirror
 
 
 class ContainerPage(PageObject):
@@ -280,6 +282,36 @@ class ContainerPage(PageObject):
         Return whether this container's display name is in its editable form.
         """
         return "is-editing" in self.q(css=self.NAME_FIELD_WRAPPER_SELECTOR).first.attrs("class")[0]
+
+    def get_category_tab_names(self, category_type):
+        """
+        Returns list of tab name in a category.
+
+        Arguments:
+            category_type (str): category type
+
+        Returns:
+            list
+        """
+        self.q(css='.add-xblock-component-button[data-type={}]'.format(category_type)).first.click()
+        return self.q(css='.{}-type-tabs>li>a'.format(category_type)).text
+
+    def get_category_tab_components(self, category_type, tab_index):
+        """
+        Return list of component names in a tab in a category.
+
+        Arguments:
+            category_type (str): category type
+            tab_index (int): tab index in a category
+
+        Returns:
+            list
+        """
+        css = '#tab{tab_index} button[data-category={category_type}] span'.format(
+            tab_index=tab_index,
+            category_type=category_type
+        )
+        return self.q(css=css).html
 
 
 class XBlockWrapper(PageObject):

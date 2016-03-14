@@ -13,7 +13,7 @@ from social.apps.django_app.default import models as social_models
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
-User = social_models.DjangoStorage.user.user_model()  # pylint: disable-msg=invalid-name
+User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
 
 
 class TestCase(testutil.TestCase, test.TestCase):
@@ -107,13 +107,13 @@ class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
         self.assertTrue(google_state.has_account)
         self.assertEqual(google_provider.provider_id, google_state.provider.provider_id)
         # Also check the row ID. Note this 'id' changes whenever the configuration does:
-        self.assertEqual(google_provider.id, google_state.provider.id)  # pylint: disable=no-member
+        self.assertEqual(google_provider.id, google_state.provider.id)
         self.assertEqual(self.user, google_state.user)
         self.assertEqual(user_social_auth_google.id, google_state.association_id)
 
         self.assertTrue(linkedin_state.has_account)
         self.assertEqual(linkedin_provider.provider_id, linkedin_state.provider.provider_id)
-        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)  # pylint: disable=no-member
+        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)
         self.assertEqual(self.user, linkedin_state.user)
         self.assertEqual(user_social_auth_linkedin.id, linkedin_state.association_id)
 
@@ -134,12 +134,12 @@ class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
         self.assertFalse(google_state.has_account)
         self.assertEqual(google_provider.provider_id, google_state.provider.provider_id)
         # Also check the row ID. Note this 'id' changes whenever the configuration does:
-        self.assertEqual(google_provider.id, google_state.provider.id)  # pylint: disable=no-member
+        self.assertEqual(google_provider.id, google_state.provider.id)
         self.assertEqual(self.user, google_state.user)
 
         self.assertFalse(linkedin_state.has_account)
         self.assertEqual(linkedin_provider.provider_id, linkedin_state.provider.provider_id)
-        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)  # pylint: disable=no-member
+        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)
         self.assertEqual(self.user, linkedin_state.user)
 
 

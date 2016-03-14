@@ -2,26 +2,27 @@
 Unit tests for getting the list of courses for a user through iterating all courses and
 by reversing group name formats.
 """
-import mock
-from mock import patch, Mock
+import unittest
 
-from student.tests.factories import UserFactory
+from django.conf import settings
+from django.test.client import Client
+import mock
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 from student.roles import GlobalStaff
+from student.tests.factories import UserFactory
+from student.views import get_course_enrollments
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.error_module import ErrorDescriptor
-from django.test.client import Client
-from student.models import CourseEnrollment
-from student.views import get_course_enrollment_pairs
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     set_prerequisite_courses,
     seed_milestone_relationship_types
 )
-import unittest
-from django.conf import settings
 
 
 class TestCourseListing(ModuleStoreTestCase):
@@ -73,13 +74,13 @@ class TestCourseListing(ModuleStoreTestCase):
         self._create_course_with_access_groups(course_location)
 
         # get dashboard
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 1)
-        self.assertEqual(courses_list[0][0].id, course_location)
+        self.assertEqual(courses_list[0].course_id, course_location)
 
         CourseEnrollment.unenroll(self.student, course_location)
         # get dashboard
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 0)
 
     def test_errored_course_regular_access(self):
@@ -91,11 +92,13 @@ class TestCourseListing(ModuleStoreTestCase):
         course_key = mongo_store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
-        with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
+        with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
             self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
 
-            # get courses through iterating all courses
-            courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+            # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
+            CourseOverview.objects.filter(id=course_key).delete()
+
+            courses_list = list(get_course_enrollments(self.student, None, []))
             self.assertEqual(courses_list, [])
 
     def test_course_listing_errored_deleted_courses(self):
@@ -112,9 +115,9 @@ class TestCourseListing(ModuleStoreTestCase):
         self._create_course_with_access_groups(course_location, default_store=ModuleStoreEnum.Type.mongo)
         mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_list = list(get_course_enrollments(self.student, None, []))
         self.assertEqual(len(courses_list), 1, courses_list)
-        self.assertEqual(courses_list[0][0].id, good_location)
+        self.assertEqual(courses_list[0].course_id, good_location)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_listing_has_pre_requisite_courses(self):
@@ -142,9 +145,11 @@ class TestCourseListing(ModuleStoreTestCase):
 
         set_prerequisite_courses(course_location, pre_requisite_courses)
         # get dashboard
-        course_enrollment_pairs = list(get_course_enrollment_pairs(self.student, None, []))
-        courses_having_prerequisites = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                                 if course.pre_requisite_courses)
+        course_enrollments = list(get_course_enrollments(self.student, None, []))
+        courses_having_prerequisites = frozenset(
+            enrollment.course_id for enrollment in course_enrollments
+            if enrollment.course_overview.pre_requisite_courses
+        )
         courses_requirements_not_met = get_pre_requisite_courses_not_completed(
             self.student,
             courses_having_prerequisites

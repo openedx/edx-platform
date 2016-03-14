@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_false  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_false
 
 
 @step('I fill in the registration form$')

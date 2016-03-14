@@ -1,14 +1,12 @@
-var edx = edx || {};
-
-(function(Backbone) {
+;(function (define) {
     'use strict';
-
-    edx.groups = edx.groups || {};
-
-    edx.groups.DiscussionTopicsSettingsModel = Backbone.Model.extend({
-        defaults: {
-            course_wide_discussions: {},
-            inline_discussions: {}
-        }
+    define(['backbone'], function(Backbone) {
+        var DiscussionTopicsSettingsModel = Backbone.Model.extend({
+            defaults: {
+                course_wide_discussions: {},
+                inline_discussions: {}
+            }
+        });
+        return DiscussionTopicsSettingsModel;
     });
-}).call(this, Backbone);
+}).call(this, define || RequireJS.define);

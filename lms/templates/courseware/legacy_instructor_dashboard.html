@@ -148,9 +148,6 @@ function goto( mode)
     %endif
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
-          %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
-            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
-          %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">${_("Forum Admin")}</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
@@ -158,9 +155,6 @@ function goto( mode)
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">${_("Manage Groups")}</a>
           %if show_email_tab:
              | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">${_("Email")}</a>
-          %endif
-          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
-             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
           %if settings.FEATURES.get('CLASS_DASHBOARD'):
              | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">${_("Metrics")}</a>
@@ -271,27 +265,6 @@ function goto( mode)
  %endif
 
 ##-----------------------------------------------------------------------------
-%if modeflag.get('Psychometrics'):
-
-    <p>${_("Select a problem and an action:")}
-    </p>
-
-    <p>
-    <select name="Problem">
-    %for problem, count in sorted(problems.items(), key=lambda x: x[0]):
-        <option value="${problem}">${problem} [${count}]</option>
-    %endfor
-    </select>
-    </p>
-    <p>
-    <input type="submit" name="action" value="Generate Histogram and IRT Plot">
-    </p>
-
-    <p></p>
-
-%endif
-
-##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
 
   %if instructor_access or admin_access:
@@ -364,9 +337,8 @@ function goto( mode)
 
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
-    <p> ${_("Problem urlname:")}
-        <input type="text" name="problem_to_dump" size="40">
-        <input type="submit" name="action" value="Download CSV of all responses to problem">
+    <p class="is-deprecated">
+      ${_("To download a CSV listing student responses to a given problem, visit the Data Download section of the Instructor Dashboard.")}
     </p>
 
     <p class="is-deprecated">
@@ -402,204 +374,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 
-%if modeflag.get('Analytics'):
-
-  %if not any(analytics_results.values()):
-    <p>${_("No Analytics are available at this time.")}</p>
-  %endif
-
-  %if analytics_results.get("StudentsDropoffPerDay"):
-    <p>
-      ${_("Student activity day by day")}
-      (${analytics_results["StudentsDropoffPerDay"]['time']})
-    </p>
-    <div>
-      <table class="stat_table">
-        <tr>
-          <th>${_("Day")}</th>
-          <th>${_("Students")}</th>
-        </tr>
-      %for row in analytics_results['StudentsDropoffPerDay']['data']:
-        <tr>
-          ## For now, just discard the non-date portion
-          <td>${row['last_day'].split("T")[0]}</td>
-          <td>${row['num_students']}</td>
-        </tr>
-      %endfor
-      </table>
-    </div>
-  %endif
-  <br/>
-  %if analytics_results.get("ProblemGradeDistribution"):
-    <p>
-      ${_("Score distribution for problems")}
-      (${analytics_results["ProblemGradeDistribution"]['time']})
-    </p>
-    <div>
-      <table class="stat_table">
-        <tr>
-          <th>${_("Problem")}</th>
-          <th>${_("Max")}</th>
-          <th colspan="99">${_("Points Earned (Num Students)")}</th>
-        </tr>
-      %for row in analytics_results['ProblemGradeDistribution']['data']:
-        <tr>
-          <td>${row['block_id']}</td>
-          <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
-          %for grade_record in row["grade_info"]:
-          <td>
-            %if isinstance(grade_record["grade"], float):
-              ${"{grade:.2f}".format(**grade_record)}
-            %else:
-              ${"{grade}".format(**grade_record)}
-            %endif
-            (${grade_record["num_students"]})
-          </td>
-          %endfor
-        </tr>
-      %endfor
-      </table>
-    </div>
-  %endif
-%endif
-
-%if modeflag.get('Metrics'):
-  %if not any (metrics_results.values()):
-    <p>${_("There is no data available to display at this time.")}</p>
-  %else:
-    <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
-    <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
-
-    <script>
-      ${d3_stacked_bar_graph.body()}
-    </script>
-
-    <div id="metrics"></div>
-
-    <h3 class="attention">${_("Loading the latest graphs for you; depending on your class size, this may take a few minutes.")}</h3>
-
-    %for i in range(0,len(metrics_results['section_display_name'])):
-        <div class="metrics-container" id="metrics_section_${i}">
-          <h2>${_("Section:")} ${metrics_results['section_display_name'][i]}</h2>
-          <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
-          <div class="metrics-left" id="metric_opened_${i}">
-            <h3>${_("Count of Students that Opened a Subsection")}</h3>
-            <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
-          </div>
-          <div class="metrics-right" id="metric_grade_${i}">
-            <h3>${_("Grade Distribution per Problem")}</h3>
-            %if not metrics_results['section_has_problem'][i]:
-              <p>${_("There are no problems in this section.")}</p>
-            %else:
-              <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
-            %endif
-          </div>
-        </div>
-    %endfor
-      <script>
-        var allSubsectionTooltipArr = new Array();
-        var allProblemTooltipArr = new Array();
-        ${all_section_metrics.body("metric_opened_","metric_grade_","metric_attempts_","metric_tooltip_",course.id, allSubsectionTooltipArr, allProblemTooltipArr)}
-      </script>
-
-  %endif
-%endif
-
-%if modeflag.get('Analytics In Progress'):
-
-  ##This is not as helpful as it could be -- let's give full point distribution
-  ##instead.
-  %if analytics_results.get("StudentsPerProblemCorrect"):
-    <p>
-      ${_("Students answering correctly")}
-      (${analytics_results["StudentsPerProblemCorrect"]['time']})
-    </p>
-    <div class="divScroll">
-      <table class="stat_table">
-        <tr>
-          <th>${_("Problem")}</th>
-          <th>${_("Number of students")}</th>
-        </tr>
-      %for row in analytics_results['StudentsPerProblemCorrect']['data']:
-        <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
-          <td>${row['count']}</td>
-        </tr>
-      %endfor
-      </table>
-    </div>
-  %endif
-
-   <p>
-     ${_("Student distribution per country, all courses, Sep 12 to Oct 17, 1 server (shown here as an example):")}
-   </p>
-
-<div id="posts-list" class="clearfix">
-<figure>
-    <div id="world-map-students" style="width: 720px; height: 400px"></div>
-    <script>
-      var student_data = {BD : '300', BE : '156', BF : '7', BG : '246', BA : '62', BB : '1', BN : '7', BO : '61', JP : '153', BI : '4', BJ : '6', BT : '11', JM : '32', JO : '67', WS : '1', BR : '1941', BS : '5', JE : '6', BY : '166', BZ : '4', RU : '1907', RW : '50', RS : '128', TL : '1', RE : '2', A2 : '59', TJ : '9', RO : '232', GU : '3', GT : '76', GR : '565', BH : '22', GY : '6', GG : '2', GF : '1', GE : '22', GD : '7', GB : '2023', GA : '4', GM : '18', GL : '2', GI : '1', GH : '393', OM : '25', TN : '143', BW : '26', HR : '76', HT : '38', HU : '259', HK : '103', HN : '51', AD : '1', PR : '40', PS : '38', PT : '487', PY : '38', PA : '21', PG : '11', PE : '342', PK : '1833', PH : '571', TM : '1', PL : '736', ZM : '61', EE : '67', EG : '961', ZA : '184', EC : '118', AL : '44', AO : '10', SB : '2', EU : '183', ET : '153', SO : '1', ZW : '42', KY : '3', ES : '1954', ER : '3', ME : '6', MD : '26', MG : '10', UY : '64', UZ : '40', MM : '21', ML : '4', MO : '3', MN : '49', US : '11899', MU : '11', MT : '15', MW : '41', MV : '5', MP : '4', MR : '1', IM : '2', UG : '133', MY : '207', MX : '844', AT : '83', FR : '446', MA : '175', A1 : '167', AX : '1', FI : '97', FJ : '9', NI : '23', NL : '240', NO : '110', NA : '27', NC : '1', NE : '4', NG : '753', NZ : '98', NP : '200', CI : '9', CH : '144', CO : '851', CN : '282', CM : '82', CL : '243', CA : '1129', CD : '7', CZ : '161', CY : '26', CR : '137', CV : '11', CU : '15', SZ : '6', SY : '58', KG : '47', KE : '282', SR : '5', KI : '1', KH : '40', SV : '155', KM : '1', ST : '1', SK : '66', KR : '141', SI : '70', KP : '1', KW : '28', SN : '16', SL : '11', KZ : '174', SA : '352', SG : '217', SE : '172', SD : '61', DO : '104', DM : '5', DJ : '6', DK : '105', DE : '941', YE : '90', DZ : '281', MK : '28', TZ : '124', LC : '5', LA : '7', TW : '115', TT : '33', TR : '288', LK : '96', LV : '52', TO : '2', LT : '114', LU : '21', LR : '9', LS : '9', TH : '84', TG : '11', LY : '15', VC : '6', AE : '151', VE : '180', AG : '1', AF : '21', IQ : '29', VI : '1', IS : '14', IR : '153', AM : '37', IT : '365', VN : '269', AP : '23', AR : '258', AU : '661', IL : '159', AW : '3', IN : '7836', LB : '28', AZ : '22', IE : '210', ID : '382', UA : '860', QA : '23', MZ : '8'};
-      $(function(){
-        $('#world-map-students').vectorMap({
-          map: 'world_mill_en',
-          backgroundColor: '#eeeeee',
-          series: {
-            regions: [{
-              values: student_data,
-              scale: ['#C8EEFF', '#0071A4'],
-              normalizeFunction: 'polynomial'
-            }]
-          },
-          onRegionLabelShow: function(event, label, code){
-            label.text(label.text() + ': ' + (student_data[code] != null ? student_data[code] : 0));
-          }
-        });
-      });
-    </script>
-</figure>
-</div>
-
-
-##     <p>Number of students who dropped off per day before becoming inactive:</p>
-##
-##     % if dropoff_per_day is not None:
-##     % if dropoff_per_day['status'] == 'success':
-##     <div class="divScroll">
-##     <table class="stat_table">
-##     <tr><th>Day</th><th>Number of students</th></tr>
-##     % for k,v in dropoff_per_day['data'].items():
-##     <tr> <td>${k}</td> <td>${v}</td> </tr>
-##     % endfor
-##     </table>
-##     </div>
-##     % else:
-##     <i> ${dropoff_per_day['error']}</i>
-##     % endif
-##     % else:
-##     <i> null data </i>
-##     % endif
-##   </p>
-##
-
-
-##   <p>
-##     <h2>Daily activity (online version):</h2>
-##     <table class="stat_table">
-##     <tr><th>Day</td><th>Number of students</td></tr>
-##     % for k,v in daily_activity_json['data'].items():
-##     <tr>
-##     <td>${k}</td> <td>${v}</td>
-##     </tr>
-##     % endfor
-##     </table>
-##   </p>
-
-
-%endif
-
-##-----------------------------------------------------------------------------
-
-%if datatable and modeflag.get('Psychometrics') is None:
+%if datatable:
 
     <br/>
     <br/>
@@ -691,32 +466,6 @@ function goto( mode)
       ${_("View course statistics in the Admin section of this legacy instructor dashboard.")}
     </p>
 %endif
-
-##-----------------------------------------------------------------------------
-%if modeflag.get('Psychometrics'):
-
-    %for plot in plots:
-      <br/>
-      <h3>${plot['title']}</h3>
-      <br/>
-      <p>${plot['info']}</p>
-      <br/>
-      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
-      <script type="text/javascript">
-          $(function () {
-              ${plot['data']}
-              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
-          });
-      </script>
-      <br/>
-      <br/>
-    %endfor
-
-%endif
-
-##-----------------------------------------------------------------------------
-## always show msg
-
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):

@@ -118,7 +118,7 @@ class ItemizedPurchaseReport(Report):
         for item in query:
             yield [
                 item.fulfilled_time,
-                item.order_id,  # pylint: disable=no-member
+                item.order_id,
                 item.status,
                 item.qty,
                 item.unit_cost,

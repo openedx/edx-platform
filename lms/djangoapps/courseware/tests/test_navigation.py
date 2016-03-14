@@ -2,6 +2,7 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
+from mock import patch
 from nose.plugins.attrib import attr
 
 from django.conf import settings
@@ -12,6 +13,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
@@ -105,7 +107,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
-            self.assertEquals('open_close_accordion' in response.content, accordion)
             self.assertEquals('course-tabs' in response.content, tabs)
 
         self.assertTabInactive('progress', response)
@@ -266,3 +267,45 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': test_course_id}
         )
         self.assert_request_status_code(302, url)
+
+    def test_proctoring_js_includes(self):
+        """
+        Make sure that proctoring JS does not get included on
+        courseware pages if either the FEATURE flag is turned off
+        or the course is not proctored enabled
+        """
+
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+        self.enroll(self.test_course, True)
+
+        test_course_id = self.test_course.id.to_deprecated_string()
+
+        with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False}):
+            url = reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+            resp = self.client.get(url)
+
+            self.assertNotContains(resp, '/static/js/lms-proctoring.js')
+
+        with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True}):
+            url = reverse(
+                'courseware',
+                kwargs={'course_id': test_course_id}
+            )
+            resp = self.client.get(url)
+
+            self.assertNotContains(resp, '/static/js/lms-proctoring.js')
+
+            # now set up a course which is proctored enabled
+
+            self.test_course.enable_proctored_exams = True
+            self.test_course.save()
+
+            modulestore().update_item(self.test_course, self.user.id)
+
+            resp = self.client.get(url)
+
+            self.assertContains(resp, '/static/js/lms-proctoring.js')

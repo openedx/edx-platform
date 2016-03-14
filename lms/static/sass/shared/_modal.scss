@@ -12,15 +12,15 @@
 
 .modal {
   @extend %ui-depth1;
-  background: $gray-d2;
-  border-radius: 3px;
-  box-shadow: 0 0px 5px 0 $shadow-d1;
-  color: $white;
   display: none;
+  position: absolute;
   left: 50%;
   padding: 8px;
-  position: absolute;
   width: grid-width(5);
+  border-radius: 3px;
+  box-shadow: 0 0px 5px 0 $shadow-d1;
+  background: $gray-d2;
+  color: $base-font-color;
 
   &.video-modal {
     left: 50%;
@@ -61,6 +61,11 @@
     padding-right: ($baseline/2);
     padding-bottom: ($baseline/2);
     position: relative;
+
+    p {
+      font-size: .9em;
+      line-height: 1.4;
+    }
 
     header {
       @extend %ui-depth1;

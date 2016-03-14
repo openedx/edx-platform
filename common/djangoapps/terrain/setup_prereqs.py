@@ -43,7 +43,7 @@ def start_video_server():
     video_source_dir = '{}/data/video'.format(settings.TEST_ROOT)
     video_server = VideoSourceHttpService(port_num=settings.VIDEO_SOURCE_PORT)
     video_server.config['root_dir'] = video_source_dir
-    setattr(world, 'video_source', video_server)
+    world.video_source = video_server
 
 
 @after.all  # pylint: disable=no-member

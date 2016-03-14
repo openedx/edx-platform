@@ -1,5 +1,0 @@
-<h2>
-    <%= gettext('Refine your search') %>
-</h2>
-<section class="search-facets-lists">
-</section>

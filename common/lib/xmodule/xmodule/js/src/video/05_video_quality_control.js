@@ -1,15 +1,27 @@
 (function (requirejs, require, define) {
 
 // VideoQualityControl module.
+'use strict';
 define(
 'video/05_video_quality_control.js',
 [],
 function () {
     var template = [
-        '<a href="#" class="quality-control is-hidden" title="',
-            gettext('HD off'), '" role="button" aria-disabled="false">',
-            gettext('HD off'),
-        '</a>'
+        '<button class="control quality-control is-hidden" aria-disabled="false">',
+            '<span class="icon-fallback-img">',
+                '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
+                // Translator note:
+                // HD stands for high definition
+                '<span class="sr text-translation">',
+                    gettext('High Definition'),
+                '</span>&nbsp;',
+                '<span class="text control-text">',
+                    // Translator note:
+                    // Values are 'off' or 'on' depending on the state of the HD control
+                    gettext('off'),
+                '</span>',
+            '</span>',
+        '</button>'
     ].join('');
 
     // VideoQualityControl() function - what this module "exports".
@@ -134,17 +146,17 @@ function () {
         var controlStateStr;
         this.videoQualityControl.quality = value;
         if (_.contains(this.config.availableHDQualities, value)) {
-            controlStateStr = gettext('HD on');
+            controlStateStr = gettext('on');
             this.videoQualityControl.el
                                     .addClass('active')
-                                    .attr('title', controlStateStr)
-                                    .text(controlStateStr);
+                                    .find('.control-text')
+                                        .text(controlStateStr);
         } else {
-            controlStateStr = gettext('HD off');
+            controlStateStr = gettext('off');
             this.videoQualityControl.el
                                     .removeClass('active')
-                                    .attr('title', controlStateStr)
-                                    .text(controlStateStr);
+                                    .find('.control-text')
+                                        .text(controlStateStr);
 
         }
     }

@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches  # pylint: disable=no-name-in-module
+from nose.tools import assert_false, assert_equal, assert_regexp_matches
 from common import type_in_codemirror, press_the_notification_button, get_codemirror_value
 
 KEY_CSS = '.key h3.title'

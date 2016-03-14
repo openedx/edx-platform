@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 class Thread(models.Model):
 
+    # accessible_fields can be set and retrieved on the model
     accessible_fields = [
         'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
@@ -19,19 +20,23 @@ class Thread(models.Model):
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
+        'context',
     ]
 
+    # updateable_fields are sent in PUT requests
     updatable_fields = [
-        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 
+    # metric_tag_fields are used by Datadog to record metrics about the model
     metric_tag_fields = [
         'course_id', 'group_id', 'pinned', 'closed', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'read'
     ]
 
-    initializable_fields = updatable_fields + ['thread_type']
+    # initializable_fields are sent in POST requests
+    initializable_fields = updatable_fields + ['thread_type', 'context']
 
     base_url = "{prefix}/threads".format(prefix=settings.PREFIX)
     default_retrieve_params = {'recursive': False}

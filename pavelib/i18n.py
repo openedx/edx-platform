@@ -3,13 +3,13 @@ Internationalization tasks
 """
 import sys
 import subprocess
-from path import path
+from path import Path as path
 from paver.easy import task, cmdopts, needs, sh
 
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable-msg=invalid-name
+    colorize = lambda color, text: text
 
 
 @task
@@ -150,13 +150,13 @@ def i18n_rtl():
     cmd = "i18n_tool transifex"
     sh(cmd + " rtl")
 
-    print("Now generating langugage files...")
+    print "Now generating langugage files..."
 
     cmd = "i18n_tool generate"
 
     sh(cmd + " --rtl")
 
-    print("Committing translations...")
+    print "Committing translations..."
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -170,13 +170,13 @@ def i18n_ltr():
     cmd = "i18n_tool transifex"
     sh(cmd + " ltr")
 
-    print("Now generating langugage files...")
+    print "Now generating langugage files..."
 
     cmd = "i18n_tool generate"
 
     sh(cmd + " --ltr")
 
-    print("Committing translations...")
+    print "Committing translations..."
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -194,10 +194,13 @@ def i18n_robot_pull():
     """
     Pull source strings, generate po and mo files, and validate
     """
-    # sh('paver test_i18n')  # TODO tests were removed from repo, but there should still be tests that cover the translations...
-    # Validate the recently pulled translations, and give a bail option
+    # sh('paver test_i18n')
+    # Tests were removed from repo, but there should still be tests covering the translations
+    # TODO: Validate the recently pulled translations, and give a bail option
+    sh('git clean -fdX conf/locale/rtl')
+    sh('git clean -fdX conf/locale/eo')
     cmd = "i18n_tool validate"
-    print("\n\nValidating translations with `i18n_tool validate`...")
+    print "\n\nValidating translations with `i18n_tool validate`..."
     sh("{cmd}".format(cmd=cmd))
 
     con = raw_input("Continue with committing these translations (y/n)? ")

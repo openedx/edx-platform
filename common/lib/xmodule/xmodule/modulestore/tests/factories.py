@@ -2,19 +2,19 @@
 Factories for use in tests of XBlocks.
 """
 
+import datetime
 import functools
-import inspect
-import pprint
 import pymongo.message
+import pytz
 import threading
 import traceback
 from collections import defaultdict
-from decorator import contextmanager
+from contextlib import contextmanager
 from uuid import uuid4
 
 from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
-from mock import Mock, patch
+from mock import patch
 from nose.tools import assert_less_equal, assert_greater_equal
 import dogstats_wrapper as dog_stats_api
 
@@ -22,6 +22,7 @@ from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
+from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
@@ -73,10 +74,11 @@ class XModuleFactory(Factory):
     Factory for XModules
     """
 
-    # We have to give a Factory a FACTORY_FOR.
+    # We have to give a model for Factory.
     # However, the class that we create is actually determined by the category
     # specified in the factory
-    FACTORY_FOR = Dummy
+    class Meta(object):
+        model = Dummy
 
     @lazy_attribute
     def modulestore(self):
@@ -101,7 +103,11 @@ class CourseFactory(XModuleFactory):
     # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
-
+        """
+        Create and return a new course. For performance reasons, we do not emit
+        signals during this process, but if you need signals to run, you can
+        pass `emit_signals=True` to this method.
+        """
         # All class attributes (from this class and base classes) are
         # passed in via **kwargs. However, some of those aren't actual field values,
         # so pop those off for use separately
@@ -112,20 +118,130 @@ class CourseFactory(XModuleFactory):
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
         run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+        emit_signals = kwargs.pop('emit_signals', False)
 
         # Pass the metadata just as field=value pairs
         kwargs.update(kwargs.pop('metadata', {}))
         default_store_override = kwargs.pop('default_store', None)
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            if default_store_override is not None:
-                with store.default_store(default_store_override):
+            course_key = store.make_course_key(org, number, run)
+            with store.bulk_operations(course_key, emit_signals=emit_signals):
+                if default_store_override is not None:
+                    with store.default_store(default_store_override):
+                        new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+                else:
                     new_course = store.create_course(org, number, run, user_id, fields=kwargs)
-            else:
-                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
 
-            last_course.loc = new_course.location
-            return new_course
+                last_course.loc = new_course.location
+                return new_course
+
+
+class SampleCourseFactory(CourseFactory):
+    """
+    Factory for sample courses using block_info_tree definitions.
+    """
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create and return a new sample course. See CourseFactory for customization kwargs.
+        """
+        block_info_tree = kwargs.pop('block_info_tree', default_block_info_tree)
+        store = kwargs.get('modulestore')
+        user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
+            course = super(SampleCourseFactory, cls)._create(target_class, **kwargs)
+
+            def create_sub_tree(parent_loc, block_info):
+                """Recursively creates a sub_tree on this parent_loc with this block."""
+                block = store.create_child(
+                    user_id,
+                    parent_loc,
+                    block_info.category,
+                    block_id=block_info.block_id,
+                    fields=block_info.fields,
+                )
+                for tree in block_info.sub_tree:
+                    create_sub_tree(block.location, tree)
+
+            for tree in block_info_tree:
+                create_sub_tree(course.location, tree)
+
+            store.publish(course.location, user_id)
+        return course
+
+
+class ToyCourseFactory(SampleCourseFactory):
+    """
+    Factory for sample course that is equivalent to the toy xml course.
+    """
+    org = 'edX'
+    course = 'toy'
+    run = '2012_Fall'
+    display_name = 'Toy Course'
+
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create and return a new toy course instance. See SampleCourseFactory for customization kwargs.
+        """
+        store = kwargs.get('modulestore')
+        user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+
+        fields = {
+            'block_info_tree': TOY_BLOCK_INFO_TREE,
+            'textbooks': [["Textbook", "path/to/a/text_book"]],
+            'wiki_slug': "toy",
+            'graded': True,
+            'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
+            'graceperiod': datetime.timedelta(days=2, seconds=21599),
+            'start': datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
+            'pdf_textbooks': [
+                {
+                    "tab_title": "Sample Multi Chapter Textbook",
+                    "id": "MyTextbook",
+                    "chapters": [
+                        {"url": "/static/Chapter1.pdf", "title": "Chapter 1"},
+                        {"url": "/static/Chapter2.pdf", "title": "Chapter 2"}
+                    ]
+                }
+            ],
+            'course_image': "just_a_test.jpg",
+        }
+        fields.update(kwargs)
+
+        toy_course = super(ToyCourseFactory, cls)._create(
+            target_class,
+            **fields
+        )
+        with store.bulk_operations(toy_course.id, emit_signals=False):
+            with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, toy_course.id):
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="short_description",
+                    fields={"data": "A course about toys."}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="effort",
+                    fields={"data": "6 hours"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "about", block_id="end_date",
+                    fields={"data": "TBD"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "course_info", "handouts",
+                    fields={"data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>"}
+                )
+                store.create_item(
+                    user_id, toy_course.id, "static_tab", "resources",
+                    fields={"display_name": "Resources"},
+                )
+                store.create_item(
+                    user_id, toy_course.id, "static_tab", "syllabus",
+                    fields={"display_name": "Syllabus"},
+                )
+        return toy_course
 
 
 class LibraryFactory(XModuleFactory):
@@ -544,7 +660,8 @@ def check_mongo_calls(num_finds=0, num_sends=None):
 # This dict represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
 # handled separately; its value maps to an alternate key name.
-# Reference : cms/djangoapps/models/settings/course_details.py
+# Reference : from openedx.core.djangoapps.models.course_details.py
+
 
 ABOUT_ATTRIBUTES = {
     'effort': "Testing effort",

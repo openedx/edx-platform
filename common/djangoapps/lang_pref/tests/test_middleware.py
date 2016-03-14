@@ -1,9 +1,7 @@
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
-# TODO PLAT-671 Import from Django 1.8
-# from django.utils.translation import LANGUAGE_SESSION_KEY
-from django_locale.trans_real import LANGUAGE_SESSION_KEY
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from lang_pref.middleware import LanguagePreferenceMiddleware
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference

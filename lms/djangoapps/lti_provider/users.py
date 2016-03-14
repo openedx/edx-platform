@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from lti_provider.models import LtiUser
 from student.models import UserProfile
 
@@ -53,16 +53,17 @@ def create_lti_user(lti_user_id, lti_consumer):
         try:
             edx_user_id = generate_random_edx_username()
             edx_email = "{}@{}".format(edx_user_id, settings.LTI_USER_EMAIL_DOMAIN)
-            edx_user = User.objects.create_user(
-                username=edx_user_id,
-                password=edx_password,
-                email=edx_email,
-            )
-            # A profile is required if PREVENT_CONCURRENT_LOGINS flag is set.
-            # TODO: We could populate user information from the LTI launch here,
-            # but it's not necessary for our current uses.
-            edx_user_profile = UserProfile(user=edx_user)
-            edx_user_profile.save()
+            with transaction.atomic():
+                edx_user = User.objects.create_user(
+                    username=edx_user_id,
+                    password=edx_password,
+                    email=edx_email,
+                )
+                # A profile is required if PREVENT_CONCURRENT_LOGINS flag is set.
+                # TODO: We could populate user information from the LTI launch here,
+                # but it's not necessary for our current uses.
+                edx_user_profile = UserProfile(user=edx_user)
+                edx_user_profile.save()
             created = True
         except IntegrityError:
             # The random edx_user_id wasn't unique. Since 'created' is still

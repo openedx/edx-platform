@@ -7,7 +7,7 @@ from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
 from django.conf import settings
 from django.utils.http import urlquote_plus
 %>
-<%block name="bodyclass">view-incourse view-progress</%block>
+<%block name="bodyclass">view-in-course view-progress</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -21,13 +21,13 @@ from django.utils.http import urlquote_plus
 <%block name="nav_skip">#course-info-progress</%block>
 
 <%block name="js_extra">
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
-<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js')}"></script>
-<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js') | h}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js') | h}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js') | h}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js') | h}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js') | h}"></script>
 <script>
-  ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
+  ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade) | h}
 </script>
 </%block>
 
@@ -40,12 +40,12 @@ from django.utils.http import urlquote_plus
     <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info">
-          <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
+          <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
         </div>
       % endif
 
       <header class="progress-certificates">
-        <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
+        <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}</h1>
       </header>
 
       %if show_generate_cert_btn:
@@ -59,22 +59,23 @@ from django.utils.http import urlquote_plus
               <div class="msg-content">
                 <h2 class="title">${_("Your certificate is available")}</h2>
                 <p class="copy">
-                  ${_("You can now access your certificate. If you keep working and receive a higher grade, you can request an updated certificate.")}
+                  ${_("You can keep working for a higher grade, or request your certificate now.")}
                 </p>
               </div>
               <div class="msg-actions">
                 %if show_cert_web_view and cert_web_view_url:
-                <a class="btn" href="${cert_web_view_url}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
+                <a class="btn" href="${cert_web_view_url | h}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
                   ${_("View Certificate")}
                 </a>
                 %elif download_url:
-                <a class="btn" href="${download_url}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
+                <a class="btn" href="${download_url | h}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
                   ${_("Download Your Certificate")}
                 </a>
                 %endif
               </div>
               %elif is_generating:
               <div class="msg-content">
+                ## Translators: This message appears to users when the system is processessing course certificates, which can take a few hours.
                 <h2 class="title">${_("We're working on it...")}</h2>
                 <p class="copy">${_("We're creating your certificate. You can keep working in your courses and a link to it will appear here and on your Dashboard when it is ready.")}</p>
               </div>
@@ -85,7 +86,7 @@ from django.utils.http import urlquote_plus
                 <p class="copy">${_("You can keep working for a higher grade, or request your certificate now.")}</p>
               </div>
               <div class="msg-actions">
-                <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
               </div>
               %endif
           </div>
@@ -105,29 +106,44 @@ from django.utils.http import urlquote_plus
                     <h2>${_("Requirements for Course Credit")}</h2>
                 </div>
                 %if credit_course_requirements['eligibility_status'] == 'not_eligible':
-                    <span class="eligibility_msg">${student.get_full_name()}, ${_("You are no longer eligible for this course.")}</span>
+                    <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name) | h}</span>
                 %elif credit_course_requirements['eligibility_status'] == 'eligible':
-                    <span class="eligibility_msg">${student.get_full_name()}, ${_("You have met the requirements for credit in this course.")}
-                        ${_("{link} to purchase course credit.").format(link="<a href={url}>{url_name}</a>".format(url = reverse('dashboard'), url_name = _('Go to your dashboard')))}
+                    <span class="eligibility_msg">${_("{student_name}, you have met the requirements for credit in this course.").format(student_name=student.profile.name) | h}
+                        ${_("{a_start}Go to your dashboard{a_end} to purchase course credit.").format(
+		             a_start=u"<a href={url}>".format(url=reverse('dashboard')),
+			     a_end="</a>"
+		      )}
                     </span>
                 %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
-                    <span>${student.get_full_name()}, ${_("You have not yet met the requirements for credit.")}</span>
+                    <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name) | h}</span>
                 %endif
-                <button class="credit-help"><i class="fa fa-question"></i><span class="sr">Help regarding credit requirement</span></button><br>
-                <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
+                <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><i class="fa fa-question"></i><span class="sr">${_("Information about course credit requirements")}</span></a><br>
+                <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status'] | h}">
                 %for requirement in credit_course_requirements['requirements']:
                     <div class="requirement">
-                        <div class="requirement-name">${_(requirement['display_name'])}</div>
+                        <div class="requirement-name">
+                            ${_(requirement['display_name']) | h}
+                            %if requirement['namespace'] == 'grade':
+                                <span>${int(requirement['criteria']['min_grade'] * 100) | h}%</span>
+                            %endif
+                        </div>
                         <div class="requirement-status">
                             %if requirement['status']:
                                 %if requirement['status'] == 'submitted':
                                     <span class="requirement-submitted">${_("Verification Submitted")}</span>
                                 %elif requirement['status'] == 'failed':
-                                    <i class="fa fa-times"></i>
+                                    <i class="fa fa-times" aria-hidden="true"></i>
                                     <span>${_("Verification Failed" )}</span>
+                                %elif requirement['status'] == 'declined':
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                    <span>${_("Verification Declined" )}</span>
                                 %elif requirement['status'] == 'satisfied':
-                                    <i class="fa fa-check"></i>
-                                    <span>Verified on ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                    % if requirement['namespace'] == 'grade' and 'final_grade' in requirement['reason']:
+                                    <span>${int(requirement['reason']['final_grade'] * 100) | h}%</span>
+                                    % else:
+                                    <span>${_("Completed")} ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
+                                    % endif
                                 %endif
                             %else:
                                 <span class="not-achieve">${_("Upcoming")}</span>
@@ -136,7 +152,7 @@ from django.utils.http import urlquote_plus
                     </div>
                 %endfor
                  </div>
-                <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up"></i>
+                <button class="detail-collapse" aria-live="polite"><i class="fa fa-caret-up" aria-hidden="true"></i>
                     <span class="requirement-detail">${_("Less")}</span>
                 </button>
             </div>
@@ -147,7 +163,7 @@ from django.utils.http import urlquote_plus
         %for chapter in courseware_summary:
         %if not chapter['display_name'] == "hidden":
         <section>
-          <h2>${ chapter['display_name'] }</h2>
+          <h2>${ chapter['display_name'] | h}</h2>
 
           <div class="sections">
             %for section in chapter['sections']:
@@ -158,20 +174,20 @@ from django.utils.http import urlquote_plus
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
 
-              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section['url_name']))}">
-                ${ section['display_name'] }
+              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section['url_name'])) | h}">
+                ${ section['display_name'] | h}
                 %if total > 0 or earned > 0:
                   <span class="sr">
-                    ${_("{earned:.3n} of {total:.3n} possible points").format( earned = float(earned), total = float(total) )}
+                    ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total))) | h}
                   </span>
                 %endif
                 </a>
                 %if total > 0 or earned > 0:
-                  <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
+                  <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString ) | h}</span>
                 %endif
               </h3>
               <p>
-                ${section['format']}
+                ${section['format'] | h}
 
                 %if section.get('due') is not None:
                   <%
@@ -179,7 +195,7 @@ from django.utils.http import urlquote_plus
                       due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                   %>
                   <em>
-                  ${due_date}
+                  ${due_date | h}
                   </em>
                 %endif
               </p>
@@ -189,7 +205,7 @@ from django.utils.http import urlquote_plus
                   <h3> ${ _("Problem Scores: ") if section['graded'] else _("Practice Scores: ")} </h3>
                   <ol>
                     %for score in section['scores']:
-                    <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
+                    <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
                     %endfor
                   </ol>
                 %else:

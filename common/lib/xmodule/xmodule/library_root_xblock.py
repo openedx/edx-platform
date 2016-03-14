@@ -11,7 +11,8 @@ from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -78,7 +79,7 @@ class LibraryRoot(XBlock):
 
         force_render = context.get('force_render', None)
 
-        for child_key in children_to_show:  # pylint: disable=E1101
+        for child_key in children_to_show:
             # Children must have a separate context from the library itself. Make a copy.
             child_context = context.copy()
             child_context['show_preview'] = self.show_children_previews

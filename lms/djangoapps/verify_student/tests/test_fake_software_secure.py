@@ -7,7 +7,7 @@ from django.test import TestCase
 from mock import patch
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):

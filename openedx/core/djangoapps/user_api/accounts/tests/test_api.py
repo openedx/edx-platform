@@ -15,6 +15,7 @@ from student.tests.factories import UserFactory
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.test.client import RequestFactory
 from student.models import PendingEmailChange
 from student.tests.tests import UserSettingsEventTestMixin
 from ...errors import (
@@ -24,7 +25,7 @@ from ...errors import (
 from ..api import (
     get_account_settings, update_account_settings, create_account, activate_account, request_password_change
 )
-from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH
+from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PRIVATE_VISIBILITY
 
 
 def mock_render_to_string(template_name, context):
@@ -43,21 +44,24 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
     def setUp(self):
         super(TestAccountApi, self).setUp()
+        self.request_factory = RequestFactory()
         self.table = "student_languageproficiency"
         self.user = UserFactory.create(password=self.password)
+        self.default_request = self.request_factory.get("/api/user/v1/accounts/")
+        self.default_request.user = self.user
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
         self.reset_tracker()
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
-        account_settings = get_account_settings(self.user)
+        account_settings = get_account_settings(self.default_request)
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.user, username=self.user.username)
+        account_settings = get_account_settings(self.default_request, username=self.user.username)
         self.assertEqual(self.user.username, account_settings["username"])
 
-        account_settings = get_account_settings(self.user, username=self.different_user.username)
+        account_settings = get_account_settings(self.default_request, username=self.different_user.username)
         self.assertEqual(self.different_user.username, account_settings["username"])
 
     def test_get_configuration_provided(self):
@@ -75,29 +79,35 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         }
 
         # With default configuration settings, email is not shared with other (non-staff) users.
-        account_settings = get_account_settings(self.user, self.different_user.username)
-        self.assertFalse("email" in account_settings)
+        account_settings = get_account_settings(self.default_request, self.different_user.username)
+        self.assertNotIn("email", account_settings)
 
-        account_settings = get_account_settings(self.user, self.different_user.username, configuration=config)
+        account_settings = get_account_settings(
+            self.default_request,
+            self.different_user.username,
+            configuration=config
+        )
         self.assertEqual(self.different_user.email, account_settings["email"])
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
         with self.assertRaises(UserNotFound):
-            get_account_settings(self.user, username="does_not_exist")
+            get_account_settings(self.default_request, username="does_not_exist")
 
         self.user.username = "does_not_exist"
+        request = self.request_factory.get("/api/user/v1/accounts/")
+        request.user = self.user
         with self.assertRaises(UserNotFound):
-            get_account_settings(self.user)
+            get_account_settings(request)
 
     def test_update_username_provided(self):
         """Test the difference in behavior when a username is supplied to update_account_settings."""
         update_account_settings(self.user, {"name": "Mickey Mouse"})
-        account_settings = get_account_settings(self.user)
+        account_settings = get_account_settings(self.default_request)
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
         update_account_settings(self.user, {"name": "Donald Duck"}, username=self.user.username)
-        account_settings = get_account_settings(self.user)
+        account_settings = get_account_settings(self.default_request)
         self.assertEqual("Donald Duck", account_settings["name"])
 
         with self.assertRaises(UserNotAuthorized):
@@ -140,6 +150,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
                 {"language_proficiencies": [{}]}
             )
 
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(self.user, {"account_privacy": ""})
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
@@ -154,7 +167,10 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         field_errors = context_manager.exception.field_errors
         self.assertEqual(3, len(field_errors))
         self.assertEqual("This field is not editable via this API", field_errors["username"]["developer_message"])
-        self.assertIn("Select a valid choice", field_errors["gender"]["developer_message"])
+        self.assertIn(
+            "Value \'undecided\' is not valid for field \'gender\'",
+            field_errors["gender"]["developer_message"]
+        )
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
 
     @patch('django.core.mail.send_mail')
@@ -171,7 +187,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         self.assertIn("Error thrown from do_email_change_request", context_manager.exception.developer_message)
 
         # Verify that the name change happened, even though the attempt to send the email failed.
-        account_settings = get_account_settings(self.user)
+        account_settings = get_account_settings(self.default_request)
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
@@ -199,6 +215,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         Test that eventing of language proficiencies, which happens update_account_settings method, behaves correctly.
         """
         def verify_event_emitted(new_value, old_value):
+            """
+            Confirm that the user setting event was properly emitted
+            """
             update_account_settings(self.user, {"language_proficiencies": new_value})
             self.assert_user_setting_event_emitted(setting='language_proficiencies', old=old_value, new=new_value)
             self.reset_tracker()
@@ -213,7 +232,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
 )
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class AccountSettingsOnCreationTest(TestCase):
@@ -229,7 +250,9 @@ class AccountSettingsOnCreationTest(TestCase):
 
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
-        account_settings = get_account_settings(user)
+        request = RequestFactory().get("/api/user/v1/accounts/")
+        request.user = user
+        account_settings = get_account_settings(request)
 
         # Expect a date joined field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])
@@ -250,17 +273,20 @@ class AccountSettingsOnCreationTest(TestCase):
             'bio': None,
             'profile_image': {
                 'has_image': False,
-                'image_url_full': '/static/default_50.png',
-                'image_url_small': '/static/default_10.png',
+                'image_url_full': request.build_absolute_uri('/static/default_50.png'),
+                'image_url_small': request.build_absolute_uri('/static/default_10.png'),
             },
             'requires_parental_consent': True,
             'language_proficiencies': [],
+            'account_privacy': PRIVATE_VISIBILITY,
         })
 
 
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
-
+    """
+    Test cases to cover the account initialization workflow
+    """
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'frank+underwood@example.com'
@@ -287,7 +313,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         '@domain.com',
         'test@no_extension',
         u'fŕáńḱ@example.com',
-        u'frank@éxáḿṕĺé.ćőḿ',
 
         # Long email -- subtract the length of the @domain
         # except for one character (so we exceed the max length limit)
@@ -303,18 +328,22 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         u'a' * (PASSWORD_MAX_LENGTH + 1)
     ]
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_activate_account(self):
         # Create the account, which is initially inactive
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         user = User.objects.get(username=self.USERNAME)
-        account = get_account_settings(user)
+
+        request = RequestFactory().get("/api/user/v1/accounts/")
+        request.user = user
+        account = get_account_settings(request)
         self.assertEqual(self.USERNAME, account["username"])
         self.assertEqual(self.EMAIL, account["email"])
         self.assertFalse(account["is_active"])
 
         # Activate the account and verify that it is now active
         activate_account(activation_key)
-        account = get_account_settings(user)
+        account = get_account_settings(request)
         self.assertTrue(account['is_active'])
 
     def test_create_account_duplicate_username(self):
@@ -374,7 +403,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         # Verify that the body of the message contains something that looks
         # like an activation link
         email_body = mail.outbox[0].body
-        result = re.search('(?P<url>https?://[^\s]+)', email_body)
+        result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
         self.assertIsNot(result, None)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
@@ -396,6 +425,9 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def _assert_is_datetime(self, timestamp):
+        """
+        Internal helper to validate the type of the provided timestamp
+        """
         if not timestamp:
             return False
         try:

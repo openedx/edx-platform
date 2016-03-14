@@ -10,6 +10,10 @@
                 description: '',
                 team_count: 0,
                 id: ''
+            },
+
+            initialize: function(options) {
+                this.url = options.url;
             }
         });
         return Topic;

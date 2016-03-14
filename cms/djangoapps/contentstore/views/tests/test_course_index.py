@@ -10,6 +10,7 @@ import pytz
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
@@ -130,7 +131,11 @@ class TestCourseIndex(CourseTestCase):
         outline_url = reverse_course_url('course_handler', self.course.id)
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
         lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
-        subsection = ItemFactory.create(parent_location=lesson.location, category='vertical', display_name='Subsection 1')
+        subsection = ItemFactory.create(
+            parent_location=lesson.location,
+            category='vertical',
+            display_name='Subsection 1'
+        )
         ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
@@ -173,8 +178,16 @@ class TestCourseIndex(CourseTestCase):
         self.assertEquals(resp.status_code, 400)
 
         # create a test notification
-        rerun_state = CourseRerunState.objects.update_state(course_key=self.course.id, new_state=state, allow_not_found=True)
-        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=UserFactory(), should_display=should_display)
+        rerun_state = CourseRerunState.objects.update_state(
+            course_key=self.course.id,
+            new_state=state,
+            allow_not_found=True
+        )
+        CourseRerunState.objects.update_should_display(
+            entry_id=rerun_state.id,
+            user=UserFactory(),
+            should_display=should_display
+        )
 
         # try to get information on this notification
         notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
@@ -198,8 +211,16 @@ class TestCourseIndex(CourseTestCase):
         add_instructor(rerun_course_key, self.user, user2)
 
         # create a test notification
-        rerun_state = CourseRerunState.objects.update_state(course_key=rerun_course_key, new_state=state, allow_not_found=True)
-        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=user2, should_display=should_display)
+        rerun_state = CourseRerunState.objects.update_state(
+            course_key=rerun_course_key,
+            new_state=state,
+            allow_not_found=True
+        )
+        CourseRerunState.objects.update_should_display(
+            entry_id=rerun_state.id,
+            user=user2,
+            should_display=should_display
+        )
 
         # try to get information on this notification
         notification_dismiss_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
@@ -225,6 +246,48 @@ class TestCourseIndex(CourseTestCase):
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response)
+
+    def test_course_updates_invalid_url(self):
+        """
+        Tests the error conditions for the invalid course updates URL.
+        """
+        # Testing the response code by passing slash separated course id whose format is valid but no course
+        # having this id exists.
+        invalid_course_key = '{}_blah_blah_blah'.format(self.course.id)
+        course_updates_url = reverse_course_url('course_info_handler', invalid_course_key)
+        response = self.client.get(course_updates_url)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response code by passing split course id whose format is valid but no course
+        # having this id exists.
+        split_course_key = CourseLocator(org='orgASD', course='course_01213', run='Run_0_hhh_hhh_hhh')
+        course_updates_url_split = reverse_course_url('course_info_handler', split_course_key)
+        response = self.client.get(course_updates_url_split)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response by passing split course id whose format is invalid.
+        invalid_course_id = 'invalid.course.key/{}'.format(split_course_key)
+        course_updates_url_split = reverse_course_url('course_info_handler', invalid_course_id)
+        response = self.client.get(course_updates_url_split)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_index_invalid_url(self):
+        """
+        Tests the error conditions for the invalid course index URL.
+        """
+        # Testing the response code by passing slash separated course key, no course
+        # having this key exists.
+        invalid_course_key = '{}_some_invalid_run'.format(self.course.id)
+        course_outline_url = reverse_course_url('course_handler', invalid_course_key)
+        response = self.client.get_html(course_outline_url)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response code by passing split course key, no course
+        # having this key exists.
+        split_course_key = CourseLocator(org='invalid_org', course='course_01111', run='Run_0_invalid')
+        course_outline_url_split = reverse_course_url('course_handler', split_course_key)
+        response = self.client.get_html(course_outline_url_split)
+        self.assertEqual(response.status_code, 404)
 
 
 @ddt.ddt
@@ -378,6 +441,7 @@ class TestCourseOutline(CourseTestCase):
             info['block_types_enabled'],
             any(component in advanced_modules for component in deprecated_block_types)
         )
+
         self.assertItemsEqual(info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
@@ -393,27 +457,29 @@ class TestCourseOutline(CourseTestCase):
         """
         Verify deprecated warning info for single deprecated feature.
         """
-        block_types = settings.DEPRECATED_BLOCK_TYPES
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-        info = _deprecated_blocks_info(course_module, block_types)
-        self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
-            info,
-            block_types
-        )
+        block_types = ['notes']
+        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
+            course_module = modulestore().get_item(self.course.location)
+            self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
+            info = _deprecated_blocks_info(course_module, block_types)
+            self._verify_deprecated_info(
+                course_module.id,
+                course_module.advanced_modules,
+                info,
+                block_types
+            )
 
     def test_verify_deprecated_warning_message_with_multiple_features(self):
         """
         Verify deprecated warning info for multiple deprecated features.
         """
-        block_types = ['peergrading', 'combinedopenended', 'openassessment']
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types)
+        block_types = ['notes', 'lti']
+        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
+            course_module = modulestore().get_item(self.course.location)
+            self._create_test_data(course_module, create_blocks=True, block_types=block_types)
 
-        info = _deprecated_blocks_info(course_module, block_types)
-        self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
+            info = _deprecated_blocks_info(course_module, block_types)
+            self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
 
     @ddt.data(
         {'delete_vertical': True},
@@ -430,7 +496,7 @@ class TestCourseOutline(CourseTestCase):
             un-published block(s). This behavior should be same if we delete
             unpublished vertical or problem.
         """
-        block_types = ['peergrading']
+        block_types = ['notes']
         course_module = modulestore().get_item(self.course.location)
 
         vertical1 = ItemFactory.create(
@@ -438,8 +504,8 @@ class TestCourseOutline(CourseTestCase):
         )
         problem1 = ItemFactory.create(
             parent_location=vertical1.location,
-            category='peergrading',
-            display_name='peergrading problem in vert1',
+            category='notes',
+            display_name='notes problem in vert1',
             publish_item=False
         )
 
@@ -453,8 +519,8 @@ class TestCourseOutline(CourseTestCase):
         )
         ItemFactory.create(
             parent_location=vertical2.location,
-            category='peergrading',
-            display_name='peergrading problem in vert2',
+            category='notes',
+            display_name='notes problem in vert2',
             pubish_item=True
         )
         # At this point CourseStructure will contain both the above
@@ -464,8 +530,8 @@ class TestCourseOutline(CourseTestCase):
         self.assertItemsEqual(
             info['blocks'],
             [
-                [reverse_usage_url('container_handler', vertical1.location), 'peergrading problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']
+                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
+                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
             ]
         )
 
@@ -480,7 +546,7 @@ class TestCourseOutline(CourseTestCase):
         # There shouldn't be any info present about un-published vertical1
         self.assertEqual(
             info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']]
+            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
         )
 
 
@@ -488,7 +554,6 @@ class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
-
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     def setUp(self):
@@ -549,12 +614,12 @@ class TestCourseReIndex(CourseTestCase):
         response = non_staff_client.get(index_url, {}, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
 
-    def test_content_type_none(self):
+    def test_empty_content_type(self):
         """
-        Test json content type is set if none is selected
+        Test json content type is set if '' is selected
         """
         index_url = reverse_course_url('course_search_index_handler', self.course.id)
-        response = self.client.get(index_url, {}, CONTENT_TYPE=None)
+        response = self.client.get(index_url, {}, CONTENT_TYPE='')
 
         # A course with the default release date should display as "Unscheduled"
         self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)

@@ -7,7 +7,7 @@ Define steps for bulk email acceptance test.
 
 from lettuce import world, step
 from lettuce.django import mail
-from nose.tools import assert_in, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_equal
 from django.core.management import call_command
 from django.conf import settings
 

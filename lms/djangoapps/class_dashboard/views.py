@@ -8,7 +8,7 @@ import json
 from django.http import HttpResponse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_overview_with_access
 from courseware.access import has_access
 from class_dashboard import dashboard_data
 
@@ -21,8 +21,8 @@ def has_instructor_access_for_class(user, course_id):
     Returns true if the `user` is an instructor for the course.
     """
 
-    course = get_course_with_access(user, 'staff', course_id, depth=None)
-    return has_access(user, 'staff', course)
+    course = get_course_overview_with_access(user, 'staff', course_id)
+    return bool(has_access(user, 'staff', course))
 
 
 def all_sequential_open_distrib(request, course_id):
@@ -49,7 +49,7 @@ def all_sequential_open_distrib(request, course_id):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def all_problem_grade_distribution(request, course_id):
@@ -75,7 +75,7 @@ def all_problem_grade_distribution(request, course_id):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def section_problem_grade_distrib(request, course_id, section):
@@ -106,4 +106,4 @@ def section_problem_grade_distrib(request, course_id, section):
     else:
         data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(json.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), content_type="application/json")

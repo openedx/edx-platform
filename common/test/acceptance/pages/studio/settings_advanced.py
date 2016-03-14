@@ -48,11 +48,26 @@ class AdvancedSettingsPage(CoursePage):
         self.browser.refresh()
         self.wait_for_page()
 
+    def coordinates_for_scrolling(self, coordinates_for):
+        """
+        Get the x and y coordinates of elements
+        """
+        cordinates_dict = self.browser.find_element_by_css_selector(coordinates_for)
+        location = cordinates_dict.location
+        for key, val in location.iteritems():
+            if key == 'x':
+                x_axis = val
+            elif key == 'y':
+                y_axis = val
+        return x_axis, y_axis
+
     def undo_changes_via_modal(self):
         """
         Trigger clicking event of the undo changes button in the modal.
         Wait for the undoing process to load via ajax call.
+        Before that Scroll so the button is clickable on all browsers
         """
+        self.browser.execute_script("window.scrollTo" + str(self.coordinates_for_scrolling(UNDO_BUTTON_SELECTOR)))
         self.q(css=UNDO_BUTTON_SELECTOR).click()
         self.wait_for_ajax()
 
@@ -60,7 +75,9 @@ class AdvancedSettingsPage(CoursePage):
         """
         Trigger click event of the manual changes button in the modal.
         No need to wait for any ajax.
+        Before that Scroll so the button is clickable on all browsers
         """
+        self.browser.execute_script("window.scrollTo" + str(self.coordinates_for_scrolling(MANUAL_BUTTON_SELECTOR)))
         self.q(css=MANUAL_BUTTON_SELECTOR).click()
 
     def is_validation_modal_present(self):
@@ -161,13 +178,11 @@ class AdvancedSettingsPage(CoursePage):
             'display_name',
             'info_sidebar_name',
             'is_new',
-            'ispublic',
             'issue_badges',
             'max_student_enrollments_allowed',
             'no_grade',
             'display_coursenumber',
             'display_organization',
-            'end_of_course_survey_url',
             'catalog_visibility',
             'chrome',
             'days_early_for_beta',
@@ -193,12 +208,13 @@ class AdvancedSettingsPage(CoursePage):
             'annotation_token_secret',
             'showanswer',
             'show_calculator',
-            'show_chat',
             'show_reset_button',
             'static_asset_path',
             'text_customization',
             'annotation_storage_url',
             'social_sharing_url',
-            'teams_configuration',
             'video_bumper',
+            'cert_html_view_enabled',
+            'enable_proctored_exams',
+            'enable_timed_exams',
         ]

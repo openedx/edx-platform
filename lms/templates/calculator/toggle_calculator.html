@@ -11,13 +11,13 @@ from django.core.urlresolvers import reverse
   <div id="calculator_wrapper">
     <form id="calculator">
       <div class="input-wrapper">
-        <label for="calculator_input" class="sr">${_('Calculator Input')}</label>
+        <label for="calculator_input" class="label-calc-input sr">${_('Calculator Input')}</label>
         <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" />
 
         <div class="help-wrapper">
           <p class="sr" id="hint-instructions">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
 
-          <button id="calculator_hint" aria-haspopup="true" aria-expanded="false" aria-controls=“calculator_input_help” aria-describedby="hint-instructions"><span class="sr">${_("Hints")}</span></button>
+          <button id="calculator_hint" aria-haspopup="true" aria-expanded="false" aria-controls="calculator_input_help" aria-describedby="hint-instructions"><span class="calc-hint sr">${_("Hints")}</span></button>
 
           <ul id="calculator_input_help" class="help" aria-hidden="true">
             <li class="hint-item" id="hint-moreinfo">
@@ -135,8 +135,8 @@ from django.core.urlresolvers import reverse
         </div>
       </div>
 
-      <button id="calculator_button">=<span class="sr">${_('Calculate')}</span></button>
-      <label for="calculator_output" class="sr">${_('Calculator Output')}</label>
+      <input type="submit" id="calculator_button" value="=" aria-label="${_('Calculate')}">
+      <label for="calculator_output" class="calc-output-label sr">${_('Calculator Output')}</label>
       <input type="text" id="calculator_output" readonly />
     </form>
   </div>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Microsite Dashboard with Shopping Cart History
 """
@@ -134,11 +135,13 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         receipt_url_cert_non_microsite = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_cert_non_microsite})
         receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_donation})
 
-        self.assertIn(receipt_url_microsite_course, response.content)
-        self.assertNotIn(receipt_url_microsite_course2, response.content)
-        self.assertNotIn(receipt_url_non_microsite, response.content)
-        self.assertNotIn(receipt_url_cert_non_microsite, response.content)
-        self.assertNotIn(receipt_url_donation, response.content)
+        # We need to decode because of these chars: © & ▸
+        content = response.content.decode('utf-8')
+        self.assertIn(receipt_url_microsite_course, content)
+        self.assertNotIn(receipt_url_microsite_course2, content)
+        self.assertNotIn(receipt_url_non_microsite, content)
+        self.assertNotIn(receipt_url_cert_non_microsite, content)
+        self.assertNotIn(receipt_url_donation, content)
 
     @mock.patch("microsite_configuration.microsite.get_value", non_microsite)
     @mock.patch("microsite_configuration.microsite.get_all_orgs", fake_all_orgs)
@@ -152,9 +155,11 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
         receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_donation})
         receipt_url_courseless_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.orderid_courseless_donation})
 
-        self.assertNotIn(receipt_url_microsite_course, response.content)
-        self.assertNotIn(receipt_url_microsite_course2, response.content)
-        self.assertIn(receipt_url_non_microsite, response.content)
-        self.assertIn(receipt_url_cert_non_microsite, response.content)
-        self.assertIn(receipt_url_donation, response.content)
-        self.assertIn(receipt_url_courseless_donation, response.content)
+        # We need to decode because of these chars: © & ▸
+        content = response.content.decode('utf-8')
+        self.assertNotIn(receipt_url_microsite_course, content)
+        self.assertNotIn(receipt_url_microsite_course2, content)
+        self.assertIn(receipt_url_non_microsite, content)
+        self.assertIn(receipt_url_cert_non_microsite, content)
+        self.assertIn(receipt_url_donation, content)
+        self.assertIn(receipt_url_courseless_donation, content)

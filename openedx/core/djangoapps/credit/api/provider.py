@@ -2,17 +2,14 @@
 API for initiating and tracking requests for credit from a provider.
 """
 
+import datetime
 import logging
 import uuid
-import datetime
 
 import pytz
-
 from django.db import transaction
 
-from util.date_utils import to_timestamp
-
-from student.models import User
+from lms.djangoapps.django_comment_client.utils import JsonResponse
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
     CreditProviderNotConfigured,
@@ -27,31 +24,93 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
 )
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from student.models import User
+from util.date_utils import to_timestamp
 
+
+# TODO: Cleanup this mess! ECOM-2908
 
 log = logging.getLogger(__name__)
 
 
-def get_credit_providers():
-    """
-    Retrieve all available credit providers.
+def get_credit_providers(providers_list=None):
+    """Retrieve all available credit providers or filter on given providers_list.
 
-    Example:
-    >>> get_credit_providers()
-    [
+    Arguments:
+        providers_list (list of strings or None): contains list of ids of credit providers
+        or None.
+
+    Returns:
+        list of credit providers represented as dictionaries
+    Response Values:
+        >>> get_credit_providers(['hogwarts'])
+        [
+            {
+                "id": "hogwarts",
+                "name": "Hogwarts School of Witchcraft and Wizardry",
+                "url": "https://credit.example.com/",
+                "status_url": "https://credit.example.com/status/",
+                "description: "A new model for the Witchcraft and Wizardry School System.",
+                "enable_integration": false,
+                "fulfillment_instructions": "
+                <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
+                <ul>
+                <li>Sample instruction abc</li>
+                <li>Sample instruction xyz</li>
+                </ul>",
+            },
+            ...
+        ]
+    """
+    return CreditProvider.get_credit_providers(providers_list=providers_list)
+
+
+def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-argument
+    """Retrieve the 'CreditProvider' model data against provided
+     credit provider.
+
+    Args:
+        provider_id (str): The identifier for the credit provider
+
+    Returns: 'CreditProvider' data dictionary
+
+    Example Usage:
+        >>> get_credit_provider_info("hogwarts")
         {
-            "id": "hogwarts",
-            "display_name": "Hogwarts School of Witchcraft and Wizardry"
-        },
-        ...
-    ]
+            "provider_id": "hogwarts",
+            "display_name": "Hogwarts School of Witchcraft and Wizardry",
+            "provider_url": "https://credit.example.com/",
+            "provider_status_url": "https://credit.example.com/status/",
+            "provider_description: "A new model for the Witchcraft and Wizardry School System.",
+            "enable_integration": False,
+            "fulfillment_instructions": "
+                <p>In order to fulfill credit, Hogwarts School of Witchcraft and Wizardry requires learners to:</p>
+                <ul>
+                <li>Sample instruction abc</li>
+                <li>Sample instruction xyz</li>
+                </ul>",
+            "thumbnail_url": "https://credit.example.com/logo.png"
+        }
 
-    Returns: list
     """
-    return CreditProvider.get_credit_providers()
+    credit_provider = CreditProvider.get_credit_provider(provider_id=provider_id)
+    credit_provider_data = {}
+    if credit_provider:
+        credit_provider_data = {
+            "provider_id": credit_provider.provider_id,
+            "display_name": credit_provider.display_name,
+            "provider_url": credit_provider.provider_url,
+            "provider_status_url": credit_provider.provider_status_url,
+            "provider_description": credit_provider.provider_description,
+            "enable_integration": credit_provider.enable_integration,
+            "fulfillment_instructions": credit_provider.fulfillment_instructions,
+            "thumbnail_url": credit_provider.thumbnail_url
+        }
+
+    return JsonResponse(credit_provider_data)
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def create_credit_request(course_key, provider_id, username):
     """
     Initiate a request for credit from a credit provider.
@@ -84,7 +143,7 @@ def create_credit_request(course_key, provider_id, username):
     Arguments:
         course_key (CourseKey): The identifier for the course.
         provider_id (str): The identifier of the credit provider.
-        user (User): The user initiating the request.
+        username (str): The user initiating the request.
 
     Returns: dict
 
@@ -105,7 +164,7 @@ def create_credit_request(course_key, provider_id, username):
                 "course_org": "HogwartsX",
                 "course_num": "Potions101",
                 "course_run": "1T2015",
-                "final_grade": 0.95,
+                "final_grade": "0.95",
                 "user_username": "ron",
                 "user_email": "ron@example.com",
                 "user_full_name": "Ron Weasley",
@@ -189,15 +248,21 @@ def create_credit_request(course_key, provider_id, username):
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
+            requirement__course__course_key=course_key,
             status="satisfied"
         ).reason["final_grade"]
+
+        # NOTE (CCB): Limiting the grade to seven characters is a hack for ASU.
+        if len(unicode(final_grade)) > 7:
+            final_grade = u'{:.5f}'.format(final_grade)
+        else:
+            final_grade = unicode(final_grade)
+
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
-        log.exception(
-            "Could not retrieve final grade from the credit eligibility table "
-            "for user %s in course %s.",
-            user.id, course_key
-        )
-        raise UserIsNotEligible
+        msg = 'Could not retrieve final grade from the credit eligibility table for ' \
+              'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
+        log.exception(msg)
+        raise UserIsNotEligible(msg)
 
     parameters = {
         "request_uuid": credit_request.uuid,
@@ -209,11 +274,7 @@ def create_credit_request(course_key, provider_id, username):
         "user_username": user.username,
         "user_email": user.email,
         "user_full_name": user.profile.name,
-        "user_mailing_address": (
-            user.profile.mailing_address
-            if user.profile.mailing_address is not None
-            else ""
-        ),
+        "user_mailing_address": "",
         "user_country": (
             user.profile.country.code
             if user.profile.country.code is not None

@@ -6,17 +6,16 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.django import modulestore
 
 
 USER_COUNT = 11
 
 
 @attr('shard_1')
-class TestGradebook(ModuleStoreTestCase):
+class TestGradebook(SharedModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and
     students who've scored various scores on these assignments. Base class for further
@@ -24,45 +23,48 @@ class TestGradebook(ModuleStoreTestCase):
     """
     grading_policy = None
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestGradebook, cls).setUpClass()
+
+        # Create a course with the desired grading policy (from our class attribute)
+        kwargs = {}
+        if cls.grading_policy is not None:
+            kwargs['grading_policy'] = cls.grading_policy
+        cls.course = CourseFactory.create(**kwargs)
+
+        # Now give it some content
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            chapter = ItemFactory.create(
+                parent_location=cls.course.location,
+                category="sequential",
+            )
+            section = ItemFactory.create(
+                parent_location=chapter.location,
+                category="sequential",
+                metadata={'graded': True, 'format': 'Homework'}
+            )
+            cls.items = [
+                ItemFactory.create(
+                    parent_location=section.location,
+                    category="problem",
+                    data=StringResponseXMLFactory().build_xml(answer='foo'),
+                    metadata={'rerandomize': 'always'}
+                )
+                for __ in xrange(USER_COUNT - 1)
+            ]
+
     def setUp(self):
         super(TestGradebook, self).setUp()
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-
-        # remove the caches
-        modulestore().request_cache = None
-        modulestore().metadata_inheritance_cache_subsystem = None
-
-        kwargs = {}
-        if self.grading_policy is not None:
-            kwargs['grading_policy'] = self.grading_policy
-
-        self.course = CourseFactory.create(**kwargs)
-        chapter = ItemFactory.create(
-            parent_location=self.course.location,
-            category="sequential",
-        )
-        section = ItemFactory.create(
-            parent_location=chapter.location,
-            category="sequential",
-            metadata={'graded': True, 'format': 'Homework'}
-        )
-
         self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        for i in xrange(USER_COUNT - 1):
-            category = "problem"
-            item = ItemFactory.create(
-                parent_location=section.location,
-                category=category,
-                data=StringResponseXMLFactory().build_xml(answer='foo'),
-                metadata={'rerandomize': 'always'}
-            )
-
+        for i, item in enumerate(self.items):
             for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     grade=1 if i < j else 0,
@@ -77,7 +79,6 @@ class TestGradebook(ModuleStoreTestCase):
             args=(self.course.id.to_deprecated_string(),)
         ))
 
-    def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)
 
 
@@ -139,7 +140,6 @@ class TestLetterCutoffPolicy(TestGradebook):
         self.assertIn("grade_D {color:DarkSlateGray;}", self.response.content)
 
     def test_assigned_grades(self):
-        print self.response.content
         # Users 9-10 have >= 90% on Homeworks [2]
         # Users 9-10 have >= 90% on the class [2]
         # One use at the top of the page [1]

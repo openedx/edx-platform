@@ -52,8 +52,8 @@ class Command(TrackedCommand):
                     help="If True, try to transfer certificate items to the new course.")
     )
 
-    @transaction.commit_manually
-    def handle(self, *args, **options):  # pylint: disable=unused-argument
+    @transaction.atomic
+    def handle(self, *args, **options):
         source_key = CourseKey.from_string(options.get('source_course', ''))
         dest_keys = []
         for course_key in options.get('dest_course_list', '').split(','):
@@ -72,8 +72,8 @@ class Command(TrackedCommand):
         )
 
         for user in source_students:
-            with transaction.commit_on_success():
-                print("Moving {}.".format(user.username))
+            with transaction.atomic():
+                print "Moving {}.".format(user.username)
                 # Find the old enrollment.
                 enrollment = CourseEnrollment.objects.get(
                     user=user,
@@ -84,14 +84,14 @@ class Command(TrackedCommand):
                 mode = enrollment.mode
                 old_is_active = enrollment.is_active
                 CourseEnrollment.unenroll(user, source_key, skip_refund=True)
-                print(u"Unenrolled {} from {}".format(user.username, unicode(source_key)))
+                print u"Unenrolled {} from {}".format(user.username, unicode(source_key))
 
                 for dest_key in dest_keys:
                     if CourseEnrollment.is_enrolled(user, dest_key):
                         # Un Enroll from source course but don't mess
                         # with the enrollment in the destination course.
                         msg = u"Skipping {}, already enrolled in destination course {}"
-                        print(msg.format(user.username, unicode(dest_key)))
+                        print msg.format(user.username, unicode(dest_key))
                     else:
                         new_enrollment = CourseEnrollment.enroll(user, dest_key, mode=mode)
 
@@ -128,7 +128,7 @@ class Command(TrackedCommand):
                 course_enrollment=enrollment
             )
         except CertificateItem.DoesNotExist:
-            print(u"No certificate for {}".format(user))
+            print u"No certificate for {}".format(user)
             return
 
         certificate_item.course_id = dest_keys[0]

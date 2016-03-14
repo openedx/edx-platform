@@ -1,0 +1,12 @@
+<h1><%- gettext("Editing post") %></h1>
+<ul class="post-errors"></ul>
+<div class="forum-edit-post-form-wrapper"></div>
+<div class="form-row">
+  <label class="sr" for="edit-post-title"><%- gettext("Edit post title") %></label>
+  <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="<%-title %>" placeholder="<%- gettext('Title') %>">
+</div>
+<div class="form-row">
+  <div class="edit-post-body" name="body"><%- body %></div>
+</div>
+<input type="submit" id="edit-post-submit" class="post-update" value="<%- gettext("Update post") %>">
+<a href="#" class="post-cancel"><%- gettext("Cancel") %></a>

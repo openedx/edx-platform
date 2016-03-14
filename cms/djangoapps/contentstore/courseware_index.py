@@ -7,13 +7,13 @@ import re
 from six import add_metaclass
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.core.urlresolvers import resolve
 
-from contentstore.utils import course_image_url
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from eventtracking import tracker
+from openedx.core.lib.courses import course_image_url
 from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
@@ -111,8 +111,7 @@ class SearchIndexerBase(object):
             exclude_dictionary={"id": list(exclude_items)}
         )
         result_ids = [result["data"]["id"] for result in response["results"]]
-        for result_id in result_ids:
-            searcher.remove(cls.DOCUMENT_TYPE, result_id)
+        searcher.remove(cls.DOCUMENT_TYPE, result_ids)
 
     @classmethod
     def index(cls, modulestore, structure_key, triggered_at=None, reindex_age=REINDEX_AGE):
@@ -142,7 +141,7 @@ class SearchIndexerBase(object):
         structure_key = cls.normalize_structure_key(structure_key)
         location_info = cls._get_location_info(structure_key)
 
-        # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `index_item`
+        # Wrap counter in dictionary - otherwise we seem to lose scope inside the embedded function `prepare_item_index`
         indexed_count = {
             "count": 0
         }
@@ -153,15 +152,20 @@ class SearchIndexerBase(object):
         # list - those are ready to be destroyed
         indexed_items = set()
 
+        # items_index is a list of all the items index dictionaries.
+        # it is used to collect all indexes and index them using bulk API,
+        # instead of per item index API call.
+        items_index = []
+
         def get_item_location(item):
             """
             Gets the version agnostic item location
             """
             return item.location.version_agnostic().replace(branch=None)
 
-        def index_item(item, skip_index=False, groups_usage_info=None):
+        def prepare_item_index(item, skip_index=False, groups_usage_info=None):
             """
-            Add this item to the search index and indexed_items list
+            Add this item to the items_index and indexed_items list
 
             Arguments:
             item - item to add to index, its children will be processed recursively
@@ -212,7 +216,7 @@ class SearchIndexerBase(object):
                 for child_item in item.get_children():
                     if modulestore.has_published_version(child_item):
                         children_groups_usage.append(
-                            index_item(
+                            prepare_item_index(
                                 child_item,
                                 skip_index=skip_child_index,
                                 groups_usage_info=groups_usage_info
@@ -234,7 +238,7 @@ class SearchIndexerBase(object):
                     item_index['start_date'] = item.start
                 item_index['content_groups'] = item_content_groups if item_content_groups else None
                 item_index.update(cls.supplemental_fields(item))
-                searcher.index(cls.DOCUMENT_TYPE, item_index)
+                items_index.append(item_index)
                 indexed_count["count"] += 1
                 return item_content_groups
             except Exception as err:  # pylint: disable=broad-except
@@ -252,7 +256,8 @@ class SearchIndexerBase(object):
 
                 # Now index the content
                 for item in structure.get_children():
-                    index_item(item, groups_usage_info=groups_usage_info)
+                    prepare_item_index(item, groups_usage_info=groups_usage_info)
+                searcher.index(cls.DOCUMENT_TYPE, items_index)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
@@ -345,7 +350,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         'category': 'courseware_index'
     }
 
-    UNNAMED_MODULE_NAME = _("(Unnamed)")
+    UNNAMED_MODULE_NAME = ugettext_lazy("(Unnamed)")
 
     @classmethod
     def normalize_structure_key(cls, structure_key):
@@ -412,7 +417,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         while parent is not None:
             path_component_name = parent.display_name
             if not path_component_name:
-                path_component_name = cls.UNNAMED_MODULE_NAME
+                path_component_name = unicode(cls.UNNAMED_MODULE_NAME)
             location_path.append(path_component_name)
             parent = parent.get_parent()
         location_path.reverse()
@@ -623,7 +628,7 @@ class CourseAboutSearchIndexer(object):
 
         # Broad exception handler to protect around and report problems with indexing
         try:
-            searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, course_info)
+            searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, [course_info])
         except:  # pylint: disable=bare-except
             log.exception(
                 "Course discovery indexing error encountered, course discovery index may be out of date %s",
@@ -635,3 +640,22 @@ class CourseAboutSearchIndexer(object):
             "Successfully added %s course to the course discovery index",
             course_id
         )
+
+    @classmethod
+    def _get_location_info(cls, normalized_structure_key):
+        """ Builds location info dictionary """
+        return {"course": unicode(normalized_structure_key), "org": normalized_structure_key.org}
+
+    @classmethod
+    def remove_deleted_items(cls, structure_key):
+        """ Remove item from Course About Search_index """
+        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+        if not searcher:
+            return
+
+        response = searcher.search(
+            doc_type=cls.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary=cls._get_location_info(structure_key)
+        )
+        result_ids = [result["data"]["id"] for result in response["results"]]
+        searcher.remove(cls.DISCOVERY_DOCUMENT_TYPE, result_ids)

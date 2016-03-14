@@ -21,5 +21,5 @@ class LmsSearchInitializer(SearchInitializer):
                 course_key = CourseKey.from_string(kwargs['course_id'])
             except InvalidKeyError:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
-            staff_access = has_access(request.user, 'staff', course_key)
+            staff_access = bool(has_access(request.user, 'staff', course_key))
             setup_masquerade(request, course_key, staff_access)

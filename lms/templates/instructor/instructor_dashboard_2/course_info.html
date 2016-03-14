@@ -7,7 +7,7 @@
 
     %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
       ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
-      <span class="tip">${_("Number of enrollees (instructors, staff members, and students) by track")}</span>
+      <span class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</span>
       <br/><br/>
       <% modes = section_data['enrollment_count'] %>
       <table>
@@ -55,7 +55,17 @@
 
     <li class="field text is-not-editable" id="field-course-display-name">
       <label for="course-display-name">${_("Course Display Name:")}</label>
-      <b>${ section_data['course_display_name'] }</b>
+      <b>${ section_data['course_display_name'] | h}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-start-date">
+      <label for="course-start-date">${_("Course Start Date:")}</label>
+      <b>${ section_data['start_date'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-end-date">
+      <label for="course-end-date">${_("Course End Date:")}</label>
+      <b>${ section_data['end_date'] }</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-started">
@@ -73,6 +83,12 @@
       <b>${_("No")}</b>
       %endif
     </li>
+
+    <li class="field text is-not-editable" id="field-course-num-sections">
+      <label for="course-num-sections">${_("Number of sections:")}</label>
+      <b>${ section_data['num_sections'] }</b>
+    </li>
+
     <li class="field text is-not-editable" id="field-grade-cutoffs">
       <label for="start-date">${_("Grade Cutoffs:")}</label>
       <b>${ section_data['grade_cutoffs'] }</b>
@@ -94,7 +110,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h2> ${_("Pending Tasks")} </h2>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

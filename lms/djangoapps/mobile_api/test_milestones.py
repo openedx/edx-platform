@@ -3,6 +3,7 @@ Milestone related tests for the mobile_api
 """
 from mock import patch
 
+from courseware.access_response import MilestoneError
 from courseware.tests.helpers import get_request_for_user
 from courseware.tests.test_entrance_exam import answer_entrance_exam_problem, add_entrance_exam_milestone
 from util.milestones_helpers import (
@@ -23,10 +24,6 @@ class MobileAPIMilestonesMixin(object):
     the mobile api will appropriately block content until the milestone is
     fulfilled.
     """
-    MILESTONE_MESSAGE = {
-        'developer_message':
-            'Cannot access content with unfulfilled pre-requisites or unpassed entrance exam.'
-    }
 
     ALLOW_ACCESS_TO_MILESTONE_COURSE = False  # pylint: disable=invalid-name
 
@@ -126,12 +123,12 @@ class MobileAPIMilestonesMixin(object):
 
         Since different endpoints will have different behaviours towards milestones,
         setting ALLOW_ACCESS_TO_MILESTONE_COURSE (default is False) to True, will
-        not return a 204. For example, when getting a list of courses a user is
+        not return a 404. For example, when getting a list of courses a user is
         enrolled in, although a user may have unfulfilled milestones, the course
         should still show up in the course enrollments list.
         """
         if self.ALLOW_ACCESS_TO_MILESTONE_COURSE:
             self.api_response()
         else:
-            response = self.api_response(expected_response_code=204)
-            self.assertEqual(response.data, self.MILESTONE_MESSAGE)
+            response = self.api_response(expected_response_code=404)
+            self.assertEqual(response.data, MilestoneError().to_json())

@@ -6,7 +6,7 @@ from common import *
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
 from contentstore.utils import reverse_course_url
-from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_in, assert_equal, assert_not_equal
 
 
 @step(u'I am viewing the grading settings')
@@ -170,7 +170,7 @@ def cannot_edit_fail(_step):
     # try to change the grade range -- this should throw an exception
     try:
         ranges.last.value = 'Failure'
-    except (InvalidElementStateException):
+    except InvalidElementStateException:
         pass  # We should get this exception on failing to edit the element
 
     # check to be sure that nothing has changed

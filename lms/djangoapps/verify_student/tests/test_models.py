@@ -2,22 +2,27 @@
 from datetime import timedelta, datetime
 import ddt
 import json
+import mock
 import requests.exceptions
 import pytz
 
 from django.conf import settings
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
+from django.test import TestCase
 from mock import patch
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint, VerificationStatus,
-    SkippedReverification
+from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification,
+    VerificationException, VerificationCheckpoint,
+    VerificationStatus, SkippedReverification,
+    VerificationDeadline
 )
 
 FAKE_SETTINGS = {
@@ -123,9 +128,9 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
 
 # Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
+@patch('lms.djangoapps.verify_student.models.S3Connection', new=MockS3Connection)
+@patch('lms.djangoapps.verify_student.models.Key', new=MockKey)
+@patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class TestPhotoVerification(ModuleStoreTestCase):
 
@@ -216,18 +221,6 @@ class TestPhotoVerification(ModuleStoreTestCase):
 
         return attempt
 
-    def test_fetch_photo_id_image(self):
-        user = UserFactory.create()
-        orig_attempt = SoftwareSecurePhotoVerification(user=user)
-        orig_attempt.save()
-
-        old_key = orig_attempt.photo_id_key
-
-        new_attempt = SoftwareSecurePhotoVerification(user=user)
-        new_attempt.save()
-        new_attempt.fetch_photo_id_image()
-        assert_equals(new_attempt.photo_id_key, old_key)
-
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
@@ -235,14 +228,30 @@ class TestPhotoVerification(ModuleStoreTestCase):
         assert_equals(attempt.status, "submitted")
 
         # We post, but Software Secure doesn't like what we send for some reason
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_error):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
         # We try to post, but run into an error (in this case a newtork connection error)
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
+
+    @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_submission_while_testing_flag_is_true(self):
+        """ Test that a fake value is set for field 'photo_id_key' of user's
+        initial verification when the feature flag 'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'
+        is enabled.
+        """
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        user.profile.name = "test-user"
+
+        attempt.upload_photo_id_image("Image data")
+        attempt.mark_ready()
+        attempt.submit()
+
+        self.assertEqual(attempt.photo_id_key, "fake-photo-id-key")
 
     def test_active_for_user(self):
         """
@@ -463,6 +472,7 @@ class TestPhotoVerification(ModuleStoreTestCase):
     @ddt.unpack
     @ddt.data(
         {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'audit', 'status': None, 'output': 'N/A'},
         {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
         {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
     )
@@ -473,12 +483,46 @@ class TestPhotoVerification(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
 
-        with patch('verify_student.models.SoftwareSecurePhotoVerification.user_is_verified') as mock_verification:
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as mock_verification:
 
             mock_verification.return_value = status
 
             status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
             self.assertEqual(status, output)
+
+    def test_initial_verification_for_user(self):
+        """Test that method 'get_initial_verification' of model
+        'SoftwareSecurePhotoVerification' always returns the initial
+        verification with field 'photo_id_key' set against a user.
+        """
+        user = UserFactory.create()
+
+        # No initial verification for the user
+        result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIs(result, None)
+
+        # Make an initial verification with 'photo_id_key'
+        attempt = SoftwareSecurePhotoVerification(user=user, photo_id_key="dummy_photo_id_key")
+        attempt.status = 'approved'
+        attempt.save()
+
+        # Check that method 'get_initial_verification' returns the correct
+        # initial verification attempt
+        first_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIsNotNone(first_result)
+
+        # Now create a second verification without 'photo_id_key'
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.status = 'submitted'
+        attempt.save()
+
+        # Test method 'get_initial_verification' still returns the correct
+        # initial verification attempt which have 'photo_id_key' set
+        second_result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
+        self.assertIsNotNone(second_result)
+        self.assertEqual(second_result, first_result)
 
 
 @ddt.ddt
@@ -497,7 +541,7 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
         )
 
     @ddt.data('midterm', 'final')
-    def test_get_verification_checkpoint(self, checkpoint):
+    def test_get_or_create_verification_checkpoint(self, checkpoint):
         """
         Test that a reverification checkpoint is created properly.
         """
@@ -510,25 +554,38 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
             checkpoint_location=checkpoint_location
         )
         self.assertEqual(
-            VerificationCheckpoint.get_verification_checkpoint(self.course.id, checkpoint_location),
+            VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, checkpoint_location),
             verification_checkpoint
         )
 
-    def test_get_verification_checkpoint_for_not_existing_values(self):
-        """Test that 'get_verification_checkpoint' method returns None if user
-        tries to access a checkpoint with an invalid location.
-        """
-        # create the VerificationCheckpoint checkpoint
-        VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_location=self.checkpoint_midterm)
+    def test_get_or_create_verification_checkpoint_for_not_existing_values(self):
+        # Retrieving a checkpoint that doesn't yet exist will create it
+        location = u'i4x://edX/DemoX/edx-reverification-block/invalid_location'
+        checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, location)
 
-        # get verification for a non existing checkpoint
-        self.assertEqual(
-            VerificationCheckpoint.get_verification_checkpoint(
-                self.course.id,
-                u'i4x://edX/DemoX/edx-reverification-block/invalid_location'
-            ),
-            None
+        self.assertIsNot(checkpoint, None)
+        self.assertEqual(checkpoint.course_id, self.course.id)
+        self.assertEqual(checkpoint.checkpoint_location, location)
+
+    def test_get_or_create_integrity_error(self):
+        # Create the checkpoint
+        VerificationCheckpoint.objects.create(
+            course_id=self.course.id,
+            checkpoint_location=self.checkpoint_midterm,
         )
+
+        # Simulate that the get-or-create operation raises an IntegrityError.
+        # This can happen when two processes both try to get-or-create at the same time
+        # when the database is set to REPEATABLE READ.
+        # To avoid IntegrityError situations when calling this method, set the view to
+        # use a READ COMMITTED transaction instead.
+        with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
+            mock_get_or_create.side_effect = IntegrityError
+            with self.assertRaises(IntegrityError):
+                _ = VerificationCheckpoint.get_or_create_verification_checkpoint(
+                    self.course.id,
+                    self.checkpoint_midterm
+                )
 
     def test_unique_together_constraint(self):
         """
@@ -682,14 +739,12 @@ class VerificationStatusTest(ModuleStoreTestCase):
             status='submitted'
         )
 
-        self.assertEqual(
-            VerificationStatus.get_user_attempts(
-                user_id=self.user.id,
-                course_key=self.course.id,
-                related_assessment_location=self.first_checkpoint_location
-            ),
-            1
+        actual_attempts = VerificationStatus.get_user_attempts(
+            self.user.id,
+            self.course.id,
+            self.first_checkpoint_location
         )
+        self.assertEqual(actual_attempts, 1)
 
 
 class SkippedReverificationTest(ModuleStoreTestCase):
@@ -757,10 +812,58 @@ class SkippedReverificationTest(ModuleStoreTestCase):
             checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
         )
         self.assertTrue(
-            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=self.user)
+            SkippedReverification.check_user_skipped_reverification_exists(
+                user_id=self.user.id,
+                course_id=self.course.id
+            )
         )
 
         user2 = UserFactory.create()
         self.assertFalse(
-            SkippedReverification.check_user_skipped_reverification_exists(course_id=self.course.id, user=user2)
+            SkippedReverification.check_user_skipped_reverification_exists(
+                user_id=user2.id,
+                course_id=self.course.id
+            )
         )
+
+
+class VerificationDeadlineTest(TestCase):
+    """
+    Tests for the VerificationDeadline model.
+    """
+
+    def test_caching(self):
+        deadlines = {
+            CourseKey.from_string("edX/DemoX/Fall"): datetime.now(pytz.UTC),
+            CourseKey.from_string("edX/DemoX/Spring"): datetime.now(pytz.UTC) + timedelta(days=1)
+        }
+        course_keys = deadlines.keys()
+
+        # Initially, no deadlines are set
+        with self.assertNumQueries(1):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, {})
+
+        # Create the deadlines
+        for course_key, deadline in deadlines.iteritems():
+            VerificationDeadline.objects.create(
+                course_key=course_key,
+                deadline=deadline,
+            )
+
+        # Warm the cache
+        with self.assertNumQueries(1):
+            VerificationDeadline.deadlines_for_courses(course_keys)
+
+        # Load the deadlines from the cache
+        with self.assertNumQueries(0):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, deadlines)
+
+        # Delete the deadlines
+        VerificationDeadline.objects.all().delete()
+
+        # Verify that the deadlines are updated correctly
+        with self.assertNumQueries(1):
+            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
+            self.assertEqual(all_deadlines, {})

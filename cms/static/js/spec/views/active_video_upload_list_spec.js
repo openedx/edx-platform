@@ -22,6 +22,11 @@ define(
                 $(document).ajaxError(this.globalAjaxError);
             });
 
+            // Remove window unload handler triggered by the upload requests
+            afterEach(function() {
+                $(window).off("beforeunload");
+            });
+
             it("should trigger file selection when either the upload button or the drop zone is clicked", function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.andCallFake(function(event) { event.preventDefault(); });
@@ -31,6 +36,10 @@ define(
                 clickSpy.reset();
                 this.uploadButton.click();
                 expect(clickSpy).toHaveBeenCalled();
+            });
+
+            it('should not show a notification message if there are no active video uploads', function () {
+                expect(this.view.onBeforeUnload()).toBeUndefined();
             });
 
             var makeUploadUrl = function(fileName) {
@@ -152,6 +161,10 @@ define(
                                 });
                             });
 
+                            it('should show a notification message when there are active video uploads', function () {
+                                expect(this.view.onBeforeUnload()).toBe("Your video uploads are not complete.");
+                            });
+
                             // TODO: test progress update; the libraries we are using to mock ajax
                             // do not currently support progress events. If we upgrade to Jasmine
                             // 2.0, the latest version of jasmine-ajax (mock-ajax.js) does have the
@@ -209,6 +222,21 @@ define(
                                                     ActiveVideoUpload.STATUS_UPLOADING
                                                 );
                                                 expect($uploadElem).not.toHaveClass("queued");
+                                            });
+                                        }
+
+                                        // If we're uploading more files than the one we've closed above, 
+                                        // the unload warning should still be shown
+                                        if (caseInfo.numFiles > 1) {
+                                            it('should show notification when videos are still uploading', 
+                                                function () {
+                                                    expect(this.view.onBeforeUnload()).toBe(
+                                                        "Your video uploads are not complete.");
+                                            });
+                                        } else {
+                                            it('should not show notification once video uploads are complete', 
+                                                function () {
+                                                    expect(this.view.onBeforeUnload()).toBeUndefined();
                                             });
                                         }
                                     });

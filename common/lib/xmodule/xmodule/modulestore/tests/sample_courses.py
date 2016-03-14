@@ -7,7 +7,7 @@ The data type and use of it for declaratively creating test courses.
 # fields is a dictionary of keys and values. sub_tree is a collection of BlockInfo
 from collections import namedtuple
 import datetime
-BlockInfo = namedtuple('BlockInfo', 'block_id, category, fields, sub_tree')  # pylint: disable=invalid-name
+BlockInfo = namedtuple('BlockInfo', 'block_id, category, fields, sub_tree')
 default_block_info_tree = [  # pylint: disable=invalid-name
     BlockInfo(
         'chapter_x', 'chapter', {}, [
