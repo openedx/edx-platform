@@ -109,10 +109,6 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             view = request.QUERY_PARAMS.get('view', None)
             grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
             course_key = None
-            if view == 'ids':
-                user_ids = User.objects.filter(organizations=pk).values_list('id', flat=True)
-                return Response(user_ids)
-
             if course_id:
                 course_key = get_course_key(course_id)
 
@@ -129,6 +125,11 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 enrollments_by_user = {}
                 for enrollment in enrollments:
                     enrollments_by_user[enrollment['user']] = enrollment['total']
+
+            # if we only need ids of users in organization return now
+            if view == 'ids':
+                user_ids = users.values_list('id', flat=True)
+                return Response(user_ids)
 
             response_data = []
             if users:
@@ -176,12 +177,15 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             group_type = request.QUERY_PARAMS.get('type', None)
             view = request.QUERY_PARAMS.get('view', None)
             groups = Group.objects.filter(organizations=pk)
+
+            if group_type:
+                groups = groups.filter(groupprofile__group_type=group_type)
+
+            # if we only need ids of groups in organization return now
             if view == 'ids':
                 group_ids = groups.values_list('id', flat=True)
                 return Response(group_ids)
 
-            if group_type:
-                groups = groups.filter(groupprofile__group_type=group_type)
             response_data = []
             if groups:
                 for group in groups:
