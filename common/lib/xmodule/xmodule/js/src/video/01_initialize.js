@@ -296,7 +296,7 @@ function (VideoPlayer, i18n, moment) {
                     .addClass('hidden');
             state.el
                 .find('.video-player .video-error')
-                    .removeClass('hidden');
+                    .removeClass('is-hidden');
 
             return false;
         }
@@ -498,7 +498,7 @@ function (VideoPlayer, i18n, moment) {
             this.el.find('.video-player div')
                 .removeClass('hidden');
             this.el.find('.video-player .video-error')
-                .addClass('hidden');
+                .addClass('is-hidden');
 
             // If in reality the timeout was to short, try to
             // continue loading the YouTube video anyways.
