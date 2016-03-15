@@ -652,7 +652,7 @@ REQUIRE_BASE_URL = "./"
 REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
-REQUIRE_JS = "js/vendor/require.js"
+REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
 # A dictionary of standalone modules to build with almond.js.
 REQUIRE_STANDALONE_MODULES = {}
