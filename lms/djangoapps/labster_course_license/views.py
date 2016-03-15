@@ -99,6 +99,7 @@ def _send_request(url, data):
         "content-type": 'application/json',
         "accept": 'application/json',
     }
+    response = None
 
     try:
         response = requests.post(url, headers=headers, data=json.dumps(data))
