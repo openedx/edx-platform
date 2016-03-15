@@ -10,7 +10,6 @@ from student.models import AnonymousUserId
 
 
 class Command(BaseCommand):
-
     help = """Recreate anonymized ids when django secret key was changed"""
     can_import_settings = True
 
@@ -18,6 +17,7 @@ class Command(BaseCommand):
         from django.conf import settings
         secret_key = settings.SECRET_KEY
         qs = AnonymousUserId.objects.all()
+        remaped_count = 0
         for student in qs:
             hasher = hashlib.md5()
             hasher.update(secret_key)
@@ -35,3 +35,7 @@ class Command(BaseCommand):
                 )
                 student.anonymous_user_id = digest
                 student.save()
+                remaped_count += 1
+        self.stdout.write(
+            "{} ids were changed of total {}".format(remaped_count, qs.count())
+        )
