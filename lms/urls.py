@@ -110,6 +110,9 @@ urlpatterns = (
     # TODO Namespace these!
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
+
+    # Course API for Otto
+    url(r'^api/courseoverview/', include('openedx.core.djangoapps.content.course_overviews.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
