@@ -34,16 +34,6 @@
 
           var modal_id = $(this).attr("href");
 
-          if ($(modal_id).hasClass("video-modal")) {
-            //Video modals need to be cloned before being presented as a modal
-            //This is because actions on the video get recorded in the history.
-            //Deleting the video (clone) prevents the odd back button behavior.
-            var modal_clone = $(modal_id).clone(true, true);
-            modal_clone.attr('id', 'modal_clone');
-            $(modal_id).after(modal_clone);
-            modal_id = '#modal_clone';
-          }
-
           $("#lean_overlay").click(function(e) {
             close_modal(modal_id, e);
           });
@@ -96,6 +86,8 @@
             $notice.find("a[rel*=leanModal]").leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
           }
           window.scrollTo(0, 0);
+          // InterSystems: play modal video 
+          $(modal_id + ' video').each(function() {this.play()});          
           e.preventDefault();
         });
       });

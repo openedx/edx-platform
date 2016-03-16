@@ -352,9 +352,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   </div>
 
                   <div class="input">
-                    ## Translators: This is the placeholder text for a field that requests a YouTube video ID for a course video
-                    <input type="text"  dir="ltr" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="${_("your YouTube video's ID")}" autocomplete="off" />
-                    <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
+                    ## Translators: This is the placeholder text for a field that requests a YouTube video ID for a course video.  InterSystems: adds other video types
+                    <input type="text" dir="ltr" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="${_("YouTube videos ID, video URL, or embed code")}" autocomplete="off" />
+                    <span class="tip tip-stacked">${_("Enter a YouTube video ID, a URL to a browser compatible video file, or an embed code.")}</span>
+
                   </div>
                 </li>
                 % endif

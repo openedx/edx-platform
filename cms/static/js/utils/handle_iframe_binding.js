@@ -18,8 +18,8 @@ define(["jquery"], function($) {
             if ($(this).prop('tagName') === 'IFRAME') {
                 var ifr_source = $(this).attr('src');
 
-                // Modify iframe src only if it is not empty
-                if (ifr_source) {
+                // InterSystems: Modify iframe src only if it is not empty and not a data url
+                if (ifr_source && ifr_source.substr(0, 5) != 'data:') {
                     var wmode = "wmode=transparent";
                     if (ifr_source.indexOf('?') !== -1) {
                         var getQString = ifr_source.split('?');

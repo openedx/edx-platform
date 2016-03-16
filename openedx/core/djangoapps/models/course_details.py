@@ -258,15 +258,19 @@ class CourseDetails(object):
         if not raw_video:
             return None
 
-        keystring_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
-        if keystring_matcher is None:
-            keystring_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', raw_video)
-
-        if keystring_matcher:
-            return keystring_matcher.group(0)
-        else:
-            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
-            return None
+        # InterSystems:  allow BrightCove, YouTube, any web playable video
+        match_patterns = (
+             r'(?<=embed/)[a-zA-Z0-9_-]+',
+             r'<?=\d+:[a-zA-Z0-9_-]+',
+             r'(?<=source src=")[^"]+'
+             r'(^<.+)',
+         )
+        for pattern in match_patterns:
+            match = re.search(pattern, raw_video)
+            if match:
+                return match.group(0)
+        
+        logging.warn("ignoring the content because it doesn't conform to expected pattern: " + raw_video)
 
     @staticmethod
     def recompose_video_tag(video_key):
@@ -277,10 +281,32 @@ class CourseDetails(object):
         # that this is a short-term workaround for the db not storing
         #  the right thing
         result = None
-        if video_key:
-            result = (
-                '<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/' +
-                video_key +
-                '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
-            )
+
+        # InterSystems:  allow BrightCove, YouTube, any web playable video
+        if not video_key:
+            return None
+        
+        video_key = video_key.strip()
+        if video_key.startswith('<'):
+            # It's an embed
+            result = video_key
+            result = re.sub(r'width="\d+"', 'width="560"', result)
+            result = re.sub(r'height="\d+"', 'height="315"', result)
+        
+        elif '//' in video_key:
+            # It's a url
+            video_key = video_key[video_key.find('//'):]  # strip protocol
+            result = """
+              <video style="height: 315px; width: 560px;" controls="">
+                <source src="{url}">
+                This browser cannot play .mp4, .ogg, or .webm files.
+                Try using a different browser, such as Google Chrome.
+            </video>
+            """.format(url=video_key, id=id)
+        
+        else:
+            # It's a Youtube video id
+            result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
+                video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
+        
         return result
