@@ -230,17 +230,16 @@ def _can_enroll_courselike(user, courselike):
     Returns:
         AccessResponse, indicating whether the user can enroll.
     """
-    enrollment_domain = courselike.enrollment_domain
+    # enrollment_domain = courselike.enrollment_domain
     # Courselike objects (e.g., course descriptors and CourseOverviews) have an attribute named `id`
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
 
-    # If using a registration method to restrict enrollment (e.g., Shibboleth)
-    if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
-        if user is not None and user.is_authenticated() and \
-                ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
-            debug("Allow: external_auth of " + enrollment_domain)
-            reg_method_ok = True
+    # ISC: we are hijacking the enrollment domain field for a totally different purpose than 
+    # intended.  User email must match domain to be able to register.
+    if courselike.enrollment_domain:
+        if user is not None and hasattr(user, 'email'):
+            reg_method_ok = user and user.email.lower().endswith('@' + courselike.enrollment_domain.lower())
         else:
             reg_method_ok = False
     else:

@@ -436,6 +436,10 @@ def user_pre_save_callback(sender, **kwargs):
     """
     user = kwargs['instance']
     user._changed_fields = get_changed_fields_dict(user, sender)
+    email = kwargs['instance'].email
+    if email:
+        uname, domain = email.split('@')
+        kwargs['instance'].email = '@'.join([uname,domain.lower()])
 
 
 @receiver(post_save, sender=User)
