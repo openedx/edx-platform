@@ -905,6 +905,7 @@ div.problem .action {
     vertical-align: middle;
     text-transform: uppercase;
     font-weight: 600;
+    display: inline !important;
     @media print {
       display: none;
     }
