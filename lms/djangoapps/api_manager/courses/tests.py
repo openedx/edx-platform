@@ -858,6 +858,24 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(tabs[1]['id'], u'readings')
         self.assertEqual(tabs[1]['content'], self.static_tab2.data)
 
+        # get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tabs[0]['id']
+        )
+        tab1_content = cache.get(cache_key)
+        self.assertTrue(tab1_content is not None)
+        self.assertEqual(tab1_content, self.static_tab1.data)
+
+        # get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tabs[1]['id']
+        )
+        tab2_content = cache.get(cache_key)
+        self.assertTrue(tab2_content is not None)
+        self.assertEqual(tab2_content, self.static_tab2.data)
+
     def test_static_tab_list_get_invalid_course(self):
         #try a bogus course_id to test failure case
         test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id + '/static_tabs'
@@ -873,6 +891,15 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(tab['id'], u'syllabus')
         self.assertEqual(tab['content'], self.static_tab1.data)
 
+        # now try to get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -880,6 +907,78 @@ class CoursesApiTests(ModuleStoreTestCase):
         tab = response.data
         self.assertEqual(tab['id'], u'readings')
         self.assertEqual(tab['content'], self.static_tab2.data)
+
+        # now try to get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab2.data)
+
+    @override_settings(STATIC_TAB_CONTENTS_CACHE_MAX_SIZE_LIMIT=200)
+    def test_static_tab_content_cache_max_size_limit(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['content'], self.static_tab1.data)
+
+        # try to get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
+        # now test static tab with content size greater than 200 bytes
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'readings')
+        self.assertEqual(tab['content'], self.static_tab2.data)
+
+        # try to get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is None)
+
+    @override_settings(STATIC_TAB_CONTENTS_CACHE_TTL=60)
+    def test_static_tab_content_cache_time_to_live(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['content'], self.static_tab1.data)
+
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+
+        # try to get syllabus tab contents from cache
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
+        # now reset the time to 1 minute and 5 seconds from now in future to expire cache
+        reset_time = datetime.now(pytz.UTC) + timedelta(seconds=65)
+        with freeze_time(reset_time):
+            # try to get syllabus tab contents from cache again
+            tab_contents = cache.get(cache_key)
+            self.assertTrue(tab_contents is None)
 
     def test_static_tab_detail_get_invalid_course(self):
         # try a bogus courseId
