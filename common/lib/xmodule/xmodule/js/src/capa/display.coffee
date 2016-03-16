@@ -47,7 +47,7 @@ class @Problem
       icon = $(ev.target).children "i"
       window.globalTooltipManager.openTooltip icon
     @$('.clarification').blur (ev) =>
-      window.globalTooltipManager.hide()
+      window.globalTooltipManager.hideTooltip immediately: true
 
     @bindResetCorrectness()
     if @checkButton.length

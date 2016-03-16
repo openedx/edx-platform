@@ -139,7 +139,7 @@ def enable_jquery_animations(page):
 
 def disable_css_animations(page):
     """
-    Disable CSS3 animations, transitions, transforms.
+    Disable CSS3 animations and transitions.
     """
     page.browser.execute_script("""
         var id = 'no-transitions';
@@ -161,11 +161,6 @@ def disable_css_animations(page):
                     '-o-transition-property: none !important;',
                     '-ms-transition-property: none !important;',
                     'transition-property: none !important;',
-                    '-webkit-transform: none !important;',
-                    '-moz-transform: none !important;',
-                    '-o-transform: none !important;',
-                    '-ms-transform: none !important;',
-                    'transform: none !important;',
                     '-webkit-animation: none !important;',
                     '-moz-animation: none !important;',
                     '-o-animation: none !important;',
