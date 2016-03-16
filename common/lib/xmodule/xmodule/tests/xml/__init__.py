@@ -41,6 +41,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
         """Parse `xml` as an XBlock, and add it to `self._descriptors`"""
+        self.get_asides = Mock(return_value=[])
         descriptor = self.xblock_from_node(
             etree.fromstring(xml),
             None,

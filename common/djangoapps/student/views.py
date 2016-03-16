@@ -701,6 +701,10 @@ def dashboard(request):
         redirect_message = _("The course you are looking for does not start until {date}.").format(
             date=request.GET['notlive']
         )
+    elif 'course_closed' in request.GET:
+        redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
+            date=request.GET['course_closed']
+        )
     else:
         redirect_message = ''
 

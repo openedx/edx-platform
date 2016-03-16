@@ -91,6 +91,8 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
+NOTES_DISABLED_TABS = []
+
 # Silence noisy logs
 import logging
 LOG_OVERRIDES = [

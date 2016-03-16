@@ -176,6 +176,14 @@ SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
+for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+    oldvalue = CODE_JAIL.get(name)
+    if isinstance(oldvalue, dict):
+        for subname, subvalue in value.items():
+            oldvalue[subname] = subvalue
+    else:
+        CODE_JAIL[name] = value
+
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)

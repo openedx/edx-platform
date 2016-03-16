@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-02-24 18:01+0000\n"
+"POT-Creation-Date: 2016-03-04 14:17+0000\n"
 "PO-Revision-Date: 2016-02-11 19:09+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5390,7 +5390,7 @@ msgstr "Básico"
 #. Translators: This label refers to access to course content.
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Access"
-msgstr ""
+msgstr "Acceder"
 
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
@@ -5671,6 +5671,8 @@ msgid ""
 "Any content that has listed this content as a prerequisite will also have "
 "access limitations removed."
 msgstr ""
+"Se eliminarán las restricciones de acceso a cualquier contenido que inscriba"
+" este contenido como prerrequisito."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this %(xblock_type)s (and prerequisite)?"

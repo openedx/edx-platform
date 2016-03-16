@@ -143,6 +143,72 @@ def wrap_xblock(
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
+def wrap_xblock_aside(
+        runtime_class,
+        aside,
+        view,
+        frag,
+        context,                        # pylint: disable=unused-argument
+        usage_id_serializer,
+        request_token,                   # pylint: disable=redefined-outer-name
+        extra_data=None
+):
+    """
+    Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
+    data so that the appropriate javascript module can be loaded onto it.
+
+    :param runtime_class: The name of the javascript runtime class to use to load this block
+    :param aside: An XBlockAside
+    :param view: The name of the view that rendered the fragment being wrapped
+    :param frag: The :class:`Fragment` to be wrapped
+    :param context: The context passed to the view being rendered
+    :param usage_id_serializer: A function to serialize the block's usage_id for use by the
+        front-end Javascript Runtime.
+    :param request_token: An identifier that is unique per-request, so that only xblocks
+        rendered as part of this request will have their javascript initialized.
+    :param extra_data: A dictionary with extra data values to be set on the wrapper
+    """
+
+    if extra_data is None:
+        extra_data = {}
+
+    data = {}
+    data.update(extra_data)
+
+    css_classes = [
+        'xblock-{}'.format(markupsafe.escape(view)),
+        'xblock-{}-{}'.format(
+            markupsafe.escape(view),
+            markupsafe.escape(aside.scope_ids.block_type),
+        ),
+        'xblock_asides-v1'
+    ]
+
+    if frag.js_init_fn:
+        data['init'] = frag.js_init_fn
+        data['runtime-class'] = runtime_class
+        data['runtime-version'] = frag.js_init_version
+
+    data['block-type'] = aside.scope_ids.block_type
+    data['usage-id'] = usage_id_serializer(aside.scope_ids.usage_id)
+    data['request-token'] = request_token
+
+    template_context = {
+        'content': frag.content,
+        'classes': css_classes,
+        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                     for key, value in data.iteritems()),
+    }
+
+    if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
+        # Replace / with \/ so that "</script>" in the data won't break things.
+        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+    else:
+        template_context['js_init_parameters'] = ""
+
+    return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
+
+
 def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, context):  # pylint: disable=unused-argument
     """
     This will replace a link between courseware in the format

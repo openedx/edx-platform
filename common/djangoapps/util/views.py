@@ -374,3 +374,22 @@ def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
+
+
+def add_p3p_header(view_func):
+    """
+    This decorator should only be used with views which may be displayed through the iframe.
+    It adds additional headers to response and therefore gives IE browsers an ability to save cookies inside the iframe
+    Details:
+    http://blogs.msdn.com/b/ieinternals/archive/2013/09/17/simple-introduction-to-p3p-cookie-blocking-frame.aspx
+    http://stackoverflow.com/questions/8048306/what-is-the-most-broad-p3p-header-that-will-work-with-ie
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):
+        """
+        Helper function
+        """
+        response = view_func(request, *args, **kwargs)
+        response['P3P'] = settings.P3P_HEADER
+        return response
+    return inner

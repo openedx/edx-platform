@@ -912,6 +912,13 @@ class DataDownloadPage(PageObject):
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
 
+    @property
+    def generate_ora2_response_report_button(self):
+        """
+        Returns the ORA2 response download button for the current page.
+        """
+        return self.q(css='input[name=export-ora2-data]')
+
     def wait_for_available_report(self):
         """
         Waits for a downloadable report to be available.

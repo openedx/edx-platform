@@ -184,9 +184,6 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
-    # Allow use of the hint managment instructor view.
-    'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
-
     # for load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
@@ -1087,7 +1084,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
-    'clean_headers.middleware.CleanHeadersMiddleware',
+    'header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -1162,6 +1159,9 @@ MIDDLEWARE_CLASSES = (
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
 X_FRAME_OPTIONS = 'ALLOW'
+
+# Platform for Privacy Preferences header
+P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
 
@@ -1976,6 +1976,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Review widgets
+    'openedx.core.djangoapps.coursetalk',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2227,6 +2230,8 @@ BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
 
 ###################### Grade Downloads ######################
+# These keys are used for all of our asynchronous downloadable files, including
+# the ones that contain information other than grades.
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = {
@@ -2240,7 +2245,6 @@ FINANCIAL_REPORTS = {
     'BUCKET': 'edx-financial-reports',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
-
 
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8
@@ -2538,6 +2542,9 @@ ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 # for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
+# These tabs are currently disabled
+NOTES_DISABLED_TABS = ['course_structure', 'tags']
 
 # Configuration used for generating PDF Receipts/Invoices
 PDF_RECEIPT_TAX_ID = 'add here'

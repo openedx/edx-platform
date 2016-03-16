@@ -14,8 +14,7 @@ import logging
 import analytics
 from monkey_patch import (
     third_party_auth,
-    django_db_models_options,
-    django_utils_http_is_safe_url
+    django_db_models_options
 )
 
 import xmodule.x_module
@@ -33,7 +32,6 @@ def run():
     """
     third_party_auth.patch()
     django_db_models_options.patch()
-    django_utils_http_is_safe_url.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):

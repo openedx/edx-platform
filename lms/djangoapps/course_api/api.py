@@ -2,7 +2,7 @@
 Course API
 """
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.exceptions import PermissionDenied
 
 from lms.djangoapps.courseware.courses import (
@@ -19,6 +19,8 @@ def get_effective_user(requesting_user, target_username):
     """
     if target_username == requesting_user.username:
         return requesting_user
+    elif target_username == '':
+        return AnonymousUser()
     elif can_view_courses_for_username(requesting_user, target_username):
         return User.objects.get(username=target_username)
     else:
