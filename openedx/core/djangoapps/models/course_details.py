@@ -292,6 +292,16 @@ class CourseDetails(object):
             result = video_key
             result = re.sub(r'width="\d+"', 'width="560"', result)
             result = re.sub(r'height="\d+"', 'height="315"', result)
+
+        # InterSystems: accommodate BrightCove videos 
+        elif 'brightcove' in video_key or 'bcove' in video_key:
+            # BrightCove urls will return an embed code and some JS
+            # and need to be displayed in an iframe
+            video_key = video_key[video_key.find('//'):]  # strip protocol
+            result = """
+              <iframe width="560" height="315" src="{0}"
+               frameborder="0" allowfullscreen=""></iframe>
+            """.format(video_key)
         
         elif '//' in video_key:
             # It's a url
