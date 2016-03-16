@@ -2,83 +2,87 @@
 Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
-
+from path import Path
 import os.path
-import re
-
-from django.core.exceptions import ImproperlyConfigured
-from django.contrib.staticfiles.storage import StaticFilesStorage
-from django.utils._os import safe_join
 from django.conf import settings
-
-from openedx.core.djangoapps.theming.helpers import (
-    get_base_theme_dir,
-    get_project_root_name,
-    get_current_site_theme_dir,
-)
+from django.core.exceptions import ImproperlyConfigured
+from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
+from django.utils._os import safe_join
 
 
-class ComprehensiveThemingStorage(StaticFilesStorage):
+class ComprehensiveThemingAwareMixin(object):
     """
     Mixin for Django storage system to make it aware of the currently-active
     comprehensive theme, so that it can generate theme-scoped URLs for themed
     static assets.
     """
     def __init__(self, *args, **kwargs):
-        super(ComprehensiveThemingStorage, self).__init__(*args, **kwargs)
-        themes_dir = get_base_theme_dir()
-        if not themes_dir:
-            self.themes_location = None
+        super(ComprehensiveThemingAwareMixin, self).__init__(*args, **kwargs)
+        theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
+        if not theme_dir:
+            self.theme_location = None
             return
 
-        if not isinstance(themes_dir, basestring):
+        if not isinstance(theme_dir, basestring):
             raise ImproperlyConfigured("Your COMPREHENSIVE_THEME_DIR setting must be a string")
 
-        self.themes_location = themes_dir
+        root = Path(settings.PROJECT_ROOT)
+        if root.name == "":
+            root = root.parent
 
-    def themed(self, name, theme_dir):
+        component_dir = Path(theme_dir) / root.name
+        self.theme_location = component_dir / "static"
+
+    @property
+    def prefix(self):
+        """
+        This is used by the ComprehensiveThemeFinder in the collection step.
+        """
+        theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
+        if not theme_dir:
+            return None
+        theme_name = os.path.basename(os.path.normpath(theme_dir))
+        return "themes/{name}/".format(name=theme_name)
+
+    def themed(self, name):
         """
         Given a name, return a boolean indicating whether that name exists
         as a themed asset in the comprehensive theme.
         """
-        # Nothing can be themed if we don't have a theme location or required params.
-        if not all((self.themes_location, theme_dir, name)):
+        # Nothing can be themed if we don't have a theme location.
+        if not self.theme_location:
             return False
 
-        themed_path = "/".join([
-            self.themes_location,
-            theme_dir,
-            get_project_root_name(),
-            "static/"
-        ])
-        name = name[1:] if name.startswith("/") else name
-        path = safe_join(themed_path, name)
+        path = safe_join(self.theme_location, name)
         return os.path.exists(path)
 
     def path(self, name):
         """
         Get the path to the real asset on disk
         """
-        try:
-            theme_dir, asset_path = name.split("/", 1)
-            if self.themed(asset_path, theme_dir):
-                name = asset_path
-                base = self.themes_location + "/" + theme_dir + "/" + get_project_root_name() + "/static/"
-            else:
-                base = self.location
-        except ValueError:
-            # in case we don't '/' in name
+        if self.themed(name):
+            base = self.theme_location
+        else:
             base = self.location
-        if base == settings.STATIC_ROOT:
-            name = re.sub(r"/?(?P<theme>[^/]+)/(?P<system>lms|cms)/static/", r"\g<theme>/", name)
         path = safe_join(base, name)
         return os.path.normpath(path)
 
-    def url(self, name):
+    def url(self, name, *args, **kwargs):
         """
         Add the theme prefix to the asset URL
         """
-        theme_dir = get_current_site_theme_dir()
-        if self.themed(name, theme_dir):
-            name = theme_dir + "/" + name
-        return super(ComprehensiveThemingStorage, self).url(name)
+        if self.themed(name):
+            name = self.prefix + name
+        return super(ComprehensiveThemingAwareMixin, self).url(name, *args, **kwargs)
+
+
+class CachedComprehensiveThemingStorage(
+        ComprehensiveThemingAwareMixin,
+        CachedFilesMixin,
+        StaticFilesStorage
+):
+    """
+    Used by the ComprehensiveThemeFinder class. Mixes in support for cached
+    files and comprehensive theming in static files.
+    """
+    pass

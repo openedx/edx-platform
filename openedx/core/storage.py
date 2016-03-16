@@ -1,16 +1,15 @@
 """
 Django storage backends for Open edX.
 """
-from django.contrib.staticfiles.storage import StaticFilesStorage
+from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from pipeline.storage import PipelineMixin, NonPackagingMixin
 from require.storage import OptimizedFilesMixin
-from openedx.core.djangoapps.theming.storage import ComprehensiveThemingStorage
 
 
 class ProductionStorage(
-        ComprehensiveThemingStorage,
         OptimizedFilesMixin,
         PipelineMixin,
+        CachedFilesMixin,
         StaticFilesStorage
 ):
     """
@@ -21,7 +20,6 @@ class ProductionStorage(
 
 
 class DevelopmentStorage(
-        ComprehensiveThemingStorage,
         NonPackagingMixin,
         PipelineMixin,
         StaticFilesStorage
