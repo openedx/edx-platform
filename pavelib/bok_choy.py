@@ -44,7 +44,7 @@ def parse_bokchoy_opts(options):
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
         'num_processes': int(getattr(options, 'num_processes', 1)),
-        'verify_xss': getattr(options, 'verify_xss', False),
+        'verify_xss': getattr(options, 'verify_xss', os.environ.get('VERIFY_XSS', False)),
         'serversonly': getattr(options, 'serversonly', False),
         'testsonly': getattr(options, 'testsonly', False),
         'default_store': getattr(options, 'default_store', os.environ.get('DEFAULT_STORE', 'split')),
