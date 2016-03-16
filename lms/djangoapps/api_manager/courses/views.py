@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from django.db.models import Avg, Count, Max, Min
 from django.http import Http404
 from django.utils import timezone
@@ -52,6 +53,7 @@ from api_manager.users.serializers import UserSerializer, UserCountByCitySeriali
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
+from .tasks import cache_static_tab_contents
 from progress.serializers import CourseModuleCompletionSerializer
 
 
@@ -370,6 +372,20 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
     resource_uri = '{}/users/'.format(base_uri_without_qs)
     data['resources'].append({'uri': resource_uri})
     return data
+
+
+def _get_static_tab_contents(request, course, tab):
+    """
+    Wrapper around get_static_tab_contents to cache contents for the given static tab
+    """
+
+    cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(course_id=course.id, url_slug=tab.url_slug)
+    contents = cache.get(cache_key)
+    if contents is None:
+        contents = get_static_tab_contents(request, course, tab, wrap_xmodule_display=False)
+        cache_static_tab_contents.delay(cache_key, contents)
+
+    return contents
 
 
 class CourseContentList(SecureAPIView):
@@ -917,11 +933,10 @@ class CoursesStaticTabsList(SecureAPIView):
                 tab_data['id'] = tab.url_slug
                 tab_data['name'] = tab.name
                 if request.GET.get('detail') and request.GET.get('detail') in ['True', 'true']:
-                    tab_data['content'] = get_static_tab_contents(
+                    tab_data['content'] = _get_static_tab_contents(
                         request,
                         course_descriptor,
-                        tab,
-                        wrap_xmodule_display=False
+                        tab
                     )
                 tabs.append(tab_data)
         response_data['tabs'] = tabs
@@ -963,11 +978,10 @@ class CoursesStaticTabsDetail(SecureAPIView):
             if tab.type == 'static_tab' and tab.url_slug == tab_id:
                 response_data['id'] = tab.url_slug
                 response_data['name'] = tab.name
-                response_data['content'] = get_static_tab_contents(
+                response_data['content'] = _get_static_tab_contents(
                     request,
                     course_descriptor,
-                    tab,
-                    wrap_xmodule_display=False
+                    tab
                 )
         if not response_data:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
