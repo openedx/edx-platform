@@ -5,6 +5,7 @@ import unittest
 
 import ddt
 from django.conf import settings
+from django.contrib.auth import get_user
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
@@ -275,6 +276,16 @@ class TestCreateAccount(TestCase):
                 self.assertIsNotNone(preference)
             else:
                 self.assertIsNone(preference)
+
+    # InterSystems            
+    def test_not_logged_in_after_create(self):
+        """
+        Test user not automatically logged in after user creation
+        """
+        response = self.client.post(self.url, self.params)
+        self.assertEqual(response.status_code, 200)
+        user = get_user(self.client)
+        self.assertTrue(user.is_anonymous())                
 
 
 @ddt.ddt

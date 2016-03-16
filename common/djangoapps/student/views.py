@@ -1721,9 +1721,12 @@ def create_account_with_params(request, params):
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    new_user = authenticate(username=user.username, password=params['password'])
-    login(request, new_user)
-    request.session.set_expiry(0)
+
+    # InterSystems: we don't log in the user automatically for InterSystems
+    # new_user = authenticate(username=user.username, password=params['password'])
+    # login(request, new_user)
+    # request.session.set_expiry(0)
+    new_user = None
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
@@ -1780,7 +1783,8 @@ def create_account(request, post_override=None):
         'success': True,
         'redirect_url': redirect_url,
     })
-    set_logged_in_cookies(request, response, user)
+    # InterSystems: don't log in
+    # set_logged_in_cookies(request, response, user)
     return response
 
 
