@@ -10,6 +10,7 @@ import shutil
 import tarfile
 from path import Path as path
 from tempfile import mkdtemp
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -393,7 +394,7 @@ def create_export_tarball(course_module, course_key, context):
 
     Updates the context with any error information if applicable.
     """
-    name = course_module.url_name
+    name = '%s_%s' % (str(datetime.now()).replace(' ',''), str(course_module.id).replace('/','-'))
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
     root_dir = path(mkdtemp())
 
