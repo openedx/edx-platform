@@ -33,7 +33,7 @@ lib_paths:
     - xmodule_js/common_static/js/src/logger.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
-    - xmodule_js/common_static/js/vendor/require.js
+    - xmodule_js/common_static/js/vendor/requirejs/require.js
     - js/RequireJS-namespace-undefine.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
