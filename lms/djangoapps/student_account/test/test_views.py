@@ -100,7 +100,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
             follow=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Your password has been reset.")
+        self.assertContains(response, "Your password has been set.")
 
         # Log the user out to clear session data
         self.client.logout()
@@ -116,7 +116,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
             follow=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "This password reset link is invalid. It may have been used already.")
+        self.assertContains(response, "The password reset link was invalid, possibly because the link has already been used.")
 
         self.client.logout()
 
