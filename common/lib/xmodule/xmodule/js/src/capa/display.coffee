@@ -5,7 +5,6 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
-    @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
     # ensure that we wait a minimum of ~ 1s before transitioning the check
@@ -13,7 +12,7 @@ class @Problem
     @has_timed_out = false
     @has_response = false
 
-    @render(@content)
+    @render()
 
   $: (selector) ->
     $(selector, @el)
