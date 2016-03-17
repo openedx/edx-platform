@@ -22,8 +22,7 @@ define(
                     uploadButton: this.uploadButton
                 });
                 this.view.render();
-                jasmine.Ajax.useMock();
-                clearAjaxRequests();
+                jasmine.Ajax.install();
                 this.globalAjaxError = jasmine.createSpy();
                 $(document).ajaxError(this.globalAjaxError);
             });
@@ -31,6 +30,7 @@ define(
             // Remove window unload handler triggered by the upload requests
             afterEach(function() {
                 $(window).off("beforeunload");
+                jasmine.Ajax.uninstall();
             });
 
             it("should trigger file selection when either the upload button or the drop zone is clicked", function() {
@@ -53,17 +53,16 @@ define(
             };
 
             var getSentRequests = function() {
-                return _.filter(
-                    ajaxRequests,
-                    function(request) { return request.readyState > 0; }
-                );
+                return jasmine.Ajax.requests.filter(function (request) {
+                    return request.readyState > 0;
+                });
             };
 
             _.each(
                 [
                     {desc: "a single file", numFiles: 1},
                     {desc: "multiple files", numFiles: concurrentUploadLimit},
-                    {desc: "more files than upload limit", numFiles: concurrentUploadLimit + 1},
+                    {desc: "more files than upload limit", numFiles: concurrentUploadLimit + 1}
                 ],
                 function(caseInfo) {
                     var fileNames = _.map(
@@ -88,7 +87,7 @@ define(
                                 }
                             });
                             this.view.$(".js-file-input").change();
-                            this.request = mostRecentAjaxRequest();
+                            this.request = jasmine.Ajax.requests.mostRecent();
                         });
 
                         it("should trigger the correct request", function() {
@@ -105,14 +104,14 @@ define(
                         });
 
                         it("should trigger the global AJAX error handler on server error", function() {
-                            this.request.response({status: 500});
+                            this.request.respondWith({status: 500});
                             expect(this.globalAjaxError).toHaveBeenCalled();
                         });
 
                         describe("and successful server response", function() {
                             beforeEach(function() {
-                                clearAjaxRequests();
-                                this.request.response({
+                                jasmine.Ajax.requests.reset();
+                                this.request.respondWith({
                                     status: 200,
                                     responseText: JSON.stringify({
                                         files: _.map(
@@ -198,7 +197,7 @@ define(
                                 function(subCaseInfo) {
                                     describe("and upload " + subCaseInfo.desc, function() {
                                         beforeEach(function() {
-                                            getSentRequests()[0].response({status: subCaseInfo.responseStatus});
+                                            getSentRequests()[0].respondWith({status: subCaseInfo.responseStatus});
                                         });
 
                                         it("should update status and progress", function() {

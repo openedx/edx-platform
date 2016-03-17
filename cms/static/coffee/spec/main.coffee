@@ -43,7 +43,7 @@ requirejs.config({
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
-        "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
+        "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
@@ -179,7 +179,7 @@ requirejs.config({
             deps: ["jasmine"]
         },
         "jasmine-stealth": {
-            deps: ["jasmine"]
+            deps: ["jasmine", "underscore", "underscore.string"]
         },
         "jasmine.async": {
             deps: ["jasmine"],

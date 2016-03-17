@@ -6,7 +6,7 @@
 define(["jquery", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_prompt",
         'common/js/spec_helpers/ajax_helpers'],
     function($, NotificationView, Prompt, AjaxHelpers) {
-        var installViewTemplates, waitUntil, createFeedbackSpy, verifyFeedbackShowing,
+        var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden,
@@ -16,32 +16,10 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             appendSetFixtures('<div id="page-notification"></div>');
         };
 
-        waitUntil = function (conditionalFn) {
-            var deferred = $.Deferred(),
-                timeout;
-
-            var fn = function () {
-                if (conditionalFn()) {
-                    timeout && clearTimeout(timeout);
-                    deferred.resolve();
-                } else {
-                    timeout = setTimeout(fn, 50);
-                }
-            };
-
-            setTimeout(fn, 50);
-            return deferred.promise();
-        };
-
         createFeedbackSpy = function(type, intent) {
-            var _class = type[intent];
-            var feedbackSpy = {
-                'constructor': spyOn(_class.prototype, 'initialize'),
-                'show': spyOn(_class.prototype, 'show'),
-                'hide': spyOn(_class.prototype, 'hide')
-            };
-
+            var feedbackSpy = jasmine.stealth.spyOnConstructor(type, intent, ['show', 'hide']);
             feedbackSpy.show.and.returnValue(feedbackSpy);
+            afterEach && afterEach(jasmine.stealth.clearSpies);
             return feedbackSpy;
         };
 

@@ -8,7 +8,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState,
                 collapseItemsAndVerifyState, createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
                 verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
-                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON
+                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
                 mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
                 mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
