@@ -6,57 +6,87 @@ from functools import wraps
 import os
 import os.path
 import contextlib
-import re
 
 from mock import patch
 
 from django.conf import settings
-from django.contrib.sites.models import Site
+from django.template import Engine
+from django.test.utils import override_settings
 
 import edxmako
-from .models import SiteTheme
+
+from .core import comprehensive_theme_changes
+
+EDX_THEME_DIR = settings.REPO_ROOT / "themes" / "edx.org"
 
 
-def with_comprehensive_theme(theme_dir_name):
+def with_comprehensive_theme(theme_dir):
     """
-    A decorator to run a test with a comprehensive theming enabled.
+    A decorator to run a test with a particular comprehensive theme.
+
     Arguments:
-        theme_dir_name (str): directory name of the site for which we want comprehensive theming enabled.
+        theme_dir (str): the full path to the theme directory to use.
+            This will likely use `settings.REPO_ROOT` to get the full path.
+
     """
-    # This decorator creates Site and SiteTheme models for given domain
+    # This decorator gets the settings changes needed for a theme, and applies
+    # them using the override_settings and edxmako.paths.add_lookup context
+    # managers.
+
+    changes = comprehensive_theme_changes(theme_dir)
+
     def _decorator(func):                       # pylint: disable=missing-docstring
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
-            # make a domain name out of directory name
-            domain = "{theme_dir_name}.org".format(theme_dir_name=re.sub(r"\.org$", "", theme_dir_name))
-            site, __ = Site.objects.get_or_create(domain=domain, name=domain)
-            SiteTheme.objects.get_or_create(site=site, theme_dir_name=theme_dir_name)
-            edxmako.paths.add_lookup('main', settings.COMPREHENSIVE_THEME_DIR, prepend=True)
-            with patch('openedx.core.djangoapps.theming.helpers.get_current_site_theme_dir',
-                       return_value=theme_dir_name):
-                with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
-                    return func(*args, **kwargs)
+            with override_settings(COMPREHENSIVE_THEME_DIR=theme_dir, **changes['settings']):
+                default_engine = Engine.get_default()
+                dirs = default_engine.dirs[:]
+                with edxmako.save_lookups():
+                    for template_dir in changes['template_paths']:
+                        edxmako.paths.add_lookup('main', template_dir, prepend=True)
+                        dirs.insert(0, template_dir)
+                    with patch.object(default_engine, 'dirs', dirs):
+                        return func(*args, **kwargs)
         return _decorated
     return _decorator
 
 
-@contextlib.contextmanager
-def with_comprehensive_theme_context(theme=None):
+def with_is_edx_domain(is_edx_domain):
     """
-    A function to run a test as if request was made to the given theme.
+    A decorator to run a test as if request originated from edX domain or not.
 
     Arguments:
-        theme (str): name if the theme or None if no theme is applied
+        is_edx_domain (bool): are we an edX domain or not?
 
     """
-    if theme:
-        domain = '{theme}.org'.format(theme=re.sub(r"\.org$", "", theme))
-        site, __ = Site.objects.get_or_create(domain=domain, name=theme)
-        SiteTheme.objects.get_or_create(site=site, theme_dir_name=theme)
-        edxmako.paths.add_lookup('main', settings.COMPREHENSIVE_THEME_DIR, prepend=True)
-        with patch('openedx.core.djangoapps.theming.helpers.get_current_site_theme_dir',
-                   return_value=theme):
-            with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
+    # This is weird, it's a decorator that conditionally applies other
+    # decorators, which is confusing.
+    def _decorator(func):                       # pylint: disable=missing-docstring
+        if is_edx_domain:
+            # This applies @with_comprehensive_theme to the func.
+            func = with_comprehensive_theme(EDX_THEME_DIR)(func)
+
+        return func
+
+    return _decorator
+
+
+@contextlib.contextmanager
+def with_edx_domain_context(is_edx_domain):
+    """
+    A function to run a test as if request originated from edX domain or not.
+
+    Arguments:
+        is_edx_domain (bool): are we an edX domain or not?
+
+    """
+    if is_edx_domain:
+        changes = comprehensive_theme_changes(EDX_THEME_DIR)
+        with override_settings(COMPREHENSIVE_THEME_DIR=EDX_THEME_DIR, **changes['settings']):
+            with edxmako.save_lookups():
+                for template_dir in changes['template_paths']:
+                    edxmako.paths.add_lookup('main', template_dir, prepend=True)
+
                 yield
     else:
         yield

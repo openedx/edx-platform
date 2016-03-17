@@ -10,7 +10,7 @@ import mock
 import ddt
 from config_models.models import cache
 from branding.models import BrandingApiConfig
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
@@ -30,19 +30,19 @@ class TestFooter(TestCase):
 
     @ddt.data(
         # Open source version
-        (None, "application/json", "application/json; charset=utf-8", "Open edX"),
-        (None, "text/html", "text/html; charset=utf-8", "lms-footer.css"),
-        (None, "text/html", "text/html; charset=utf-8", "Open edX"),
+        (False, "application/json", "application/json; charset=utf-8", "Open edX"),
+        (False, "text/html", "text/html; charset=utf-8", "lms-footer.css"),
+        (False, "text/html", "text/html; charset=utf-8", "Open edX"),
 
         # EdX.org version
-        ("edx.org", "application/json", "application/json; charset=utf-8", "edX Inc"),
-        ("edx.org", "text/html", "text/html; charset=utf-8", "lms-footer-edx.css"),
-        ("edx.org", "text/html", "text/html; charset=utf-8", "edX Inc"),
+        (True, "application/json", "application/json; charset=utf-8", "edX Inc"),
+        (True, "text/html", "text/html; charset=utf-8", "lms-footer-edx.css"),
+        (True, "text/html", "text/html; charset=utf-8", "edX Inc"),
     )
     @ddt.unpack
-    def test_footer_content_types(self, theme, accepts, content_type, content):
+    def test_footer_content_types(self, is_edx_domain, accepts, content_type, content):
         self._set_feature_flag(True)
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer(accepts=accepts)
 
         self.assertEqual(resp.status_code, 200)
@@ -50,10 +50,10 @@ class TestFooter(TestCase):
         self.assertIn(content, resp.content)
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
-    @ddt.data("edx.org", None)
-    def test_footer_json(self, theme):
+    @ddt.data(True, False)
+    def test_footer_json(self, is_edx_domain):
         self._set_feature_flag(True)
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
@@ -142,18 +142,18 @@ class TestFooter(TestCase):
 
     @ddt.data(
         # OpenEdX
-        (None, "en", "lms-footer.css"),
-        (None, "ar", "lms-footer-rtl.css"),
+        (False, "en", "lms-footer.css"),
+        (False, "ar", "lms-footer-rtl.css"),
 
         # EdX.org
-        ("edx.org", "en", "lms-footer-edx.css"),
-        ("edx.org", "ar", "lms-footer-edx-rtl.css"),
+        (True, "en", "lms-footer-edx.css"),
+        (True, "ar", "lms-footer-edx-rtl.css"),
     )
     @ddt.unpack
-    def test_language_rtl(self, theme, language, static_path):
+    def test_language_rtl(self, is_edx_domain, language, static_path):
         self._set_feature_flag(True)
 
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             resp = self._get_footer(accepts="text/html", params={'language': language})
 
         self.assertEqual(resp.status_code, 200)
@@ -161,18 +161,18 @@ class TestFooter(TestCase):
 
     @ddt.data(
         # OpenEdX
-        (None, True),
-        (None, False),
+        (False, True),
+        (False, False),
 
         # EdX.org
-        ("edx.org", True),
-        ("edx.org", False),
+        (True, True),
+        (True, False),
     )
     @ddt.unpack
-    def test_show_openedx_logo(self, theme, show_logo):
+    def test_show_openedx_logo(self, is_edx_domain, show_logo):
         self._set_feature_flag(True)
 
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             params = {'show-openedx-logo': 1} if show_logo else {}
             resp = self._get_footer(accepts="text/html", params=params)
 
@@ -185,17 +185,17 @@ class TestFooter(TestCase):
 
     @ddt.data(
         # OpenEdX
-        (None, False),
-        (None, True),
+        (False, False),
+        (False, True),
 
         # EdX.org
-        ("edx.org", False),
-        ("edx.org", True),
+        (True, False),
+        (True, True),
     )
     @ddt.unpack
-    def test_include_dependencies(self, theme, include_dependencies):
+    def test_include_dependencies(self, is_edx_domain, include_dependencies):
         self._set_feature_flag(True)
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             params = {'include-dependencies': 1} if include_dependencies else {}
             resp = self._get_footer(accepts="text/html", params=params)
 

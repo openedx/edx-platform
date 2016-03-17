@@ -9,7 +9,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
 @attr('shard_1')
@@ -37,7 +37,7 @@ class TestFooter(TestCase):
         "youtube": "https://www.youtube.com/"
     }
 
-    @with_comprehensive_theme("edx.org")
+    @with_is_edx_domain(True)
     def test_edx_footer(self):
         """
         Verify that the homepage, when accessed at edx.org, has the edX footer
@@ -46,6 +46,7 @@ class TestFooter(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'footer-edx-v3')
 
+    @with_is_edx_domain(False)
     def test_openedx_footer(self):
         """
         Verify that the homepage, when accessed at something other than
@@ -55,7 +56,7 @@ class TestFooter(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'footer-openedx')
 
-    @with_comprehensive_theme("edx.org")
+    @with_is_edx_domain(True)
     @override_settings(
         SOCIAL_MEDIA_FOOTER_NAMES=SOCIAL_MEDIA_NAMES,
         SOCIAL_MEDIA_FOOTER_URLS=SOCIAL_MEDIA_URLS

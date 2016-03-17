@@ -100,7 +100,7 @@ function () {
                     .addClass('hidden')
                 .end()
                 .find('.video-player .video-error')
-                    .removeClass('hidden')
+                    .removeClass('is-hidden')
                 .end()
                     .addClass('is-initialized')
                 .find('.spinner')
@@ -123,9 +123,9 @@ function () {
             this.video.removeEventListener('pause', this.onPause, false);
             this.video.removeEventListener('ended', this.onEnded, false);
             this.el
-                .find('.video-player div').removeClass('hidden')
+                .find('.video-player div').removeClass('is-hidden')
                 .end()
-                .find('.video-player .video-error').addClass('hidden')
+                .find('.video-player .video-error').addClass('is-hidden')
                 .end().removeClass('is-initialized')
                 .find('.spinner').attr({'aria-hidden': 'false'});
             this.videoEl.remove();

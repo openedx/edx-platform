@@ -998,6 +998,21 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         response = self.client.get(self.notes_page_url)
         self.assertContains(response, 'Highlights and notes you&#39;ve made in course content')
 
+    # pylint: disable=unused-argument
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    @patch("edxnotes.views.get_notes", return_value={'results': []})
+    @patch("edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})
+    def test_edxnotes_html_tags_should_not_be_escaped(self, mock_get_notes, mock_position):
+        """
+        Tests that explicit html tags rendered correctly.
+        """
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.get(self.notes_page_url)
+        self.assertContains(
+            response,
+            'Get started by making a note in something you just read, like <a href="test_url">Section 1</a>'
+        )
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):
         """

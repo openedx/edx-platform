@@ -45,7 +45,7 @@
 
 # Third-party:
 git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline==1.5.3
-git+https://github.com/edx/django-wiki.git@v0.0.7#egg=django-wiki==0.0.7
+git+https://github.com/edx/django-wiki.git@v0.0.5#egg=django-wiki==0.0.5
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
@@ -64,6 +64,9 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 
 # custom opaque-key implementations for CCX
 git+https://github.com/edx/ccx-keys.git@0.1.1#egg=ccx-keys==0.1.1
+
+# NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
+git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
@@ -94,4 +97,4 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.0.3#egg=xblock-lti-consume
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
 -e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.3#egg=xblock-drag-and-drop-v2==2.0.3
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.4#egg=xblock-drag-and-drop-v2==2.0.4
