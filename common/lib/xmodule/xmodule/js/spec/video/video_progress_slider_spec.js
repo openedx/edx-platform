@@ -5,7 +5,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
         });
 
         afterEach(function () {
@@ -18,13 +18,13 @@
         describe('constructor', function () {
             describe('on a non-touch based device', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').andCallThrough();
+                    spyOn($.fn, 'slider').and.callThrough();
 
                     state = jasmine.initializePlayer();
                 });
 
                 it('build the slider', function () {
-                    expect(state.videoProgressSlider.slider).toBe('.slider');
+                    expect(state.videoProgressSlider.slider).toEqual('.slider');
                     expect($.fn.slider).toHaveBeenCalledWith({
                         range: 'min',
                         min: 0,
@@ -37,7 +37,7 @@
 
                 it('build the seek handle', function () {
                     expect(state.videoProgressSlider.handle)
-                        .toBe('.slider .ui-slider-handle');
+                        .toEqual('.slider .ui-slider-handle');
                 });
 
                 it('add ARIA attributes to time control', function () {
@@ -56,7 +56,7 @@
             describe('on a touch-based device', function () {
                 it('does not build the slider on iPhone', function () {
 
-                    window.onTouchBasedDevice.andReturn(['iPhone']);
+                    window.onTouchBasedDevice.and.returnValue(['iPhone']);
 
                     state = jasmine.initializePlayer();
 
@@ -67,7 +67,7 @@
                 });
                 $.each(['iPad', 'Android'], function (index, device) {
                     it('build the slider on ' + device, function () {
-                        window.onTouchBasedDevice.andReturn([device]);
+                        window.onTouchBasedDevice.and.returnValue([device]);
 
                         state = jasmine.initializePlayer();
 
@@ -87,12 +87,12 @@
 
                 beforeEach(function () {
                     spy = spyOn(state.videoProgressSlider, 'buildSlider');
-                    spy.andCallThrough();
+                    spy.and.callThrough();
                     state.videoPlayer.play();
                 });
 
                 it('does not build the slider', function () {
-                    expect(spy.callCount).toEqual(0);
+                    expect(spy.calls.count()).toEqual(0);
                 });
             });
 
@@ -106,7 +106,7 @@
 
             describe('when frozen', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').andCallThrough();
+                    spyOn($.fn, 'slider').and.callThrough();
                     state.videoProgressSlider.frozen = true;
                     state.videoProgressSlider.updatePlayTime(20, 120);
                 });
@@ -118,7 +118,7 @@
 
             describe('when not frozen', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').andCallThrough();
+                    spyOn($.fn, 'slider').and.callThrough();
                     state.videoProgressSlider.frozen = false;
                     state.videoProgressSlider.updatePlayTime({
                         time: 20,
@@ -149,8 +149,8 @@
             beforeEach(function () {
                 state = jasmine.initializePlayer();
 
-                spyOn($.fn, 'slider').andCallThrough();
-                spyOn(state.videoPlayer, 'onSlideSeek').andCallThrough();
+                spyOn($.fn, 'slider').and.callThrough();
+                spyOn(state.videoPlayer, 'onSlideSeek').and.callThrough();
             });
 
             // Disabled 12/30/13 due to flakiness in master
@@ -175,12 +175,16 @@
         describe('onStop', function () {
 
             beforeEach(function () {
-                jasmine.Clock.useMock();
+                jasmine.clock().install();
 
                 state = jasmine.initializePlayer();
 
-                spyOn(state.videoPlayer, 'onSlideSeek').andCallThrough();
+                spyOn(state.videoPlayer, 'onSlideSeek').and.callThrough();
             });
+
+            afterEach(function () {
+                jasmine.clock().uninstall();
+            })
 
             // Disabled 12/30/13 due to flakiness in master
             xit('freeze the slider', function () {
@@ -206,7 +210,7 @@
                     jQuery.Event('stop'), { value: 20 }
                 );
 
-                jasmine.Clock.tick(200);
+                jasmine.clock().tick(200);
 
                 expect(state.videoProgressSlider.frozen).toBeFalsy();
             });
@@ -255,7 +259,7 @@
 
                 spyOnEvent(state.videoProgressSlider.handle, 'focus');
                 spyOn(state.videoProgressSlider, 'notifyThroughHandleEnd')
-                    .andCallThrough();
+                    .and.callThrough();
             });
 
             it('params.end = true', function () {
@@ -280,17 +284,14 @@
                 );
             });
 
-            it('is called when video plays', function () {
+            it('is called when video plays', function (done) {
                 state.videoPlayer.play();
-
-                waitsFor(function () {
+                jasmine.waitForInputAjax(function() {
                     return state.videoPlayer.isPlaying();
-                }, 'duration is set, video is playing', 5000);
+                }).done(function() {
+                    expect(state.videoProgressSlider.notifyThroughHandleEnd).toHaveBeenCalledWith({end: false});
+                }).always(done);
 
-                runs(function () {
-                    expect(state.videoProgressSlider.notifyThroughHandleEnd)
-                        .toHaveBeenCalledWith({end: false});
-                });
             });
         });
 

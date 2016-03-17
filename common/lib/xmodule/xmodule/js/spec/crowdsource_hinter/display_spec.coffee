@@ -1,16 +1,16 @@
 describe 'Crowdsourced hinter', ->
   beforeEach ->
     window.update_schematics = ->
-    jasmine.stubRequests()
     # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'crowdsource_hinter.html'
+    jasmine.stubRequests()
     @hinter = new Hinter($('#hinter-root'))
 
   describe 'high-level integration tests', ->
     # High-level, happy-path tests for integration with capa problems.
     beforeEach ->
       # Make a more thorough $.postWithPrefix mock.
-      spyOn($, 'postWithPrefix').andCallFake( ->
+      spyOn($, 'postWithPrefix').and.callFake( ->
         last_argument = arguments[arguments.length - 1]
         if typeof last_argument == 'function'
           response =
@@ -30,7 +30,7 @@ describe 'Crowdsourced hinter', ->
       expect($.postWithPrefix).toHaveBeenCalledWith("#{@hinter.url}/get_hint", 'test answer', jasmine.any(Function))
 
     it 'knows when a capa problem is graded usig check_fd.', ->
-      spyOn($, 'ajaxWithPrefix').andCallFake((url, settings) ->
+      spyOn($, 'ajaxWithPrefix').and.callFake((url, settings) ->
         response =
           success: 'incorrect'
           contents: 'mock grader response'
@@ -42,7 +42,7 @@ describe 'Crowdsourced hinter', ->
 
   describe 'capture_problem', ->
     beforeEach ->
-      spyOn($, 'postWithPrefix').andReturn(null)
+      spyOn($, 'postWithPrefix').and.returnValue(null)
 
     it 'gets hints for an incorrect answer', ->
       data = ['some answers', '<thing class="incorrect">']

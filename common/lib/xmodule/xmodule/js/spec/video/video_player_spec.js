@@ -10,7 +10,7 @@ function (VideoPlayer) {
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
         });
 
         afterEach(function () {
@@ -73,7 +73,7 @@ function (VideoPlayer) {
                 var events;
 
                 jasmine.stubRequests();
-                spyOn(window.YT, 'Player').andCallThrough();
+                spyOn(window.YT, 'Player').and.callThrough();
                 state = jasmine.initializePlayerYouTube();
                 state.videoEl = $('video, iframe');
 
@@ -107,9 +107,9 @@ function (VideoPlayer) {
                 state = jasmine.initializePlayerYouTube();
                 state.videoEl = state.el.find('video, iframe').width(100);
                 player = state.videoPlayer.player;
-                player.getAvailablePlaybackRates.andReturn([1]);
+                player.getAvailablePlaybackRates.and.returnValue([1]);
                 state.currentPlayerMode = 'html5';
-                spyOn(window.YT, 'Player').andCallThrough();
+                spyOn(window.YT, 'Player').and.callThrough();
                 state.videoPlayer.onReady();
 
                 expect(YT.Player).toHaveBeenCalledWith('id', {
@@ -137,7 +137,7 @@ function (VideoPlayer) {
             describe('when on a touch based device', function () {
                 $.each(['iPad', 'Android'], function (index, device) {
                     it('create video volume control on' + device, function () {
-                        window.onTouchBasedDevice.andReturn([device]);
+                        window.onTouchBasedDevice.and.returnValue([device]);
                         state = jasmine.initializePlayer();
 
                         state.videoEl = $('video, iframe');
@@ -167,7 +167,7 @@ function (VideoPlayer) {
                 state = jasmine.initializePlayer();
 
                 state.videoEl = $('video, iframe');
-                spyOn(state.videoPlayer, 'play').andCallThrough();
+                spyOn(state.videoPlayer, 'play').and.callThrough();
                 state.videoPlayer.onReady();
             });
 
@@ -204,7 +204,7 @@ function (VideoPlayer) {
                     state = jasmine.initializePlayerYouTube();
 
                     state.videoEl = $('video, iframe');
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.ENDED
                     });
@@ -226,7 +226,7 @@ function (VideoPlayer) {
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
                     state.videoEl = $('video, iframe');
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
 
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.PAUSED
@@ -250,15 +250,15 @@ function (VideoPlayer) {
                     state = jasmine.initializePlayer();
                     oldState = state;
 
-                    spyOn(oldState.videoPlayer, 'onPause').andCallThrough();
+                    spyOn(oldState.videoPlayer, 'onPause').and.callThrough();
 
                     // Now initialize a second instance.
                     state = jasmine.initializePlayer();
 
                     state.videoEl = $('video, iframe');
 
-                    spyOn(window, 'setInterval').andReturn(100);
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn(window, 'setInterval').and.returnValue(100);
+                    spyOn($.fn, 'trigger').and.callThrough();
 
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.PLAYING
@@ -289,7 +289,7 @@ function (VideoPlayer) {
 
                     state.videoEl = $('video, iframe');
 
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.PLAYING
                     });
@@ -319,7 +319,7 @@ function (VideoPlayer) {
                     state = jasmine.initializePlayer();
 
                     state.videoEl = $('video, iframe');
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
                     state.videoPlayer.onStateChange({
                         data: YT.PlayerState.ENDED
                     });
@@ -362,59 +362,51 @@ function (VideoPlayer) {
         describe('onSeek', function () {
             beforeEach(function () {
                 // jasmine.Clock can't be used to fake out debounce with newer versions of underscore
-                spyOn(_, 'debounce').andCallFake(function (func) {
+                spyOn(_, 'debounce').and.callFake(function (func) {
                     return function () {
                         func.apply(this, arguments);
                     };
                 });
                 state = jasmine.initializePlayer();
                 state.videoEl = $('video, iframe');
-                spyOn(state.videoPlayer, 'duration').andReturn(120);
+                spyOn(state.videoPlayer, 'duration').and.returnValue(120);
             });
 
             describe('when the video is playing', function () {
-                beforeEach(function () {
-                    runs(function () {
-                        state.videoPlayer.play();
-                    });
+                beforeEach(function (done) {
+                    state.videoPlayer.play();
 
-                    waitsFor(function () {
+                    jasmine.waitForInputAjax(function() {
                         return state.videoPlayer.isPlaying();
-                    }, 'video didn\'t start playing', WAIT_TIMEOUT);
+                    }).done(done);
                 });
 
 
                 it('call runTimer in seekTo on player', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer, 'stopTimer');
-                        spyOn(state.videoPlayer, 'runTimer');
-                        state.videoPlayer.seekTo(10);
-                        expect(state.videoPlayer.currentTime).toBe(10);
-                        expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
-                        expect(state.videoPlayer.runTimer).toHaveBeenCalled();
-                    });
+                    spyOn(state.videoPlayer, 'stopTimer');
+                    spyOn(state.videoPlayer, 'runTimer');
+                    state.videoPlayer.seekTo(10);
+                    expect(state.videoPlayer.currentTime).toBe(10);
+                    expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
+                    expect(state.videoPlayer.runTimer).toHaveBeenCalled();
                 });
 
                 it('seek the player', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer.player, 'seekTo').andCallThrough();
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 30 }
-                        );
-                        expect(state.videoPlayer.currentTime).toBe(30);
-                        expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(30, true);
-                    });
+                    spyOn(state.videoPlayer.player, 'seekTo').and.callThrough();
+                    state.videoProgressSlider.onSlide(
+                        jQuery.Event('slide'), { value: 30 }
+                    );
+                    expect(state.videoPlayer.currentTime).toBe(30);
+                    expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(30, true);
                 });
 
                 it('call updatePlayTime on player', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 30 }
-                        );
-                        expect(state.videoPlayer.currentTime).toBe(30);
-                        expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(30, true);
-                    });
+                    spyOn(state.videoPlayer, 'updatePlayTime').and.callThrough();
+                    state.videoProgressSlider.onSlide(
+                        jQuery.Event('slide'), { value: 30 }
+                    );
+                    expect(state.videoPlayer.currentTime).toBe(30);
+                    expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(30, true);
                 });
             });
 
@@ -433,7 +425,7 @@ function (VideoPlayer) {
             describe('when the video is not playing', function () {
                 beforeEach(function () {
                     spyOn(state.videoPlayer, 'setPlaybackRate')
-                        .andCallThrough();
+                        .and.callThrough();
                 });
 
                 it('video has a correct speed', function () {
@@ -442,7 +434,7 @@ function (VideoPlayer) {
                     expect(state.videoPlayer.setPlaybackRate)
                         .toHaveBeenCalledWith('2.0', true);
                     state.videoPlayer.onPlay();
-                    expect(state.videoPlayer.setPlaybackRate.calls.length)
+                    expect(state.videoPlayer.setPlaybackRate.calls.count())
                         .toEqual(1);
                 });
             });
@@ -483,7 +475,7 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
+                spyOn(state.videoPlayer, 'updatePlayTime').and.callThrough();
             });
 
             describe(
@@ -535,29 +527,26 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state.videoPlayer, 'update').andCallThrough();
-                spyOn(state.videoPlayer, 'pause').andCallThrough();
+                spyOn(state.videoPlayer, 'update').and.callThrough();
+                spyOn(state.videoPlayer, 'pause').and.callThrough();
                 spyOn(state.videoProgressSlider, 'notifyThroughHandleEnd')
-                    .andCallThrough();
+                    .and.callThrough();
             });
 
             it(
                 'video is paused on first endTime, start & end time are reset',
-                function ()
+                function (done)
             {
                 var duration;
 
-                state.videoProgressSlider.notifyThroughHandleEnd.reset();
-                state.videoPlayer.pause.reset();
+                state.videoProgressSlider.notifyThroughHandleEnd.calls.reset();
+                state.videoPlayer.pause.calls.reset();
                 state.videoPlayer.play();
 
-                waitsFor(function () {
+                jasmine.waitForInputAjax(function () {
                     duration = Math.round(state.videoPlayer.currentTime);
-
-                    return state.videoPlayer.pause.calls.length === 1;
-                }, 'pause() has been called', WAIT_TIMEOUT);
-
-                runs(function () {
+                    return state.videoPlayer.pause.calls.count() === 1;
+                }).then(function () {
                     expect(state.videoPlayer.startTime).toBe(0);
                     expect(state.videoPlayer.endTime).toBe(null);
 
@@ -565,7 +554,7 @@ function (VideoPlayer) {
 
                     expect(state.videoProgressSlider.notifyThroughHandleEnd)
                         .toHaveBeenCalledWith({end: true});
-                });
+                }).always(done);
             });
         });
 
@@ -573,14 +562,14 @@ function (VideoPlayer) {
             beforeEach(function () {
                 state = jasmine.initializePlayerYouTube();
                 state.videoEl = $('video, iframe');
-                spyOn(state.videoCaption, 'updatePlayTime').andCallThrough();
-                spyOn(state.videoProgressSlider, 'updatePlayTime').andCallThrough();
+                spyOn(state.videoCaption, 'updatePlayTime').and.callThrough();
+                spyOn(state.videoProgressSlider, 'updatePlayTime').and.callThrough();
             });
 
-            it('update the video playback time', function () {
+            it('update the video playback time', function (done) {
                 var duration = 0;
 
-                waitsFor(function () {
+                jasmine.waitForInputAjax(function () {
                     duration = state.videoPlayer.duration();
 
                     if (duration > 0) {
@@ -588,40 +577,34 @@ function (VideoPlayer) {
                     }
 
                     return false;
-                }, 'Video is fully loaded.', WAIT_TIMEOUT);
-
-                runs(function () {
+                }, 1000).then(function () {
                     state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect($('.vidtime')).toHaveHtml('1:00 / 1:00');
-                });
+                }).always(done);
             });
 
-            it('update the playback time on caption', function () {
-                waitsFor(function () {
+            it('update the playback time on caption', function (done) {
+                jasmine.waitForInputAjax(function () {
                     return state.videoPlayer.duration() > 0;
-                }, 'Video is fully loaded.', WAIT_TIMEOUT);
-
-                runs(function () {
+                }, 1000).then(function () {
                     state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
                     expect(state.videoCaption.updatePlayTime)
                         .toHaveBeenCalledWith(60);
-                });
+                }).always(done);
             });
 
-            it('update the playback time on progress slider', function () {
+            it('update the playback time on progress slider', function (done) {
                 var duration = 0;
 
-                waitsFor(function () {
+                jasmine.waitForInputAjax(function () {
                     duration = state.videoPlayer.duration();
 
                     return duration > 0;
-                }, 'Video is fully loaded.', WAIT_TIMEOUT);
-
-                runs(function () {
+                }, 1000).then(function () {
                     state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 
@@ -630,7 +613,7 @@ function (VideoPlayer) {
                             time: 60,
                             duration: duration
                         });
-                });
+                }).always(done);
             });
         });
 
@@ -652,15 +635,15 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
-                spyOn(state.videoPlayer.player, 'seekTo').andCallThrough();
+                spyOn(state.videoPlayer, 'updatePlayTime').and.callThrough();
+                spyOn(state.videoPlayer.player, 'seekTo').and.callThrough();
                 spyOn(state.videoProgressSlider, 'updateStartEndTimeRegion')
-                    .andCallThrough();
+                    .and.callThrough();
             });
 
             it(
                 'when duration becomes available, updatePlayTime() is called',
-                function ()
+                function (done)
             {
                 var duration;
 
@@ -669,14 +652,12 @@ function (VideoPlayer) {
 
                 state.videoPlayer.play();
 
-                waitsFor(function () {
+                jasmine.waitForInputAjax(function () {
                     duration = state.videoPlayer.duration();
 
                     return state.videoPlayer.isPlaying() &&
                         state.videoPlayer.initialSeekToStartTime === false;
-                }, 'duration becomes available', WAIT_TIMEOUT);
-
-                runs(function () {
+                }).then(function () {
                     expect(state.videoPlayer.startTime).toBe(START_TIME);
                     expect(state.videoPlayer.endTime).toBe(END_TIME);
 
@@ -688,7 +669,7 @@ function (VideoPlayer) {
 
                     expect(state.videoPlayer.seekToStartTimeOldSpeed)
                         .toBe(state.speed);
-                });
+                }).always(done);
             });
         });
 
@@ -708,7 +689,7 @@ function (VideoPlayer) {
                             seekTo: function () {}
                         },
                         figureOutStartEndTime: jasmine.createSpy(),
-                        figureOutStartingTime: jasmine.createSpy().andReturn(0)
+                        figureOutStartingTime: jasmine.createSpy().and.returnValue(0)
                     },
                     config: {
                         savedVideoPosition: 0,
@@ -723,7 +704,7 @@ function (VideoPlayer) {
                     currentPlayerMode: 'html5',
                     trigger: function () {},
                     browserIsFirefox: false,
-                    isFlashMode: jasmine.createSpy().andReturn(false)
+                    isFlashMode: jasmine.createSpy().and.returnValue(false)
                 };
             });
         });
@@ -733,7 +714,7 @@ function (VideoPlayer) {
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
                     state.videoEl = $('video, iframe');
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
                     $('.add-fullscreen').click();
                 });
 
@@ -752,7 +733,7 @@ function (VideoPlayer) {
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
                     state.videoEl = $('video, iframe');
-                    spyOn($.fn, 'trigger').andCallThrough();
+                    spyOn($.fn, 'trigger').and.callThrough();
                     state.el.addClass('video-fullscreen');
                     state.videoFullScreen.fullScreenState = true;
                     state.videoFullScreen.isFullScreen = true;
@@ -779,7 +760,7 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state.videoPlayer.player, 'getDuration').andCallThrough();
+                spyOn(state.videoPlayer.player, 'getDuration').and.callThrough();
                 state.videoPlayer.duration();
             });
 
@@ -801,11 +782,11 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state, 'getDuration').andCallThrough();
+                spyOn(state, 'getDuration').and.callThrough();
 
                 // When `state.videoPlayer.player.getDuration()` returns a `0`,
                 // the fall-back function `state.getDuration()` will be called.
-                state.videoPlayer.player.getDuration.andReturn(0);
+                state.videoPlayer.player.getDuration.and.returnValue(0);
             });
 
             it('getDuration is called as a fall-back', function () {
@@ -821,7 +802,7 @@ function (VideoPlayer) {
 
                 state.videoEl = $('video, iframe');
 
-                spyOn(state.videoPlayer.player, 'getVolume').andCallThrough();
+                spyOn(state.videoPlayer.player, 'getVolume').and.callThrough();
             });
 
             it('set the player volume', function () {
@@ -841,7 +822,7 @@ function (VideoPlayer) {
                     ['iPad', 'Android', 'iPhone'],
                     function (index, device)
                 {
-                    window.onTouchBasedDevice.andReturn([device]);
+                    window.onTouchBasedDevice.and.returnValue([device]);
                     state = jasmine.initializePlayer();
 
                     state.videoEl = $('video, iframe');
@@ -851,7 +832,7 @@ function (VideoPlayer) {
             });
 
             it('modules are not initialized on iPhone', function () {
-                window.onTouchBasedDevice.andReturn(['iPhone']);
+                window.onTouchBasedDevice.and.returnValue(['iPhone']);
                 state = jasmine.initializePlayer();
 
                 state.videoEl = $('video, iframe');
@@ -870,35 +851,29 @@ function (VideoPlayer) {
                 var message = 'controls become visible after playing starts ' +
                     'on ' + device;
 
-                it(message, function () {
+                it(message, function (done) {
                     var controls;
 
-                    window.onTouchBasedDevice.andReturn([device]);
+                    window.onTouchBasedDevice.and.returnValue([device]);
 
-                    runs(function () {
-                        state = jasmine.initializePlayer();
-                        state.videoEl = $('video, iframe');
-                        controls = state.el.find('.video-controls');
-                    });
+                    state = jasmine.initializePlayer();
+                    state.videoEl = $('video, iframe');
+                    controls = state.el.find('.video-controls');
 
-                    waitsFor(function () {
+                    jasmine.waitForInputAjax(function () {
                         return state.el.hasClass('is-initialized');
-                    },'Video is not initialized.' , WAIT_TIMEOUT);
-
-                    runs(function () {
+                    }).then(function () {
                         expect(controls).toHaveClass('is-hidden');
                         state.videoPlayer.play();
-                    });
+                    }).always(done);
 
-                    waitsFor(function () {
+                    jasmine.waitForInputAjax(function () {
                         var duration = state.videoPlayer.duration();
 
                         return duration > 0 && state.videoPlayer.isPlaying();
-                    },'Video does not play.' , WAIT_TIMEOUT);
-
-                    runs(function () {
+                    }).then(function () {
                         expect(controls).not.toHaveClass('is-hidden');
-                    });
+                    }).always(done);
                 });
             });
         });
@@ -916,13 +891,13 @@ function (VideoPlayer) {
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', ['setPlaybackRate'])
                     },
-                    isFlashMode: jasmine.createSpy().andReturn(false)
+                    isFlashMode: jasmine.createSpy().and.returnValue(false)
                 };
             });
 
             describe('always', function () {
                 it('convert the current time to the new speed', function () {
-                    state.isFlashMode.andReturn(true);
+                    state.isFlashMode.and.returnValue(true);
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
                     expect(state.videoPlayer.currentTime).toBe('120.000');
                 });
@@ -939,17 +914,17 @@ function (VideoPlayer) {
         describe('setPlaybackRate', function () {
             beforeEach(function () {
                 state = {
-                    youtubeId: jasmine.createSpy().andReturn('videoId'),
-                    isFlashMode: jasmine.createSpy().andReturn(false),
-                    isHtml5Mode: jasmine.createSpy().andReturn(true),
-                    isYoutubeType: jasmine.createSpy().andReturn(true),
+                    youtubeId: jasmine.createSpy().and.returnValue('videoId'),
+                    isFlashMode: jasmine.createSpy().and.returnValue(false),
+                    isHtml5Mode: jasmine.createSpy().and.returnValue(true),
+                    isYoutubeType: jasmine.createSpy().and.returnValue(true),
                     setPlayerMode: jasmine.createSpy(),
                     trigger: jasmine.createSpy(),
                     videoPlayer: {
                         currentTime: 60,
                         isPlaying: jasmine.createSpy(),
                         seekTo: jasmine.createSpy(),
-                        duration: jasmine.createSpy().andReturn(60),
+                        duration: jasmine.createSpy().and.returnValue(60),
                         updatePlayTime: jasmine.createSpy(),
                         setPlaybackRate: jasmine.createSpy(),
                         player: jasmine.createSpyObj('player', [
@@ -960,9 +935,9 @@ function (VideoPlayer) {
             });
 
             it('in Flash mode and video is playing', function () {
-                state.isFlashMode.andReturn(true);
-                state.isHtml5Mode.andReturn(false);
-                state.videoPlayer.isPlaying.andReturn(true);
+                state.isFlashMode.and.returnValue(true);
+                state.isHtml5Mode.and.returnValue(false);
+                state.videoPlayer.isPlaying.and.returnValue(true);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
                 expect(state.videoPlayer.player.loadVideoById)
@@ -970,9 +945,9 @@ function (VideoPlayer) {
             });
 
             it('in Flash mode and video not started', function () {
-                state.isFlashMode.andReturn(true);
-                state.isHtml5Mode.andReturn(false);
-                state.videoPlayer.isPlaying.andReturn(false);
+                state.isFlashMode.and.returnValue(true);
+                state.isHtml5Mode.and.returnValue(false);
+                state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
                 expect(state.videoPlayer.seekTo).toHaveBeenCalledWith(60);
@@ -986,7 +961,7 @@ function (VideoPlayer) {
             });
 
             it('in HTML5 mode', function () {
-                state.isYoutubeType.andReturn(false);
+                state.isYoutubeType.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
                 expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('0.75');
             });
@@ -994,7 +969,7 @@ function (VideoPlayer) {
             it('Youtube video in FF, with new speed equal 1.0', function () {
                 state.browserIsFirefox = true;
 
-                state.videoPlayer.isPlaying.andReturn(false);
+                state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '1.0');
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
                 expect(state.videoPlayer.player.cueVideoById)
