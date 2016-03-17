@@ -1,0 +1,77 @@
+<!doctype html>
+    {% load i18n %}
+    {% load pipeline %}
+    {% load staticfiles %}
+<!--[if lte IE 9]><html class="ie9 lte9" lang="{{LANGUAGE_CODE}}"><![endif]-->
+<!--[if !IE]><<!--><html lang="{{LANGUAGE_CODE}}"><!--<![endif]-->
+  <head dir="${static.dir_rtl()}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
+
+    {% stylesheet 'style-vendor' %}
+    {% stylesheet 'style-vendor-tinymce-content' %}
+    {% stylesheet 'style-vendor-tinymce-skin' %}
+    {% stylesheet 'style-main' %}
+
+  </head>
+
+  <body class="${static.dir_rtl()} {% block bodyclass %} {% endblock %} lang_{{LANGUAGE_CODE}}">
+    <a class="nav-skip" href="#content">{% trans "Skip to main content" }}</a>
+
+    <script type="text/javascript">
+      window.baseUrl = "{{STATIC_URL}}";
+      window.TENDER_SUBDOMAIN = "{{TENDER_SUBDOMAIN}}";
+      var require = {baseUrl: window.baseUrl};
+    </script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/vendor/require.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}cms/js/require-config.js"></script>
+
+
+    {% with context_course=request.course context_library=request.library %}
+        <!-- view -->
+        <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
+          {% include "widgets/header.html" with online_help_token=None %}
+
+          <div id="page-alert">
+          {%block page_alert %} {% endblock %}
+          </div>
+
+        <div id="content">
+            {% block content %} {% endblock %}
+        </div>
+        {% if user.is_authenticated %}
+            {% include "widgets/sock.html" with online_help_token=None %}
+        {% endif %}
+        {% include "widgets/footer.html" %}
+
+        <script type="text/javascript">
+          require(['common/js/common_libraries'], function () {
+              require(['js/factories/base'], function () {
+                  {% if context_course %}
+                      require(['js/factories/course'], function(CourseFactory) {
+                          CourseFactory({
+                              id: "${context_course.id | escapejs}",
+                              name: "${context_course.display_name_with_default | h}",
+                              url_name: "${context_course.location.name | h}",
+                              org: "${context_course.location.org | h}",
+                              num: "${context_course.location.course | h}",
+                              revision: "${context_course.location.revision | h}"
+                          });
+                      });
+                  {% endif %}
+                  {% if user.is_authenticated %}
+                      require(['js/sock']);
+                  {% endif %}
+                  {% block requirejs %} {% endblock %}
+              });
+          });
+        </script>
+    {% endwith %}
+  </body>
+</html>

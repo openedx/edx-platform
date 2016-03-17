@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.test import RequestFactory
 
 from third_party_auth.decorators import xframe_allow_whitelisted
-from third_party_auth.tests.testutil import TestCase
+from third_party_auth.tests.testutil import TestCase, AUTH_FEATURE_ENABLED
 
 
 @xframe_allow_whitelisted
@@ -19,10 +19,7 @@ def mock_view(_request):
 
 
 # remove this decorator once third_party_auth is enabled in CMS
-@unittest.skipIf(
-    'third_party_auth' not in settings.INSTALLED_APPS,
-    'third_party_auth is not currently installed in CMS'
-)
+@unittest.skipUnless(AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 @ddt.ddt
 class TestXFrameWhitelistDecorator(TestCase):
     """ Test the xframe_allow_whitelisted decorator. """

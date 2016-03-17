@@ -1,0 +1,36 @@
+{% extends "base_django.html" %}
+
+{% load pipeline %}
+{% load i18n third_party_auth_links %}
+
+{% stylesheet 'style-vendor' %}
+{% stylesheet 'style-main' %}
+
+{% block title %}{% trans "Confirm Your Password" %}{% endblock %}
+{%block bodyclass %} is-signedin course view-sudo {% endblock %}
+
+{% block content %}
+
+<div class="wrapper-content wrapper">
+    <section aria-hidden="true" class="content">
+      <div class="content-primary sudo-content">
+        <header>
+          <h2>{% trans "Confirm Your Password to Access the Course Team Settings" %}</h2>
+        </header>
+        <div>
+            <form class="sudo-form" method="post" action="">{% csrf_token %}
+                <ol class="list-input">
+                    <li class="field text required">{{ form.as_p }}</li>
+                </ol>
+                <p class="form-actions">
+                    {# Translators: this is a button to submit password. #}
+                    <button type="submit" id="sudo-button" class="action action-primary">{% trans 'Submit' %}</button>
+                </p>
+
+            {% third_party_auth_links %}
+            </form>
+        </div>
+      </div>
+    </section>
+</div>
+{% endblock %}

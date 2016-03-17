@@ -27,7 +27,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     def setUp(self):
         super(TestOptoutCourseEmails, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        self.course = CourseFactory.create(display_name=course_title)
+        self.course = CourseFactory.create(display_name=course_title, run='T12015')
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
@@ -47,6 +47,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         """Navigate to the instructor dash's email view"""
         # Pull up email view on instructor dashboard
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False

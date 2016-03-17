@@ -5,11 +5,11 @@ URLs for LMS
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
-from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 from microsite_configuration import microsite
 import auth_exchange.views
+from edx_admin import admin
 
 from config_models.views import ConfigurationModelCurrentAPIView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -988,4 +988,10 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             'courseware.views.financial_assistance_request',
             name='submit_financial_assistance_request'
         )
+    )
+
+# Django-sudo
+if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+    urlpatterns += (
+        url(r'^sudo/$', 'sudo.views.sudo'),
     )
