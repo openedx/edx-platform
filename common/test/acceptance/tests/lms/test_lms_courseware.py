@@ -3,7 +3,6 @@
 End-to-end tests for the LMS.
 """
 from nose.plugins.attrib import attr
-from unittest import skip
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -533,7 +532,6 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         ).visit()
         self.assertIn('html 2 dummy body', html2_page.get_selected_tab_content())
 
-    @skip('Fix a11y test errors.')
     @attr('a11y')
     def test_courseware_a11y(self):
         """

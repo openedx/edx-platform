@@ -233,7 +233,7 @@ class CoursewarePage(CoursePage):
         """ Returns the usage id of active sequence item """
         get_active = lambda el: 'active' in el.get_attribute('class')
         attribute_value = lambda el: el.get_attribute('data-id')
-        return self.q(css='#sequence-list a').filter(get_active).map(attribute_value).results[0]
+        return self.q(css='#sequence-list .nav-item').filter(get_active).map(attribute_value).results[0]
 
     @property
     def breadcrumb(self):
