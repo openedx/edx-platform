@@ -317,6 +317,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -332,6 +333,7 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+        @el.trigger('contentChanged', [@id, response.html])
         @render(response.html)
         @updateProgress response
 
@@ -420,6 +422,8 @@ class @Problem
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
+      if response.success
+        @el.trigger('contentChanged', [@id, response.html])
       @gentle_alert saveMessage
       @updateProgress response
 
