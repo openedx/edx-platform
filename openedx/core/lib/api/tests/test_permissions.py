@@ -4,6 +4,7 @@ import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import TestCase, RequestFactory
+from nose.plugins.attrib import attr
 
 from student.roles import CourseStaffRole, CourseInstructorRole
 from openedx.core.lib.api.permissions import (
@@ -29,6 +30,7 @@ class TestCcxObject(TestObject):
         self.coach = user
 
 
+@attr('shard_2')
 class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
 
@@ -62,6 +64,7 @@ class IsCourseStaffInstructorTests(TestCase):
         self.assertFalse(self.permission.has_object_permission(self.request, None, self.obj))
 
 
+@attr('shard_2')
 class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
 
@@ -106,6 +109,7 @@ class IsMasterCourseStaffInstructorTests(TestCase):
             self.permission.has_permission(post_request, None)
 
 
+@attr('shard_2')
 @ddt.ddt
 class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """

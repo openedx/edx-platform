@@ -6,6 +6,7 @@ import datetime
 import ddt
 import unittest
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.conf import settings
@@ -28,6 +29,7 @@ from ...preferences.api import (
 )
 
 
+@attr('shard_2')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestPreferenceAPI(TestCase):
     """
@@ -319,6 +321,7 @@ class TestPreferenceAPI(TestCase):
         )
 
 
+@attr('shard_2')
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """

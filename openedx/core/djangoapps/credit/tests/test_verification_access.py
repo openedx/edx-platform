@@ -12,6 +12,7 @@ into verify_student.
 """
 
 from mock import patch
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 
@@ -27,6 +28,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from xmodule.partitions.partitions import Group, UserPartition
 
 
+@attr('shard_2')
 class CreateVerificationPartitionTest(ModuleStoreTestCase):
     """
     Tests for applying verification access rules.
@@ -230,6 +232,7 @@ class CreateVerificationPartitionTest(ModuleStoreTestCase):
             return None
 
 
+@attr('shard_2')
 class WriteOnPublishTest(ModuleStoreTestCase):
     """
     Verify that updates to the course descriptor's

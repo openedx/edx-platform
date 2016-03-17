@@ -1,6 +1,7 @@
 """
 Tests for bookmark services.
 """
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 
 
+@attr('shard_2')
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksServiceTests(BookmarksTestsBase):
     """

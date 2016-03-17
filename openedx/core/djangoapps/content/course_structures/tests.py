@@ -2,6 +2,7 @@
 Course Structure Content sub-application test cases
 """
 import json
+from nose.plugins.attrib import attr
 
 from xmodule_django.models import UsageKey
 from xmodule.modulestore.django import SignalHandler
@@ -22,6 +23,7 @@ class SignalDisconnectTestMixin(object):
         SignalHandler.course_published.disconnect(listen_for_course_publish)
 
 
+@attr('shard_2')
 class CourseStructureTaskTests(ModuleStoreTestCase):
     """
     Test cases covering Course Structure task-related workflows

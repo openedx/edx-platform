@@ -4,6 +4,7 @@ Tests for bookmark views.
 
 import ddt
 import json
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 import urllib
 
@@ -63,6 +64,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         return response
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksListViewTests(BookmarksViewsTestsBase):
@@ -367,6 +369,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksDetailViewTests(BookmarksViewsTestsBase):

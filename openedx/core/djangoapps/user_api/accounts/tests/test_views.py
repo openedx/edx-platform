@@ -9,6 +9,7 @@ import ddt
 import hashlib
 import json
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 import unittest
 
@@ -118,6 +119,7 @@ class UserAPITestCase(APITestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
+@attr('shard_2')
 class TestAccountAPI(UserAPITestCase):
     """
     Unit tests for the Account API.
@@ -717,6 +719,7 @@ class TestAccountAPI(UserAPITestCase):
         )
 
 
+@attr('shard_2')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPITransactions(TransactionTestCase):
     """
