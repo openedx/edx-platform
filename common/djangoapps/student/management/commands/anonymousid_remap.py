@@ -20,7 +20,7 @@ class Command(BaseCommand):
         from django.conf import settings
         secret_key = settings.SECRET_KEY
         qs = AnonymousUserId.objects.all()
-        remaped = []
+        remapped = []
         for student in qs:
             hasher = hashlib.md5()
             hasher.update(secret_key)
@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 old_id = student.anonymous_user_id
                 student.anonymous_user_id = digest
                 student.save()
-                remaped.append({
+                remapped.append({
                     "old_id": old_id,
                     "new_id": digest,
                     "email": student.user.email,
@@ -51,7 +51,7 @@ class Command(BaseCommand):
             filename_postfix.strftime('%Y-%m-%d_%H:%M:%S_%Z')
         )
         with open(filename, 'w') as outfile:
-            json.dump({"dump": remaped}, outfile)
+            json.dump({"dump": remapped}, outfile)
         self.stdout.write(
-            "{} ids were changed of total {}".format(len(remaped), qs.count())
+            "{} ids were changed of total {}".format(len(remapped), qs.count())
         )
