@@ -146,7 +146,6 @@ define(
                             });
 
                             it("should display upload status and progress", function() {
-                                var spec = this;
                                 expect(this.$uploadElems.length).toEqual(caseInfo.numFiles);
                                 this.$uploadElems.each(function(i, uploadElem) {
                                     var $uploadElem = $(uploadElem);
@@ -159,7 +158,7 @@ define(
                                             ActiveVideoUpload.STATUS_QUEUED :
                                             ActiveVideoUpload.STATUS_UPLOADING
                                     );
-                                    expect($uploadElem.find(".video-detail-progress").attr("value")).toEqual("0");
+                                    expect($uploadElem.find(".video-detail-progress").val()).toEqual(0);
                                     expect($uploadElem).not.toHaveClass("success");
                                     expect($uploadElem).not.toHaveClass("error");
                                     expect($uploadElem.hasClass("queued")).toEqual(queued);
@@ -207,8 +206,8 @@ define(
                                                 subCaseInfo.statusText
                                             );
                                             expect(
-                                                $uploadElem.find(".video-detail-progress").attr("value")
-                                            ).toEqual(subCaseInfo.progressValue.toString());
+                                                $uploadElem.find(".video-detail-progress").val()
+                                            ).toEqual(subCaseInfo.progressValue);
                                             expect($uploadElem).toHaveClass(subCaseInfo.presentClass);
                                             expect($uploadElem).not.toHaveClass(subCaseInfo.absentClass);
                                         });
