@@ -88,7 +88,7 @@ describe "DiscussionThreadListView", ->
                     <% } %>
                     <label class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
-                            <option value="date">by recent activity</option>
+                            <option value="activity">by recent activity</option>
                             <option value="comments">by most activity</option>
                             <option value="votes">by most votes</option>
                         </select>
@@ -232,8 +232,8 @@ describe "DiscussionThreadListView", ->
                     )
                 ).toEqual(["+25 votes", "+20 votes", "+42 votes", "+12 votes"])
 
-        it "with sort preference date", ->
-            checkRender(@threads, "date", ["Thread1", "Thread4", "Thread2", "Thread3"])
+        it "with sort preference activity", ->
+            checkRender(@threads, "activity", ["Thread1", "Thread2", "Thread3", "Thread4"])
 
         it "with sort preference votes", ->
             checkRender(@threads, "votes", ["Thread4", "Thread1", "Thread2", "Thread3"])
@@ -249,7 +249,7 @@ describe "DiscussionThreadListView", ->
         sortControl = view.$el.find(".forum-nav-sort-control")
         expect(sortControl.val()).toEqual(selected_type)
         sorted_threads = []
-        if new_type == 'date'
+        if new_type == 'activity'
           sorted_threads = [threads[0], threads[3], threads[1], threads[2]]
         else if new_type == 'comments'
           sorted_threads = [threads[0], threads[3], threads[2], threads[1]]
@@ -265,11 +265,11 @@ describe "DiscussionThreadListView", ->
         expect($.ajax).toHaveBeenCalled()
         checkThreadsOrdering(view, sort_order, new_type)
 
-      it "with sort preference date", ->
-          changeSorting(@threads, "comments", "date", ["Thread1", "Thread4", "Thread2", "Thread3"])
+      it "with sort preference activity", ->
+          changeSorting(@threads, "comments", "activity", ["Thread1", "Thread4", "Thread3", "Thread2"])
 
       it "with sort preference votes", ->
-          changeSorting(@threads, "date", "votes", ["Thread4", "Thread1", "Thread2", "Thread3"])
+          changeSorting(@threads, "activity", "votes", ["Thread4", "Thread1", "Thread2", "Thread3"])
 
       it "with sort preference comments", ->
           changeSorting(@threads, "votes", "comments", ["Thread1", "Thread4", "Thread3", "Thread2"])

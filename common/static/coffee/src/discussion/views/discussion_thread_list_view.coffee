@@ -161,7 +161,7 @@ if Backbone?
       voteCounts.hide()
       commentCounts.hide()
       switch @$(".forum-nav-sort-control").val()
-        when "date", "comments"
+        when "activity", "comments"
           commentCounts.show()
         when "votes"
           voteCounts.show()
