@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').andReturn(null);
+                .createSpy('onTouchBasedDevice').and.returnValue(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
             $('.poster .btn-play').click();
             spyOn(state.bumperState.videoCommands, 'execute');
@@ -19,6 +19,9 @@
                 state.bumperState.videoPlayer.destroy();
             }
             window.onTouchBasedDevice = oldOTBD;
+            if (state.videoPlayer) {
+                _.result(state.videoPlayer, 'destroy');
+            }
         });
 
         it('can render the control', function () {
@@ -38,7 +41,7 @@
 
         it('can skip the video on click', function () {
             state.el.trigger('play');
-            spyOn(state.bumperState.videoPlayer, 'isPlaying').andReturn(true);
+            spyOn(state.bumperState.videoPlayer, 'isPlaying').and.returnValue(true);
             $('.video_control.skip').first().click();
             expect(state.bumperState.videoCommands.execute).toHaveBeenCalledWith('skip');
         });
@@ -46,7 +49,7 @@
         it('can destroy itself', function () {
             var plugin = state.bumperState.videoPlaySkipControl,
                 el = plugin.el;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             plugin.destroy();
             expect(state.bumperState.videoPlaySkipControl).toBeUndefined();
             expect(el).not.toExist();

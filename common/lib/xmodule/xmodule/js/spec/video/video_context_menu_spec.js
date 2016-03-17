@@ -6,7 +6,8 @@
 
         openMenu = function () {
             var container = $('.video');
-            jasmine.Clock.useMock();
+            jasmine.clock().uninstall();
+            jasmine.clock().install();
             container.find('video').trigger('contextmenu');
             menu = container.children('.contextmenu');
             menuItems = menu.children('.menu-item').not('.submenu-item');
@@ -23,7 +24,7 @@
 
         openSubmenuMouse = function (menuSubmenuItem) {
             menuSubmenuItem.mouseover();
-            jasmine.Clock.tick(200);
+            jasmine.clock().tick(200);
             expect(menuSubmenuItem).toHaveClass('is-opened');
         };
 
@@ -35,7 +36,7 @@
 
         closeSubmenuMouse = function (menuSubmenuItem) {
             menuSubmenuItem.mouseleave();
-            jasmine.Clock.tick(200);
+            jasmine.clock().tick(200);
             expect(menuSubmenuItem).not.toHaveClass('is-opened');
         };
 
@@ -47,8 +48,8 @@
 
         beforeEach(function () {
             // $.cookie is mocked, make sure we have a state with an unmuted volume.
-            $.cookie.andReturn('100');
-            this.addMatchers({
+            $.cookie.and.returnValue('100');
+            jasmine.addMatchers({
                 toBeFocused: function () {
                     return {
                         compare: function (actual) {
@@ -56,10 +57,16 @@
                         }
                     };
                 },
-                toHaveCorrectLabels: function (labelsList) {
-                    return _.difference(labelsList, _.map(this.actual, function (item) {
-                        return $(item).text();
-                    })).length === 0;
+                toHaveCorrectLabels: function () {
+                    return {
+                        compare: function (actual, labelsList) {
+                            return {
+                              pass: _.difference(labelsList, _.map(this.actual, function (item) {
+                                        return $(item).text();
+                                    })).length === 0
+                            };
+                        }
+                    }
                 }
             });
         });
@@ -69,6 +76,7 @@
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
             _.result(state.videoPlayer, 'destroy');
+            jasmine.clock().uninstall();
         });
 
         describe('constructor', function () {
@@ -204,14 +212,14 @@
             });
 
             it('mouse right-clicking inside video but outside of context menu will not close it', function () {
-                spyOn(menu.data('menu'), 'pointInContainerBox').andReturn(true);
+                spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
                 overlay.trigger('contextmenu');
                 expect(menu).toHaveClass('is-opened');
                 expect(overlay).toExist();
             });
 
             it('mouse right-clicking inside video but outside of context menu will close submenus', function () {
-                spyOn(menu.data('menu'), 'pointInContainerBox').andReturn(true);
+                spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
                 openSubmenuMouse(menuSubmenuItem);
                 expect(menuSubmenuItem).toHaveClass('is-opened');
                 overlay.trigger('contextmenu');
@@ -221,12 +229,12 @@
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
                 spyOn(state.videoPlayer, 'isPlaying');
-                spyOn(state.videoPlayer, 'play').andCallFake(function () {
-                    state.videoPlayer.isPlaying.andReturn(true);
+                spyOn(state.videoPlayer, 'play').and.callFake(function () {
+                    state.videoPlayer.isPlaying.and.returnValue(true);
                     state.el.trigger('play');
                 });
-                spyOn(state.videoPlayer, 'pause').andCallFake(function () {
-                    state.videoPlayer.isPlaying.andReturn(false);
+                spyOn(state.videoPlayer, 'pause').and.callFake(function () {
+                    state.videoPlayer.isPlaying.and.returnValue(false);
                     state.el.trigger('pause');
                 });
                 // Left-click on play
@@ -238,7 +246,7 @@
                 menuItem.click();
                 expect(state.videoPlayer.pause).toHaveBeenCalled();
                 expect(menuItem).toHaveText('Play');
-                state.videoPlayer.play.reset();
+                state.videoPlayer.play.calls.reset();
                 // Right-click on play
                 menuItem.trigger('contextmenu');
                 expect(state.videoPlayer.play).toHaveBeenCalled();

@@ -14,8 +14,8 @@ describe "TabsEditingDescriptor", ->
     TabsEditingDescriptor.Model.addModelUpdate(@html_id, 'Tab 1 Transcripts', @tab_1_modelUpdate)
     TabsEditingDescriptor.Model.addOnSwitch(@html_id, 'Tab 1 Transcripts', @tab_1_switch)
 
-    spyOn($.fn, 'hide').andCallThrough()
-    spyOn($.fn, 'show').andCallThrough()
+    spyOn($.fn, 'hide').and.callThrough()
+    spyOn($.fn, 'show').and.callThrough()
     spyOn(TabsEditingDescriptor.Model, 'initialize')
     spyOn(TabsEditingDescriptor.Model, 'updateValue')
 
@@ -37,11 +37,11 @@ describe "TabsEditingDescriptor", ->
       expect(@tab_1_switch).toHaveBeenCalled()
 
     it "if click on current tab, nothing should happen", ->
-      spyOn($.fn, 'trigger').andCallThrough()
+      spyOn($.fn, 'trigger').and.callThrough()
       currentTab = @descriptor.$tabs.filter('.' + @isCurrent)
       @descriptor.$tabs.eq(0).trigger("click")
       expect(@descriptor.$tabs.filter('.' + @isCurrent)).toEqual(currentTab)
-      expect($.fn.trigger.calls.length).toEqual(1)
+      expect($.fn.trigger.calls.count()).toEqual(1)
 
     it "onSwitch function call", ->
       @descriptor.$tabs.eq(1).trigger("click")
@@ -82,7 +82,7 @@ describe "TabsEditingDescriptor special save cases", ->
       expect(data).toEqual(null)
 
     it "case: no function in model update, but value presented", ->
-      @tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate').andReturn(1)
+      @tab_0_modelUpdate = jasmine.createSpy('tab_0_modelUpdate').and.returnValue(1)
       TabsEditingDescriptor.Model.addModelUpdate(@html_id, 'Tab 0 Editor', @tab_0_modelUpdate)
       @descriptor.$tabs.eq(1).trigger("click")
       expect(@tab_0_modelUpdate).toHaveBeenCalled()

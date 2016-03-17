@@ -30,7 +30,7 @@ describe 'Histogram', ->
       secondArg = $.plot.calls.mostRecent().args[1]
       thirdArg = $.plot.calls.mostRecent().args[2]
 
-      expect(firstArg.selector).toEqual("#histogram_1")
+      expect(firstArg[0]).toEqual($("#histogram_1")[0])
       expect(secondArg).toEqual([
         data: [[1, Math.log(2)], [2, Math.log(3)], [3, Math.log(4)]]
         bars:
