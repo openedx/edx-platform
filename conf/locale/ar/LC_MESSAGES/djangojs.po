@@ -94,7 +94,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-10 18:16+0000\n"
 "PO-Revision-Date: 2016-02-12 08:07+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -2927,6 +2927,10 @@ msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرج�
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "نأسف لحدوث خطأ في إنشاء تقرير درجات المسائل. يُرجى إعادة المحاولة."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5811,6 +5815,10 @@ msgstr "إضافة %(component_type)s"
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "تحذير"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
