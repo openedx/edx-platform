@@ -245,7 +245,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:18+0000\n"
+"POT-Creation-Date: 2016-03-10 18:17+0000\n"
 "PO-Revision-Date: 2016-01-19 18:08+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -842,6 +842,10 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr "O curso que você está procurando não começara até {date}."
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for is closed for enrollment as of {date}."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -5730,8 +5734,12 @@ msgstr ""
 " minutos."
 
 #: lms/djangoapps/edxnotes/helpers.py
-msgid "Server error. Please try again in a few minutes."
-msgstr "Erro de servidor. Por favor tente novamente em alguns minutos."
+msgid "Invalid JSON response received from notes api."
+msgstr ""
+
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "Incorrect data received from notes api."
+msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -5964,31 +5972,22 @@ msgstr "Equipe"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrolled learner profile report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
-"O relatório de perfil do aluno matriculado está sendo criado. Para "
-"visualizar o status do relatório, veja abaixo em \"Tarefas pendentes do "
-"instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "This enrollment report is currently being created. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"O relatório de inscrição está sendo criado. Para visualizar o status do "
-"relatório, veja abaixo em \"Tarefas pendentes do instrutor\". Você será "
-"capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrollment report is being created. This report contains information "
 "about learners who can enroll in the course. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"O relatório de inscrição está sendo criado. Este relatório contém "
-"informações sobre alunos que podem se inscrever no curso. Para visualizar o "
-"status do relatório, veja \"Tarefas pendentes do Instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6050,75 +6049,54 @@ msgstr "Valor total descontado"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"O relatório de inscrição detalhada está sendo criado. Para visualizar o "
-"status do relatório, veja abaixo em \"Tarefas pendentes do instrutor\". "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"O relatório de inscrição detalhada está sendo criado. Para visualizar o "
-"status do relatório, veja abaixo em \"Tarefas pendentes do instrutor\". Você"
-" será capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"O relatório de sumário executivo está sendo criado. Para visualizar o status"
-" do relatório, veja abaixo em \"Tarefas pendentes do instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is currently being created. To view the status "
-"of the report, see Pending Instructor Tasks below. You will be able to "
-"download the report when it is complete."
+"of the report, see Pending Tasks below. You will be able to download the "
+"report when it is complete."
 msgstr ""
-"O relatório de sumário executivo está sendo criado. Para visualizar o status"
-" do relatório, veja abaixo em \"Tarefas pendentes do instrutor\". Você será "
-"capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
-"O relatório de pesquisa está sendo criado. Para visualizar o status do "
-"relatório, veja abaixo em \"Tarefas pendentes do instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"O relatório de pesquisa está sendo criado. Para visualizar o status do "
-"relatório, veja abaixo em \"Tarefas pendentes do instrutor\". Você será "
-"capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
-"O relatório de notas dos exames supervisionados está sendo criado. Para "
-"visualizar o status do relatório, veja abaixo em \"Tarefas pendentes do "
-"instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is currently being created. To view the "
-"status of the report, see Pending Instructor Tasks below. You will be able "
-"to download the report when it is complete."
+"status of the report, see Pending Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
-"O relatório de notas dos exames supervisionados está sendo criado. Para "
-"visualizar o status do relatório, veja abaixo em \"Tarefas pendentes do "
-"instrutor\". Você será capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6177,40 +6155,41 @@ msgstr ""
 "identificador_único_estudante."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "The ORA data report is being generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An ORA data report generation task is already in progress. Check the "
+"'Pending Tasks' table for the status of the task. When completed, the report"
+" will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
-"O relatório de notas está sendo criado. Para visualizar o status do "
-"relatório, veja abaixo em \"Tarefas pendentes do instrutor\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"O relatório de notas está atualmente sendo criado. Para visualizar o status "
-"do relatório, veja abaixo em \"Tarefas pendentes do instrutor\". Você será "
-"capaz de baixar quando o relatório estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The problem grade report is being created. To view the status of the report,"
-" see Pending Instructor Tasks below."
+" see Pending Tasks below."
 msgstr ""
-"O relatório de correção do problema já está sendo criado. Para visualizar o "
-"status do relatório, veja abaixo em \"Tarefas pendentes do instrutor\""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A problem grade report is already being generated. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Um relatório do problema já está sendo gerado. Para visualizar o status do "
-"relatório, veja abaixo em \"Tarefas pendentes do Instrutor\". Você será "
-"capaz de baixar o relatório quando ele estiver completo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -8528,154 +8507,67 @@ msgid "Your Password Reset is Complete"
 msgstr "A redefinição da sua senha foi concluída"
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
-"      "
+msgid "Password Reset Complete"
 msgstr ""
-"\n"
-"Sua senha foi criada. Você já pode %(link_start)srealizar o acesso%(link_end)s."
 
-#: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"      Reset Your %(platform_name)s Password\n"
-"  "
+"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
+"                "
 msgstr ""
-"\n"
-"Redefinir a sua senha de %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"          Reset Your %(platform_name)s Password\n"
-"          "
+"    Reset Your %(platform_name)s Password\n"
 msgstr ""
-"\n"
-"Redefinir a sua senha de %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Form"
-msgstr "Formulário para redefinição de senha"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"\n"
-"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
-"            "
+msgid "Error Resetting Password"
 msgstr ""
-"\n"
-"Desculpe, mas esta versão do navegador não é suportado. Tente novamente usando um navegador diferente ou uma versão mais recente do seu navegador."
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The following errors occurred while processing your registration: "
-msgstr "Os seguintes erros ocorreram ao processar a sua inscrição:"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must complete all fields."
-msgstr "Por favor, preencha todos os campos."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The two password fields didn't match."
-msgstr "A confirmação da senha não coincide com a senha informada."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
+msgid "You must enter and confirm your new password."
 msgstr ""
-"Desculpe, os nossos sistemas parecem estar tendo problemas ao processar a "
-"redefinição da sua senha"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The text in both password fields must match."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Confirm Password"
+msgstr ""
+
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "Redefinir minha senha"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
-"            "
+"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
+"                "
 msgstr ""
-"\n"
-"Já fomos informados sobre o problema. Por favor, tente novamente em breve e %(start_link)sentre em contato%(end_link)s conosco sobre qualquer questão que possa ter."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Por favor, digite a nova senha duas vezes para que possamos verificar se "
-"você a digitou corretamente."
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
-"        "
-msgstr ""
-"\n"
-"Campos obrigatórios são identificado por %(bold_start)stexto em negrio e um asterisco (*)%(bold_end)s."
-
-#: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "Informação obrigatória"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password"
-msgstr "A sua nova senha"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password Again"
-msgstr "A sua nova senha novamente"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Change My Password"
-msgstr "Trocar senha"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your Password Reset Was Unsuccessful"
-msgstr "A redefinição da sua senha não foi bem sucedida"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
-"        "
-msgstr ""
-"\n"
-"O link para redefinição da senha é inválido, possivelmente porque o já foi usado. Por favor, retorne para a %(start_link)spágina de acesso%(end_link)s e recomece o processo de redefinição de senha."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Help"
-msgstr "Ajuda para redefinição de senha"
-
-#: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Precisa de ajuda?"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
-"          "
-msgstr ""
-"\n"
-"Visite nossa %(start_link)sseção de ajuda para informações de contato e respostas a perguntas frequentes%(end_link)s⏎"
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -9228,6 +9120,13 @@ msgstr ""
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
 msgstr "Um grupo com o mesmo nome já existe."
+
+#: openedx/core/djangoapps/coursetalk/models.py
+msgid ""
+"The platform key associates CourseTalk widgets with your platform. "
+"Generally, it is the domain name for your platform. For example, if your "
+"platform is http://edx.org, the platform key is \"edx\"."
+msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -10128,7 +10027,7 @@ msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "Formato incorreto para o campo '{name}'.{detailed_message}"
 
 #: cms/lib/xblock/tagging.py
-msgid "Learning outcomes"
+msgid "Difficulty"
 msgstr ""
 
 #: cms/lib/xblock/tagging.py
@@ -10589,6 +10488,18 @@ msgstr ""
 "Insira o seu e-mail abaixo para receber as instruções para a criação de uma "
 "nova senha. "
 
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "Informação obrigatória"
+
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "O seu e-mail"
@@ -10596,10 +10507,6 @@ msgstr "O seu e-mail"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "Este é o e-mail que você utilizou para registrar-se em {platform}"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "Redefinir minha senha"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -10842,6 +10749,11 @@ msgstr "Não está inscrito?"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "Registre-se na {platform_name} hoje mesmo!"
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Precisa de ajuda?"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -12590,14 +12502,6 @@ msgid "View About Page in studio"
 msgstr "Visualizar a página Sobre no Studio"
 
 #: lms/templates/courseware/course_about.html
-msgid "Course About"
-msgstr "Sobre o Curso"
-
-#: lms/templates/courseware/course_about.html
-msgid "Overview"
-msgstr "Visão geral"
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "Início das aulas"
 
@@ -12842,10 +12746,6 @@ msgstr "Navegação das apostilas"
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
 msgstr "Datas importantes do curso"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates &amp; News"
-msgstr "Atualizações e notícias do curso"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -13229,12 +13129,8 @@ msgid "I'm learning on {platform_name}:"
 msgstr "Estou aprendendo em {platform_name}:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course options dropdown"
-msgstr "Menu suspenso Opções do Curso"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Additional Actions Menu"
-msgstr "Menu Ações Adicionais"
+msgid "Course options for"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
@@ -14944,6 +14840,10 @@ msgstr "Gerar relatório de notas"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
 msgstr "Gerar relatório de notas do problema"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Data Report"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
