@@ -57,11 +57,11 @@ var edx = edx || {};
         },
 
         _getPaymentButtonText: function(processorName) {
-            if (processorName.toLowerCase().substr(0, 11)=='cybersource') {
+            if (processorName.toLowerCase().substr(0, 11)==='cybersource') {
                 return gettext('Checkout');
-            } else if (processorName.toLowerCase()=='paypal') {
+            } else if (processorName.toLowerCase()==='paypal') {
                 return gettext('Checkout with PayPal');
-            } else if (processorName.toLowerCase()=='adyen') {
+            } else if (processorName.toLowerCase()==='adyen') {
                 return gettext('Checkout with Adyen');
             } else {
                 // This is mainly for testing as no other processors are supported right now.
