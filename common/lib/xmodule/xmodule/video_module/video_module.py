@@ -589,6 +589,20 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         return xml
 
+    def create_youtube_url(self, youtube_id):
+        """
+
+        Args:
+            youtube_id: The ID of the video to create a link for
+
+        Returns:
+            A full youtube url to the video whose ID is passed in
+        """
+        if youtube_id:
+            return 'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+        else:
+            return ''
+
     def get_context(self):
         """
         Extend context by data for transcript basic tab.
@@ -612,10 +626,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 if val_youtube_id:
                     video_id = val_youtube_id
 
-            if video_id:
-                return 'http://youtu.be/{0}'.format(video_id)
-            else:
-                return ''
+            return self.create_youtube_url(video_id)
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
@@ -848,7 +859,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     val_video_data = edxval_api.get_video_info(self.edx_video_id)
                     # Unfortunately, the VAL API is inconsistent in how it returns the encodings, so remap here.
                     for enc_vid in val_video_data.pop('encoded_videos'):
-                        encoded_videos[enc_vid['profile']] = {key: enc_vid[key] for key in ["url", "file_size"]}
+                        if enc_vid['profile'] in video_profile_names:
+                            encoded_videos[enc_vid['profile']] = {key: enc_vid[key] for key in ["url", "file_size"]}
                 except edxval_api.ValVideoNotFoundError:
                     pass
 
@@ -859,6 +871,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 encoded_videos["fallback"] = {
                     "url": video_url,
                     "file_size": 0,  # File size is unknown for fallback URLs
+                }
+
+            # Include youtube link if there is no encoding for mobile- ie only a fallback URL or no encodings at all
+            # We are including a fallback URL for older versions of the mobile app that don't handle Youtube urls
+            if self.youtube_id_1_0:
+                encoded_videos["youtube"] = {
+                    "url": self.create_youtube_url(self.youtube_id_1_0),
+                    "file_size": 0,  # File size is not relevant for external link
                 }
 
         transcripts_info = self.get_transcripts_info()
