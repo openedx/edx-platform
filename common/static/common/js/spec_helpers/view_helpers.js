@@ -6,19 +6,41 @@
 define(["jquery", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_prompt",
         'common/js/spec_helpers/ajax_helpers'],
     function($, NotificationView, Prompt, AjaxHelpers) {
-        var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
+        var installViewTemplates, waitUntil, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden,
-            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError,
-            verifyElementInFocus, verifyElementNotInFocus;
+            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError;
 
         installViewTemplates = function() {
             appendSetFixtures('<div id="page-notification"></div>');
         };
 
+        waitUntil = function (conditionalFn) {
+            var deferred = $.Deferred(),
+                timeout;
+
+            var fn = function () {
+                if (conditionalFn()) {
+                    timeout && clearTimeout(timeout);
+                    deferred.resolve();
+                } else {
+                    timeout = setTimeout(fn, 50);
+                }
+            };
+
+            setTimeout(fn, 50);
+            return deferred.promise();
+        };
+
         createFeedbackSpy = function(type, intent) {
-            var feedbackSpy = spyOnConstructor(type, intent, ['show', 'hide']);
+            var _class = type[intent];
+            var feedbackSpy = {
+                'constructor': spyOn(_class.prototype, 'initialize'),
+                'show': spyOn(_class.prototype, 'show'),
+                'hide': spyOn(_class.prototype, 'hide')
+            };
+
             feedbackSpy.show.and.returnValue(feedbackSpy);
             return feedbackSpy;
         };
@@ -128,22 +150,6 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyNotificationShowing(notificationSpy, /Saving/);
         };
 
-        verifyElementInFocus = function(view, selector) {
-            waitsFor(
-              function() { return view.$(selector + ':focus').length === 1; },
-              "element to have focus: " + selector,
-              500
-            );
-        };
-
-        verifyElementNotInFocus = function(view, selector) {
-            waitsFor(
-              function() { return view.$(selector + ':focus').length === 0; },
-              "element to not have focus: " + selector,
-              500
-            );
-        };
-
         return {
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
@@ -160,9 +166,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             'clickDeleteItem': clickDeleteItem,
             'patchAndVerifyRequest': patchAndVerifyRequest,
             'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
-            'submitAndVerifyFormError': submitAndVerifyFormError,
-            'verifyElementInFocus': verifyElementInFocus,
-            'verifyElementNotInFocus': verifyElementNotInFocus
+            'submitAndVerifyFormError': submitAndVerifyFormError
         };
     });
 }).call(this, define || RequireJS.define);

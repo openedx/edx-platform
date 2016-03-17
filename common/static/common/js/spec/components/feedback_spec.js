@@ -4,7 +4,7 @@
   define(["jquery", "common/js/components/views/feedback", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_alert", "common/js/components/views/feedback_prompt", 'common/js/spec_helpers/view_helpers', "sinon", "jquery.simulate"],
     function($, SystemFeedback, NotificationView, AlertView, PromptView, ViewHelpers, sinon) {
     var tpl;
-    tpl = readFixtures('system-feedback.underscore');
+    tpl = readFixtures('common/templates/components/system-feedback.underscore');
     beforeEach(function() {
       setFixtures(sandbox({
         id: "page-alert"
@@ -149,7 +149,7 @@
           actions: {
             primary: {
               text: "Yes, I'm sure.",
-              "class": "confirm-button",
+              "class": "confirm-button"
             },
             secondary: {
               text: "Cancel",
@@ -160,19 +160,26 @@
         this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').and.callThrough();
         return this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').and.callThrough();
       });
-      it("is focused on show", function() {
+      it("is focused on show", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
-        return ViewHelpers.verifyElementInFocus(view, ".wrapper-prompt")
+        setTimeout(function () {
+          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
-      it("is not focused on hide", function() {
+      it("is not focused on hide", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).hide();
         expect(this.outFocusSpy).toHaveBeenCalled();
-        return ViewHelpers.verifyElementNotInFocus(view, ".wrapper-prompt")
+
+        setTimeout(function () {
+          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(0);
+          done();
+        }, 500);
       });
-      it("traps keyboard focus when moving forward", function() {
+      it("traps keyboard focus when moving forward", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
@@ -180,9 +187,13 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-primary")
+
+        setTimeout(function () {
+          expect(view.$(".action-primary" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
-      it("traps keyboard focus when moving backward", function() {
+      it("traps keyboard focus when moving backward", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
@@ -190,9 +201,14 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB, shiftKey: true }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-secondary")
+
+        setTimeout(function () {
+          expect(view.$(".action-secondary" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
       return it("changes class on body", function() {
+        // TODO: add expectation here
         var view;
         view = new PromptView.Confirmation({
           title: "Portal",
