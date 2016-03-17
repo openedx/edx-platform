@@ -7,14 +7,13 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
 
-            jasmine.stubRequests();
             state = jasmine.initializePlayer('video_with_bumper.html');
             spyOn(Logger, 'log');
             $('.poster .btn-play').click();
-            spyOn(state.bumperState.videoEventsBumperPlugin, 'getCurrentTime').andReturn(10);
-            spyOn(state.bumperState.videoEventsBumperPlugin, 'getDuration').andReturn(20);
+            spyOn(state.bumperState.videoEventsBumperPlugin, 'getCurrentTime').and.returnValue(10);
+            spyOn(state.bumperState.videoEventsBumperPlugin, 'getDuration').and.returnValue(20);
         });
 
         afterEach(function () {
@@ -60,7 +59,7 @@
                 duration: 20
             });
 
-            Logger.log.reset();
+            Logger.log.calls.reset();
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.stopped', {
                 host_component_id: 'id',
@@ -137,7 +136,7 @@
 
         it('can destroy itself', function () {
             var plugin = state.bumperState.videoEventsBumperPlugin;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             plugin.destroy();
             expect(state.bumperState.videoEventsBumperPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
