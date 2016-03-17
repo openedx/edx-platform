@@ -3,13 +3,19 @@
 from datetime import datetime
 from pytz import UTC
 
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import UserPartition, Group
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
+from openedx.core.djangoapps.content.course_metadata.signals import (
+    listen_for_course_publish as course_publish_listener
+)
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):
@@ -207,3 +213,14 @@ class TestConditionalContent(ModuleStoreTestCase):
             display_name='Group B problem container',
             location=vertical_b_url
         )
+
+
+class SignalDisconnectTestMixin(object):
+    """
+    Mixin for tests to disable calls to signals.listen_for_course_publish when the course_published signal is fired.
+    """
+
+    def setUp(self):
+        super(SignalDisconnectTestMixin, self).setUp()
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
+        SignalHandler.course_published.disconnect(course_publish_listener)

@@ -3,8 +3,6 @@
 """ Database ORM models managed by this Django app """
 from django.contrib.auth.models import Group, User
 from django.db import models
-from django.db.models import Q
-from django.conf import settings
 
 from model_utils.models import TimeStampedModel
 from .utils import is_int
