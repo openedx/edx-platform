@@ -177,4 +177,4 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
 
           it "loads the .xmodule-display inside the module editor", ->
             expect(XBlock.initializeBlock).toHaveBeenCalled()
-            expect(XBlock.initializeBlock.calls.mostRecent().args[0]).toBe($('.xblock-student_view'))
+            expect(XBlock.initializeBlock.calls.mostRecent().args[0].get(0)).toBe($('.xblock-student_view').get(0))
