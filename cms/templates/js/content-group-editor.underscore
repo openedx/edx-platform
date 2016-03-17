@@ -15,7 +15,7 @@
                     </span><%
                 }
                 %>
-                <input name="group-cohort-name" id="group-cohort-name-<%= uniqueId %>" class="collection-name-input input-text" value="<%= name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
+                <input name="group-cohort-name" id="group-cohort-name-<%= uniqueId %>" class="collection-name-input input-text" value="<%- name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
             </div>
         </fieldset>
         <% if (!_.isEmpty(usage)) { %>
