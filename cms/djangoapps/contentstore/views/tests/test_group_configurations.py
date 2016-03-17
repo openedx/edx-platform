@@ -14,6 +14,7 @@ from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
@@ -204,7 +205,8 @@ class GroupConfigurationsBaseTestCase(object):
 
 
 # pylint: disable=no-member
-class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsListHandlerTestCase(SignalDisconnectTestMixin, CourseTestCase,
+                                             GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
     """
