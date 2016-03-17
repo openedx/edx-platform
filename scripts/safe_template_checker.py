@@ -171,7 +171,8 @@ class MakoTemplateChecker(object):
 
     _skip_mako_dirs = _skip_dirs
 
-    _results = []
+    def __init__(self):
+        self._results = []
 
     def process_file(self, directory, file_name):
         """
@@ -399,7 +400,8 @@ class UnderscoreTemplateChecker(object):
 
     _skip_underscore_dirs = _skip_dirs
 
-    _results = []
+    def __init__(self):
+        self._results = []
 
     def process_file(self, directory, file_name):
         """
@@ -481,6 +483,16 @@ def _process_os_walk(starting_dir, template_checkers):
 
 def main():
     #TODO: Use click
+    if '--help' in sys.argv:
+        print "Check that templates are safe."
+        print "Options:"
+        print "   --quiet    Just display the filenames with violations."
+        print
+        print "Rules:"
+        for rule in Rules.__members__.values():
+            print "  {0[0]}: {0[1]}".format(rule.value)
+        return
+
     is_quiet = '--quiet' in sys.argv
 
     options = {
