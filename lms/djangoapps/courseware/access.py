@@ -60,7 +60,10 @@ from courseware.access_response import (
     MobileAvailabilityError,
     VisibilityError,
 )
-from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
+from courseware.access_utils import (
+    adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
+    in_preview_mode
+)
 
 log = logging.getLogger(__name__)
 
@@ -102,6 +105,10 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(course_key, CCXLocator):
         course_key = course_key.to_course_locator()
 
+    if in_preview_mode():
+        if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
+            return ACCESS_DENIED
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -139,6 +146,52 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
+
+def has_staff_access_to_preview_mode(user, obj, course_key=None):
+    """
+    Returns whether user has staff access to specified modules or not.
+
+    Arguments:
+
+        user: a Django user object.
+
+        obj: The object to check access for.
+
+        course_key: A course_key specifying which course this access is for.
+
+    Returns an AccessResponse object.
+    """
+    if course_key is None:
+        if isinstance(obj, CourseDescriptor) or isinstance(obj, CourseOverview):
+            course_key = obj.id
+
+        elif isinstance(obj, ErrorDescriptor):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, XModule):
+            course_key = obj.descriptor.course_key
+
+        elif isinstance(obj, XBlock):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, CCXLocator):
+            course_key = obj.to_course_locator()
+
+        elif isinstance(obj, CourseKey):
+            course_key = obj
+
+        elif isinstance(obj, UsageKey):
+            course_key = obj.course_key
+
+    if course_key is None:
+        if GlobalStaff().has_user(user):
+            return ACCESS_GRANTED
+        else:
+            return ACCESS_DENIED
+
+    return _has_access_to_course(user, 'staff', course_key=course_key)
+
+
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a descriptor based on its start date.
