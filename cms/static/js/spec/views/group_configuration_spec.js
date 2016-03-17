@@ -125,7 +125,7 @@ define([
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
         expect($(listItemView)).toExist();
     };
-    var assertCannotDeleteUsed = function (that, toolTipText, warningText){
+    var assertCannotDeleteUsed = function (that, toolTipText, warningText) {
         setUsageInfo(that.model);
         that.view.render();
         expect(that.view.$(SELECTORS.note)).toHaveAttr(

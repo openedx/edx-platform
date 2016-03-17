@@ -34,7 +34,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             @collection = new TextbookSet([@model])
             @view = new ShowTextbook({model: @model})
 
-            @promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"])
+            @promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"])
             @promptSpies.show.and.returnValue(@promptSpies)
             window.course = new Course({
                 id: "5",
@@ -80,7 +80,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
         describe "AJAX", ->
             beforeEach ->
-                @savingSpies = spyOnConstructor(Notification, "Mini",
+                @savingSpies = jasmine.stealth.spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
                 @savingSpies.show.and.returnValue(@savingSpies)
                 CMS.URL.TEXTBOOKS = "/textbooks"

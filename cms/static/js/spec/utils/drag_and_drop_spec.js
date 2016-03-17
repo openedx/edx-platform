@@ -301,7 +301,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
             });
             describe("AJAX", function () {
                 beforeEach(function () {
-                    this.savingSpies = spyOnConstructor(Notification, "Mini", ["show", "hide"]);
+                    this.savingSpies = jasmine.stealth.spyOnConstructor(Notification, "Mini", ["show", "hide"]);
                     this.savingSpies.show.and.returnValue(this.savingSpies);
                     this.clock = sinon.useFakeTimers();
                 });

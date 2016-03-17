@@ -152,7 +152,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 };
 
                 beforeEach(function() {
-                    promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
+                    promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
                     promptSpies.show.and.returnValue(this.promptSpies);
                 });
 

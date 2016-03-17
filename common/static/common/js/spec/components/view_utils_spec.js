@@ -1,7 +1,7 @@
 ;(function (define) {
     'use strict';
     define(["jquery", "underscore", "backbone", "common/js/components/utils/view_utils",
-            "common/js/spec_helpers/view_helpers"],
+            "common/js/spec_helpers/view_helpers", "jasmine-stealth"],
         function ($, _, Backbone, ViewUtils, ViewHelpers) {
 
             describe("ViewUtils", function() {

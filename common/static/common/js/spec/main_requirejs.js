@@ -29,7 +29,7 @@
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
             'backbone-super': "js/vendor/backbone-super",
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'js/vendor/jasmine-stealth',
+            'jasmine-stealth': 'js/libs/jasmine-stealth',
             'jasmine.async': 'js/vendor/jasmine.async',
             'URI': 'js/vendor/URI.min'
         },
@@ -137,7 +137,7 @@
                 deps: ['jasmine']
             },
             'jasmine-stealth': {
-                deps: ['jasmine']
+                deps: ['jasmine', 'underscore', 'underscore.string']
             },
             'jasmine.async': {
                 deps: ['jasmine'],
