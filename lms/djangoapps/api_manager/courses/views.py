@@ -37,10 +37,15 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole, get_aggregate_exclusion_user_ids
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
+from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
 
-from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
+from api_manager.courseware_access import get_course, get_course_child, get_course_key, \
     course_exists, get_modulestore, get_course_descriptor
-from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from api_manager.models import (
+    CourseGroupRelationship,
+    CourseContentGroupRelationship,
+    GroupProfile,
+)
 from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
@@ -1736,7 +1741,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        total_possible_completions = float(len(get_course_leaf_nodes(course_key)))
+        course_metadata = CourseAggregatedMetaData.get_from_id(course_key)
+        total_possible_completions = float(course_metadata.total_assessments)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
         orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
         if orgs_filter:
@@ -1758,7 +1764,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         if orgs_filter:
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
         total_users = total_users_qs.count()
-        if total_users and total_actual_completions:
+        if total_users and total_actual_completions and total_possible_completions:
             course_avg = total_actual_completions / float(total_users)
             course_avg = min(100 * (course_avg / total_possible_completions), 100)  # avg in percentage
         data['course_avg'] = course_avg

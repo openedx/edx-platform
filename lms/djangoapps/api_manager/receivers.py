@@ -1,10 +1,9 @@
 """
-Signal handlers supporting various gradebook use cases
+Signal handlers supporting various course metadata use cases
 """
 from django.dispatch import receiver
 
 from util.signals import course_deleted
-
 from .models import CourseGroupRelationship, CourseContentGroupRelationship
 
 
