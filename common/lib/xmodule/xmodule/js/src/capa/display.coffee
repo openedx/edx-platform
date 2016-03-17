@@ -133,6 +133,13 @@ class @Problem
             new_timeout
           )
 
+  updateContent: (content) =>
+    # Updates the content data attribute with latest problem content passed as a parameter.
+    # params:
+    #   'content' is supposed to be latest problem content.
+    if content != @el.data('content')
+        @el.data('content', content)
+
 
   # Use this if you want to make an ajax call on the input type object
   # static method so you don't have to instantiate a Problem in order to use it
@@ -314,6 +321,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          @updateContent(response.contents)
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -329,6 +337,7 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+        @updateContent(response.html)
         @render(response.html)
         @updateProgress response
 
@@ -417,6 +426,8 @@ class @Problem
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
+      if response.success
+        @updateContent response.html
       @gentle_alert saveMessage
       @updateProgress response
 
