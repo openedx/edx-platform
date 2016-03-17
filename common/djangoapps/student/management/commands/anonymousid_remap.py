@@ -7,6 +7,7 @@ Must be called when django secret key was changed
 import hashlib
 import json
 import datetime
+from dateutil.tz import tzlocal
 from django.core.management.base import BaseCommand, CommandError
 from student.models import AnonymousUserId
 
@@ -45,7 +46,10 @@ class Command(BaseCommand):
                     "course_id": student.course_id.to_deprecated_string()
                         .encode('utf-8') if student.course_id else ""
                 })
-        filename = "anonymous_ids-{}.json".format(datetime.datetime.now())
+        filename_postfix = datetime.datetime.now(tzlocal())
+        filename = "anonymous_ids_{}.json".format(
+            filename_postfix.strftime('%Y-%m-%d_%H:%M:%S_%Z')
+        )
         with open(filename, 'w') as outfile:
             json.dump({"dump": remaped}, outfile)
         self.stdout.write(
