@@ -5,10 +5,8 @@ var waitForInputAjax = function (conditionalFn) {
     var fn = function () {
         if (conditionalFn()) {
             timeout && clearTimeout(timeout);
-            console.log('condition met');
             deferred.resolve();
         } else {
-            console.log('condition not met');
             timeout = setTimeout(fn, 50);
         }
     };
