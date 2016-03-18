@@ -8,6 +8,7 @@ import freezegun
 from nose.plugins.attrib import attr
 import pytz
 
+from commerce.models import CommerceConfiguration
 from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
 from courseware.courses import _get_course_date_summary_blocks
@@ -44,6 +45,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             enrollment_mode=CourseMode.VERIFIED,
             days_till_verification_deadline=14,
             verification_status=None,
+            sku=None
     ):
         """Set up the course and user for this test."""
         now = datetime.now(pytz.UTC)
@@ -61,7 +63,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=enrollment_mode,
-                expiration_datetime=now + timedelta(days=days_till_upgrade_deadline)
+                expiration_datetime=now + timedelta(days=days_till_upgrade_deadline),
+                sku=sku
             )
             CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
         else:
@@ -199,6 +202,18 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.setup_course_and_user(enrollment_mode=None)
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
         self.assertIsNone(block.date)
+
+    def test_ecommerce_checkout_redirect(self):
+        """Verify the block link redirects to ecommerce checkout if it's enabled."""
+        sku = 'TESTSKU'
+        checkout_page = '/test_basket/'
+        CommerceConfiguration.objects.create(
+            checkout_on_ecommerce_service=True,
+            single_course_checkout_page=checkout_page
+        )
+        self.setup_course_and_user(sku=sku)
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertEqual(block.link, '{}?sku={}'.format(checkout_page, sku))
 
     ## VerificationDeadlineDate
 

@@ -89,7 +89,7 @@ class ChooseModeView(View):
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             redirect_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
-            if ecommerce_service.is_enabled(request):
+            if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if professional_mode.sku:
                     redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
@@ -158,7 +158,7 @@ class ChooseModeView(View):
             context["verified_description"] = verified_mode.description
 
             if verified_mode.sku:
-                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request)
+                context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
 
