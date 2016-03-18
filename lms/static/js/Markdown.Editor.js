@@ -1134,7 +1134,7 @@
             // The main dialog box.
             dialog = doc.createElement("div");
             dialog.innerHTML = _.template(
-                document.getElementById("customwmd-prompt-template").innerHTML, {
+                document.getElementById("customwmd-prompt-template").innerHTML)({
                 title: title,
                 uploadFieldClass: (imageUploadHandler ? 'file-upload' : ''),
                 urlLabel: urlLabel,

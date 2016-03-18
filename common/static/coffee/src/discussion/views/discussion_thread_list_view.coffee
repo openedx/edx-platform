@@ -39,9 +39,9 @@ if Backbone?
 
       @searchAlertCollection.on "add", (searchAlert) =>
         content = _.template(
-          $("#search-alert-template").html(),
+          $("#search-alert-template").html())(
           {'message': searchAlert.attributes.message, 'cid': searchAlert.cid}
-          )
+        )
         @$(".search-alerts").append(content)
         @$("#search-alert-" + searchAlert.cid + " a.dismiss").bind "click", searchAlert, (event) =>
           @removeSearchAlert(event.data.cid)
@@ -491,7 +491,7 @@ if Backbone?
             message = interpolate(
               _.escape(gettext('Show posts by %(username)s.')),
               {"username":
-                _.template('<a class="link-jump" href="<%= url %>"><%- username %></a>', {
+                _.template('<a class="link-jump" href="<%= url %>"><%- username %></a>')({
                   url: DiscussionUtil.urlFor("user_profile", response.users[0].id),
                   username: response.users[0].username
                 })
