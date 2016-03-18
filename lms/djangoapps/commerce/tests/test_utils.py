@@ -38,26 +38,25 @@ class EcommerceServiceTests(TestCase):
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
-        self.request.user = self.user
         update_commerce_config(enabled=True)
         super(EcommerceServiceTests, self).setUp()
 
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
-        is_enabled = EcommerceService().is_enabled(self.request)
+        is_enabled = EcommerceService().is_enabled(self.user)
         self.assertTrue(is_enabled)
 
         config = CommerceConfiguration.current()
         config.checkout_on_ecommerce_service = False
         config.save()
-        is_not_enabled = EcommerceService().is_enabled(self.request)
+        is_not_enabled = EcommerceService().is_enabled(self.user)
         self.assertFalse(is_not_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_microsites(self, is_microsite):
         """Verify that is_enabled() returns False if used for a microsite."""
         is_microsite.return_value = True
-        is_not_enabled = EcommerceService().is_enabled(self.request)
+        is_not_enabled = EcommerceService().is_enabled(self.user)
         self.assertFalse(is_not_enabled)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
