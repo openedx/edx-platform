@@ -5,6 +5,9 @@ Must be called when django secret key was changed
 """
 
 import hashlib
+import json
+import datetime
+from dateutil.tz import tzlocal
 from django.core.management.base import BaseCommand, CommandError
 from student.models import AnonymousUserId
 
@@ -17,7 +20,7 @@ class Command(BaseCommand):
         from django.conf import settings
         secret_key = settings.SECRET_KEY
         qs = AnonymousUserId.objects.all()
-        remaped_count = 0
+        remapped = []
         for student in qs:
             hasher = hashlib.md5()
             hasher.update(secret_key)
@@ -33,9 +36,22 @@ class Command(BaseCommand):
                         student.user.id
                     )
                 )
+                old_id = student.anonymous_user_id
                 student.anonymous_user_id = digest
                 student.save()
-                remaped_count += 1
+                remapped.append({
+                    "old_id": old_id,
+                    "new_id": digest,
+                    "email": student.user.email,
+                    "course_id": student.course_id.to_deprecated_string()
+                        .encode('utf-8') if student.course_id else ""
+                })
+        filename_postfix = datetime.datetime.now(tzlocal())
+        filename = "anonymous_ids_{}.json".format(
+            filename_postfix.strftime('%Y-%m-%d_%H:%M:%S_%Z')
+        )
+        with open(filename, 'w') as outfile:
+            json.dump({"dump": remapped}, outfile)
         self.stdout.write(
-            "{} ids were changed of total {}".format(remaped_count, qs.count())
+            "{} ids were changed of total {}".format(len(remapped), qs.count())
         )
