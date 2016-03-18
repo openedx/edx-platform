@@ -44,7 +44,6 @@ requirejs.config({
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
         "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
-        "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
@@ -180,10 +179,6 @@ requirejs.config({
         },
         "jasmine-stealth": {
             deps: ["jasmine", "underscore", "underscore.string"]
-        },
-        "jasmine.async": {
-            deps: ["jasmine"],
-            exports: "AsyncSpec"
         },
         "xblock/core": {
             exports: "XBlock",

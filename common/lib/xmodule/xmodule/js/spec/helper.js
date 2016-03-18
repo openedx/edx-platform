@@ -184,7 +184,6 @@
             } else if(startsWith(settings.url, jasmine.getFixtures().fixturesPath)) {
                 return origAjax(settings);
             } else {
-                debugger;
                 $.ajax.and.callThrough();
             }
         });
