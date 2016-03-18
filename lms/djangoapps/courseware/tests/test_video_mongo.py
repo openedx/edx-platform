@@ -1159,7 +1159,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         Tests retrieving a video that is not stored in VAL.
         """
         self.video.edx_video_id = self.TEST_EDX_VIDEO_ID
-        # The video is not is VAL so in contexts that do and don't allow cache misses we should always get a fallback
+        # The video is not in VAL so in contexts that do and don't allow cache misses we should always get a fallback
         result = self.get_result(allow_cache_miss)
         self.verify_result_with_fallback_and_youtube(result)
 
