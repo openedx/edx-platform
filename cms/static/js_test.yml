@@ -50,7 +50,6 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/Squire.js
     - xmodule_js/common_static/js/libs/jasmine-stealth.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
-    - xmodule_js/common_static/js/vendor/jasmine.async.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js
     - xmodule_js/src/xmodule.js
