@@ -19,7 +19,7 @@ from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
 from student.roles import get_aggregate_exclusion_user_ids
 
-from .serializers import OrganizationSerializer
+from .serializers import OrganizationSerializer, BasicOrganizationSerializer
 
 
 class OrganizationsViewSet(viewsets.ModelViewSet):
@@ -28,6 +28,14 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
     """
     serializer_class = OrganizationSerializer
     model = Organization
+
+    def list(self, request, *args, **kwargs):
+        self.serializer_class = BasicOrganizationSerializer
+        return super(OrganizationsViewSet, self).list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = BasicOrganizationSerializer
+        return super(OrganizationsViewSet, self).retrieve(request, *args, **kwargs)
 
     @action(methods=['get', ])
     def metrics(self, request, pk):
@@ -89,6 +97,8 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             * include_course_counts parameter should be `true` to get user's enrollment count
             * include_grades parameter should be `true` to get user's grades
             * for the course given in the course_id parameter
+            * view parameter can be used to get a particular data .i.e. view=ids to
+            * get list of user ids
         - POST: Adds a User to an Organization
 
         """
@@ -96,6 +106,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             include_course_counts = request.QUERY_PARAMS.get('include_course_counts', None)
             include_grades = request.QUERY_PARAMS.get('include_grades', None)
             course_id = request.QUERY_PARAMS.get('course_id', None)
+            view = request.QUERY_PARAMS.get('view', None)
             grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
             course_key = None
             if course_id:
@@ -114,6 +125,11 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 enrollments_by_user = {}
                 for enrollment in enrollments:
                     enrollments_by_user[enrollment['user']] = enrollment['total']
+
+            # if we only need ids of users in organization return now
+            if view == 'ids':
+                user_ids = users.values_list('id', flat=True)
+                return Response(user_ids)
 
             response_data = []
             if users:
@@ -152,12 +168,24 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
     def groups(self, request, pk):
         """
         Add a Group to a organization or retrieve list of groups in organization
+        - GET: Returns groups in an organization
+            * view parameter can be used to get a particular data .i.e. view=ids to
+            * get list of group ids
+
         """
         if request.method == 'GET':
             group_type = request.QUERY_PARAMS.get('type', None)
+            view = request.QUERY_PARAMS.get('view', None)
             groups = Group.objects.filter(organizations=pk)
+
             if group_type:
                 groups = groups.filter(groupprofile__group_type=group_type)
+
+            # if we only need ids of groups in organization return now
+            if view == 'ids':
+                group_ids = groups.values_list('id', flat=True)
+                return Response(group_ids)
+
             response_data = []
             if groups:
                 for group in groups:
