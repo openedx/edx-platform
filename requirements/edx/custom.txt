@@ -12,7 +12,7 @@
 -e git+https://github.com/open-craft/xblock-poll.git@bd93e4851c15d9cb1522e692f8b692cf584d23b1#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@484014cc87278a5c474e6cc1bca14c417fb35599#egg=edx-notifications
 -e git+https://github.com/open-craft/problem-builder.git@594f1f2853d05bf65fe4d48aeecd343088cfab4f#egg=problem-builder
--e git+https://github.com/open-craft/xblock-group-project-v2.git@d693b833d7226f4cb287566abca10d330220ea60#egg=xblock-group-project-v2
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@b9fca1fb67fcb81025f7b380d4a6670545531a40#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/edx-solutions/xblock.git@d25a661454da9e6b149d6c559de50ddcd0770857#egg=xblock
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@52e5a655c229147fc79071f7c9f7053d4a8d327b#egg=xblock-diagnostic-feedback
