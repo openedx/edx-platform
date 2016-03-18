@@ -4,13 +4,15 @@ Asset compilation and collection.
 
 from __future__ import print_function
 from datetime import datetime
+from functools import wraps
+from threading import Timer
 import argparse
 import glob
 import traceback
 
 from paver import tasks
 from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
 
 from .utils.envs import Env
@@ -238,6 +240,29 @@ def get_watcher_dirs(themes_base_dir=None, themes=None):
     return dirs
 
 
+def debounce(seconds=1):
+    """
+    Prevents the decorated function from being called more than every `seconds`
+    seconds. Waits until calls stop coming in before calling the decorated
+    function.
+    """
+    def decorator(func):  # pylint: disable=missing-docstring
+        func.timer = None
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):  # pylint: disable=missing-docstring
+            def call():  # pylint: disable=missing-docstring
+                func(*args, **kwargs)
+                func.timer = None
+            if func.timer:
+                func.timer.cancel()
+            func.timer = Timer(seconds, call)
+            func.timer.start()
+
+        return wrapper
+    return decorator
+
+
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
     """
     Watches for coffeescript changes
@@ -255,7 +280,8 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
         for dirname in dirnames:
             observer.schedule(self, dirname)
 
-    def on_modified(self, event):
+    @debounce()
+    def on_any_event(self, event):
         print('\tCHANGED:', event.src_path)
         try:
             compile_coffeescript(event.src_path)
@@ -288,7 +314,8 @@ class SassWatcher(PatternMatchingEventHandler):
             for dirname in paths:
                 observer.schedule(self, dirname, recursive=True)
 
-    def on_modified(self, event):
+    @debounce()
+    def on_any_event(self, event):
         print('\tCHANGED:', event.src_path)
         try:
             compile_sass()      # pylint: disable=no-value-for-parameter
@@ -303,7 +330,8 @@ class XModuleSassWatcher(SassWatcher):
     ignore_directories = True
     ignore_patterns = []
 
-    def on_modified(self, event):
+    @debounce()
+    def on_any_event(self, event):
         print('\tCHANGED:', event.src_path)
         try:
             process_xmodule_assets()
@@ -324,7 +352,8 @@ class XModuleAssetsWatcher(PatternMatchingEventHandler):
         """
         observer.schedule(self, 'common/lib/xmodule/', recursive=True)
 
-    def on_modified(self, event):
+    @debounce()
+    def on_any_event(self, event):
         print('\tCHANGED:', event.src_path)
         try:
             process_xmodule_assets()
@@ -634,7 +663,7 @@ def watch_assets(options):
         themes = themes if isinstance(themes, list) else [themes]
 
     sass_directories = get_watcher_dirs(theme_base_dir, themes)
-    observer = Observer()
+    observer = PollingObserver()
 
     CoffeeScriptWatcher().register(observer)
     SassWatcher().register(observer, sass_directories)
