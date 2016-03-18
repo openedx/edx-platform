@@ -228,7 +228,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
         # Verify that the certificate has status 'generating'
-        cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
         self.assertEqual(cert.status, CertificateStatuses.generating)
         self.assert_event_emitted(
             'edx.certificate.created',
@@ -246,7 +246,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
         # Verify that the certificate has been marked with status error
-        cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
         self.assertEqual(cert.status, 'error')
         self.assertIn(self.ERROR_REASON, cert.error_reason)
 
@@ -260,7 +260,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
             certs_api.generate_user_certificates(self.student, self.course.id)
 
         # Verify that the certificate has status 'downloadable'
-        cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
         self.assertEqual(cert.status, CertificateStatuses.downloadable)
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False})

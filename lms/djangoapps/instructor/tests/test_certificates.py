@@ -618,7 +618,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Verify that certificate exception successfully removed from CertificateWhitelist and GeneratedCertificate
         with self.assertRaises(ObjectDoesNotExist):
             CertificateWhitelist.objects.get(user=self.user2, course_id=self.course.id)
-            GeneratedCertificate.objects.get(
+            GeneratedCertificate.eligible_certificates.get(
                 user=self.user2, course_id=self.course.id, status__not=CertificateStatuses.unavailable
             )
 
