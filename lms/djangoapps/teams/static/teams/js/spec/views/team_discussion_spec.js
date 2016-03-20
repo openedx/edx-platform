@@ -1,8 +1,9 @@
 define([
     'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/views/team_discussion',
     'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper',
+    'edx-ui-toolkit/js/utils/string-utils'
+], function(_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper, StringUtils) {
     'use strict';
     xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
@@ -23,14 +24,12 @@ define([
             discussionView.render();
             AjaxHelpers.expectRequest(
                 requests, 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/inline?page=1&ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{discussionID}/inline?page=1&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
-
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse(threads));
@@ -38,25 +37,24 @@ define([
         };
 
         createPost = function(requests, view, title, body, threadID) {
-            title = title || "Test title";
-            body = body || "Test body";
-            threadID = threadID || "999";
+            title = title || 'Test title';
+            body = body || 'Test body';
+            threadID = threadID || '999';
             view.$('.new-post-button').click();
             view.$('.js-post-title').val(title);
             view.$('.js-post-body textarea').val(body);
             view.$('.submit').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/{discussionID}/threads/create?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 ),
-                interpolate(
-                    'thread_type=discussion&title=%(title)s&body=%(body)s&anonymous=false&anonymous_to_peers=false&auto_subscribe=true',
+                StringUtils.interpolate(
+                    'thread_type=discussion&title={title}&body={body}&anonymous=false&anonymous_to_peers=false&auto_subscribe=true',  // jshint ignore:line
                     {
                         title: title.replace(/ /g, '+'),
                         body: body.replace(/ /g, '+')
@@ -78,14 +76,13 @@ define([
             view.$('.forum-thread-expand').first().click();
             AjaxHelpers.expectRequest(
                 requests, 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(discussionID)s/threads/%(threadID)s?ajax=1&resp_skip=0&resp_limit=25',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{discussionID}/threads/{threadID}?ajax=1&resp_skip=0&resp_limit=25',  // jshint ignore:line
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID,
-                        threadID: threadID || "999"
-                    },
-                    true
+                        threadID: threadID || '999'
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, {
@@ -100,13 +97,12 @@ define([
             replyForm.find('.discussion-submit-post').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/threads/%(threadID)s/reply?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/threads/{threadID}/reply?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
-                        threadID: threadID || "999"
-                    },
-                    true
+                        threadID: threadID || '999'
+                    }
                 ),
                 'body=' + reply.replace(/ /g, '+')
             );
@@ -115,7 +111,7 @@ define([
                     body: reply,
                     comments_count: 1
                 }),
-                "annotated_content_info": TeamSpecHelpers.createAnnotatedContentInfo()
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -143,8 +139,8 @@ define([
         it('can post a reply', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests),
-                testReply = "Test reply",
-                testThreadID = "1";
+                testReply = 'Test reply',
+                testThreadID = '1';
             expandReplies(requests, view, testThreadID);
             postReply(requests, view, testReply, testThreadID);
             expect(view.$('.discussion-response .response-body').text().trim()).toBe(testReply);
@@ -153,7 +149,7 @@ define([
         it('can post a reply to a new post', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests, []),
-                testReply = "Test reply";
+                testReply = 'Test reply';
             createPost(requests, view);
             expandReplies(requests, view);
             postReply(requests, view, testReply);
@@ -166,7 +162,7 @@ define([
                 postTopicButton, updatedThreadElement,
                 updatedTitle = 'Updated title',
                 updatedBody = 'Updated body',
-                testThreadID = "1";
+                testThreadID = '1';
             expandReplies(requests, view, testThreadID);
             view.$('.action-more .icon').first().click();
             view.$('.action-edit').first().click();
@@ -177,19 +173,18 @@ define([
             view.$('.submit').click();
             AjaxHelpers.expectRequest(
                 requests, 'POST',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/%(discussionID)s/threads/create?ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/{discussionID}/threads/create?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 ),
-                'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'
+                'thread_type=discussion&title=&body=Updated+body&anonymous=false&anonymous_to_peers=false&auto_subscribe=true'  // jshint ignore:line
             );
             AjaxHelpers.respondWithJson(requests, {
                 content: TeamSpecHelpers.createMockPostResponse({
-                    id: "999", title: updatedTitle, body: updatedBody
+                    id: '999', title: updatedTitle, body: updatedBody
                 }),
                 annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
@@ -202,8 +197,7 @@ define([
 
         it('cannot move a new thread to a different topic', function() {
             var requests = AjaxHelpers.requests(this),
-                view = createDiscussionView(requests),
-                postTopicButton;
+                view = createDiscussionView(requests);
             createPost(requests, view);
             expandReplies(requests, view);
             view.$('.action-more .icon').first().click();

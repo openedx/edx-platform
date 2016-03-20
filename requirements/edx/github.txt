@@ -65,6 +65,9 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 # custom opaque-key implementations for CCX
 git+https://github.com/edx/ccx-keys.git@0.1.1#egg=ccx-keys==0.1.1
 
+# NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
+git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
+
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 

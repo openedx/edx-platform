@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.test import TestCase
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
@@ -19,6 +20,7 @@ from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@attr('shard_2')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
                            CredentialsApiConfigMixin, TestCase):
     """Tests covering the retrieval of programs from the Programs service."""

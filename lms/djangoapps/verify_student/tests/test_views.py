@@ -11,6 +11,7 @@ from uuid import uuid4
 import ddt
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 import boto
 import moto
 import pytz
@@ -67,7 +68,12 @@ render_mock = Mock(side_effect=mock_render_to_response)
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
 
 
+@attr('shard_2')
 class StartView(TestCase):
+    """
+    This view is for the first time student is
+    attempting a Photo Verification.
+    """
     def start_url(self, course_id=""):
         return "/verify_student/{0}".format(urllib.quote(course_id))
 
@@ -83,6 +89,7 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     """
@@ -1173,6 +1180,7 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
+@attr('shard_2')
 @patch('lms.djangoapps.verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA, autospec=True)
 class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the shoppingcart is used. """
@@ -1186,6 +1194,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
 
 
+@attr('shard_2')
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
@@ -1204,6 +1213,7 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('user', 'course_key', 'course_mode', 'processor'), patched_create_order.call_args[0]))
 
 
+@attr('shard_2')
 class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
     Ensures correct behavior in the function `checkout_with_ecommerce_service`.
@@ -1249,6 +1259,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         self.assertEqual(actual_payment_data, expected_payment_data)
 
 
+@attr('shard_2')
 class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
@@ -1352,6 +1363,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         return response
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 class TestSubmitPhotosForVerification(TestCase):
@@ -1593,6 +1605,7 @@ class TestSubmitPhotosForVerification(TestCase):
         return json.loads(last_request.body)
 
 
+@attr('shard_2')
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
@@ -1954,6 +1967,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         VerificationStatus.add_verification_status(checkpoint, self.user, "submitted")
 
 
+@attr('shard_2')
 class TestReverifyView(TestCase):
     """
     Tests for the reverification view.
@@ -2048,6 +2062,7 @@ class TestReverifyView(TestCase):
         self.assertContains(response, "reverify-blocked")
 
 
+@attr('shard_2')
 class TestInCourseReverifyView(ModuleStoreTestCase):
     """
     Tests for the incourse reverification views.
@@ -2247,6 +2262,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         return self.client.post(url, data)
 
 
+@attr('shard_2')
 class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
     """
     Test email sending on re-verification
@@ -2451,6 +2467,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         )
 
 
+@attr('shard_2')
 class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
     """
     Test for In-course Re-verification

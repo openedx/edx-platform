@@ -78,6 +78,8 @@ src_paths:
     - js/certificates
     - js/factories
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
 
 # Paths to spec (test) JavaScript files
 # We should define the custom path mapping in /coffee/spec/main.coffee as well e.g. certificates etc.

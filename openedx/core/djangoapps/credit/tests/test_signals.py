@@ -5,6 +5,7 @@ Tests for minimum grade requirement status
 import pytz
 import ddt
 from datetime import timedelta, datetime
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.test.client import RequestFactory
@@ -21,6 +22,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@attr('shard_2')
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):

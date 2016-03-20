@@ -1,17 +1,17 @@
 <div class="image-wrapper">
-    <img class="image-frame" src="<%- imageUrl %>"  alt="<%=imageAltText%>"/>
+    <img class="image-frame" src="<%- imageUrl %>"  alt="<%= HtmlUtils.escape(imageAltText) %>"/>
     <div class="u-field-actions">
         <label class="u-field-upload-button">
-            <span class="upload-button-icon" aria-hidden="true"><%= uploadButtonIcon %></span>
-            <span class="upload-button-title" aria-live="polite"><%= uploadButtonTitle %></span>
-            <input class="upload-button-input" type="file" name="<%= inputName %>"/>
+            <span class="upload-button-icon" aria-hidden="true"><%= HtmlUtils.escape(uploadButtonIcon) %></span>
+            <span class="upload-button-title" aria-live="polite"><%= HtmlUtils.escape(uploadButtonTitle) %></span>
+            <input class="upload-button-input" type="file" name="<%= HtmlUtils.escape(inputName) %>"/>
        	</label>
-       	<button class="upload-submit" type="button" hidden="true"><%= uploadButtonTitle %></button>
+       	<button class="upload-submit" type="button" hidden="true"><%= HtmlUtils.escape(uploadButtonTitle) %></button>
         
         <button class="u-field-remove-button" type="button">
-            <span class="remove-button-icon" aria-hidden="true"><%= removeButtonIcon %></span>
-            <span class="remove-button-title" aria-live="polite"><%= removeButtonTitle %></span>
-            <span class="sr"><%= screenReaderTitle %></span>
+            <span class="remove-button-icon" aria-hidden="true"><%= HtmlUtils.escape(removeButtonIcon) %></span>
+            <span class="remove-button-title" aria-live="polite"><%= HtmlUtils.escape(removeButtonTitle) %></span>
+            <span class="sr"><%= HtmlUtils.escape(screenReaderTitle) %></span>
         </button>
     </div>
 </div>

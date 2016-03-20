@@ -18,6 +18,7 @@ from django.test import TestCase
 from django.utils import unittest
 from django.utils.http import urlencode
 from mock import patch
+from nose.plugins.attrib import attr
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -75,6 +76,7 @@ urlpatterns = patterns(
 )
 
 
+@attr('shard_2')
 @ddt.ddt
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
@@ -292,6 +294,7 @@ class OAuth2Tests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.write_status)
 
 
+@attr('shard_2')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestJWTAuthToggle(JwtMixin, TestCase):

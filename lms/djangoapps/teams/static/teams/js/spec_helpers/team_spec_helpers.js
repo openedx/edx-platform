@@ -29,9 +29,9 @@ define([
 
     var createMockTeamData = function (startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
-            var id = "id" + i;
+            var id = 'id' + i;
             return {
-                name: "team " + i,
+                name: 'Team <' + i + '>',
                 id: id,
                 language: testLanguages[i%4][0],
                 country: testCountries[i%4][0],

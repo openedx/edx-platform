@@ -3,6 +3,7 @@ Tests for bookmarks api.
 """
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 from django.conf import settings
@@ -35,6 +36,7 @@ class BookmarkApiEventTestMixin(object):
         self.assertFalse(mock_tracker.called)  # pylint: disable=maybe-no-member
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):

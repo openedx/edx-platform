@@ -1,4 +1,4 @@
-;(function (define) {
+;(function(define) {
     'use strict';
 
     define(['backbone',
@@ -8,6 +8,8 @@
             'common/js/components/views/search_field',
             'js/components/header/views/header',
             'js/components/header/models/header',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'edx-ui-toolkit/js/utils/string-utils',
             'teams/js/models/topic',
             'teams/js/collections/topic',
             'teams/js/models/team',
@@ -25,10 +27,10 @@
             'teams/js/views/team_utils',
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
-                  TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
+        function(Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel, HtmlUtils, StringUtils,
+                 TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
+                 TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
+                 TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function () {
                     _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
@@ -131,19 +133,22 @@
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext("Teams"),
-                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
+                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),  // jshint ignore:line
                         mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: interpolate(
+                                title: HtmlUtils.interpolateHtml(
                                     // Translators: sr_start and sr_end surround text meant only for screen readers.
                                     // The whole string will be shown to users as "Browse teams" if they are using a
                                     // screenreader, and "Browse" otherwise.
-                                    gettext("Browse %(sr_start)s teams %(sr_end)s"),
-                                    {"sr_start": '<span class="sr">', "sr_end": '</span>'}, true
+                                    gettext("Browse {sr_start}teams{sr_end}"),
+                                    {
+                                        sr_start: HtmlUtils.HTML('<span class="sr">'),
+                                        sr_end: HtmlUtils.HTML('</span>')
+                                    }
                                 ),
                                 url: 'browse',
                                 view: this.topicsView
@@ -161,10 +166,10 @@
 
                     $(document).ajaxError(function (event, xhr) {
                         if (xhr.status === 401) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed. Reload the page and try again."));
+                            TeamUtils.showMessage(gettext('Your request could not be completed. Reload the page and try again.'));  // jshint ignore:line
                         }
                         else if (xhr.status === 500) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem."));
+                            TeamUtils.showMessage(gettext('Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.'));  // jshint ignore:line
                         }
                     });
 
@@ -212,10 +217,9 @@
                                 collection: view.teamsCollection,
                                 breadcrumbs: view.createBreadcrumbs(topic),
                                 title: gettext('Team Search'),
-                                description: interpolate(
-                                    gettext('Showing results for "%(searchString)s"'),
-                                    { searchString: view.teamsCollection.searchString },
-                                    true
+                                description: HtmlUtils.interpolateHtml(
+                                    gettext('Showing results for "{searchString}"'),
+                                    { searchString: view.teamsCollection.searchString }
                                 ),
                                 showSortControls: false
                             });
@@ -233,8 +237,8 @@
                     this.getTopic(topicID).done(function (topic) {
                         view.mainView = view.createViewWithHeader({
                             topic: topic,
-                            title: gettext("Create a New Team"),
-                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            title: gettext('Create a New Team'),
+                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),  // jshint ignore:line
                             breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
                                 action: 'create',
@@ -268,7 +272,7 @@
                         });
                         editViewWithHeader = self.createViewWithHeader({
                             title: gettext("Edit Team"),
-                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),  // jshint ignore:line
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
@@ -297,7 +301,7 @@
                                 mainView: view,
                                 breadcrumbs: self.createBreadcrumbs(topic, team),
                                 title: gettext("Membership"),
-                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),  // jshint ignore:line
                                 topic: topic,
                                 team: team
                             }
@@ -347,7 +351,6 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
-                        self = this,
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
@@ -584,30 +587,27 @@
 
                 routeNotFound: function (route) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The page "%(route)s" could not be found.'),
-                            {route: route},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The page "{route}" could not be found.'),
+                            {route: route}
                         )
                     );
                 },
 
                 topicNotFound: function (topicID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The topic "%(topic)s" could not be found.'),
-                            {topic: topicID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The topic "{topic}" could not be found.'),
+                            {topic: topicID}
                         )
                     );
                 },
 
                 teamNotFound: function (teamID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The team "%(team)s" could not be found.'),
-                            {team: teamID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The team "{team}" could not be found.'),
+                            {team: teamID}
                         )
                     );
                 },

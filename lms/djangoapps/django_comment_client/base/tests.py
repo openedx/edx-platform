@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from lms.lib.comment_client import Thread
 
@@ -48,6 +49,7 @@ class MockRequestSetupMixin(object):
         mock_request.return_value = self._create_response_mock(data)
 
 
+@attr('shard_2')
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
@@ -83,6 +85,7 @@ class CreateThreadGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
 
 
+@attr('shard_2')
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_edited')
 @disable_signal(views, 'thread_voted')
@@ -340,6 +343,7 @@ class ViewsTestCaseMixin(object):
         self.assertEqual(data['commentable_id'], 'some_topic')
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_created')
@@ -389,6 +393,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.update_thread_helper(mock_request)
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
@@ -1016,6 +1021,7 @@ class ViewsTestCase(
         self.assertEqual(response.status_code, 200)
 
 
+@attr('shard_2')
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'comment_endorsed')
 class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
@@ -1125,6 +1131,7 @@ class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequ
         self.assertEqual(response.status_code, 200)
 
 
+@attr('shard_2')
 class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
     @classmethod
@@ -1160,6 +1167,7 @@ class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
+@attr('shard_2')
 @disable_signal(views, 'thread_edited')
 class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
@@ -1197,6 +1205,7 @@ class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
         self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
 class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
@@ -1239,6 +1248,7 @@ class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
             del Thread.commentable_id
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_edited')
 class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
 
@@ -1272,6 +1282,7 @@ class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
 class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     """
@@ -1318,6 +1329,7 @@ class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
             del Thread.commentable_id
 
 
+@attr('shard_2')
 @ddt.ddt
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'thread_voted')
@@ -1589,6 +1601,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockReq
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
 
 
+@attr('shard_2')
 @disable_signal(views, 'comment_created')
 @ddt.ddt
 class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
@@ -1774,6 +1787,7 @@ class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(event['vote_value'], 'up')
 
 
+@attr('shard_2')
 class UsersEndpointTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
 
     @classmethod

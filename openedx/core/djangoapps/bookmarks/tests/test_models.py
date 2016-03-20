@@ -6,6 +6,7 @@ import datetime
 import ddt
 from freezegun import freeze_time
 import mock
+from nose.plugins.attrib import attr
 import pytz
 from unittest import skipUnless
 
@@ -223,6 +224,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarkModelTests(BookmarksTestsBase):
@@ -407,6 +409,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
+@attr('shard_2')
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """
