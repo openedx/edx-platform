@@ -383,6 +383,9 @@ XBLOCK_MIXINS = (
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
+# Paths to wrapper methods which should be applied to every XBlock's FieldData.
+XBLOCK_FIELD_DATA_WRAPPERS = ()
+
 ############################ Modulestore Configuration ################################
 MODULESTORE_BRANCH = 'draft-preferred'
 
@@ -416,6 +419,10 @@ MODULESTORE = {
         }
     }
 }
+
+# Modulestore-level field override providers. These field override providers don't
+# require student context.
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
 
 #################### Python sandbox ############################################
 
