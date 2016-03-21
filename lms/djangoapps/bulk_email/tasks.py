@@ -418,8 +418,8 @@ def _get_source_address(course_id, course_title):
     # course title
     if len(from_addr) >= 320:
         max_course_title_length = 320 - len(format_address("")) - 5
-        course_title_no_quotes = course_title[:max_course_title_length] + u"..."
-        from_addr = format_address(course_title_no_quotes)
+        truncated_course_title = course_title_no_quotes[:max_course_title_length] + u"..."
+        from_addr = format_address(truncated_course_title)
 
     return from_addr
 
