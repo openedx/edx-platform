@@ -328,6 +328,8 @@ class ItemFactory(XModuleFactory):
         :data: (optional): the data for the item
             (e.g. XML problem definition for a problem item)
 
+        :name: (optional): the name of the item
+
         :display_name: (optional): the display name of the item
 
         :metadata: (optional): dictionary of metadata attributes
@@ -401,8 +403,9 @@ class ItemFactory(XModuleFactory):
                 )
 
                 course = store.get_course(location.course_key)
+                name = kwargs.pop('name', 'Static Tab')
                 course.tabs.append(
-                    CourseTab.load('static_tab', name='Static Tab', url_slug=location.name)
+                    CourseTab.load('static_tab', name=name, url_slug=location.name)
                 )
                 store.update_item(course, user_id)
 
