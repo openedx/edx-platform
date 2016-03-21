@@ -408,6 +408,11 @@ def _get_source_address(course_id, course_title):
         re.sub(r"[^\w.-]", '_', course_id.course),
         settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
     )
+
+    # make sure it's not longer than 320 chars
+    if len(from_addr) >= 320:
+        from_addr = from_addr[:316] + u"..."
+
     return from_addr
 
 
