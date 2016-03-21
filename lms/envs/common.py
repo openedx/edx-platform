@@ -1360,8 +1360,6 @@ PIPELINE_CSS = {
             'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/font-awesome.css',
             'css/vendor/jquery.qtip.min.css',
-            'css/vendor/responsive-carousel/responsive-carousel.css',
-            'css/vendor/responsive-carousel/responsive-carousel.slide.css',
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
