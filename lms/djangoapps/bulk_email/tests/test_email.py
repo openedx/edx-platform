@@ -314,9 +314,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         from_email = mail.outbox[0].from_email
 
         # 320 appears to be the length limit of from_email for amazon
-        self.assertEqual(len(from_email), 319)
-        self.assertTrue(from_email.endswith(u"..."))
+        self.assertEqual(len(from_email), 318)
+        self.assertIn(u"...", from_email)
         self.assertTrue(from_email.startswith(u'"xxx'))
+        self.assertTrue(
+            from_email.endswith(
+                u'Course Staff <{}-no-reply@example.com>'.format(course.id.course)
+            )
+        )
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')

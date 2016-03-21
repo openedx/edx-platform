@@ -403,15 +403,23 @@ def _get_source_address(course_id, course_title):
     # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
-    )
+    course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
-    # make sure it's not longer than 320 chars
+    def format_address(course_title_no_quotes):
+        return u'"{0}" Course Staff <{1}-{2}>'.format(
+            course_title_no_quotes,
+            course_name,
+            settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+        )
+
+    from_addr = format_address(course_title_no_quotes)
+
+    # if it's longer than 320 characters, reformat, but with a truncated
+    # course title
     if len(from_addr) >= 320:
-        from_addr = from_addr[:316] + u"..."
+        max_course_title_length = 320 - len(format_address("")) - 5
+        course_title_no_quotes = course_title[:max_course_title_length] + u"..."
+        from_addr = format_address(course_title_no_quotes)
 
     return from_addr
 
