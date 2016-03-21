@@ -947,19 +947,19 @@ class CoursesStaticTabsDetail(SecureAPIView):
     """
     **Use Case**
 
-        CoursesStaticTabsDetail returns a collection of custom pages in the
-        course, including the page content.
+        CoursesStaticTabsDetail returns a custom page in the course,
+        including the page content.
 
     **Example Requests**
 
-          GET /api/courses/{course_id}/static_tabs/{tab_id}
+          GET /api/courses/{course_id}/static_tabs/{tab_url_slug}
+          GET /api/courses/{course_id}/static_tabs/{tab_name}
 
     **Response Values**
 
-        * tabs: The collection of custom pages in the course. Each object in the
-          collection conains the following keys:
+        * tab: A custom page in the course. containing following keys:
 
-          * id: The ID of the custom page.
+          * id: The url_slug of the custom page.
 
           * name: The Display Name of the custom page.
 
@@ -975,7 +975,7 @@ class CoursesStaticTabsDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = OrderedDict()
         for tab in course_descriptor.tabs:
-            if tab.type == 'static_tab' and tab.url_slug == tab_id:
+            if tab.type == 'static_tab' and (tab.url_slug == tab_id or tab.name == tab_id):
                 response_data['id'] = tab.url_slug
                 response_data['name'] = tab.name
                 response_data['content'] = _get_static_tab_contents(
@@ -983,9 +983,9 @@ class CoursesStaticTabsDetail(SecureAPIView):
                     course_descriptor,
                     tab
                 )
-        if not response_data:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-        return Response(response_data, status=status.HTTP_200_OK)
+                return Response(response_data, status=status.HTTP_200_OK)
+
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CoursesUsersList(SecureAPIView):
