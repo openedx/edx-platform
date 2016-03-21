@@ -197,7 +197,8 @@ class CoursesApiTests(ModuleStoreTestCase):
             category="static_tab",
             parent_location=self.course.location,
             data=TEST_STATIC_TAB1_CONTENT,
-            display_name="syllabus"
+            display_name="syllabus",
+            name="Static+Tab"
         )
 
         self.static_tab2 = ItemFactory.create(
@@ -882,13 +883,15 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_static_tab_detail_get(self):
-        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
+    def test_static_tab_detail_get_by_name(self):
+        # get course static tab by tab name
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/Static+Tab'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         tab = response.data
         self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['name'], u'Static+Tab')
         self.assertEqual(tab['content'], self.static_tab1.data)
 
         # now try to get syllabus tab contents from cache
@@ -900,6 +903,8 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertTrue(tab_contents is not None)
         self.assertEqual(tab_contents, self.static_tab1.data)
 
+    def test_static_tab_detail_get_by_url_slug(self):
+        # get course static tab by url_slug
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
