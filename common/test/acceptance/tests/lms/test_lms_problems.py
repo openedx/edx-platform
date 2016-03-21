@@ -6,8 +6,6 @@ See also old lettuce tests in lms/djangoapps/courseware/features/problems.featur
 """
 from textwrap import dedent
 
-from flaky import flaky
-
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
@@ -360,7 +358,6 @@ class LogoutDuringAnswering(ProblemsTest):
         """
         self.browser.delete_cookie('sessionid')
 
-    @flaky  # TNL-4272
     def test_logout_after_click_redirect(self):
         """
         1) User goes to a problem page.

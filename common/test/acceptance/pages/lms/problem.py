@@ -91,6 +91,7 @@ class ProblemPage(PageObject):
         Fill in the answer to a numerical problem.
         """
         self.q(css='div.problem section.inputtype input').fill(text)
+        self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
     def click_check(self):
