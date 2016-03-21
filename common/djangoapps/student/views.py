@@ -1,6 +1,7 @@
 """
 Student Views
 """
+import MySQLdb
 import datetime
 import logging
 import uuid
