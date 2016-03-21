@@ -14,4 +14,12 @@ window.VerticalStudentView = function (runtime, element) {
             apiUrl: $(".courseware-bookmarks-button").data('bookmarksApiUrl')
         });
     });
+    RequireJS.require(['js/fullscreen/views/fullscreen_button'], function (FullscreenButton) {
+        var $element = $(element);
+        var $fullscreenButtonElement = $element.find('.fullscreen-button');
+
+        return new FullscreenButton({
+            el: $fullscreenButtonElement,
+        });
+    });
 };

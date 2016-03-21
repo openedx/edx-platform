@@ -1,0 +1,49 @@
+.course-content {
+
+  .fullscreen-icon.is_fullscreen {
+    top: -3px;
+    position: absolute;
+    left: ($baseline/4);
+  }
+
+  .fullscreen-button-wrapper {
+    text-align: right;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    float: right;
+  }
+
+  .fullscreen-button {
+    @extend %ui-clear-button;
+    @extend %btn-pl-default-base;
+    @include font-size(13);
+    padding: ($baseline/4) ($baseline/2);
+
+    &:before {
+      content: "\f0b2";
+      font-family: FontAwesome;
+    }
+
+    &.in_fullscreen {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+
+      &:before {
+        content: "\f066";
+        font-family: FontAwesome;
+      }
+    }
+  }
+
+  .fullscreen-element {
+    overflow: auto;
+    border-color: lighten($action-primary-bg,10%);
+    border-style: solid;
+    border-width: 5px;
+    padding: 10px;
+    height: calc(100vh - 10px);
+  }
+}

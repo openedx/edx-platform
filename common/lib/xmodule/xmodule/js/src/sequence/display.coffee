@@ -8,6 +8,7 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
+    @nextUrl = @el.data('next-url')
     @base_page_title = " | " + document.title
     @initProgress()
     @bind()
@@ -86,7 +87,7 @@ class @Sequence
     else
       @$('.sequence-nav-button.button-previous').removeClass('disabled').removeAttr('disabled').click(@previous)
 
-    if @position == @contents.length ## If the final position on the nav matches the total contents.
+    if @position == @contents.length and @nextUrl == null ## If the final position on the nav matches the total contents.
       @$('.sequence-nav-button.button-next').addClass('disabled').attr('disabled', true)
     else
       @$('.sequence-nav-button.button-next').removeClass('disabled').removeAttr('disabled').click(@next)
@@ -164,10 +165,13 @@ class @Sequence
       new: new_position
       id: @id
 
-    # If the bottom nav is used, scroll to the top of the page on change.
-    if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
-      $.scrollTo 0, 150
-    @render new_position
+    if (direction == "seq_next") and (@position == @contents.length)
+      window.location.href = @nextUrl
+    else
+      # If the bottom nav is used, scroll to the top of the page on change.
+      if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+        $.scrollTo 0, 150
+      @render new_position
 
   link_for: (position) ->
     @$("#sequence-list a[data-element=#{position}]")

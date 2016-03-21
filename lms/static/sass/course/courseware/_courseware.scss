@@ -413,6 +413,10 @@ html.video-fullscreen {
       margin-top: -($baseline);
       margin-bottom: $baseline;
       color: $gray;
+
+      &.in_fullscreen {
+        margin-top: 0;
+      }
     }
 
     div#seq_content {
