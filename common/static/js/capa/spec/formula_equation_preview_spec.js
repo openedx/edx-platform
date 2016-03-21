@@ -1,20 +1,3 @@
-var waitForInputAjax = function (conditionalFn) {
-    var deferred = $.Deferred(),
-        timeout;
-
-    var fn = function () {
-        if (conditionalFn()) {
-            timeout && clearTimeout(timeout);
-            deferred.resolve();
-        } else {
-            timeout = setTimeout(fn, 50);
-        }
-    };
-
-    setTimeout(fn, 50);
-    return deferred.promise();
-};
-
 describe("Formula Equation Preview", function () {
     beforeEach(function () {
         // Simulate an environment conducive to a FormulaEquationInput
@@ -101,7 +84,7 @@ describe("Formula Equation Preview", function () {
             formulaEquationPreview.enable();
 
             // This part may be asynchronous, so wait.
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 //debugger;
@@ -150,7 +133,7 @@ describe("Formula Equation Preview", function () {
             $('#input_THE_ID').val('user_input').trigger('input');
 
             // This part is probably asynchronous
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 expect(Problem.inputAjax.calls.mostRecent().args[3].formula).toEqual('user_input');
@@ -164,7 +147,7 @@ describe("Formula Equation Preview", function () {
             $('#input_THE_ID').val('').trigger('input');
 
             // Either it makes a request or jumps straight into displaying ''.
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 // (Short circuit if `inputAjax` is indeed called)
                 return Problem.inputAjax.calls.count() > 0 ||
                     MathJax.Hub.Queue.calls.count() > 0;
@@ -185,14 +168,14 @@ describe("Formula Equation Preview", function () {
                 $input.val(value).trigger('input');
             }
 
-            waitForInputAjax((function () {
+            jasmine.waitUntil((function () {
                 var iter = 0;
                 return function () {
                     inputAnother(iter++);
                     return Date.now() > end;  // Stop when we get to `end`.
                 };
             }())).then(function () {
-                return waitForInputAjax(function () {
+                return jasmine.waitUntil(function () {
                     return Problem.inputAjax.calls.count() > 0 &&
                         Problem.inputAjax.calls.mostRecent().args[3].formula == value;
                 });
@@ -217,7 +200,7 @@ describe("Formula Equation Preview", function () {
             expect($img.css('visibility')).toEqual('visible');
 
             // This part could be asynchronous
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 expect($img.css('visibility')).toEqual('visible');
@@ -228,7 +211,7 @@ describe("Formula Equation Preview", function () {
 
                 expect($img.css('visibility')).toEqual('visible');
             }).then(function () {
-                return waitForInputAjax(function () {
+                return jasmine.waitUntil(function () {
                     var args = Problem.inputAjax.calls.mostRecent().args;
                     return args[3].formula == "different";
                 });
@@ -238,7 +221,7 @@ describe("Formula Equation Preview", function () {
         it('updates MathJax and loading icon on callback', function (done) {
             formulaEquationPreview.enable();
 
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 var args = Problem.inputAjax.calls.mostRecent().args;
@@ -266,7 +249,7 @@ describe("Formula Equation Preview", function () {
             formulaEquationPreview.enable();
             $('#input_THE_ID').val('user_input').trigger('input');
 
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 var args = Problem.inputAjax.calls.mostRecent().args;
@@ -298,7 +281,7 @@ describe("Formula Equation Preview", function () {
         it('displays errors from the server well', function (done) {
             var $img = $("img.loading");
             formulaEquationPreview.enable();
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 var args = Problem.inputAjax.calls.mostRecent().args;
@@ -310,7 +293,7 @@ describe("Formula Equation Preview", function () {
                 expect(MathJax.Hub.Queue).not.toHaveBeenCalled();
                 expect($img.css('visibility')).toEqual('visible');
             }).then(function () {
-                return waitForInputAjax(function () {
+                return jasmine.waitUntil(function () {
                     return MathJax.Hub.Queue.calls.count() > 0;
                 });
             }).then(function () {
@@ -327,12 +310,12 @@ describe("Formula Equation Preview", function () {
         beforeEach(function (done) {
             formulaEquationPreview.enable();
 
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 $('#input_THE_ID').val('different').trigger('input');
             }).then(function () {
-                return waitForInputAjax(function () {
+                return jasmine.waitUntil(function () {
                     return Problem.inputAjax.calls.count() > 1;
                 });
             }).then(_.bind(function () {
@@ -405,7 +388,7 @@ describe("Formula Equation Preview", function () {
 
             // Make sure that it doesn't indeed show up later
             MathJax.Hub.Queue.calls.reset();
-            waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return formulaEquationPreview.errorDelay * 1.1;
             }).then(function () {
                 expect(MathJax.Hub.Queue).not.toHaveBeenCalled();

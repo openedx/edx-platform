@@ -4,7 +4,7 @@
         var state, oldOTBD, waitForPlaying;
 
         waitForPlaying = function (state, done) {
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return state.el.hasClass('is-playing');
             }).done(done);
         };

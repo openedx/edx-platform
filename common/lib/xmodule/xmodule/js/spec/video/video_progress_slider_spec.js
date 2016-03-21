@@ -286,7 +286,7 @@
 
             it('is called when video plays', function (done) {
                 state.videoPlayer.play();
-                jasmine.waitForInputAjax(function() {
+                jasmine.waitUntil(function() {
                     return state.videoPlayer.isPlaying();
                 }).done(function() {
                     expect(state.videoProgressSlider.notifyThroughHandleEnd).toHaveBeenCalledWith({end: false});

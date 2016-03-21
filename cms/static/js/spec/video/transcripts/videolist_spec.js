@@ -163,20 +163,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
         };
 
         var waitsForResponse = function (mockServer) {
-            var deferred = $.Deferred();
-            var fn = function() {
+            return jasmine.waitUntil(function () {
                 var requests = mockServer.requests,
                     len = requests.length;
 
-                if (len && requests[0].readyState === 4) {
-                    deferred.resolve();
-                } else {
-                    setTimeout(fn, 50);
-                }
-            };
-
-            setTimeout(fn, 50);
-            return deferred.promise();
+                return len && requests[0].readyState === 4;
+            });
         };
 
 

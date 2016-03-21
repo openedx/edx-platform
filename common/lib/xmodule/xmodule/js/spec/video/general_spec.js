@@ -108,7 +108,7 @@
             });
 
             it('callback, to be called after YouTube API loads, exists and is called', function (done) {
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.youtubeApiAvailable === true;
                 }).done(function(){
                     window.YT = jasmine.YT;

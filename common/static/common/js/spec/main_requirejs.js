@@ -30,6 +30,7 @@
             'backbone-super': "js/vendor/backbone-super",
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'js/libs/jasmine-stealth',
+            'jasmine-waituntil': 'js/libs/jasmine-waituntil',
             'URI': 'js/vendor/URI.min'
         },
         shim: {
@@ -137,6 +138,9 @@
             },
             'jasmine-stealth': {
                 deps: ['jasmine', 'underscore', 'underscore.string']
+            },
+            'jasmine-waituntil': {
+                deps: ['jquery']
             },
             "sinon": {
                 exports: "sinon"

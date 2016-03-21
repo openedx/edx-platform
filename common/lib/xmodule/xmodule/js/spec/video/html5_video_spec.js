@@ -42,7 +42,7 @@
                         });
 
                         it('player state was changed', function (done) {
-                            jasmine.waitForInputAjax(function () {
+                            jasmine.waitUntil(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                             }).then(function () {
                                 expect(state.videoPlayer.player.getPlayerState())
@@ -51,7 +51,7 @@
                         });
 
                         it('callback was not called', function (done) {
-                            jasmine.waitForInputAjax(function () {
+                            jasmine.waitUntil(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                             }).then(function () {
                                 expect(state.videoPlayer.player.callStateChangeCallback)
@@ -72,7 +72,7 @@
                         });
 
                         it('player state was changed', function (done) {
-                            jasmine.waitForInputAjax(function () {
+                            jasmine.waitUntil(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                             }).then(function () {
                                 expect(state.videoPlayer.player.getPlayerState())
@@ -81,7 +81,7 @@
                         });
 
                         it('callback was not called', function (done) {
-                            jasmine.waitForInputAjax(function () {
+                            jasmine.waitUntil(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                             }).then(function () {
                                 expect(state.videoPlayer.player.callStateChangeCallback)
@@ -104,7 +104,7 @@
 
 
                     it('player state was changed', function (done) {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function () {
                             expect(state.videoPlayer.player.getPlayerState())
@@ -113,7 +113,7 @@
                     });
 
                     it('callback was called', function (done) {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function () {
                             expect(state.videoPlayer.player.callStateChangeCallback)
@@ -128,7 +128,7 @@
                         state.videoPlayer.player.playerState = STATUS.UNSTARTED;
                         state.videoPlayer.player.playVideo();
 
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).done(done);
 
@@ -140,7 +140,7 @@
                     });
 
                     it('player state was changed', function (done) {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                         }).then(function () {
                             expect(state.videoPlayer.player.getPlayerState())
@@ -149,7 +149,7 @@
                     });
 
                     it('callback was called', function (done) {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                         }).then(function () {
                             expect(state.videoPlayer.player.callStateChangeCallback)
@@ -163,7 +163,7 @@
                         'player state was changed, start/end was defined, ' +
                         'onReady called', function (done)
                     {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).then(function () {
                             expect(state.videoPlayer.player.getPlayerState())
@@ -177,7 +177,7 @@
 
                 describe('[ended]', function () {
                     beforeEach(function (done) {
-                        jasmine.waitForInputAjax(function () {
+                        jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).done(done);
                     });
@@ -202,7 +202,7 @@
                     volume = state.videoPlayer.player.video.volume;
                     seek = state.videoPlayer.player.video.currentTime;
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoPlayer.player.playerState === STATUS.PAUSED;
                     }).done(done);
                 });

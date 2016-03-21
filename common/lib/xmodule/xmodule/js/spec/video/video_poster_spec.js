@@ -29,7 +29,7 @@
 
         it('can start playing the video on click', function (done) {
             $('.btn-play').click();
-            jasmine.waitForInputAjax(function() {
+            jasmine.waitUntil(function() {
                 return state.el.hasClass('is-playing');
             }).done(done);
         });

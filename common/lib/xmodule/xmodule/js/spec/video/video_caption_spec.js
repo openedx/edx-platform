@@ -60,7 +60,7 @@
                 it('fetch the transcript in HTML5 mode', function (done) {
                     state = jasmine.initializePlayer();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.loaded;
                     }).then(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
@@ -80,7 +80,7 @@
                     spyOn(state, 'isFlashMode').and.returnValue(true);
                     state.videoCaption.fetchCaption();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.loaded;
                     }).then(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
@@ -100,7 +100,7 @@
                 it('fetch the transcript in Youtube mode', function (done) {
                     state = jasmine.initializePlayerYouTube();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.loaded;
                     }).then(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
@@ -310,7 +310,7 @@
                 beforeEach(function (done) {
                     state = jasmine.initializePlayer();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.rendered;
                     }).then(function(){
                         done();
@@ -379,7 +379,7 @@
                 it('set rendered to true', function (done) {
                     state = jasmine.initializePlayer();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.rendered;
                     }).then(function () {
                         expect(state.videoCaption.rendered).toBeTruthy();
@@ -404,7 +404,7 @@
                 it('show transcript on play', function (done) {
                     state.el.trigger('play');
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.rendered;
                     }).then(function () {
                         var captionsData = jasmine.stubbedCaption,
@@ -448,7 +448,7 @@
 
                 state = jasmine.initializePlayer();
                 jasmine.clock().tick(50);
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
                 }).then(function () {
                     done();
@@ -807,7 +807,7 @@
                     state = jasmine.initializePlayer();
                     state.videoCaption.play();
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.videoCaption.rendered;
                     }).then(function(){
                         done();
@@ -859,7 +859,7 @@
             beforeEach(function (done) {
                 state = jasmine.initializePlayer();
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
                 }).then(function(){
                     done();
@@ -940,7 +940,7 @@
             beforeEach(function (done) {
                 state = jasmine.initializePlayer();
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
                 }).then(function () {
                     videoControl = state.videoControl;
@@ -1154,7 +1154,7 @@
             beforeEach(function (done) {
                 state = jasmine.initializePlayer();
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
                 }).then(function(){
                     done();

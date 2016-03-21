@@ -54,7 +54,7 @@
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
                     return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
                 }).then(function () {
@@ -81,7 +81,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -112,7 +112,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -143,7 +143,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -174,7 +174,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -207,7 +207,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -238,7 +238,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -269,7 +269,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -300,7 +300,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -332,7 +332,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -365,7 +365,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -397,7 +397,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -429,7 +429,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -461,7 +461,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -493,7 +493,7 @@
                 sliderEl = state.videoProgressSlider.slider;
                 spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
@@ -530,7 +530,7 @@
             var btnPlay;
             state = jasmine.initializePlayer({focusFirstControl: true});
             btnPlay = state.el.find('.video-controls .play');
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return state.el.hasClass('is-initialized');
             }).then(function () {
                 expect(btnPlay).toBeFocused();

@@ -26,7 +26,7 @@ function (AsyncProcess) {
                 processedArray = result;
             });
 
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
             }).then(function () {
                 expect(processedArray).toEqual(expectedArray);
@@ -41,7 +41,7 @@ function (AsyncProcess) {
                 isError = true;
             });
 
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return isError;
             }).then(function () {
                 expect(isError).toBeTruthy();
@@ -56,7 +56,7 @@ function (AsyncProcess) {
                 processedArray = result;
             });
 
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
             }).then(function () {
                 expect(processedArray).toEqual([]);
@@ -70,7 +70,7 @@ function (AsyncProcess) {
                 processedArray = result;
             });
 
-            jasmine.waitForInputAjax(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
             }).then(function () {
                 expect(processedArray).toEqual(items);

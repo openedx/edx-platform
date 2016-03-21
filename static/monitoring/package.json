@@ -25,9 +25,6 @@
     },
     "devDependencies": {
         "jasmine": "1.0.0",
-        "jasmine-async": "0.1.0",
-        "jasmine-jquery": "1.5.1",
-        "jasmine-stealth": "0.0.12",
         "sinon": "1.17.0",
         "squire": "1.0.0"
     }

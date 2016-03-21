@@ -37,6 +37,7 @@ lib_paths:
     - common_static/coffee/src/ajax_prefix.js
     - common_static/js/src/logger.js
     - common_static/js/vendor/jasmine-imagediff.js
+    - common_static/js/libs/jasmine-waituntil.js
     - common_static/js/vendor/requirejs/require.js
     - RequireJS-namespace-undefine.js
     - common_static/js/vendor/jquery-ui.min.js
@@ -59,7 +60,6 @@ lib_paths:
     - common_static/js/vendor/moment.min.js
     - spec/main_requirejs.js
     - src/word_cloud/d3.min.js
-    - spec_util.js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

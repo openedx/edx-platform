@@ -376,7 +376,7 @@ function (VideoPlayer) {
                 beforeEach(function (done) {
                     state.videoPlayer.play();
 
-                    jasmine.waitForInputAjax(function() {
+                    jasmine.waitUntil(function() {
                         return state.videoPlayer.isPlaying();
                     }).done(done);
                 });
@@ -543,7 +543,7 @@ function (VideoPlayer) {
                 state.videoPlayer.pause.calls.reset();
                 state.videoPlayer.play();
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = Math.round(state.videoPlayer.currentTime);
                     return state.videoPlayer.pause.calls.count() === 1;
                 }).then(function () {
@@ -569,7 +569,7 @@ function (VideoPlayer) {
             it('update the video playback time', function (done) {
                 var duration = 0;
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     if (duration > 0) {
@@ -586,7 +586,7 @@ function (VideoPlayer) {
             });
 
             it('update the playback time on caption', function (done) {
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.videoPlayer.duration() > 0;
                 }, 1000).then(function () {
                     state.videoPlayer.goToStartTime = false;
@@ -600,7 +600,7 @@ function (VideoPlayer) {
             it('update the playback time on progress slider', function (done) {
                 var duration = 0;
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return duration > 0;
@@ -652,7 +652,7 @@ function (VideoPlayer) {
 
                 state.videoPlayer.play();
 
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     duration = state.videoPlayer.duration();
 
                     return state.videoPlayer.isPlaying() &&
@@ -860,14 +860,14 @@ function (VideoPlayer) {
                     state.videoEl = $('video, iframe');
                     controls = state.el.find('.video-controls');
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         return state.el.hasClass('is-initialized');
                     }).then(function () {
                         expect(controls).toHaveClass('is-hidden');
                         state.videoPlayer.play();
                     }).always(done);
 
-                    jasmine.waitForInputAjax(function () {
+                    jasmine.waitUntil(function () {
                         var duration = state.videoPlayer.duration();
 
                         return duration > 0 && state.videoPlayer.isPlaying();

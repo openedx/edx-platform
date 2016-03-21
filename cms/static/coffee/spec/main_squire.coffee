@@ -37,6 +37,7 @@ requirejs.config({
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
+        "jasmine-waituntil": "xmodule_js/common_static/js/libs/jasmine-waituntil",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
@@ -156,6 +157,9 @@ requirejs.config({
         },
         "jasmine-stealth": {
             deps: ["jasmine", "underscore", "underscore.string"]
+        },
+        "jasmine-waituntil": {
+            deps: ["jquery"]
         },
         "xblock/core": {
             exports: "XBlock",

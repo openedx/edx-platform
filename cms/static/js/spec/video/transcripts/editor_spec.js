@@ -43,18 +43,10 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             transcripts, container;
 
         var waitsForDisplayName = function (collection) {
-            var deferred = $.Deferred();
-            var fn = function () {
+            return jasmine.waitUntil(function () {
                 var displayNameValue = collection[0].getValue();
-                if (displayNameValue !== '' && displayNameValue != 'video_id') {
-                    deferred.resolve();
-                } else {
-                    setTimeout(fn, 50);
-                }
-            };
-
-            setTimeout(fn, 50);
-            return deferred.promise();
+                return displayNameValue !== '' && displayNameValue != 'video_id';
+            });
         };
 
         beforeEach(function () {

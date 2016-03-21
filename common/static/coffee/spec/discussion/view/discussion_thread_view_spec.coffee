@@ -222,18 +222,6 @@ describe "DiscussionThreadView", ->
                     assertResponseCountAndPaginationCorrect(@view, "111 responses", "Showing first 3 responses", "Load next 100 responses")
 
     describe "inline mode", ->
-        waitForCondition = (conditionalFn) ->
-            deferred = $.Deferred()
-
-            fn = ->
-                if conditionalFn()
-                    deferred.resolve()
-                else
-                    setTimeout(fn, 50)
-
-            fn()
-            return deferred.promise()
-
         beforeEach ->
             @view = new DiscussionThreadView(
                 model: @thread
@@ -258,7 +246,7 @@ describe "DiscussionThreadView", ->
                 @view.render()
                 @view.expand()
                 self = @
-                waitForCondition(->
+                jasmine.waitUntil(->
                     # This is the implementation of "toBeFocused". However, simply calling that method
                     # with no wait seems to be flaky.
                     article = self.view.$el.find('.discussion-article')

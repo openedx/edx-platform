@@ -21,8 +21,8 @@ describe 'Problem', ->
     loadFixtures 'problem.html'
 
     spyOn Logger, 'log'
-    spyOn($.fn, 'load').andCallFake (url, callback) ->
-      $(@).html problem_content_default
+    spyOn($.fn, 'load').and.callFake (url, callback) ->
+      $(@).html readFixtures('problem_content.html')
       callback()
 
   describe 'constructor', ->

@@ -21,7 +21,7 @@
             });
 
             it('initialize', function (done) {
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.el.hasClass('is-initialized');
                 }).then(function () {
                     expect('initialize').not.toHaveBeenTriggeredOn('.video');
@@ -29,7 +29,7 @@
             });
 
             it('ready', function (done) {
-                jasmine.waitForInputAjax(function () {
+                jasmine.waitUntil(function () {
                     return state.el.hasClass('is-initialized');
                 }).then(function () {
                     expect('ready').not.toHaveBeenTriggeredOn('.video');
