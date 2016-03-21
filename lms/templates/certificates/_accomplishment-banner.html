@@ -40,7 +40,7 @@ from django.template.defaultfilters import escapejs
 <div class="wrapper-banner wrapper-banner-user">
     <section class="banner banner-user">
         <div class="message message-block message-notice">
-            <h2 class="message-title hd-5 emphasized">${accomplishment_banner_opening}</h2>
+            <h2 class="message-title hd-5 emphasized">${accomplishment_banner_opening | h}</h2>
             <div class="wrapper-copy-and-actions">
                 <p class="message-copy copy copy-base emphasized">${accomplishment_banner_congrats}</p>
                 <div class="message-actions">
