@@ -24,7 +24,7 @@ course_mode_class = course_mode if course_mode else ''
             <div class="wrapper-statement-and-signatories">
                 <div class="accomplishment-statement">
                     <p class="accomplishment-statement-lead">
-                        <strong class="accomplishment-recipient hd-1 emphasized">${accomplishment_copy_name}</strong>
+                        <strong class="accomplishment-recipient hd-1 emphasized">${accomplishment_copy_name | h}</strong>
                         <span class="accomplishment-summary copy copy-lead">${accomplishment_copy_description_full}</span>
 
                         <span class="accomplishment-course hd-1 emphasized">
@@ -86,7 +86,7 @@ course_mode_class = course_mode if course_mode else ''
 
     <div class="wrapper-accomplishment-metadata">
         <div class="accomplishment-metadata">
-            <h2 class="accomplishment-metadata-title hd-6">${accomplishment_copy_more_about}</h2>
+            <h2 class="accomplishment-metadata-title hd-6">${accomplishment_copy_more_about | h}</h2>
 
             <div class="wrapper-metadata">
                 <dl class="metadata accomplishment-recipient">
@@ -96,7 +96,7 @@ course_mode_class = course_mode if course_mode else ''
                             <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="">
                         </span>
                         <div class="recipient-details">
-                            <h3 class="recipient-name">${accomplishment_copy_name}</h3>
+                            <h3 class="recipient-name">${accomplishment_copy_name | h}</h3>
                             <p class="recipient-username">${accomplishment_copy_username} @ ${platform_name}</p>
                         </div>
                     </dd>
