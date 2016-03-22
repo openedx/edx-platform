@@ -1633,14 +1633,14 @@ REQUIRE_ENVIRONMENT = "node"
 # If you want to load JavaScript dependencies using RequireJS
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
-REQUIRE_JS_PATH_OVERRIDES = [
-    'js/bookmarks/views/bookmark_button.js',
-    'js/views/message_banner.js',
-    'js/vendor/moment.min.js',
-    'js/vendor/url.min.js',
-    'js/courseware/course_home_events.js',
-    'js/courseware/toggle_element_visibility.js'
-]
+REQUIRE_JS_PATH_OVERRIDES = {
+    'bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'message_banner': 'js/views/message_banner.js',
+    'moment': 'js/vendor/moment.min.js',
+    'url': 'js/vendor/url.min.js',
+    'course_home_events': 'js/courseware/course_home_events.js',
+    'toggle_element_visibility': 'js/courseware/toggle_element_visibility.js'
+}
 ################################# CELERY ######################################
 
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
