@@ -94,6 +94,7 @@ class UsersPageMixin(PageObject):
         self.click_add_button()
         self.set_new_user_email(email)
         self.click_submit_new_user_form()
+        self.wait_for_page()
 
     def delete_user_from_course(self, email):
         """ Deletes user from course/library """
