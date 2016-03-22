@@ -4,6 +4,7 @@ import datetime
 import json
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from freezegun import freeze_time
@@ -99,3 +100,13 @@ class EdxRestApiClientTest(TestCase):
         )
         actual_object = ecommerce_api_client(self.user).baskets(1).order.get()
         self.assertEqual(actual_object, {u"result": u"Préparatoire"})
+
+    def test_client_with_user_without_profile(self):
+        """
+        Verify client initialize successfully for users having no profile.
+        """
+        worker = User.objects.create_user(username='test_worker', email='test@example.com')
+        api_client = ecommerce_api_client(worker)
+
+        self.assertEqual(api_client._store['session'].auth.__dict__['username'], worker.username)  # pylint: disable=protected-access
+        self.assertIsNone(api_client._store['session'].auth.__dict__['full_name'])  # pylint: disable=protected-access
