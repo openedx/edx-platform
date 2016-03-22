@@ -37,7 +37,8 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """ Don't show every single field in the admin change list """
         return (
             'name', 'enabled', 'backend_name', 'entity_id', 'metadata_source',
-            'has_data', 'icon_class', 'change_date', 'changed_by', 'edit_link'
+            'has_data', 'icon_class', 'icon_image', 'change_date',
+            'changed_by', 'edit_link'
         )
 
     def has_data(self, inst):
@@ -104,6 +105,7 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
 
     exclude = (
         'icon_class',
+        'icon_image',
         'secondary',
     )
 
