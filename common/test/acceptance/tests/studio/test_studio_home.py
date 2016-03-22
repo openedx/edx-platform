@@ -2,6 +2,7 @@
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
 from bok_choy.web_app_test import WebAppTest
+from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
 
@@ -32,6 +33,7 @@ class CreateLibraryTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
+    @flaky  # TODO: SOL-430
     def test_create_library(self):
         """
         From the home page:

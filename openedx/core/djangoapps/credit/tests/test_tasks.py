@@ -3,6 +3,7 @@ Tests for credit course tasks.
 """
 
 import mock
+from nose.plugins.attrib import attr
 from datetime import datetime, timedelta
 
 from pytz import UTC
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from edx_proctoring.api import create_exam
 
 
+@attr('shard_2')
 class TestTaskExecution(ModuleStoreTestCase):
     """Set of tests to ensure that the task code will do the right thing when
     executed directly.

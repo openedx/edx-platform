@@ -104,6 +104,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
 
+    def __init__(self, **kwargs):
+        super(PreviewModuleSystem, self).__init__(**kwargs)
+
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
             'usage_key_string': unicode(block.scope_ids.usage_id),
@@ -236,8 +239,8 @@ def _preview_module_system(request, descriptor, field_data):
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
-            "i18n": ModuleI18nService(),
             "field-data": field_data,
+            "i18n": ModuleI18nService,
             "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),

@@ -4,6 +4,7 @@ import unittest
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
+from nose.plugins.attrib import attr
 import httpretty
 from oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
@@ -19,6 +20,7 @@ from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@attr('shard_2')
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, TestCase):
     """ Tests covering the retrieval of user credentials from the Credentials

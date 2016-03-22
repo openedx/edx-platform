@@ -4,6 +4,7 @@ Tests for cohorts
 # pylint: disable=no-member
 import ddt
 from mock import call, patch
+from nose.plugins.attrib import attr
 import before_after
 
 from django.contrib.auth.models import User
@@ -25,6 +26,7 @@ from ..tests.helpers import (
 )
 
 
+@attr('shard_2')
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
 class TestCohortSignals(TestCase):
     """
@@ -130,6 +132,7 @@ class TestCohortSignals(TestCase):
         self.assertFalse(mock_tracker.emit.called)
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestCohorts(ModuleStoreTestCase):
     """
@@ -723,6 +726,7 @@ class TestCohorts(ModuleStoreTestCase):
             )
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """

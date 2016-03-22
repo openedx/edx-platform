@@ -159,6 +159,21 @@ class CertificateSearchTests(CertificateSupportTestCase):
         else:
             self.assertEqual(response.status_code, 400)
 
+    def test_search_with_plus_sign(self):
+        """
+        Test that email address that contains '+' accepted by student support
+        """
+        self.student.email = "student+student@example.com"
+        self.student.save()  # pylint: disable=no-member
+
+        response = self._search(self.student.email)
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+
+        self.assertEqual(len(results), 1)
+        retrieved_data = results[0]
+        self.assertEqual(retrieved_data["username"], self.STUDENT_USERNAME)
+
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)

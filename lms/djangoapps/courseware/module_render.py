@@ -75,7 +75,7 @@ from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.mixin import wrap_with_license
-from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from .field_overrides import OverrideFieldData
@@ -713,7 +713,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
         services={
-            'i18n': ModuleI18nService(),
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),

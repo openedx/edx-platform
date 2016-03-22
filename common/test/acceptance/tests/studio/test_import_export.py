@@ -409,6 +409,7 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     def page_args(self):
         return [self.browser, self.library_key]
 
+    @flaky  # TODO: SOL-430
     def test_library_updated(self):
         """
         Given that I visit an empty library
