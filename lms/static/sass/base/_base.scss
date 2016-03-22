@@ -235,7 +235,7 @@ mark {
   }
 }
 
-.help-tab, .report-tab {
+.help-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
   @extend %ui-depth2;
@@ -261,10 +261,6 @@ mark {
       background: $link-color;
     }
   }
-}
-
-.report-tab {
-  top: 442px;
 }
 
 .help-buttons {
@@ -296,7 +292,7 @@ mark {
   }
 }
 
-#feedback_form, #report-form {
+#feedback_form {
   input, textarea {
     font: normal 1em/1.4em $sans-serif;
   }
@@ -305,7 +301,7 @@ mark {
   }
 }
 
-#feedback_success_wrapper, #report-success-wrapper {
+#feedback_success_wrapper {
   p {
     padding: 0 $baseline $baseline $baseline;
   }
