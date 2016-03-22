@@ -166,8 +166,11 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Create a user account
         email, password = self._create_unique_user()
 
-        # Navigate to the login page and try to log in using "Dummy" provider
+        # Navigate to the login page
         self.login_page.visit()
+        self.assertScreenshot('#login .login-providers', 'login-providers')
+
+        # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
 
         # The user will be redirected somewhere and then back to the login page:
@@ -206,6 +209,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # We should now be redirected to the login page
         self.login_page.wait_for_page()
         self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
+        self.assertScreenshot('#hinted-login-form', 'hinted-login')
         self.login_page.click_third_party_dummy_provider()
 
         # We should now be redirected to the course page
@@ -329,8 +333,11 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         Test that we can register using third party credentials, and that the
         third party account gets linked to the edX account.
         """
-        # Navigate to the register page and try to authenticate using the "Dummy" provider
+        # Navigate to the register page
         self.register_page.visit()
+        self.assertScreenshot('#register .login-providers', 'register-providers')
+
+        # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()
 
         # The user will be redirected somewhere and then back to the register page:
