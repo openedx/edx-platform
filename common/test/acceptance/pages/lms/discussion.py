@@ -48,6 +48,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         Given the selector for an ancestor of a secondary menu, return a context
         manager that will open and close the menu
         """
+        self.wait_for_ajax()
         self._find_within(ancestor_selector + " .action-more").click()
         EmptyPromise(
             lambda: self._is_element_visible(ancestor_selector + " .actions-dropdown"),
@@ -69,6 +70,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def get_response_total_text(self):
         """Returns the response count text, or None if not present"""
+        self.wait_for_ajax()
         return self._get_element_text(".response-count")
 
     def get_num_displayed_responses(self):
@@ -132,6 +134,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
+        self.wait_for_ajax()
         return self._is_element_visible(".response_{} .response-body".format(comment_id))
 
     def is_response_editable(self, response_id):

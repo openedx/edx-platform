@@ -12,6 +12,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from nose.plugins.attrib import attr
 
 from student.tests.factories import UserFactory
 
@@ -30,6 +31,7 @@ def create_mock_request():
     return request
 
 
+@attr('shard_2')
 class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
@@ -130,6 +132,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_user_in_session()
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
@@ -232,6 +235,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.assert_response_with_delete_cookie()
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """

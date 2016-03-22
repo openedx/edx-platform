@@ -1237,7 +1237,7 @@ base_vendor_js = [
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'js/vendor/underscore-min.js',
-    'js/vendor/require.js',
+    'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
     'js/vendor/backbone-min.js'
@@ -1604,7 +1604,7 @@ REQUIRE_BASE_URL = "./"
 REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
-REQUIRE_JS = "js/vendor/require.js"
+REQUIRE_JS = "js/vendor/requirejs/require.js"
 
 # A dictionary of standalone modules to build with almond.js.
 REQUIRE_STANDALONE_MODULES = {}
@@ -1633,7 +1633,11 @@ REQUIRE_ENVIRONMENT = "node"
 # then you need to add the js urls in this list.
 REQUIRE_JS_PATH_OVERRIDES = [
     'js/bookmarks/views/bookmark_button.js',
-    'js/views/message_banner.js'
+    'js/views/message_banner.js',
+    'js/vendor/moment.min.js',
+    'js/vendor/url.min.js',
+    'js/courseware/course_home_events.js',
+    'js/courseware/toggle_element_visibility.js'
 ]
 ################################# CELERY ######################################
 

@@ -16,7 +16,6 @@
         "moment": "2.10.6",
         "mustache": "0.5.1",
         "rangeslider": "1.0",
-        "require": "2.1.8",
         "requirejs-text": "2.0.14",
         "slickgrid": "2.1",
         "timeago": "0.11.4",

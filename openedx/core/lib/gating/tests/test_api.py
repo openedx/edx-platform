@@ -2,6 +2,7 @@
 Tests for the gating API
 """
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 from ddt import ddt, data
 from milestones.tests.utils import MilestonesTestCaseMixin
 from milestones import api as milestones_api
@@ -11,6 +12,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
 
 
+@attr('shard_2')
 @ddt
 @patch.dict('django.conf.settings.FEATURES', {'MILESTONES_APP': True})
 class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):

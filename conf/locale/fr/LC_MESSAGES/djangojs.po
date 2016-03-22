@@ -120,7 +120,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-10 18:16+0000\n"
 "PO-Revision-Date: 2016-02-20 21:50+0000\n"
 "Last-Translator: Eric Fortin\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -2856,6 +2856,10 @@ msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Erreur lors de la génération du rapport des notes. Merci d’essayer à "
 "nouveau."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5665,6 +5669,10 @@ msgstr "Nouveau composant \"%(component_type)s\""
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "Attention"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore

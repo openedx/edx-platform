@@ -85,7 +85,7 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = request.GET.get("user", "")
+    user_filter = urllib.unquote(urllib.quote_plus(request.GET.get("user", "")))
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)

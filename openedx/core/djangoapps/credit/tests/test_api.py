@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core import mail
 from django.test.utils import override_settings
 from django.db import connection, transaction
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 import pytz
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -86,6 +87,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         return credit_course
 
 
+@attr('shard_2')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
 @ddt.ddt
 class CreditRequirementApiTests(CreditApiTestBase):
@@ -550,6 +552,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(req_status[0]["status"], None)
 
 
+@attr('shard_2')
 @ddt.ddt
 class CreditProviderIntegrationApiTests(CreditApiTestBase):
     """

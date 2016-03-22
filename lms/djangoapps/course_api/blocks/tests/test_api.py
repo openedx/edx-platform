@@ -77,3 +77,22 @@ class TestGetBlocks(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
                 self.assertIn(unicode(block.location), blocks['blocks'])
             else:
                 self.assertNotIn(unicode(block.location), blocks['blocks'])
+
+    def test_filtering_by_block_types(self):
+        sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
+
+        # not filtered blocks
+        blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
+        self.assertEquals(len(blocks['blocks']), 5)
+        found_not_problem = False
+        for block in blocks['blocks'].itervalues():
+            if block['type'] != 'problem':
+                found_not_problem = True
+        self.assertTrue(found_not_problem)
+
+        # filtered blocks
+        blocks = get_blocks(self.request, sequential_block.location, self.user,
+                            block_types_filter=['problem'], requested_fields=['type'])
+        self.assertEquals(len(blocks['blocks']), 3)
+        for block in blocks['blocks'].itervalues():
+            self.assertEqual(block['type'], 'problem')

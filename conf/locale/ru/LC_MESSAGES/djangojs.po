@@ -22,6 +22,7 @@
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
+# Maria Artemieva <maria.m.artemieva@gmail.com>, 2016
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Orlov <mike.orlv@gmail.com>, 2015
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -114,7 +115,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-10 18:16+0000\n"
 "PO-Revision-Date: 2016-02-29 15:27+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -2942,6 +2943,10 @@ msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Ошибка при создании подробного оценочного листа. Пожалуйста, попробуйте ещё "
 "раз."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5836,6 +5841,10 @@ msgstr "Новый %(component_type)s"
 msgid "Warning"
 msgstr "Предупреждение"
 
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr ""
+
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
@@ -7178,7 +7187,7 @@ msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
 msgstr[0] "Загрузить %(num_items)s результат"
 msgstr[1] "Загрузить следующие %(num_items)s результата"
-msgstr[2] ""
+msgstr[2] "Загрузить следующие %(num_items)s результаты"
 msgstr[3] "Загрузить следующие %(num_items)s результаты"
 
 #: lms/templates/search/course_search_results.underscore
