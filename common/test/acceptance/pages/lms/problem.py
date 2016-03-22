@@ -37,6 +37,13 @@ class ProblemPage(PageObject):
         return self.q(css="div.problem span.message").text[0]
 
     @property
+    def extract_hint_text_from_html(self):
+        """
+        Return the "hint" text of the problem from html
+        """
+        return self.q(css="div.problem div.problem-hint").html[0].split(' <', 1)[0]
+
+    @property
     def hint_text(self):
         """
         Return the "hint" text of the problem from its div.
