@@ -60,7 +60,8 @@ def forwards(apps, schema_editor):
         assertion.save()
         # Would be overwritten by the first save.
         assertion.created = datetime.fromtimestamp(
-            time.mktime(time.strptime(badge.data['created_at'], "%Y-%m-%dT%H:%M:%S"))
+            # Later versions of badgr include microseconds, but they aren't certain to be there.
+            time.mktime(time.strptime(badge.data['created_at'].split('.')[0], "%Y-%m-%dT%H:%M:%S"))
         )
         assertion.save()
 
