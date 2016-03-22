@@ -52,7 +52,8 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-spyOn(window, 'onunload')
+# This is forbidden in jasmine 2. Spies must be created in a before function or a spec.
+# spyOn(window, 'onunload')
 
 # Stub Youtube API
 window.YT =
@@ -65,7 +66,7 @@ window.YT =
     CUED: 5
 
 # Stub jQuery.cookie
-$.cookie = jasmine.createSpy('jQuery.cookie').andReturn '1.0'
+$.cookie = jasmine.createSpy('jQuery.cookie').and.returnValue '1.0'
 
 # Stub jQuery.qtip
 $.fn.qtip = jasmine.createSpy 'jQuery.qtip'
