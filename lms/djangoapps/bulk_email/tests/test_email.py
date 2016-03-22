@@ -51,12 +51,12 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
     Test that emails send correctly.
     """
 
-    @classmethod
-    def create_course(cls):
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        cls.course = CourseFactory.create(display_name=course_title)
-
     def create_staff_and_instructor(self):
+        """
+        Creates one instructor and several course staff for self.course. Assigns
+        them to self.instructor (single user) and self.staff (list of users),
+        repectively.
+        """
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         self.staff = [
@@ -64,27 +64,39 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         ]
 
     def create_students(self):
+        """
+        Creates users and enrolls them in self.course. Assigns these users to
+        self.students.
+        """
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
-    def login_as_instructor(self, instructor):
-        self.client.login(username=instructor.username, password="test")
+    def login_as_user(self, user):
+        """
+        Log in self.client as user.
+        """
+        self.client.login(username=user.username, password="test")
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def goto_instructor_dash_email_view(self):
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        """
+        Goes to the instructor dashboard to verify that the email section is
+        there.
+        """
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
-        response = self.client.get(self.url)
+        response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
-        self.assertTrue(email_section in response.content)
+        self.assertIn(email_section, response.content)
 
     @classmethod
     def setUpClass(cls):
         super(EmailSendFromDashboardTestCase, cls).setUpClass()
-        cls.create_course()
+        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        cls.course = CourseFactory.create(display_name=course_title)
 
     def setUp(self):
         super(EmailSendFromDashboardTestCase, self).setUp()
@@ -94,11 +106,12 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.login_as_instructor(self.instructor)
+        self.login_as_user(self.instructor)
 
         self.goto_instructor_dash_email_view()
-
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': unicode(self.course.id)})
+        self.send_mail_url = reverse(
+            'send_email', kwargs={'course_id': unicode(self.course.id)}
+        )
         self.success_content = {
             'course_id': unicode(self.course.id),
             'success': True,
@@ -374,7 +387,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
     def test_long_course_display_name(self):
         """
         This test tests that courses with exorbitantly large display names
-        can still send emails
+        can still send emails, since it appears that 320 appears to be the
+        character length limit of from emails for Amazon SES.
         """
         test_email = {
             'action': 'Send email',
@@ -385,13 +399,10 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         # make very long display_name for course
         long_name = u"x" * 321
-        course = CourseFactory(display_name=long_name)
+        course = CourseFactory.create(display_name=long_name)
         instructor = InstructorFactory(course_key=course.id)
 
-        # login as instructor
-        self.login_as_instructor(instructor)
-
-        # Post the email to the instructor dashboard API
+        self.login_as_user(instructor)
         send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
         response = self.client.post(send_mail_url, test_email)
         self.assertTrue(json.loads(response.content)['success'])
@@ -399,7 +410,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox), 1)
         from_email = mail.outbox[0].from_email
 
-        # 320 appears to be the length limit of from_email for amazon
         self.assertEqual(len(from_email), 318)
         self.assertIn(u"...", from_email)
         self.assertTrue(from_email.startswith(u'"xxx'))

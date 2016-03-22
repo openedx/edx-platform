@@ -408,15 +408,22 @@ def _get_source_address(course_id, course_title):
     course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
     # Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
-    course_staff_title = _('"{course_name}" Course Staff')
+    course_staff_title = _('"{course_title}" Course Staff')
 
-    from_addr_format = course_staff_title + u' <{course_id}-{from_email}>'
+    from_addr_format = course_staff_title + u' <{course_name}-{from_email}>'
 
     def format_address(course_title_no_quotes):
+        """
+        Partial function for formatting the from_addr. Since
+        `course_title_no_quotes` may be truncated to make sure the returned
+        string has fewer than 320 characters, we define this function to make
+        it easy to determine quickly what the max length is for
+        `course_title_no_quotes`.
+        """
         return from_addr_format.format(
-            course_title_no_quotes,
-            course_name,
-            settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+            course_title=course_title_no_quotes,
+            course_name=course_name,
+            from_email=settings.BULK_EMAIL_DEFAULT_FROM_EMAIL,
         )
 
     from_addr = format_address(course_title_no_quotes)
