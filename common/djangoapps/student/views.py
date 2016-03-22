@@ -2342,39 +2342,26 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
 
     return programs_data
 
-def db_connect():
-    db = {'host': 'localhost',
-          'user': 'edxapp001',
-          'pass': 'password',
-          'db': 'edxapp',
-          'port': 3306
-        }
+def select_user(user_id, link):
 
-    return MySQLdb.connect(host=db['host'], user=db['user'], passwd=db['pass'], db=db['db'], port=db['port'])
-
-
-def select_user(dbConn, user_id, link):
-    sql = "SELECT visited FROM edx_mdl WHERE user_id={0} AND link='{1}' AND visited=0".format(user_id, link)
     try:
-        cursor = dbConn.cursor()
-        cursor.execute(sql)
-        logging.info(sql)
-        if cursor.fetchone()[0]:
+        valid_user = MdlToEdx.objects.filter(user_id=user_id, visited=False, link=link)
+        if valid_user:
             return True
         else:
             return False
     except:
-        return 'Something went wrong!'
+        return 'Something went wrong'
 
 
 def update_user(user_id):
-    sql = "UPDATE edx_mdl SET visited=1  WHERE user_id={0} AND status=1".format(user_id)
 
-    db_conn = db_connect()
-    cursor = db_conn.cursor()
-    cursor.execute(sql)
-    db_conn.commit()
-    return cursor.lastrowid
+    try:
+        updated_user = MdlToEdx.objects.get(user_id=user_id)
+        updated_user.visited = True
+        updated_user.save()
+    except:
+        return False
 
 
 def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
@@ -2389,7 +2376,8 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
     except (ValueError, User.DoesNotExist):
         user = None
 
-    if not select_user(db_connect(), user.id, link):
+
+    if select_user(user.id, link):
         validlink = True
         title = _('Update your details')
         update_user(user.id)
@@ -2405,11 +2393,23 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         'user': user,
     }
 
-
     err_msg = None
 
     if request.method == 'POST':
         password = request.POST['new_password1']
+
+        conf_password = request.POST['new_password2']
+
+        if not password == conf_password:
+            err_msg = 'Password must match'
+            context = {
+                'user': user,
+                'validlink': True,
+                'title': _('Password reset unsuccessful'),
+                'err_msg': err_msg,
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            }
+            return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -2424,7 +2424,7 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         # We have an password reset attempt which violates some security policy, use the
         # existing Django template to communicate this back to the user
         context = {
-            'validlink': True,
+            'validlink': False,
             'form': None,
             'title': _('Password reset unsuccessful'),
             'err_msg': err_msg,

@@ -12,17 +12,14 @@
 {% block bodyextra %}
   <script type="text/javascript">
     $(function() {
-
       // adding js class for styling with accessibility in mind
       $('body').addClass('js');
-
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
       window.open( $(this).attr('href') );
       return false;
       });
-
       // form field label styling on focus
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").parent().addClass("is-focused");
@@ -112,7 +109,7 @@
               <input id="new_password1" type="password" name="new_password1" placeholder="*****" />
             </li>
             <li class="field required password" id="field-new_password2">
-              <label for="new_password2">{% trans "New Password Again" %}</label>
+              <label for="new_password2">{% trans "Confirm Password" %}</label>
               <input id="new_password2" type="password" name="new_password2" placeholder="******" />
             </li>
           </ol>

@@ -36,7 +36,7 @@
     <header>
       <h1 class="title">
         <span class="title-super">
-          {% trans "Your Password Reset is Complete" %}
+          {% trans "Your Details Reset is Complete" %}
         </span>
       </h1>
     </header>
@@ -46,10 +46,9 @@
     {% block content %}
     <section role="main" class="content">
       {% blocktrans with link_start='<a href="/login">' link_end='</a>' %}
-      Your password has been set.  You may go ahead and {{ link_start }}log in{{ link_end }} now.
+      Your details has been updated.  You may go ahead and {{ link_start }}log in{{ link_end }} now.
       {% endblocktrans %}
     </section>
     {% endblock %}
   </section>
 {% endblock %}
-

@@ -2066,3 +2066,15 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
     def refund_window(self, refund_window):
         """Set the current refund window to the given timedelta."""
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
+
+
+class MdlToEdx(models.Model):
+
+    class Meta(object):
+        db_table = 'edx_mdl'
+
+    user = models.OneToOneField(User)
+    link = models.CharField(max_length=255)
+    status = models.BooleanField(default=False)
+    visited = models.BooleanField(default=False)
+    timesent = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
