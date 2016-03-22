@@ -75,9 +75,11 @@ src_paths:
     - js
     - coffee/src
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
+    - support/js
     - teams/js
     - xmodule_js/common_static/coffee
-    - support/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:
