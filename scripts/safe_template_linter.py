@@ -322,12 +322,6 @@ class MakoTemplateLinter(object):
 
     _skip_mako_dirs = _skip_dirs
 
-    def __init__(self):
-        """
-        The init method.
-        """
-        self._results = []
-
     def process_file(self, directory, file_name):
         """
         Process file to determine if it is a Mako template file and
@@ -337,13 +331,13 @@ class MakoTemplateLinter(object):
             directory (string): The directory of the file to be checked
             file_name (string): A filename for a potential Mako file
 
-        Side effects:
-            Adds detailed results to internal data structure for
-            later reporting
+        Returns:
+            The file results containing any violations, or None if the file is
+            never checked.
 
         """
         if not self._is_mako_directory(directory):
-            return
+            return None
 
         # TODO: When safe-by-default is turned on at the platform level, will we:
         # 1. Turn it on for .html only, or
@@ -352,21 +346,9 @@ class MakoTemplateLinter(object):
         #    the n filter to turn off h for some of these)?
         # For now, we only check .html and .xml files
         if not (file_name.lower().endswith('.html') or file_name.lower().endswith('.xml')):
-            return
+            return None
 
-        self._load_and_check_mako_file_is_safe(directory + '/' + file_name)
-
-    def print_results(self, options):
-        """
-        Prints all results (i.e. violations) for all files that failed this
-        linter.
-
-        Arguments:
-            options: A list of the options.
-
-        """
-        for result in self._results:
-            result.print_results(options)
+        return self._load_and_check_mako_file_is_safe(directory + '/' + file_name)
 
     def _is_mako_directory(self, directory):
         """
@@ -393,17 +375,19 @@ class MakoTemplateLinter(object):
         Loads the Mako template file and checks if it is in violation.
 
         Arguments:
-            mako_file_full_path: The file to be loaded and linted
+            mako_file_full_path: The file to be loaded and linted.
 
-        Side Effects:
-            Stores all violations in results for later processing.
+        Returns:
+            The file results containing any violations, or None if none found.
 
         """
         mako_template = _load_file(self, mako_file_full_path)
         results = FileResults(mako_file_full_path)
         self._check_mako_file_is_safe(mako_template, results)
         if len(results.violations) > 0:
-            self._results.append(results)
+            return results
+        else:
+            return None
 
     def _check_mako_file_is_safe(self, mako_template, results):
         """
@@ -411,7 +395,7 @@ class MakoTemplateLinter(object):
 
         Arguments:
             mako_template: The contents of the Mako template.
-            results: A list of results into which violations will be added.
+            results: A file results objects to which violations will be added.
 
         """
         has_page_default = self._has_page_default(mako_template, results)
@@ -673,12 +657,6 @@ class UnderscoreTemplateLinter(object):
 
     _skip_underscore_dirs = _skip_dirs
 
-    def __init__(self):
-        """
-        The init method.
-        """
-        self._results = []
-
     def process_file(self, directory, file_name):
         """
         Process file to determine if it is an Underscore template file and
@@ -688,9 +666,9 @@ class UnderscoreTemplateLinter(object):
             directory (string): The directory of the file to be checked
             file_name (string): A filename for a potential underscore file
 
-        Side effects:
-            Adds detailed results to internal data structure for
-            later reporting
+        Returns:
+            The file results containing any violations, or None if the file is
+            never checked.
 
         """
         if not self._is_underscore_directory(directory):
@@ -699,7 +677,8 @@ class UnderscoreTemplateLinter(object):
         if not file_name.lower().endswith('.underscore'):
             return
 
-        self._load_and_check_underscore_file_is_safe(directory + '/' + file_name)
+        full_path = directory + '/' + file_name
+        return self._load_and_check_underscore_file_is_safe(full_path)
 
     def print_results(self, options):
         """
@@ -737,15 +716,18 @@ class UnderscoreTemplateLinter(object):
         Arguments:
             file_full_path: The file to be loaded and linted
 
-        Side Effects:
-            Stores all violations in results for later processing.
+        Returns:
+            The file results containing any violations, or None if the file is
+            never checked.
 
         """
         underscore_template = _load_file(self, file_full_path)
         results = FileResults(file_full_path)
         self._check_underscore_file_is_safe(underscore_template, results)
         if len(results.violations) > 0:
-            self._results.append(results)
+            return results
+        else:
+            return None
 
     def _check_underscore_file_is_safe(self, underscore_template, results):
         """
@@ -753,7 +735,7 @@ class UnderscoreTemplateLinter(object):
 
         Arguments:
             underscore_template: The contents of the Underscore.js template.
-            results: A list of results into which violations will be added.
+            results: A file results objects to which violations will be added.
 
         """
         self._check_underscore_expressions(underscore_template, results)
@@ -805,39 +787,38 @@ class UnderscoreTemplateLinter(object):
         return expressions
 
 
-def _process_current_walk(current_walk, template_linters):
+def _process_current_walk(current_walk, template_linters, options):
     """
-    For each linter, lints all the files in the current os walk.
+    For each linter, lints all the files in the current os walk.  This means
+    finding and printing violations.
 
     Arguments:
         current_walk: A walk returned by os.walk().
         template_linters: A list of linting objects.
-
-    Side Effect:
-        The results (i.e. violations) are stored in each linting object.
+        options: A list of the options.
 
     """
     walk_directory = current_walk[0]
     walk_files = current_walk[2]
     for walk_file in walk_files:
         for template_linter in template_linters:
-            template_linter.process_file(walk_directory, walk_file)
+            results = template_linter.process_file(walk_directory, walk_file)
+            if results is not None:
+                results.print_results(options)
 
 
-def _process_os_walk(starting_dir, template_linters):
+def _process_os_walk(starting_dir, template_linters, options):
     """
     For each linter, lints all the directories in the starting directory.
 
     Arguments:
         starting_dir: The initial directory to begin the walk.
         template_linters: A list of linting objects.
-
-    Side Effect:
-        The results (i.e. violations) are stored in each linting object.
+        options: A list of the options.
 
     """
     for current_walk in os.walk(starting_dir):
-        _process_current_walk(current_walk, template_linters)
+        _process_current_walk(current_walk, template_linters, options)
 
 
 def main():
@@ -864,10 +845,7 @@ def main():
     }
 
     template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter()]
-    _process_os_walk('.', template_linters)
-
-    for template_linter in template_linters:
-        template_linter.print_results(options)
+    _process_os_walk('.', template_linters, options)
 
 
 if __name__ == "__main__":
