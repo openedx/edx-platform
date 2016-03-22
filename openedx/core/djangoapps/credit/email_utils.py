@@ -68,26 +68,8 @@ def send_credit_notifications(username, course_key):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         logo_image_id = logo_image.get('Content-ID', '')[1:-1]
 
-    providers = get_credit_provider_display_names(course_key)
-    providers_string = None
-    if providers:
-        if len(providers) > 1:
-            if len(providers) > 2:
-                # Translators: The join of three or more university names. The first of these formatting strings
-                # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-                providers_string = _("{first_providers}, and {last_provider}").format(
-                    first_providers=u", ".join(providers[:-1]),
-                    last_provider=providers[-1]
-                )
-            else:
-                # Translators: The join of two university names (e.g., Harvard and MIT).
-                providers_string = _("{first_provider} and {second_provider}").format(
-                    first_provider=providers[0],
-                    second_provider=providers[1]
-                )
-        else:
-            providers_string = providers[0]
-
+    providers_names = get_credit_provider_display_names(course_key)
+    providers_string = make_providers_strings(providers_names)
     context = {
         'full_name': user.get_full_name(),
         'platform_name': settings.PLATFORM_NAME,
@@ -107,7 +89,8 @@ def send_credit_notifications(username, course_key):
     notification_msg.attach(msg_alternative)
     # render the credit notification templates
     subject = _(u'Course Credit Eligibility')
-    if providers:
+
+    if providers_string:
         subject = _(u'You are eligible for credit from {providers_string}').format(
             providers_string=providers_string
         )
@@ -259,3 +242,35 @@ def get_credit_provider_display_names(course_key):
         cache.set(cache_key, provider_names, credit_config.cache_ttl)
 
     return provider_names
+
+
+def make_providers_strings(providers):
+    """Get the list of course providers and make them comma seperated string.
+
+    Arguments:
+        providers : List containing the providers names
+
+    Returns:
+        strings containing providers names in readable way .
+    """
+    if not providers:
+        return None
+
+    if len(providers) == 1:
+        providers_string = providers[0]
+
+    elif len(providers) == 2:
+        # Translators: The join of two university names (e.g., Harvard and MIT).
+        providers_string = _("{first_provider} and {second_provider}").format(
+            first_provider=providers[0],
+            second_provider=providers[1]
+        )
+    else:
+        # Translators: The join of three or more university names. The first of these formatting strings
+        # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+        providers_string = _("{first_providers}, and {last_provider}").format(
+            first_providers=u", ".join(providers[:-1]),
+            last_provider=providers[-1]
+        )
+
+    return providers_string
