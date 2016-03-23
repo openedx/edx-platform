@@ -9,6 +9,7 @@ define([
     "common/js/components/utils/view_utils",
     "js/views/utils/xblock_utils",
     "text!templates/container-message.underscore",
+    "text!templates/publish-history.underscore",
     "edx-ui-toolkit/js/utils/html-utils"
     ], function (
         $,
@@ -18,6 +19,7 @@ define([
         ViewUtils,
         XBlockViewUtils,
         ContainerMessageTemplate,
+        PublishHistoryTemplate,
         HtmlUtils
     ) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
@@ -246,7 +248,7 @@ define([
 
             initialize: function () {
                 BaseView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('publish-history');
+                this.template = HtmlUtils.template(PublishHistoryTemplate);
                 this.model.on('sync', this.onSync, this);
             },
 
@@ -257,12 +259,14 @@ define([
             },
 
             render: function () {
-                this.$el.html(this.template({
-                    published: this.model.get('published'),
-                    published_on: this.model.get('published_on'),
-                    published_by: this.model.get('published_by')
-                }));
-
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        published: this.model.get('published'),
+                        published_on: this.model.get('published_on'),
+                        published_by: this.model.get('published_by')
+                    })
+                );
                 return this;
             }
         });

@@ -15,7 +15,6 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
             beforeEach(function () {
                 TemplateHelpers.installTemplate('publish-xblock');
-                TemplateHelpers.installTemplate('publish-history');
                 appendSetFixtures(mockContainerPage);
             });
 
