@@ -1,4 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%inherit file="../main.html" />
 
@@ -6,7 +11,13 @@
 
 
 <section class="container">
-    <h1>${_("Checkout Error")}</h1>
-    ${ _(u"An error has occurred with your payment. <b>You have not been charged.</b> Please try to submit your payment again. If this problem persists, contact {email}.").format(
-    email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+  <h1>${_("Checkout Error")}</h1>
+  ## Translators: bold_end and bold_start are HTML tags to create bold text.
+  ${
+      Text(_(u"An error has occurred with your payment. {bold_start}You have not been charged.{bold_end} Please try to submit your payment again. If this problem persists, contact {email}.")).format(
+          email=HTML("<a href=\"mailto:{email}\">{email}</a>").format(email=payment_support_email),
+          bold_start=HTML('<b>'),
+          bold_end=HTML('</b>')
+      ) 
+   }
 </section>

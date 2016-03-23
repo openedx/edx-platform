@@ -39,7 +39,7 @@ var edx = edx || {};
                 courseKey: this.courseKey
             });
 
-            this.$el.html(_.template(templateHtml)(context));
+            edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template(templateHtml)(context));
 
             this.trackLinks();
 
@@ -67,7 +67,8 @@ var edx = edx || {};
             context.course_key = this.courseKey;
             context.username = this.username;
             context.platformName = this.$el.data('platform-name');
-            providerDiv.html(_.template(templateHtml)(context)).removeClass('hidden');
+            context.fulfillment_instructions = edx.HtmlUtils.HTML(context.fulfillment_instructions);
+            edx.HtmlUtils.setHtml(providerDiv, edx.HtmlUtils.template(templateHtml)(context)).removeClass('hidden');
         },
 
         renderError: function () {
