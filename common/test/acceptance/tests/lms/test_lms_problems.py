@@ -328,6 +328,7 @@ class ProblemPartialCredit(ProblemsTest):
         self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
         problem_page.fill_answer_numerical('-1')
         problem_page.click_check()
+        problem_page.wait_for_element_visibility('use', 'MathJax rendered completely')
         problem_page.wait_for_status_icon()
         self.assertTrue(problem_page.simpleprob_is_partially_correct())
 
