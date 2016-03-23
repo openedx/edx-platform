@@ -108,6 +108,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     # To make sure that js files are called in proper order we use numerical
     # index. We do that to avoid issues that occurs in tests.
     module = __name__.replace('.video_module', '', 2)
+
+    #TODO: For each of the following, ensure that any generated html is properly escaped.
     js = {
         'js': [
             resource_string(module, 'js/src/video/00_component.js'),
