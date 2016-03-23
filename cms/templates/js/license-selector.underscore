@@ -1,6 +1,6 @@
 <div class="wrapper-license">
     <h3 class="label setting-label">
-        <%= gettext("License Type") %>
+        <%- gettext("License Type") %>
     </h3>
     <ul class="license-types">
         <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
@@ -15,8 +15,10 @@
                 <p class="tip">
                     <% if(license.url) { %>
                         <a href="<%- license.url %>" target="_blank">
-                            <%= gettext("Learn more about {license_name}")
-                                        .replace("{license_name}", license.name)
+                            <%- StringUtils.interpolate(
+                                gettext("Learn more about {license_name}"),
+                                {license_name: license.name}
+                            );
                             %>
                         </a>
                     <% } else { %>
@@ -31,16 +33,21 @@
 <% if(license && !_.isEmpty(license.options)) { %>
     <div class="wrapper-license-options">
         <h4 class="label setting-label">
-            <%- gettext("Options for {license_name}").replace("{license_name}", license.name) %>
+            <%- StringUtils.interpolate(
+                gettext("Options for {license_name}"),
+                {license_name: license.name}
+            %>
         </h4>
         <p class='tip tip-inline'>
-            <%- gettext("The following options are available for the {license_name} license.")
-                        .replace("{license_name}", license.name) %>
+            <%- StringUtils.interpolate(
+                gettext("The following options are available for the {license_name} license."),
+                {license_name: license.name}
+            %>
         </p>
         <ul class="license-options">
             <% _.each(license.option_order, function(optionKey) { %>
                 <% var optionInfo = license.options[optionKey]; %>
-                <% if (optionInfo.type == "boolean") { %>
+                <% if (optionInfo.type === "boolean") { %>
                     <% var optionSelected = model.options[optionKey]; %>
                     <% var optionDisabled = optionInfo.disabled %>
                     <li data-option="<%- optionKey %>"
@@ -71,15 +78,15 @@
 <% if (showPreview) { %>
     <div class="wrapper-license-preview">
         <h4 class="label setting-label">
-            <%= gettext("License Display") %>
+            <%- gettext("License Display") %>
         </h4>
         <p class="tip">
-            <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
+            <%- gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
         </p>
         <div class="license-preview">
         <% // keep this synchronized with the contents of common/templates/license.html %>
         <% if (model.type === "all-rights-reserved") { %>
-            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+            © <span class="license-text"><%- gettext("All Rights Reserved") %></span>
         <% } else if (model.type === "creative-commons") {
              var possible = ["by", "nc", "nd", "sa"];
              var enabled = _.filter(possible, function(option) {
@@ -98,16 +105,16 @@
                     />
             <% } else { %>
 	        <% //<span> must come before <i> icon or else spacing gets messed up %>
-                <span class="sr">gettext("Creative Commons licensed content, with terms as follow:")&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
+                <span class="sr"><%- gettext("Creative Commons licensed content, with terms as follow:")%>&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
                 <% _.each(enabled, function(option) { %>
                         <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><i aria-hidden="true" class="icon-cc-<%- option %>"></i>
                 <% }); %>
-                <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
+                <span class="license-text"><%- gettext("Some Rights Reserved") %></span>
             <% } %>
         <% } else { %>
-            <%= typeof licenseString == "string" ? licenseString : "" %>
+            <%- typeof licenseString == "string" ? licenseString : "" %>
             <% // Default to ARR license %>
-            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+            © <span class="license-text"><%- gettext("All Rights Reserved") %></span>
         <% } %>
         </a>
     </div>
