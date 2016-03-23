@@ -73,7 +73,8 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
         if (typeof body === 'undefined') {
-            // The contents if this call may not be germane to the current test.
+            // The body of the request may not be germane to the current test-- like some call by a library,
+            // so allow it to be ignored.
             return;
         }
         expect(request.requestBody).toEqual(body);
