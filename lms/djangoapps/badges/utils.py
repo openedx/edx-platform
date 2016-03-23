@@ -20,7 +20,11 @@ def requires_badges_enabled(function):
         """
         Wrapped function which bails out early if bagdes aren't enabled.
         """
-        if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
+        if not badges_enabled():
             return
         return function(*args, **kwargs)
     return wrapped
+
+
+def badges_enabled():
+    return settings.FEATURES.get('ENABLE_OPENBADGES', False)

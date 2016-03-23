@@ -23,6 +23,7 @@ import uuid
 
 import analytics
 
+from badges.utils import badges_enabled
 from config_models.models import ConfigurationModel
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -1213,7 +1214,7 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
-        if settings.FEATURES.get("ENABLE_OPENBADGES"):
+        if badges_enabled():
             from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
             award_enrollment_badge(user)
 

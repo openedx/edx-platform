@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from badges.utils import badges_enabled
 from . import (
     NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
     ALL_USERS_VISIBILITY,
@@ -63,7 +64,7 @@ class UserReadOnlySerializer(serializers.Serializer):
         :return: Dict serialized account
         """
         profile = user.profile
-        accomplishments_shared = settings.FEATURES.get('ENABLE_OPENBADGES') or False
+        accomplishments_shared = badges_enabled()
 
         data = {
             "username": user.username,
