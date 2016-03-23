@@ -1,5 +1,12 @@
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery.form"],
-    function($, _, gettext, BaseModal) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/modals/base_modal",
+    "text!cms/static/templates/upload-dialog.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    "jquery.form"
+    ], function($, _, gettext, BaseModal, UploadDialogTemplate, HtmlUtils) {
         var UploadDialog = BaseModal.extend({
             events: {
                 "change input[type=file]": "selectFile",
@@ -16,7 +23,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
-                this.template = this.loadTemplate("upload-dialog");
+                this.template = HtmlUtils.template(UploadDialogTemplate);
                 this.listenTo(this.model, "change", this.renderContents);
                 this.options.title = this.model.get('title');
             },
@@ -51,7 +58,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             getContentHtml: function() {
                 return this.template({
                     url: this.options.url || CMS.URL.UPLOAD_ASSET,
-                    message: this.model.escape('message'),
+                    message: this.model.get('message'),
                     selectedFile: this.model.get('selectedFile'),
                     uploading: this.model.get('uploading'),
                     uploadedBytes: this.model.get('uploadedBytes'),
