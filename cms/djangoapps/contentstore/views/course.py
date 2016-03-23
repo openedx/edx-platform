@@ -90,6 +90,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from util.course_key_utils import from_string_or_404
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -868,10 +869,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError:
-        raise Http404
+    course_key = from_string_or_404(course_key_string)
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)

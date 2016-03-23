@@ -517,7 +517,7 @@ class MakoTemplateLinter(object):
             <script.*?>|  # script tag start
             </script>|  # script tag end
             <%static:require_module.*?>|  # require js script tag start
-            </%static:require_module>  # require js script tag end""", re.VERBOSE + re.IGNORECASE)
+            </%static:require_module>  # require js script tag end""", re.VERBOSE | re.IGNORECASE)
         media_type_re = re.compile(r"""type=['"].*?['"]""", re.IGNORECASE)
 
         contexts = [{'index': 0, 'type': 'html'}]
@@ -773,7 +773,7 @@ class UnderscoreTemplateLinter(object):
                 end_index: The index of the end of the expression.
                 expression: The text of the expression.
         """
-        unescaped_expression_regex = re.compile("<%=.*?%>")
+        unescaped_expression_regex = re.compile("<%=.*?%>", re.DOTALL)
 
         expressions = []
         for match in unescaped_expression_regex.finditer(underscore_template):
