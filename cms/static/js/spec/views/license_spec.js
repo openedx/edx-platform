@@ -3,7 +3,6 @@ define(["js/views/license", "js/models/license", "common/js/spec_helpers/templat
     describe("License view", function() {
 
         beforeEach(function() {
-            TemplateHelpers.installTemplate("license-selector", true);
             this.model = new LicenseModel();
             this.view = new LicenseView({model: this.model});
         });

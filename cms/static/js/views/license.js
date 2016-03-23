@@ -1,4 +1,10 @@
-define(["js/views/baseview", "underscore"], function(BaseView, _) {
+define([
+    "js/views/baseview",
+    "underscore",
+    "text!templates/license-selector.underscore",
+    "edx-ui-toolkit/js/utils/html-utils",
+    "edx-ui-toolkit/js/utils/string-utils"
+    ], function(BaseView, _, LicenseSelectorTemplate, StringUtils) {
     var defaultLicenseInfo = {
         "all-rights-reserved": {
             "name": gettext("All Rights Reserved"),
@@ -55,7 +61,7 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         initialize: function(options) {
             this.licenseInfo = options.licenseInfo || defaultLicenseInfo;
             this.showPreview = !!options.showPreview; // coerce to boolean
-            this.template = this.loadTemplate("license-selector");
+            this.template = HtmlUtils.template(LicenseSelectorTemplate);
 
             // Rerender when the model changes
             this.listenTo(this.model, 'change', this.render);
@@ -79,13 +85,17 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         },
 
         render: function() {
-            this.$el.html(this.template({
-                model: this.model.attributes,
-                licenseString: this.model.toString() || "",
-                licenseInfo: this.licenseInfo,
-                showPreview: this.showPreview,
-                previewButton: false,
-            }));
+            this.setHtml(
+                this.$el,
+                this.template({
+                    model: this.model.attributes,
+                    licenseString: this.model.toString() || "",
+                    licenseInfo: this.licenseInfo,
+                    showPreview: this.showPreview,
+                    previewButton: false,
+                    StringUtils: StringUtils
+                })
+            );
             return this;
         },
 
