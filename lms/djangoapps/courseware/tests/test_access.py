@@ -175,7 +175,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         self.assertTrue(bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id)))
         self.assertTrue(bool(access.has_access(self.course_staff, 'staff', self.course, course_key=self.course.id)))
-        self.assertTrue(bool(access.has_access(self.course_instructor, 'staff', self.course, course_key=self.course.id)))
+        self.assertTrue(bool(access.has_access(
+            self.course_instructor, 'staff', self.course, course_key=self.course.id
+        )))
         self.assertFalse(bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id)))
         self.assertFalse(bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id)))
 
