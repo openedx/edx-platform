@@ -5,8 +5,12 @@
  * XBlock field's value if it has been changed. If the user presses Escape, then any changes will
  * be removed and the input hidden again.
  */
-define(["js/views/baseview", "js/views/utils/xblock_utils"],
-    function (BaseView, XBlockViewUtils) {
+define([
+    "js/views/baseview",
+    "js/views/utils/xblock_utils",
+    "text!templates/xblock-string-field-editor.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    ], function (BaseView, XBlockViewUtils, FieldEditorTemplate, HtmlUtils) {
 
         var XBlockStringFieldEditor = BaseView.extend({
             events: {
@@ -25,16 +29,19 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 BaseView.prototype.initialize.call(this);
                 this.fieldName = this.$el.data('field');
                 this.fieldDisplayName = this.$el.data('field-display-name');
-                this.template = this.loadTemplate('xblock-string-field-editor');
+                this.template = HtmlUtils.template(FieldEditorTemplate);
                 this.model.on('change:' + this.fieldName, this.onChangeField, this);
             },
 
             render: function() {
-                this.$el.append(this.template({
-                    value: this.model.escape(this.fieldName),
-                    fieldName: this.fieldName,
-                    fieldDisplayName: this.fieldDisplayName
-                }));
+                HtmlUtils.append(
+                    this.$el,
+                    this.template({
+                        value: this.model.escape(this.fieldName),
+                        fieldName: this.fieldName,
+                        fieldDisplayName: this.fieldDisplayName
+                    })
+                );
                 return this;
             },
 

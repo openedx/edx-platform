@@ -1,12 +1,16 @@
-define(["js/views/baseview"],
-    function (BaseView) {
+define([
+    "js/views/baseview",
+    "text!cms/static/templates/add-xblock-component-button.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+], function (BaseView, AddXBlockComponentButtonTemplate, HtmlUtils) {
 
         return BaseView.extend({
             tagName: "li",
             initialize: function () {
                 BaseView.prototype.initialize.call(this);
-                this.template = this.loadTemplate("add-xblock-component-button");
-                this.$el.html(
+                this.template = HtmlUtils.template(AddXBlockComponentButtonTemplate);
+                HtmlUtils.setHtml(
+                    this.$el,
                     this.template({
                         type: this.model.type,
                         templates: this.model.templates,

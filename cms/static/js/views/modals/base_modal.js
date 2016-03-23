@@ -19,8 +19,15 @@
  *   addSaveButton: A boolean indicating whether to include a save
  *     button on the modal.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview"],
-    function($, _, gettext, BaseView) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "text!templates/modal-button.underscore",
+    "text!templates/basic-modal.underscore",
+    "edx-ui-toolkit/js/utils/html-utils",
+    ], function($, _, gettext, BaseView, ModalButtonTemplate, BasicModalTemplate, HtmlUtils) {
         var BaseModal = BaseView.extend({
             events : {
                 'click .action-cancel': 'cancel'
@@ -42,8 +49,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
             initialize: function() {
                 var parent = this.options.parent,
                     parentElement = this.options.parentElement;
-                this.modalTemplate = this.loadTemplate('basic-modal');
-                this.buttonTemplate = this.loadTemplate('modal-button');
+                this.modalTemplate = HtmlUtils.template(BasicModalTemplate);
+                this.buttonTemplate = HtmlUtils.template(ModalButtonTemplate);
                 if (parent) {
                     parentElement = parent.$el;
                 } else if (!parentElement) {
@@ -56,13 +63,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
             },
 
             render: function() {
-                this.$el.html(this.modalTemplate({
-                    name: this.options.modalName,
-                    type: this.options.modalType,
-                    size: this.options.modalSize,
-                    title: this.getTitle(),
-                    viewSpecificClasses: this.options.viewSpecificClasses
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.modalTemplate({
+                        name: this.options.modalName,
+                        type: this.options.modalType,
+                        size: this.options.modalSize,
+                        title: this.getTitle(),
+                        viewSpecificClasses: this.options.viewSpecificClasses
+                    })
+                );
                 this.addActionButtons();
                 this.renderContents();
                 this.parentElement.append(this.$el);
@@ -74,7 +84,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
 
             renderContents: function() {
                 var contentHtml = this.getContentHtml();
-                this.$('.modal-content').html(contentHtml);
+                HtmlUtils.setHtml(
+                    this.$('.modal-content'),
+                    contentHtml
+                );
             },
 
             /**
@@ -130,7 +143,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                     name: name,
                     isPrimary: isPrimary
                 });
-                this.getActionBar().find('ul').append(html);
+                HtmlUtils.append(
+                    this.getActionBar().find('ul'),
+                    html
+                );
             },
 
             /**
