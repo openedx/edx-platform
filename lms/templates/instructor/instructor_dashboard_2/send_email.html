@@ -1,5 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
 
 <div class="vert-left send-email" id="section-send-email">
   <h2> ${_("Send Email")} </h2>
@@ -34,7 +37,7 @@
   <li class="field">
     <label>${_("Message:")}</label>
       <div class="email-editor">
-      ${ section_data['editor'] }
+      ${ HTML(section_data['editor']) }
       </div>
     <input type="hidden" name="message" value="">
   </li>
