@@ -218,8 +218,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 EditHelpers.installViewTemplates();
                 TemplateHelpers.installTemplates([
                     'course-outline',
-                    'modal-button',
-                    'basic-modal',
                     'course-outline-modal',
                     'release-date-editor',
                     'due-date-editor',

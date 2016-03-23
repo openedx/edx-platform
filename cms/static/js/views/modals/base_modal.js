@@ -19,8 +19,15 @@
  *   addSaveButton: A boolean indicating whether to include a save
  *     button on the modal.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview"],
-    function($, _, gettext, BaseView) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "text!templates/modal-button.underscore",
+    "text!templates/basic-modal.underscore",
+    "edx-ui-toolkit/js/utils/html-utils",
+    ], function($, _, gettext, BaseView, ModalButtonTemplate, BasicModalTemplate, HtmlUtils) {
         var BaseModal = BaseView.extend({
             events : {
                 'click .action-cancel': 'cancel'
@@ -42,8 +49,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
             initialize: function() {
                 var parent = this.options.parent,
                     parentElement = this.options.parentElement;
-                this.modalTemplate = this.loadTemplate('basic-modal');
-                this.buttonTemplate = this.loadTemplate('modal-button');
+                this.modalTemplate = HtmlUtils.template(BasicModalTemplate);
+                this.buttonTemplate = HtmlUtils.template(ModalButtonTemplate);
                 if (parent) {
                     parentElement = parent.$el;
                 } else if (!parentElement) {
