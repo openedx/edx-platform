@@ -3,7 +3,7 @@ define([
     "underscore",
     "gettext",
     "js/views/modals/base_modal",
-    "text!cms/static/templates/upload-dialog.underscore",
+    "text!templates/upload-dialog.underscore",
     "edx-ui-toolkit/js/utils/html-utils",
     "jquery.form"
     ], function($, _, gettext, BaseModal, UploadDialogTemplate, HtmlUtils) {
