@@ -63,13 +63,16 @@ define([
             },
 
             render: function() {
-                this.$el.html(this.modalTemplate({
-                    name: this.options.modalName,
-                    type: this.options.modalType,
-                    size: this.options.modalSize,
-                    title: this.getTitle(),
-                    viewSpecificClasses: this.options.viewSpecificClasses
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.modalTemplate({
+                        name: this.options.modalName,
+                        type: this.options.modalType,
+                        size: this.options.modalSize,
+                        title: this.getTitle(),
+                        viewSpecificClasses: this.options.viewSpecificClasses
+                    })
+                );
                 this.addActionButtons();
                 this.renderContents();
                 this.parentElement.append(this.$el);
@@ -81,7 +84,10 @@ define([
 
             renderContents: function() {
                 var contentHtml = this.getContentHtml();
-                this.$('.modal-content').html(contentHtml);
+                HtmlUtils.setHtml(
+                    this.$('.modal-content'),
+                    contentHtml
+                );
             },
 
             /**
@@ -137,7 +143,10 @@ define([
                     name: name,
                     isPrimary: isPrimary
                 });
-                this.getActionBar().find('ul').append(html);
+                HtmlUtils.append(
+                    this.getActionBar().find('ul'),
+                    html
+                );
             },
 
             /**
