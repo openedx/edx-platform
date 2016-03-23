@@ -3,9 +3,29 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common/js/components/utils/view_utils",
-    "js/models/xblock_info", "js/views/xblock_editor"],
-    function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/modals/base_modal",
+    "common/js/components/utils/view_utils",
+    "js/models/xblock_info",
+    "js/views/xblock_editor",
+    "text!templates/editor-mode-button.underscore",
+    "text!templates/edit-xblock-modal.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"],
+    function(
+        $,
+        _,
+        gettext,
+        BaseModal,
+        ViewUtils,
+        XBlockInfo,
+        XBlockEditorView,
+        EditorModeButtonTemplateString,
+        EditXBlockModalTemplate,
+        HtmlUtils
+    ) {
         "strict mode";
 
         var EditXBlockModal = BaseModal.extend({
@@ -26,8 +46,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
-                this.template = this.loadTemplate('edit-xblock-modal');
-                this.editorModeButtonTemplate = this.loadTemplate('editor-mode-button');
+                this.template = HtmlUtils.template(EditXBlockModalTemplate);
+                this.editorModeButtonTemplate = HtmlUtils.template(EditorModeButtonTemplateString);
             },
 
             /**
