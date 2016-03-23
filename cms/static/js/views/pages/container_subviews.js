@@ -8,7 +8,7 @@ define([
     "js/views/baseview",
     "common/js/components/utils/view_utils",
     "js/views/utils/xblock_utils",
-    "text!cms/static/templates/container-message.underscore",
+    "text!templates/container-message.underscore",
     "edx-ui-toolkit/js/utils/html-utils"
     ], function (
         $,
