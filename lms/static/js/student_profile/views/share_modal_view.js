@@ -8,6 +8,7 @@
                 attributes: {
                     'class': 'badges-overlay'
                 },
+                template: _.template(badgeModalTemplate),
                 events: {
                     'click .badges-modal': function (event) {event.stopPropagation();},
                     'click .badges-modal .close': 'close',
@@ -38,7 +39,7 @@
                     this.$el.find('.badges-modal').focus();
                 },
                 render: function () {
-                    this.$el.html(_.template(badgeModalTemplate, this.model.toJSON()));
+                    this.$el.html(this.template(this.model.toJSON()));
                     return this;
                 }
             });
