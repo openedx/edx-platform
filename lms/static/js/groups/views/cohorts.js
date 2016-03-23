@@ -4,9 +4,10 @@
             'js/groups/views/cohort_editor', 'js/groups/views/cohort_form', 
             'js/groups/views/course_cohort_settings_notification',
             'js/groups/views/cohort_discussions_inline', 'js/groups/views/cohort_discussions_course_wide',
+            'edx-ui-toolkit/js/utils/html-utils',
             'js/views/file_uploader', 'js/models/notification', 'js/views/notification', 'string_utils'],
         function($, _, Backbone, gettext, CohortModel, CohortEditorView, CohortFormView,
-                CourseCohortSettingsNotificationView, InlineDiscussionsView, CourseWideDiscussionsView) {
+                CourseCohortSettingsNotificationView, InlineDiscussionsView, CourseWideDiscussionsView, HtmlUtils) {
 
             var hiddenClass = 'is-hidden',
                 disabledClass = 'is-disabled';
@@ -27,8 +28,8 @@
                 initialize: function(options) {
                     var model = this.model;
 
-                    this.template = _.template($('#cohorts-tpl').text());
-                    this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
+                    this.template = HtmlUtils.template($('#cohorts-tpl').text());
+                    this.selectorTemplate = HtmlUtils.template($('#cohort-selector-tpl').text());
                     this.context = options.context;
                     this.contentGroups = options.contentGroups;
                     this.cohortSettings = options.cohortSettings;
@@ -43,7 +44,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(this.template({
+                    HtmlUtils.setHtml(this.$el, this.template({
                         cohorts: this.model.models,
                         cohortsEnabled: this.cohortSettings.get('is_cohorted')
                     }));
@@ -52,7 +53,7 @@
                 },
 
                 renderSelector: function(selectedCohort) {
-                    this.$('.cohort-select').html(this.selectorTemplate({
+                    HtmlUtils.setHtml(this.$('.cohort-select'), this.selectorTemplate({
                         cohorts: this.model.models,
                         selectedCohort: selectedCohort
                     }));

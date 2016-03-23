@@ -32,7 +32,7 @@ function(BaseView, _, str, gettext) {
                 index = collection.indexOf(this.model);
 
             this.$el.html(this.template({
-                name: this.model.escape('name'),
+                name: this.model.get('name'),
                 allocation: this.getAllocation(),
                 index: index,
                 error: this.model.validationError
