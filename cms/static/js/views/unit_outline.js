@@ -3,12 +3,16 @@
  * the ancestors of the unit along with its direct siblings. It also has a single "New Unit"
  * button to allow a new sibling unit to be added.
  */
-define(['underscore', 'js/views/xblock_outline', 'js/views/unit_outline_child'],
-    function(_, XBlockOutlineView, UnitOutlineChildView) {
+define([
+    'underscore',
+    'js/views/xblock_outline',
+    'js/views/unit_outline_child',
+    "text!templates/unit-outline.underscore",
+    ], function(_, XBlockOutlineView, UnitOutlineChildView, UnitOutlineTemplate) {
         var UnitOutlineView = XBlockOutlineView.extend({
             // takes XBlockInfo as a model
 
-            templateName: 'unit-outline',
+            templateString: UnitOutlineTemplate,
 
             render: function() {
                 XBlockOutlineView.prototype.render.call(this);

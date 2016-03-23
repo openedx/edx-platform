@@ -13,9 +13,27 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "common/js/components/utils/view_utils",
+    "js/views/utils/xblock_utils",
+    "js/views/xblock_string_field_editor",
+    "text!templates/xblock-outline.underscore",
+    "edx-ui-toolkit/js/utils/html-utils",
+    ], function(
+        $,
+        _,
+        gettext,
+        BaseView,
+        ViewUtils,
+        XBlockViewUtils,
+        XBlockStringFieldEditor,
+        XBlockOutlineTemplate,
+        HtmlUtils
+    ) {
 
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -24,7 +42,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                 collapsedClass: 'is-collapsed'
             },
 
-            templateName: 'xblock-outline',
+            templateString: XBlockOutlineView,
 
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
@@ -32,7 +50,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                 this.expandedLocators = this.options.expandedLocators;
                 this.template = this.options.template;
                 if (!this.template) {
-                    this.template = this.loadTemplate(this.templateName);
+                    this.template = HtmlUtils.template(this.templateString);
                 }
                 this.parentInfo = this.options.parentInfo;
                 this.parentView = this.options.parentView;
@@ -67,9 +85,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
             renderTemplate: function() {
                 var html = this.template(this.getTemplateContext());
                 if (this.parentInfo) {
-                    this.setElement($(html));
+                    this.setElement($(HtmlUtils.ensureHtml(html).toString()));
                 } else {
-                    this.$el.html(html);
+                    HtmlUtils.setHtml(this.$el, html)
                 }
             },
 
