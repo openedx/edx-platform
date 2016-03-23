@@ -5,18 +5,19 @@
             'jquery',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
             'js/financial-assistance/models/financial_assistance_model',
             'js/student_account/views/FormView',
             'text!../../../templates/financial-assistance/financial_assessment_form.underscore',
             'text!../../../templates/financial-assistance/financial_assessment_submitted.underscore',
-            'text!templates/student_account/form_field.underscore',
-            'string_utils'
+            'text!templates/student_account/form_field.underscore'
          ],
          function(
              Backbone,
              $,
              _,
              gettext,
+             HtmlUtils,
              FinancialAssistanceModel,
              FormView,
              formViewTpl,
@@ -73,10 +74,11 @@
 
                 render: function(html) {
                     var data = _.extend( this.model.toJSON(), this.context, {
-                        fields: html || '',
+                        fieldsHtml: html || '',
+                        HtmlUtils: HtmlUtils
                     });
 
-                    this.$el.html(_.template(this.tpl)(data));
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.tpl)(data));
 
                     this.postRender();
                     this.validateCountry();
@@ -85,7 +87,7 @@
                 },
 
                 renderSuccess: function() {
-                    this.$el.html(_.template(successTpl)({
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(successTpl)({
                         course: this.model.get('course'),
                         dashboard_url: this.context.dashboard_url
                     }));
@@ -94,18 +96,15 @@
                 },
 
                 saveError: function(error) {
-                    /*jslint maxlen: 500 */
-                    var txt = [
-                            'An error has occurred. Wait a few minutes and then try to submit the application again.',
-                            'If you continue to have issues please contact support.'
-                        ],
-                        msg = gettext(txt.join(' '));
+                    var msg = gettext(
+                        'An error has occurred. Wait a few minutes and then try to submit the application again. If you continue to have issues please contact support.' // jshint ignore:line
+                    );
 
                     if (error.status === 0) {
                         msg = gettext('An error has occurred. Check your Internet connection and try again.');
                     }
 
-                    this.errors = ['<li>' + msg + '</li>'];
+                    this.errors = [HtmlUtils.joinHtml('<li>', msg, '</li>')];
                     this.setErrors();
                     this.element.hide( this.$resetSuccess );
                     this.toggleDisableButton(false);
@@ -119,22 +118,24 @@
                     var $submissionContainer = $('.submission-error'),
                         $errorMessageContainer = $submissionContainer.find('.message-copy'),
                         $countryLabel = $('#user-country-title'),
-                        txt = [
-                            'Please go to your {link_start}profile page{link_end} ',
-                            'and provide your country of residence.'
-                        ],
-                        msg = window.interpolate_text(
-                            // Translators: link_start and link_end denote the html to link back to the profile page.
-                            gettext(txt.join('')),
+                        msg = HtmlUtils.interpolateHtml(
+                            // Translators: link_start and link_end
+                            // denote the html to link back to the
+                            // profile page.
+                            gettext('Please go to your {link_start}profile page{link_end} and provide your country of residence.'), // jshint ignore:line
                             {
-                                link_start: '<a href="' + this.context.account_settings_url + '">',
-                                link_end: '</a>'
+                                link_start: HtmlUtils.joinHtml('<a href="', this.context.account_settings_url, '">'),
+                                link_end: HtmlUtils.HTML('</a>')
                             }
                         );
 
                     if( !this.model.get('country') ){
                         $countryLabel.addClass('error');
-                        $errorMessageContainer.append("<li>" + msg + "</li>");
+                        HtmlUtils.append($errorMessageContainer, HtmlUtils.joinHtml(
+                            HtmlUtils.HTML("<li>"),
+                            msg,
+                            HtmlUtils.HTML("</li>")
+                        ));
                         this.toggleDisableButton(true);
                         $submissionContainer.removeClass('hidden');
                     }
