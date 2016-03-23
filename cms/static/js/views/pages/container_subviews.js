@@ -259,12 +259,14 @@ define([
             },
 
             render: function () {
-                this.$el.html(this.template({
-                    published: this.model.get('published'),
-                    published_on: this.model.get('published_on'),
-                    published_by: this.model.get('published_by')
-                }));
-
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        published: this.model.get('published'),
+                        published_on: this.model.get('published_on'),
+                        published_by: this.model.get('published_by')
+                    })
+                );
                 return this;
             }
         });
