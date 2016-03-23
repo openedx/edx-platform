@@ -4,9 +4,10 @@
             'jquery',
             'underscore',
             'backbone',
-            'common/js/utils/edx.utils.validate'
+            'common/js/utils/edx.utils.validate',
+            'edx-ui-toolkit/js/utils/html-utils'
         ],
-        function($, _, Backbone, EdxUtilsValidate) {
+        function($, _, Backbone, EdxUtilsValidate, HtmlUtils) {
 
         return Backbone.View.extend({
             tagName: 'form',
@@ -53,11 +54,14 @@
             },
 
             render: function( html ) {
-                var fields = html || '';
+                var fieldsHtml = html ? HtmlUtils.HTML(html) : '';
 
-                $(this.el).html( _.template(this.tpl)({
-                    fields: fields
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.template(this.tpl)({
+                        fieldsHtml: fieldsHtml,
+                    })
+                );
 
                 this.postRender();
 
@@ -75,16 +79,29 @@
                 var html = [],
                     i,
                     len = data.length,
-                    fieldTpl = this.fieldTpl;
+                    fieldTpl = this.fieldTpl,
+                    // errorMessages,
+                    instructions,
+                    label;
 
                 this.fields = data;
 
                 for ( i=0; i<len; i++ ) {
-                    if ( data[i].errorMessages ) {
-                        data[i].errorMessages = this.escapeStrings( data[i].errorMessages );
+                    instructions = data[i].instructions;
+                    if ( instructions.length ) {
+                        data[i].instructionsHtml = {
+                            value: HtmlUtils.HTML(instructions)
+                        };
                     }
 
-                    html.push( _.template(fieldTpl)($.extend( data[i], {
+                    label = data[i].label;
+                    if ( label.length ) {
+                        data[i].labelHtml = {
+                            value: HtmlUtils.HTML(label)
+                        };
+                    }
+
+                    html.push( HtmlUtils.template(fieldTpl)($.extend( data[i], {
                         form: this.formType,
                         requiredStr: this.requiredStr
                     }) ) );
@@ -115,14 +132,6 @@
                         $el.removeClass('hidden');
                     }
                 }
-            },
-
-            escapeStrings: function( obj ) {
-                _.each( obj, function( val, key ) {
-                    obj[key] = _.escape( val );
-                });
-
-                return obj;
             },
 
             focusFirstError: function() {
@@ -184,7 +193,13 @@
             },
 
             saveError: function( error ) {
-                this.errors = ['<li>' + error.responseText + '</li>'];
+                this.errors = [
+                    HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<li class="drums">'),
+                        error.responseText,
+                        HtmlUtils.HTML('</li>')
+                    )
+                ];
                 this.setErrors();
                 this.toggleDisableButton(false);
             },

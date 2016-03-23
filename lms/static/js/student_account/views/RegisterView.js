@@ -3,9 +3,10 @@
     define([
             'jquery',
             'underscore',
-            'js/student_account/views/FormView'
+            'js/student_account/views/FormView',
+            'edx-ui-toolkit/js/utils/html-utils'
         ],
-        function($, _, FormView) {
+        function($, _, FormView, HtmlUtils) {
 
         return FormView.extend({
             el: '#register-form',
@@ -35,21 +36,22 @@
             },
 
             render: function( html ) {
-                var fields = html || '';
+                var fieldsHtml = html ? HtmlUtils.HTML(html) : '',
+                    output =  HtmlUtils.template(this.tpl)({
+                        /* We pass the context object to the template so that
+                         * we can perform variable interpolation using sprintf
+                         */
+                        context: {
+                            fieldsHtml: fieldsHtml,
+                            currentProvider: this.currentProvider,
+                            errorMessage: this.errorMessage,
+                            providers: this.providers,
+                            hasSecondaryProviders: this.hasSecondaryProviders,
+                            platformName: this.platformName
+                        }
+                    });
 
-                $(this.el).html(_.template(this.tpl)({
-                    /* We pass the context object to the template so that
-                     * we can perform variable interpolation using sprintf
-                     */
-                    context: {
-                        fields: fields,
-                        currentProvider: this.currentProvider,
-                        errorMessage: this.errorMessage,
-                        providers: this.providers,
-                        hasSecondaryProviders: this.hasSecondaryProviders,
-                        platformName: this.platformName
-                    }
-                }));
+                HtmlUtils.setHtml(this.$el, output);
 
                 this.postRender();
 
@@ -82,7 +84,13 @@
                         function(error_list) {
                             return _.map(
                                 error_list,
-                                function(error) { return '<li>' + error.user_message + '</li>'; }
+                                function(error) {
+                                    return HtmlUtils.joinHtml(
+                                        HtmlUtils.HTML('<li>'),
+                                        error.user_message,
+                                        HtmlUtils.HTML('</li>')
+                                    );
+                                }
                             );
                         }
                     )

@@ -46,7 +46,7 @@
         <%- gettext("If you do not yet have an account, use the button below to register.") %>
     </p>
 
-    <%= context.fields %>
+    <%= HtmlUtils.ensureHtml(context.fieldsHtml) %>
 
     <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
 
