@@ -1,7 +1,7 @@
 """
 Tests the course meta badging events
 """
-
+from ddt import ddt, unpack, data
 from django.test.utils import override_settings
 from mock import patch
 
@@ -24,6 +24,7 @@ class DummyBackend(BadgeBackend):
         return BadgeAssertionFactory(badge_class=badge_class, user=user)
 
 
+@ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
 @override_settings(BADGING_BACKEND='lms.djangoapps.badges.events.tests.test_course_meta.DummyBackend')
 class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
@@ -58,40 +59,23 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(user, course_key=course.location.course_key)
         self.assertFalse(user.badgeassertion_set.all())
 
-    def test_checkpoint_matches(self):
+    @unpack
+    @data((1, 3), (2, 5), (3, 8))
+    def test_checkpoint_matches(self, checkpoint, required_badges):
         """
         Make sure the proper badges are awarded at the right checkpoints.
         """
         user = UserFactory()
-        courses = [CourseFactory() for _i in range(3)]
+        courses = [CourseFactory() for _i in range(required_badges)]
         for course in courses:
-            CourseEnrollment.enroll(user, course_key=course.location.course_key)
-        # pylint: disable=no-member
-        assertions = user.badgeassertion_set.all()
-        self.assertEqual(user.badgeassertion_set.all().count(), 1)
-        self.assertEqual(assertions[0].badge_class, self.badge_classes[0])
-
-        courses = [CourseFactory() for _i in range(2)]
-        for course in courses:
-            # pylint: disable=no-member
             CourseEnrollment.enroll(user, course_key=course.location.course_key)
         # pylint: disable=no-member
         assertions = user.badgeassertion_set.all().order_by('id')
-        # pylint: disable=no-member
-        self.assertEqual(user.badgeassertion_set.all().count(), 2)
-        self.assertEqual(assertions[1].badge_class, self.badge_classes[1])
-
-        courses = [CourseFactory() for _i in range(3)]
-        for course in courses:
-            # pylint: disable=no-member
-            CourseEnrollment.enroll(user, course_key=course.location.course_key)
-        # pylint: disable=no-member
-        assertions = user.badgeassertion_set.all().order_by('id')
-        # pylint: disable=no-member
-        self.assertEqual(user.badgeassertion_set.all().count(), 3)
-        self.assertEqual(assertions[2].badge_class, self.badge_classes[2])
+        self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
+        self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
 
 
+@ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
 @override_settings(BADGING_BACKEND='lms.djangoapps.badges.events.tests.test_course_meta.DummyBackend')
 class CourseCompletionBadgeTest(ModuleStoreTestCase):
@@ -130,43 +114,24 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         # pylint: disable=no-member
         self.assertFalse(user.badgeassertion_set.all())
 
-    def test_checkpoint_matches(self):
+    @unpack
+    @data((1, 2), (2, 6), (3, 9))
+    def test_checkpoint_matches(self, checkpoint, required_badges):
         """
         Make sure the proper badges are awarded at the right checkpoints.
         """
         user = UserFactory()
-        courses = [CourseFactory() for _i in range(2)]
+        courses = [CourseFactory() for _i in range(required_badges)]
         for course in courses:
             GeneratedCertificate(
                 # pylint: disable=no-member
                 user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
             ).save()
         # pylint: disable=no-member
-        assertions = user.badgeassertion_set.all()
-        # pylint: disable=no-member
-        self.assertEqual(user.badgeassertion_set.all().count(), 1)
-        self.assertEqual(assertions[0].badge_class, self.badge_classes[0])
-
-        courses = [CourseFactory() for _i in range(6)]
-        for course in courses:
-            GeneratedCertificate(
-                user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
-            ).save()
-        # pylint: disable=no-member
-        assertions = user.badgeassertion_set.all().order_by('id')
-        self.assertEqual(user.badgeassertion_set.all().count(), 2)
-        self.assertEqual(assertions[1].badge_class, self.badge_classes[1])
-
-        courses = [CourseFactory() for _i in range(9)]
-        for course in courses:
-            GeneratedCertificate(
-                user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
-            ).save()
-        # pylint: disable=no-member
         assertions = user.badgeassertion_set.all().order_by('id')
         # pylint: disable=no-member
-        self.assertEqual(user.badgeassertion_set.all().count(), 3)
-        self.assertEqual(assertions[2].badge_class, self.badge_classes[2])
+        self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
+        self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
