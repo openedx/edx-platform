@@ -1,9 +1,27 @@
 /**
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-        "js/views/components/add_xblock_button", "js/views/components/add_xblock_menu"],
-    function ($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "common/js/components/utils/view_utils",
+    "js/views/components/add_xblock_button",
+    "js/views/components/add_xblock_menu",
+    "text!templates/add-xblock-component.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    ], function (
+        $,
+        _,
+        gettext,
+        BaseView,
+        ViewUtils,
+        AddXBlockButton,
+        AddXBlockMenu,
+        AddXBlockComponentTemplate,
+        HtmlUtils
+    ) {
         var AddXBlockComponent = BaseView.extend({
             events: {
                 'click .new-component .new-component-type .multiple-templates': 'showComponentTemplates',
@@ -15,13 +33,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             initialize: function(options) {
                 BaseView.prototype.initialize.call(this, options);
-                this.template = this.loadTemplate('add-xblock-component');
+                this.template = HtmlUtils.template(AddXBlockComponentTemplate);
             },
 
             render: function () {
                 if (!this.$el.html()) {
                     var that = this;
-                    this.$el.html(this.template({}));
+                    HtmlUtils.setHtml(this.$el, this.template({}));
                     this.collection.each(
                         function (componentModel) {
                             var view, menu;

@@ -72,7 +72,6 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
             modal_helpers.installModalTemplates(append);
 
             // Add templates needed by the add XBlock menu
-            TemplateHelpers.installTemplate('add-xblock-component');
             TemplateHelpers.installTemplate('add-xblock-component-button');
             TemplateHelpers.installTemplate('add-xblock-component-menu');
             TemplateHelpers.installTemplate('add-xblock-component-menu-problem');
