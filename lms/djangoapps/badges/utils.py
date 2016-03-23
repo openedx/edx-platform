@@ -27,6 +27,9 @@ def requires_badges_enabled(function):
 
 
 def badges_enabled():
+    """
+    returns a boolean indicating whether or not openbadges are enabled.
+    """
     return settings.FEATURES.get('ENABLE_OPENBADGES', False)
 
 
