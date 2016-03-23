@@ -154,6 +154,15 @@ header.global nav.nav-wrapper {
   visibility: visible;
 }
 
+.best-attempt-info {
+  border-left: 3px solid #000;
+}
+
+.best-attempt-info .best-attempt-info-label {
+  text-align: center;
+  font-weight: bold;
+}
+
 @-webkit-keyframes webkit-spin {
     from { -webkit-transform: rotate(0deg);}
     to { -webkit-transform: rotate(360deg);}

@@ -1,9 +1,10 @@
 ;(function (define) {
   'use strict';
   define([
-    "teacher_dashboard/js/app/views/base", "underscore", "moment", "text!teacher_dashboard/templates/license_item.underscore",
-    'teacher_dashboard/js/app/collections/simulation', 'teacher_dashboard/js/app/views/simulation_list'
-  ], function(BaseView, _, moment, LicenseItemTemplate, SimulationCollection, SimulationListView) {
+    "teacher_dashboard/js/app/views/base", "underscore", "moment",
+    "text!teacher_dashboard/templates/license_item.underscore", 'teacher_dashboard/js/app/collections/simulation',
+    'teacher_dashboard/js/app/views/simulation_list', 'teacher_dashboard/js/app/utils'
+  ], function(BaseView, _, moment, LicenseItemTemplate, SimulationCollection, SimulationListView, utils) {
     var DATE_FORMAT = "L";
 
     var LicenseView = BaseView.extend({
@@ -26,9 +27,15 @@
           this.chldrenView = null;
         }
         if (this.isExpanded) {
-          var collection = SimulationCollection.factory(null, null, this.model.get('id'));
+          var collection = SimulationCollection.factory(null, null, this.model);
+
           this.chldrenView = new SimulationListView({collection: collection});
           this.chldrenView.$el.appendTo(this.$el);
+
+          utils.fetch(collection, {
+            type: 'simulations',
+            license: this.model.get('id')
+          });
         }
       },
 

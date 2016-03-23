@@ -10,7 +10,6 @@
       });
       var licenseCollection = LicenseCollection.factory();
       buildLicenseList(licenseCollection);
-      licenseCollection.url = utils.getUrl("licenses", {}, true);
-      licenseCollection.fetch({data: {course_id: course_id}});
+      utils.fetch(licenseCollection, {type: 'licenses'});
   });
 }).call(this, define || RequireJS.define);

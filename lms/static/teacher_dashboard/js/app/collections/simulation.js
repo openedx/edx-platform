@@ -1,8 +1,8 @@
 ;(function (define) {
   'use strict';
   define([
-    "backbone", "underscore", "teacher_dashboard/js/app/models/simulation", "teacher_dashboard/js/app/utils"
-  ], function(Backbone, _, SimulationModel, utils) {
+    "backbone", "underscore", "teacher_dashboard/js/app/models/simulation"
+  ], function(Backbone, _, SimulationModel) {
     var SimulationCollection = Backbone.Collection.extend({
       comparator: "display_name",
       model: SimulationModel,
@@ -24,18 +24,17 @@
       },
 
       toJSON: function(data) {
-        return _.map(response, function(rawModel) {
+        return _.map(data, function(rawModel) {
           delete data.license;
           return rawModel;
         }, this);
       }
     }, {
-      factory: function(models, options, license_id) {
+      factory: function(models, options, license) {
         var collection;
 
-        options = _.extend({license: license_id}, options);
+        options = _.extend({license: license}, options);
         collection =  new SimulationCollection(models, options);
-        collection.url = utils.getUrl("simulations", {license_id: license_id}, false);
         return collection;
       }
     });

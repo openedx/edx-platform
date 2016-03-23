@@ -5,6 +5,11 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 
+from courseware.access import has_access
+from ccx.utils import get_ccx_from_ccx_locator
+from student.roles import CourseCcxCoachRole
+
+
 log = logging.getLogger(__name__)
 
 
@@ -42,13 +47,44 @@ def _send_request(url, method=None, data=None, params=None, headers=None):
         response.raise_for_status()
         return response.content
 
-    except (requests.exceptions.InvalidSchema, requests.exceptions.InvalidURL, requests.exceptions.MissingSchema) as ex:
+    except (
+        requests.exceptions.InvalidSchema, requests.exceptions.InvalidURL, requests.exceptions.MissingSchema
+    ) as ex:
         log.exception("Setup Labster endpoints in settings: \n%r", ex)
         raise ImproperlyConfigured(_("Setup Labster endpoints in settings"))
 
     except requests.RequestException as ex:
-        log.exception("Labster API is unavailable:\n%r", ex)
+        log.exception("Labster API is unavailable:\nurl: %s\n%r", url, ex)
         raise LabsterApiError(_("Labster API is unavailable."))
 
     except ValueError as ex:
         log.error("Invalid JSON:\n%r", ex)
+
+
+def has_teacher_access(user, course):
+    """
+    Returns True when:
+        Teached dashboard feature is enabled
+        AND (
+            user has staff role
+            OR (
+                CCX feature is enabled AND user has coach role
+            )
+        )
+    """
+    if not (user and settings.LABSTER_FEATURES.get('ENABLE_TEACHER_DASHBOARD', False)):
+        return False
+
+    # Displays tab for course staff.
+    if bool(has_access(user, 'staff', course, course.id)):
+        return True
+
+    # The tab is hidden if the user is not staff and CCX feature is disabled.
+    if not (settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx):
+        return False
+
+    ccx = get_ccx_from_ccx_locator(course.id)
+    if ccx:
+        return CourseCcxCoachRole(ccx.course_id).has_user(user)
+
+    return False

@@ -13,8 +13,7 @@
         _.bindAll(this, "renderChildren");
         this.children = [];
         BaseView.prototype.constructor.apply(this, arguments);
-        this.listenTo(this.collection, "sync", this.render);
-        this.collection.fetch();
+        this.listenTo(this.collection, "sync reset", this.render);
       },
 
       render: function(context) {
