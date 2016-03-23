@@ -1,10 +1,12 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
 <section id="textbox_${id}" class="capa_inputtype cminput">
 <div class="script_placeholder" data-src="${matlab_editor_js}"></div>
-<textarea 
-  rows="${rows}" 
-  cols="${cols}" 
-  name="input_${id}" 
-  aria-describedby="answer_${id}" 
+<textarea
+  rows="${rows}"
+  cols="${cols}"
+  name="input_${id}"
+  aria-describedby="answer_${id}"
   id="input_${id}"
   data-tabsize="${tabsize}"
   data-mode="octave"
@@ -14,7 +16,7 @@
  % if hidden:
   style="display:none;"
  % endif
-  >${value|h}</textarea>
+  >${value}</textarea>
 
   <div class="grader-status" tabindex="-1">
       <span id="status_${id}"
@@ -37,10 +39,10 @@
   <span id="answer_${id}"></span>
 
   <div class="external-grader-message" aria-live="polite">
-    ${msg|n}
+    ${msg}
   </div>
   <div class="ungraded-matlab-result" aria-live="polite">
-    ${queue_msg|n}
+    ${queue_msg | n, unicode}
   </div>
 
   % if button_enabled:
@@ -55,7 +57,7 @@
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
           }
-          var alert_elem = $("<div>" + msg + "</div>");
+          var alert_elem = $("<div>" + "${msg | n, js_escaped_string}" + "</div>");
           alert_elem.addClass('capa_alert').addClass('is-fading-in');
           $(parent_elt).find('.action').after(alert_elem);
       };
@@ -64,7 +66,7 @@
       var plot = function(event) {
           var problem_elt = $(event.target).closest('.problems-wrapper');
           url = $(event.target).closest('.problems-wrapper').data('url');
-          input_id = "${id}";
+          input_id = "${id | n, js_escaped_string}";
 
           // save the codemirror text to the textarea
           // since there could be multiple codemirror instances on the page,
@@ -72,7 +74,7 @@
           $('.CodeMirror').each(function(i, el){
               el.CodeMirror.save();
           });
-          var input = $("#input_${id}");
+          var input = $("#input_" + "${id | n, js_escaped_string}");
 
           // pull out the coded text
           submission = input.val();
@@ -131,7 +133,7 @@
           // save the answer
           $.postWithPrefix(url + '/problem_save', answer, save_callback);
       };
-      $('#plot_${id}').click(plot);
+      $("#plot_" +"${id | n, js_escaped_string}").click(plot);
 
     });
   </script>

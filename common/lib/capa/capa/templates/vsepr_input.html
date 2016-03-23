@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <section id="inputtype_${id}" class="capa_inputtype" >
      <table><tr><td height='600'>
     <div id="vsepr_div_${id}" style="position:relative;" data-molecules="${molecules}" data-geometries="${geometries}">
@@ -15,7 +16,7 @@
     <div class="${status.classname}" id="status_${id}">
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value}"
       style="display:none;"
    />
 
@@ -26,7 +27,7 @@
   <p id="answer_${id}" class="answer"></p>
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message">${msg}</span>
   % endif
 % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
 </div>

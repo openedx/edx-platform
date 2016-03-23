@@ -1,3 +1,5 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
 <div class="imageinput capa_inputtype" id="inputtype_${id}">
   <input
     type="hidden"
@@ -37,7 +39,7 @@
   </div>
 
   <script type="text/javascript" charset="utf-8">
-    (new ImageInput('${id}'));
+    (new ImageInput('${id | n, js_escaped_string}'));
   </script>
 
       <span

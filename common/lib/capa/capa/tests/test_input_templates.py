@@ -601,7 +601,6 @@ class AnnotationInputTemplateTest(TemplateTestCase):
         self.context['comment_prompt'] = "<p>Prompt <b>prompt HTML</b></p>"
         self.context['text'] = "<p>Unescaped <b>text</b></p>"
         xml = self.render_to_xml(self.context)
-
         # Because the HTML is unescaped, we should be able to
         # descend to the <b> tag
         xpath = "//div[@class='block']/p/b"
