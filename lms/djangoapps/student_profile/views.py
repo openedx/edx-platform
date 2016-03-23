@@ -9,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from django_countries import countries
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+from badges.utils import badges_enabled
 from edxmako.shortcuts import render_to_response, marketing_link
 from microsite_configuration import microsite
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -96,7 +97,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
         'disable_courseware_js': True,
     }
 
-    if settings.FEATURES.get("ENABLE_OPENBADGES"):
+    if badges_enabled():
         context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})
 
     return context

@@ -11,17 +11,18 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
 )
-from badges.models import BadgeAssertion
-from .serializers import BadgeAssertionSerializer
 from xmodule_django.models import CourseKeyField
 
+from badges.models import BadgeAssertion
+from .serializers import BadgeAssertionSerializer
 
-class CourseKeyError(APIException):
+
+class InvalidCourseKeyError(APIException):
     """
     Raised the course key given isn't valid.
     """
     status_code = 400
-    default_detail = "The course key provided could not be parsed."
+    default_detail = "The course key provided was invalid."
 
 
 class UserBadgeAssertions(generics.ListAPIView):
@@ -118,11 +119,13 @@ class UserBadgeAssertions(generics.ListAPIView):
             try:
                 course_id = CourseKey.from_string(provided_course_id)
             except InvalidKeyError:
-                raise CourseKeyError
+                raise InvalidCourseKeyError
         elif 'slug' not in self.request.query_params:
             # Need to get all badges for the user.
             course_id = None
         else:
+            # Django won't let us use 'None' for querying a ForeignKey field. We have to use this special
+            # 'Empty' value to indicate we're looking only for badges without a course key set.
             course_id = CourseKeyField.Empty
 
         if course_id is not None:

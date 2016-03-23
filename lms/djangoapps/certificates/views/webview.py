@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 
 from badges.events.course_complete import get_completion_badge
+from badges.utils import badges_enabled
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -445,7 +446,7 @@ def _update_badge_context(context, course, user):
     Updates context with badge info.
     """
     badge = None
-    if settings.FEATURES.get('ENABLE_OPENBADGES') and course.issue_badges:
+    if badges_enabled() and course.issue_badges:
         badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
         if badges:
             badge = badges[0]

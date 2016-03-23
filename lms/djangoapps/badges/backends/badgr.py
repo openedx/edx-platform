@@ -175,5 +175,8 @@ class BadgrBackend(BadgeBackend):
         BadgrBackend.badges.append(slug)
 
     def award(self, badge_class, user, evidence_url=None):
+        """
+        Make sure the badge class has been created on the backend, and then award the badge class to the user.
+        """
         self._ensure_badge_created(badge_class)
         return self._create_assertion(badge_class, user, evidence_url)

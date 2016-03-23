@@ -317,6 +317,14 @@
     .badge-set-display {
         @extend .container;
         padding: 0 0;
+
+        .badge-list {
+            // We're using a div instead of ul for accessibility, so we have to match the style
+            // used by ul.
+            margin: 1em 0;
+            padding: 0 0 0 40px;
+        }
+
         .badge-display {
             width: 50%;
             display: inline-block;

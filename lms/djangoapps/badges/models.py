@@ -8,20 +8,21 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from jsonfield import JSONField
 from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from badges.utils import deserialize_count_specs
 from config_models.models import ConfigurationModel
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField
-from jsonfield import JSONField
 
 
 def validate_badge_image(image):
     """
-    Validates that a particular image is small enough, of the right type, and square to be a badge.
+    Validates that a particular image is small enough to be a badge and square.
     """
     if image.width != image.height:
         raise ValidationError(_(u"The badge image must be square."))
@@ -70,6 +71,11 @@ class BadgeClass(models.Model):
         """
         Looks up a badge class by its slug, issuing component, and course_id and returns it should it exist.
         If it does not exist, and create is True, creates it according to the arguments. Otherwise, returns None.
+
+        The expectation is that an XBlock or platform developer should not need to concern themselves with whether
+        or not a badge class has already been created, but should just feed all requirements to this function
+        and it will 'do the right thing'. It should be the exception, rather than the common case, that a badge class
+        would need to be looked up without also being created were it missing.
         """
         slug = slug.lower()
         issuing_component = issuing_component.lower()
@@ -253,32 +259,19 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
     def __unicode__(self):
         return u"<CourseEventBadgesConfiguration ({})>".format(u"Enabled" if self.enabled else u"Disabled")
 
-    @staticmethod
-    def get_specs(text):
-        """
-        Takes a string in the format of:
-            int,course_key
-            int,course_key
-
-        And returns a dictionary with the keys as the numbers and the values as the course keys.
-        """
-        specs = text.splitlines()
-        specs = [line.split(',') for line in specs if line.strip()]
-        return {int(num): slug.strip().lower() for num, slug in specs}
-
     @property
     def completed_settings(self):
         """
         Parses the settings from the courses_completed field.
         """
-        return self.get_specs(self.courses_completed)
+        return deserialize_count_specs(self.courses_completed)
 
     @property
     def enrolled_settings(self):
         """
         Parses the settings from the courses_completed field.
         """
-        return self.get_specs(self.courses_enrolled)
+        return deserialize_count_specs(self.courses_enrolled)
 
     @property
     def course_group_settings(self):

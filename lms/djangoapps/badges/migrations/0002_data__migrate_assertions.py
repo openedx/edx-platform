@@ -39,10 +39,9 @@ def forwards(apps, schema_editor):
                 mode=image_config.mode,
                 course_id=badge.course_id,
             )
-            file_content = ContentFile(icon.read())
             badge_class._meta.get_field('image').generate_filename = \
                 lambda inst, fn: os.path.join('badge_classes', fn)
-            badge_class.image.save(icon.name, file_content)
+            badge_class.image.name = icon.name
             badge_class.save()
             classes[(badge.course_id, badge.mode)] = badge_class
         if isinstance(badge.data, basestring):
@@ -66,17 +65,15 @@ def forwards(apps, schema_editor):
         assertion.save()
 
     for configuration in BadgeImageConfiguration.objects.all():
-        file_content = ContentFile(configuration.icon.read())
         new_conf = CourseCompleteImageConfiguration(
             default=configuration.default,
             mode=configuration.mode,
         )
-        new_conf.icon.save(configuration.icon.name, file_content)
+        new_conf.icon.name = configuration.icon.name
         new_conf.save()
 
 #
 def backwards(apps, schema_editor):
-    from django.core.files.base import ContentFile
     OldBadgeAssertion = apps.get_model("certificates", "BadgeAssertion")
     BadgeAssertion = apps.get_model("badges", "BadgeAssertion")
     BadgeImageConfiguration = apps.get_model("certificates", "BadgeImageConfiguration")
@@ -97,12 +94,11 @@ def backwards(apps, schema_editor):
         ).save()
 
     for configuration in CourseCompleteImageConfiguration.objects.all():
-        file_content = ContentFile(configuration.icon.read())
         new_conf = BadgeImageConfiguration(
             default=configuration.default,
             mode=configuration.mode,
         )
-        new_conf.icon.save(configuration.icon.name, file_content)
+        new_conf.icon.name = configuration.icon.name
         new_conf.save()
 
 

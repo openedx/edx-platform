@@ -15,6 +15,9 @@ def award_badge(config, count, user):
     config is a dictionary with integer keys and course keys as values.
     count is the key to retrieve from this dictionary.
     user is the user to award the badge to.
+
+    Example config:
+        {3: 'slug_for_badge_for_three_enrollments', 5: 'slug_for_badge_with_five_enrollments'}
     """
     slug = config.get(count)
     if not slug:

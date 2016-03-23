@@ -20,7 +20,27 @@ def requires_badges_enabled(function):
         """
         Wrapped function which bails out early if bagdes aren't enabled.
         """
-        if not settings.FEATURES.get('ENABLE_OPENBADGES', False):
+        if not badges_enabled():
             return
         return function(*args, **kwargs)
     return wrapped
+
+
+def badges_enabled():
+    """
+    returns a boolean indicating whether or not openbadges are enabled.
+    """
+    return settings.FEATURES.get('ENABLE_OPENBADGES', False)
+
+
+def deserialize_count_specs(text):
+    """
+    Takes a string in the format of:
+        int,course_key
+        int,course_key
+
+    And returns a dictionary with the keys as the numbers and the values as the course keys.
+    """
+    specs = text.splitlines()
+    specs = [line.split(',') for line in specs if line.strip()]
+    return {int(num): slug.strip().lower() for num, slug in specs}
