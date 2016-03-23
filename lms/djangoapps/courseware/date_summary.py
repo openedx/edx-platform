@@ -14,6 +14,7 @@ from lazy import lazy
 import pytz
 
 from course_modes.models import CourseMode
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment
 
@@ -204,6 +205,12 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
 
     @property
     def link(self):
+        ecommerce_service = EcommerceService()
+        if ecommerce_service.is_enabled(self.user):
+            course_mode = CourseMode.objects.get(
+                course_id=self.course.id, mode_slug=CourseMode.VERIFIED
+            )
+            return ecommerce_service.checkout_page_url(course_mode.sku)
         return reverse('verify_student_upgrade_and_verify', args=(self.course.id,))
 
     @lazy
