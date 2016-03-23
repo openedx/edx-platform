@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
-    <% return ${"content_libraries" | n, unicode} %>
+    <% return "content_libraries" %>
 </%def>
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
@@ -91,7 +91,7 @@ from openedx.core.djangolib.markup import Text, HTML
                     <p>${_("Add components to your library for use in courses, using Add New Component at the bottom of this page.")}</p>
                     <p>${_("Components are listed in the order in which they are added, with the most recently added at the bottom. Use the pagination arrows to navigate from page to page if you have more than one page of components in your library.")}</p>
                     <h3 class="title-3">${_("Using library content in courses")}</h3>
-                    <p>${TEXT(_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to the Advanced Module List in the course's Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, select this library as the source library, and specify the number of problems to be randomly selected and displayed to each student.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+                    <p>${Text(_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to the Advanced Module List in the course's Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, select this library as the source library, and specify the number of problems to be randomly selected and displayed to each student.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                 </div>
                 % endif
                 <div class="bit external-help">
