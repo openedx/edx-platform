@@ -24,7 +24,6 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     var newDisplayName = 'New Display Name';
 
                     EditHelpers.installEditTemplates();
-                    TemplateHelpers.installTemplate('xblock-string-field-editor');
                     TemplateHelpers.installTemplate('container-message');
                     appendSetFixtures(mockContainerPage);
 
