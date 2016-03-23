@@ -136,7 +136,8 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     MIGRATION_MODULES = NoOpMigrationModules()
 
 LMS_BASE = "localhost:8000"
-FEATURES['PREVIEW_LMS_BASE'] = "preview"
+FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
