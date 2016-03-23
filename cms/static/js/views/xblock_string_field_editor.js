@@ -34,11 +34,14 @@ define([
             },
 
             render: function() {
-                this.$el.append(this.template({
-                    value: this.model.escape(this.fieldName),
-                    fieldName: this.fieldName,
-                    fieldDisplayName: this.fieldDisplayName
-                }));
+                HtmlUtils.append(
+                    this.$el,
+                    this.template({
+                        value: this.model.escape(this.fieldName),
+                        fieldName: this.fieldName,
+                        fieldDisplayName: this.fieldDisplayName
+                    })
+                );
                 return this;
             },
 
