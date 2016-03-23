@@ -85,9 +85,9 @@ define([
             renderTemplate: function() {
                 var html = this.template(this.getTemplateContext());
                 if (this.parentInfo) {
-                    this.setElement($(html));
+                    this.setElement($(HtmlUtils.ensureHtml(html).toString()));
                 } else {
-                    this.$el.html(html);
+                    HtmlUtils.setHtml(this.$el, html)
                 }
             },
 
