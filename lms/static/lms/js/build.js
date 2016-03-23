@@ -70,7 +70,11 @@
             'logger': 'empty:',
             'utility': 'empty:',
             'URI': 'empty:',
-            'DiscussionModuleView': 'empty:'
+            'DiscussionModuleView': 'empty:',
+
+            // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
+            'edx-ui-toolkit/js/utils/html-utils': 'empty:',
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
         },
 
         /**

@@ -4,13 +4,23 @@
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        var defineDependency = function (globalVariable, name, noShim) {
-            if (window[globalVariable]) {
+        var defineDependency = function (globalName, name, noShim) {
+            var getGlobalValue = function(name) {
+                var globalNamePath = name.split('.'),
+                    result = window,
+                    i;
+                for (i = 0; i < globalNamePath.length; i++) {
+                    result = result[globalNamePath[i]];
+                }
+                return result;
+            },
+                globalValue = getGlobalValue(globalName);
+            if (globalValue) {
                 if (noShim) {
                     define(name, {});
                 }
                 else {
-                    define(name, [], function() {return window[globalVariable];});
+                    define(name, [], function() { return globalValue; });
                 }
             }
             else {
@@ -29,6 +39,10 @@
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
         defineDependency("Backbone", "backbone");
+
+        // Add the UI Toolkit helper classes that have been installed in the "edx" namespace
+        defineDependency("edx.HtmlUtils", "edx-ui-toolkit/js/utils/html-utils");
+        defineDependency("edx.StringUtils", "edx-ui-toolkit/js/utils/string-utils");
 
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency("isExternal", "utility", true);
@@ -84,18 +98,12 @@
             // end of files needed by OVA
         },
         shim: {
-            "gettext": {
-                exports: "gettext"
-            },
             "annotator_1.2.9": {
                 deps: ["jquery"],
                 exports: "Annotator"
             },
             "date": {
                 exports: "Date"
-            },
-            "jquery": {
-                exports: "$"
             },
             "jquery.cookie": {
                 deps: ["jquery"],
@@ -116,13 +124,6 @@
             "jquery.tinymce": {
                 deps: ["jquery", "tinymce"],
                 exports: "jQuery.fn.tinymce"
-            },
-            "underscore": {
-                exports: "_"
-            },
-            "backbone": {
-                deps: ["underscore", "jquery"],
-                exports: "Backbone"
             },
             "backbone.paginator": {
                 deps: ["backbone"],
