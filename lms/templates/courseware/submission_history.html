@@ -4,7 +4,7 @@
 % for i, (entry, score) in enumerate(zip(history_entries, scores)):
 <hr/>
 <div>
-<b>#${len(history_entries) - i}</b>: ${entry.updated} (${TIME_ZONE} time)</br>
+<b>#${len(history_entries) - i}</b>: ${entry.updated} UTC</br>
 Score: ${score.grade} / ${score.max_grade}
 <pre>
 ${json.dumps(entry.state, indent=2, sort_keys=True) | h}
