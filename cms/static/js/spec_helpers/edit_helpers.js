@@ -73,8 +73,6 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
 
             // Add templates needed by the add XBlock menu
             TemplateHelpers.installTemplate('add-xblock-component-button');
-            TemplateHelpers.installTemplate('add-xblock-component-menu');
-            TemplateHelpers.installTemplate('add-xblock-component-menu-problem');
 
             // Add templates needed by the settings editor
             TemplateHelpers.installTemplate('metadata-editor');
