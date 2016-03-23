@@ -8,7 +8,7 @@
 define([
     "js/views/baseview",
     "js/views/utils/xblock_utils",
-    "text!cms/static/templates/xblock-string-field-editor.underscore",
+    "text!templates/xblock-string-field-editor.underscore",
     "edx-ui-toolkit/js/utils/html-utils"
     ], function (BaseView, XBlockViewUtils, FieldEditorTemplate, HtmlUtils) {
 
