@@ -16,7 +16,7 @@ define([
     "js/views/utils/xblock_utils",
     "js/models/xblock_outline_info",
     "js/views/modals/course_outline_modals",
-    "js/utils/drag_and_drop"
+    "js/utils/drag_and_drop",
     "text!templates/course-outline.underscore"
     ],
     function(
