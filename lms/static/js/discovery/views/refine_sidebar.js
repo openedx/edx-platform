@@ -4,8 +4,8 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'gettext'
-], function ($, _, Backbone, gettext) {
+    'edx-ui-toolkit/js/utils/html-utils'
+], function ($, _, Backbone, HtmlUtils) {
     'use strict';
 
     return Backbone.View.extend({
@@ -18,10 +18,10 @@ define([
         },
 
         initialize: function (options) {
-            this.meanings = options.meanings || {}
+            this.meanings = options.meanings || {};
             this.$container = this.$el.find('.search-facets-lists');
-            this.facetTpl = _.template($('#facet-tpl').html());
-            this.facetOptionTpl = _.template($('#facet_option-tpl').html());
+            this.facetTpl = HtmlUtils.template($('#facet-tpl').html());
+            this.facetOptionTpl = HtmlUtils.template($('#facet_option-tpl').html());
         },
 
         facetName: function (key) {
@@ -35,31 +35,32 @@ define([
         },
 
         renderOptions: function (options) {
-            var html = _.map(options, function(option) {
+            return HtmlUtils.joinHtml.apply(this, _.map(options, function(option) {
                 var data = _.clone(option.attributes);
                 data.name = this.termName(data.facet, data.term);
                 return this.facetOptionTpl(data);
-            }, this).join('');
-            return html;
+            }, this));
         },
 
         renderFacet: function (facetKey, options) {
             return this.facetTpl({
                 name: facetKey,
                 displayName: this.facetName(facetKey),
-                options: this.renderOptions(options),
+                optionsHtml: this.renderOptions(options),
                 listIsHuge: (options.length > 9)
             });
         },
 
         render: function () {
             var grouped = this.collection.groupBy('facet');
-            var html = _.map(grouped, function(options, facetKey) {
-                if (options.length > 0) {
-                    return this.renderFacet(facetKey, options);
-                }
-            }, this).join('');
-            this.$container.html(html);
+            var htmlSnippet = HtmlUtils.joinHtml.apply(
+                this, _.map(grouped, function(options, facetKey) {
+                    if (options.length > 0) {
+                        return this.renderFacet(facetKey, options);
+                    }
+                }, this)
+            );
+            HtmlUtils.setHtml(this.$container, htmlSnippet);
             return this;
         },
 
@@ -90,7 +91,7 @@ define([
                 $target.data('value'),
                 $target.data('text')
             );
-        },
+        }
 
     });
 
