@@ -773,7 +773,7 @@ class UnderscoreTemplateLinter(object):
                 end_index: The index of the end of the expression.
                 expression: The text of the expression.
         """
-        unescaped_expression_regex = re.compile("<%=.*?%>", re.MULTILINE)
+        unescaped_expression_regex = re.compile("<%=.*?%>", re.DOTALL)
 
         expressions = []
         for match in unescaped_expression_regex.finditer(underscore_template):
