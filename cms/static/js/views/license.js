@@ -85,14 +85,17 @@ define([
         },
 
         render: function() {
-            this.$el.html(this.template({
-                model: this.model.attributes,
-                licenseString: this.model.toString() || "",
-                licenseInfo: this.licenseInfo,
-                showPreview: this.showPreview,
-                previewButton: false,
-                StringUtils: StringUtils
-            }));
+            this.setHtml(
+                this.$el,
+                this.template({
+                    model: this.model.attributes,
+                    licenseString: this.model.toString() || "",
+                    licenseInfo: this.licenseInfo,
+                    showPreview: this.showPreview,
+                    previewButton: false,
+                    StringUtils: StringUtils
+                })
+            );
             return this;
         },
 
