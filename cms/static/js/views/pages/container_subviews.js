@@ -1,9 +1,25 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-    "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "common/js/components/utils/view_utils",
+    "js/views/utils/xblock_utils",
+    "text!templates/container-message.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    ], function (
+        $,
+        _,
+        gettext,
+        BaseView,
+        ViewUtils,
+        XBlockViewUtils,
+        ContainerMessageTemplate,
+        HtmlUtils
+    ) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
             disabledCss = "is-disabled";
 
@@ -34,7 +50,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
         var MessageView = ContainerStateListenerView.extend({
             initialize: function () {
                 ContainerStateListenerView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('container-message');
+                this.template = HtmlUtils.template(ContainerMessageTemplate);
             },
 
             shouldRefresh: function(model) {
@@ -42,9 +58,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
+                    })
+                );
                 return this;
             }
         });
