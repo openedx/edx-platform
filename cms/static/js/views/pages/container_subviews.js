@@ -1,9 +1,25 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-    "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "common/js/components/utils/view_utils",
+    "js/views/utils/xblock_utils",
+    "text!cms/static/templates/container-message.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    ], function (
+        $,
+        _,
+        gettext,
+        BaseView,
+        ViewUtils,
+        XBlockViewUtils,
+        ContainerMessageTemplate,
+        HtmlUtils
+    ) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
             disabledCss = "is-disabled";
 
@@ -34,7 +50,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
         var MessageView = ContainerStateListenerView.extend({
             initialize: function () {
                 ContainerStateListenerView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('container-message');
+                this.template = HtmlUtils.template(ContainerMessageTemplate);
             },
 
             shouldRefresh: function(model) {
