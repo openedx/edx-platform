@@ -1,7 +1,7 @@
 define([
     "js/views/baseview",
     "underscore",
-    "text!cms/static/templates/license-selector.underscore",
+    "text!templates/license-selector.underscore",
     "edx-ui-toolkit/js/utils/html-utils",
     "edx-ui-toolkit/js/utils/string-utils"
     ], function(BaseView, _, LicenseSelectorTemplate, StringUtils) {
