@@ -389,7 +389,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
     CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
 
 
-# Field overrides.  To use the IDDE feature, add
+# Field overrides. To use the IDDE feature, add
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
 FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
 
@@ -405,6 +405,16 @@ if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
 
 ############### Module Store Items ##########
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', {})
+
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ENV_TOKENS.get(
+    'MODULESTORE_FIELD_OVERRIDE_PROVIDERS',
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS
+)
+
+XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
+    'XBLOCK_FIELD_DATA_WRAPPERS',
+    XBLOCK_FIELD_DATA_WRAPPERS
+)
 
 ############### Mixed Related(Secure/Not-Secure) Items ##########
 LMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
@@ -693,7 +703,11 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     )
 
 ##### Self-Paced Course Due Dates #####
-FIELD_OVERRIDE_PROVIDERS += (
+XBLOCK_FIELD_DATA_WRAPPERS += (
+    'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',
+)
+
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
     'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
 )
 

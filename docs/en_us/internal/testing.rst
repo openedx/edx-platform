@@ -399,7 +399,7 @@ common/test/acceptance/tests. This is another example.
 
     paver test_bokchoy -t studio/test_studio_bad_data.py
 
-To run a single test faster by not repeating setup tasks us the ``--fasttest`` option.
+To run a single test faster by not repeating setup tasks use the ``--fasttest`` option.
 
 ::
 

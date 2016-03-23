@@ -278,8 +278,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
             request = self.request_factory.get("foo")
-            request.user = AnonymousUser()
-            self.assertEqual(EcommerceService().is_enabled(request), False)
+            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     @ddt.data(True, False)
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
@@ -289,8 +288,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
         else:
             request = self.request_factory.get("foo")
-            request.user = AnonymousUser()
-            self.assertEqual(EcommerceService().is_enabled(request), False)
+            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     def test_user_groups(self):
         # depreciated function
@@ -857,7 +855,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         )
 
         self.course = modulestore().get_course(course.id)
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
@@ -1044,7 +1042,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((40, 4, True), (40, 4, False)), (True, False))
+        *itertools.product(((41, 4, True), (41, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
@@ -1054,6 +1052,27 @@ class ProgressPageTests(ModuleStoreTestCase):
         with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):
             resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertEqual(resp.status_code, 200)
+
+    @patch('courseware.grades.grade', Mock(return_value={
+        'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
+    }))
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.HONOR, True),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.PROFESSIONAL, True),
+        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+        (CourseMode.CREDIT_MODE, True),
+    )
+    @ddt.unpack
+    def test_show_certificate_request_button(self, course_mode, show_button):
+        """Verify that the Request Certificate is not displayed in audit mode."""
+        CertificateGenerationConfiguration(enabled=True).save()
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
+
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertEqual(show_button, 'Request Certificate' in resp.content)
 
 
 @attr('shard_1')

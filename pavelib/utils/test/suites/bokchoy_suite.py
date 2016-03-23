@@ -11,6 +11,8 @@ from pavelib.utils.envs import Env
 from pavelib.utils.test import bokchoy_utils
 from pavelib.utils.test import utils as test_utils
 
+import os
+
 try:
     from pygments.console import colorize
 except ImportError:
@@ -37,6 +39,7 @@ class BokChoyTestSuite(TestSuite):
       default_store - modulestore to use when running tests (split or draft)
       num_processes - number of processes or threads to use in tests. Recommendation is that this
       is less than or equal to the number of available processors.
+      verify_xss - when set, check for XSS vulnerabilities in the page HTML.
       See nosetest documentation: http://nose.readthedocs.org/en/latest/usage.html
     """
     def __init__(self, *args, **kwargs):
@@ -53,6 +56,7 @@ class BokChoyTestSuite(TestSuite):
         self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', DEFAULT_VERBOSITY)
         self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
+        self.verify_xss = kwargs.get('verify_xss', os.environ.get('VERIFY_XSS', False))
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
@@ -223,6 +227,7 @@ class BokChoyTestSuite(TestSuite):
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
+            "VERIFY_XSS='{}'".format(self.verify_xss),
             "nosetests",
             test_spec,
             "{}".format(self.verbosity_processes_string())

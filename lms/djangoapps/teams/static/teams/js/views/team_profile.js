@@ -31,7 +31,7 @@
                     var memberships = this.model.get('membership'),
                         discussionTopicID = this.model.get('discussion_topic_id'),
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username);
-                    this.$el.html(_.template(teamTemplate, {
+                    this.$el.html(_.template(teamTemplate)({
                         courseID: this.context.courseID,
                         discussionTopicID: discussionTopicID,
                         readOnly: !(this.context.userInfo.privileged || isMember),
@@ -56,7 +56,7 @@
                 renderTeamMembers: function() {
                     var view = this;
                     _.each(this.model.get('membership'), function(membership) {
-                        view.$('.members-info').append(_.template(teamMemberTemplate, {
+                        view.$('.members-info').append(_.template(teamMemberTemplate)({
                             imageUrl: membership.user.profile_image.image_url_medium,
                             username: membership.user.username,
                             memberProfileUrl: '/u/' + membership.user.username

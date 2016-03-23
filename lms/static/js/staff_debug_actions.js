@@ -35,15 +35,11 @@ var StaffDebug = (function (){
         url: get_url(action.method),
         data: pdata,
         success: function(data){
-            var text = _.template(
-                action.success_msg,
-                {user: data.student},
-                {interpolate: /\{(.+?)\}/g}
+            var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
+                {user: data.student}
             );
-            var html = _.template(
-                '<p id="idash_msg" class="success">{text}</p>',
-                {text: text},
-                {interpolate: /\{(.+?)\}/g}
+            var html = _.template('<p id="idash_msg" class="success">{text}</p>', {interpolate: /\{(.+?)\}/g})(
+                {text: text}
             );
             $("#result_"+sanitized_string(action.locationName)).html(html);
         },
@@ -54,18 +50,14 @@ var StaffDebug = (function (){
             } catch(e) {
                 response_json = { error: gettext('Unknown Error Occurred.') };
             }
-            var text = _.template(
-                '{error_msg} {error}',
+            var text = _.template('{error_msg} {error}', {interpolate: /\{(.+?)\}/g})(
                 {
                     error_msg: action.error_msg,
                     error: response_json.error
-                },
-                {interpolate: /\{(.+?)\}/g}
+                }
             );
-            var html = _.template(
-                '<p id="idash_msg" class="error">{text}</p>',
-                {text: text},
-                {interpolate: /\{(.+?)\}/g}
+            var html = _.template('<p id="idash_msg" class="error">{text}</p>', {interpolate: /\{(.+?)\}/g})(
+                {text: text}
             );
             $("#result_"+sanitized_string(action.locationName)).html(html);
 

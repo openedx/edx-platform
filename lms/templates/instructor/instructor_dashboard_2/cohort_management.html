@@ -2,6 +2,7 @@
 <%namespace name='static' file='../../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 from courseware.courses import get_studio_url
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 %>
@@ -27,7 +28,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
             % for content_group in content_groups:
             {
                 id: ${content_group.id},
-                name: "${content_group.name | h}",
+                name: "${content_group.name | n, js_escaped_string}",
                 user_partition_id: cohortUserPartitionId
             },
             % endfor

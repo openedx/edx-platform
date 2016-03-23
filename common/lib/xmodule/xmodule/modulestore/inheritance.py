@@ -218,6 +218,17 @@ class InheritanceMixin(XBlockMixin):
         default=False
     )
 
+    self_paced = Boolean(
+        display_name=_('Self Paced'),
+        help=_(
+            'Set this to "true" to mark this course as self-paced. Self-paced courses do not have '
+            'due dates for assignments, and students can progress through the course at any rate before '
+            'the course ends.'
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata

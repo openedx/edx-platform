@@ -37,7 +37,9 @@ define([
 
         afterEach(function () {
             NotesVisibilityFactory.VisibilityDecorator._setVisibility(null);
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
             $('.annotator-notice').remove();
         });
 

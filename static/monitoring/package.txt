@@ -87,7 +87,6 @@
         "reply-annotator": "1.0",
         "require": "2.1.8",
         "requirejs.text": "2.0.14",
-        "responsive-carousel": "0.1.0",
         "richText-annotator": "1.0",
         "share-annotator": "1.1",
         // "slick.core": "unknown",

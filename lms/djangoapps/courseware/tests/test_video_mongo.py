@@ -1013,14 +1013,17 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         'file_size': 222,
     }
     TEST_EDX_VIDEO_ID = 'test_edx_video_id'
+    TEST_YOUTUBE_ID = 'test_youtube_id'
+    TEST_YOUTUBE_EXPECTED_URL = 'https://www.youtube.com/watch?v=test_youtube_id'
 
     def setUp(self):
         super(TestVideoDescriptorStudentViewJson, self).setUp()
-        sample_xml = (
-            "<video display_name='Test Video'> " +
-            "<source src='" + self.TEST_SOURCE_URL + "'/> " +
-            "<transcript language='" + self.TEST_LANGUAGE + "' src='german_translation.srt' /> " +
-            "</video>"
+        video_declaration = "<video display_name='Test Video' youtube_id_1_0=\'" + self.TEST_YOUTUBE_ID + "\'>"
+        sample_xml = ''.join([
+            video_declaration,
+            "<source src='", self.TEST_SOURCE_URL, "'/> ",
+            "<transcript language='", self.TEST_LANGUAGE, "' src='german_translation.srt' /> ",
+            "</video>"]
         )
         self.transcript_url = "transcript_url"
         self.video = instantiate_descriptor(data=sample_xml)
@@ -1055,7 +1058,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         }
         return self.video.student_view_data(context)
 
-    def verify_result_with_fallback_url(self, result):
+    def verify_result_with_fallback_and_youtube(self, result):
         """
         Verifies the result is as expected when returning "fallback" video data (not from VAL).
         """
@@ -1065,7 +1068,24 @@ class TestVideoDescriptorStudentViewJson(TestCase):
                 "only_on_web": False,
                 "duration": None,
                 "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
-                "encoded_videos": {"fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0}},
+                "encoded_videos": {
+                    "fallback": {"url": self.TEST_SOURCE_URL, "file_size": 0},
+                    "youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}
+                },
+            }
+        )
+
+    def verify_result_with_youtube_url(self, result):
+        """
+        Verifies the result is as expected when returning "fallback" video data (not from VAL).
+        """
+        self.assertDictEqual(
+            result,
+            {
+                "only_on_web": False,
+                "duration": None,
+                "transcripts": {self.TEST_LANGUAGE: self.transcript_url},
+                "encoded_videos": {"youtube": {"url": self.TEST_YOUTUBE_EXPECTED_URL, "file_size": 0}},
             }
         )
 
@@ -1093,21 +1113,55 @@ class TestVideoDescriptorStudentViewJson(TestCase):
 
     def test_no_edx_video_id(self):
         result = self.get_result()
-        self.verify_result_with_fallback_url(result)
+        self.verify_result_with_fallback_and_youtube(result)
 
-    @ddt.data(
-        *itertools.product([True, False], [True, False], [True, False])
-    )
-    @ddt.unpack
-    def test_with_edx_video_id(self, allow_cache_miss, video_exists_in_val, associate_course_in_val):
+    def test_no_edx_video_id_and_no_fallback(self):
+        video_declaration = "<video display_name='Test Video' youtube_id_1_0=\'{}\'>".format(self.TEST_YOUTUBE_ID)
+        # the video has no source listed, only a youtube link, so no fallback url will be provided
+        sample_xml = ''.join([
+            video_declaration,
+            "<transcript language='", self.TEST_LANGUAGE, "' src='german_translation.srt' /> ",
+            "</video>"
+        ])
+        self.transcript_url = "transcript_url"
+        self.video = instantiate_descriptor(data=sample_xml)
+        self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
+        result = self.get_result()
+        self.verify_result_with_youtube_url(result)
+
+    @ddt.data(True, False)
+    def test_with_edx_video_id_video_associated_in_val(self, allow_cache_miss):
+        """
+        Tests retrieving a video that is stored in VAL and associated with a course in VAL.
+        """
         self.video.edx_video_id = self.TEST_EDX_VIDEO_ID
-        if video_exists_in_val:
-            self.setup_val_video(associate_course_in_val)
+        self.setup_val_video(associate_course_in_val=True)
+        # the video is associated in VAL so no cache miss should ever happen but test retrieval in both contexts
         result = self.get_result(allow_cache_miss)
-        if video_exists_in_val and (associate_course_in_val or allow_cache_miss):
+        self.verify_result_with_val_profile(result)
+
+    @ddt.data(True, False)
+    def test_with_edx_video_id_video_unassociated_in_val(self, allow_cache_miss):
+        """
+        Tests retrieving a video that is stored in VAL but not associated with a course in VAL.
+        """
+        self.video.edx_video_id = self.TEST_EDX_VIDEO_ID
+        self.setup_val_video(associate_course_in_val=False)
+        result = self.get_result(allow_cache_miss)
+        if allow_cache_miss:
             self.verify_result_with_val_profile(result)
         else:
-            self.verify_result_with_fallback_url(result)
+            self.verify_result_with_fallback_and_youtube(result)
+
+    @ddt.data(True, False)
+    def test_with_edx_video_id_video_not_in_val(self, allow_cache_miss):
+        """
+        Tests retrieving a video that is not stored in VAL.
+        """
+        self.video.edx_video_id = self.TEST_EDX_VIDEO_ID
+        # The video is not in VAL so in contexts that do and don't allow cache misses we should always get a fallback
+        result = self.get_result(allow_cache_miss)
+        self.verify_result_with_fallback_and_youtube(result)
 
 
 @attr('shard_1')

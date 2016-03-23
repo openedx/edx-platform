@@ -17,6 +17,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from django.conf import settings
 from django.core.urlresolvers import reverse, resolve
+from django.utils.translation import ugettext as _
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
@@ -263,6 +264,29 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertTrue(re.search(
             '<form action=".+create_ccx"',
             response.content))
+
+    def test_create_ccx_with_ccx_connector_set(self):
+        """
+        Assert that coach cannot create ccx when ``ccx_connector`` url is set.
+        """
+        course = CourseFactory.create()
+        course.ccx_connector = "http://ccx.com"
+        course.save()
+        self.store.update_item(course, 0)
+        role = CourseCcxCoachRole(course.id)
+        role.add_users(self.coach)
+
+        url = reverse(
+            'create_ccx',
+            kwargs={'course_id': unicode(course.id)})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        error_message = _(
+            "A CCX can only be created on this course through an external service."
+            " Contact a course admin to give you access."
+        )
+        self.assertTrue(re.search(error_message, response.content))
 
     def test_create_ccx(self, ccx_name='New CCX'):
         """

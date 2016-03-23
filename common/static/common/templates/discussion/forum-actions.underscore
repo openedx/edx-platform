@@ -1,6 +1,6 @@
 <% if (!readOnly) { %>
     <ul class="<%= contentType %>-actions-list">
-        <% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>
+        <% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>
         <li class="actions-item is-visible">
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-<%= contentId %>">
@@ -9,7 +9,7 @@
                 </a>
                 <div class="actions-dropdown" id="action-menu-<%= contentType %>" aria-expanded="false">
                   <ul class="actions-dropdown-list">
-                    <% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>
+                    <% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>
                   </ul>
                 </div>
             </div>
