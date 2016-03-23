@@ -60,9 +60,12 @@ define([
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
+                    })
+                );
                 return this;
             }
         });
