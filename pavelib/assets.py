@@ -35,6 +35,15 @@ CMS_SASS_DIRECTORIES = [
 THEME_SASS_DIRECTORIES = []
 SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
 
+# A list of NPM installed libraries that should be copied into the common
+# static directory.
+NPM_INSTALLED_LIBRARIES = [
+    'underscore/underscore.js'
+]
+
+# Directory to install static vendor files
+NPM_VENDOR_DIRECTORY = path("common/static/common/js/vendor")
+
 
 def configure_paths():
     """Configure our paths based on settings.  Called immediately."""
@@ -292,6 +301,26 @@ def compile_templated_sass(systems, settings):
         print("\t\tFinished preprocessing {} assets.".format(system))
 
 
+def process_npm_assets():
+    """
+    Process vendor libraries installed via NPM.
+    """
+    # Skip processing of the libraries if this is just a dry run
+    if tasks.environment.dry_run:
+        tasks.environment.info("install npm_assets")
+        return
+
+    # Ensure that the vendor directory exists
+    NPM_VENDOR_DIRECTORY.mkdir_p()
+
+    # Copy each file to the vendor directory, overwriting any existing file.
+    for library in NPM_INSTALLED_LIBRARIES:
+        sh('/bin/cp -rf node_modules/{library} {vendor_dir}'.format(
+            library=library,
+            vendor_dir=NPM_VENDOR_DIRECTORY,
+        ))
+
+
 def process_xmodule_assets():
     """
     Process XModule static assets.
@@ -387,6 +416,7 @@ def update_assets(args):
 
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
+    process_npm_assets()
     compile_coffeescript()
     call_task('pavelib.assets.compile_sass', options={'system': args.system, 'debug': args.debug})
 
