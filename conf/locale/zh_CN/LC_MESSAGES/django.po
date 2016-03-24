@@ -7,13 +7,17 @@
 # vingte <411029240@qq.com>, 2014
 # Alfred <alfredhuang211@qq.com>, 2015
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
+# ckyOL, 2015
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
+# freakylemon <freakylemon@ymail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
 # ckyOL, 2015
 # GoodLuck <1833447072@qq.com>, 2014
@@ -24,16 +28,21 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
 # Jiadong Zhang <fighting-dong@qq.com>, 2015
+# Jianfei Wang <me@thinxer.com>, 2013
 # Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
+# Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Michael Cao <ming.cao.ming@gmail.com>, 2015
 # Mingye Wang <arthur200126@gmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
+# riceball <snowyu.lee@gmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Rui Xu <xurui6376@gmail.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -44,24 +53,30 @@
 # Jianfei Wang <me@thinxer.com>, 2013
 # Tiffany Wang <tiffany.wang0524@gmail.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# vingte <411029240@qq.com>, 2014
 # wanghe <1636807295@qq.com>, 2014
+# wenheping <wenheping@gmail.com>, 2014
 # wenheping <wenheping@gmail.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013-2014
 # wuqiong <wuqiong417@gmail.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # Xiang Junfu <xiangjf.fnst@cn.fujitsu.com>, 2015
 # yan9yu, 2014
+# yan9yu, 2014
 # Yuelan Sheng <shengyl.cheryl@gmail.com>, 2015
+# Yu <inactive+harrycaoyu@transifex.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # zhouxuan <lion19930924@163.com>, 2014-2015
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 赵宏鑫 <zhaohongxinxin@aol.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -75,6 +90,8 @@
 # GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
+# hohomi <hohomi@gmail.com>, 2016
+# hohomi <hohomi@gmail.com>, 2016
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
@@ -113,12 +130,15 @@
 # Alfred <alfredhuang211@qq.com>, 2015
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
 # KaeChenn <cjh_0731@sina.com>, 2015
 # Yufei Xue <cmouse@163.com>, 2013
+# daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # Hanwei <chuxiking@163.com>, 2014
@@ -128,6 +148,7 @@
 # harry <i.jucao@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2014,2016
+# hohomi <hohomi@gmail.com>, 2014,2016
 # Hu Tong <buildmindht@outlook.com>, 2014
 # bnw, 2014
 # bnw, 2014
@@ -136,6 +157,8 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
+# Jianfei Wang <me@thinxer.com>, 2013
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
@@ -143,14 +166,19 @@
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# Junjie, 2014
 # Junjie Weng <wengjunjie@gmail.com>, 2014
+# KaeChenn <cjh_0731@sina.com>, 2015
 # 匡冲 <kuangchong07@gmail.com>, 2013
+# Lingming Kong <klm123698745@gmail.com>, 2016
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # Junjie, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Lucas H. Xu <xuh@bu.edu>, 2015
 # Mingye Wang <arthur200126@gmail.com>, 2015
 # Wheathana <mr_wheat@sina.cn>, 2015
+# perypery <410224186@qq.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -163,13 +191,18 @@
 # tucunchao <tucunchao@gmail.com>, 2013
 # VainChan <fsszns@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# vingte <411029240@qq.com>, 2014
+# wendiyan420 <wendiyan420@gmail.com>, 2015
 # wendiyan420 <wendiyan420@gmail.com>, 2015
 # Wentao Han <wentao.han@gmail.com>, 2013
+# Wheathana <mr_wheat@sina.cn>, 2015
 # wuqiong <wuqiong417@gmail.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yan9yu, 2014
+# yan9yu, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
-# Yufei Xue <cmouse@163.com>, 2014
+# YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# Yufei Xue <cmouse@163.com>, 2013-2014
 # Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
 # yuki f <likemood@163.com>, 2015
 # Yu Zhao <zhaoyu62188@gmail.com>, 2013
@@ -182,13 +215,16 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 李子豪 <178354170lizihao@gmail.com>, 2014
 # 李莉 <happylily0516@foxmail.com>, 2013
 # 汤和果 <hgtang93@163.com>, 2015
+# 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 胡超威 <chadennishu@gmail.com>, 2014
 # 顾翔 <c0710204@gmail.com>, 2014
 # 黄鸿飞 <853885165@qq.com>, 2015
@@ -200,11 +236,13 @@
 # Translators:
 # dcschwester <244876839@qq.com>, 2014
 # AdiaCheng <75707teen@gmail.com>, 2014
+# AdiaCheng <75707teen@gmail.com>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # BertZou <turingcat@gmail.com>, 2015
 # 肖寒 <bookman@vip.163.com>, 2013
 # Changyue Wang <peterwang.dut@gmail.com>, 2014
 # Yufei Xue <cmouse@163.com>, 2013
+# dcschwester <244876839@qq.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # natop <golfeng@gmail.com>, 2014
 # GoodLuck <1833447072@qq.com>, 2014
@@ -213,15 +251,21 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
+# Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Wheathana <mr_wheat@sina.cn>, 2015
+# natop <golfeng@gmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Scott Huang <sc.h@aol.com>, 2014
@@ -231,18 +275,33 @@
 # tucunchao <tucunchao@gmail.com>, 2013
 # VainChan <fsszns@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
+# Wheathana <mr_wheat@sina.cn>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yezhixin20 <yezhixin20@gmail.com>, 2014
+# yezhixin20 <yezhixin20@gmail.com>, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# Yufei Xue <cmouse@163.com>, 2013
+# Yu Zhao <zhaoyu62188@gmail.com>, 2013
 # YVONNE <yenyoong85@gmail.com>, 2014
 # YVONNE <yenyoong85@gmail.com>, 2014
+# Zhang Meng <zmlarry@foxmail.com>, 2013
 # Yu Zhao <zhaoyu62188@gmail.com>, 2013
 # zhouxuan <lion19930924@163.com>, 2015
 # 刘知远 <liuliudong@163.com>, 2013
 # Zhang Meng <zmlarry@foxmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 刘家骅 <alphaf52@gmail.com>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# 匡冲 <kuangchong07@gmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 李莉 <happylily0516@foxmail.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -259,10 +318,15 @@
 # 
 # Translators:
 # focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# louyihua <supermouselyh@hotmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
+# riceball <snowyu.lee@gmail.com>, 2015
 # riceball <snowyu.lee@gmail.com>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2015
 # Tianyu Huang <hty0508@gmail.com>, 2014
@@ -275,7 +339,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-10 18:17+0000\n"
+"POT-Creation-Date: 2016-03-17 11:00+0000\n"
 "PO-Revision-Date: 2015-12-13 04:46+0000\n"
 "Last-Translator: riceball <snowyu.lee@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -7482,66 +7546,131 @@ msgid "Your Password Reset is Complete"
 msgstr "您的密码重置已完成"
 
 #: lms/templates/registration/password_reset_complete.html
-msgid "Password Reset Complete"
-msgstr ""
-
-#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
-"                "
+"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
+"      "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"    Reset Your %(platform_name)s Password\n"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr ""
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "重置我的密码"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Invalid Password Reset Link"
+"      Reset Your %(platform_name)s Password\n"
+"  "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
-"                "
+"          Reset Your %(platform_name)s Password\n"
+"          "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Password Reset Form"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"\n"
+"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The following errors occurred while processing your registration: "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "You must complete all fields."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"We're sorry, our systems seem to be having trouble processing your password "
+"reset"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
+"        "
+msgstr ""
+
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "必填信息"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your New Password Again"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Change My Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your Password Reset Was Unsuccessful"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
+"        "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Password Reset Help"
+msgstr ""
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "需要帮助？"
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
+"          "
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -9348,18 +9477,6 @@ msgid ""
 "setting a new password."
 msgstr "请在下面输入您的电子邮件地址。我们会通过邮件发送设置新密码的说明。"
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "必填信息"
-
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "您的邮件地址"
@@ -9367,6 +9484,10 @@ msgstr "您的邮件地址"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "这是您在{platform}注册时使用的e-mail地址。"
+
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "重置我的密码"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -9586,11 +9707,6 @@ msgstr "尚未选课？"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "现在就注册加入{platform_name}！"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "需要帮助？"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
