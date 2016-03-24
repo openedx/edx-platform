@@ -3,7 +3,7 @@ Declaration of CourseOverview model
 """
 import json
 import logging
-from urlparse import urlunparse
+from urlparse import urlparse, urlunparse
 
 from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
@@ -549,9 +549,9 @@ class CourseOverview(TimeStampedModel):
             urls['small'] = self.image_set.small_url or raw_image_url
             urls['large'] = self.image_set.large_url or raw_image_url
 
-        return self._apply_cdn(urls)
+        return self.apply_cdn_to_urls(urls)
 
-    def _apply_cdn(self, image_urls):
+    def apply_cdn_to_urls(self, image_urls):
         """
         Given a dict of resolutions -> urls, return a copy with CDN applied.
 
@@ -568,9 +568,31 @@ class CourseOverview(TimeStampedModel):
         base_url = cdn_config.base_url
 
         return {
-            resolution: urlunparse((None, base_url, url, None, None, None))
+            resolution: self._apply_cdn_to_url(url, base_url)
             for resolution, url in image_urls.items()
         }
+
+    def _apply_cdn_to_url(self, url, base_url):
+        """
+        Applies a new CDN/base URL to the given URL.
+
+        If a URL is absolute, we skip switching the host since it could
+        be a hostname that isn't behind our CDN, and we could unintentionally
+        break the URL overall.
+        """
+
+        # The URL can't be empty.
+        if not url:
+            return url
+
+        _, netloc, path, params, query, fragment = urlparse(url)
+
+        # If this is an absolute URL, just return it as is.  It could be a domain
+        # that isn't ours, and thus CDNing it would actually break it.
+        if netloc:
+            return url
+
+        return urlunparse((None, base_url, path, params, query, fragment))
 
     def __unicode__(self):
         """Represent ourselves with the course key."""
