@@ -245,7 +245,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-10 18:17+0000\n"
+"POT-Creation-Date: 2016-03-17 11:00+0000\n"
 "PO-Revision-Date: 2016-01-19 18:08+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -8507,66 +8507,131 @@ msgid "Your Password Reset is Complete"
 msgstr "A redefinição da sua senha foi concluída"
 
 #: lms/templates/registration/password_reset_complete.html
-msgid "Password Reset Complete"
-msgstr ""
-
-#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
-"                "
+"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
+"      "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"    Reset Your %(platform_name)s Password\n"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr ""
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "Redefinir minha senha"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Invalid Password Reset Link"
+"      Reset Your %(platform_name)s Password\n"
+"  "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
-"                "
+"          Reset Your %(platform_name)s Password\n"
+"          "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Password Reset Form"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"\n"
+"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The following errors occurred while processing your registration: "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "You must complete all fields."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"We're sorry, our systems seem to be having trouble processing your password "
+"reset"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
+"            "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
+"        "
+msgstr ""
+
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "Informação obrigatória"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your New Password Again"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Change My Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Your Password Reset Was Unsuccessful"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
+"        "
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Password Reset Help"
+msgstr ""
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Precisa de ajuda?"
+
+#: lms/templates/registration/password_reset_confirm.html
+#, python-format
+msgid ""
+"\n"
+"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
+"          "
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -10488,18 +10553,6 @@ msgstr ""
 "Insira o seu e-mail abaixo para receber as instruções para a criação de uma "
 "nova senha. "
 
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "Informação obrigatória"
-
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "O seu e-mail"
@@ -10507,6 +10560,10 @@ msgstr "O seu e-mail"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "Este é o e-mail que você utilizou para registrar-se em {platform}"
+
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "Redefinir minha senha"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -10749,11 +10806,6 @@ msgstr "Não está inscrito?"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "Registre-se na {platform_name} hoje mesmo!"
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Precisa de ajuda?"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
