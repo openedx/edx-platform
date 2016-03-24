@@ -16,6 +16,24 @@ FIELD_ICONS = {
 }
 
 
+class Badge(PageObject):
+    """
+    Represents a single badge displayed on the learner profile page.
+    """
+    url = None
+
+    def __init__(self, element):
+        # Element API is similar to browser API, should allow subqueries.
+        super(Badge, self).__init__(element)
+
+    def is_browser_on_page(self):
+        return self.q(css=".badge-details").visible
+
+    def display_modal(self):
+        self.q(css=".share-button").click()
+        self.wait_for_element_visibility(".badges-modal")
+
+
 class LearnerProfilePage(FieldsMixin, PageObject):
     """
     PageObject methods for Learning Profile Page.
@@ -57,6 +75,24 @@ class LearnerProfilePage(FieldsMixin, PageObject):
             'all_users' or 'private'
         """
         return 'all_users' if self.q(css=PROFILE_VISIBILITY_SELECTOR.format('all_users')).selected else 'private'
+
+    def accomplishments_available(self):
+        """
+        Verify that the accomplishments tab is available.
+        """
+        return self.q(css="button[data-url='accomplishments']").visible
+
+    def display_accomplishments(self):
+        """
+        Click the accomplishments tab and wait for the accomplishments to load.
+        """
+        EmptyPromise(self.accomplishments_available, "Accomplishments tab is displayed").fulfill()
+        self.q(css="button[data-url='accomplishments']").click()
+        self.wait_for_element_visibility(".badge-list", "Badge list displayed")
+
+    @property
+    def badges(self):
+        return [Badge(element) for element in self.q(css=".badge-display:not(.badge-placeholder)")]
 
     @privacy.setter
     def privacy(self, privacy):

@@ -7,7 +7,6 @@ from mock import patch
 
 from django.conf import settings
 
-from badges.backends.base import BadgeBackend
 from badges.tests.factories import RandomBadgeClassFactory, CourseEventBadgesConfigurationFactory, BadgeAssertionFactory
 from certificates.models import GeneratedCertificate, CertificateStatuses
 from student.models import CourseEnrollment
@@ -16,17 +15,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class DummyBackend(BadgeBackend):
-    """
-    Dummy backend that creates assertions without contacting any real-world backend.
-    """
-    def award(self, badge_class, user, evidence_url=None):
-        return BadgeAssertionFactory(badge_class=badge_class, user=user)
-
-
 @ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-@override_settings(BADGING_BACKEND='lms.djangoapps.badges.events.tests.test_course_meta.DummyBackend')
+@override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
 class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on number of courses a user is enrolled in.
@@ -77,7 +68,7 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
 
 @ddt
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-@override_settings(BADGING_BACKEND='lms.djangoapps.badges.events.tests.test_course_meta.DummyBackend')
+@override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
 class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on the number of courses completed.
@@ -135,7 +126,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
-@override_settings(BADGING_BACKEND='lms.djangoapps.badges.events.tests.test_course_meta.DummyBackend')
+@override_settings(BADGING_BACKEND='lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend')
 class CourseGroupBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges when a user completes a set of courses.
