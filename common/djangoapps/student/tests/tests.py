@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from urlparse import urljoin
 
 import pytz
+from markupsafe import escape
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery as pq
@@ -404,7 +405,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertNotIn('Add Certificate to LinkedIn', response.content)
 
         response_url = 'http://www.linkedin.com/profile/add?_ed='
-        self.assertNotContains(response, response_url)
+        self.assertNotContains(response, escape(response_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
@@ -452,7 +453,7 @@ class DashboardTest(ModuleStoreTestCase):
             'pfCertificationUrl=www.edx.org&'
             'source=o'
         )
-        self.assertContains(response, expected_url)
+        self.assertContains(response, escape(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
