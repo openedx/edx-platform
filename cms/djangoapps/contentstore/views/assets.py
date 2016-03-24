@@ -1,3 +1,15 @@
+"""
+A set of views for managing uploads of files by course
+instructors. This may be used for e.g. a PDF of a course syllabus, a
+tarball needed for students in a programming course, and similar.
+
+This is also used for files associated with XBlocks. For example, if
+an HTML or problem XBlock needs a schematic diagram, it would be
+uploaded here. Eventually, these should become part of the XBlock
+(which now supports uploads and downloads through pyfilesystem), but
+the platform isn't there yet.
+"""
+
 import logging
 from functools import partial
 import math

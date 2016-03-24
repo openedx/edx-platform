@@ -1,7 +1,9 @@
 """
 Views related to content libraries.
+
 A content library is a structure containing XBlocks which can be re-used in the
-multiple courses.
+multiple courses. For example, a content library might be a problem bank used
+to deliver randomized problems to each student from a common pool.
 """
 from __future__ import absolute_import
 
