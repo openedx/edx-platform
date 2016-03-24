@@ -1,3 +1,6 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
+
 % if settings.CMS_SEGMENT_KEY:
     <!-- begin segment footer -->
     <script type="text/javascript">
@@ -6,10 +9,10 @@
         // screws up RequireJS' JQuery initialization.
         var onLoadCallback = function() {
             analytics.identify(
-                "${user.id}",
+                "${ user.id | n, js_escaped_string }",
                 {
-                    email: "${user.email}",
-                    username: "${user.username}"
+                    email: "${ user.email | n, js_escaped_string }",
+                    username: "${ ser.username | n, js_escaped_string }"
                 },
                 {
                     integrations: {
