@@ -969,6 +969,7 @@ urlpatterns += (
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += (
     url(r'^api/', include('edx_proctoring.urls')),
+    url(r'^api/extended/', include('open_edx_api_extension.urls', namespace='api_extension')),
 )
 
 if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
