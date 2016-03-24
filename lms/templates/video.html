@@ -1,5 +1,9 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
 
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 % if display_name is not UNDEFINED and display_name is not None:
     <h3 class="hd hd-2">${display_name}</h3>
 % endif
@@ -89,26 +93,28 @@
 </div>
 % if cdn_eval:
 <script>
+  //TODO: refactor this js into a separate file.
   function sendPerformanceBeacon(id, expgroup, value, event_name) {
     var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
     $.ajax({method: "POST", url: "/performance", data: data});
   }
   var cdnStartTime;
   var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  var id = "${id | n, js_escaped_string}";
   function initializeCDNExperiment() {
-    sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, "", "load");
+    sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, "", "load");
     cdnStartTime = Date.now();
     $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
                     'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
                     function(index, eventName) {
-      $("#video_${id}").bind("html5:" + eventName, null, function() {
+      $("#video_" + id).bind("html5:" + eventName, null, function() {
         timeElapsed = Date.now() - cdnStartTime;
-        sendPerformanceBeacon("${id}_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+        sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
       });
     });
   }
-  $("#video_${id}").bind("initialize", null, initializeCDNExperiment);
-  if ($("#video_${id}").hasClass("is-initialized")) {
+  $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_" + id).hasClass("is-initialized")) {
     initializeCDNExperiment();
   }
 </script>
