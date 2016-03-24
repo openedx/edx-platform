@@ -31,32 +31,54 @@ class TestMakoTemplateLinter(TestCase):
 
         self.assertEqual(linter._is_mako_directory(data['directory']), data['expected'])
 
-    def test_check_page_default_with_default_provided(self):
+    @data(
+        {
+            'template': '\n <%page expression_filter="h"/>',
+            'violations': 0,
+            'rule': None
+        },
+        {
+            'template':
+                '\n <%page args="section_data" expression_filter="h" /> ',
+            'violations': 0,
+            'rule': None
+        },
+        {
+            'template':
+                '\n <%page expression_filter="h" /> '
+                '\n <%page args="section_data"/>',
+            'violations': 1,
+            'rule': Rules.mako_multiple_page_tags
+        },
+        {
+            'template': '\n <%page args="section_data" /> ',
+            'violations': 1,
+            'rule': Rules.mako_missing_default
+        },
+        {
+            'template':
+                '\n <%page args="section_data"/> <some-other-tag expression_filter="h" /> ',
+            'violations': 1,
+            'rule': Rules.mako_missing_default
+        },
+        {
+            'template': '\n',
+            'violations': 1,
+            'rule': Rules.mako_missing_default
+        },
+    )
+    def test_check_page_default(self, data):
         """
-        Test _check_mako_file_is_safe with default causes no violation
+        Test _check_mako_file_is_safe with different page defaults
         """
         linter = MakoTemplateLinter()
         results = FileResults('')
-        mako_template = """
-            <%page expression_filter="h"/>
-        """
 
-        linter._check_mako_file_is_safe(mako_template, results)
+        linter._check_mako_file_is_safe(data['template'], results)
 
-        self.assertEqual(len(results.violations), 0)
-
-    def test_check_page_default_with_no_default_provided(self):
-        """
-        Test _check_mako_file_is_safe with no default causes violation
-        """
-        linter = MakoTemplateLinter()
-        results = FileResults('')
-        mako_template = ""
-
-        linter._check_mako_file_is_safe(mako_template, results)
-
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, Rules.mako_missing_default)
+        self.assertEqual(len(results.violations), data['violations'])
+        if data['violations'] > 0:
+            self.assertEqual(results.violations[0].rule, data['rule'])
 
     def test_check_mako_expressions_in_html(self):
         """

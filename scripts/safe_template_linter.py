@@ -150,7 +150,8 @@ class Rules(Enum):
     """
     An Enum of each rule which the linter will check.
     """
-    mako_missing_default = ('mako-missing-default', 'The default page directive with h filter is missing.')
+    mako_missing_default = ('mako-missing-default', 'Missing default <%page expression_filter="h"/>.')
+    mako_multiple_page_tags = ('mako-multiple-page-tags', 'A Mako template can only have one <%page> tag.')
     mako_unparsable_expression = ('mako-unparsable-expression', 'The expression could not be properly parsed.')
     mako_unwanted_html_filter = ('mako-unwanted-html-filter', 'Remove explicit h filters when it is provided by the page directive.')
     mako_invalid_html_filter = ('mako-invalid-html-filter', 'The expression is using an invalid filter in an HTML context.')
@@ -398,23 +399,37 @@ class MakoTemplateLinter(object):
             results: A file results objects to which violations will be added.
 
         """
-        has_page_default = self._has_page_default(mako_template, results)
-        if not has_page_default:
-            results.violations.append(RuleViolation(Rules.mako_missing_default))
+        has_page_default = False
+        if self._has_multiple_page_tags(mako_template):
+            results.violations.append(RuleViolation(Rules.mako_multiple_page_tags))
+        else:
+            has_page_default = self._has_page_default(mako_template)
+            if not has_page_default:
+                results.violations.append(RuleViolation(Rules.mako_missing_default))
         self._check_mako_expressions(mako_template, has_page_default, results)
         results.prepare_results(mako_template)
 
-    def _has_page_default(self, mako_template, results):
+    def _has_multiple_page_tags(self, mako_template):
+        """
+        Checks if the Mako template contains more than one page expression.
+
+        Arguments:
+            mako_template: The contents of the Mako template.
+
+        """
+        count = len(re.findall('<%page ', mako_template, re.IGNORECASE))
+        return count > 1
+
+    def _has_page_default(self, mako_template):
         """
         Checks if the Mako template contains the page expression marking it as
         safe by default.
 
         Arguments:
             mako_template: The contents of the Mako template.
-            results: A list of results into which violations will be added.
 
         """
-        page_h_filter_regex = re.compile('<%page expression_filter=(?:"h"|\'h\')\s*/>')
+        page_h_filter_regex = re.compile('<%page[^>]*expression_filter=(?:"h"|\'h\')[^>]*/>')
         page_match = page_h_filter_regex.search(mako_template)
         return page_match
 
