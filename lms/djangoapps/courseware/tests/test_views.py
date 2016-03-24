@@ -278,8 +278,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
             request = self.request_factory.get("foo")
-            request.user = AnonymousUser()
-            self.assertEqual(EcommerceService().is_enabled(request), False)
+            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     @ddt.data(True, False)
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
@@ -289,8 +288,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assert_enrollment_link_present(is_anonymous=is_anonymous, _id=True)
         else:
             request = self.request_factory.get("foo")
-            request.user = AnonymousUser()
-            self.assertEqual(EcommerceService().is_enabled(request), False)
+            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
 
     def test_user_groups(self):
         # depreciated function
