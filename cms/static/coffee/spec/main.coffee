@@ -247,6 +247,7 @@ define([
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
+    "js/spec/views/edit_chapter_spec"
     "js/spec/views/paged_container_spec",
     "js/spec/views/group_configuration_spec",
     "js/spec/views/unit_outline_spec",
@@ -257,7 +258,7 @@ define([
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/login_studio_spec",
-
+    "js/spec/views/utils/view_utils_spec",
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
