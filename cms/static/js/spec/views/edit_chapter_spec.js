@@ -8,12 +8,7 @@ define(['jquery', 'underscore', 'js/views/edit_chapter', 'js/models/course', 'js
 
             beforeEach(function() {
                 var course = new Course({
-                    id: '1',
                     name: '&amp;lt;Vedran&#39;s course&amp;gt;',
-                    url_name: 'course_name',
-                    org: 'course_org',
-                    num: 'course_num',
-                    revision: 'course_rev'
                 });
                 this.model = new ChapterModel({name: 'test-model'});
                 this.collection = new ChapterCollection(this.model);
