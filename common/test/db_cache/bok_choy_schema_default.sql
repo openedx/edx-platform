@@ -515,9 +515,12 @@ CREATE TABLE `badges_badgeassertion` (
   `backend` varchar(50) NOT NULL,
   `image_url` varchar(200) NOT NULL,
   `assertion_url` varchar(200) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `created` datetime(6) NOT NULL,
   `badge_class_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
+  KEY `badges_badgeassertion_e2fa5388` (`created`),
   KEY `badges_badgeassertion_c389e456` (`badge_class_id`),
   KEY `badges_badgeassertion_e8701ad4` (`user_id`),
   CONSTRAINT `badges_b_badge_class_id_3a4a16cb833201e8_fk_badges_badgeclass_id` FOREIGN KEY (`badge_class_id`) REFERENCES `badges_badgeclass` (`id`),
@@ -554,6 +557,22 @@ CREATE TABLE `badges_coursecompleteimageconfiguration` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `mode` (`mode`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `badges_courseeventbadgesconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `badges_courseeventbadgesconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `change_date` datetime(6) NOT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  `courses_completed` longtext NOT NULL,
+  `courses_enrolled` longtext NOT NULL,
+  `course_groups` longtext NOT NULL,
+  `changed_by_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `badges_courseeven_changed_by_id_50986a94d73238b9_fk_auth_user_id` (`changed_by_id`),
+  CONSTRAINT `badges_courseeven_changed_by_id_50986a94d73238b9_fk_auth_user_id` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bookmarks_bookmark`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3813,18 +3832,6 @@ CREATE TABLE `teams_courseteammembership` (
   KEY `teams_courseteam_team_id_594700d19b04f922_fk_teams_courseteam_id` (`team_id`),
   CONSTRAINT `teams_courseteam_team_id_594700d19b04f922_fk_teams_courseteam_id` FOREIGN KEY (`team_id`) REFERENCES `teams_courseteam` (`id`),
   CONSTRAINT `teams_courseteammembers_user_id_2d93b28be22c3c40_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `theming_sitetheme`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `theming_sitetheme` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `theme_dir_name` varchar(255) NOT NULL,
-  `site_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `theming_sitetheme_site_id_4fccdacaebfeb01f_fk_django_site_id` (`site_id`),
-  CONSTRAINT `theming_sitetheme_site_id_4fccdacaebfeb01f_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `third_party_auth_ltiproviderconfig`;
