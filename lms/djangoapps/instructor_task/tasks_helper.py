@@ -836,7 +836,7 @@ def _order_problems(blocks):
         an OrderedDict that maps a problem id to its headers in the final report.
     """
     problems = OrderedDict()
-    assignments = dict()
+    assignments = OrderedDict()
     # First, sort out all the blocks into their correct assignments and all the
     # assignments into their correct types.
     for block in blocks:
