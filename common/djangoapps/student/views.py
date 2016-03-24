@@ -2374,10 +2374,11 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         link = "{0}-{1}".format(uidb36, token)
 
     except (ValueError, User.DoesNotExist):
+        validlink = False
         user = None
 
 
-    if select_user(user.id, link):
+    if user is not None and select_user(user.id, link):
         validlink = True
         title = _('Update your details')
         update_user(user.id)
