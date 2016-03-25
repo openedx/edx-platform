@@ -221,6 +221,6 @@ define(['underscore'], function(_) {
         expectTabbedViewToBeHidden: expectTabbedViewToBeHidden, expectTabbedViewToBeShown: expectTabbedViewToBeShown,
         expectBadgesDisplayed: expectBadgesDisplayed, expectBadgesHidden: expectBadgesHidden,
         firstPageBadges: firstPageBadges, secondPageBadges: secondPageBadges, thirdPageBadges: thirdPageBadges,
-        emptyBadges: emptyBadges, expectPage: expectPage
+        emptyBadges: emptyBadges, expectPage: expectPage, makeBadge: makeBadge
     };
 });
