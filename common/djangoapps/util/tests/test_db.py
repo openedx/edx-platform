@@ -6,6 +6,7 @@ import time
 import unittest
 
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.db import connection, IntegrityError
 from django.db.transaction import atomic, TransactionManagementError
 from django.test import TestCase, TransactionTestCase
@@ -161,3 +162,17 @@ class GenerateIntIdTestCase(TestCase):
         for i in range(times):
             int_id = generate_int_id(minimum, maximum, used_ids)
             self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))
+
+
+class MigrationTests(TestCase):
+    """
+    Tests for migrations.
+    """
+
+    def test_migrations_are_in_sync(self):
+        """
+        Tests that the migration files are in sync with the models.
+        If this fails, you needs to run the Django command makemigrations.
+        """
+        with self.assertRaises(SystemExit):
+            call_command('makemigrations', '-e')
