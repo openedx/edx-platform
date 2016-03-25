@@ -70,9 +70,21 @@ source, template_path = Loader(engine).load_template_source(path)
 <%def name="require_module(module_name, class_name)">
     <script type="text/javascript">
         (function (require) {
-            require(['${module_name}'], function (${class_name}) {
-                ${caller.body()}
-            });
+            % if settings.REQUIRE_DEBUG:
+                require(['${module_name}'], function (${class_name}) {
+                    ${caller.body()}
+                });
+            % else:
+                ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
+                ## static_replace calls (as woudl happen if require_module is used within courseware).
+                ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
+                ## being appended more than once, causing the import to fail in production environments.
+                require(['${staticfiles_storage.url(module_name + ".js") + "?raw"}'], function () {
+                    require(['${module_name}'], function (${class_name}) {
+                        ${caller.body()}
+                    });
+                });
+            % endif
         }).call(this, require || RequireJS.require);
     </script>
 </%def>
