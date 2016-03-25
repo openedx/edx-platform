@@ -1,6 +1,6 @@
 <%!
 from django.contrib.staticfiles.storage import staticfiles_storage
-from pipeline_mako import compressed_css, compressed_js
+from pipeline_mako import compressed_css, compressed_js, pipeline_css_info
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 
@@ -40,7 +40,7 @@ except:
   % if settings.PIPELINE_ENABLED:
     ${compressed_css(group, raw=raw)}
   % else:
-    % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
+    % for filename in pipeline_css_info(group)['source_filenames']:
       <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >
     % endfor
   %endif
