@@ -1,4 +1,4 @@
-define(['underscore'], function(_) {
+define(['underscore', 'URI', 'common/js/spec_helpers/ajax_helpers'], function(_, URI, AjaxHelpers) {
     'use strict';
 
     var expectProfileElementContainsField = function(element, view) {
@@ -148,6 +148,21 @@ define(['underscore'], function(_) {
         });
     };
 
+    var expectBadgeLoadingErrorIsRendered = function(learnerProfileView) {
+        var errorMessage = learnerProfileView.$el.find(".badge-set-display").text();
+        expect(errorMessage).toBe(
+            'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
+            'Help tab to report the problem.'
+        );
+    };
+
+    var breakBadgeLoading = function(learnerProfileView, requests) {
+        var request = AjaxHelpers.currentRequest(requests);
+        var path = new URI(request.url).path();
+        expect(path).toBe('/api/badges/v1/assertions/user/student/');
+        AjaxHelpers.respondWithError(requests, 500);
+    };
+
     var firstPageBadges = {
         count: 30,
         previous: null,
@@ -220,7 +235,8 @@ define(['underscore'], function(_) {
         expectProfileSectionsNotToBeRendered: expectProfileSectionsNotToBeRendered,
         expectTabbedViewToBeHidden: expectTabbedViewToBeHidden, expectTabbedViewToBeShown: expectTabbedViewToBeShown,
         expectBadgesDisplayed: expectBadgesDisplayed, expectBadgesHidden: expectBadgesHidden,
+        expectBadgeLoadingErrorIsRendered: expectBadgeLoadingErrorIsRendered, breakBadgeLoading: breakBadgeLoading,
         firstPageBadges: firstPageBadges, secondPageBadges: secondPageBadges, thirdPageBadges: thirdPageBadges,
-        emptyBadges: emptyBadges, expectPage: expectPage
+        emptyBadges: emptyBadges, expectPage: expectPage, makeBadge: makeBadge
     };
 });

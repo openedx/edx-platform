@@ -206,5 +206,15 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
             });
 
+            it("renders an error if the badges can't be fetched", function () {
+                var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
+                learnerProfileView.options.accountSettingsModel.set({'accomplishments_shared': true});
+                var requests = AjaxHelpers.requests(this);
+
+                learnerProfileView.render();
+                
+                LearnerProfileHelpers.breakBadgeLoading(learnerProfileView, requests);
+                LearnerProfileHelpers.expectBadgeLoadingErrorIsRendered(learnerProfileView);
+            });
         });
     });

@@ -66,6 +66,8 @@
                     });
                     this.options.badgeListContainer.collection.fetch().done(function () {
                         self.options.badgeListContainer.render();
+                    }).error(function () {
+                        self.options.badgeListContainer.renderError();
                     });
                 }
                 this.tabbedView = new TabbedView({
