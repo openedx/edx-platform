@@ -1,4 +1,4 @@
-<h3><%= gettext("Generate Exception Certificates") %></h3>
+<h3><%- gettext("Generate Exception Certificates") %></h3>
 <p class="under-heading">
 <label>
     <input type='radio' name='generate-exception-certificates-radio' checked="checked" value='new' aria-describedby='generate-exception-certificates-radio-new-tip'>
@@ -10,7 +10,7 @@
     <span id='generate-exception-certificates-radio-all-tip'><%- gettext('Generate a Certificate for all users on the Exception list') %></span>
 </label>
 </p>
-<button id="generate-exception-certificates" class="btn-blue" type="button"><%= gettext('Generate Exception Certificates') %></button>
+<button id="generate-exception-certificates" class="btn-blue" type="button"><%- gettext('Generate Exception Certificates') %></button>
 <br/>
 <% if (certificates.length === 0) { %>
     <p><%- gettext("No results") %></p>
