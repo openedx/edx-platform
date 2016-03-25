@@ -74,6 +74,13 @@
       @extend %t-strong;
       margin: 34px 0 11px;
     }
+
+    .message-error {
+      @extend %t-copy-sub1;
+      margin-top: ($baseline/4);
+      margin-bottom: ($baseline/2);
+      color: $red;
+    }
   }
 
   .update-contents {
