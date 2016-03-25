@@ -35,7 +35,12 @@ CMS_SASS_DIRECTORIES = [
     path("cms/static/sass"),
 ]
 THEME_SASS_DIRECTORIES = []
-SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
+SASS_LOAD_PATHS = [
+    'common/static',
+    'common/static/sass',
+    'node_modules',
+    'node_modules/edx-pattern-library/node_modules',
+]
 
 # A list of NPM installed libraries that should be copied into the common
 # static directory.

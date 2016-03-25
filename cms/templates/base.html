@@ -13,6 +13,7 @@ from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 %>
+
 <%page expression_filter="h"/>
 <!doctype html>
 <!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -42,7 +43,8 @@ from openedx.core.djangolib.js_utils import (
     <%static:css group='style-vendor'/>
     <%static:css group='style-vendor-tinymce-content'/>
     <%static:css group='style-vendor-tinymce-skin'/>
-    <%static:css group='style-main'/>
+
+    <%static:css group='${self.attr.main_css}'/>
 
     <%include file="widgets/segment-io.html" />
 

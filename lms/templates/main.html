@@ -60,17 +60,7 @@ from pipeline_mako import render_require_js_path_overrides
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  ## We could do <%static:css group='style-main'/>, but that's only useful
-  ## if the group contains multiple files, and the 'style-main' group doesn't.
-  ## Instead, we'll construct this <link> element manually, to improve clarity.
-  ## When nothing in the system is referencing the 'style-main' group, it can
-  ## be removed from the environment file.
-  <%
-  application_css_path = "css/lms-main{rtl}.css".format(
-    rtl="-rtl" if get_language_bidi() else "",
-  )
-  %>
-  <link rel="stylesheet" href="${static.url(application_css_path)}" type="text/css" media="all" />
+  <%static:css group='${self.attr.main_css}'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
