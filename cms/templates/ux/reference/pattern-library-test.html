@@ -1,0 +1,23 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "css/studio-main-v2.css" %>
+
+<%inherit file="../../base.html" />
+
+<%block name="title">Pattern Library Test Page</%block>
+<%block name="bodyclass">is-signedin pattern-library</%block>
+
+<%block name="content">
+<h3 class="hd-6 example-set-hd">Warning Alert with Message Only</h3>
+<div class="example-set">
+    <div class="alert alert-warning" role="alert" aria-labelledby="alert-warning-publish-title" tabindex="-1">
+        <span class="icon alert-icon icon-warning" aria-hidden="true"></span>
+
+        <div class="alert-message">
+            <p class="alert-copy">
+                Interesting pattern library content to come...
+            </p>
+        </div>
+
+    </div>
+</div>
+</%block>
