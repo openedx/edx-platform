@@ -47,7 +47,7 @@
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
-            "underscore": "js/vendor/underscore-min",
+            "underscore": "common/js/vendor/underscore",
             "underscore.string": "js/vendor/underscore.string.min",
             "jquery": "js/vendor/jquery.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
