@@ -160,10 +160,9 @@ case "$TEST_SUITE" in
     "bok-choy")
 
         # Back compatibility support for firefox upgrade:
-        # Copy newer firefox version to project root,
-        # set that as the path for bok-choy to use.
-        cp -R $HOME/firefox/ firefox/
-        export SELENIUM_FIREFOX_PATH=firefox/firefox
+        # set path for bok-choy to use. This will be removed
+        # later when the default firefox will be updated and used.
+        export SELENIUM_FIREFOX_PATH=$HOME/firefox/firefox
 
         case "$SHARD" in
 
