@@ -668,6 +668,7 @@
         'lms/include/js/spec/student_profile/learner_profile_badge_view.js',
         'lms/include/js/spec/student_profile/learner_profile_section_two_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_badge_list_spec.js',
+        'lms/include/js/spec/student_profile/learner_profile_badge_list_container_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/reverify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
