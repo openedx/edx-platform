@@ -218,11 +218,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Fetch the course object.
     course = get_course(course_id)
 
-    if course is None:
-        msg = u"Task %s: course not found: %s"
-        log.error(msg, task_id, course_id)
-        raise ValueError(msg % (task_id, course_id))
-
     # Get arguments that will be passed to every subtask.
     to_option = email_obj.to_option
     global_email_context = _get_course_email_context(course)
