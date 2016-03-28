@@ -335,6 +335,7 @@ class RegistrationView(APIView):
 
         try:
             user = create_account_with_params(request, data)
+            user  # pyflakes
         except ValidationError as err:
             # Should only get non-field errors from this function
             assert NON_FIELD_ERRORS not in err.message_dict
@@ -346,7 +347,8 @@ class RegistrationView(APIView):
             return JsonResponse(errors, status=400)
 
         response = JsonResponse({"success": True})
-        set_logged_in_cookies(request, response, user)
+        # don't log in automatically
+        # set_logged_in_cookies(request, response, user)
         return response
 
     def _add_email_field(self, form_desc, required=True):
