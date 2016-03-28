@@ -1992,6 +1992,9 @@ INSTALLED_APPS = (
 
     # Review widgets
     'openedx.core.djangoapps.coursetalk',
+
+    # API access administration
+    'openedx.core.djangoapps.api_admin',
 )
 
 # Migrations which are not in the standard module "migrations"
