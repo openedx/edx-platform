@@ -17,6 +17,9 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
+
+from django.core.urlresolvers import reverse
+from courseware.grades import grade
 %>
 
 <%
@@ -318,6 +321,25 @@ from student.helpers import (
           % endif
         </div>
         % endif
+
+        % if course.may_certify() and cert_status['status'] == 'downloadable':
+          <%
+            grade_summary = grade(request.user, request, course)
+            nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
+            success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+          %>
+          %if success_cutoff and grade_summary['percent'] > success_cutoff:
+          <div class="message message-status is-shown">
+            <h3 class="title">Course Passed</h3>
+            <p class="message-copy">
+            You have enough credits to pass this course.</p>
+            <form method="post" action="${reverse('request_grade')}">
+              <input type="hidden" name="course_id" value="${course.id}" />
+              <input type="submit" value="Complete Course" />
+            </form>
+          </div>
+          %endif
+        %endif
 
         % if course_mode_info['show_upsell'] and not is_course_blocked:
           <div class="message message-upsell has-actions is-shown">

@@ -223,9 +223,16 @@ class XQueueCertInterface(object):
             status.downloadable
         ]
 
-        cert_status = certificate_status_for_student(student, course_id)['status']
+        # InterSystems bypasses certs
+        use_certs = settings.FEATURES['USE_CERTIFICATES']
+
+        if use_certs:
+            cert_status = certificate_status_for_student(student, course_id)['status']
+        else:
+            cert_status = status.downloadable
+
         new_status = cert_status
-        cert = None
+            cert = None
 
         if cert_status not in valid_statuses:
             LOGGER.warning(
@@ -350,7 +357,7 @@ class XQueueCertInterface(object):
                     }
                     if template_file:
                         contents['template_pdf'] = template_file
-                    if generate_pdf:
+                    if use_certs generate_pdf:
                         new_status = status.generating
                     else:
                         new_status = status.downloadable
@@ -359,7 +366,7 @@ class XQueueCertInterface(object):
                     cert.status = new_status
                     cert.save()
 
-                    if generate_pdf:
+                    if use_certs and generate_pdf:
                         try:
                             self._send_to_xqueue(contents, key)
                         except XQueueAddToQueueError as exc:

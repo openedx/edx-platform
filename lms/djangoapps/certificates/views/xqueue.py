@@ -24,8 +24,18 @@ from certificates.models import (
     ExampleCertificate,
 )
 
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+
 
 log = logging.getLogger(__name__)
+
+
+# InterSystems
+@csrf_exempt
+def request_grade(request):
+    result = request_certificate(request)
+    return redirect(reverse('dashboard'))
 
 
 # Grades can potentially be written - if so, let grading manage the transaction.

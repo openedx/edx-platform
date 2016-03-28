@@ -920,6 +920,9 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
 
 # Certificates
 urlpatterns += (
+    # InterSytesms, autocomplete course
+    url(r'^request_grade$', 'certificates.views.xqueue.request_grade', name="request_grade"),
+    
     url(r'^certificates/', include('certificates.urls', app_name="certificates", namespace="certificates")),
 
     # Backwards compatibility with XQueue, which uses URLs that are not prefixed with /certificates/
