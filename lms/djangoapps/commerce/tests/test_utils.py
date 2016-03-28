@@ -54,8 +54,14 @@ class EcommerceServiceTests(TestCase):
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_microsites(self, is_microsite):
-        """Verify that is_enabled() returns False if used for a microsite."""
+        """Verify that is_enabled() returns True when ecomm checkout is enabled for microsite """
         is_microsite.return_value = True
+        is_enabled = EcommerceService().is_enabled(self.user)
+        self.assertTrue(is_enabled)
+
+        config = CommerceConfiguration.current()
+        config.checkout_on_ecommerce_service = False
+        config.save()
         is_not_enabled = EcommerceService().is_enabled(self.user)
         self.assertFalse(is_not_enabled)
 

@@ -3,6 +3,8 @@ from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 from eventtracking import tracker
 
+from openedx.core.djangoapps.theming.helpers import get_value
+
 ECOMMERCE_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
@@ -23,14 +25,17 @@ def is_commerce_service_configured():
     Return a Boolean indicating whether or not configuration is present to use
     the external commerce service.
     """
-    return bool(settings.ECOMMERCE_API_URL and settings.ECOMMERCE_API_SIGNING_KEY)
+    return bool(
+        get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL) and
+        get_value('ECOMMERCE_API_SIGNING_KEY', settings.ECOMMERCE_API_SIGNING_KEY)
+    )
 
 
 def ecommerce_api_client(user):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
     return EdxRestApiClient(
-        settings.ECOMMERCE_API_URL,
-        settings.ECOMMERCE_API_SIGNING_KEY,
+        get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL),
+        get_value('ECOMMERCE_API_SIGNING_KEY', settings.ECOMMERCE_API_SIGNING_KEY),
         user.username,
         user.profile.name if hasattr(user, 'profile') else None,
         user.email,
