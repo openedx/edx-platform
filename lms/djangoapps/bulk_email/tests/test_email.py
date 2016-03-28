@@ -410,7 +410,9 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         # make very long display_name for course
         long_name = u"x" * 321
-        course = CourseFactory.create(display_name=long_name)
+        course = CourseFactory.create(
+            display_name=long_name, number="bulk_email_course_name"
+        )
         instructor = InstructorFactory(course_key=course.id)
 
         self.login_as_user(instructor)
@@ -427,7 +429,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
                 course_name=course.id.course
             )
         )
-        self.assertEqual(len(from_email), 55)
+        self.assertEqual(len(from_email), 83)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')
