@@ -51,8 +51,8 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             return {
                 id: this.model.get('id'),
                 uniqueId: _.uniqueId(),
-                name: this.model.escape('name'),
-                description: this.model.escape('description'),
+                name: this.model.get('name'),
+                description: this.model.get('description'),
                 usage: this.model.get('usage'),
                 isNew: this.model.isNew()
             };
