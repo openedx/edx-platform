@@ -589,6 +589,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.select_language('en')
         self._verify_caption_text('Welcome to edX.')
 
+    @flaky  # TODO: Fix TNL-4304
     def test_video_language_menu_working_closed_captions(self):
         """
         Scenario: Language menu works correctly in Video component, checks closed captions
