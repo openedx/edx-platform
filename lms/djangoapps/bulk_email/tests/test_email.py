@@ -56,7 +56,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         """
         Creates one instructor and several course staff for self.course. Assigns
         them to self.instructor (single user) and self.staff (list of users),
-        repectively.
+        respectively.
         """
         self.instructor = InstructorFactory(course_key=self.course.id)
 
