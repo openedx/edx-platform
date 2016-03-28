@@ -749,12 +749,14 @@ div.problem {
 // ====================
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
+    display: inline-block;
 
     input {
       @include box-sizing(border-box);
       border: 2px solid $gray-l4;
       border-radius: 3px;
       min-width: 160px;
+      width: calc(100% - 45px);
       height: 46px;
     }
 
@@ -1491,4 +1493,3 @@ div.problem .annotation-input {
     background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
-
