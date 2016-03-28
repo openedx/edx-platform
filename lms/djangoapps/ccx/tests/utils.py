@@ -8,9 +8,13 @@ from django.conf import settings
 
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from student.roles import CourseCcxCoachRole
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole
+)
 from student.tests.factories import (
-    AdminFactory,
+    UserFactory,
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -76,9 +80,29 @@ class CcxTestCase(SharedModuleStoreTestCase):
         super(CcxTestCase, self).setUp()
 
         # Create instructor account
-        self.coach = AdminFactory.create()
+        self.coach = UserFactory.create()
         # create an instance of modulestore
         self.mstore = modulestore()
+
+    def make_staff(self):
+        """
+        create staff user.
+        """
+        staff = UserFactory.create(password="test")
+        role = CourseStaffRole(self.course.id)
+        role.add_users(staff)
+
+        return staff
+
+    def make_instructor(self):
+        """
+        create instructor user.
+        """
+        instructor = UserFactory.create(password="test")
+        role = CourseInstructorRole(self.course.id)
+        role.add_users(instructor)
+
+        return instructor
 
     def make_coach(self):
         """
