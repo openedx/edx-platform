@@ -428,12 +428,11 @@ def _get_source_address(course_id, course_title):
 
     from_addr = format_address(course_title_no_quotes)
 
-    # if it's longer than 320 characters, reformat, but with a truncated
-    # course title
+    # If it's longer than 320 characters, reformat, but with the course name
+    # rather than course title. Amazon SES's from address field appears to have a maximum
+    # length of 320.
     if len(from_addr) >= 320:
-        max_course_title_length = 320 - len(format_address("")) - 5
-        truncated_course_title = course_title_no_quotes[:max_course_title_length] + u"..."
-        from_addr = format_address(truncated_course_title)
+        from_addr = format_address(course_name)
 
     return from_addr
 

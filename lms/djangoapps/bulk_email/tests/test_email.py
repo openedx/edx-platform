@@ -22,6 +22,7 @@ from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -96,7 +97,10 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(EmailSendFromDashboardTestCase, cls).setUpClass()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        cls.course = CourseFactory.create(display_name=course_title)
+        cls.course = CourseFactory.create(
+            display_name=course_title,
+            default_store=ModuleStoreEnum.Type.split
+        )
 
     def setUp(self):
         super(EmailSendFromDashboardTestCase, self).setUp()
@@ -246,6 +250,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
         self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
+        self.assertEquals(
+            mail.outbox[0].from_email,
+            u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+                course_display_name=self.course.display_name,
+                course_name=self.course.id.course
+            )
+        )
 
     def test_send_to_staff(self):
         """
@@ -410,14 +421,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox), 1)
         from_email = mail.outbox[0].from_email
 
-        self.assertEqual(len(from_email), 318)
-        self.assertIn(u"...", from_email)
-        self.assertTrue(from_email.startswith(u'"xxx'))
-        self.assertTrue(
-            from_email.endswith(
-                u'Course Staff <{}-no-reply@example.com>'.format(course.id.course)
+        self.assertEqual(
+            from_email,
+            u'"{course_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+                course_name=course.id.course
             )
         )
+        self.assertEqual(len(from_email), 55)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')
