@@ -918,6 +918,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                  'min_count': 2,
                  'short_label': 'HW',
                  'type': 'Homework',
+                 'passing_grade': 0,
                  'weight': 1}
             ],
             'GRADE_CUTOFFS': {'Pass': 0.75},
@@ -976,6 +977,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # picking first student records
         data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
+
         self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')

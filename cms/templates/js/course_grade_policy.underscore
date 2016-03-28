@@ -29,6 +29,24 @@
     <span class="tip tip-stacked"><%= gettext("The number of assignments of this type that will be dropped. The lowest scoring assignments are dropped first.") %></span>
   </div>
 
+  <div class="clearfix"></div>
+  <div class="field field-checkbox checkbox-cosmetic" id="assignment-passing-grade-enabled">
+    <input type="checkbox" id="passing-grade-enabled" name="passing-grade-enabled" class="input input-checkbox">
+    <label for="passing_grade_enabled" class="label">
+      <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+      <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
+      <%= gettext("Passing Grade Enabled") %>
+    </label>
+  </div>
+  <br>
+  <div class="div-grade-section" style="display: none">
+    <div class="field text" id="field-assignment-passing-grade">
+      <label for="assignment-passing-grade"><%= gettext("Passing Grade") %></label>
+      <input type="text" class="short" id="assignment-passing-grade" value="<%= model.get('passing_grade') %>" />
+      <span class="tip tip-inline"><%= gettext("as a percent, e.g. 60") %></span>
+    </div>
+  </div>
+
   <div class="actions">
   	<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span><%= gettext("Delete") %></a>
   </div>

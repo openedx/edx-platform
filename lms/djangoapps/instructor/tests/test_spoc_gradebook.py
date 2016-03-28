@@ -121,6 +121,7 @@ class TestLetterCutoffPolicy(TestGradebook):
                 "min_count": 1,
                 "drop_count": 0,
                 "short_label": "HW",
+                "passing_grade_enabled": False,
                 "weight": 1
             },
         ],
@@ -169,3 +170,37 @@ class TestLetterCutoffPolicy(TestGradebook):
         # User 0 has 0 on the class [1]
         # One use at the top of the page [1]
         self.assertEquals(3, self.response.content.count('grade_None'))
+
+
+@attr('shard_1')
+class TestPassingGrade(TestGradebook):
+    """
+    Tests advanced grading policy (with letter grade cutoffs and passing grades).
+    """
+    grading_policy = {
+        "GRADER": [
+            {
+                "type": "Homework",
+                "min_count": 1,
+                "drop_count": 0,
+                "short_label": "HW",
+                "passing_grade": .9,
+                "passing_grade_enabled": True,
+                "weight": 1
+            },
+        ],
+        "GRADE_CUTOFFS": {
+            'A': .9,
+            'B': .8,
+            'C': .7,
+            'D': .6,
+        }
+    }
+
+    def test_assigned_grades(self):
+        # Users 9-10 have >= 90% on Homeworks [2]
+        # Users 9-10 have >= 90% on the class [2]
+        # One use at the top of the page [1]
+        self.assertEquals(5, self.response.content.count('grade_A'))
+        # All other users don't reach passing grade
+        self.assertEquals(19, self.response.content.count('grade_None'))

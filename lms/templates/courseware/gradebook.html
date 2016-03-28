@@ -91,10 +91,20 @@ from django.core.urlresolvers import reverse
           </tr>
         </thead>
 
-        <%def name="percent_data(fraction, label)">
+        <%def name="percent_data(fraction, label, is_passed=True)">
           <%
+            def is_passing_grade_enabled(category):
+              for conf in course.raw_grader:
+                if conf['type'] != category:
+                  continue
+                else:
+                  return conf.get('passing_grade_enabled', False)
+
             letter_grade = 'None'
-            if fraction > 0:
+            passing_grade_enabled = is_passing_grade_enabled(section['category'])
+            if not passing_grade_enabled:
+              is_passed=True
+            if fraction > 0 and is_passed:
               letter_grade = 'F'
               for (grade, cutoff) in ordered_grades:
                 if fraction >= cutoff:
@@ -108,11 +118,13 @@ from django.core.urlresolvers import reverse
 
         <tbody>
           %for student in students:
+          <% sections_passed = {section['category']: section['is_passed'] for section in student['grade_summary']['grade_breakdown']} %>
           <tr>
             %for section in student['grade_summary']['section_breakdown']:
-              ${percent_data( section['percent'], section['detail'] )}
+              <% is_passed = sections_passed.get(section['category']) %>
+              ${percent_data( section['percent'], section['detail'], is_passed )}
             %endfor
-            ${percent_data( student['grade_summary']['percent'], _('Total'))}
+            ${percent_data( student['grade_summary']['percent'], _('Total'), student['grade_summary']['sections_passed'])}
           </tr>
           %endfor
         </tbody>
@@ -139,5 +151,3 @@ from django.core.urlresolvers import reverse
   </section>
 </div>
 </section>
-
-

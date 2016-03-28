@@ -43,6 +43,7 @@ class ContentGroupTestCase(ModuleStoreTestCase):
                     "min_count": 1,
                     "drop_count": 0,
                     "short_label": "HW",
+                    "passing_grade": 0,
                     "weight": 1.0
                 }]
             },
@@ -146,6 +147,7 @@ class TestConditionalContent(ModuleStoreTestCase):
                     "min_count": 1,
                     "drop_count": 0,
                     "short_label": "HW",
+                    "passing_grade": 0,
                     "weight": 1.0
                 }]
             }
