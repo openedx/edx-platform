@@ -20,3 +20,10 @@ def reload_django_url_config():
     reloaded = import_module(urlconf)
     reloaded_urls = reloaded.urlpatterns
     set_urlconf(tuple(reloaded_urls))
+
+
+def strip_port_from_host(host):
+    """
+    Strips port number from host
+    """
+    return host.split(':')[0]
