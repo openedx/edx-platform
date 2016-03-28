@@ -1,12 +1,10 @@
-define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/ajax_helpers',
-        'common/js/spec_helpers/template_helpers',
+define(['backbone', 'jquery', 'underscore', 'moment',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
         'js/student_profile/views/share_modal_view',
-        // These defines are not passed as parameter
         'jquery.simulate'
     ],
-    function (Backbone, $, _, Moment, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, ShareModalView) {
+    function (Backbone, $, _, Moment, Helpers, LearnerProfileHelpers, ShareModalView) {
         "use strict";
         describe("edx.user.ShareModalView", function () {
             var keys = $.simulate.keyCode;
@@ -57,7 +55,7 @@ define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/aj
                 expect(view.close).toHaveBeenCalled();
             });
 
-            // TOOD: Test for focus behaviour
+            // TODO: Test for focus behaviour
 
         });
     }

@@ -1,13 +1,10 @@
-define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/ajax_helpers',
-        'common/js/spec_helpers/template_helpers',
+define(['backbone', 'jquery', 'underscore',
         'js/spec/student_account/helpers',
-        'js/spec/student_profile/helpers',
         'js/student_profile/views/section_two_tab',
         'js/views/fields',
         'js/student_account/models/user_account_model'
     ],
-    function (Backbone, $, _, Moment, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
-              SectionTwoTabView, FieldViews, UserAccountModel) {
+    function (Backbone, $, _, Helpers, SectionTwoTabView, FieldViews, UserAccountModel) {
         "use strict";
         describe("edx.user.SectionTwoTab", function () {
 

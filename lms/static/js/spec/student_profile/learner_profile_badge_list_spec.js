@@ -1,12 +1,9 @@
-define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/ajax_helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/student_account/helpers',
+define(['backbone', 'jquery', 'underscore',
         'js/spec/student_profile/helpers',
         'js/student_profile/views/badge_list_view',
         'common/js/components/collections/paging_collection'
     ],
-    function (Backbone, $, _, Moment, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, BadgeListView,
-              PagingCollection) {
+    function (Backbone, $, _,  LearnerProfileHelpers, BadgeListView, PagingCollection) {
         "use strict";
         describe("edx.user.BadgeListView", function () {
 
@@ -38,7 +35,6 @@ define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/aj
             });
             
             it("there is a single row if there is only one badge", function () {
-                var requests = AjaxHelpers.requests(this);
                 view = createView([LearnerProfileHelpers.makeBadge(1)], 1, 1, false);
                 view.render();
                 var rows = view.$el.find('div.row');
@@ -46,7 +42,6 @@ define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/aj
             });
 
             it("accomplishments placeholder is visible on a last page", function () {
-                var requests = AjaxHelpers.requests(this);
                 view = createView([LearnerProfileHelpers.makeBadge(1)], 2, 2, false);
                 view.render();
                 var placeholder = view.$el.find('span.accomplishment-placeholder');
@@ -54,7 +49,6 @@ define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/aj
             });
 
             it("accomplishments placeholder to be not visible on a first page", function () {
-                var requests = AjaxHelpers.requests(this);
                 view = createView([LearnerProfileHelpers.makeBadge(1)], 1, 2, true);
                 view.render();
                 var placeholder = view.$el.find('span.accomplishment-placeholder');
@@ -62,7 +56,6 @@ define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/aj
             });
 
             it("badges are in two columns (checked by counting rows for a known number of badges)", function () {
-                var requests = AjaxHelpers.requests(this);
                 var badges = [];
                 _.each(_.range(4), function (item) {
                    badges.push(LearnerProfileHelpers.makeBadge(item));

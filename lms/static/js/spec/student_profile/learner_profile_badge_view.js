@@ -1,10 +1,8 @@
-define(['backbone', 'jquery', 'underscore', 'moment', 'common/js/spec_helpers/ajax_helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/student_account/helpers',
+define(['backbone', 'jquery', 'underscore',
         'js/spec/student_profile/helpers',
         'js/student_profile/views/badge_view'
     ],
-    function (Backbone, $, _, Moment, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, BadgeView) {
+    function (Backbone, $, _, LearnerProfileHelpers, BadgeView) {
         "use strict";
         describe("edx.user.BadgeView", function () {
 
