@@ -122,6 +122,34 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, "Completed {date}".format(date=self._now_formatted_date()))
         self.assertContains(response, "95%")
 
+    def test_credit_requirements_eligible_with_grade_updated(self):
+        """
+        Test that progress page shows updated credit eligibility grades.
+        """
+        # Mark the user as eligible for all requirements.
+        credit_api.set_credit_requirement_status(
+            self.user.username, self.course.id,
+            "grade", "grade",
+            status="satisfied",
+            reason={"final_grade": 0.85}
+        )
+
+        # Check the progress page display
+        response = self._get_progress_page()
+        self.assertContains(response, "85%")
+
+        # Update credit eligibility data with new final grades.
+        credit_api.set_credit_requirement_status(
+            self.user.username, self.course.id,
+            "grade", "grade",
+            status="satisfied",
+            reason={"final_grade": 0.95}
+        )
+
+        # Check the progress page display
+        response = self._get_progress_page()
+        self.assertContains(response, "95%")
+
     def test_credit_requirements_not_eligible(self):
         # Mark the user as having failed both requirements
         credit_api.set_credit_requirement_status(
