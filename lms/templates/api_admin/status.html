@@ -1,0 +1,27 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../main.html"/>
+<%
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangolib.markup import Text, HTML
+%>
+
+<div id="api-access-wrapper">
+  <h1 id="api-access-request-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>
+  <div class="request-status request-${status}">
+    % if status == ApiAccessRequest.PENDING:
+    ## Translators: "platform_name" is the name of this Open edX installation. "link_start" and "link_end" are the HTML for a link to the API documentation. "api_support_email_link" is HTML for a link to email the API support staff.
+    <p id="api-access-status">${Text(_('Your request to access the {platform_name} Course Catalog API is being processed. You will receive a message at the email address in your profile when processing is complete. You can also return to this page to see the status of your API access request. To learn more about the {platform_name} Course Catalog API, visit {link_start}our API documentation page{link_end}. For questions about using this API, visit our FAQ page or contact {api_support_email_link}.')).format(
+      platform_name=Text(settings.PLATFORM_NAME),
+      link_start=HTML('<a href="{}">').format(Text(api_support_link)),
+      link_end=HTML('</a>'),
+      api_support_email_link=HTML('<a href="mailto:{email}">{email}</a>').format(email=Text(api_support_email))
+      )}</p>
+    % endif
+
+    ## TODO (ECOM-3946): Add status text for 'active' and 'denied', as well as API client creation.
+
+  </div>
+</div>
