@@ -1,4 +1,6 @@
 requirejs.config({
+    baseUrl: '/base/',
+
     paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
@@ -156,7 +158,7 @@ requirejs.config({
             exports: "sinon"
         },
         "jasmine-stealth": {
-            deps: ["jasmine", "underscore", "underscore.string"]
+            deps: ["underscore", "underscore.string"]
         },
         "jasmine-waituntil": {
             deps: ["jquery"]
@@ -181,9 +183,16 @@ requirejs.config({
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
-define([
-    "coffee/spec/views/assets_spec",
-    "js/spec/video/translations_editor_spec",
-    "js/spec/video/file_uploader_editor_spec",
-    "js/spec/models/group_configuration_spec"
-    ])
+testFiles = [
+    'coffee/spec/views/assets_spec'
+    'js/spec/video/translations_editor_spec'
+    'js/spec/video/file_uploader_editor_spec'
+    'js/spec/models/group_configuration_spec'
+]
+i = 0
+while i < testFiles.length
+    testFiles[i] = '/base/' + testFiles[i] + '.js'
+    i++
+require testFiles, ->
+# start test run, once Require.js is done
+    window.__karma__.start()

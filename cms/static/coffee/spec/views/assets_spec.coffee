@@ -1,5 +1,5 @@
-define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
-($, jasmine, AjaxHelpers, Squire) ->
+define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
+($, AjaxHelpers, Squire) ->
 
     assetLibraryTpl = readFixtures('asset-library.underscore')
     assetTpl = readFixtures('asset.underscore')

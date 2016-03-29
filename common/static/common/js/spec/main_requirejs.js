@@ -1,5 +1,6 @@
 (function(requirejs, define) {
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
             'jquery': 'js/vendor/jquery.min',
@@ -133,11 +134,9 @@
             'URI': {
                 exports: 'URI'
             },
-            'jasmine-imagediff': {
-                deps: ['jasmine']
-            },
+            'jasmine-imagediff': {},
             'jasmine-stealth': {
-                deps: ['jasmine', 'underscore', 'underscore.string']
+                deps: ['underscore', 'underscore.string']
             },
             'jasmine-waituntil': {
                 deps: ['jquery']
@@ -148,17 +147,25 @@
         }
     });
 
-    define([
-        // Run the common tests that use RequireJS.
-        'common-requirejs/include/common/js/spec/components/feedback_spec.js',
-        'common-requirejs/include/common/js/spec/components/list_spec.js',
-        'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_collection_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
-        'common-requirejs/include/common/js/spec/components/search_field_spec.js',
-        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
-        'common-requirejs/include/common/js/spec/utils/edx.utils.validate_spec.js'
-    ]);
+    var testFiles = [
+        'common/js/spec/components/feedback_spec.js',
+        'common/js/spec/components/list_spec.js',
+        'common/js/spec/components/paginated_view_spec.js',
+        'common/js/spec/components/paging_collection_spec.js',
+        'common/js/spec/components/paging_header_spec.js',
+        'common/js/spec/components/paging_footer_spec.js',
+        'common/js/spec/components/search_field_spec.js',
+        'common/js/spec/components/view_utils_spec.js',
+        'common/js/spec/utils/edx.utils.validate_spec.js'
+    ];
+
+    for (var i = 0; i < testFiles.length; i++) {
+        testFiles[i] = '/base/' + testFiles[i];
+    }
+
+    require(testFiles, function () {
+        // start test run, once Require.js is done
+        window.__karma__.start();
+    });
 
 }).call(this, requirejs, define);

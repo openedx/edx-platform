@@ -1,23 +1,23 @@
-// Common JavaScript tests, using RequireJS.
+// Xmodule Tests
 //
 //
 // To run all the tests and print results to the console:
 //
-//   karma start lms/static/js_test_coffee.js
+//   karma start common/lib/xmodule/xmodule/js/karma_xmodule.conf.js
 //
 //
-// To run the tests for debugging: Debugging can be done in any browser but Chrome's developer console debugging experience is best.
+// To run the tests for debugging: Debugging can be done in any browser
+// Chrome's developer console debugging experience is the best though
 //
-//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --single-run=false
+//   karma start common/lib/xmodule/xmodule/js/karma-xmodule.conf.js --browsers=BROWSER --single-run=false
 //
 //
 // To run the tests with coverage and junit reports:
 //
-//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
+//   karma start common/lib/xmodule/xmodule/js/karma-xmodule.conf.js
+//  --browsers=BROWSER --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
 //
 // where `BROWSER` could be Chrome or Firefox.
-//
-//
 
 /**
  * Customize the name attribute in xml testcase element
@@ -47,7 +47,7 @@ function junitClassNameFormatter(browser, result) {
  * @return {Array}
  */
 function reporters(config) {
-    var defaultReporters = ['dots', 'junit'];
+    var defaultReporters = ['dots', 'junit', 'kjhtml'];
     if (config.coverage) {
         defaultReporters.push('coverage')
     }
@@ -61,7 +61,7 @@ function reporters(config) {
  * @return {Object}
  */
 function getBasepathAndFilename(filepath) {
-    if(!filepath) {
+    if (!filepath) {
         // these will configure the reporters to create report files relative to this karma config file
         return {
             dir: undefined,
@@ -89,7 +89,7 @@ function coverageSettings(config) {
     return {
         dir: path.dir,
         subdir: '.',
-        reporters:[
+        reporters: [
             {type: 'cobertura', file: path.file},
             {type: 'text-summary'}
         ]
@@ -115,11 +115,12 @@ function junitSettings(config) {
 }
 
 
-module.exports = function(config) {
+module.exports = function (config) {
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
+        baseUrl: '/base',
 
 
         // frameworks to use
@@ -129,62 +130,62 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            // include vendor js files but don't add a <script> tag for each
-            'xmodule_js/common_static/js/vendor/jquery.min.js',
-            'xmodule_js/common_static/js/test/i18n.js',
-            'xmodule_js/common_static/coffee/src/ajax_prefix.js',
-            'xmodule_js/common_static/js/src/logger.js',
-            'xmodule_js/common_static/js/vendor/underscore-min.js',
-            'xmodule_js/common_static/js/vendor/jasmine-imagediff.js',
-            'xmodule_js/common_static/js/vendor/requirejs/require.js',
-            'js/RequireJS-namespace-undefine.js',
-            'xmodule_js/common_static/js/vendor/jquery-ui.min.js',
-            'xmodule_js/common_static/js/vendor/jquery.cookie.js',
-            'xmodule_js/common_static/js/vendor/flot/jquery.flot.js',
-            'xmodule_js/common_static/js/vendor/moment.min.js',
-            'xmodule_js/common_static/js/vendor/moment-with-locales.min.js',
-            'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js',
-            'xmodule_js/common_static/js/vendor/URI.min.js',
-            'xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js',
-            'xmodule_js/common_static/js/xblock/*.js',
-            'xmodule_js/common_static/coffee/src/xblock/*.js',
-            'moment_requirejs.js',
-            'xmodule_js/src/capa/*.js',
-            'xmodule_js/src/video/*.js',
-            'xmodule_js/src/xmodule.js',
-
-            // include src js
-            //- coffee/src
-
-            'coffee/src/**/*.js',
-
-            // include spec js
-            //- coffee/spec
-
-            //'coffee/spec/helper.js',
-            'coffee/spec/**/*.js',
-
-
-            // include fixtures
-            //- coffee/fixtures
-
-            'coffee/fixtures/**/*.*',
-
             // override fixture path and other config.
-            'test_config.js'
+            {pattern: 'test_config.js', included: true},
+
+            {pattern: 'common_static/js/vendor/jquery.min.js', included: true},
+            {pattern: 'common_static/js/test/i18n.js', included: true},
+            {pattern: 'common_static/coffee/src/ajax_prefix.js', included: true},
+            {pattern: 'common_static/js/src/logger.js', included: true},
+            {pattern: 'common_static/js/vendor/jasmine-imagediff.js', included: true},
+            {pattern: 'common_static/js/libs/jasmine-waituntil.js', included: true},
+            {pattern: 'common_static/js/vendor/requirejs/require.js', included: true},
+            {pattern: 'RequireJS-namespace-undefine.js', included: true},
+            {pattern: 'common_static/js/vendor/jquery-ui.min.js', included: true},
+            {pattern: 'common_static/js/vendor/jquery.ui.draggable.js', included: true},
+            {pattern: 'common_static/js/vendor/jquery.cookie.js', included: true},
+            {pattern: 'common_static/js/vendor/json2.js', included: true},
+            {pattern: 'common_static/js/vendor/underscore-min.js', included: true},
+            {pattern: 'common_static/js/vendor/backbone-min.js', included: true},
+            {pattern: 'common_static/js/vendor/jquery.leanModal.js', included: true},
+            {pattern: 'common_static/js/vendor/CodeMirror/codemirror.js', included: true},
+            {pattern: 'common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', included: true},
+            {pattern: 'common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js', included: true},
+            {pattern: 'common_static/js/vendor/jquery.timeago.js', included: true},
+            {pattern: 'common_static/js/vendor/sinon-1.17.0.js', included: true},
+            {pattern: 'common_static/js/vendor/analytics.js', included: true},
+            {pattern: 'common_static/js/test/add_ajax_prefix.js', included: true},
+            {pattern: 'common_static/js/src/utility.js', included: true},
+            {pattern: 'public/js/split_test_staff.js', included: true},
+            {pattern: 'common_static/js/src/accessibility_tools.js', included: true},
+            {pattern: 'common_static/js/vendor/moment.min.js', included: true},
+            {pattern: 'spec/main_requirejs.js', included: true},
+            {pattern: 'src/word_cloud/d3.min.js', included: true},
+
+            // Paths to source JavaScript files
+            {pattern: 'src/xmodule.js', included: true},
+            {pattern: 'src/**/*.js', included: true},
+
+            // Paths to spec (test) JavaScript files
+            {pattern: 'spec/helper.js', included: true},
+            {pattern: 'spec/**/*.js', included: true},
+
+            // Paths to fixture files
+            {pattern: 'fixtures/*.*', included: false, served: true},
+
+            {pattern: 'karma_runner.js', included: true}
         ],
 
 
         // list of files to exclude
-        exclude: [
-        ],
+        exclude: [],
 
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {
-            'coffee/src/**/*.js': ['coverage']
-        },
+        //preprocessors: {
+        //    'coffee/src/**/*.js': ['coverage']
+        //},
 
 
         // test results reporter to use
@@ -211,7 +212,7 @@ module.exports = function(config) {
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_DEBUG,
 
 
         // enable / disable watching file and executing tests whenever any file changes
