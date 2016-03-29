@@ -33,6 +33,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
 from xblock.fragment import Fragment
+from util.course_key_utils import from_string_or_404
 
 import shoppingcart
 import survey.utils
@@ -633,10 +634,10 @@ def jump_to(_request, course_id, location):
     has access, and what they should see.
     """
     try:
-        course_key = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id, message="Invalid course_key")
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
     except InvalidKeyError:
-        raise Http404(u"Invalid course_key or usage_key")
+        raise Http404(u"Invalid usage_key")
     try:
         redirect_url = get_redirect_url(course_key, usage_key)
     except ItemNotFoundError:

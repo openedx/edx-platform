@@ -30,6 +30,7 @@ from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
+from util.course_key_utils import from_string_or_404
 
 import static_replace
 from openedx.core.lib.gating import api as gating_api
@@ -903,10 +904,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     if not request.user.is_authenticated():
         return HttpResponse('Unauthenticated', status=403)
 
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404("Invalid location")
+    course_key = from_string_or_404(course_id, message="Invalid location")
 
     with modulestore().bulk_operations(course_key):
         try:
@@ -997,10 +995,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404
+    course_key = from_string_or_404(course_id)
 
     # Gather metrics for New Relic so we can slice data in New Relic Insights
     newrelic.agent.add_custom_parameter('course_id', unicode(course_key))

@@ -8,6 +8,7 @@ from django.core.cache import caches
 from django.core.validators import ValidationError, validate_email
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
+from util.course_key_utils import from_string_or_404
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
 import dogstats_wrapper as dog_stats_api
@@ -33,10 +34,7 @@ def ensure_valid_course_key(view_func):
     def inner(request, *args, **kwargs):
         course_key = kwargs.get('course_key_string') or kwargs.get('course_id')
         if course_key is not None:
-            try:
-                CourseKey.from_string(course_key)
-            except InvalidKeyError:
-                raise Http404
+            from_string_or_404(course_key)
 
         response = view_func(request, *args, **kwargs)
         return response

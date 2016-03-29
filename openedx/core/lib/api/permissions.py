@@ -8,6 +8,7 @@ from rest_framework import permissions
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 from student.roles import CourseStaffRole, CourseInstructorRole
 
 
@@ -101,10 +102,7 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
                             or request.POST.get('master_course_id')
                             or request.data.get('master_course_id'))
         if master_course_id is not None:
-            try:
-                course_key = CourseKey.from_string(master_course_id)
-            except InvalidKeyError:
-                raise Http404()
+            course_key = from_string_or_404(master_course_id)
             return (hasattr(request, 'user') and
                     (CourseInstructorRole(course_key).has_user(request.user) or
                      CourseStaffRole(course_key).has_user(request.user)))

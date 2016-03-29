@@ -6,7 +6,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 
-def from_string_or_404(course_key_string):
+def from_string_or_404(course_key_string, message=None):
     """
     Gets CourseKey from the string passed as parameter.
 
@@ -14,6 +14,7 @@ def from_string_or_404(course_key_string):
 
     Arguments:
         course_key_string(str): It is string containing the course key
+        message(str): It is string containing the exception message
 
     Returns:
         CourseKey: A key that uniquely identifies a course
@@ -25,6 +26,6 @@ def from_string_or_404(course_key_string):
     try:
         course_key = CourseKey.from_string(course_key_string)
     except InvalidKeyError:
-        raise Http404
+        raise Http404(message)
 
     return course_key
