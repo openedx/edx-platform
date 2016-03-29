@@ -10,7 +10,6 @@ from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
 from openedx.core.djangolib.markup import Text, HTML
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -20,6 +19,26 @@ from status.status import get_site_status_msg
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
+
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
+
+<%
+if uses_pattern_library:
+    dropdown_menu_classlist = "left list-inline"
+    dropdown_menu_item_classlist = "dropdown-item item has-block-link"
+    main_nav_menu_classlist = "list-inline"
+else:
+    dropdown_menu_classlist = "dropdown-menu"
+    dropdown_menu_item_classlist = ""
+    main_nav_menu_classlist = "nav-global"
+%>
 
 <%block>
 <%
@@ -39,8 +58,8 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
-  <header id="global-navigation" class="global ${"slim" if course else ""}" >
-    <nav class="nav-wrapper" aria-label="${_('Global')}">
+  <header id="global-navigation" class="${"header-global" if uses_pattern_library else "global"} ${"slim" if course else ""}" >
+    <nav class="${"wrapper-header" if uses_pattern_library else "nav-wrapper"}" aria-label="${_('Global')}">
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
@@ -63,10 +82,10 @@ site_status_msg = get_site_status_msg(course_id)
     % endif
 
     % if user.is_authenticated():
-    <ol class="left nav-global authenticated">
+    <ol class="left ${main_nav_menu_classlist} authenticated">
       <%block name="navigation_global_links_authenticated">
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
-          <li class="nav-global-01">
+          <li class="item nav-global-01">
             <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
           </li>
         % endif
@@ -83,37 +102,72 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
         %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
-          <li>
+          <li class="item">
             ## Translators: This is short for "System administration".
             <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
           </li>
         %endif
       </%block>
     </ol>
+    % if uses_pattern_library:
+    <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
+      <a href="${reverse('dashboard')}" class="menu-title">
+        <span class="sr-only">${_("Dashboard for:")}</span>
+        <%
+          username = user.username
+          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+        %>
+        <img class="menu-image" src="${profile_image_url}" alt="">
+        ${username}
+      </a>
+      <button type="button" class="menu-button button-more has-dropdown js-dropdown-button default-icon" aria-haspopup="true" aria-expanded="false" aria-controls="${_("Usermenu")}">
+        <span class="icon-fallback icon-fallback-img">
+          <span class="icon icon-angle-down" aria-hidden="true"></span>
+          <span class="text">${_("Usermenu dropdown")}</span>
+        </span>
+      </button>
+      <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
+        <%block name="navigation_dropdown_menu_links" >
+        <%
+        if uses_pattern_library:
+          dropdown_menu_item_classlist = "dropdown-item item has-block-link"
+        else:
+          dropdown_menu_item_classlist = ""
+        %>
+            <li class="${dropdown_menu_item_classlist}"><a href="${reverse('dashboard')}" class="action">${_("Dashboard")}</a></li>
+            <li class="${dropdown_menu_item_classlist}"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action">${_("Profile")}</a></li>
+            <li class="${dropdown_menu_item_classlist}"><a href="${reverse('account_settings')}" class="action">${_("Account")}</a></li>
+          </%block>
+            <li class="${dropdown_menu_item_classlist}"><a href="${reverse('logout')}" role="menuitem" class="action">${_("Sign Out")}</a></li>
+      </ul>
+    </div>
+    % else:
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>
           <%
-          username = user.username
-          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+          if uses_pattern_library:
+            discovery_btn_classlist = "btn"
+          else:
+            discovery_btn_classlist = "cta cta-discovery"
           %>
-          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
-          <div class="label-username">${username}</div>
-        </a>
-      </li>
-      <li class="primary">
-        <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
-          </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
-        </ul>
-      </li>
-    </ol>
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+            <li class="item nav-global-01">
+              <a class="${discovery_btn_classlist}" href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+            </li>
+          % endif
+          %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+            <li class="item">
+              ## Translators: This is short for "System administration".
+              <a class="${discovery_btn_classlist}" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+            </li>
+          %endif
+        </%block>
+      </ol>
+
+      <%include file="user_dropdown.html"/>
+
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
@@ -124,57 +178,70 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
-    <ol class="left nav-global">
-      <%block name="navigation_global_links">
-        % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-          <li class="nav-global-01">
-            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
-          </li>
-          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-            <li class="nav-global-02">
-              <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+      <ol class="left ${main_nav_menu_classlist}">
+        <%block name="navigation_global_links">
+          % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+            <li class="item nav-global-01">
+              <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+            </li>
+            % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+              <li class="item nav-global-02">
+                <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+              </li>
+            % endif
+            <li class="item nav-global-03">
+              <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
             </li>
           % endif
-          <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
-          </li>
-        % endif
-      </%block>
+        </%block>
 
-      <%block name="navigation_other_global_links">
-        % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+        <%block name="navigation_other_global_links">
+          <%
+          if uses_pattern_library:
+            discovery_btn_classlist = "btn"
+            register_btn_classlist = "btn-neutral"
+          else:
+            discovery_btn_classlist = "cta cta-discovery"
+            register_btn_classlist = "cta cta-register"
+          %>
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-            <li class="nav-global-05">
-              <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
-            </li>
+              <li class="item nav-global-05">
+                <a class="${discovery_btn_classlist}" href="/courses">${_("Find Courses")}</a>
+              </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            <li class="nav-global-04">
-              <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
-            </li>
+              <li class="item nav-global-04">
+                <a class="${register_btn_classlist}" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </li>
             % else:
-            <li class="nav-global-04">
-              <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
-            </li>
+              <li class="item nav-global-04">
+                <a class="${register_btn_classlist}" href="/register${login_query()}">${_("Register")}</a>
+              </li>
             % endif
-
-        % endif
-      </%block>
-    </ol>
-
-    <ol class="right nav-courseware">
-      <%block name="navigation_sign_in">
-        <li class="nav-courseware-01">
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-              <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
-              % else:
-              <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
-              % endif
           % endif
-        </li>
-      </%block>
-    </ol>
+        </%block>
+      </ol>
+
+      <ol class="right nav-courseware list-inline">
+        <%block name="navigation_sign_in">
+          <%
+          if uses_pattern_library:
+            login_btn_classlist = "btn-brand"
+          else:
+            login_btn_classlist = "cta cta-login"
+          %>
+          <li class="nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                <a class="${login_btn_classlist}" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              % else:
+                <a class="${login_btn_classlist}" href="/login${login_query()}">${_("Sign in")}</a>
+              % endif
+            % endif
+          </li>
+        </%block>
+      </ol>
     % endif
     % if static.show_language_selector():
      <% languages = static.get_released_languages() %>
