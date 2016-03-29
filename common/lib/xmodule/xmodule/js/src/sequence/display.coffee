@@ -8,6 +8,8 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
+    @nextUrl = @el.data('next-url')
+    @prevUrl = @el.data('prev-url')
     @base_page_title = " | " + document.title
     @initProgress()
     @bind()
@@ -17,9 +19,17 @@ class @Sequence
     $(selector, @el)
 
   bind: ->
-    @$('#sequence-list a').click @goto
+    @$('#sequence-list .nav-item').click @goto
     @el.on 'bookmark:add', @addBookmarkIconToActiveNavItem
     @el.on 'bookmark:remove', @removeBookmarkIconFromActiveNavItem
+    @$('#sequence-list .nav-item').on('focus mouseenter', @displayTabTooltip)
+    @$('#sequence-list .nav-item').on('blur mouseleave', @hideTabTooltip)
+
+  displayTabTooltip: (event) =>
+    $(event.currentTarget).find('.sequence-tooltip').removeClass('sr')
+
+  hideTabTooltip: (event) =>
+    $(event.currentTarget).find('.sequence-tooltip').addClass('sr')
 
   initProgress: ->
     @progressTable = {}  # "#problem_#{id}" -> progress
@@ -73,23 +83,35 @@ class @Sequence
         when 'in_progress' then element.addClass('progress-some')
         when 'done' then element.addClass('progress-done')
 
+  enableButton: (button_class, button_action) ->
+    @$(button_class).removeClass('disabled').removeAttr('disabled').click(button_action)
+
+  disableButton: (button_class) ->
+    @$(button_class).addClass('disabled').attr('disabled', true)
+
+  setButtonLabel: (button_class, button_label) ->
+    @$(button_class + ' .sr').html(button_label)
+
+  updateButtonState: (button_class, button_action, action_label_prefix, is_at_boundary, boundary_url) ->
+    if is_at_boundary and boundary_url == 'None'
+      @disableButton(button_class)
+    else
+      button_label = action_label_prefix + (if is_at_boundary then ' Section' else ' Unit')
+      @setButtonLabel(button_class, button_label)
+      @enableButton(button_class, button_action)
+
   toggleArrows: =>
     @$('.sequence-nav-button').unbind('click')
 
-    if @contents.length == 0  ## There are no modules to display, and therefore no nav to build.
-      @$('.sequence-nav-button.button-previous').addClass('disabled').attr('disabled', true)
-      @$('.sequence-nav-button.button-next').addClass('disabled').attr('disabled', true)
-      return
+    # previous button
+    first_tab = @position == 1
+    previous_button_class = '.sequence-nav-button.button-previous'
+    @updateButtonState(previous_button_class, @previous, 'Previous', first_tab, @prevUrl)
 
-    if @position == 1  ## 1 != 0 here. 1 is the first item in the sequence nav.
-      @$('.sequence-nav-button.button-previous').addClass('disabled').attr('disabled', true)
-    else
-      @$('.sequence-nav-button.button-previous').removeClass('disabled').removeAttr('disabled').click(@previous)
-
-    if @position == @contents.length ## If the final position on the nav matches the total contents.
-      @$('.sequence-nav-button.button-next').addClass('disabled').attr('disabled', true)
-    else
-      @$('.sequence-nav-button.button-next').removeClass('disabled').removeAttr('disabled').click(@next)
+    # next button
+    last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
+    next_button_class = '.sequence-nav-button.button-next'
+    @updateButtonState(next_button_class, @next, 'Next', last_tab, @nextUrl)
 
   render: (new_position) ->
     if @position != new_position
@@ -122,7 +144,6 @@ class @Sequence
       @el.find('.path').text(@el.find('.nav-item.active').data('path'))
 
       @sr_container.focus();
-      # @$("a.active").blur()
 
   goto: (event) =>
     event.preventDefault()
@@ -164,13 +185,18 @@ class @Sequence
       new: new_position
       id: @id
 
-    # If the bottom nav is used, scroll to the top of the page on change.
-    if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
-      $.scrollTo 0, 150
-    @render new_position
+    if (direction == "seq_next") and (@position == @contents.length)
+      window.location.href = @nextUrl
+    else if (direction == "seq_prev") and (@position == 1)
+      window.location.href = @prevUrl
+    else
+      # If the bottom nav is used, scroll to the top of the page on change.
+      if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+        $.scrollTo 0, 150
+      @render new_position
 
   link_for: (position) ->
-    @$("#sequence-list a[data-element=#{position}]")
+    @$("#sequence-list .nav-item[data-element=#{position}]")
 
   mark_visited: (position) ->
     # Don't overwrite class attribute to avoid changing Progress class

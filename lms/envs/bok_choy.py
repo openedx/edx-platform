@@ -162,6 +162,9 @@ FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Enable dashboard search for tests
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
+# Enable cross-section Next button for tests
+FEATURES['ENABLE_NEXT_BUTTON_ACROSS_SECTIONS'] = True
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index

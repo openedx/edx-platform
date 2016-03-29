@@ -30,6 +30,23 @@ $link-color: rgb(26, 161, 222) !default;
   }
 }
 
+%ui-clear-button  {
+  background-color: rgba(0,0,0,0);
+  background-image: none;
+  background-position: center 14px;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+
+  background-clip: border-box;
+  box-shadow: none;
+  box-sizing: content-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+
 // ====================
 
 .sequence-nav {
@@ -90,7 +107,7 @@ $link-color: rgb(26, 161, 222) !default;
     padding: 0 ($baseline/2);
     width: 100%;
 
-    a {
+    button {
       @extend .block-link;
     }
 
@@ -98,15 +115,14 @@ $link-color: rgb(26, 161, 222) !default;
       display: table-cell;
       min-width: 20px;
 
-      a {
+      button {
         @extend %ui-fake-link;
+        @extend %ui-clear-button;
         @include transition(none);
         width: 100%;
         height: 42px;
         margin: 0;
-        background-position: center 14px;
-        background-repeat: no-repeat;
-        border: 1px solid transparent;
+
         display: block;
         padding: 0;
         position: relative;
@@ -197,7 +213,6 @@ $link-color: rgb(26, 161, 222) !default;
 
         .sequence-tooltip {
           @extend %ui-depth2;
-          display: none;
           margin-top: ($baseline/5);
           background: #333;
           color: $white;
@@ -209,7 +224,6 @@ $link-color: rgb(26, 161, 222) !default;
           top: 48px;
           text-shadow: 0 -1px 0 $black;
           @include text-align(left);
-          @include transition(all .1s $ease-in-out-quart 0s);
           white-space: pre;
           pointer-events: none;
 
@@ -233,17 +247,11 @@ $link-color: rgb(26, 161, 222) !default;
             width: 10px;
           }
         }
-
-        &:hover, &:focus {
-          .sequence-tooltip {
-            display: block;
-          }
-        }
       }
     }
   }
 
-  body.touch-based-device & ol li a:hover p {
+  body.touch-based-device & ol li button:hover p {
     display: none;
   }
 }
