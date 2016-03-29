@@ -171,16 +171,15 @@ class ImportMixin(object):
             timeout=30
         ).fulfill()
 
-    def upload_tarball(self, tarball_filename):
+    def  upload_tarball(self, tarball_filename):
         """
         Upload a tarball to be imported.
         """
         asset_file_path = self.file_path(tarball_filename)
         # Make the upload elements visible to the WebDriver.
         self.browser.execute_script('$(".file-name-block").show();$(".file-input").show()')
+        self.q(css='input[type="file"]')[0].send_keys(self.file_path('test.tar.gz'))
         self.q(css='input[type="file"]')[0].send_keys(asset_file_path)
-        self._wait_for_button()
-        click_css(self, '.submit-button', require_notification=False)
 
     def is_upload_finished(self):
         """
