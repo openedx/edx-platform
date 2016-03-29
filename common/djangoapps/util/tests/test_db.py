@@ -4,14 +4,16 @@ import ddt
 import threading
 import time
 import unittest
+from unittest import skipIf
 
 from django.contrib.auth.models import User
 from django.core.management import call_command
+from django.conf import settings
 from django.db import connection, IntegrityError
 from django.db.transaction import atomic, TransactionManagementError
 from django.test import TestCase, TransactionTestCase
 
-from util.db import commit_on_success, generate_int_id, outer_atomic
+from util.db import commit_on_success, generate_int_id, outer_atomic, NoOpMigrationModules
 
 
 @ddt.ddt
@@ -168,7 +170,7 @@ class MigrationTests(TestCase):
     """
     Tests for migrations.
     """
-
+    @skipIf(isinstance(settings.MIGRATION_MODULES, NoOpMigrationModules), 'Skip in case of NoOpMigrationModules')
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
