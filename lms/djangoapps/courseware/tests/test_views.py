@@ -652,6 +652,44 @@ class ViewsTestCase(ModuleStoreTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
+    def test_bypass_course_info(self):
+        course_id = unicode(self.course_key)
+        request = self.request_factory.get(
+            reverse('info', args=[course_id])
+        )
+
+        # Middleware is not supported by the request factory. Simulate a
+        # logged-in user by setting request.user manually.
+        request.user = self.user
+        mako_middleware_process_request(request)
+
+        self.assertFalse(self.course.bypass_home)
+
+        self.assertIsNone(request.META.get('HTTP_REFERER'))  # pylint: disable=no-member
+        response = views.course_info(request, course_id)
+        self.assertEqual(response.status_code, 200)
+
+        request.META['HTTP_REFERER'] = reverse('dashboard')  # pylint: disable=no-member
+        response = views.course_info(request, course_id)
+        self.assertEqual(response.status_code, 200)
+
+        self.course.bypass_home = True
+        self.store.update_item(self.course, self.user.id)  # pylint: disable=no-member
+        self.assertTrue(self.course.bypass_home)
+
+        response = views.course_info(request, course_id)
+
+        # assertRedirects would be great here, but it forces redirections to be absolute URLs.
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse('courseware', args=[course_id])
+        )
+
+        request.META['HTTP_REFERER'] = 'foo'  # pylint: disable=no-member
+        response = views.course_info(request, course_id)
+        self.assertEqual(response.status_code, 200)
+
 
 @attr('shard_1')
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
