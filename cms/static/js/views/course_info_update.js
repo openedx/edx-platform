@@ -39,7 +39,9 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 }
             });
             this.$el.find(".new-update-form").hide();
-            this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+            var dateElement = this.$el.find('.date');
+            dateElement.datepicker({ 'dateFormat': 'MM d, yy' });
+            dateElement.attr( 'readOnly' , 'true' ); //force input to come from datepicker
             return this;
         },
 
@@ -75,8 +77,10 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 // Binding empty function to prevent default hideModal.
             });
 
-            $('.date').datepicker('destroy');
-            $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
+            var dateElement = this.$el.find('.date');
+            dateElement.datepicker('destroy');
+            dateElement.datepicker({ 'dateFormat': 'MM d, yy' });
+            dateElement.attr( 'readOnly' , 'true' ); //force input to come from datepicker
         },
 
         onSave: function(event) {
