@@ -1,7 +1,5 @@
 """Helper functions for working with Programs."""
-from django.conf import settings
 import logging
-from urlparse import urljoin
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -30,6 +28,31 @@ def get_programs(user):
     return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 
 
+def flatten_programs(programs, course_ids):
+    """Flatten the result returned by the Programs API.
+
+    Arguments:
+        programs (list): Serialized programs
+        course_ids (list): Course IDs to key on.
+
+    Returns:
+        dict, programs keyed by course ID
+    """
+    flattened = {}
+
+    for program in programs:
+        try:
+            for course_code in program['course_codes']:
+                for run in course_code['run_modes']:
+                    run_id = run['course_key']
+                    if run_id in course_ids:
+                        flattened.setdefault(run_id, []).append(program)
+        except KeyError:
+            log.exception('Unable to parse Programs API response: %r', program)
+
+    return flattened
+
+
 def get_programs_for_dashboard(user, course_keys):
     """Build a dictionary of programs, keyed by course.
 
@@ -56,23 +79,8 @@ def get_programs_for_dashboard(user, course_keys):
         log.debug('No programs found for the user with ID %d.', user.id)
         return course_programs
 
-    # Convert course keys to Unicode representation for efficient lookup.
-    course_keys = map(unicode, course_keys)
-
-    # Reindex the result returned by the Programs API from:
-    #     program -> course code -> course run
-    # to:
-    #     course run -> program_array
-    # Ignore course runs not present in the user's active enrollments.
-    for program in programs:
-        try:
-            for course_code in program['course_codes']:
-                for run in course_code['run_modes']:
-                    course_key = run['course_key']
-                    if course_key in course_keys:
-                        course_programs.setdefault(course_key, []).append(program)
-        except KeyError:
-            log.exception('Unable to parse Programs API response: %r', program)
+    course_ids = [unicode(c) for c in course_keys]
+    course_programs = flatten_programs(programs, course_ids)
 
     return course_programs
 
@@ -105,33 +113,28 @@ def get_programs_for_credentials(user, programs_credentials):
     return certificate_programs
 
 
-def get_user_enrolled_programs(user, course_keys):
-    '''
-    The helper function that takes in user enrollment information,
-    and returns the list of programs the user is enrolled in.
+def get_engaged_programs(user, enrollments):
+    """Derive a list of programs in which the given user is engaged.
+
     Arguments:
-        user (User): The user to authenticate as for requesting programs.
-        course_key (list): List of courses keys of courses user is enrolled in
+        user (User): The user for which to find programs.
+        enrollments (list): The user's enrollments.
 
     Returns:
-        list, contains programs enrolled
-    '''
-    # Get the programs by courses dictionary from the get_programs_for_dashboard function call
-    programs_dict = get_programs_for_dashboard(
-        user,
-        course_keys)
-    program_list = []
-    # Extract all the programs from the dictionary above
-    for programs_by_courses in programs_dict.values():
-        for program in programs_by_courses:
-            #Remove duplicate programs through the if check below
-            if program not in program_list:
-                program_list.append(program)
+        list of serialized programs, ordered by most recent enrollment
+    """
+    programs = get_programs(user)
 
-    for program in program_list:
-        program['marketing_url'] = urljoin(
-            settings.MKTG_URLS.get('ROOT'),
-            'xseries' + '/{}'
-        ).format(program['marketing_slug'])
+    enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
+    # enrollment.course_id is really a course key.
+    course_ids = [unicode(e.course_id) for e in enrollments]
 
-    return program_list
+    flattened = flatten_programs(programs, course_ids)
+
+    engaged_programs = []
+    for course_id in course_ids:
+        for program in flattened.get(course_id, []):
+            if program not in engaged_programs:
+                engaged_programs.append(program)
+
+    return engaged_programs
