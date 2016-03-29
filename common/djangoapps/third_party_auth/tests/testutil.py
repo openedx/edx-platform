@@ -125,6 +125,16 @@ class ThirdPartyAuthTestMixin(object):
         return cls.configure_oauth_provider(**kwargs)
 
     @classmethod
+    def configure_azure_ad_provider(cls, **kwargs):
+        """ Update the settings for the Azure AD third party auth provider/backend """
+        kwargs.setdefault("name", "Azure AD")
+        kwargs.setdefault("backend_name", "azuread-oauth2")
+        kwargs.setdefault("icon_class", "fa-azuread")
+        kwargs.setdefault("key", "test")
+        kwargs.setdefault("secret", "test")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
     def configure_twitter_provider(cls, **kwargs):
         """ Update the settings for the Twitter third party auth provider/backend """
         kwargs.setdefault("name", "Twitter")

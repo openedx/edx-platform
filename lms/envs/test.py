@@ -265,6 +265,7 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.google.GoogleOAuth2',
     'social.backends.linkedin.LinkedinOAuth2',
     'social.backends.facebook.FacebookOAuth2',
+    'social.backends.azuread.AzureADOAuth2',
     'social.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
