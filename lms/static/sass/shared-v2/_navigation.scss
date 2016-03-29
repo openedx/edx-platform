@@ -1,0 +1,21 @@
+// skip navigation
+.nav-skip {
+  font-size: font-size(small);
+  display: inline-block;
+  position: absolute;
+  left: 0px;
+  top: -($baseline*30);
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid #fcfcfc;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+}
