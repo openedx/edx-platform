@@ -15,7 +15,6 @@ import json
   cert_name_long = settings.CERT_NAME_LONG
 %>
 
-
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
 <%block name="nav_skip">#my-courses</%block>
@@ -175,9 +174,16 @@ import json
         </li>
         % endif
 
-        <%include file='dashboard/_dashboard_status_verification.html' />
-
+## FUN : add links to receipt page
+      <span class="title">
+        <a href="${reverse('payment:list-receipts')}" class="edit-name">
+            ${_("Order History")}
+        </a>
+## END FUN
       </ul>
+
+      <%include file='dashboard/_dashboard_status_verification.html' />
+
     </section>
   </section>
 </section>
