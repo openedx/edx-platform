@@ -8,13 +8,15 @@ APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 FEATURES["ENABLE_SYSADMIN_DASHBOARD"] = True
 
 # needed to show only users and appsembler courses
-FEATURES["ENABLE_COURSE_DISCOVERY"] = False
-FEATURES["SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES"] = True
+FEATURES["ENABLE_COURSE_DISCOVERY"] = True
+FEATURES["SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES"] = False
 OAUTH_ENFORCE_SECURE = False
 
 # disable caching in dev environment
-#CACHES['general']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
-#CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+CACHES['general']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+CACHES['default']['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += ('appsembler_lms',)
