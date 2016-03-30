@@ -228,17 +228,6 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
             )
 
     """
-    # Check if we're already eligible for credit.
-    # If so, short-circuit this process.
-    if CreditEligibility.is_user_eligible_for_credit(course_key, username):
-        log.info(
-            u'Skipping update of credit requirement with namespace "%s" '
-            u'and name "%s" because the user "%s" is already eligible for credit '
-            u'in the course "%s".',
-            req_namespace, req_name, username, course_key
-        )
-        return
-
     # Retrieve all credit requirements for the course
     # We retrieve all of them to avoid making a second query later when
     # we need to check whether all requirements have been satisfied.
@@ -265,6 +254,20 @@ def set_credit_requirement_status(username, course_key, req_namespace, req_name,
                 u'The user "%s" should have had his/her status updated to "%s".'
             ),
             unicode(course_key), req_namespace, req_name, username, status
+        )
+        return
+
+    # There is a chance of improvement in final grades of a user even he is already
+    # eligible for the credit, so update the requirement status and reason.
+    if CreditEligibility.is_user_eligible_for_credit(course_key, username) and req_namespace == 'grade':
+        log.info(
+            u'Update of credit requirement with namespace "%s" '
+            u'and name "%s" for the user "%s" who is already eligible for credit '
+            u'in the course "%s".',
+            req_namespace, req_name, username, course_key
+        )
+        CreditRequirementStatus.add_or_update_requirement_status(
+            username, req_to_update, status=status, reason=reason
         )
         return
 
