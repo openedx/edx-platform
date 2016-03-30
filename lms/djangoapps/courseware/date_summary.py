@@ -182,7 +182,11 @@ class CourseEndDate(DateSummary):
     @property
     def description(self):
         if datetime.now(pytz.UTC) <= self.date:
-            return _('To earn a certificate, you must complete all requirements before this date.')
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            if is_active and CourseMode.is_eligible_for_certificate(mode):
+                return _('To earn a certificate, you must complete all requirements before this date.')
+            else:
+                return _('After this date, course content will be archived.')
         return _('This course is archived, which means you can review course content but it is no longer active.')
 
     @property
