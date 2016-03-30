@@ -11,9 +11,14 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
+from openedx.core.djangoapps.content.course_structures.signals import (
+    listen_for_course_publish as listener_in_course_structures
+)
 from openedx.core.djangoapps.content.course_metadata.signals import (
-    listen_for_course_publish as course_publish_listener
+    listen_for_course_publish as listener_in_course_metadata
+)
+from openedx.core.djangoapps.content.course_overviews.signals import (
+    listen_for_course_publish as listener_in_course_overviews
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
@@ -217,10 +222,24 @@ class TestConditionalContent(ModuleStoreTestCase):
 
 class SignalDisconnectTestMixin(object):
     """
-    Mixin for tests to disable calls to signals.listen_for_course_publish when the course_published signal is fired.
+    Mixin for tests to disable calls to signals.
     """
 
     def setUp(self):
         super(SignalDisconnectTestMixin, self).setUp()
-        SignalHandler.course_published.disconnect(listen_for_course_publish)
-        SignalHandler.course_published.disconnect(course_publish_listener)
+        SignalDisconnectTestMixin.disconnect_course_published_signals()
+
+    @staticmethod
+    def disconnect_course_published_signals():
+        """
+        Disconnects receivers from course_published signals
+        """
+        SignalHandler.course_published.disconnect(
+            listener_in_course_structures, dispatch_uid='openedx.core.djangoapps.content.course_structures'
+        )
+        SignalHandler.course_published.disconnect(
+            listener_in_course_metadata, dispatch_uid='openedx.core.djangoapps.content.course_metadata'
+        )
+        SignalHandler.course_published.disconnect(
+            listener_in_course_overviews, dispatch_uid='openedx.core.djangoapps.content.course_overviews'
+        )
