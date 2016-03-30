@@ -75,6 +75,10 @@ def i18n_dummy():
     # Need to then compile the new dummy strings
     sh("i18n_tool generate")
 
+    # Generate static i18n JS files.
+    for system in ['lms', 'cms']:
+        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
+
 
 @task
 def i18n_validate_gettext():
@@ -192,10 +196,6 @@ def i18n_robot_pull():
     sh('git clean -fdX conf/locale/eo')
     print "\n\nValidating translations with `i18n_tool validate`..."
     sh("i18n_tool validate")
-
-    # Generate static i18n JS files.
-    for system in ['lms', 'cms']:
-        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
 
     con = raw_input("Continue with committing these translations (y/n)? ")
 
