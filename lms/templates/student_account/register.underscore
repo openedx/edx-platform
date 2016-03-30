@@ -61,5 +61,5 @@
 </form>
 
 <div class="toggle-form">
-    <button class="sign-up-button" data-type="login"><%- gettext("LOG IN INSTEAD") %></button>
+    <a class="sign-up-button form-toggle" data-type="login"><%- gettext("LOG IN INSTEAD") %></a>
 </div>
