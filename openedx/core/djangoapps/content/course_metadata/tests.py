@@ -9,12 +9,14 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangoapps.content.course_metadata.signals import listen_for_course_publish
 from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
 class CoursesMetaDataTests(ModuleStoreTestCase):
     """ Test suite for Course Meta Data """
 
     def setUp(self):
+        SignalHandler.course_published.connect(listen_for_course_publish)
         super(CoursesMetaDataTests, self).setUp()
 
         self.course = CourseFactory.create()
@@ -43,6 +45,8 @@ class CoursesMetaDataTests(ModuleStoreTestCase):
             data=self.test_data,
             display_name="Html component"
         )
+
+        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
 
     def test_course_aggregate_metadata_update_on_course_published(self):
         """
