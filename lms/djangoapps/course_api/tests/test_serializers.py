@@ -2,8 +2,10 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
+from __future__ import unicode_literals
 from datetime import datetime
 
+import ddt
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework.test import APIRequestFactory
@@ -18,6 +20,7 @@ from ..serializers import CourseSerializer, CourseDetailSerializer
 from .mixins import CourseApiFactoryMixin
 
 
+@ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """
     Test CourseSerializer
@@ -54,6 +57,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'enrollment_end': u'2015-07-15T00:00:00Z',
             'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
+            'pacing': 'instructor',
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
@@ -100,6 +104,16 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
         self.assertEqual(result['start_type'], u'empty')
         self.assertIsNone(result['start_display'])
+
+    @ddt.unpack
+    @ddt.data(
+        (True, 'self'),
+        (False, 'instructor'),
+    )
+    def test_pacing(self, self_paced, expected_pacing):
+        course = self.create_course(self_paced=self_paced)
+        result = self._get_result(course)
+        self.assertEqual(result['pacing'], expected_pacing)
 
 
 class TestCourseDetailSerializer(TestCourseSerializer):  # pylint: disable=test-inherits-tests
