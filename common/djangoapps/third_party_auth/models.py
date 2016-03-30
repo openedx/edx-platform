@@ -192,9 +192,8 @@ class OAuth2ProviderConfig(ProviderConfig):
     """
     prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
-    BACKEND_CHOICES = [(name, name) for name in _PSA_OAUTH2_BACKENDS]
     backend_name = models.CharField(
-        max_length=50, choices=BACKEND_CHOICES, blank=False, db_index=True,
+        max_length=50, choices=[(name, name) for name in _PSA_OAUTH2_BACKENDS], blank=False, db_index=True,
         help_text=(
             "Which python-social-auth OAuth2 provider backend to use. "
             "The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting."
@@ -246,9 +245,8 @@ class SAMLProviderConfig(ProviderConfig):
     """
     prefix = 'saml'
     KEY_FIELDS = ('idp_slug', )
-    BACKEND_CHOICES = [(name, name) for name in _PSA_SAML_BACKENDS]
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', choices=BACKEND_CHOICES, blank=False,
+        max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
     idp_slug = models.SlugField(
         max_length=30, db_index=True,
