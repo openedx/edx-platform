@@ -11,55 +11,68 @@ from django.test.utils import override_settings
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 
 
 @attr('shard_1')
-class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    def setUp(self):
-        super(TestNavigation, self).setUp()
-        self.test_course = CourseFactory.create()
-        self.course = CourseFactory.create()
-        self.chapter0 = ItemFactory.create(parent=self.course,
-                                           display_name='Overview')
-        self.chapter9 = ItemFactory.create(parent=self.course,
-                                           display_name='factory_chapter')
-        self.section0 = ItemFactory.create(parent=self.chapter0,
-                                           display_name='Welcome')
-        self.section9 = ItemFactory.create(parent=self.chapter9,
-                                           display_name='factory_section')
-        self.unit0 = ItemFactory.create(parent=self.section0,
-                                        display_name='New Unit')
+    @classmethod
+    def setUpClass(cls):
+        #  pylint: disable=super-method-not-called
+        with super(TestNavigation, cls).setUpClassAndTestData():
+            cls.test_course = CourseFactory.create()
+            cls.test_course_proctored = CourseFactory.create()
+            cls.course = CourseFactory.create()
 
-        self.chapterchrome = ItemFactory.create(parent=self.course,
-                                                display_name='Chrome')
-        self.chromelesssection = ItemFactory.create(parent=self.chapterchrome,
-                                                    display_name='chromeless',
-                                                    chrome='none')
-        self.accordionsection = ItemFactory.create(parent=self.chapterchrome,
-                                                   display_name='accordion',
-                                                   chrome='accordion')
-        self.tabssection = ItemFactory.create(parent=self.chapterchrome,
-                                              display_name='tabs',
-                                              chrome='tabs')
-        self.defaultchromesection = ItemFactory.create(
-            parent=self.chapterchrome,
+    @classmethod
+    def setUpTestData(cls):
+        cls.chapter0 = ItemFactory.create(parent=cls.course,
+                                          display_name='Overview')
+        cls.chapter9 = ItemFactory.create(parent=cls.course,
+                                          display_name='factory_chapter')
+        cls.section0 = ItemFactory.create(parent=cls.chapter0,
+                                          display_name='Welcome')
+        cls.section9 = ItemFactory.create(parent=cls.chapter9,
+                                          display_name='factory_section')
+        cls.unit0 = ItemFactory.create(parent=cls.section0,
+                                       display_name='New Unit')
+
+        cls.chapterchrome = ItemFactory.create(parent=cls.course,
+                                               display_name='Chrome')
+        cls.chromelesssection = ItemFactory.create(parent=cls.chapterchrome,
+                                                   display_name='chromeless',
+                                                   chrome='none')
+        cls.accordionsection = ItemFactory.create(parent=cls.chapterchrome,
+                                                  display_name='accordion',
+                                                  chrome='accordion')
+        cls.tabssection = ItemFactory.create(parent=cls.chapterchrome,
+                                             display_name='tabs',
+                                             chrome='tabs')
+        cls.defaultchromesection = ItemFactory.create(
+            parent=cls.chapterchrome,
             display_name='defaultchrome',
         )
-        self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
-                                                    display_name='fullchrome',
-                                                    chrome='accordion,tabs')
-        self.tabtest = ItemFactory.create(parent=self.chapterchrome,
-                                          display_name='progress_tab',
-                                          default_tab='progress')
+        cls.fullchromesection = ItemFactory.create(parent=cls.chapterchrome,
+                                                   display_name='fullchrome',
+                                                   chrome='accordion,tabs')
+        cls.tabtest = ItemFactory.create(parent=cls.chapterchrome,
+                                         display_name='progress_tab',
+                                         default_tab='progress')
+
+        cls.staff_user = GlobalStaffFactory()
+        cls.user = UserFactory()
+
+    def setUp(self):
+        super(TestNavigation, self).setUp()
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -67,8 +80,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             username = 'u{0}'.format(i)
             self.create_account(username, email, password)
             self.activate_user(email)
-
-        self.staff_user = GlobalStaffFactory()
 
     def assertTabActive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
@@ -277,9 +288,9 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
-        self.enroll(self.test_course, True)
+        self.enroll(self.test_course_proctored, True)
 
-        test_course_id = self.test_course.id.to_deprecated_string()
+        test_course_id = self.test_course_proctored.id.to_deprecated_string()
 
         with patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False}):
             url = reverse(
@@ -301,10 +312,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
             # now set up a course which is proctored enabled
 
-            self.test_course.enable_proctored_exams = True
-            self.test_course.save()
+            self.test_course_proctored.enable_proctored_exams = True
+            self.test_course_proctored.save()
 
-            modulestore().update_item(self.test_course, self.user.id)
+            modulestore().update_item(self.test_course_proctored, self.user.id)
 
             resp = self.client.get(url)
 

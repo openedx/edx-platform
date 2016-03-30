@@ -3,6 +3,8 @@ A class used for defining and running test suites
 """
 import sys
 import subprocess
+
+from paver import tasks
 from paver.easy import sh
 
 from pavelib.utils.process import kill_process
@@ -74,6 +76,11 @@ class TestSuite(object):
         returns True.
         """
         cmd = self.cmd
+
+        if tasks.environment.dry_run:
+            tasks.environment.info(cmd)
+            return
+
         sys.stdout.write(cmd)
 
         msg = colorize(
@@ -130,6 +137,10 @@ class TestSuite(object):
         Runs the tests in the suite while tracking and reporting failures.
         """
         self.run_suite_tests()
+
+        if tasks.environment.dry_run:
+            return
+
         self.report_test_results()
 
         if len(self.failed_suites) > 0:

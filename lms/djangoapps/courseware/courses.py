@@ -289,8 +289,8 @@ def get_course_info_section(request, user, course, section_key):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course=%s, section_key=%s",
-                course, section_key
+                u"Error rendering course_id=%s, section_key=%s",
+                unicode(course.id), section_key
             )
 
     return html

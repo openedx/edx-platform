@@ -55,7 +55,9 @@ else
             paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
             echo "Finding pylint violations and storing in report..."
-            paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
+            # HACK: we need to print something to the console, otherwise circleci
+            # fails and aborts the job because nothing is displayed for > 10 minutes.
+            paver run_pylint -l $PYLINT_THRESHOLD | tee pylint.log || EXIT=1
 
             mkdir -p reports
             echo "Finding jshint violations and storing report..."

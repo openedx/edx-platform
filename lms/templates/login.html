@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 import third_party_auth
 from third_party_auth import provider, pipeline
-from microsite_configuration import microsite
 %>
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
@@ -233,8 +232,8 @@ from microsite_configuration import microsite
   <aside role="complementary">
 
 <%
-  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = microsite.get_template_path('login-sidebar.html')
+  # allow for theming overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = static.get_template_path('login-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from edxmako.tests import mako_middleware_process_request
 
 from django_comment_common.utils import ThreadContext
@@ -25,7 +26,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    TEST_DATA_MONGO_MODULESTORE
+    SharedModuleStoreTestCase,
+    TEST_DATA_MONGO_MODULESTORE,
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
@@ -96,7 +98,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
         # for the profiled user's active threads
-        mock_threads.return_value = [], 1, 1
+        mock_threads.return_value = CommentClientPaginatedResult(collection=[], page=1, num_pages=1)
 
         # Mock the code that makes the HTTP request to the cs_comment_service app
         # that gets the current user's info
@@ -1281,13 +1283,20 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(InlineDiscussionUnicodeTestCase, self).setUp()
+class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(InlineDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(InlineDiscussionUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1304,13 +1313,19 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(ForumFormDiscussionUnicodeTestCase, self).setUp()
+class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(ForumFormDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
 
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpTestData(cls):
+        super(ForumFormDiscussionUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1376,13 +1391,20 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotIn(malicious_code, resp.content)
 
 
-class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
+class ForumDiscussionSearchUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(ForumDiscussionSearchUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(ForumDiscussionSearchUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1402,13 +1424,20 @@ class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(SingleThreadUnicodeTestCase, self).setUp()
+class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
-        self.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(SingleThreadUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
+
+    @classmethod
+    def setUpTestData(cls):
+        super(SingleThreadUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1425,13 +1454,20 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["content"]["body"], text)
 
 
-class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(UserProfileUnicodeTestCase, self).setUp()
+class UserProfileUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(UserProfileUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(UserProfileUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1447,13 +1483,20 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
-    def setUp(self):
-        super(FollowedThreadsUnicodeTestCase, self).setUp()
+class FollowedThreadsUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+    @classmethod
+    def setUpClass(cls):
+        # pylint: disable=super-method-not-called
+        with super(FollowedThreadsUnicodeTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def setUpTestData(cls):
+        super(FollowedThreadsUnicodeTestCase, cls).setUpTestData()
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):

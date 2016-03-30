@@ -202,7 +202,7 @@ def send_beta_role_email(action, user, email_params):
     send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
 
 
-def reset_student_attempts(course_id, student, module_state_key, delete_module=False):
+def reset_student_attempts(course_id, student, module_state_key, requesting_user, delete_module=False):
     """
     Reset student attempts for a problem. Optionally deletes all student state for the specified problem.
 
@@ -219,26 +219,42 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
         submissions.SubmissionError: unexpected error occurred while resetting the score in the submissions API.
 
     """
+    user_id = anonymous_id_for_user(student, course_id)
+    requesting_user_id = anonymous_id_for_user(requesting_user, course_id)
+    submission_cleared = False
     try:
         # A block may have children. Clear state on children first.
         block = modulestore().get_item(module_state_key)
         if block.has_children:
             for child in block.children:
                 try:
-                    reset_student_attempts(course_id, student, child, delete_module=delete_module)
+                    reset_student_attempts(course_id, student, child, requesting_user, delete_module=delete_module)
                 except StudentModule.DoesNotExist:
                     # If a particular child doesn't have any state, no big deal, as long as the parent does.
                     pass
+        if delete_module:
+            # Some blocks (openassessment) use StudentModule data as a key for internal submission data.
+            # Inform these blocks of the reset and allow them to handle their data.
+            clear_student_state = getattr(block, "clear_student_state", None)
+            if callable(clear_student_state):
+                clear_student_state(
+                    user_id=user_id,
+                    course_id=unicode(course_id),
+                    item_id=unicode(module_state_key),
+                    requesting_user_id=requesting_user_id
+                )
+                submission_cleared = True
     except ItemNotFoundError:
         log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
-    # Reset the student's score in the submissions API
-    # Currently this is used only by open assessment (ORA 2)
-    # We need to do this *before* retrieving the `StudentModule` model,
-    # because it's possible for a score to exist even if no student module exists.
-    if delete_module:
+    # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
+    # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
+
+    # TODO: Should the LMS know about sub_api and call this reset, or should it generically call it on all of its
+    # xblock services as well?  See JIRA ARCH-26.
+    if delete_module and not submission_cleared:
         sub_api.reset_score(
-            anonymous_id_for_user(student, course_id),
+            user_id,
             course_id.to_deprecated_string(),
             module_state_key.to_deprecated_string(),
         )
@@ -427,6 +443,7 @@ def render_message_to_string(subject_template, message_template, param_dict, lan
     Returns two strings that correspond to the rendered, translated email
     subject and message.
     """
+    language = language or settings.LANGUAGE_CODE
     with override_language(language):
         return get_subject_and_message(subject_template, message_template, param_dict)
 

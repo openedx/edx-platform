@@ -81,7 +81,7 @@ class Bookmark(TimeStampedModel):
 
             xblock_cache = XBlockCache.create({
                 'usage_key': usage_key,
-                'display_name': block.display_name,
+                'display_name': block.display_name_with_default,
             })
             data['_path'] = prepare_path_for_serialization(Bookmark.updated_path(usage_key, xblock_cache))
 
@@ -177,9 +177,8 @@ class Bookmark(TimeStampedModel):
                         block = modulestore().get_item(ancestor_usage_key)
                     except ItemNotFoundError:
                         return []  # No valid path can be found.
-
                     path_data.append(
-                        PathItem(usage_key=block.location, display_name=block.display_name)
+                        PathItem(usage_key=block.location, display_name=block.display_name_with_default)
                     )
 
         return path_data
@@ -238,7 +237,6 @@ class XBlockCache(TimeStampedModel):
         usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
         data['course_key'] = usage_key.course_key
-
         xblock_cache, created = cls.objects.get_or_create(usage_key=usage_key, defaults=data)
 
         if not created:

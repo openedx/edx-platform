@@ -41,10 +41,14 @@ class RefundableTest(SharedModuleStoreTestCase):
     Tests for dashboard utility functions
     """
 
+    @classmethod
+    def setUpClass(cls):
+        super(RefundableTest, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         """ Setup components used by each refund test."""
         super(RefundableTest, self).setUp()
-        self.course = CourseFactory.create()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         self.verified_mode = CourseModeFactory.create(
             course_id=self.course.id,

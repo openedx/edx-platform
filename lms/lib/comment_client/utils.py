@@ -1,3 +1,4 @@
+"""" Common utilities for comment client wrapper """
 from contextlib import contextmanager
 import dogstats_wrapper as dog_stats_api
 import logging
@@ -141,9 +142,9 @@ class CommentClientError(Exception):
 
 
 class CommentClientRequestError(CommentClientError):
-    def __init__(self, msg, status_code=400):
+    def __init__(self, msg, status_codes=400):
         super(CommentClientRequestError, self).__init__(msg)
-        self.status_code = status_code
+        self.status_code = status_codes
 
 
 class CommentClient500Error(CommentClientError):
@@ -152,3 +153,14 @@ class CommentClient500Error(CommentClientError):
 
 class CommentClientMaintenanceError(CommentClientError):
     pass
+
+
+class CommentClientPaginatedResult(object):
+    """ class for paginated results returned from comment services"""
+
+    def __init__(self, collection, page, num_pages, thread_count=0, corrected_text=None):
+        self.collection = collection
+        self.page = page
+        self.num_pages = num_pages
+        self.thread_count = thread_count
+        self.corrected_text = corrected_text

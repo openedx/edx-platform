@@ -9,7 +9,6 @@ from courseware.tests.test_entrance_exam import answer_entrance_exam_problem, ad
 from util.milestones_helpers import (
     add_prerequisite_course,
     fulfill_course_milestone,
-    seed_milestone_relationship_types,
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -82,7 +81,6 @@ class MobileAPIMilestonesMixin(object):
 
     def _add_entrance_exam(self):
         """ Sets up entrance exam """
-        seed_milestone_relationship_types()
         self.course.entrance_exam_enabled = True
 
         self.entrance_exam = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
@@ -108,7 +106,6 @@ class MobileAPIMilestonesMixin(object):
 
     def _add_prerequisite_course(self):
         """ Helper method to set up the prerequisite course """
-        seed_milestone_relationship_types()
         self.prereq_course = CourseFactory.create()  # pylint: disable=attribute-defined-outside-init
         add_prerequisite_course(self.course.id, self.prereq_course.id)
 

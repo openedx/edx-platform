@@ -6,7 +6,6 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.utils import html
 from django_countries import countries
-from microsite_configuration import microsite
 from student.models import UserProfile
 from datetime import date
 import third_party_auth
@@ -112,8 +111,8 @@ import calendar
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
 <%
-  # allow for microsite override on the registration form
-  registration_form = microsite.get_template_path('register-form.html')
+  # allow for theming override on the registration form
+  registration_form = static.get_template_path('register-form.html')
 %>
       <%include file="${registration_form}" />
     </form>
@@ -122,8 +121,8 @@ import calendar
   <aside role="complementary">
 
 <%
-  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = microsite.get_template_path('register-sidebar.html')
+  # allow for theming overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = static.get_template_path('register-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

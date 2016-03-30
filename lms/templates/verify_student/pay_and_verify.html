@@ -41,7 +41,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     % endfor
 </%block>
 <%block name="js_extra">
-  <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
@@ -59,7 +58,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     <div
       id="pay-and-verify-container"
       class="pay-and-verify"
-      data-full-name='${user_full_name}'
+      data-full-name='${user_full_name | h}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
       data-course-name='${course.display_name|h}'

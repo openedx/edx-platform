@@ -9,10 +9,15 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
 import django
-from monkey_patch import third_party_auth
+from monkey_patch import (
+    third_party_auth,
+    django_db_models_options
+)
 
 import xmodule.x_module
 import cms.lib.xblock.runtime
+
+from openedx.core.djangoapps.theming.core import enable_comprehensive_theming
 
 
 def run():
@@ -20,6 +25,12 @@ def run():
     Executed during django startup
     """
     third_party_auth.patch()
+    django_db_models_options.patch()
+
+    # Comprehensive theming needs to be set up before django startup,
+    # because modifying django template paths after startup has no effect.
+    if settings.COMPREHENSIVE_THEME_DIR:
+        enable_comprehensive_theming(settings.COMPREHENSIVE_THEME_DIR)
 
     django.setup()
 

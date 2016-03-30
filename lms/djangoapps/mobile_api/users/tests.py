@@ -5,6 +5,7 @@ Tests for users API
 import datetime
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -23,10 +24,8 @@ from courseware.access_response import (
 from course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
-from util.milestones_helpers import (
-    set_prerequisite_courses,
-    seed_milestone_relationship_types,
-)
+from util.milestones_helpers import set_prerequisite_courses
+from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from util.testing import UrlResetMixin
@@ -36,6 +35,7 @@ from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTe
 from .serializers import CourseEnrollmentSerializer
 
 
+@attr('shard_2')
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>...
@@ -50,6 +50,7 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
+@attr('shard_2')
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
     Tests for /api/mobile/v0.5/my_user_info
@@ -65,8 +66,10 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertTrue(self.username in response['location'])
 
 
+@attr('shard_2')
 @ddt.ddt
-class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
+                            MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
@@ -130,7 +133,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True, 'DISABLE_START_DATES': False}
     )
     def test_courseware_access(self):
-        seed_milestone_relationship_types()
         self.login()
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
@@ -255,23 +257,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             )
         )
 
-    def test_no_facebook_url(self):
-        self.login_and_enroll()
-
-        response = self.api_response()
-        course_data = response.data[0]['course']
-        self.assertIsNone(course_data['social_urls']['facebook'])
-
-    def test_facebook_url(self):
-        self.login_and_enroll()
-
-        self.course.facebook_url = "http://facebook.com/test_group_page"
-        self.store.update_item(self.course, self.user.id)
-
-        response = self.api_response()
-        course_data = response.data[0]['course']
-        self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
-
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_discussion_url(self):
         self.login_and_enroll()
@@ -281,6 +266,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
 
+@attr('shard_2')
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
@@ -315,7 +301,9 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+@attr('shard_2')
+class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
+                          MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
@@ -333,7 +321,9 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mobi
         )
 
 
-class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileCourseAccessTestMixin):
+@attr('shard_2')
+class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
+                            MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
@@ -435,6 +425,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
         )
 
 
+@attr('shard_2')
 class TestCourseEnrollmentSerializer(MobileAPITestCase):
     """
     Test the course enrollment serializer

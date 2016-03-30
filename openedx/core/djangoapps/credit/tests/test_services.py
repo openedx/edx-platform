@@ -2,6 +2,8 @@
 Tests for the Credit xBlock service
 """
 
+from nose.plugins.attrib import attr
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -12,6 +14,7 @@ from openedx.core.djangoapps.credit.api.eligibility import set_credit_requiremen
 from student.models import CourseEnrollment, UserProfile
 
 
+@attr('shard_2')
 class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
@@ -253,7 +256,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertNotIn('course_name', credit_state)
 
         # now make sure it is in there when we pass in the flag
-        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_name=True)
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
         self.assertIn('course_name', credit_state)
         self.assertEqual(credit_state['course_name'], self.course.display_name)
 

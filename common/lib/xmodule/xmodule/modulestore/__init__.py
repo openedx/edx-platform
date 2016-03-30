@@ -428,7 +428,8 @@ class BlockData(object):
             'block_type': self.block_type,
             'definition': self.definition,
             'defaults': self.defaults,
-            'edit_info': self.edit_info.to_storable()
+            'asides': self.get_asides(),
+            'edit_info': self.edit_info.to_storable(),
         }
 
     def from_storable(self, block_data):
@@ -449,8 +450,20 @@ class BlockData(object):
         # blocks are copied from a library to a course)
         self.defaults = block_data.get('defaults', {})
 
+        # Additional field data that stored in connected XBlockAsides
+        self.asides = block_data.get('asides', {})
+
         # EditInfo object containing all versioning/editing data.
         self.edit_info = EditInfo(**block_data.get('edit_info', {}))
+
+    def get_asides(self):
+        """
+        For the situations if block_data has no asides attribute
+        (in case it was taken from memcache)
+        """
+        if not hasattr(self, 'asides'):
+            self.asides = {}   # pylint: disable=attribute-defined-outside-init
+        return self.asides
 
     def __repr__(self):
         # pylint: disable=bad-continuation, redundant-keyword-arg
@@ -459,17 +472,19 @@ class BlockData(object):
                 "definition={self.definition}, "
                 "definition_loaded={self.definition_loaded}, "
                 "defaults={self.defaults}, "
+                "asides={asides}, "
                 "edit_info={self.edit_info})").format(
             self=self,
             classname=self.__class__.__name__,
+            asides=self.get_asides()
         )  # pylint: disable=bad-continuation
 
     def __eq__(self, block_data):
         """
         Two BlockData objects are equal iff all their attributes are equal.
         """
-        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
-        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'asides', 'edit_info']
+        return all(getattr(self, attr, None) == getattr(block_data, attr, None) for attr in attrs)
 
     def __neq__(self, block_data):
         """
@@ -1145,7 +1160,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None, disabled_xblock_types=(),  # pylint: disable=bad-continuation
+        xblock_mixins=(), xblock_select=None, xblock_field_data_wrappers=(), disabled_xblock_types=(),  # pylint: disable=bad-continuation
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
@@ -1162,6 +1177,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.xblock_field_data_wrappers = xblock_field_data_wrappers
         self.disabled_xblock_types = disabled_xblock_types
         self.contentstore = contentstore
 
@@ -1374,6 +1390,13 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.signal_handler:
             self.signal_handler.send("course_deleted", course_key=course_key)
+
+    def _emit_item_deleted_signal(self, usage_key, user_id):
+        """
+        Helper method used to emit the item_deleted signal.
+        """
+        if self.signal_handler:
+            self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
 
 
 def only_xmodules(identifier, entry_points):

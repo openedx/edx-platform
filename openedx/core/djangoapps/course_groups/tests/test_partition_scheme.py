@@ -7,6 +7,7 @@ import json
 from django.conf import settings
 import django.test
 from mock import patch
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -25,6 +26,7 @@ from ..cohorts import add_user_to_cohort, remove_user_from_cohort, get_course_co
 from .helpers import CohortFactory, config_course_cohorts
 
 
+@attr('shard_2')
 class TestCohortPartitionScheme(ModuleStoreTestCase):
     """
     Test the logic for linking a user to a partition group based on their cohort.
@@ -258,6 +260,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
             self.assertRegexpMatches(mock_log.warn.call_args[0][0], 'partition mismatch')
 
 
+@attr('shard_2')
 class TestExtension(django.test.TestCase):
     """
     Ensure that the scheme extension is correctly plugged in (via entry point
@@ -270,6 +273,7 @@ class TestExtension(django.test.TestCase):
             UserPartition.get_scheme('other')
 
 
+@attr('shard_2')
 class TestGetCohortedUserPartition(ModuleStoreTestCase):
     """
     Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
@@ -327,6 +331,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         self.assertIsNone(get_cohorted_user_partition(self.course))
 
 
+@attr('shard_2')
 class TestMasqueradedGroup(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.
@@ -393,7 +398,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         group.
         """
         self.course.cohort_config = {'cohorted': True}
-        self.update_course(self.course, self.test_user.id)
+        modulestore().update_item(self.course, self.test_user.id)  # pylint: disable=no-member
         cohort = CohortFactory.create(course_id=self.course.id, users=[self.test_user])
         CourseUserGroupPartitionGroup(
             course_user_group=cohort,

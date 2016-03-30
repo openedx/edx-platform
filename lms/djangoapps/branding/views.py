@@ -148,8 +148,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
 
     """
     bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
-    version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
-    css_name = settings.FOOTER_CSS[version][bidi]
+    css_name = settings.FOOTER_CSS['openedx'][bidi]
 
     context = {
         'hide_openedx_link': not show_openedx_logo,
@@ -159,11 +158,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'include_dependencies': include_dependencies,
     }
 
-    return (
-        render_to_response("footer-edx-v3.html", context)
-        if settings.FEATURES.get("IS_EDX_DOMAIN", False)
-        else render_to_response("footer.html", context)
-    )
+    return render_to_response("footer.html", context)
 
 
 @cache_control(must_revalidate=True, max_age=settings.FOOTER_BROWSER_CACHE_MAX_AGE)

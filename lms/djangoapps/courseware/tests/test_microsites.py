@@ -11,51 +11,38 @@ from course_modes.models import CourseMode
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
-class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestMicrosites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    def setUp(self):
-        super(TestMicrosites, self).setUp()
-
-        # use a different hostname to test Microsites since they are
-        # triggered on subdomain mappings
-        #
-        # NOTE: The Microsite Configuration is in lms/envs/test.py. The content for the Test Microsite is in
-        # test_microsites/test_microsite.
-        #
-        # IMPORTANT: For these tests to work, this domain must be defined via
-        # DNS configuration (either local or published)
-
-        self.course = CourseFactory.create(
+    @classmethod
+    def setUpClass(cls):
+        super(TestMicrosites, cls).setUpClass()
+        cls.course = CourseFactory.create(
             display_name='Robot_Super_Course',
             org='TestMicrositeX',
             emit_signals=True,
         )
-        self.chapter0 = ItemFactory.create(parent_location=self.course.location,
-                                           display_name='Overview')
-        self.chapter9 = ItemFactory.create(parent_location=self.course.location,
-                                           display_name='factory_chapter')
-        self.section0 = ItemFactory.create(parent_location=self.chapter0.location,
-                                           display_name='Welcome')
-        self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
-                                           display_name='factory_section')
+        cls.chapter0 = ItemFactory.create(parent_location=cls.course.location, display_name='Overview')
+        cls.chapter9 = ItemFactory.create(parent_location=cls.course.location, display_name='factory_chapter')
+        cls.section0 = ItemFactory.create(parent_location=cls.chapter0.location, display_name='Welcome')
+        cls.section9 = ItemFactory.create(parent_location=cls.chapter9.location, display_name='factory_section')
 
-        self.course_outside_microsite = CourseFactory.create(
+        cls.course_outside_microsite = CourseFactory.create(
             display_name='Robot_Course_Outside_Microsite',
             org='FooX',
             emit_signals=True,
         )
 
         # have a course which explicitly sets visibility in catalog to False
-        self.course_hidden_visibility = CourseFactory.create(
+        cls.course_hidden_visibility = CourseFactory.create(
             display_name='Hidden_course',
             org='TestMicrositeX',
             catalog_visibility=CATALOG_VISIBILITY_NONE,
@@ -63,13 +50,16 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # have a course which explicitly sets visibility in catalog and about to true
-        self.course_with_visibility = CourseFactory.create(
+        cls.course_with_visibility = CourseFactory.create(
             display_name='visible_course',
             org='TestMicrositeX',
             course="foo",
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
             emit_signals=True,
         )
+
+    def setUp(self):
+        super(TestMicrosites, self).setUp()
 
     def setup_users(self):
         # Create student accounts and activate them.
@@ -142,6 +132,26 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
 
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_microsite_anonymous_copyright_content(self):
+        """
+        Verify that the copyright, when accessed via a Microsite domain, returns
+        the expected 200 response
+        """
+
+        resp = self.client.get('/copyright', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertContains(resp, 'This is a copyright page for an Open edX microsite.')
+
+    def test_not_microsite_anonymous_copyright_content(self):
+        """
+        Verify that the copyright page does not exist if we are not in a microsite
+        """
+
+        resp = self.client.get('/copyright')
+        self.assertEqual(resp.status_code, 404)
+
     def test_no_redirect_on_homepage_when_no_enrollments(self):
         """
         Verify that a user going to homepage will not redirect if he/she has no course enrollments
@@ -188,6 +198,21 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('dashboard'))
         self.assertNotContains(resp, 'Robot_Super_Course')
         self.assertContains(resp, 'Robot_Course_Outside_Microsite')
+
+    def test_microsite_course_custom_tabs(self):
+        """
+        Enroll user in a course scoped in a Microsite and make sure that
+        template with tabs is overridden
+        """
+        self.setup_users()
+
+        email, password = self.STUDENT_INFO[1]
+        self.login(email, password)
+        self.enroll(self.course, True)
+
+        resp = self.client.get(reverse('courseware', args=[unicode(self.course.id)]),
+                               HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertContains(resp, 'Test Microsite Tab:')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_visible_about_page_settings(self):

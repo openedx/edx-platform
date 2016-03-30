@@ -12,12 +12,39 @@ describe "DiscussionThreadView", ->
         spyOn(DiscussionThreadShowView.prototype, "convertMath")
         spyOn(DiscussionContentView.prototype, "makeWmdEditor")
         spyOn(DiscussionUtil, "makeWmdEditor")
-        spyOn(ThreadResponseView.prototype, "renderShowView")
+        spyOn(DiscussionUtil, "setWmdContent")
+        spyOn(ThreadResponseShowView.prototype, "convertMath")
 
     renderWithContent = (view, content) ->
-        DiscussionViewSpecHelper.setNextResponseContent(content)
+        $.ajax.andCallFake((params) =>
+            params.success(
+                createAjaxResponseJson(content, false),
+                'success'
+            )
+            {always: ->}
+        )
         view.render()
         jasmine.Clock.tick(100)
+
+    renderWithTestResponses = (view, count, options) ->
+        renderWithContent(
+            view,
+            _.extend(
+                {
+                    resp_total: count,
+                    children: if count > 0 then (createTestResponseJson(index) for index in [1..count]) else []
+                },
+                options
+            )
+        )
+
+    createTestResponseJson = (index) ->
+        {
+            user_id: window.user.id,
+            body: "Response " + index,
+            id: "id_" + index,
+            created_at: "2015-01-01T22:20:28Z"
+        }
 
     assertContentVisible = (view, selector, visible) ->
         content = view.$el.find(selector)
@@ -42,6 +69,34 @@ describe "DiscussionThreadView", ->
         else
             expect(view.$el.find(".load-response-button").length).toEqual(0)
 
+    createAjaxResponseJson = (content, can_act) ->
+        {
+            content: content,
+            annotated_content_info: {
+                ability: {
+                    editable: can_act,
+                    can_delete: can_act,
+                    can_reply: can_act,
+                    can_vote: can_act
+                }
+            }
+        }
+
+    postResponse = (view, index) ->
+        testResponseJson = createTestResponseJson(index)
+        responseText = testResponseJson.body
+        spyOn(view, "getWmdContent").andReturn(responseText)
+        $.ajax.andCallFake((params) =>
+            expect(params.type).toEqual("POST")
+            expect(params.data.body).toEqual(responseText)
+            params.success(
+                createAjaxResponseJson(testResponseJson, true),
+                'success'
+            )
+            {always: ->}
+        )
+        view.$(".discussion-submit-post").click()
+
     describe "closed and open Threads", ->
 
         createDiscussionThreadView = (originallyClosed, mode) ->
@@ -54,12 +109,12 @@ describe "DiscussionThreadView", ->
                 mode: mode
                 course_settings: DiscussionSpecHelper.makeCourseSettings()
             )
-            renderWithContent(view, {resp_total: 1, children: [{}]})
+            renderWithTestResponses(view, 1)
             if mode == "inline"
-              view.expand()
+                view.expand()
             spyOn(DiscussionUtil, "updateWithUndo").andCallFake(
-              (model, updates, safeAjaxParams, errorMsg) ->
-                model.set(updates)
+                (model, updates, safeAjaxParams, errorMsg) ->
+                    model.set(updates)
             )
             view
 
@@ -73,24 +128,24 @@ describe "DiscussionThreadView", ->
 
         checkVoteDisplay = (originallyClosed, mode) ->
             view = createDiscussionThreadView(originallyClosed, mode)
-            expect(view.$('.action-vote').is(":visible")).toBe(not originallyClosed)
-            expect(view.$('.display-vote').is(":visible")).toBe(originallyClosed)
+            expect(view.$('.forum-thread-main-wrapper .action-vote').is(":visible")).toBe(not originallyClosed)
+            expect(view.$('.forum-thread-main-wrapper .display-vote').is(":visible")).toBe(originallyClosed)
             view.$(".action-close").click()
             expect(view.$('.action-vote').is(":visible")).toBe(originallyClosed)
             expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)
 
         _.each(["tab", "inline"], (mode) =>
-                it "Test that in #{mode} mode when a closed thread is opened the comment form is displayed", ->
-                        checkCommentForm(true, mode)
+            it "Test that in #{mode} mode when a closed thread is opened the comment form is displayed", ->
+                checkCommentForm(true, mode)
 
-                it "Test that in #{mode} mode when a open thread is closed the comment form is hidden", ->
-                        checkCommentForm(false, mode)
+            it "Test that in #{mode} mode when a open thread is closed the comment form is hidden", ->
+                checkCommentForm(false, mode)
 
-                it "Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden", ->
-                        checkVoteDisplay(true, mode)
+            it "Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden", ->
+                checkVoteDisplay(true, mode)
 
-                it "Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed", ->
-                        checkVoteDisplay(false, mode)
+            it "Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed", ->
+                checkVoteDisplay(false, mode)
         )
 
     describe "tab mode", ->
@@ -102,40 +157,66 @@ describe "DiscussionThreadView", ->
                 course_settings: DiscussionSpecHelper.makeCourseSettings()
             )
 
+        describe "responses", ->
+            it "can post a first response", ->
+                # Initially render a test post (made by someone else) with zero responses
+                renderWithTestResponses(@view, 0)
+                postResponse(@view, 1)
+                expect(@view.$(".forum-response").length).toBe(1)
+                # At this point, there are 2 DiscussionContentViews, the main post and the response.
+                # Each an .action-edit button, but only 1 (the response) should be available.
+                expect(@view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1)
+                expect(@view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(1)
+
+            it "can post a second response", ->
+                # Initially render a test post (made by someone else) with a single response (made by the current learner)
+                renderWithTestResponses(@view, 1)
+                expect(@view.$(".forum-response").length).toBe(1)
+                # Post should not be editable, response should be
+                expect(@view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1)
+                expect(@view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(1)
+
+                # Now make a second response. Prior to TNL-3788, a bug would hide the edit button for the first response
+                postResponse(@view, 2)
+                expect(@view.$(".forum-response").length).toBe(2)
+                # Post should not be editable, responses should be
+                expect(@view.$(".post-actions-list").find(".action-edit").parent(".is-hidden").length).toBe(1)
+                expect(@view.$(".response-actions-list").find(".action-edit").parent().not(".is-hidden").length).toBe(2)
+
         describe "response count and pagination", ->
             it "correctly render for a thread with no responses", ->
-                renderWithContent(@view, {resp_total: 0, children: []})
+                renderWithTestResponses(@view, 0)
                 assertResponseCountAndPaginationCorrect(@view, "0 responses", null, null)
 
             it "correctly render for a thread with one response", ->
-                renderWithContent(@view, {resp_total: 1, children: [{}]})
+                renderWithTestResponses(@view, 1)
                 assertResponseCountAndPaginationCorrect(@view, "1 response", "Showing all responses", null)
 
             it "correctly render for a thread with one additional page", ->
-                renderWithContent(@view, {resp_total: 2, children: [{}]})
+                renderWithTestResponses(@view, 1, {resp_total: 2})
                 assertResponseCountAndPaginationCorrect(@view, "2 responses", "Showing first response", "Load all responses")
 
             it "correctly render for a thread with multiple additional pages", ->
-                renderWithContent(@view, {resp_total: 111, children: [{}, {}]})
+                renderWithTestResponses(@view, 2, {resp_total: 111})
                 assertResponseCountAndPaginationCorrect(@view, "111 responses", "Showing first 2 responses", "Load next 100 responses")
 
             describe "on clicking the load more button", ->
                 beforeEach ->
-                    renderWithContent(@view, {resp_total: 5, children: [{}]})
+                    renderWithTestResponses(@view, 1, {resp_total: 5})
                     assertResponseCountAndPaginationCorrect(@view, "5 responses", "Showing first response", "Load all responses")
 
                 it "correctly re-render when all threads have loaded", ->
-                    DiscussionViewSpecHelper.setNextResponseContent({resp_total: 5, children: [{}, {}, {}, {}]})
+                    renderWithTestResponses(@view, 5, {resp_total: 5})
                     @view.$el.find(".load-response-button").click()
                     assertResponseCountAndPaginationCorrect(@view, "5 responses", "Showing all responses", null)
 
                 it "correctly re-render when one page remains", ->
-                    DiscussionViewSpecHelper.setNextResponseContent({resp_total: 42, children: [{}, {}]})
+                    renderWithTestResponses(@view, 3, {resp_total: 42})
                     @view.$el.find(".load-response-button").click()
                     assertResponseCountAndPaginationCorrect(@view, "42 responses", "Showing first 3 responses", "Load all responses")
 
                 it "correctly re-render when multiple pages remain", ->
-                    DiscussionViewSpecHelper.setNextResponseContent({resp_total: 111, children: [{}, {}]})
+                    renderWithTestResponses(@view, 3, {resp_total: 111})
                     @view.$el.find(".load-response-button").click()
                     assertResponseCountAndPaginationCorrect(@view, "111 responses", "Showing first 3 responses", "Load next 100 responses")
 
@@ -247,9 +328,10 @@ describe "DiscussionThreadView", ->
                 course_settings: DiscussionSpecHelper.makeCourseSettings()
             )
 
+        generateContent = (idStart, idEnd) ->
+            _.map(_.range(idStart, idEnd), (i) -> createTestResponseJson(i))
+
         renderTestCase = (view, numEndorsed, numNonEndorsed) ->
-            generateContent = (idStart, idEnd) ->
-                _.map(_.range(idStart, idEnd), (i) -> {"id": "#{i}"})
             renderWithContent(
                 view,
                 {
@@ -278,15 +360,15 @@ describe "DiscussionThreadView", ->
             renderWithContent(
                 @view,
                 {
-                    endorsed_responses: [{id: "1"}, {id: "2"}],
-                    non_endorsed_responses: [{id: "3"}, {id: "4"}, {id: "5"}],
+                    endorsed_responses: generateContent(0, 2),
+                    non_endorsed_responses: generateContent(3, 6),
                     non_endorsed_resp_total: 42
                 }
             )
             DiscussionViewSpecHelper.setNextResponseContent({
                 # Add an endorsed response; it should be rendered
-                endorsed_responses: [{id: "1"}, {id: "2"}, {id: "6"}],
-                non_endorsed_responses: [{id: "7"}, {id: "8"}, {id: "9"}],
+                endorsed_responses: generateContent(0, 3),
+                non_endorsed_responses: generateContent(6, 9),
                 non_endorsed_resp_total: 41
             })
             @view.$el.find(".load-response-button").click()

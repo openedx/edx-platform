@@ -7,7 +7,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
-			<div class="annotatable-title">${display_name}</div>
+			<h3 class="hd hd-2 annotatable-title">${display_name}</h3>
 		% endif
 	</div>
 	% if instructions_html is not UNDEFINED and instructions_html is not None:
@@ -184,7 +184,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
         // END TODO
 
         ova.annotator.addPlugin('Tags');
-        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ?
                 '${instructor_email}':
                 '${user.email}';
 

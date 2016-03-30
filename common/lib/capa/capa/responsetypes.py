@@ -2134,6 +2134,10 @@ class StringResponse(LoncapaResponse):
         Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
         Should be removed soon. When to remove it, is up to Lyla Fisher.
         """
+        # if given answer is empty.
+        if not given:
+            return False
+
         _ = self.capa_system.i18n.ugettext
         # backward compatibility, should be removed in future.
         if self.backward:
@@ -2208,7 +2212,7 @@ class CustomResponse(LoncapaResponse):
 
         # if <customresponse> has an "expect" (or "answer") attribute then save
         # that
-        self.expect = xml.get('expect') or xml.get('answer')
+        self.expect = contextualize_text(xml.get('expect') or xml.get('answer'), self.context)
 
         log.debug('answer_ids=%s', self.answer_ids)
 
@@ -2815,6 +2819,7 @@ class CodeResponse(LoncapaResponse):
         student_info = {
             'anonymous_student_id': anonymous_student_id,
             'submission_time': qtime,
+            'random_seed': self.context['seed'],
         }
         contents.update({'student_info': json.dumps(student_info)})
 

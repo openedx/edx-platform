@@ -14,8 +14,22 @@ class @DiscussionViewSpecHelper
           body: "",
           title: "dummy title",
           created_at: "2014-08-18T01:02:03Z"
+          ability: {
+              can_delete: false,
+              can_reply: true,
+              can_vote: false,
+              editable: false,
+            }
         }
         $.extend(thread, props)
+
+    @checkVoteClasses = (view) ->
+        view.render()
+        display_button = view.$el.find(".display-vote")
+        expect(display_button.hasClass("is-hidden")).toBe(true)
+        action_button = view.$el.find(".action-vote")
+        # Check that inline css is not applied to the ".action-vote"
+        expect(action_button).not.toHaveAttr('style','display: inline; ');
 
     @expectVoteRendered = (view, model, user) ->
         button = view.$el.find(".action-vote")
@@ -72,7 +86,7 @@ class @DiscussionViewSpecHelper
         spy.reset()
         button.trigger($.Event("keydown", {which: 32}))
         expect(spy).toHaveBeenCalled()
-        
+
     @checkVoteButtonEvents = (view) ->
         @checkButtonEvents(view, "toggleVote", ".action-vote")
 

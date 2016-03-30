@@ -54,7 +54,9 @@
                         model.destroy(
                             {
                                 success: function() {
-                                    self.showMessage('Student Removed from certificate white list successfully.');
+                                    self.escapeAndShowMessage(
+                                        gettext('Student Removed from certificate white list successfully.')
+                                    );
                                 },
                                 error: this.showError(this),
                                 wait: true,
@@ -63,9 +65,8 @@
                         );
                     }
                     else{
-                        this.showMessage(
-                            'Could not find Certificate Exception in white list. ' +
-                            'Please refresh the page and try again'
+                        this.escapeAndShowMessage(
+                            gettext('Could not find Certificate Exception in white list. Please refresh the page and try again') // jshint ignore:line
                         );
                     }
                 },
@@ -77,15 +78,15 @@
                     );
                 },
 
-                showMessage: function(message){
+                escapeAndShowMessage: function(message){
                     $(this.message_div +  ">p" ).remove();
-                    $(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>").focus();
+                    $(this.message_div).removeClass('hidden').append("<p>"+ _.escape(message) + "</p>").focus();
                     $(this.message_div).fadeOut(6000, "linear");
                 },
 
                 showSuccess: function(caller_object){
                     return function(xhr){
-                        caller_object.showMessage(xhr.message);
+                        caller_object.escapeAndShowMessage(xhr.message);
                     };
                 },
 
@@ -93,11 +94,12 @@
                     return function(xhr){
                         try{
                             var response = JSON.parse(xhr.responseText);
-                            caller_object.showMessage(response.message);
+                            caller_object.escapeAndShowMessage(response.message);
                         }
                         catch(exception){
-                            caller_object.showMessage(
-                                "Server Error, Please refresh the page and try again.");
+                            caller_object.escapeAndShowMessage(
+                                gettext("Server Error, Please refresh the page and try again.")
+                            );
                         }
                     };
                 }

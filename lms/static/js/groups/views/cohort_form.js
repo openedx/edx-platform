@@ -1,8 +1,8 @@
 ;(function (define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort', 
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
             'js/models/notification', 'js/views/notification'],
-        function($, _, Backbone, gettext, CohortModel) {
+        function($, _, Backbone, gettext, HtmlUtils) {
 
             var CohortFormView = Backbone.View.extend({
                 events : {
@@ -10,7 +10,7 @@
                 },
 
                 initialize: function(options) {
-                    this.template = _.template($('#cohort-form-tpl').text());
+                    this.template = HtmlUtils.template($('#cohort-form-tpl').text());
                     this.contentGroups = options.contentGroups;
                     this.context = options.context;
                 },
@@ -32,7 +32,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(this.template({
+                    HtmlUtils.setHtml(this.$el, this.template({
                         cohort: this.model,
                         isDefaultCohort: this.isDefault(this.model.get('name')),
                         contentGroups: this.contentGroups,

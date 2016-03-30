@@ -1,6 +1,5 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
-from microsite_configuration import microsite
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import get_course_about_section
@@ -18,7 +17,10 @@ from openedx.core.lib.courses import course_image_url
 </%block>
 
 <%block name="js_extra">
-
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
+  % endif
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
@@ -40,6 +42,7 @@ from openedx.core.lib.courses import course_image_url
             location.href = "${reg_then_add_to_cart_link}";
         }
       };
+
       $("#add_to_cart_post").click(function(event){
         $.ajax({
           url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
@@ -109,14 +112,12 @@ from openedx.core.lib.courses import course_image_url
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">
-        <hgroup>
+        <div class="heading-group">
           <h1>
             ${course.display_name_with_default_escaped}
-            % if not self.theme_enabled():
-              <a href="#">${course.display_org_with_default | h}</a>
-            % endif
+            <a href="#">${course.display_org_with_default | h}</a>
           </h1>
-        </hgroup>
+        </div>
 
         <div class="main-cta">
         %if user.is_authenticated() and registered:
@@ -127,7 +128,7 @@ from openedx.core.lib.courses import course_image_url
           <span class="register disabled">${_("You are enrolled in this course")}</span>
 
           %if show_courseware_link:
-            <strong>${_("View Courseware")}</strong>
+            <strong>${_("View Course")}</strong>
             </a>
           %endif
 
@@ -155,14 +156,27 @@ from openedx.core.lib.courses import course_image_url
             reg_href = reg_then_add_to_cart_link
             reg_element_id = "reg_then_add_to_cart"
           %>
+          <% if ecommerce_checkout:
+              reg_href = ecommerce_checkout_link
+              reg_element_id = ""
+          %>
           <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
             ${_("Add {course_name} to Cart <span>({price} USD)</span>")\
               .format(course_name=course.display_number_with_default, price=course_price)}
-
           </a>
           <div id="register_error"></div>
         %else:
-          <a href="#" class="register">
+          <% 
+            if ecommerce_checkout:
+              reg_href = ecommerce_checkout_link
+            else:
+              reg_href="#"
+            if professional_mode:
+              href_class = "add-to-cart"
+            else:
+              href_class = "register"
+          %>
+          <a href="${reg_href}" class="${href_class}">
             ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           <div id="register_error"></div>
@@ -196,15 +210,6 @@ from openedx.core.lib.courses import course_image_url
         </div>
       % endif
 
-      <nav aria-label="${_('Course About')}">
-        <a href="#" class="active">${_("Overview")}</a>
-      ##  <a href="#">${_("FAQ")}</a>
-      ##  <a href="#">${_("Requirements")}</a>
-      ##  <a href="#">${_("Text-book")}</a>
-      ##  <a href="#">${_("Syllabus")}</a>
-      ##  <a href="#">${_("Reviews")}</a>
-      </nav>
-
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
@@ -212,66 +217,8 @@ from openedx.core.lib.courses import course_image_url
 
     <section class="course-sidebar">
       <section class="course-summary">
-        <header>
-          % if microsite.get_value('course_about_show_social_links', True):
-          <div class="social-sharing">
-            <div class="sharing-message">${_("Share with friends and family!")}</div>
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${course.display_name_with_default_escaped}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${course.display_name_with_default_escaped}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
-              </a>
-            % else:
-              <%
-                site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
-                platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
 
-                ## Translators: This text will be automatically posted to the student's
-                ## Twitter account. {url} should appear at the end of the text.
-                tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
-                    number=course.number,
-                    title=course.display_name_with_default_escaped,
-                    account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
-                    url=u"http://{domain}{path}".format(
-                        domain=site_domain,
-                        path=reverse('about_course', args=[course.id.to_deprecated_string()])
-                    )
-                ).replace(u" ", u"+")
-                tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
-
-                facebook_link = microsite.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
-
-                email_subject = u"mailto:?subject={subject}&body={body}".format(
-                    subject=_("Take a course with {platform} online").format(platform=platform_name),
-                    body=_("I just enrolled in {number} {title} through {platform} {url}").format(
-                        number=course.number,
-                        title=course.display_name_with_default_escaped,
-                        platform=platform_name,
-                        url=u"http://{domain}{path}".format(
-                            domain=site_domain,
-                            path=reverse('about_course', args=[course.id.to_deprecated_string()]),
-                        )
-                    )
-                ).replace(u" ", u"%20")
-              %>
-              <a href="${tweet_action}" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
-              </a>
-              <a href="${facebook_link}" class="share">
-                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
-              </a>
-              <a href="${email_subject}" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
-              </a>
-            % endif
-          </div>
-          % endif
-        </header>
+        <%include file="course_about_sidebar_header.html" />
 
         <ol class="important-dates">
           <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
@@ -330,6 +277,12 @@ from openedx.core.lib.courses import course_image_url
         </ol>
       </section>
 
+      ## CourseTalk widget
+      % if show_coursetalk_widget:
+      <div class="coursetalk-read-reviews">
+          <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
+      </div>
+      % endif
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):
@@ -345,6 +298,7 @@ from openedx.core.lib.courses import course_image_url
         </section>
       </section>
       %endif
+
     </section>
 
   </section>

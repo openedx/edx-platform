@@ -114,7 +114,7 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
-                    document.location.reload();
+                    location.reload(true);
                 }
 
                 var view = this;
@@ -312,7 +312,7 @@
 
             updateValueInField: function () {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
-                this.$('.u-field-value input').val(_.escape(value));
+                this.$('.u-field-value input').val(value);
             },
 
             saveValue: function () {

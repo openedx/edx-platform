@@ -173,9 +173,8 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
         course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
-        # course_updates 'data' field should update accordingly
-        update_data = u"<section><article><h2>{date}</h2>{content}</article></section>".format(date=update_date, content=update_content)
-        self.assertEqual(course_updates.data, update_data)
+        # course_updates 'data' field should not update automatically
+        self.assertEqual(course_updates.data, '')
 
         # test delete course update item (soft delete)
         course_updates = modulestore().get_item(location)

@@ -648,21 +648,22 @@ hr.divider {
 // ui - skipnav
 .nav-skip {
   @extend %t-action3;
-  display: block;
+  display: inline-block;
   position: absolute;
   left: 0px;
   top: -($baseline*30);
-  width: 1px;
-  height: 1px;
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $gray-l4;
   padding: ($baseline*0.75) ($baseline/2);
 
-  &:focus, &:active {
-    position: static;
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
     width: auto;
     height: auto;
+    margin: 0;
   }
 }
 
@@ -725,4 +726,3 @@ hr.divider {
     color: $gray-l1;
   }
 }
-

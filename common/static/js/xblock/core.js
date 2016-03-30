@@ -92,6 +92,10 @@
 
             var requestToken = requestToken || $element.data('request-token');
             var children = XBlock.initializeXBlocks($element, requestToken);
+            var asides = XBlock.initializeXBlockAsides($element, requestToken);
+            if (asides) {
+                children = children.concat(asides);
+            }
             $element.prop('xblock_children', children);
 
             return constructBlock(element, [initArgs(element)]);
@@ -132,8 +136,12 @@
          * If neither is available, then use the request tokens of the immediateDescendent xblocks.
          */
         initializeBlocks: function(element, requestToken) {
-            XBlock.initializeXBlockAsides(element, requestToken);
-            return XBlock.initializeXBlocks(element, requestToken);
+            var asides = XBlock.initializeXBlockAsides(element, requestToken);
+            var xblocks = XBlock.initializeXBlocks(element, requestToken);
+            if (asides) {
+                xblocks = xblocks.concat(asides);
+            }
+            return xblocks;
         }
     };
 

@@ -21,7 +21,7 @@ import unicodecsv
 import uuid
 
 
-@attr('shard_6')
+@attr('shard_8')
 class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin):
     """
     Tests for cohort management on the LMS Instructor Dashboard

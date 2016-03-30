@@ -1,9 +1,10 @@
+<%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
+from openedx.core.djangolib.js_utils import js_escaped_string
 import pytz
 %>
-<%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
@@ -239,7 +240,7 @@ import pytz
 
          $.ajax({
          type: "POST",
-         url: "${section_data['get_user_invoice_preference_url']}",
+         url: "${section_data['get_user_invoice_preference_url'] | n, js_escaped_string}",
          success: function (data) {
              $('#invoice-copy').prop('checked', data.invoice_copy);
              $('#registration_code_generation_link-trigger').click();
@@ -255,13 +256,13 @@ import pytz
          }
          if($('#invoice_number').val() == "") {
                      $('#error-msg').attr('class','error-msgs')
-                     $('#error-msg').html("${_('The Invoice Number field cannot be empty.')}").show();
+                     $('#error-msg').html("${_('The Invoice Number field cannot be empty.') | n, h, js_escaped_string}").show();
                      return
          }
          $.ajax({
              type: "POST",
              data: {invoice_number: $('#invoice_number').val(), event_type:event_type},
-             url: "${section_data['sale_validation_url']}",
+             url: "${section_data['sale_validation_url'] | n, js_escaped_string}",
              success: function (data) {
                  $('#error-msg').attr('class','success-msgs')
                  $('#error-msg').html(data.message).show();
@@ -287,7 +288,7 @@ import pytz
        $.ajax({
          type: "POST",
          data: {id: coupon_id},
-         url: "${section_data['ajax_get_coupon_info']}",
+         url: "${section_data['ajax_get_coupon_info'] | n, js_escaped_string}",
          success: function (data) {
              $('#error-msg').val('');
              $('#error-msg').hide()
@@ -299,7 +300,7 @@ import pytz
                  $('input#edit_coupon_expiration_date').val(data.expiry_date);
              }
              else {
-                $('input#edit_coupon_expiration_date').val("${_('No Expiration Date')}");
+                $('input#edit_coupon_expiration_date').val("${_('No Expiration Date') | n, js_escaped_string}");
              }
              $('#edit-modal-trigger').click();
            },
@@ -323,7 +324,7 @@ import pytz
        $.ajax({
          type: "POST",
          data: {id: $(this).data('item-id')},
-         url: "${section_data['ajax_remove_coupon_url']}",
+         url: "${section_data['ajax_remove_coupon_url'] | n, js_escaped_string}",
          success: function (data) {
              anchor.removeData("disabled");
              location.reload(true);
@@ -359,91 +360,91 @@ import pytz
 
       if (company_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the company name.')}");
+        registration_code_error.text("${_('Enter the company name.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('The company name cannot be a number.')}");
+        registration_code_error.text("${_('The company name cannot be a number.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the company contact name.')}");
+        registration_code_error.text("${_('Enter the company contact name.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_contact_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('The company contact name cannot be a number.')}");
+        registration_code_error.text("${_('The company contact name cannot be a number.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the email address for the company contact.')}");
+        registration_code_error.text("${_('Enter the email address for the company contact.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(company_contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter a valid email address.')}");
+        registration_code_error.text("${_('Enter a valid email address.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the recipient name.')}");
+        registration_code_error.text("${_('Enter the recipient name.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(recipient_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('The recipient name cannot be a number.')}");
+        registration_code_error.text("${_('The recipient name cannot be a number.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the recipient email address.')}");
+        registration_code_error.text("${_('Enter the recipient email address.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(recipient_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter a valid email address.')}");
+        registration_code_error.text("${_('Enter a valid email address.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (address_line == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the billing address.')}");
+        registration_code_error.text("${_('Enter the billing address.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the price per course seat.')}");
+        registration_code_error.text("${_('Enter the price per course seat.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.')}");
+        registration_code_error.text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (total_registration_codes == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter the number of enrollment codes.')}");
+        registration_code_error.text("${_('Enter the number of enrollment codes.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(total_registration_codes))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text("${_('Enter a numeric value for the number of enrollment codes.')}");
+        registration_code_error.text("${_('Enter a numeric value for the number of enrollment codes.') | n, js_escaped_string}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
@@ -464,7 +465,7 @@ import pytz
            "coupon_id"  : coupon_id,
            "description": description
          },
-         url: "${section_data['ajax_update_coupon']}",
+         url: "${section_data['ajax_update_coupon'] | n, js_escaped_string}",
          success: function (data) {
              location.reload(true);
            },
@@ -498,19 +499,19 @@ import pytz
        // Check if empty of not
        if (course_price === '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Enter the price per course seat.')}");
+         $('#set_price_form #course_form_error').text("${_('Enter the price per course seat.') | n, js_escaped_string}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
        if (!$.isNumeric(course_price)) {
          $("#set_course_button").removeAttr('disabled');
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.')}");
+         $('#set_price_form #course_form_error').text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.') | n, js_escaped_string}");
          return false;
        }
        if (currency == '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Select a currency.')}");
+         $('#set_price_form #course_form_error').text("${_('Select a currency.') | n, js_escaped_string}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
@@ -520,7 +521,7 @@ import pytz
            "course_price"  : course_price,
            "currency": currency
          },
-         url: "${section_data['set_course_mode_url']}",
+         url: "${section_data['set_course_mode_url'] | n, js_escaped_string}",
          success: function (data) {
              location.reload(true);
            },
@@ -545,19 +546,19 @@ import pytz
        if (code === '') {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Enter a coupon code.')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Enter a coupon code.') | n, js_escaped_string}");
          return false;
        }
        if (parseInt(coupon_discount) > 100) {
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('The discount percentage must be less than or equal to 100.')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('The discount percentage must be less than or equal to 100.') | n, js_escaped_string}");
          $("#add_coupon_button").removeAttr('disabled');
          return false;
        }
        if (!$.isNumeric(coupon_discount)) {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Enter a numeric value for the discount amount. Do not include the percent sign.')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Enter a numeric value for the discount amount. Do not include the percent sign.') | n, js_escaped_string}");
          return false;
        }
        $.ajax({
@@ -569,7 +570,7 @@ import pytz
            "description": description,
            "expiration_date": expiration_date
          },
-         url: "${section_data['ajax_add_coupon']}",
+         url: "${section_data['ajax_add_coupon'] | n, js_escaped_string}",
          success: function (data) {
              location.reload(true);
            },

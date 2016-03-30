@@ -13,39 +13,38 @@ from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_ov
 from request_cache.middleware import RequestCache
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 
-from lms.djangoapps.ccx.tests.test_views import flatten, iter_blocks
+from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 
 
 @attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
-class TestFieldOverrides(ModuleStoreTestCase):
+class TestFieldOverrides(SharedModuleStoreTestCase):
     """
     Make sure field overrides behave in the expected manner.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """
-        Set up tests
+        Course is created here and shared by all the class's tests.
         """
-        super(TestFieldOverrides, self).setUp()
-        self.course = course = CourseFactory.create()
-        self.course.enable_ccx = True
+        super(TestFieldOverrides, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.course.enable_ccx = True
 
         # Create a course outline
-        self.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
-        self.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
-        chapters = [ItemFactory.create(start=start, parent=course)
+        start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
+        due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
+        chapters = [ItemFactory.create(start=start, parent=cls.course)
                     for _ in xrange(2)]
         sequentials = flatten([
             [ItemFactory.create(parent=chapter) for _ in xrange(2)]
@@ -57,8 +56,14 @@ class TestFieldOverrides(ModuleStoreTestCase):
             [ItemFactory.create(parent=vertical) for _ in xrange(2)]
             for vertical in verticals])
 
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(TestFieldOverrides, self).setUp()
+
         self.ccx = ccx = CustomCourseForEdX(
-            course_id=course.id,
+            course_id=self.course.id,
             display_name='Test CCX',
             coach=AdminFactory.create())
         ccx.save()
@@ -70,7 +75,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
 
         self.addCleanup(RequestCache.clear_request_cache)
 
-        inject_field_overrides(iter_blocks(ccx.course), course, AdminFactory.create())
+        inject_field_overrides(iter_blocks(ccx.course), self.course, AdminFactory.create())
 
         def cleanup_provider_classes():
             """

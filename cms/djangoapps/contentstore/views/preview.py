@@ -9,7 +9,8 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, request_token
+from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside,\
+    request_token
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
@@ -19,6 +20,7 @@ from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.asides import AsideUsageKeyV1
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -56,8 +58,18 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(usage_key)
-    instance = _load_preview_module(request, descriptor)
+    if isinstance(usage_key, AsideUsageKeyV1):
+        descriptor = modulestore().get_item(usage_key.usage_key)
+        for aside in descriptor.runtime.get_asides(descriptor):
+            if aside.scope_ids.block_type == usage_key.aside_type:
+                asides = [aside]
+                instance = aside
+                break
+    else:
+        descriptor = modulestore().get_item(usage_key)
+        instance = _load_preview_module(request, descriptor)
+        asides = []
+
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
     try:
@@ -80,6 +92,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         log.exception("error processing ajax call")
         raise
 
+    modulestore().update_item(descriptor, request.user.id, asides=asides)
     return webob_to_django_response(resp)
 
 
@@ -90,6 +103,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
     is_author_mode = True
+
+    def __init__(self, **kwargs):
+        super(PreviewModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
@@ -118,6 +134,20 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         Renders a placeholder XBlock.
         """
         return self.wrap_xblock(block, view_name, Fragment(), context)
+
+    def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
+        position_for_asides = '<!-- footer for xblock_aside -->'
+        result = Fragment()
+        result.add_frag_resources(frag)
+
+        for aside, aside_fn in aside_frag_fns:
+            aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
+            aside.save()
+            result.add_frag_resources(aside_frag)
+            frag.content = frag.content.replace(position_for_asides, position_for_asides + aside_frag.content)
+
+        result.add_content(frag.content)
+        return result
 
 
 class StudioPermissionsService(object):
@@ -170,6 +200,15 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
+    wrappers_asides = [
+        partial(
+            wrap_xblock_aside,
+            'PreviewRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request)
+        )
+    ]
+
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
@@ -194,13 +233,14 @@ def _preview_module_system(request, descriptor, field_data):
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
+        wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
-            "i18n": ModuleI18nService(),
             "field-data": field_data,
+            "i18n": ModuleI18nService,
             "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),

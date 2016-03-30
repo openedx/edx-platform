@@ -359,12 +359,12 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "draggabilly",
             makeDraggable: function (element, options) {
                 var draggable;
                 options = _.defaults({
-                    type: null,
-                    handleClass: null,
-                    droppableClass: null,
-                    parentLocationSelector: null,
-                    refresh: null,
-                    ensureChildrenRendered: null
+                    type: undefined,
+                    handleClass: undefined,
+                    droppableClass: undefined,
+                    parentLocationSelector: undefined,
+                    refresh: undefined,
+                    ensureChildrenRendered: undefined
                 }, options);
 
                 if ($(element).data('droppable-class') !== options.droppableClass) {

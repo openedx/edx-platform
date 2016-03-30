@@ -9,13 +9,13 @@ from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 @attr('shard_1')
-class SplitTestBase(ModuleStoreTestCase):
+class SplitTestBase(SharedModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
     Also provides tests of rendered HTML for two user_tag conditions, 0 and 1.
@@ -27,9 +27,10 @@ class SplitTestBase(ModuleStoreTestCase):
     HIDDEN_CONTENT = None
     VISIBLE_CONTENT = None
 
-    def setUp(self):
-        super(SplitTestBase, self).setUp()
-        self.partition = UserPartition(
+    @classmethod
+    def setUpClass(cls):
+        super(SplitTestBase, cls).setUpClass()
+        cls.partition = UserPartition(
             0,
             'first_partition',
             'First Partition',
@@ -39,21 +40,24 @@ class SplitTestBase(ModuleStoreTestCase):
             ]
         )
 
-        self.course = CourseFactory.create(
-            number=self.COURSE_NUMBER,
-            user_partitions=[self.partition]
+        cls.course = CourseFactory.create(
+            number=cls.COURSE_NUMBER,
+            user_partitions=[cls.partition]
         )
 
-        self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
+        cls.chapter = ItemFactory.create(
+            parent_location=cls.course.location,
             category="chapter",
             display_name="test chapter",
         )
-        self.sequential = ItemFactory.create(
-            parent_location=self.chapter.location,
+        cls.sequential = ItemFactory.create(
+            parent_location=cls.chapter.location,
             category="sequential",
             display_name="Split Test Tests",
         )
+
+    def setUp(self):
+        super(SplitTestBase, self).setUp()
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
@@ -119,7 +123,7 @@ class SplitTestBase(ModuleStoreTestCase):
         content = resp.content
 
         # Assert we see the proper icon in the top display
-        self.assertIn('<a class="{} inactive progress-0 nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
+        self.assertIn('<button class="{} inactive progress-0 nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)
@@ -269,14 +273,14 @@ class TestSplitTestVert(SplitTestBase):
 
 
 @attr('shard_1')
-class SplitTestPosition(ModuleStoreTestCase):
+class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
     """
-    def setUp(self):
-        super(SplitTestPosition, self).setUp()
-
-        self.partition = UserPartition(
+    @classmethod
+    def setUpClass(cls):
+        super(SplitTestPosition, cls).setUpClass()
+        cls.partition = UserPartition(
             0,
             'first_partition',
             'First Partition',
@@ -286,15 +290,18 @@ class SplitTestPosition(ModuleStoreTestCase):
             ]
         )
 
-        self.course = CourseFactory.create(
-            user_partitions=[self.partition]
+        cls.course = CourseFactory.create(
+            user_partitions=[cls.partition]
         )
 
-        self.chapter = ItemFactory.create(
-            parent_location=self.course.location,
+        cls.chapter = ItemFactory.create(
+            parent_location=cls.course.location,
             category="chapter",
             display_name="test chapter",
         )
+
+    def setUp(self):
+        super(SplitTestPosition, self).setUp()
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)

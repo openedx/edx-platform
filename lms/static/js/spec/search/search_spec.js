@@ -490,7 +490,7 @@ define([
                     '<div class="courseware-results"></div>' +
                     '<section id="course-content"></section>' +
                     '<section id="dashboard-search-results"></section>' +
-                    '<section id="my-courses"></section>'
+                    '<section id="my-courses" tabindex="-1"></section>'
                 );
 
                 TemplateHelpers.installTemplates([
@@ -705,7 +705,7 @@ define([
                     loadFixtures('js/fixtures/search/dashboard_search_form.html');
                     appendSetFixtures(
                         '<section id="dashboard-search-results"></section>' +
-                        '<section id="my-courses"></section>'
+                        '<section id="my-courses" tabindex="-1"></section>'
                     );
                     loadTemplates.call(this);
                     DashboardSearchFactory();

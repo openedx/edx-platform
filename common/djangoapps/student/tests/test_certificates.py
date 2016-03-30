@@ -8,8 +8,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
 from django.test.utils import override_settings
+from xmodule.modulestore import ModuleStoreEnum
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
@@ -30,22 +31,27 @@ def _fake_is_request_in_microsite():
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CertificateDisplayTest(ModuleStoreTestCase):
+class CertificateDisplayTest(SharedModuleStoreTestCase):
     """Tests display of certificates on the student dashboard. """
 
     USERNAME = "test_user"
     PASSWORD = "password"
     DOWNLOAD_URL = "http://www.example.com/certificate.pdf"
 
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateDisplayTest, cls).setUpClass()
+        cls.course = CourseFactory()
+        cls.course.certificates_display_behavior = "early_with_info"
+
+        with cls.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, cls.course.id):
+            cls.store.update_item(cls.course, cls.USERNAME)
+
     def setUp(self):
         super(CertificateDisplayTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")
-
-        self.course = CourseFactory()
-        self.course.certificates_display_behavior = "early_with_info"
-        self.update_course(self.course, self.user.username)
 
     @ddt.data('verified', 'professional')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})

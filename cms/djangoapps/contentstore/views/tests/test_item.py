@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
@@ -23,6 +24,7 @@ from contentstore.views.item import (
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
+from xblock_django.models import XBlockDisableConfig
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1328,6 +1330,11 @@ class TestComponentTemplates(CourseTestCase):
         super(TestComponentTemplates, self).setUp()
         self.templates = get_component_templates(self.course)
 
+        # Initialize the deprecated modules settings with empty list
+        XBlockDisableConfig.objects.create(
+            disabled_create_blocks='', enabled=True
+        )
+
     def get_templates_of_type(self, template_type):
         """
         Returns the templates for the specified type, or None if none is found.
@@ -1384,22 +1391,24 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(circuit_template.get('category'), 'problem')
         self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_deprecated_no_advance_component_button(self):
         """
         Test that there will be no `Advanced` button on unit page if units are
         deprecated provided that they are the only modules in `Advanced Module List`
         """
+        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
         self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_cannot_create_deprecated_problems(self):
         """
         Test that we can't create problems if they are deprecated
         """
+        XBlockDisableConfig.objects.create(disabled_create_blocks='poll survey', enabled=True)
         self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
@@ -1408,7 +1417,7 @@ class TestComponentTemplates(CourseTestCase):
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
         self.assertEqual(template_display_names, ['Annotation'])
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ['poll'])
     def test_create_non_deprecated_problems(self):
         """
         Test that we can create problems if they are not deprecated
@@ -1417,9 +1426,9 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
-        self.assertEqual(len(templates[0]['templates']), 3)
+        self.assertEqual(len(templates[0]['templates']), 2)
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
+        self.assertEqual(template_display_names, ['Annotation', 'Survey'])
 
 
 @ddt.ddt
@@ -1839,6 +1848,7 @@ class TestLibraryXBlockCreation(ItemTest):
         self.assertFalse(lib.children)
 
 
+@ddt.ddt
 class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
@@ -2161,3 +2171,31 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_self_paced_item_visibility_state(self, store_type):
+        """
+        Test that in self-paced course, item has `live` visibility state.
+        Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
+        now in self-paced course, item should have `live` visibility state.
+        """
+        SelfPacedConfiguration(enabled=True).save()
+
+        # Create course, chapter and setup future release date to make chapter in scheduled state
+        course = CourseFactory.create(default_store=store_type)
+        chapter = self._create_child(course, 'chapter', "Test Chapter")
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+
+        # Check that chapter has scheduled state
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self.assertFalse(course.self_paced)
+
+        # Change course pacing to self paced
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        self.assertTrue(course.self_paced)
+
+        # Check that in self paced course content has live state now
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)

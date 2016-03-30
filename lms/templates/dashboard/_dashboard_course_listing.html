@@ -50,7 +50,7 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
- % if course_program_info and course_program_info['category']=='xseries':
+ % if course_program_info and course_program_info.get('category')=='xseries':
   <div class="label-xseries-association">
     <i class="xseries-icon"></i>
     <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
@@ -178,11 +178,14 @@ from student.helpers import (
               % endif
             % endif
             <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
-              <a href="#actions-dropdown-${dashboard_index}" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default_escaped | h}" data-dashboard-index="${dashboard_index}">
-                <span class="sr">${_('Course options dropdown')}</span>
+              <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default_escaped | h}" data-dashboard-index="${dashboard_index}">
+                <span class="sr">${_('Course options for')}</span>
+                <span class="sr">&nbsp;
+                  ${course_overview.display_name_with_default_escaped}
+                </span>
                 <i class="fa fa-cog" aria-hidden="true"></i>
-              </a>
-              <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" aria-label="${_('Additional Actions Menu')}">
+              </button>
+              <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                 <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                   % if can_unenroll:
                     <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
@@ -330,7 +333,11 @@ from student.helpers import (
                     ${_("It's official. It's easily shareable. It's a proven motivator to complete the course. <br>{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}" class="verified-info" data-course-key="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT'), enrollment.course_id), link_end="</a>", cert_name_long=cert_name_long)}
                 </p>
                 <div class="action-upgrade-container">
-                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
+                  % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
+                    <a class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
+                  % else:
+                    <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_overview.id)})}" data-course-id="${course_overview.id | h}" data-user="${user.username | h}">
+                  % endif
                       <i class="action-upgrade-icon"></i>
                     <span class="wrapper-copy">
                       <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified")}</span>
@@ -341,8 +348,10 @@ from student.helpers import (
           </div>
         %endif
 
-        % if course_program_info and course_program_info['category']=='xseries':
-            <%include file = "_dashboard_xseries_info.html" args="course_program_info=course_program_info, enrollment_mode=enrollment.mode" />
+        % if course_program_info and course_program_info.get('category')=='xseries':
+          %for program_data in course_program_info.get('course_program_list', []):
+            <%include file = "_dashboard_xseries_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, display_category=course_program_info['display_category']" />
+          %endfor
         % endif
 
         % if is_course_blocked:

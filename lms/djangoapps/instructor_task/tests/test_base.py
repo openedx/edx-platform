@@ -151,6 +151,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
+            self.logout()
             user_email = User.objects.get(username=username).email
             self.login(user_email, "test")
             self.current_user = username
@@ -175,7 +176,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def get_task_status(task_id):
         """Use api method to fetch task status, using mock request."""
         mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
+        mock_request.GET = mock_request.POST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         return status

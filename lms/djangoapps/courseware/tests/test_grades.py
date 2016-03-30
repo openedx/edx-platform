@@ -10,11 +10,25 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from courseware.grades import field_data_cache_for_grading, grade, iterate_grades_for, MaxScoresCache, ProgressSummary
+from courseware.grades import (
+    field_data_cache_for_grading,
+    grade,
+    iterate_grades_for,
+    MaxScoresCache,
+    ProgressSummary,
+    get_module_score
+)
+from courseware.module_render import get_module
+from courseware.model_data import FieldDataCache, set_score
+from courseware.tests.helpers import (
+    LoginEnrollmentTestCase,
+    get_request_for_user
+)
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 def _grade_with_errors(student, request, course, keep_raw_scores=False):
@@ -32,12 +46,20 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
 
 
 @attr('shard_1')
-class TestGradeIteration(ModuleStoreTestCase):
+class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student gradesets.
     """
     COURSE_NUM = "1000"
     COURSE_NAME = "grading_test_course"
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGradeIteration, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            display_name=cls.COURSE_NAME,
+            number=cls.COURSE_NUM
+        )
 
     def setUp(self):
         """
@@ -45,10 +67,6 @@ class TestGradeIteration(ModuleStoreTestCase):
         """
         super(TestGradeIteration, self).setUp()
 
-        self.course = CourseFactory.create(
-            display_name=self.COURSE_NAME,
-            number=self.COURSE_NUM
-        )
         self.students = [
             UserFactory.create(username='student1'),
             UserFactory.create(username='student2'),
@@ -128,19 +146,24 @@ class TestGradeIteration(ModuleStoreTestCase):
         return students_to_gradesets, students_to_errors
 
 
-class TestMaxScoresCache(ModuleStoreTestCase):
+class TestMaxScoresCache(SharedModuleStoreTestCase):
     """
     Tests for the MaxScoresCache
     """
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestMaxScoresCache, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.problems = []
+        for _ in xrange(3):
+            cls.problems.append(
+                ItemFactory.create(category='problem', parent=cls.course)
+            )
+
     def setUp(self):
         super(TestMaxScoresCache, self).setUp()
         self.student = UserFactory.create()
-        self.course = CourseFactory.create()
-        self.problems = []
-        for _ in xrange(3):
-            self.problems.append(
-                ItemFactory.create(category='problem', parent=self.course)
-            )
 
         CourseEnrollment.enroll(self.student, self.course.id)
         self.request = RequestFactory().get('/')
@@ -169,22 +192,26 @@ class TestMaxScoresCache(ModuleStoreTestCase):
         self.assertEqual(max_scores_cache.num_cached_from_remote(), 1)
 
 
-class TestFieldDataCacheScorableLocations(ModuleStoreTestCase):
+class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
     """
     Make sure we can filter the locations we pull back student state for via
     the FieldDataCache.
     """
-    def setUp(self):
-        super(TestFieldDataCacheScorableLocations, self).setUp()
-        self.student = UserFactory.create()
-        self.course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent=self.course)
+    @classmethod
+    def setUpClass(cls):
+        super(TestFieldDataCacheScorableLocations, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent=cls.course)
         sequential = ItemFactory.create(category='sequential', parent=chapter)
         vertical = ItemFactory.create(category='vertical', parent=sequential)
         ItemFactory.create(category='video', parent=vertical)
         ItemFactory.create(category='html', parent=vertical)
         ItemFactory.create(category='discussion', parent=vertical)
         ItemFactory.create(category='problem', parent=vertical)
+
+    def setUp(self):
+        super(TestFieldDataCacheScorableLocations, self).setUp()
+        self.student = UserFactory.create()
 
         CourseEnrollment.enroll(self.student, self.course.id)
 
@@ -213,6 +240,9 @@ class TestProgressSummary(TestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
+    # Tell Django to clean out all databases, not just default
+    multi_db = True
+
     def setUp(self):
         super(TestProgressSummary, self).setUp()
         self.course_key = CourseLocator(
@@ -318,3 +348,167 @@ class TestProgressSummary(TestCase):
         earned, possible = self.progress_summary.score_for_module(self.loc_m)
         self.assertEqual(earned, 0)
         self.assertEqual(possible, 0)
+
+
+class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
+    """
+    Test get_module_score
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetModuleScore, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.chapter = ItemFactory.create(
+            parent=cls.course,
+            category="chapter",
+            display_name="Test Chapter"
+        )
+        cls.seq1 = ItemFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name="Test Sequential",
+            graded=True
+        )
+        cls.seq2 = ItemFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name="Test Sequential",
+            graded=True
+        )
+        cls.vert1 = ItemFactory.create(
+            parent=cls.seq1,
+            category='vertical',
+            display_name='Test Vertical 1'
+        )
+        cls.vert2 = ItemFactory.create(
+            parent=cls.seq2,
+            category='vertical',
+            display_name='Test Vertical 2'
+        )
+        cls.randomize = ItemFactory.create(
+            parent=cls.vert2,
+            category='randomize',
+            display_name='Test Randomize'
+        )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
+        cls.problem1 = ItemFactory.create(
+            parent=cls.vert1,
+            category="problem",
+            display_name="Test Problem 1",
+            data=problem_xml
+        )
+        cls.problem2 = ItemFactory.create(
+            parent=cls.vert1,
+            category="problem",
+            display_name="Test Problem 2",
+            data=problem_xml
+        )
+        cls.problem3 = ItemFactory.create(
+            parent=cls.randomize,
+            category="problem",
+            display_name="Test Problem 3",
+            data=problem_xml
+        )
+        cls.problem4 = ItemFactory.create(
+            parent=cls.randomize,
+            category="problem",
+            display_name="Test Problem 4",
+            data=problem_xml
+        )
+
+    def setUp(self):
+        """
+        Set up test course
+        """
+        super(TestGetModuleScore, self).setUp()
+
+        self.request = get_request_for_user(UserFactory())
+        self.client.login(username=self.request.user.username, password="test")
+        CourseEnrollment.enroll(self.request.user, self.course.id)
+
+    def test_get_module_score(self):
+        """
+        Test test_get_module_score
+        """
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 0)
+
+        answer_problem(self.course, self.request, self.problem1)
+        answer_problem(self.course, self.request, self.problem2)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 1.0)
+
+        answer_problem(self.course, self.request, self.problem1)
+        answer_problem(self.course, self.request, self.problem2, 0)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, .5)
+
+    def test_get_module_score_with_empty_score(self):
+        """
+        Test test_get_module_score_with_empty_score
+        """
+        set_score(self.request.user.id, self.problem1.location, None, None)  # pylint: disable=no-member
+        set_score(self.request.user.id, self.problem2.location, None, None)  # pylint: disable=no-member
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 0)
+
+        answer_problem(self.course, self.request, self.problem1)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 0.5)
+
+        answer_problem(self.course, self.request, self.problem2)
+
+        with self.assertNumQueries(1):
+            score = get_module_score(self.request.user, self.course, self.seq1)
+        self.assertEqual(score, 1.0)
+
+    def test_get_module_score_with_randomize(self):
+        """
+        Test test_get_module_score_with_randomize
+        """
+        answer_problem(self.course, self.request, self.problem3)
+        answer_problem(self.course, self.request, self.problem4)
+
+        score = get_module_score(self.request.user, self.course, self.seq2)
+        self.assertEqual(score, 1.0)
+
+
+def answer_problem(course, request, problem, score=1):
+    """
+    Records a correct answer for the given problem.
+
+    Arguments:
+        course (Course): Course object, the course the required problem is in
+        request (Request): request Object
+        problem (xblock): xblock object, the problem to be answered
+    """
+
+    user = request.user
+    grade_dict = {'value': score, 'max_value': 1, 'user_id': user.id}
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id,
+        user,
+        course,
+        depth=2
+    )
+    # pylint: disable=protected-access
+    module = get_module(
+        user,
+        request,
+        problem.scope_ids.usage_id,
+        field_data_cache,
+    )._xmodule
+    module.system.publish(problem, 'grade', grade_dict)

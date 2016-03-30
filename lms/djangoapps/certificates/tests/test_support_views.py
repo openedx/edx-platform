@@ -71,7 +71,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
         )
 
         # Create certificates for the student
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.student,
             course_id=self.CERT_COURSE_KEY,
             grade=self.CERT_GRADE,
@@ -158,6 +158,21 @@ class CertificateSearchTests(CertificateSupportTestCase):
             self.assertEqual(len(results), 1)
         else:
             self.assertEqual(response.status_code, 400)
+
+    def test_search_with_plus_sign(self):
+        """
+        Test that email address that contains '+' accepted by student support
+        """
+        self.student.email = "student+student@example.com"
+        self.student.save()  # pylint: disable=no-member
+
+        response = self._search(self.student.email)
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+
+        self.assertEqual(len(results), 1)
+        retrieved_data = results[0]
+        self.assertEqual(retrieved_data["username"], self.STUDENT_USERNAME)
 
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
@@ -259,7 +274,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
         # we'd expect that the certificate status will be "notpassing"
-        cert = GeneratedCertificate.objects.get(user=self.student)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
     def test_regenerate_certificate_missing_params(self):
@@ -298,7 +313,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
-        GeneratedCertificate.objects.all().delete()
+        GeneratedCertificate.eligible_certificates.all().delete()
 
         # Should be able to regenerate
         response = self._regenerate(
@@ -308,7 +323,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.assertEqual(response.status_code, 200)
 
         # A new certificate is created
-        num_certs = GeneratedCertificate.objects.filter(user=self.student).count()
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         self.assertEqual(num_certs, 1)
 
     def _regenerate(self, course_key=None, username=None):
@@ -412,7 +427,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_user_has_no_certificate(self):
         # Delete the user's certificate
-        GeneratedCertificate.objects.all().delete()
+        GeneratedCertificate.eligible_certificates.all().delete()
 
         # Should be able to generate
         response = self._generate(
@@ -422,7 +437,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
         self.assertEqual(response.status_code, 200)
 
         # A new certificate is created
-        num_certs = GeneratedCertificate.objects.filter(user=self.student).count()
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         self.assertEqual(num_certs, 1)
 
     def _generate(self, course_key=None, username=None):

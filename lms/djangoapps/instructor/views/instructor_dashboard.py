@@ -567,6 +567,7 @@ def _section_data_download(course, access):
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
         'course_has_survey': True if course.course_survey_name else False,
         'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
+        'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -631,21 +632,12 @@ def _get_dashboard_link(course_key):
 
 def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
-    course_key = course.id
-    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-    link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
-    insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
-
-    insights_message = insights_message.format(
-        analytics_dashboard_name=u'{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
-    )
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'insights_message': insights_message,
+        'course_id': unicode(course.id),
     }
-
     return section_data
 
 

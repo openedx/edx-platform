@@ -223,6 +223,7 @@ class XmlParserMixin(object):
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
             filepath = ''
+            aside_children = []
         else:
             dog_stats_api.increment(
                 DEPRECATION_VSCOMPAT_EVENT,
@@ -250,7 +251,7 @@ class XmlParserMixin(object):
 
             definition_xml = cls.load_file(filepath, system.resources_fs, def_id)
             usage_id = id_generator.create_usage(def_id)
-            system.parse_asides(definition_xml, def_id, usage_id, id_generator)
+            aside_children = system.parse_asides(definition_xml, def_id, usage_id, id_generator)
 
             # Add the attributes from the pointer node
             definition_xml.attrib.update(xml_object.attrib)
@@ -261,6 +262,9 @@ class XmlParserMixin(object):
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
         definition['filename'] = [filepath, filename]
+
+        if aside_children:
+            definition['aside_children'] = aside_children
 
         return definition, children
 
@@ -333,6 +337,7 @@ class XmlParserMixin(object):
         url_name = node.get('url_name', node.get('slug'))
         def_id = id_generator.create_definition(node.tag, url_name)
         usage_id = id_generator.create_usage(def_id)
+        aside_children = []
 
         # VS[compat] -- detect new-style each-in-a-file mode
         if is_pointer_tag(node):
@@ -340,7 +345,7 @@ class XmlParserMixin(object):
             # read the actual definition file--named using url_name.replace(':','/')
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, runtime.resources_fs, def_id)
-            runtime.parse_asides(definition_xml, def_id, usage_id, id_generator)
+            aside_children = runtime.parse_asides(definition_xml, def_id, usage_id, id_generator)
         else:
             filepath = None
             definition_xml = node
@@ -370,6 +375,10 @@ class XmlParserMixin(object):
                 log.debug('Error in loading metadata %r', dmdata, exc_info=True)
                 metadata['definition_metadata_err'] = str(err)
 
+        definition_aside_children = definition.pop('aside_children', None)
+        if definition_aside_children:
+            aside_children.extend(definition_aside_children)
+
         # Set/override any metadata specified by policy
         cls.apply_policy(metadata, runtime.get_policy(usage_id))
 
@@ -382,12 +391,21 @@ class XmlParserMixin(object):
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
 
-        return runtime.construct_xblock_from_class(
+        xblock = runtime.construct_xblock_from_class(
             cls,
             # We're loading a descriptor, so student_id is meaningless
             ScopeIds(None, node.tag, def_id, usage_id),
             field_data,
         )
+
+        if aside_children:
+            asides_tags = [x.tag for x in aside_children]
+            asides = runtime.get_asides(xblock)
+            for asd in asides:
+                if asd.scope_ids.block_type in asides_tags:
+                    xblock.add_aside(asd)
+
+        return xblock
 
     @classmethod
     def _format_filepath(cls, category, name):

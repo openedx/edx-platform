@@ -28,14 +28,14 @@ prepend_path: cms/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - xmodule_js/common_static/js/vendor/require.js
+    - xmodule_js/common_static/js/vendor/requirejs/require.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/utility.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
     - xmodule_js/common_static/js/vendor/jquery.simulate.js
-    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/common/js/vendor/underscore.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
@@ -78,6 +78,8 @@ src_paths:
     - js/certificates
     - js/factories
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
 
 # Paths to spec (test) JavaScript files
 # We should define the custom path mapping in /coffee/spec/main.coffee as well e.g. certificates etc.

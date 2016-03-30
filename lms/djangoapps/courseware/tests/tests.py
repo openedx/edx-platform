@@ -39,6 +39,14 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         """
         self.logout()
 
+    def test_request_attr_on_logout(self):
+        """
+        Test request object after logging out to see whether it
+        has 'is_from_log_out' attribute set to true.
+        """
+        response = self.client.get(reverse('logout'))
+        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))  # pylint: disable=no-member
+
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):
     """

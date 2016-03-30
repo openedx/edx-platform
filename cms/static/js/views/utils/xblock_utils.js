@@ -31,7 +31,8 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
             ready: 'ready',
             unscheduled: 'unscheduled',
             needsAttention: 'needs_attention',
-            staffOnly: 'staff_only'
+            staffOnly: 'staff_only',
+            gated: 'gated'
         };
 
         /**
@@ -73,15 +74,7 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
         deleteXBlock = function(xblockInfo, xblockType) {
             var deletion = $.Deferred(),
                 url = ModuleUtils.getUpdateUrl(xblockInfo.id),
-                xblockType = xblockType || gettext('component');
-            ViewUtils.confirmThenRunOperation(
-                interpolate(gettext('Delete this %(xblock_type)s?'), { xblock_type: xblockType }, true),
-                interpolate(
-                    gettext('Deleting this %(xblock_type)s is permanent and cannot be undone.'),
-                    { xblock_type: xblockType }, true
-                ),
-                interpolate(gettext('Yes, delete this %(xblock_type)s'), { xblock_type: xblockType }, true),
-                function() {
+                operation = function() {
                     ViewUtils.runOperationShowingMessage(gettext('Deleting'),
                         function() {
                             return $.ajax({
@@ -90,8 +83,47 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
                             }).success(function() {
                                 deletion.resolve();
                             });
-                        });
-                });
+                        }
+                    );
+                },
+                messageBody = interpolate(
+                    gettext('Deleting this %(xblock_type)s is permanent and cannot be undone.'),
+                    { xblock_type: xblockType },
+                    true
+                );
+            xblockType = xblockType || 'component';
+            if (xblockInfo.get('is_prereq')) {
+                messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.'); // jshint ignore:line
+                ViewUtils.confirmThenRunOperation(
+                    interpolate(
+                        gettext('Delete this %(xblock_type)s (and prerequisite)?'),
+                        { xblock_type: xblockType },
+                        true
+                    ),
+                    messageBody,
+                    interpolate(
+                        gettext('Yes, delete this %(xblock_type)s'),
+                        { xblock_type: xblockType },
+                        true
+                    ),
+                    operation
+                );
+            } else {
+                ViewUtils.confirmThenRunOperation(
+                    interpolate(
+                        gettext('Delete this %(xblock_type)s?'),
+                        { xblock_type: xblockType },
+                        true
+                    ),
+                    messageBody,
+                    interpolate(
+                        gettext('Yes, delete this %(xblock_type)s'),
+                        { xblock_type: xblockType },
+                        true
+                    ),
+                    operation
+                );
+            }
             return deletion.promise();
         };
 
@@ -140,6 +172,9 @@ define(["jquery", "underscore", "gettext", "common/js/components/utils/view_util
         getXBlockVisibilityClass = function(visibilityState) {
             if (visibilityState === VisibilityState.staffOnly) {
                 return 'is-staff-only';
+            }
+            if (visibilityState === VisibilityState.gated) {
+                return 'is-gated';
             }
             if (visibilityState === VisibilityState.live) {
                 return 'is-live';

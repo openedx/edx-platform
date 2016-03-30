@@ -3,7 +3,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
-from microsite_configuration import page_title_breadcrumbs
 from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 %>
@@ -15,11 +14,12 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 </%def>
 
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+
 <%block name="title"><title>
     % if section_title:
-${page_title_breadcrumbs(section_title, course_name())}
+${static.get_page_title_breadcrumbs(section_title, course_name())}
     % else:
-${page_title_breadcrumbs(course_name())}
+${static.get_page_title_breadcrumbs(course_name())}
     %endif
 </title></%block>
 
@@ -57,7 +57,7 @@ ${page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
-<%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
+<%block name="nav_skip">${"#content" if section_title else "#content"}</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
   ${fragment.head_html()}

@@ -9,6 +9,7 @@ from urllib import urlencode
 import ddt
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.core.exceptions import ValidationError
@@ -39,6 +40,7 @@ from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
+    make_paginated_api_response
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -81,6 +83,7 @@ def _discussion_disabled_course_for(user):
     return course_with_disabled_forums
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
@@ -154,6 +157,7 @@ class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.assertEqual(result["blackouts"], [])
 
 
+@attr('shard_2')
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
@@ -480,6 +484,7 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(staff_actual, staff_expected)
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
@@ -538,11 +543,15 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     def test_empty(self):
         self.assertEqual(
-            self.get_thread_list([]),
+            self.get_thread_list([], num_pages=0).data,
             {
+                "pagination": {
+                    "next": None,
+                    "previous": None,
+                    "num_pages": 0,
+                    "count": 0
+                },
                 "results": [],
-                "next": None,
-                "previous": None,
                 "text_search_rewrite": None,
             }
         )
@@ -688,14 +697,14 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "read": False,
             },
         ]
+
+        expected_result = make_paginated_api_response(
+            results=expected_threads, count=2, num_pages=1, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
-            self.get_thread_list(source_threads),
-            {
-                "results": expected_threads,
-                "next": None,
-                "previous": None,
-                "text_search_rewrite": None,
-            }
+            self.get_thread_list(source_threads).data,
+            expected_result
         )
 
     @ddt.data(
@@ -723,32 +732,35 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     def test_pagination(self):
         # N.B. Empty thread list is not realistic but convenient for this test
-        self.assertEqual(
-            self.get_thread_list([], page=1, num_pages=3),
-            {
-                "results": [],
-                "next": "http://testserver/test_path?page=2",
-                "previous": None,
-                "text_search_rewrite": None,
-            }
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=3, next_link="http://testserver/test_path?page=2", previous_link=None
         )
+        expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
-            self.get_thread_list([], page=2, num_pages=3),
-            {
-                "results": [],
-                "next": "http://testserver/test_path?page=3",
-                "previous": "http://testserver/test_path?page=1",
-                "text_search_rewrite": None,
-            }
+            self.get_thread_list([], page=1, num_pages=3).data,
+            expected_result
         )
+
+        expected_result = make_paginated_api_response(
+            results=[],
+            count=0,
+            num_pages=3,
+            next_link="http://testserver/test_path?page=3",
+            previous_link="http://testserver/test_path?page=1"
+        )
+        expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
-            self.get_thread_list([], page=3, num_pages=3),
-            {
-                "results": [],
-                "next": None,
-                "previous": "http://testserver/test_path?page=2",
-                "text_search_rewrite": None,
-            }
+            self.get_thread_list([], page=2, num_pages=3).data,
+            expected_result
+        )
+
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=3, next_link=None, previous_link="http://testserver/test_path?page=2"
+        )
+        expected_result.update({"text_search_rewrite": None})
+        self.assertEqual(
+            self.get_thread_list([], page=3, num_pages=3).data,
+            expected_result
         )
 
         # Test page past the last one
@@ -758,7 +770,11 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     @ddt.data(None, "rewritten search string")
     def test_text_search(self, text_search_rewrite):
-        self.register_get_threads_search_response([], text_search_rewrite)
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": text_search_rewrite})
+        self.register_get_threads_search_response([], text_search_rewrite, num_pages=0)
         self.assertEqual(
             get_thread_list(
                 self.request,
@@ -766,13 +782,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 page=1,
                 page_size=10,
                 text_search="test search string"
-            ),
-            {
-                "results": [],
-                "next": None,
-                "previous": None,
-                "text_search_rewrite": text_search_rewrite,
-            }
+            ).data,
+            expected_result
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
@@ -786,17 +797,22 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         })
 
     def test_following(self):
-        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
+        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
         result = get_thread_list(
             self.request,
             self.course.id,
             page=1,
             page_size=11,
             following=True,
+        ).data
+
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
+        expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
             result,
-            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+            expected_result
         )
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
@@ -813,17 +829,22 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     @ddt.data("unanswered", "unread")
     def test_view_query(self, query):
-        self.register_get_threads_response([], page=1, num_pages=1)
+        self.register_get_threads_response([], page=1, num_pages=0)
         result = get_thread_list(
             self.request,
             self.course.id,
             page=1,
             page_size=11,
             view=query,
+        ).data
+
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
+        expected_result.update({"text_search_rewrite": None})
         self.assertEqual(
             result,
-            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
+            expected_result
         )
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
@@ -854,18 +875,20 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             http_query (str): Query string sent in the http request
             cc_query (str): Query string used for the comments client service
         """
-        self.register_get_threads_response([], page=1, num_pages=1)
+        self.register_get_threads_response([], page=1, num_pages=0)
         result = get_thread_list(
             self.request,
             self.course.id,
             page=1,
             page_size=11,
             order_by=http_query,
+        ).data
+
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
-        self.assertEqual(
-            result,
-            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
-        )
+        expected_result.update({"text_search_rewrite": None})
+        self.assertEqual(result, expected_result)
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/threads"
@@ -882,18 +905,20 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
     @ddt.data("asc", "desc")
     def test_order_direction_query(self, http_query):
-        self.register_get_threads_response([], page=1, num_pages=1)
+        self.register_get_threads_response([], page=1, num_pages=0)
         result = get_thread_list(
             self.request,
             self.course.id,
             page=1,
             page_size=11,
             order_direction=http_query,
+        ).data
+
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
-        self.assertEqual(
-            result,
-            {"results": [], "next": None, "previous": None, "text_search_rewrite": None}
-        )
+        expected_result.update({"text_search_rewrite": None})
+        self.assertEqual(result, expected_result)
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/threads"
@@ -909,6 +934,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         })
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
@@ -1055,8 +1081,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             {"thread_type": "discussion", "children": [], "resp_total": 0}
         )
         self.assertEqual(
-            self.get_comment_list(discussion_thread),
-            {"results": [], "next": None, "previous": None}
+            self.get_comment_list(discussion_thread).data,
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
 
         question_thread = self.make_minimal_cs_thread({
@@ -1066,12 +1092,12 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             "non_endorsed_resp_total": 0
         })
         self.assertEqual(
-            self.get_comment_list(question_thread, endorsed=False),
-            {"results": [], "next": None, "previous": None}
+            self.get_comment_list(question_thread, endorsed=False).data,
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
         self.assertEqual(
-            self.get_comment_list(question_thread, endorsed=True),
-            {"results": [], "next": None, "previous": None}
+            self.get_comment_list(question_thread, endorsed=True).data,
+            make_paginated_api_response(results=[], count=0, num_pages=1, next_link=None, previous_link=None)
         )
 
     def test_basic_query_params(self):
@@ -1173,7 +1199,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         ]
         actual_comments = self.get_comment_list(
             self.make_minimal_cs_thread({"children": source_comments})
-        )["results"]
+        ).data["results"]
         self.assertEqual(actual_comments, expected_comments)
 
     def test_question_content(self):
@@ -1184,10 +1210,10 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             "non_endorsed_resp_total": 1,
         })
 
-        endorsed_actual = self.get_comment_list(thread, endorsed=True)
+        endorsed_actual = self.get_comment_list(thread, endorsed=True).data
         self.assertEqual(endorsed_actual["results"][0]["id"], "endorsed_comment")
 
-        non_endorsed_actual = self.get_comment_list(thread, endorsed=False)
+        non_endorsed_actual = self.get_comment_list(thread, endorsed=False).data
         self.assertEqual(non_endorsed_actual["results"][0]["id"], "non_endorsed_comment")
 
     def test_endorsed_by_anonymity(self):
@@ -1203,7 +1229,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 })
             ]
         })
-        actual_comments = self.get_comment_list(thread)["results"]
+        actual_comments = self.get_comment_list(thread).data["results"]
         self.assertIsNone(actual_comments[0]["endorsed_by"])
 
     @ddt.data(
@@ -1231,24 +1257,24 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         })
 
         # Only page
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5)
-        self.assertIsNone(actual["next"])
-        self.assertIsNone(actual["previous"])
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5).data
+        self.assertIsNone(actual["pagination"]["next"])
+        self.assertIsNone(actual["pagination"]["previous"])
 
         # First page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2)
-        self.assertEqual(actual["next"], "http://testserver/test_path?page=2")
-        self.assertIsNone(actual["previous"])
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2).data
+        self.assertEqual(actual["pagination"]["next"], "http://testserver/test_path?page=2")
+        self.assertIsNone(actual["pagination"]["previous"])
 
         # Middle page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2)
-        self.assertEqual(actual["next"], "http://testserver/test_path?page=3")
-        self.assertEqual(actual["previous"], "http://testserver/test_path?page=1")
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2).data
+        self.assertEqual(actual["pagination"]["next"], "http://testserver/test_path?page=3")
+        self.assertEqual(actual["pagination"]["previous"], "http://testserver/test_path?page=1")
 
         # Last page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2)
-        self.assertIsNone(actual["next"])
-        self.assertEqual(actual["previous"], "http://testserver/test_path?page=2")
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2).data
+        self.assertIsNone(actual["pagination"]["next"])
+        self.assertEqual(actual["pagination"]["previous"], "http://testserver/test_path?page=2")
 
         # Page past the end
         thread = self.make_minimal_cs_thread({
@@ -1272,18 +1298,18 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             Check that requesting the given page/page_size returns the expected
             output
             """
-            actual = self.get_comment_list(thread, endorsed=True, page=page, page_size=page_size)
+            actual = self.get_comment_list(thread, endorsed=True, page=page, page_size=page_size).data
             result_ids = [result["id"] for result in actual["results"]]
             self.assertEqual(
                 result_ids,
                 ["comment_{}".format(i) for i in range(expected_start, expected_stop)]
             )
             self.assertEqual(
-                actual["next"],
+                actual["pagination"]["next"],
                 "http://testserver/test_path?page={}".format(expected_next) if expected_next else None
             )
             self.assertEqual(
-                actual["previous"],
+                actual["pagination"]["previous"],
                 "http://testserver/test_path?page={}".format(expected_prev) if expected_prev else None
             )
 
@@ -1332,6 +1358,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_created')
 @disable_signal(api, 'thread_voted')
@@ -1583,6 +1610,7 @@ class CreateThreadTest(
             create_thread(self.request, data)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
@@ -1849,6 +1877,7 @@ class CreateCommentTest(
             create_comment(self.request, data)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_edited')
 @disable_signal(api, 'thread_voted')
@@ -2086,7 +2115,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, current_vote_status, new_vote_status):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
         """
         Test attempts to edit the "voted" field.
 
@@ -2122,6 +2152,22 @@ class UpdateThreadTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, "edx.forum.thread.voted")
+            self.assertEqual(
+                event_data,
+                {
+                    'undo_vote': not new_vote_status,
+                    'url': '',
+                    'target_username': self.user.username,
+                    'vote_value': 'up',
+                    'user_forums_roles': [FORUM_ROLE_STUDENT],
+                    'user_course_roles': [],
+                    'commentable_id': 'original_topic',
+                    'id': 'test_thread'
+                }
+            )
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -2240,6 +2286,7 @@ class UpdateThreadTest(
         )
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @disable_signal(api, 'comment_voted')
@@ -2478,7 +2525,8 @@ class UpdateCommentTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_voted(self, current_vote_status, new_vote_status):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
         """
         Test attempts to edit the "voted" field.
 
@@ -2517,6 +2565,23 @@ class UpdateCommentTest(
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             self.assertEqual(actual_request_data, expected_request_data)
+
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, "edx.forum.response.voted")
+
+            self.assertEqual(
+                event_data,
+                {
+                    'undo_vote': not new_vote_status,
+                    'url': '',
+                    'target_username': self.user.username,
+                    'vote_value': 'up',
+                    'user_forums_roles': [FORUM_ROLE_STUDENT],
+                    'user_course_roles': [],
+                    'commentable_id': 'dummy',
+                    'id': 'test_comment'
+                }
+            )
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -2625,6 +2690,7 @@ class UpdateCommentTest(
             )
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2764,6 +2830,7 @@ class DeleteThreadTest(
             self.assertTrue(expected_error)
 
 
+@attr('shard_2')
 @ddt.ddt
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2922,6 +2989,7 @@ class DeleteCommentTest(
             self.assertTrue(expected_error)
 
 
+@attr('shard_2')
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetrieveThreadTest(

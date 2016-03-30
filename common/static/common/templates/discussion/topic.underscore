@@ -1,11 +1,11 @@
 <% // Using div here instead of label because we are using a non-native control %>
 <div class="field-label">
     <span class="field-label-text"><%- gettext("Topic Area:") %></span><div class="field-input post-topic">
-        <a href="#" class="post-topic-button">
-            <span class="sr"><%- gettext("Discussion topics; current selection is: ") %></span>
+        <button type="button" class="post-topic-button">
+            <span class="sr"><%- gettext("Discussion topics; currently listing: ") %></span>
             <span class="js-selected-topic"></span>
             <span class="drop-arrow" aria-hidden="true">▾</span>
-        </a>
+        </button>
         <div class="topic-menu-wrapper">
             <label class="topic-filter-label">
                 <span class="sr"><%- gettext("Filter topics") %></span>

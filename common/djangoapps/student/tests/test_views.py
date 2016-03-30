@@ -12,13 +12,13 @@ from django.conf import settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
+class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
     """
     Test to ensure that the student dashboard does not show the unenroll button for users with certificates.
     """
@@ -27,10 +27,14 @@ class TestStudentDashboardUnenrollments(ModuleStoreTestCase):
     PASSWORD = "edx"
     UNENROLL_ELEMENT_ID = "#actions-item-unenroll-0"
 
+    @classmethod
+    def setUpClass(cls):
+        super(TestStudentDashboardUnenrollments, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(TestStudentDashboardUnenrollments, self).setUp()
-        self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         self.cert_status = None

@@ -379,11 +379,13 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.enroll(self.course))
         self.assertTrue(self.enroll(self.test_course))
 
+        # Then, try as an instructor
         self.logout()
         self.login(self.instructor_user)
         self.assertTrue(self.enroll(self.course))
 
-        # unenroll and try again
+        # Then, try as global staff
+        self.logout()
         self.login(self.global_staff_user)
         self.assertTrue(self.enroll(self.course))
 

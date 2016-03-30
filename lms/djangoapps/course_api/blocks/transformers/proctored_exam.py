@@ -6,7 +6,7 @@ from django.conf import settings
 
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.models import ProctoredExamStudentAttemptStatus
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 
 
 class ProctoredExamTransformer(BlockStructureTransformer):

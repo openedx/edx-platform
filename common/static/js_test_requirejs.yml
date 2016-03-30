@@ -50,6 +50,8 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

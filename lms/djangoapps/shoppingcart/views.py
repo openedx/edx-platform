@@ -217,7 +217,7 @@ def remove_item(request):
     """
     This will remove an item from the user cart and also delete the corresponding coupon codes redemption.
     """
-    item_id = request.REQUEST.get('id', '-1')
+    item_id = request.GET.get('id') or request.POST.get('id') or '-1'
 
     items = OrderItem.objects.filter(id=item_id, status='cart').select_subclasses()
 

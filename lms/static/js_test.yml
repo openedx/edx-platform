@@ -33,11 +33,12 @@ lib_paths:
     - xmodule_js/common_static/js/src/logger.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
-    - xmodule_js/common_static/js/vendor/require.js
+    - xmodule_js/common_static/js/vendor/requirejs/require.js
     - js/RequireJS-namespace-undefine.js
     - xmodule_js/common_static/js/vendor/requirejs/text.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
+    - xmodule_js/common_static/js/vendor/jquery.simulate.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
     - xmodule_js/common_static/js/vendor/jquery.timeago.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
@@ -55,7 +56,7 @@ lib_paths:
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/src/
-    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/common/js/vendor/underscore.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
@@ -74,9 +75,11 @@ src_paths:
     - js
     - coffee/src
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
+    - support/js
     - teams/js
     - xmodule_js/common_static/coffee
-    - support/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

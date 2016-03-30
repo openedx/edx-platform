@@ -39,7 +39,8 @@ from django.core.urlresolvers import reverse
          data-sort-preference="${sort_preference | h}"
          data-flag-moderator="${flag_moderator | h}"
          data-user-cohort-id="${user_cohort | h}"
-         data-course-settings="${course_settings | h}">
+         data-course-settings="${course_settings | h}"
+         tabindex="-1">
     <div class="discussion-body">
         <div class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}"></div>
         <div class="discussion-column" role="main" aria-label="Discussion" id="discussion-column">

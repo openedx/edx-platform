@@ -149,6 +149,11 @@
         }
       }
 
+      // CASE: content is gated
+      &.is-gated {
+        @extend %bar-module-black;
+      }
+
       .bar-mod-content {
         border: 0;
         padding: ($baseline/2) ($baseline*0.75) ($baseline/4) ($baseline*0.75);

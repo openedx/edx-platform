@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
@@ -26,7 +27,7 @@ from django.utils import html
         <div class="header-survey">
           <h4 class="course-info">
             <span class="course-org">${course.display_org_with_default}</span><span class="course-number"> ${course.display_number_with_default}</span>
-            <span class="course-name">${course.display_name | h}</span>
+            <span class="course-name">${course.display_name}</span>
           </h4>
           <h3 class="title">${_("Pre-Course Survey")}</h3>
         </div>
@@ -41,7 +42,7 @@ from django.utils import html
         <ul class="message-copy"> </ul>
       </div>
 
-      ${survey_form}
+      ${survey_form | n, unicode}
 
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Submit')}</button>

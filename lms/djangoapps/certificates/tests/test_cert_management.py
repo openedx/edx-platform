@@ -6,6 +6,7 @@ from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from mock import patch
 
+from course_modes.models import CourseMode
 from opaque_keys.edx.locator import CourseLocator
 from certificates.tests.factories import BadgeAssertionFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,16 +31,17 @@ class CertificateManagementTest(ModuleStoreTestCase):
             for __ in range(3)
         ]
 
-    def _create_cert(self, course_key, user, status):
+    def _create_cert(self, course_key, user, status, mode=CourseMode.HONOR):
         """Create a certificate entry. """
         # Enroll the user in the course
         CourseEnrollmentFactory.create(
             user=user,
-            course_id=course_key
+            course_id=course_key,
+            mode=mode
         )
 
         # Create the certificate
-        GeneratedCertificate.objects.create(
+        GeneratedCertificate.eligible_certificates.create(
             user=user,
             course_id=course_key,
             status=status
@@ -52,7 +54,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
 
     def _assert_cert_status(self, course_key, user, expected_status):
         """Check the status of a certificate. """
-        cert = GeneratedCertificate.objects.get(user=user, course_id=course_key)
+        cert = GeneratedCertificate.eligible_certificates.get(user=user, course_id=course_key)
         self.assertEqual(cert.status, expected_status)
 
 
@@ -61,9 +63,10 @@ class CertificateManagementTest(ModuleStoreTestCase):
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
 
-    def test_resubmit_error_certificate(self):
+    @ddt.data(CourseMode.HONOR, CourseMode.VERIFIED)
+    def test_resubmit_error_certificate(self, mode):
         # Create a certificate with status 'error'
-        self._create_cert(self.courses[0].id, self.user, CertificateStatuses.error)
+        self._create_cert(self.courses[0].id, self.user, CertificateStatuses.error, mode)
 
         # Re-submit all certificates with status 'error'
         with check_mongo_calls(1):
@@ -198,7 +201,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
             grade_value=None
         )
-        certificate = GeneratedCertificate.objects.get(
+        certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
             course_id=key
         )
@@ -236,7 +239,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
                 course=unicode(key), noop=False, insecure=True, force=False
             )
         self.assertTrue(mock_send_to_queue.called)
-        certificate = GeneratedCertificate.objects.get(
+        certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
             course_id=key
         )

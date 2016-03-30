@@ -1,6 +1,12 @@
+"""
+Tests for course_modes views.
+"""
+
+from datetime import datetime
 import unittest
 import decimal
 import ddt
+import freezegun
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -9,11 +15,14 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
+import lms.djangoapps.commerce.tests.test_utils as ecomm_test_utils
 from course_modes.models import CourseMode, Mode
+from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 
 
 @ddt.ddt
@@ -80,6 +89,25 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # Check whether we were correctly redirected
         start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
         self.assertRedirects(response, start_flow_url)
+
+    def test_no_id_redirect_otto(self):
+        # Create the course modes
+        prof_course = CourseFactory.create()
+        CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=prof_course.id,
+                          min_price=100, sku='TEST')
+        ecomm_test_utils.update_commerce_config(enabled=True)
+        # Enroll the user in the test course
+        CourseEnrollmentFactory(
+            is_active=False,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODE,
+            course_id=prof_course.id,
+            user=self.user
+        )
+        # Configure whether we're upgrading or not
+        url = reverse('course_modes_choose', args=[unicode(prof_course.id)])
+        response = self.client.get(url)
+        self.assertRedirects(response, 'http://testserver/test_basket/?sku=TEST', fetch_redirect_response=False)
+        ecomm_test_utils.update_commerce_config(enabled=False)
 
     def test_no_enrollment(self):
         # Create the course modes
@@ -324,7 +352,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_comprehensive_theme("edx.org")
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
@@ -338,6 +366,21 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotContains(response, "How it Works")
         self.assertNotContains(response, "Find courses")
         self.assertNotContains(response, "Schools & Partners")
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @freezegun.freeze_time('2015-01-02')
+    def test_course_closed(self):
+        for mode in ["honor", "verified"]:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        self.course.enrollment_end = datetime(2015, 01, 01)
+        modulestore().update_item(self.course, self.user.id)
+
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        # URL-encoded version of 1/1/15, 12:00 AM
+        redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
+        self.assertRedirects(response, redirect_url)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

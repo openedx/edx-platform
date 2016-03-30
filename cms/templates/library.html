@@ -3,7 +3,7 @@
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%block name="title">${context_library.display_name_with_default_escaped} ${xblock_type_display_name(context_library)}</%block>
 <%block name="bodyclass">is-signedin course container view-container view-library</%block>
@@ -24,8 +24,8 @@ from openedx.core.lib.js_utils import escape_json_dumps
 <%block name="requirejs">
     require(["js/factories/library"], function(LibraryFactory) {
         LibraryFactory(
-            ${escape_json_dumps(component_templates) | n},
-            ${escape_json_dumps(xblock_info) | n},
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
             {
                 isUnitPage: false,
                 page_size: 10,

@@ -175,8 +175,7 @@ define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggab
                 'style=" ' +
                     'width: 100px; ' +
                     'height: 100px; ' +
-                    'display: inline; ' +
-                    'float: left; ' +
+                    'display: inline-block; ' +
                     'overflow: hidden; ' +
                     'border-left: 1px solid #CCC; ' +
                     'border-right: 1px solid #CCC; ' +

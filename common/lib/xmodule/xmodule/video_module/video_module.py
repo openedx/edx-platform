@@ -38,7 +38,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
-from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
+from .video_utils import create_youtube_string, get_poster, rewrite_video_url
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -108,6 +108,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     # To make sure that js files are called in proper order we use numerical
     # index. We do that to avoid issues that occurs in tests.
     module = __name__.replace('.video_module', '', 2)
+
+    #TODO: For each of the following, ensure that any generated html is properly escaped.
     js = {
         'js': [
             resource_string(module, 'js/src/video/00_component.js'),
@@ -196,6 +198,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         branding_info = None
         youtube_streams = ""
 
+        # Determine if there is an alternative source for this video
+        # based on user locale.  This exists to support cases where
+        # we leverage a geography specific CDN, like China.
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
         # stream.
@@ -215,7 +222,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                         if url not in sources:
                             sources.append(url)
                         if self.download_video:
-                            download_video_link = url
+                            # function returns None when the url cannot be re-written
+                            rewritten_link = rewrite_video_url(cdn_url, url)
+                            if rewritten_link:
+                                download_video_link = rewritten_link
+                            else:
+                                download_video_link = url
 
                 # set the youtube url
                 if val_video_urls["youtube"]:
@@ -231,12 +243,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # 'CN' is China ISO 3166-1 country code.
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
             for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
+                new_url = rewrite_video_url(cdn_url, source_url)
                 if new_url:
                     sources[index] = new_url
 
@@ -580,6 +591,20 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         return xml
 
+    def create_youtube_url(self, youtube_id):
+        """
+
+        Args:
+            youtube_id: The ID of the video to create a link for
+
+        Returns:
+            A full youtube url to the video whose ID is passed in
+        """
+        if youtube_id:
+            return 'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+        else:
+            return ''
+
     def get_context(self):
         """
         Extend context by data for transcript basic tab.
@@ -603,10 +628,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 if val_youtube_id:
                     video_id = val_youtube_id
 
-            if video_id:
-                return 'http://youtu.be/{0}'.format(video_id)
-            else:
-                return ''
+            return self.create_youtube_url(video_id)
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
@@ -839,7 +861,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     val_video_data = edxval_api.get_video_info(self.edx_video_id)
                     # Unfortunately, the VAL API is inconsistent in how it returns the encodings, so remap here.
                     for enc_vid in val_video_data.pop('encoded_videos'):
-                        encoded_videos[enc_vid['profile']] = {key: enc_vid[key] for key in ["url", "file_size"]}
+                        if enc_vid['profile'] in video_profile_names:
+                            encoded_videos[enc_vid['profile']] = {key: enc_vid[key] for key in ["url", "file_size"]}
                 except edxval_api.ValVideoNotFoundError:
                     pass
 
@@ -850,6 +873,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 encoded_videos["fallback"] = {
                     "url": video_url,
                     "file_size": 0,  # File size is unknown for fallback URLs
+                }
+
+            # Include youtube link if there is no encoding for mobile- ie only a fallback URL or no encodings at all
+            # We are including a fallback URL for older versions of the mobile app that don't handle Youtube urls
+            if self.youtube_id_1_0:
+                encoded_videos["youtube"] = {
+                    "url": self.create_youtube_url(self.youtube_id_1_0),
+                    "file_size": 0,  # File size is not relevant for external link
                 }
 
         transcripts_info = self.get_transcripts_info()

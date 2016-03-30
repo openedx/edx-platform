@@ -19,6 +19,12 @@
         };
         defineDependency("jQuery", "jquery");
         defineDependency("_", "underscore");
+        if (window._ && window._.str) {
+            define("underscore.string", [], function () {return window._.str;});
+        }
+        else {
+            console.error("Expected _.str (underscore.string) to be on the window object, but not found.");
+        }
         defineDependency("gettext", "gettext");
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
@@ -32,7 +38,6 @@
         // NOTE: baseUrl has been previously set in lms/templates/main.html
         waitSeconds: 60,
         paths: {
-            "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
             "moment": "js/vendor/moment.min",
@@ -42,7 +47,7 @@
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
-            "underscore": "js/vendor/underscore-min",
+            "underscore": "common/js/vendor/underscore",
             "underscore.string": "js/vendor/underscore.string.min",
             "jquery": "js/vendor/jquery.min",
             "jquery.cookie": "js/vendor/jquery.cookie",

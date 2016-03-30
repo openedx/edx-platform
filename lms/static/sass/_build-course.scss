@@ -59,9 +59,13 @@
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";
+@import "course/discussion/form";
 
 // search
 @import 'search/_search';
 
 // responsive
 @import 'base/layouts'; // temporary spot for responsive course
+
+// xmodule
+@import 'xmodule/headings';

@@ -20,10 +20,11 @@ from student.tests.factories import UserFactory
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from contentstore.views.helpers import create_xblock
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
-class EntranceExamHandlerTests(CourseTestCase):
+class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
     """
     Base test class for create, save, and delete
     """
@@ -36,7 +37,6 @@ class EntranceExamHandlerTests(CourseTestCase):
         self.usage_key = self.course.location
         self.course_url = '/course/{}'.format(unicode(self.course.id))
         self.exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
-        milestones_helpers.seed_milestone_relationship_types()
         self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
     def test_entrance_exam_milestone_addition(self):

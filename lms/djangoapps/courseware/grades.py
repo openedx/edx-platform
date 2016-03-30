@@ -1,21 +1,25 @@
 # Compute grades using real division, with no integer truncation
 from __future__ import division
+
+import json
+import logging
+import random
 from collections import defaultdict
 from functools import partial
-import json
-import random
-import logging
-
-from contextlib import contextmanager
-from django.conf import settings
-from django.test.client import RequestFactory
-from django.core.cache import cache
 
 import dogstats_wrapper as dog_stats_api
+from django.conf import settings
+from django.core.cache import cache
+from django.test.client import RequestFactory
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
 
+from openedx.core.lib.gating import api as gating_api
 from courseware import courses
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
+from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from student.models import anonymous_id_for_user
 from util.db import outer_atomic
 from util.module_utils import yield_dynamic_descriptor_descendants
@@ -25,10 +29,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
-
 
 log = logging.getLogger("edx.courseware")
 
@@ -589,6 +589,9 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         # be hidden behind the ScoresClient.
         max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
 
+    # Check for gated content
+    gated_content = gating_api.get_gated_content(course, student)
+
     chapters = []
     locations_to_children = defaultdict(list)
     locations_to_weighted_scores = {}
@@ -602,7 +605,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
             with outer_atomic():
-                if section_module.hide_from_toc:
+                if section_module.hide_from_toc or unicode(section_module.location) in gated_content:
                     continue
 
                 graded = section_module.graded
@@ -808,3 +811,74 @@ def _get_mock_request(student):
     request = RequestFactory().get('/')
     request.user = student
     return request
+
+
+def _calculate_score_for_modules(user_id, course, modules):
+    """
+    Calculates the cumulative score (percent) of the given modules
+    """
+
+    # removing branch and version from exam modules locator
+    # otherwise student module would not return scores since module usage keys would not match
+    modules = [m for m in modules]
+    locations = [
+        BlockUsageLocator(
+            course_key=course.id,
+            block_type=module.location.block_type,
+            block_id=module.location.block_id
+        )
+        if isinstance(module.location, BlockUsageLocator) and module.location.version
+        else module.location
+        for module in modules
+    ]
+
+    scores_client = ScoresClient(course.id, user_id)
+    scores_client.fetch_scores(locations)
+
+    # Iterate over all of the exam modules to get score percentage of user for each of them
+    module_percentages = []
+    ignore_categories = ['course', 'chapter', 'sequential', 'vertical', 'randomize']
+    for index, module in enumerate(modules):
+        if module.category not in ignore_categories and (module.graded or module.has_score):
+            module_score = scores_client.get(locations[index])
+            if module_score:
+                correct = module_score.correct or 0
+                total = module_score.total or 1
+                module_percentages.append(correct / total)
+
+    return sum(module_percentages) / float(len(module_percentages)) if module_percentages else 0
+
+
+def get_module_score(user, course, module):
+    """
+    Collects all children of the given module and calculates the cumulative
+    score for this set of modules for the given user.
+
+    Arguments:
+        user (User): The user
+        course (CourseModule): The course
+        module (XBlock): The module
+
+    Returns:
+        float: The cumulative score
+    """
+    def inner_get_module(descriptor):
+        """
+        Delegate to get_module_for_descriptor
+        """
+        field_data_cache = FieldDataCache([descriptor], course.id, user)
+        return get_module_for_descriptor(
+            user,
+            _get_mock_request(user),
+            descriptor,
+            field_data_cache,
+            course.id,
+            course=course
+        )
+
+    modules = yield_dynamic_descriptor_descendants(
+        module,
+        user.id,
+        inner_get_module
+    )
+    return _calculate_score_for_modules(user.id, course, modules)

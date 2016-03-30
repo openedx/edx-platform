@@ -18,7 +18,7 @@ from django.utils.http import urlquote_plus
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
 <%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</%block>
-<%block name="nav_skip">#course-info-progress</%block>
+<%block name="nav_skip">#content</%block>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js') | h}"></script>

@@ -59,6 +59,16 @@ NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
 # Clean up previous builds
 git clean -qxfd
 
+function emptyxunit {
+
+    cat > reports/$1.xml <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="$1" tests="1" errors="0" failures="0" skip="0">
+<testcase classname="$1" name="$1" time="0.604"></testcase>
+</testsuite>
+END
+
+}
 case "$TEST_SUITE" in
 
     "quality")
@@ -79,25 +89,31 @@ case "$TEST_SUITE" in
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
-        cat > reports/quality.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="quality" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="quality" name="quality" time="0.604"></testcase>
-</testsuite>
-END
+        emptyxunit "quality"
         exit $EXIT
         ;;
 
     "lms-unit")
         case "$SHARD" in
+            "all")
+                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+                ;;
             "1")
                 paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p"
+                ;;
+            "3")
+                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False' --with-flaky" --cov_args="-p"
                 ;;
             *)
-                paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
+                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
+                # system, but the tests are called with the old code, then builds will not fail because the
+                # code is out of date. Instead, there will be an instantly-passing shard.
+                mkdir -p reports/lms
+                emptyxunit "lms/nosetests"
                 ;;
         esac
         ;;
@@ -173,11 +189,19 @@ END
                 ;;
 
             "7")
-                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,a11y=False --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_7' --with-flaky"
+                ;;
+
+            "8")
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_8' --with-flaky"
+                ;;
+
+            "9")
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,shard_7=False,shard_8=False,a11y=False --with-flaky"
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 5) in the multi-config project and expand this file
+            # (e.g. Shard 10) in the multi-config project and expand this file
             # with an additional case condition, old branches without that commit
             # would not execute any tests on the worker assigned to that shard
             # and thus their build would fail.
@@ -188,12 +212,7 @@ END
                 # May be unnecessary if we changed the "Skip if there are no test files"
                 # option to True in the jenkins job definitions.
                 mkdir -p reports/bok_choy
-                cat > reports/bok_choy/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="acceptance.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
+                emptyxunit "bok_choy/nosetests"
                 ;;
         esac
         ;;

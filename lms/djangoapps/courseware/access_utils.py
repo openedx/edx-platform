@@ -63,8 +63,11 @@ def check_start_date(user, days_early_for_beta, start, course_key):
         return ACCESS_GRANTED
     else:
         now = datetime.now(UTC())
+        if start is None or in_preview_mode():
+            return ACCESS_GRANTED
+
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
-        if start is None or now > effective_start or in_preview_mode():
+        if now > effective_start:
             return ACCESS_GRANTED
 
         return StartDateError(start)
@@ -75,4 +78,5 @@ def in_preview_mode():
     Returns whether the user is in preview mode or not.
     """
     hostname = get_current_request_hostname()
-    return bool(hostname and settings.PREVIEW_DOMAIN in hostname.split('.'))
+    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
+    return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])

@@ -184,9 +184,7 @@ class AdvancedSettingsPage(CoursePage):
             'display_coursenumber',
             'display_organization',
             'catalog_visibility',
-            'chrome',
             'days_early_for_beta',
-            'default_tab',
             'disable_progress_graph',
             'discussion_blackouts',
             'discussion_sort_alpha',
@@ -210,6 +208,7 @@ class AdvancedSettingsPage(CoursePage):
             'show_calculator',
             'show_reset_button',
             'static_asset_path',
+            'teams_configuration',
             'text_customization',
             'annotation_storage_url',
             'social_sharing_url',
@@ -217,4 +216,5 @@ class AdvancedSettingsPage(CoursePage):
             'cert_html_view_enabled',
             'enable_proctored_exams',
             'enable_timed_exams',
+            'enable_subsection_gating',
         ]

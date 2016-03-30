@@ -11,6 +11,8 @@ from uuid import uuid4
 from mock import Mock, MagicMock, patch
 
 from celery.states import SUCCESS, FAILURE
+from django.utils.translation import ugettext_noop
+from functools import partial
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import i4xEncoder
@@ -27,8 +29,12 @@ from instructor_task.tasks import (
     reset_problem_attempts,
     delete_problem_state,
     generate_certificates,
+    export_ora2_data,
 )
-from instructor_task.tasks_helper import UpdateProblemModuleStateError
+from instructor_task.tasks_helper import (
+    UpdateProblemModuleStateError,
+    upload_ora2_data,
+)
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -471,3 +477,31 @@ class TestCertificateGenerationnstructorTask(TestInstructorTasks):
             expected_attempted=1,
             expected_total=1
         )
+
+
+class TestOra2ResponsesInstructorTask(TestInstructorTasks):
+    """Tests instructor task that fetches ora2 response data."""
+
+    def test_ora2_missing_current_task(self):
+        self._test_missing_current_task(export_ora2_data)
+
+    def test_ora2_with_failure(self):
+        self._test_run_with_failure(export_ora2_data, 'We expected this to fail')
+
+    def test_ora2_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(export_ora2_data)
+
+    def test_ora2_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(export_ora2_data)
+
+    def test_ora2_runs_task(self):
+        task_entry = self._create_input_entry()
+        task_xmodule_args = self._get_xmodule_instance_args()
+
+        with patch('instructor_task.tasks.run_main_task') as mock_main_task:
+            export_ora2_data(task_entry.id, task_xmodule_args)
+
+            action_name = ugettext_noop('generated')
+            task_fn = partial(upload_ora2_data, task_xmodule_args)
+
+            mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)

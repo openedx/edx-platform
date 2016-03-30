@@ -135,7 +135,7 @@ class ProblemTypeTestMixin(object):
     """
     Test cases shared amongst problem types.
     """
-    @attr('shard_2')
+    @attr('shard_7')
     def test_answer_correctly(self):
         """
         Scenario: I can answer a problem correctly
@@ -171,7 +171,7 @@ class ProblemTypeTestMixin(object):
         for event in expected_events:
             self.wait_for_events(event_filter=event, number_of_matches=1)
 
-    @attr('shard_2')
+    @attr('shard_7')
     def test_answer_incorrectly(self):
         """
         Scenario: I can answer a problem incorrectly
@@ -191,7 +191,7 @@ class ProblemTypeTestMixin(object):
         self.problem_page.click_check()
         self.wait_for_status('incorrect')
 
-    @attr('shard_2')
+    @attr('shard_7')
     def test_submit_blank_answer(self):
         """
         Scenario: I can submit a blank answer

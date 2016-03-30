@@ -24,10 +24,10 @@ from opaque_keys.edx.locations import Location
 
 from .component import (
     ADVANCED_COMPONENT_TYPES,
-    SPLIT_TEST_COMPONENT_TYPE,
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
+from ccx_keys.locator import CCXLocator
 from contentstore import utils
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -71,7 +71,7 @@ from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
 from student.roles import (
@@ -91,6 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from util.course_key_utils import from_string_or_404
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -165,7 +166,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     if not course_key_string or not action_state_id:
         return HttpResponseBadRequest()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format') or request.POST.get('format') or 'html'
 
     course_key = CourseKey.from_string(course_key_string)
 
@@ -251,7 +252,7 @@ def course_handler(request, course_key_string=None):
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     try:
-        response_format = request.REQUEST.get('format', 'html')
+        response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
                 course_key = CourseKey.from_string(course_key_string)
@@ -325,10 +326,10 @@ def course_search_index_handler(request, course_key_string):
         try:
             reindex_course_and_check_access(course_key, request.user)
         except SearchIndexingError as search_err:
-            return HttpResponse(escape_json_dumps({
+            return HttpResponse(dump_js_escaped_json({
                 "user_message": search_err.error_list
             }), content_type=content_type, status=500)
-        return HttpResponse(escape_json_dumps({
+        return HttpResponse(dump_js_escaped_json({
             "user_message": _("Course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
@@ -359,7 +360,7 @@ def get_in_process_course_actions(request):
     ]
 
 
-def _staff_accessible_course_list(request):
+def _accessible_courses_summary_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
@@ -388,6 +389,11 @@ def _accessible_courses_list(request):
         Filter out unusable and inaccessible courses
         """
         if isinstance(course, ErrorDescriptor):
+            return False
+
+        # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+        if isinstance(course.id, CCXLocator):
             return False
 
         # pylint: disable=fixme
@@ -434,8 +440,11 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
-            if course is not None and not isinstance(course, ErrorDescriptor):
-                # ignore deleted or errored courses
+
+            # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+            # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+            if course is not None and not isinstance(course, ErrorDescriptor) and not isinstance(course.id, CCXLocator):
+                # ignore deleted, errored or ccx courses
                 courses_list[course_key] = course
 
     return courses_list.values(), in_process_course_actions
@@ -554,11 +563,8 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     except errors.CourseStructureNotAvailableError:
         return data
 
-    blocks = []
     for block in structure_data['blocks'].values():
-        blocks.append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
-
-    data['blocks'].extend(blocks)
+        data['blocks'].append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
 
     return data
 
@@ -583,7 +589,7 @@ def course_index(request, course_key):
             reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
-        locator_to_show = request.REQUEST.get('show', None)
+        locator_to_show = request.GET.get('show', None)
         course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
         settings_url = reverse_course_url('settings_handler', course_key)
 
@@ -622,14 +628,14 @@ def get_courses_accessible_to_user(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _staff_accessible_course_list(request)
+        courses, in_process_course_actions = _accessible_courses_summary_list(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_list(request)
+            courses, in_process_course_actions = _accessible_courses_summary_list(request)
     return courses, in_process_course_actions
 
 
@@ -869,10 +875,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError:
-        raise Http404
+    course_key = from_string_or_404(course_key_string)
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -1598,8 +1601,8 @@ def are_content_experiments_enabled(course):
     Returns True if content experiments have been enabled for the course.
     """
     return (
-        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
-        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        'split_test' in ADVANCED_COMPONENT_TYPES and
+        'split_test' in course.advanced_modules
     )
 
 

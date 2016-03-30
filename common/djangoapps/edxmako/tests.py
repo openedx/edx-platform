@@ -17,7 +17,6 @@ from edxmako.shortcuts import (
     is_marketing_link_set,
     is_any_marketing_link_set,
     render_to_string,
-    open_source_footer_context_processor
 )
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
@@ -69,15 +68,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
             self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
 
-    @ddt.data((True, None), (False, None))
-    @ddt.unpack
-    def test_edx_footer(self, expected_result, _):
-        with patch.dict('django.conf.settings.FEATURES', {
-            'IS_EDX_DOMAIN': expected_result
-        }):
-            result = open_source_footer_context_processor({})
-            self.assertEquals(expected_result, result.get('IS_EDX_DOMAIN'))
-
 
 class AddLookupTests(TestCase):
     """
@@ -126,8 +116,12 @@ class MakoMiddlewareTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in LMS.
         """
-        del context_mock.context
-        self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
+        with patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
+            del context_mock.context
+            self.assertIn(
+                "this module is temporarily unavailable",
+                render_to_string("courseware/error-message.html", None),
+            )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @patch("edxmako.middleware.REQUEST_CONTEXT")
@@ -136,8 +130,9 @@ class MakoMiddlewareTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
-        del context_mock.context
-        self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
+        with patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
+            del context_mock.context
+            self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
 
 
 def mako_middleware_process_request(request):

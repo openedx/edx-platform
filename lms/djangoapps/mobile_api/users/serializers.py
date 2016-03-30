@@ -76,14 +76,6 @@ class CourseOverviewField(serializers.RelatedField):
                 kwargs={'course_id': course_id},
                 request=request,
             ),
-
-            # Note: The following 2 should be deprecated.
-            'social_urls': {
-                'facebook': course_overview.facebook_url,
-            },
-            'latest_updates': {
-                'video': None
-            },
         }
 
 

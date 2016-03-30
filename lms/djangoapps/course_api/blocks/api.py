@@ -2,10 +2,12 @@
 API function for retrieving course blocks data
 """
 
+from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
+from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.proctored_exam import ProctoredExamTransformer
 from .serializers import BlockSerializer, BlockDictSerializer
-from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 
 
 def get_blocks(
@@ -17,14 +19,15 @@ def get_blocks(
         requested_fields=None,
         block_counts=None,
         student_view_data=None,
-        return_type='dict'
+        return_type='dict',
+        block_types_filter=None,
 ):
     """
     Return a serialized representation of the course blocks.
 
     Arguments:
         request (HTTPRequest): Used for calling django reverse.
-        usage_key (UsageKey): Identifies the root block of interest.
+        usage_key (UsageKey): Identifies the starting block of interest.
         user (User): Optional user object for whom the blocks are being
             retrieved. If None, blocks are returned regardless of access checks.
         depth (integer or None): Identifies the depth of the tree to return
@@ -42,25 +45,34 @@ def get_blocks(
             which blocks to return their student_view_data.
         return_type (string): Possible values are 'dict' or 'list'. Indicates
             the format for returning the blocks.
+        block_types_filter (list): Optional list of block type names used to filter
+            the final result of returned blocks.
     """
-    # construct BlocksAPITransformer
-    blocks_api_transformer = BlocksAPITransformer(
-        block_counts,
-        student_view_data,
-        depth,
-        nav_depth
-    )
-
-    # list of transformers to apply, adding user-specific ones if user is provided
-    transformers = [blocks_api_transformer]
+    # create ordered list of transformers, adding BlocksAPITransformer at end.
+    transformers = BlockStructureTransformers()
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS + [ProctoredExamTransformer()]
+    transformers += [
+        BlocksAPITransformer(
+            block_counts,
+            student_view_data,
+            depth,
+            nav_depth
+        )
+    ]
 
-    blocks = get_course_blocks(
-        user,
-        usage_key,
-        transformers=transformers,
-    )
+    # transform
+    blocks = get_course_blocks(user, usage_key, transformers)
+
+    # filter blocks by types
+    if block_types_filter:
+        block_keys_to_remove = []
+        for block_key in blocks:
+            block_type = blocks.get_xblock_field(block_key, 'category')
+            if block_type not in block_types_filter:
+                block_keys_to_remove.append(block_key)
+        for block_key in block_keys_to_remove:
+            blocks.remove_block(block_key, keep_descendants=True)
 
     # serialize
     serializer_context = {

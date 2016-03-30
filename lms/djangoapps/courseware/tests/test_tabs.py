@@ -20,29 +20,33 @@ from courseware.views import get_static_tab_contents, static_tab
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
-    seed_milestone_relationship_types,
     get_milestone_relationship_types,
     add_milestone,
     add_course_milestone,
     add_course_content_milestone
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
-)
+    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE,
+    SharedModuleStoreTestCase)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class TabTestCase(ModuleStoreTestCase):
+class TabTestCase(SharedModuleStoreTestCase):
     """Base class for Tab-related test cases."""
+    @classmethod
+    def setUpClass(cls):
+        super(TabTestCase, cls).setUpClass()
+
+        cls.course = CourseFactory.create(org='edX', course='toy', run='2012_Fall')
+        cls.fake_dict_tab = {'fake_key': 'fake_value'}
+        cls.books = None
+
     def setUp(self):
         super(TabTestCase, self).setUp()
-
-        self.course = CourseFactory.create(org='edX', course='toy', run='2012_Fall')
-        self.fake_dict_tab = {'fake_key': 'fake_value'}
         self.reverse = lambda name, args: "name/{0}/args/{1}".format(name, ",".join(str(a) for a in args))
-        self.books = None
 
     def create_mock_user(self, is_authenticated=True, is_staff=True, is_enrolled=True):
         """
@@ -219,21 +223,25 @@ class TextbooksTestCase(TabTestCase):
 
 
 @attr('shard_1')
-class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
     MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
-    def setUp(self):
-        super(StaticTabDateTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.page = ItemFactory.create(
-            category="static_tab", parent_location=self.course.location,
+    @classmethod
+    def setUpClass(cls):
+        super(StaticTabDateTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.page = ItemFactory.create(
+            category="static_tab", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
-        self.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='New Tab', url_slug='new_tab'))
-        self.course.save()
-        self.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        cls.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='New Tab', url_slug='new_tab'))
+        cls.course.save()
+        cls.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+
+    def setUp(self):
+        super(StaticTabDateTestCase, self).setUp()
 
     def test_logged_in(self):
         self.setup_user()
@@ -310,7 +318,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
-class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
@@ -339,7 +347,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         self.enroll(self.course)
         self.user.is_staff = True
-        seed_milestone_relationship_types()
         self.relationship_types = get_milestone_relationship_types()
 
     def test_get_course_tabs_list_entrance_exam_enabled(self):
@@ -418,16 +425,20 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
     """
     MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
+    @classmethod
+    def setUpClass(cls):
+        super(TextBookCourseViewsTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TextBookCourseViewsTestCase, self).setUp()
 
-        self.course = CourseFactory.create()
         self.set_up_books(2)
         self.setup_user()
         self.enroll(self.course)
@@ -484,9 +495,10 @@ class TabListTestCase(TabTestCase):
             [{'type': CoursewareTab.type}],
             # missing course_info
             [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
+            [{'type': 'unknown_type'}],
             # incorrect order
-            [{'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
-            [{'type': 'unknown_type'}]
+            [{'type': 'discussion', 'name': 'fake_name'},
+             {'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
         ]
 
         # tab types that should appear only once

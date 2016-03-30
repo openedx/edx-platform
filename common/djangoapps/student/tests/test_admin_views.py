@@ -3,19 +3,23 @@ Tests student admin.py
 """
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 
 
-class AdminCourseRolesPageTest(ModuleStoreTestCase):
+class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     """Test the django admin course roles form saving data in db.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(AdminCourseRolesPageTest, cls).setUpClass()
+        cls.course = CourseFactory.create(org='edx')
+
     def setUp(self):
         super(AdminCourseRolesPageTest, self).setUp()
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.user.save()
-        self.course = CourseFactory.create(org='edx')
 
     def test_save_valid_data(self):
 

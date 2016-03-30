@@ -9,14 +9,14 @@ define([
 ) {
     'use strict';
     describe('EdxNotes NoteItemView', function() {
-        var getView = function (model, scrollToTag) {
+        var getView = function (model, scrollToTag, formattedText) {
             model = new NoteModel(_.defaults(model || {}, {
                 id: 'id-123',
                 user: 'user-123',
                 usage_id: 'usage_id-123',
                 created: 'December 11, 2014 at 11:12AM',
                 updated: 'December 11, 2014 at 11:12AM',
-                text: 'Third added model',
+                text: formattedText || 'Third added model',
                 quote: Helpers.LONG_TEXT,
                 unit: {
                     url: 'http://example.com/'
@@ -67,12 +67,42 @@ define([
             var view = getView({tags: ["First", "Second"]});
             expect(view.$('.reference-title').length).toBe(3);
             expect(view.$('.reference-title')[2]).toContainText('Tags:');
-            expect(view.$('a.reference-tags').length).toBe(2);
-            expect(view.$('a.reference-tags')[0]).toContainText('First');
-            expect(view.$('a.reference-tags')[1]).toContainText('Second');
+            expect(view.$('span.reference-tags').length).toBe(2);
+            expect(view.$('span.reference-tags')[0]).toContainText('First');
+            expect(view.$('span.reference-tags')[1]).toContainText('Second');
         });
 
-        it('should handle a click event on the tag', function() {
+        it('should highlight tags & text if they have elasticsearch formatter', function() {
+            var view = getView({
+                tags: ["First", "{elasticsearch_highlight_start}Second{elasticsearch_highlight_end}"]
+            }, {}, "{elasticsearch_highlight_start}Sample{elasticsearch_highlight_end}");
+            expect(view.$('.reference-title').length).toBe(3);
+            expect(view.$('.reference-title')[2]).toContainText('Tags:');
+            expect(view.$('span.reference-tags').length).toBe(2);
+            expect(view.$('span.reference-tags')[0]).toContainText('First');
+            // highlighted tag & text
+            expect($.trim($(view.$('span.reference-tags')[1]).html())).toBe(
+                '<span class="note-highlight">Second</span>'
+            );
+            expect($.trim(view.$('.note-comment-p').html())).toBe('<span class="note-highlight">Sample</span>');
+        });
+
+        it('should escape html for tags & comments', function() {
+            var view = getView({
+                tags: ["First", "<b>Second</b>", "ȗnicode"]
+            }, {}, "<b>Sample</b>");
+            expect(view.$('.reference-title').length).toBe(3);
+            expect(view.$('.reference-title')[2]).toContainText('Tags:');
+            expect(view.$('span.reference-tags').length).toBe(3);
+            expect(view.$('span.reference-tags')[0]).toContainText('First');
+            expect($.trim($(view.$('span.reference-tags')[1]).html())).toBe(
+                '&lt;b&gt;Second&lt;/b&gt;'
+            );
+            expect($.trim($(view.$('span.reference-tags')[2]).html())).toBe('ȗnicode');
+            expect($.trim(view.$('.note-comment-p').html())).toBe('&lt;b&gt;Sample&lt;/b&gt;');
+        });
+
+        xit('should handle a click event on the tag', function() {
             var scrollToTagSpy = {
                 scrollToTag: function (tagName){}
             };

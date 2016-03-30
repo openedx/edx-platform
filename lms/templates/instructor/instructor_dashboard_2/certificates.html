@@ -1,18 +1,19 @@
+<%page args="section_data" expression_filter="h"/>
 <%namespace name='static' file='../../static_content.html'/>
 
-<%! from django.utils.translation import ugettext as _
-import json
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <%static:require_module module_name="js/certificates/factories/certificate_whitelist_factory" class_name="CertificateWhitelistFactory">
-        CertificateWhitelistFactory('${json.dumps(certificate_white_list)}', "${generate_certificate_exceptions_url}", "${certificate_exception_view_url}", "${generate_bulk_certificate_exceptions_url}");
+        CertificateWhitelistFactory('${certificate_white_list | n, dump_js_escaped_json}', '${generate_certificate_exceptions_url | n, js_escaped_string}', '${certificate_exception_view_url | n, js_escaped_string}', '${generate_bulk_certificate_exceptions_url | n, js_escaped_string}');
 </%static:require_module>
 
 <%static:require_module module_name="js/certificates/factories/certificate_invalidation_factory" class_name="CertificateInvalidationFactory">
-        CertificateInvalidationFactory('${json.dumps(certificate_invalidations)}', '${certificate_invalidation_view_url}');
+        CertificateInvalidationFactory('${certificate_invalidations | n, dump_js_escaped_json}', '${certificate_invalidation_view_url | n, js_escaped_string}');
 </%static:require_module>
 
-<%page args="section_data"/>
 <div class="certificates-wrapper">
 
     <div class="example-certificates">
@@ -109,7 +110,7 @@ import json
         <h2>${_("Regenerate Certificates")}</h2>
         <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['start_certificate_regeneration']}">
             <p class="under-heading">
-                ${_('To regenerate certificates for your course, chose the learners who will receive regenerated certificates and click <br/> Regenerate Certificates.')}
+                ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click <br/> Regenerate Certificates.')}
             </p>
 
                 <label style="display: inline" for="certificate_status_${section_data['status'].downloadable}">

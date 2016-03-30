@@ -15,11 +15,6 @@ if active_page is None and active_page_context is not UNDEFINED:
   # If active_page is not passed in as an argument, it may be in the context as active_page_context
   active_page = active_page_context
 
-def url_class(is_active):
-  if is_active:
-    return "active"
-  return ""
-
 def selected(is_selected):
   return "selected" if is_selected else ""
 
@@ -83,27 +78,14 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
 % if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
   <div class="course-material">
-    <ol class="course-tabs">
-      % for tab in get_course_tab_list(request, course):
-        <%
-            tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
-        %>
-          <li>
-             <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
-                 ${_(tab.name) | h}
-                 % if tab_is_active:
-                   <span class="sr">, current location</span>
-                 %endif
-                 % if tab_image:
-                   ## Translators: 'needs attention' is an alternative string for the
-                   ## notification image that indicates the tab "needs attention".
-                   <img src="${tab_image}" alt="${_('needs attention')}" />
-                 %endif
-             </a>
-          </li>
-      % endfor
+     <%
+      tab_list = get_course_tab_list(request, course)
+      tabs_tmpl = static.get_template_path('/courseware/tabs.html')
+      %>
+      <ol class="course-tabs">
+      <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
       <%block name="extratabs" />
-    </ol>
+      </ol>
   </div>
 </nav>
 %endif

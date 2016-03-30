@@ -5,11 +5,14 @@ import sys
 import subprocess
 from path import Path as path
 from paver.easy import task, cmdopts, needs, sh
+from .utils.cmd import django_cmd
 
 try:
     from pygments.console import colorize
 except ImportError:
     colorize = lambda color, text: text
+
+DEFAULT_SETTINGS = 'devstack'
 
 
 @task
@@ -194,6 +197,7 @@ def i18n_robot_pull():
     """
     Pull source strings, generate po and mo files, and validate
     """
+
     # sh('paver test_i18n')
     # Tests were removed from repo, but there should still be tests covering the translations
     # TODO: Validate the recently pulled translations, and give a bail option
@@ -203,10 +207,16 @@ def i18n_robot_pull():
     print "\n\nValidating translations with `i18n_tool validate`..."
     sh("{cmd}".format(cmd=cmd))
 
+    # Generate static i18n JS files.
+    for system in ['lms', 'cms']:
+        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
+
     con = raw_input("Continue with committing these translations (y/n)? ")
 
     if con.lower() == 'y':
         sh('git add conf/locale')
+        sh('git add cms/static/js/i18n')
+        sh('git add lms/static/js/i18n')
 
         sh(
             'git commit --message='

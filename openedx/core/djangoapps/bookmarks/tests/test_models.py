@@ -6,6 +6,7 @@ import datetime
 import ddt
 from freezegun import freeze_time
 import mock
+from nose.plugins.attrib import attr
 import pytz
 from unittest import skipUnless
 
@@ -223,12 +224,22 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarkModelTests(BookmarksTestsBase):
     """
     Test the Bookmark model.
     """
+    def setUp(self):
+        super(BookmarkModelTests, self).setUp()
+
+        self.vertical_4 = ItemFactory.create(
+            parent_location=self.sequential_2.location,
+            category='vertical',
+            display_name=None
+        )
+
     def get_bookmark_data(self, block, user=None):
         """
         Returns bookmark data for testing.
@@ -296,6 +307,15 @@ class BookmarkModelTests(BookmarksTestsBase):
         bookmark3, __ = Bookmark.create(bookmark_data_different_user)
         self.assertNotEqual(bookmark, bookmark3)
         self.assert_bookmark_model_is_valid(bookmark3, bookmark_data_different_user)
+
+    def test_create_bookmark_successfully_with_display_name_none(self):
+        """
+        Tests creation of bookmark with display_name None.
+        """
+        bookmark_data = self.get_bookmark_data(self.vertical_4)
+        bookmark, __ = Bookmark.create(bookmark_data)
+        bookmark_data['display_name'] = self.vertical_4.display_name_with_default
+        self.assert_bookmark_model_is_valid(bookmark, bookmark_data)
 
     @ddt.data(
         (-30, [[PathItem(EXAMPLE_USAGE_KEY_1, '1')]], 1),
@@ -389,6 +409,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
+@attr('shard_2')
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """

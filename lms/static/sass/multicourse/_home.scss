@@ -69,7 +69,7 @@ $course-search-input-height: ($button-size);
         @include shift(0);
       }
 
-      > hgroup {
+      > .heading-group {
         @include left(0);
         @include box-sizing(border-box);
         @include transition(all 0.2s linear 0s);
@@ -86,7 +86,8 @@ $course-search-input-height: ($button-size);
           text-transform: none;
         }
 
-        h2 {
+        p {
+          @extend h2;
           margin-bottom: 0;
           text-transform: lowercase;
           font-style: italic;

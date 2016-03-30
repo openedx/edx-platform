@@ -37,6 +37,13 @@ class ProblemPage(PageObject):
         return self.q(css="div.problem span.message").text[0]
 
     @property
+    def extract_hint_text_from_html(self):
+        """
+        Return the "hint" text of the problem from html
+        """
+        return self.q(css="div.problem div.problem-hint").html[0].split(' <', 1)[0]
+
+    @property
     def hint_text(self):
         """
         Return the "hint" text of the problem from its div.
@@ -49,7 +56,7 @@ class ProblemPage(PageObject):
         """
         def mathjax_present():
             """ Returns True if MathJax css is present in the problem body """
-            mathjax_container = self.q(css="div.problem p .MathJax .math")
+            mathjax_container = self.q(css="div.problem p .MathJax_SVG")
             return mathjax_container.visible and mathjax_container.present
 
         self.wait_for(
@@ -63,7 +70,7 @@ class ProblemPage(PageObject):
         """
         def mathjax_present():
             """ Returns True if MathJax css is present in the problem body """
-            mathjax_container = self.q(css="div.problem div.problem-hint .MathJax .math")
+            mathjax_container = self.q(css="div.problem div.problem-hint .MathJax_SVG")
             return mathjax_container.visible and mathjax_container.present
 
         self.wait_for(
@@ -91,6 +98,7 @@ class ProblemPage(PageObject):
         Fill in the answer to a numerical problem.
         """
         self.q(css='div.problem section.inputtype input').fill(text)
+        self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
     def click_check(self):

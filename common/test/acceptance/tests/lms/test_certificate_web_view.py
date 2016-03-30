@@ -206,7 +206,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         Problems were added in the setUp
         """
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
         # Navigate to Test Subsection in Test Section Section
         self.course_nav.go_to_section('Test Section', 'Test Subsection')

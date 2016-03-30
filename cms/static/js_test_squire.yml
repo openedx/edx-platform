@@ -28,13 +28,13 @@ prepend_path: cms/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - xmodule_js/common_static/js/vendor/require.js
+    - xmodule_js/common_static/js/vendor/requirejs/require.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/utility.js
     - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
-    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/common/js/vendor/underscore.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
@@ -67,8 +67,14 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
-    - js
+    # We don't include all of js because the Javascript files in js/i18n cause issues with the Squire tests.
+    - js/collections
+    - js/models
+    - js/utils
+    - js/views
     - common/js
+    - edx-pattern-library/js
+    - edx-ui-toolkit/js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

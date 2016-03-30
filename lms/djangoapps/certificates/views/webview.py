@@ -250,9 +250,9 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     """
     Updates context dictionary with info required for social sharing.
     """
-    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    share_settings = microsite.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
     context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_app_id'] = microsite.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
     context['facebook_share_text'] = share_settings.get(
         'CERTIFICATE_FACEBOOK_TEXT',
         _("I completed the {course_title} course on {platform_name}.").format(
@@ -282,10 +282,8 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
     linkedin_config = LinkedInAddToProfileConfiguration.current()
-
-    # posting certificates to LinkedIn is not currently
-    # supported in microsites/White Labels
-    if linkedin_config.enabled and not microsite.is_request_in_microsite():
+    linkedin_share_enabled = share_settings.get('CERTIFICATE_LINKEDIN', linkedin_config.enabled)
+    if linkedin_share_enabled:
         context['linked_in_url'] = linkedin_config.add_to_profile_url(
             course.id,
             course.display_name,
@@ -342,7 +340,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     else:
         # certificate is being viewed by learner or public
         try:
-            user_certificate = GeneratedCertificate.objects.get(
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
                 user=user,
                 course_id=course_key,
                 status=CertificateStatuses.downloadable
@@ -459,7 +457,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     This public view generates an HTML representation of the specified certificate
     """
     try:
-        certificate = GeneratedCertificate.objects.get(
+        certificate = GeneratedCertificate.eligible_certificates.get(
             verify_uuid=certificate_uuid,
             status=CertificateStatuses.downloadable
         )

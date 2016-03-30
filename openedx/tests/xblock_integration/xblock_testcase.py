@@ -12,10 +12,10 @@ At this point, we support:
 1. Python unit testing
 2. Event publish testing
 3. Testing multiple students
-4. Testing multiple XBloccks on the same page.
+4. Testing multiple XBlocks on the same page.
 
 We have spec'ed out how to do acceptance testing, but have not
-implemented itt yet. We have not spec'ed out JavaScript testing,
+implemented it yet. We have not spec'ed out JavaScript testing,
 but believe it is important.
 
 We do not intend to spec out XBlock/edx-platform integration testing
@@ -28,17 +28,21 @@ either in this framework or another.
 
 Our next steps would be to:
 * Finish this framework
-* Move tests into the XBlocks themselves
-* Run tests via entrypoints
-  - Have an appropriate test to make sure those tests are likely
-    running for standard XBlocks (e.g. assert those entry points
-    exist)
+* Have an appropriate test to make sure those tests are likely
+  running for standard XBlocks (e.g. assert those entry points
+  exist)
+* Move more blocks out of the platform, and more tests into the
+  blocks themselves.
 """
 
+import HTMLParser
 import collections
 import json
 import mock
+import sys
 import unittest
+
+from bs4 import BeautifulSoup
 
 from xblock.plugin import Plugin
 
@@ -87,12 +91,16 @@ class XBlockEventTestMixin(object):
     """
     def setUp(self):
         """
-        We patch runtime.publish to capture all XBlock events sent during the test.
+        We patch runtime.publish to capture all XBlock events sent during
+        the test.
 
-        This is a little bit ugly -- it's all dynamic -- so we patch __init__ for the
-        system runtime to capture the dynamically-created publish, and catch whatever
-        is being passed into it.
+        This is a little bit ugly -- it's all dynamic -- so we patch
+        __init__ for the system runtime to capture the
+        dynamically-created publish, and catch whatever is being
+        passed into it.
+
         """
+        super(XBlockEventTestMixin, self).setUp()
         saved_init = lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__
 
         def patched_init(runtime_self, **kwargs):
@@ -110,19 +118,21 @@ class XBlockEventTestMixin(object):
             kwargs['publish'] = publish
             return saved_init(runtime_self, **kwargs)
 
-        super(XBlockEventTestMixin, self).setUp()
         self.events = []
-        patcher = mock.patch("lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__", patched_init)
+        lms_sys = "lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__"
+        patcher = mock.patch(lms_sys, patched_init)
         patcher.start()
         self.addCleanup(patcher.stop)
 
     def assert_no_events_published(self, event_type):
         """
-        Ensures no events of a given type were published since the last event related assertion.
+        Ensures no events of a given type were published since the last
+        event related assertion.
 
         We are relatively specific since things like implicit HTTP
         events almost always do get omitted, and new event types get
         added all the time. This is not useful without a filter.
+
         """
         for event in self.events:
             self.assertNotEqual(event['event_type'], event_type)
@@ -146,7 +156,9 @@ class XBlockEventTestMixin(object):
                         found = False
                 if found:
                     return
-        self.assertIn({'event_type': event_type, 'event': event_fields}, self.events)
+        self.assertIn({'event_type': event_type,
+                       'event': event_fields},
+                      self.events)
 
     def reset_published_events(self):
         """
@@ -157,8 +169,9 @@ class XBlockEventTestMixin(object):
 
 class GradePublishTestMixin(object):
     '''
-    This checks whether a grading event was correctly published. This puts basic
-    plumbing in place, but we would like to:
+    This checks whether a grading event was correctly published. This
+    puts basic plumbing in place, but we would like to:
+
     * Add search parameters. Is it for the right block? The right user? This
       only handles the case of one block/one user right now.
     * Check end-to-end. We would like to see grades in the database, not just
@@ -170,11 +183,14 @@ class GradePublishTestMixin(object):
     usage key).
 
     We could also use the runtime.publish logic above, now that we have it.
+
     '''
     def setUp(self):
         '''
         Hot-patch the grading emission system to capture grading events.
         '''
+        super(GradePublishTestMixin, self).setUp()
+
         def capture_score(user_id, usage_key, score, max_score):
             '''
             Hot-patch which stores scores in a local array instead of the
@@ -187,10 +203,9 @@ class GradePublishTestMixin(object):
                                 'score': score,
                                 'max_score': max_score})
 
-        super(GradePublishTestMixin, self).setUp()
-
         self.scores = []
-        patcher = mock.patch("courseware.module_render.set_score", capture_score)
+        patcher = mock.patch("courseware.module_render.set_score",
+                             capture_score)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -207,11 +222,15 @@ class XBlockScenarioTestCaseMixin(object):
     '''
     This allows us to have test cases defined in JSON today, and in OLX
     someday.
+
+    Until we do OLX, we're very restrictive in structure. One block
+    per sequence, essentially.
     '''
     @classmethod
     def setUpClass(cls):
         """
-        Create a page with two of the XBlock on it
+        Create a set of pages with XBlocks on them. For now, we restrict
+        ourselves to one block per learning sequence.
         """
         super(XBlockScenarioTestCaseMixin, cls).setUpClass()
 
@@ -219,6 +238,7 @@ class XBlockScenarioTestCaseMixin(object):
             display_name='XBlock_Test_Course'
         )
         cls.scenario_urls = {}
+        cls.xblocks = {}
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             for chapter_config in cls.test_configuration:
                 chapter = ItemFactory.create(
@@ -233,15 +253,25 @@ class XBlockScenarioTestCaseMixin(object):
                 )
                 unit = ItemFactory.create(
                     parent=section,
-                    display_name='New Unit',
+                    display_name='unit_' + chapter_config['urlname'],
                     category='vertical'
                 )
+
+                if len(chapter_config['xblocks']) > 1:
+                    raise NotImplementedError(
+                        """We only support one block per page. """
+                        """We will do more with OLX+learning """
+                        """sequence cleanups."""
+                    )
+
                 for xblock_config in chapter_config['xblocks']:
-                    ItemFactory.create(
+                    xblock = ItemFactory.create(
                         parent=unit,
                         category=xblock_config['blocktype'],
-                        display_name=xblock_config['urlname']
+                        display_name=xblock_config['urlname'],
+                        **xblock_config.get("parameters", {})
                     )
+                    cls.xblocks[xblock_config['urlname']] = xblock
 
                 scenario_url = unicode(reverse(
                     'courseware_section',
@@ -267,11 +297,11 @@ class XBlockStudentTestCaseMixin(object):
 
     def setUp(self):
         """
-        Create users accounts. The first three, we give helpful names to. If
-        there are any more, we auto-generate number IDs. We intentionally use
-        slightly different conventions for different users, so we exercise
-        more corner cases, but we could standardize if this is more hassle than
-        it's worth.
+        Create users accounts. The first three, we give helpful names
+        to. If there are any more, we auto-generate number IDs. We
+        intentionally use slightly different conventions for different
+        users, so we exercise more corner cases, but we could
+        standardize if this is more hassle than it's worth.
         """
         super(XBlockStudentTestCaseMixin, self).setUp()
         for idx, student in enumerate(self.student_list):
@@ -285,15 +315,17 @@ class XBlockStudentTestCaseMixin(object):
         '''
         self.create_account(username, email, password)
         self.activate_user(email)
+        self.login(email, password)
+        self.enroll(self.course, verify=True)
 
     def select_student(self, user_id):
         """
         Select a current user account
         """
         # If we don't have enough users, add a few more...
-        for user_id in range(len(self.student_list), user_id):
-            username = "user_{i}".format(i=user_id)
-            email = "user_{i}@example.edx.org".format(i=user_id)
+        for newuser_id in range(len(self.student_list), user_id):
+            username = "user_{i}".format(i=newuser_id)
+            email = "user_{i}@example.edx.org".format(i=newuser_id)
             password = "12345"
             self._enroll_user(username, email, password)
             self.student_list.append({'email': email, 'password': password})
@@ -303,7 +335,6 @@ class XBlockStudentTestCaseMixin(object):
 
         # ... and log in as the appropriate user
         self.login(email, password)
-        self.enroll(self.course, verify=True)
 
 
 class XBlockTestCase(XBlockStudentTestCaseMixin,
@@ -314,7 +345,8 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                      LoginEnrollmentTestCase,
                      Plugin):
     """
-    Class for all XBlock-internal test cases (as opposed to integration tests).
+    Class for all XBlock-internal test cases (as opposed to
+    integration tests).
     """
     test_configuration = None  # Children must override this!
 
@@ -333,8 +365,13 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         # So, skip the test class here if we are not in the LMS.
         if settings.ROOT_URLCONF != 'lms.urls':
             raise unittest.SkipTest('Test only valid in lms')
-
         super(XBlockTestCase, cls).setUpClass()
+
+    def setUp(self):
+        """
+        Call setups of all parents
+        """
+        super(XBlockTestCase, self).setUp()
 
     def get_handler_url(self, handler, xblock_name=None):
         """
@@ -342,7 +379,9 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         """
         return reverse('xblock_handler', kwargs={
             'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.course.id.make_usage_key('done', xblock_name)),
+            'usage_id': unicode(
+                self.course.id.make_usage_key('done', xblock_name)
+            ),
             'handler': handler,
             'suffix': ''
         })
@@ -356,7 +395,17 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         resp = self.client.post(url, json.dumps(json_data), '')
         ajax_response = collections.namedtuple('AjaxResponse',
                                                ['data', 'status_code'])
-        ajax_response.data = json.loads(resp.content)
+        try:
+            ajax_response.data = json.loads(resp.content)
+        except ValueError:
+            print "Invalid JSON response"
+            print "(Often a redirect if e.g. not logged in)"
+            print >>sys.stderr, "Could not load JSON from AJAX call"
+            print >>sys.stderr, "Status:", resp.status_code
+            print >>sys.stderr, "URL:", url
+            print >>sys.stderr, "Block", block_urlname
+            print >>sys.stderr, "Response", repr(resp.content)
+            raise
         ajax_response.status_code = resp.status_code
         return ajax_response
 
@@ -371,7 +420,6 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                     xblock_type = block["blocktype"]
 
         key = unicode(self.course.id.make_usage_key(xblock_type, xblock_name))
-
         return reverse('xblock_handler', kwargs={
             'course_id': unicode(self.course.id),
             'usage_id': key,
@@ -379,22 +427,80 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             'suffix': ''
         })
 
+    def extract_block_html(self, content, urlname):
+        '''This will extract the HTML of a rendered XBlock from a
+        page. This should be simple. This should just be (in lxml):
+            usage_id = self.xblocks[block_urlname].scope_ids.usage_id
+            encoded_id = usage_id.replace(";_", "/")
+        Followed by:
+            page_xml = defusedxml.ElementTree.parse(StringIO.StringIO(response_content))
+            page_xml.find("//[@data-usage-id={usage}]".format(usage=encoded_id))
+        or
+            soup_html = BeautifulSoup(response_content, 'html.parser')
+            soup_html.find(**{"data-usage-id": encoded_id})
+
+        Why isn't it? Well, the blocks are stored in a rather funky
+        way in learning sequences. Ugh. Easy enough, populate the
+        course with just verticals. Well, that doesn't work
+        either. The whole test infrastructure populates courses with
+        Studio AJAX calls, and Studio has broken support for anything
+        other than course/sequence/vertical/block.
+
+        So until we either fix Studio to support most course
+        structures, fix learning sequences to not have HTML-in-JS
+        (which causes many other problems as well -- including
+        user-facing bugs), or fix the test infrastructure to
+        create courses from OLX, we're stuck with this little hack.
+        '''
+        usage_id = self.xblocks[urlname].scope_ids.usage_id
+        # First, we get out our <div>
+        soup_html = BeautifulSoup(content)
+        xblock_html = unicode(soup_html.find(id="seq_contents_0"))
+        # Now, we get out the text of the <div>
+        try:
+            escaped_html = xblock_html.split('<')[1].split('>')[1]
+        except IndexError:
+            print >>sys.stderr, "XBlock page could not render"
+            print >>sys.stderr, "(Often, a redirect if e.g. not logged in)"
+            print >>sys.stderr, "URL Name:", repr(urlname)
+            print >>sys.stderr, "Usage ID", repr(usage_id)
+            print >>sys.stderr, "Content", repr(content)
+            print >>sys.stderr, "Split 1", repr(xblock_html.split('<'))
+            print >>sys.stderr, "Dice 1:", repr(xblock_html.split('<')[1])
+            print >> sys.stderr, "Split 2", repr(xblock_html.split('<')[1].split('>'))
+            print >> sys.stderr, "Dice 2", repr(xblock_html.split('<')[1].split('>')[1])
+            raise
+        # Finally, we unescape the contents
+        decoded_html = HTMLParser.HTMLParser().unescape(escaped_html).strip()
+
+        return decoded_html
+
     def render_block(self, block_urlname):
         '''
         Return a rendering of the XBlock.
 
         We should include data, but with a selector dropping
         the rest of the HTML around the block.
-
-        To do: Implement returning the XBlock's HTML. This is an XML
-        selector on the returned response for that div.
         '''
         section = self._containing_section(block_urlname)
         html_response = collections.namedtuple('HtmlResponse',
-                                               ['status_code'])
+                                               ['status_code',
+                                                'content',
+                                                'debug'])
         url = self.scenario_urls[section]
         response = self.client.get(url)
+
         html_response.status_code = response.status_code
+        response_content = response.content.decode('utf-8')
+        html_response.content = self.extract_block_html(
+            response_content,
+            block_urlname
+        )
+        # We return a little bit of metadata helpful for debugging.
+        # What is in this is not a defined part of the API contract.
+        html_response.debug = {'url': url,
+                               'section': section,
+                               'block_urlname': block_urlname}
         return html_response
 
     def _containing_section(self, block_urlname):

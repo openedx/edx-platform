@@ -41,6 +41,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
@@ -53,11 +54,6 @@ DJFS = {
     'directory_root': 'cms/static/djpyfs',
     'url_root': '/static/djpyfs',
 }
-
-############################# ADVANCED COMPONENTS #############################
-
-# Make it easier to test advanced components in local dev
-FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
 
 ################################# CELERY ######################################
 

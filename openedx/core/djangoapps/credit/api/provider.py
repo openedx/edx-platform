@@ -10,6 +10,7 @@ import pytz
 from django.db import transaction
 
 from lms.djangoapps.django_comment_client.utils import JsonResponse
+from edx_proctoring.api import get_last_exam_completion_date
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
     CreditProviderNotConfigured,
@@ -23,8 +24,12 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequest,
     CreditEligibility,
 )
+
+from student.models import (
+    User,
+    CourseEnrollment,
+)
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
-from student.models import User
 from util.date_utils import to_timestamp
 
 
@@ -264,12 +269,21 @@ def create_credit_request(course_key, provider_id, username):
         log.exception(msg)
         raise UserIsNotEligible(msg)
 
+    # Getting the students's enrollment date
+    course_enrollment = CourseEnrollment.get_enrollment(user, course_key)
+    enrollment_date = course_enrollment.created if course_enrollment else ""
+
+    # Getting the student's course completion date
+    completion_date = get_last_exam_completion_date(course_key, username)
+
     parameters = {
         "request_uuid": credit_request.uuid,
         "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),
         "course_org": course_key.org,
         "course_num": course_key.course,
         "course_run": course_key.run,
+        "enrollment_timestamp": to_timestamp(enrollment_date) if enrollment_date else "",
+        "course_completion_timestamp": to_timestamp(completion_date) if completion_date else "",
         "final_grade": final_grade,
         "user_username": user.username,
         "user_email": user.email,

@@ -2,9 +2,25 @@
 var releasedToStudents = xblockInfo.get('released_to_students');
 var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
+var prereq = xblockInfo.get('prereq');
 
 var statusMessage = null;
 var statusType = null;
+if (prereq) {
+    var prereqDisplayName = '';
+    _.each(xblockInfo.get('prereqs'), function (p) {
+        if (p.block_usage_key == prereq) {
+            prereqDisplayName = p.block_display_name;
+            return false;
+        }
+    });
+    statusType = 'gated';
+    statusMessage = interpolate(
+        gettext('Prerequisite: %(prereq_display_name)s'),
+        {prereq_display_name: prereqDisplayName},
+        true
+    );
+}
 if (staffOnlyMessage) {
     statusType = 'staff-only';
     statusMessage = gettext('Contains staff only content');
@@ -27,6 +43,8 @@ if (statusType === 'warning') {
 } else if (statusType === 'error') {
     statusIconClass = 'fa-warning';
 } else if (statusType === 'staff-only') {
+    statusIconClass = 'fa-lock';
+} else if (statusType === 'gated') {
     statusIconClass = 'fa-lock';
 }
 
@@ -67,11 +85,11 @@ if (is_proctored_exam) {
         <% } %>
                 <% if (xblockInfo.isVertical()) { %>
                     <span class="unit-title item-title">
-                        <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                        <a href="<%= xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
                     </span>
                 <% } else { %>
                     <span class="wrapper-<%= xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%= gettext("Display Name") %>">
-                        <span class="<%= xblockType %>-title item-title xblock-field-value incontext-editor-value"><%= xblockInfo.get('display_name') %></span>
+                        <span class="<%= xblockType %>-title item-title xblock-field-value incontext-editor-value"><%- xblockInfo.get('display_name') %></span>
                     </span>
                 <% } %>
             </h3>

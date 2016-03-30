@@ -80,6 +80,14 @@ DATABASES = {
             'timeout': 30,
         },
         'ATOMIC_REQUESTS': True,
+    },
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': TEST_ROOT / "db" / "test_student_module_history.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_student_module_history.db",
+        'OPTIONS': {
+            'timeout': 30,
+        },
     }
 }
 

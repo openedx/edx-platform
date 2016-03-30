@@ -3,9 +3,10 @@
  * It is expected to be instantiated with a GroupConfiguration model.
  */
 define([
-    'js/views/baseview', 'underscore', 'gettext', 'underscore.string'
+    'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
+    'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
 ],
-function(BaseView, _, gettext, str) {
+function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
     var GroupConfigurationDetailsView = BaseView.extend({
         tagName: 'div',
@@ -26,7 +27,7 @@ function(BaseView, _, gettext, str) {
         },
 
         initialize: function() {
-            this.template = _.template(
+            this.template = HtmlUtils.template(
                 $('#group-configuration-details-tpl').text()
             );
             this.listenTo(this.model, 'change', this.render);
@@ -36,11 +37,10 @@ function(BaseView, _, gettext, str) {
             var attrs = $.extend({}, this.model.attributes, {
                 groupsCountMessage: this.getGroupsCountTitle(),
                 usageCountMessage: this.getUsageCountTitle(),
-                outlineAnchorMessage: this.getOutlineAnchorMessage(),
+                courseOutlineUrl: this.model.collection.outlineUrl,
                 index: this.model.collection.indexOf(this.model)
             });
-
-            this.$el.html(this.template(attrs));
+            HtmlUtils.setHtml(this.$el, this.template(attrs));
             return this;
         },
 
@@ -61,54 +61,37 @@ function(BaseView, _, gettext, str) {
 
         getGroupsCountTitle: function () {
             var count = this.model.get('groups').length,
+                /* globals ngettext */
                 message = ngettext(
                     /*
                         Translators: 'count' is number of groups that the group
                         configuration contains.
                     */
-                    'Contains %(count)s group', 'Contains %(count)s groups',
+                    'Contains {count} group', 'Contains {count} groups',
                     count
                 );
 
-            return interpolate(message, { count: count }, true);
+            return StringUtils.interpolate(message, { count: count });
         },
 
         getUsageCountTitle: function () {
-            var count = this.model.get('usage').length, message;
+            var count = this.model.get('usage').length;
 
             if (count === 0) {
-                message = gettext('Not in Use');
+                return gettext('Not in Use');
             } else {
-                message = ngettext(
+                return StringUtils.interpolate(ngettext(
+
                     /*
                         Translators: 'count' is number of units that the group
                         configuration is used in.
                     */
-                    'Used in %(count)s unit', 'Used in %(count)s units',
+                    'Used in {count} unit', 'Used in {count} units',
                     count
+                ),
+                    {count: count}
                 );
             }
-
-            return interpolate(message, { count: count }, true);
-        },
-
-        getOutlineAnchorMessage: function () {
-            var message = gettext(
-                    /*
-                        Translators: 'outlineAnchor' is an anchor pointing to
-                        the course outline page.
-                    */
-                    'This Group Configuration is not in use. Start by adding a content experiment to any Unit via the %(outlineAnchor)s.'
-                ),
-                anchor = str.sprintf(
-                    '<a href="%(url)s" title="%(text)s">%(text)s</a>',
-                    {
-                            url: this.model.collection.outlineUrl,
-                            text: gettext('Course Outline')
-                    }
-                );
-
-            return str.sprintf(message, {outlineAnchor: anchor});
         }
     });
 

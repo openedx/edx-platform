@@ -76,7 +76,7 @@ class Command(BaseCommand):
         status = options.get('status', CertificateStatuses.downloadable)
         grade = options.get('grade', '')
 
-        cert, created = GeneratedCertificate.objects.get_or_create(
+        cert, created = GeneratedCertificate.eligible_certificates.get_or_create(
             user=user,
             course_id=course_key
         )

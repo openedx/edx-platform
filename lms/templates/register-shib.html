@@ -169,11 +169,7 @@ import calendar
             <div class="field required checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
-                ## TODO: provide a better way to override these links
-                if self.stanford_theme_enabled():
-                  honor_code_path = marketing_link('TOS') + "#honor"
-                else:
-                  honor_code_path = marketing_link('HONOR')
+                honor_code_path = marketing_link('HONOR')
               %>
               <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
                 link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),

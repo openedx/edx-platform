@@ -15,7 +15,7 @@ from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.util.misc import escape_invalid_characters
-from xmodule.mongo_connection import connect_to_mongodb
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from .content import StaticContent, ContentStore, StaticContentStream
 
 
@@ -399,7 +399,8 @@ class MongoContentStore(ContentStore):
     def ensure_indexes(self):
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
         # which can be `uploadDate`, `display_name`,
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.tag', pymongo.ASCENDING),
                 ('_id.org', pymongo.ASCENDING),
@@ -409,7 +410,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -418,7 +420,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -427,7 +430,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -436,7 +440,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -445,7 +450,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -454,7 +460,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -463,7 +470,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),

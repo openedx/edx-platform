@@ -6,6 +6,11 @@
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 </%block>
+<%block name="js_extra">
+
+<%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
+</%block>
+
 
 <%block name="pagetitle">${tab['name']} | ${course.display_number_with_default | h}</%block>
 

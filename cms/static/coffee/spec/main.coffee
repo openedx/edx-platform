@@ -26,7 +26,7 @@ requirejs.config({
         "moment": "xmodule_js/common_static/js/vendor/moment.min",
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
-        "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
+        "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
@@ -51,7 +51,7 @@ requirejs.config({
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
         "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
 
-        "mathjax": "//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix",
@@ -221,8 +221,11 @@ define([
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
-    "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
+    "coffee/spec/views/course_info_spec",
+    "coffee/spec/views/metadata_edit_spec",
+    "coffee/spec/views/module_edit_spec",
+    "coffee/spec/views/textbook_spec",
+    "coffee/spec/views/upload_spec",
 
     "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
     "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",

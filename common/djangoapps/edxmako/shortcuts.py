@@ -12,16 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.template import Context
-from django.http import HttpResponse
 import logging
+
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.template import Context
 
 from microsite_configuration import microsite
 
 from edxmako import lookup_template
 from edxmako.middleware import get_template_request_context
-from django.conf import settings
-from django.core.urlresolvers import reverse
+from openedx.core.djangoapps.theming.helpers import get_template_path
 log = logging.getLogger(__name__)
 
 
@@ -33,7 +35,6 @@ def marketing_link(name):
     possible URLs for certain links. This function is to decides
     which URL should be provided.
     """
-
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
@@ -101,17 +102,6 @@ def marketing_link_context_processor(request):
     )
 
 
-def open_source_footer_context_processor(request):
-    """
-    Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
-    """
-    return dict(
-        [
-            ("IS_EDX_DOMAIN", settings.FEATURES.get('IS_EDX_DOMAIN', False))
-        ]
-    )
-
-
 def microsite_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
@@ -125,8 +115,7 @@ def microsite_footer_context_processor(request):
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
 
-    # see if there is an override template defined in the microsite
-    template_name = microsite.get_template_path(template_name)
+    template_name = get_template_path(template_name)
 
     context_instance = Context(dictionary)
     # add dictionary to context_instance
@@ -165,9 +154,6 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
-
-    # see if there is an override template defined in the microsite
-    template_name = microsite.get_template_path(template_name)
 
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

@@ -158,6 +158,7 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        @renderProgressState()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>

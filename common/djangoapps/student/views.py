@@ -39,7 +39,6 @@ from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
 
-
 from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
@@ -55,6 +54,7 @@ from student.models import (
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
@@ -123,6 +123,8 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
+from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 
@@ -169,7 +171,27 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     context = {'courses': courses}
 
+    context['homepage_overlay_html'] = microsite.get_value('homepage_overlay_html')
+
+    # This appears to be an unused context parameter, at least for the master templates...
+    context['show_partners'] = microsite.get_value('show_partners', True)
+
+    # TO DISPLAY A YOUTUBE WELCOME VIDEO
+    # 1) Change False to True
+    context['show_homepage_promo_video'] = microsite.get_value('show_homepage_promo_video', False)
+
+    # 2) Add your video's YouTube ID (11 chars, eg "123456789xX"), or specify via microsite config
+    # Note: This value should be moved into a configuration setting and plumbed-through to the
+    # context via the microsite configuration workflow, versus living here
+    youtube_video_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
+    context['homepage_promo_video_youtube_id'] = youtube_video_id
+
+    # allow for microsite override of the courses list
+    context['courses_list'] = microsite.get_template_path('courses_list.html')
+
+    # Insert additional context for use in the template
     context.update(extra_context)
+
     return render_to_response('index.html', context)
 
 
@@ -294,6 +316,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
         CertificateStatuses.auditing: 'auditing',
+        CertificateStatuses.audit_passing: 'auditing',
+        CertificateStatuses.audit_notpassing: 'auditing',
     }
 
     default_status = 'processing'
@@ -479,6 +503,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
     # if verified is an option.
     if CourseMode.VERIFIED in modes and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES:
         mode_info['show_upsell'] = True
+        mode_info['verified_sku'] = modes['verified'].sku
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
@@ -587,6 +612,7 @@ def dashboard(request):
     # This is passed along in the template context to allow rendering of
     # program-related information on the dashboard.
     course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
+    xseries_credentials = _get_xseries_credentials(user)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -676,6 +702,10 @@ def dashboard(request):
         redirect_message = _("The course you are looking for does not start until {date}.").format(
             date=request.GET['notlive']
         )
+    elif 'course_closed' in request.GET:
+        redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
+            date=request.GET['course_closed']
+        )
     else:
         redirect_message = ''
 
@@ -710,7 +740,15 @@ def dashboard(request):
         'nav_hidden': True,
         'course_programs': course_programs,
         'disable_courseware_js': True,
+        'xseries_credentials': xseries_credentials,
     }
+
+    ecommerce_service = EcommerceService()
+    if ecommerce_service.is_enabled(request.user):
+        context.update({
+            'use_ecommerce_payment_flow': True,
+            'ecommerce_payment_page': ecommerce_service.payment_page_url(),
+        })
 
     return render_to_response('dashboard.html', context)
 
@@ -889,12 +927,13 @@ def _credit_statuses(user, course_enrollments):
     statuses = {}
     for eligibility in credit_api.get_eligibilities_for_user(user.username):
         course_key = CourseKey.from_string(unicode(eligibility["course_key"]))
+        providers_names = get_credit_provider_display_names(course_key)
         status = {
             "course_key": unicode(course_key),
             "eligible": True,
             "deadline": eligibility["deadline"],
             "purchased": course_key in credit_enrollments,
-            "provider_name": None,
+            "provider_name": make_providers_strings(providers_names),
             "provider_status_url": None,
             "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
@@ -1209,10 +1248,19 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     # Track the user's sign in
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(user.id, {
-            'email': email,
-            'username': username
-        })
+        analytics.identify(
+            user.id,
+            {
+                'email': email,
+                'username': username
+            },
+            {
+                # Disable MailChimp because we don't want to update the user's email
+                # and username in MailChimp on every page load. We only need to capture
+                # this data on registration/activation.
+                'MailChimp': False
+            }
+        )
 
         analytics.track(
             user.id,
@@ -1316,6 +1364,7 @@ def logout_user(request):
     """
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
+    request.is_from_logout = True
     logout(request)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
@@ -1585,7 +1634,11 @@ def create_account_with_params(request, params):
         not do_external_auth
     )
     # Can't have terms of service for certain SHIB users, like at Stanford
+    registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
+        registration_fields.get('terms_of_service') != 'hidden' or
+        registration_fields.get('honor_code') != 'hidden'
+    ) and (
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
@@ -1666,7 +1719,9 @@ def create_account_with_params(request, params):
                 'email': user.email,
                 'username': user.username,
                 'name': profile.name,
-                'age': profile.age,
+                # Mailchimp requires the age & yearOfBirth to be integers, we send a sane integer default if falsey.
+                'age': profile.age or -1,
+                'yearOfBirth': profile.year_of_birth or datetime.datetime.now(UTC).year,
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
@@ -1750,6 +1805,7 @@ def create_account_with_params(request, params):
             log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
     else:
         registration.activate()
+        _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -1777,6 +1833,25 @@ def create_account_with_params(request, params):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def _enroll_user_in_pending_courses(student):
+    """
+    Enroll student in any pending courses he/she may have.
+    """
+    ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
+    for cea in ceas:
+        if cea.auto_enroll:
+            enrollment = CourseEnrollment.enroll(student, cea.course_id)
+            manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
+            if manual_enrollment_audit is not None:
+                # get the enrolled by user and reason from the ManualEnrollmentAudit table.
+                # then create a new ManualEnrollmentAudit table entry for the same email
+                # different transition state.
+                ManualEnrollmentAudit.create_manual_enrollment_audit(
+                    manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
+                    manual_enrollment_audit.reason, enrollment
+                )
 
 
 @csrf_exempt
@@ -1874,7 +1949,7 @@ def auto_auth(request):
     # the new user object.
     try:
         user, profile, reg = _do_create_account(form)
-    except AccountValidationError:
+    except (AccountValidationError, ValidationError):
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
         user.email = email
@@ -1975,21 +2050,7 @@ def activate_account(request, key):
             already_active = False
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=regs[0].user_id)
-        if student:
-            ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
-            for cea in ceas:
-                if cea.auto_enroll:
-                    enrollment = CourseEnrollment.enroll(student[0], cea.course_id)
-                    manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student[0].email)
-                    if manual_enrollment_audit is not None:
-                        # get the enrolled by user and reason from the ManualEnrollmentAudit table.
-                        # then create a new ManualEnrollmentAudit table entry for the same email
-                        # different transition state.
-                        ManualEnrollmentAudit.create_manual_enrollment_audit(
-                            manual_enrollment_audit.enrolled_by, student[0].email, ALLOWEDTOENROLL_TO_ENROLLED,
-                            manual_enrollment_audit.reason, enrollment
-                        )
+        _enroll_user_in_pending_courses(regs[0].user)
 
         resp = render_to_response(
             "registration/activation_complete.html",
@@ -2366,24 +2427,59 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
             the given user has active enrollments.
 
     Returns:
-        dict, containing programs keyed by course. Empty if programs cannot be retrieved.
+        dict, containing programs keyed by course.
     """
     course_programs = get_programs_for_dashboard(user, user_enrolled_courses)
     programs_data = {}
 
-    for course_key, program in course_programs.viewitems():
-        if program.get('status') == 'active' and program.get('category') == 'xseries':
-            try:
-                programs_data[course_key] = {
-                    'course_count': len(program['course_codes']),
-                    'display_name': program['name'],
-                    'category': program.get('category'),
-                    'program_marketing_url': urljoin(
-                        settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
-                    ).format(program['marketing_slug']),
-                    'display_category': 'XSeries'
-                }
-            except KeyError:
-                log.warning('Program structure is invalid, skipping display: %r', program)
+    for course_key, programs in course_programs.viewitems():
+        for program in programs:
+            if program.get('status') == 'active' and program.get('category') == 'xseries':
+                try:
+                    programs_for_course = programs_data.setdefault(course_key, {})
+                    programs_for_course.setdefault('course_program_list', []).append({
+                        'course_count': len(program['course_codes']),
+                        'display_name': program['name'],
+                        'program_id': program['id'],
+                        'program_marketing_url': urljoin(
+                            settings.MKTG_URLS.get('ROOT'),
+                            'xseries' + '/{}'
+                        ).format(program['marketing_slug'])
+                    })
+                    programs_for_course['display_category'] = 'XSeries'
+                    programs_for_course['category'] = program.get('category')
+                except KeyError:
+                    log.warning('Program structure is invalid, skipping display: %r', program)
 
     return programs_data
+
+
+def _get_xseries_credentials(user):
+    """Return program credentials data required for display on
+    the learner dashboard.
+
+    Given a user, find all programs for which certificates have been earned
+    and return list of dictionaries of required program data.
+
+    Arguments:
+        user (User): user object for getting programs credentials.
+
+    Returns:
+        list of dict, containing data corresponding to the programs for which
+        the user has been awarded a credential.
+    """
+    programs_credentials = get_user_program_credentials(user)
+    credentials_data = []
+    for program in programs_credentials:
+        if program.get('category') == 'xseries':
+            try:
+                program_data = {
+                    'display_name': program['name'],
+                    'subtitle': program['subtitle'],
+                    'credential_url': program['credential_url'],
+                }
+                credentials_data.append(program_data)
+            except KeyError:
+                log.warning('Program structure is invalid: %r', program)
+
+    return credentials_data

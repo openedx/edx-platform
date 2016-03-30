@@ -70,6 +70,7 @@
     @extend %cont-truncated;
     z-index: 1000;
     padding: 0 $baseline 0 ($baseline*0.75);
+    width: 100%;
     height: 40px;
     font-size: 14px;
     line-height: 36px;

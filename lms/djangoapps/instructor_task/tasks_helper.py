@@ -57,6 +57,7 @@ from instructor_analytics.basic import (
     list_problem_responses
 )
 from instructor_analytics.csvs import format_dictlist
+from openassessment.data import OraAggregateData
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
@@ -1448,7 +1449,7 @@ def generate_students_certificates(
             course=course
         )
 
-        if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+        if CertificateStatuses.is_passing_status(status):
             task_progress.succeeded += 1
         else:
             task_progress.failed += 1
@@ -1584,7 +1585,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(
+    certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
         user__in=enrolled_students,
         course_id=course_id,
         status__in=certificate_statuses,
@@ -1599,3 +1600,70 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
         download_url='',
         grade='',
     )
+
+
+def upload_ora2_data(
+        _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
+):
+    """
+    Collect ora2 responses and upload them to S3 as a CSV
+    """
+
+    start_date = datetime.now(UTC)
+    start_time = time()
+
+    num_attempted = 1
+    num_total = 1
+
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = fmt.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=_task_input
+    )
+    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    task_progress = TaskProgress(action_name, num_total, start_time)
+    task_progress.attempted = num_attempted
+
+    curr_step = {'step': "Collecting responses"}
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s for all submissions',
+        task_info_string,
+        action_name,
+        curr_step,
+    )
+
+    task_progress.update_task_state(extra_meta=curr_step)
+
+    try:
+        header, datarows = OraAggregateData.collect_ora2_data(course_id)
+        rows = [header] + [row for row in datarows]
+    # Update progress to failed regardless of error type
+    except Exception:  # pylint: disable=broad-except
+        TASK_LOG.exception('Failed to get ORA data.')
+        task_progress.failed = 1
+        curr_step = {'step': "Error while collecting data"}
+
+        task_progress.update_task_state(extra_meta=curr_step)
+
+        return UPDATE_STATUS_FAILED
+
+    task_progress.succeeded = 1
+    curr_step = {'step': "Uploading CSV"}
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s',
+        task_info_string,
+        action_name,
+        curr_step,
+    )
+    task_progress.update_task_state(extra_meta=curr_step)
+
+    upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
+
+    curr_step = {'step': 'Finalizing ORA data report'}
+    task_progress.update_task_state(extra_meta=curr_step)
+    TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
+
+    return UPDATE_STATUS_SUCCEEDED

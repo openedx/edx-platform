@@ -105,16 +105,38 @@
   font-family: arial, helvetica, sans-serif;
 }
 
+.wmd-prompt-dialog {
+  .form {
+    width: 400px;
+    margin: 0 auto;
+  }
+  .form-actions {
+    text-align: center;
+  }
 
-.wmd-prompt-dialog > form > input[type="text"] {
-  border: 1px solid #999999;
-  color: black;
+  .input-text {
+    width: 400px;
+    padding: 0px 12px;
+  }
+
+  .field-hint,
+  .field-message.has-error {
+    width: 380px;
+  }
+
+  .file-upload {
+    .input-text {
+      width: 230px;
+    }
+    .field-message.has-error {
+      margin-top: -1px;
+      width: 210px;
+    }
+    .form-btn {
+      margin: 0 0 0 10px;
+      height: 35px;
+      width: 130px;
+      padding: 6px;
+    }
+  }
 }
-
-.wmd-prompt-dialog > form > input[type="button"]{
-  border: 1px solid #888888;
-  font-family: trebuchet MS, helvetica, sans-serif;
-  font-size: 1em;
-  font-weight: bold;
-}
-

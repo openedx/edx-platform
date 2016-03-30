@@ -30,9 +30,10 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         GET /api/courses/v1/blocks/<usage_id>/?
             username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url
             &block_counts=video
             &student_view_data=video
+            &block_types_filter=problem,html
 
     **Parameters**:
 
@@ -85,11 +86,18 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           Example: return_type=dict
 
+        * block_types_filter: (list) Requested types of blocks used to filter the final result
+          of returned blocks. Possible values include sequential, vertical, html, problem,
+          video, and discussion.
+
+          Example: block_types_filter=vertical,html
+
     **Response Values**
 
         The following fields are returned with a successful response.
 
-        * root: The ID of the root node of the course blocks.
+        * root: The ID of the root node of the requested course block
+          structure.
 
         * blocks: A dictionary that maps block usage IDs to a collection of
           information about each block.  Each block contains the following
@@ -146,6 +154,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             if the student_view_url and the student_view_data fields are not
             supported.
 
+          * lti_url: The block URL for an LTI consumer.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
@@ -176,7 +185,8 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data['requested_fields'],
                     params.cleaned_data.get('block_counts', []),
                     params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data['return_type']
+                    params.cleaned_data['return_type'],
+                    params.cleaned_data.get('block_types_filter', None),
                 )
             )
         except ItemNotFoundError as exception:
@@ -197,9 +207,10 @@ class BlocksInCourseView(BlocksView):
         GET /api/courses/v1/blocks/?course_id=<course_id>
             &username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device
+            &requested_fields=graded,format,student_view_multi_device,lti_url
             &block_counts=video
             &student_view_data=video
+            &block_types_filter=problem,html
 
     **Parameters**:
 

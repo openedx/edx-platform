@@ -61,35 +61,35 @@ describe 'Calculator', ->
   describe 'showHint', ->
     it 'show the help overlay', ->
       @calculator.showHint()
-      expect($('.calc-help-popup')).toHaveClass('shown')
-      expect($('.calc-help-popup')).toHaveAttr('aria-hidden', 'false')
+      expect($('.help')).toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'false')
 
 
   describe 'hideHint', ->
     it 'show the help overlay', ->
       @calculator.hideHint()
-      expect($('.calc-help-popup')).not.toHaveClass('shown')
-      expect($('.calc-help-popup')).toHaveAttr('aria-hidden', 'true')
+      expect($('.help')).not.toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'true')
 
   describe 'handleClickOnHintButton', ->
     it 'on click hint button hint popup becomes visible ', ->
       e = jQuery.Event('click');
       $('#calculator_hint').trigger(e);
-      expect($('.calc-help-popup')).toHaveClass 'shown'
+      expect($('.help')).toHaveClass 'shown'
 
   describe 'handleClickOnDocument', ->
     it 'on click out of the hint popup it becomes hidden', ->
       @calculator.showHint()
       e = jQuery.Event('click');
       $(document).trigger(e);
-      expect($('.calc-help-popup')).not.toHaveClass 'shown'
+      expect($('.help')).not.toHaveClass 'shown'
 
   describe 'handleClickOnHintPopup', ->
     it 'on click of hint popup it remains visible', ->
       @calculator.showHint()
       e = jQuery.Event('click');
       $('#calculator_input_help').trigger(e);
-      expect($('.calc-help-popup')).toHaveClass 'shown'
+      expect($('.help')).toHaveClass 'shown'
 
   describe 'selectHint', ->
     it 'select correct hint item', ->

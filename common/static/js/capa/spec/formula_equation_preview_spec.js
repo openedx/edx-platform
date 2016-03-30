@@ -115,6 +115,27 @@ describe("Formula Equation Preview", function () {
             ]);
         });
 
+        it('does not request again if the initial request has already been made', function () {
+            // jshint undef:false
+            expect(Problem.inputAjax.callCount).toEqual(1);
+
+            // Reset the spy in order to check calls again.
+            Problem.inputAjax.reset();
+
+            // Enabling the formulaEquationPreview again to see if this will
+            // reinitialize input request once again.
+            formulaEquationPreview.enable();
+
+            // This part may be asynchronous, so wait.
+            waitsFor(function () {
+                return !Problem.inputAjax.wasCalled;
+            }, "times out in case of AJAX call", 1000);
+
+            // Expect Problem.inputAjax was not called as input request was
+            // initialized before.
+            expect(Problem.inputAjax).not.toHaveBeenCalled();
+        });
+
         it('makes a request on user input', function () {
             Problem.inputAjax.reset();
             $('#input_THE_ID').val('user_input').trigger('input');
@@ -139,7 +160,7 @@ describe("Formula Equation Preview", function () {
             // Either it makes a request or jumps straight into displaying ''.
             waitsFor(function () {
                 // (Short circuit if `inputAjax` is indeed called)
-                return Problem.inputAjax.wasCalled || 
+                return Problem.inputAjax.wasCalled ||  // jshint ignore:line
                     MathJax.Hub.Queue.wasCalled;
             }, "AJAX never called on user input", 1000);
 
@@ -266,7 +287,7 @@ describe("Formula Equation Preview", function () {
 
                 // We should look in the preview div for the MathJax.
                 var previewElement = $("#input_THE_ID_preview")[0];
-                expect(previewElement.firstChild.data).toEqual("\\[THE_FORMULA\\]");
+                expect(previewElement.firstChild.data).toEqual("\\(THE_FORMULA\\)");
 
                 // Refresh the MathJax.
                 expect(MathJax.Hub.Queue).toHaveBeenCalledWith(

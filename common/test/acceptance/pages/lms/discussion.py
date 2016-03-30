@@ -48,6 +48,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         Given the selector for an ancestor of a secondary menu, return a context
         manager that will open and close the menu
         """
+        self.wait_for_ajax()
         self._find_within(ancestor_selector + " .action-more").click()
         EmptyPromise(
             lambda: self._is_element_visible(ancestor_selector + " .actions-dropdown"),
@@ -69,6 +70,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def get_response_total_text(self):
         """Returns the response count text, or None if not present"""
+        self.wait_for_ajax()
         return self._get_element_text(".response-count")
 
     def get_num_displayed_responses(self):
@@ -126,12 +128,13 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def verify_mathjax_rendered(self):
         """ Checks that MathJax css class is present """
         self.wait_for(
-            lambda: self._is_element_visible(".MathJax"),
+            lambda: self._is_element_visible(".MathJax_SVG"),
             description="MathJax Preview is rendered"
         )
 
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
+        self.wait_for_ajax()
         return self._is_element_visible(".response_{} .response-body".format(comment_id))
 
     def is_response_editable(self, response_id):
@@ -195,17 +198,58 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Replace the contents of the response editor"""
         self._find_within(".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
 
+    def verify_link_editor_error_messages_shown(self):
+        """
+        Confirm that the error messages are displayed in the editor.
+        """
+        def errors_visible():
+            """
+            Returns True if both errors are visible, False otherwise.
+            """
+            return (
+                self.q(css="#new-url-input-field-message.has-error").visible and
+                self.q(css="#new-url-desc-input-field-message.has-error").visible
+            )
+
+        self.wait_for(errors_visible, "Form errors should be visible.")
+
+    def add_content_via_editor_button(self, content_type, response_id, url, description, is_decorative=False):
+        """Replace the contents of the response editor"""
+        self._find_within(
+            "#wmd-{}-button-edit-post-body-{}".format(
+                content_type,
+                response_id,
+            )
+        ).click()
+        self.q(css='#new-url-input').fill(url)
+        self.q(css='#new-url-desc-input').fill(description)
+
+        if is_decorative:
+            self.q(css='#img-is-decorative').click()
+
+        self.q(css='input[value="OK"]').click()
+
     def submit_response_edit(self, response_id, new_response_body):
         """Click the submit button on the response editor"""
-        self._find_within(".response_{} .discussion-response .post-update".format(response_id)).first.click()
-        EmptyPromise(
-            lambda: (
+
+        def submit_response_check_func():
+            """
+            Tries to click "Update post" and returns True if the post
+            was successfully updated, False otherwise.
+            """
+            self._find_within(
+                ".response_{} .discussion-response .post-update".format(
+                    response_id
+                )
+            ).first.click()
+
+            return (
                 not self.is_response_editor_visible(response_id) and
                 self.is_response_visible(response_id) and
                 self.get_response_body(response_id) == new_response_body
-            ),
-            "Comment edit succeeded"
-        ).fulfill()
+            )
+
+        self.wait_for(submit_response_check_func, "Comment edit succeeded")
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
@@ -277,6 +321,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def submit_comment_edit(self, comment_id, new_comment_body):
         """Click the submit button on the comment editor"""
         self._find_within("#comment_{} .post-update".format(comment_id)).first.click()
+        self.wait_for_ajax()
         EmptyPromise(
             lambda: (
                 not self.is_comment_editor_visible(comment_id) and

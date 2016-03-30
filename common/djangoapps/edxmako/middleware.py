@@ -19,6 +19,8 @@ from django.template.context import _builtin_context_processors
 from django.utils.module_loading import import_string
 from util.request import safe_get_host
 
+from request_cache.middleware import RequestCache
+
 REQUEST_CONTEXT = threading.local()
 
 
@@ -51,6 +53,12 @@ def get_template_request_context():
     request = getattr(REQUEST_CONTEXT, "request", None)
     if not request:
         return None
+
+    request_cache_dict = RequestCache.get_request_cache().data
+    cache_key = "edxmako_request_context"
+    if cache_key in request_cache_dict:
+        return request_cache_dict[cache_key]
+
     context = RequestContext(request)
     context['is_secure'] = request.is_secure()
     context['site'] = safe_get_host(request)
@@ -61,5 +69,7 @@ def get_template_request_context():
     # https://github.com/django/django/commit/37505b6397058bcc3460f23d48a7de9641cd6ef0
     for processor in get_template_context_processors():
         context.update(processor(request))
+
+    request_cache_dict[cache_key] = context
 
     return context

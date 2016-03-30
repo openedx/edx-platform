@@ -129,7 +129,7 @@ LOCAL_LOGLEVEL = 'INFO'
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
-    ENV_TOKENS = yaml.load(env_file)
+    ENV_TOKENS = yaml.safe_load(env_file)
 
 ENV_TOKENS = convert_tokens(ENV_TOKENS)
 
@@ -220,7 +220,7 @@ MICROSITE_ROOT_DIR = path(MICROSITE_ROOT_DIR)
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.yaml") as auth_file:
-    AUTH_TOKENS = yaml.load(auth_file)
+    AUTH_TOKENS = yaml.safe_load(auth_file)
 
 AUTH_TOKENS = convert_tokens(AUTH_TOKENS)
 
@@ -247,3 +247,7 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+######################## CUSTOM COURSES for EDX CONNECTOR ######################
+if FEATURES.get('CUSTOM_COURSES_EDX'):
+    INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)

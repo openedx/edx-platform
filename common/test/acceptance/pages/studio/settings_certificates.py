@@ -13,6 +13,7 @@ import os
 from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
+from selenium.webdriver import ActionChains
 
 
 class CertificatesPage(CoursePage):
@@ -507,8 +508,11 @@ class SignatorySectionPage(CertificatesPage):
         """
         Open editing view for the signatory.
         """
-        self.find_css('.edit-signatory').first.click()
-        self.mode = 'edit'
+        element = self.q(css='.edit-signatory').results[0]
+        mouse_hover_action = ActionChains(self.browser).move_to_element(element)
+        mouse_hover_action.perform()
+        self.wait_for_element_visibility('.edit-signatory', 'Edit button visibility')
+        element.click()
         self.wait_for_signatory_edit_view()
 
     def delete_signatory(self):

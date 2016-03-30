@@ -678,6 +678,7 @@ class MembershipPageAutoEnrollSection(PageObject):
 
     auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
     auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'
     NOTIFICATION_WARNING = 'warning'
     NOTIFICATION_SUCCESS = 'confirmation'
@@ -750,6 +751,31 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
 
+    def fill_enrollment_batch_text_box(self, email):
+        """
+        Fill in the form with the provided email and submit it.
+        """
+        email_selector = "{} >p>textarea".format(self.batch_enrollment_selector)
+        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+
+        # Fill the email addresses after the email selector is visible.
+        self.wait_for_element_visibility(email_selector, 'Email field is visible')
+        self.q(css=email_selector).fill(email)
+
+        # Verify enrollment button is present before clicking
+        EmptyPromise(
+            lambda: self.q(css=enrollment_button).present, "Enrollment button"
+        ).fulfill()
+        self.q(css=enrollment_button).click()
+
+    def get_notification_text(self):
+        """
+        Check notification div is visible and have message.
+        """
+        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
+        self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
+        return self.q(css="{} h3".format(notification_selector)).text
+
 
 class SpecialExamsPageAllowanceSection(PageObject):
     """
@@ -766,6 +792,54 @@ class SpecialExamsPageAllowanceSection(PageObject):
         Returns True if the Add Allowance button is present.
         """
         return self.q(css="a#add-allowance").present
+
+    @property
+    def is_allowance_record_visible(self):
+        """
+        Returns True if the Add Allowance button is present.
+        """
+        return self.q(css="table.allowance-table tr.allowance-items").present
+
+    @property
+    def is_add_allowance_popup_visible(self):
+        """
+        Returns True if the Add Allowance popup and it's all assets are present.
+        """
+        return self.q(css="div.modal div.modal-header").present and self._are_all_assets_present()
+
+    def _are_all_assets_present(self):
+        """
+        Returns True if all the assets present in add allowance popup/form
+        """
+        return (
+            self.q(css="select#proctored_exam").present and
+            self.q(css="label#exam_type_label").present and
+            self.q(css="input#allowance_value").present and
+            self.q(css="input#user_info").present and
+            self.q(css="input#addNewAllowance").present
+        ) and (
+            # This will be present if exam is proctored
+            self.q(css="select#allowance_type").present or
+            # This will be present if exam is timed
+            self.q(css="label#timed_exam_allowance_type").present
+        )
+
+    def click_add_allowance_button(self):
+        """
+        Click the add allowance button
+        """
+        self.q(css="a#add-allowance").click()
+        self.wait_for_element_presence("div.modal div.modal-header", "Popup should be visible")
+
+    def submit_allowance_form(self, allowed_minutes, username):
+        """
+        Fill and submit the allowance
+        """
+        self.q(css='input#allowance_value').fill(allowed_minutes)
+        self.q(css='input#user_info').fill(username)
+        self.q(css="input#addNewAllowance").click()
+        self.wait_for_element_absence("div.modal div.modal-header", "Popup should be hidden")
+        self.wait_for_ajax()
 
 
 class SpecialExamsPageAttemptsSection(PageObject):
@@ -837,6 +911,13 @@ class DataDownloadPage(PageObject):
         Returns the download links for the current page.
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
+
+    @property
+    def generate_ora2_response_report_button(self):
+        """
+        Returns the ORA2 response download button for the current page.
+        """
+        return self.q(css='input[name=export-ora2-data]')
 
     def wait_for_available_report(self):
         """

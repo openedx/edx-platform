@@ -24,12 +24,9 @@ FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
 FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
-FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
-FEATURES['IS_EDX_DOMAIN'] = True  # Is this an edX-owned domain? (used on instructor dashboard)
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
 
@@ -49,6 +46,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "edx.db",
+        'ATOMIC_REQUESTS': True,
+    },
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "student_module_history.db",
         'ATOMIC_REQUESTS': True,
     }
 }
@@ -87,11 +89,6 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_course_structure_mem_cache',
-    },
-    'lms.course_blocks': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
-        'LOCATION': 'lms_course_blocks_cache',
     },
 }
 
@@ -236,7 +233,7 @@ FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
 ########################## ANALYTICS TESTING ########################
 

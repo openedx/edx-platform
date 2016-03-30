@@ -2,7 +2,7 @@
 """
 End-to-end tests for the LMS.
 """
-import time
+from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -66,7 +66,7 @@ class CoursewareTest(UniqueCourseTest):
         """
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
-        self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 1')
+        self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
     def _create_breadcrumb(self, index):
         """ Create breadcrumb """
@@ -103,8 +103,8 @@ class CoursewareTest(UniqueCourseTest):
 
         # Visit courseware as a student.
         self.courseware_page.visit()
-        # Problem name should be "TEST PROBLEM 2".
-        self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
+        # Problem name should be "Test Problem 2".
+        self.assertEqual(self.problem_page.problem_name, 'Test Problem 2')
 
     def test_course_tree_breadcrumb(self):
         """
@@ -217,7 +217,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.course_outline.proctoring_items_are_displayed())
 
     def test_proctored_exam_flow(self):
@@ -232,9 +232,9 @@ class ProctoredExamTest(UniqueCourseTest):
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.select_advanced_tab()
         self.course_outline.make_exam_proctored()
 
         LogoutPage(self.browser).visit()
@@ -256,9 +256,9 @@ class ProctoredExamTest(UniqueCourseTest):
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
-        self.course_outline.open_exam_settings_dialog()
+        self.course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.select_advanced_tab()
         self.course_outline.make_exam_timed()
 
         LogoutPage(self.browser).visit()
@@ -281,8 +281,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_none_exam()
         self.assertFalse(self.course_outline.time_allotted_field_visible())
@@ -300,8 +300,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_timed_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
@@ -319,8 +319,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
@@ -338,8 +338,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.exam_review_rules_field_visible())
@@ -361,8 +361,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_timed_exam()
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
@@ -386,8 +386,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
         self.course_outline.visit()
 
-        self.course_outline.open_exam_settings_dialog()
-        self.course_outline.select_advanced_settings_tab()
+        self.course_outline.open_subsection_settings_dialog()
+        self.course_outline.select_advanced_tab()
 
         self.course_outline.select_practice_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
@@ -420,13 +420,20 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
 
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
                     XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
                     XBlockFixtureDesc('problem', 'Test Problem 2', data="<problem>problem 2 dummy body</problem>"),
                     XBlockFixtureDesc('html', 'html 2', data="<html>html 2 dummy body</html>"),
                 ),
-                XBlockFixtureDesc('sequential', 'Test Subsection 2'),
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,2').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 3', data='<problem>problem 3 dummy body</problem>'),
+                ),
+            ),
+            XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 2,1').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 4', data='<problem>problem 4 dummy body</problem>'),
+                ),
             ),
         ).install()
 
@@ -436,10 +443,53 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.course_nav = CourseNavPage(self.browser)
 
+    def test_navigation_buttons(self):
+        # start in first section
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 0, next_enabled=True, prev_enabled=False)
+
+        # next takes us to next tab in sequential
+        self.courseware_page.click_next_button_on_top()
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 1, next_enabled=True, prev_enabled=True)
+
+        # go to last sequential position
+        self.courseware_page.go_to_sequential_position(4)
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 3, next_enabled=True, prev_enabled=True)
+
+        # next takes us to next sequential
+        self.courseware_page.click_next_button_on_bottom()
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,2', 0, next_enabled=True, prev_enabled=True)
+
+        # next takes us to next chapter
+        self.courseware_page.click_next_button_on_top()
+        self.assert_navigation_state('Test Section 2', 'Test Subsection 2,1', 0, next_enabled=False, prev_enabled=True)
+
+        # previous takes us to previous chapter
+        self.courseware_page.click_previous_button_on_top()
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,2', 0, next_enabled=True, prev_enabled=True)
+
+        # previous takes us to last tab in previous sequential
+        self.courseware_page.click_previous_button_on_bottom()
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 3, next_enabled=True, prev_enabled=True)
+
+        # previous takes us to previous tab in sequential
+        self.courseware_page.click_previous_button_on_bottom()
+        self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 2, next_enabled=True, prev_enabled=True)
+
+    def assert_navigation_state(
+            self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
+    ):
+        """
+        Verifies that the navigation state is as expected.
+        """
+        self.assertTrue(self.course_nav.is_on_section(section_title, subsection_title))
+        self.assertEquals(self.courseware_page.sequential_position, subsection_position)
+        self.assertEquals(self.courseware_page.is_next_button_enabled, next_enabled)
+        self.assertEquals(self.courseware_page.is_previous_button_enabled, prev_enabled)
+
     def test_tab_position(self):
         # test that using the position in the url direct to correct tab in courseware
-        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1')
-        subsection_url = self.courseware_page.get_active_subsection_url()
+        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,1')
+        subsection_url = self.course_nav.active_subsection_url
         url_part_list = subsection_url.split('/')
         self.assertEqual(len(url_part_list), 9)
 
@@ -481,3 +531,14 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
             position=4
         ).visit()
         self.assertIn('html 2 dummy body', html2_page.get_selected_tab_content())
+
+    @attr('a11y')
+    def test_courseware_a11y(self):
+        """
+        Run accessibility audit for the problem type.
+        """
+        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,1')
+        # Set the scope to the sequence navigation
+        self.courseware_page.a11y_audit.config.set_scope(
+            include=['div.sequence-nav'])
+        self.courseware_page.a11y_audit.check_for_accessibility_errors()

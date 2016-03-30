@@ -17,6 +17,7 @@ from mock import patch, Mock, call
 from django.conf import settings
 # This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
 from nose.plugins.attrib import attr
+from nose import SkipTest
 import pymongo
 from pytz import UTC
 from shutil import rmtree
@@ -30,6 +31,12 @@ from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.tests.test_asides import AsideTestType
+from xblock.core import XBlockAside
+from xblock.fields import Scope, String, ScopeIds
+from xblock.fragment import Fragment
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
 
 if not settings.configured:
     settings.configure()
@@ -42,6 +49,7 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DI
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location, navigation_index
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, mock_tab_from_json
@@ -155,7 +163,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         self.user_id = ModuleStoreEnum.UserID.test
 
     # pylint: disable=invalid-name
-    def _create_course(self, course_key):
+    def _create_course(self, course_key, asides=None):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
@@ -168,7 +176,8 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
                 self.assertEqual(self.course.id, course_key)
 
             # create chapter
-            chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
+            chapter = self.store.create_child(self.user_id, self.course.location, 'chapter',
+                                              block_id='Overview', asides=asides)
             self.writable_chapter_location = chapter.location
 
     def _create_block_hierarchy(self):
@@ -293,6 +302,36 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         self._create_course(self.course_locations[self.MONGO_COURSEID].course_key)
 
         self.assertEquals(default, self.store.get_modulestore_type(self.course.id))
+
+
+class AsideFoo(XBlockAside):
+    """
+    Test xblock aside class
+    """
+    FRAG_CONTENT = u"<p>Aside Foo rendered</p>"
+
+    field11 = String(default="aside1_default_value1", scope=Scope.content)
+    field12 = String(default="aside1_default_value2", scope=Scope.settings)
+
+    @XBlockAside.aside_for('student_view')
+    def student_view_aside(self, block, context):  # pylint: disable=unused-argument
+        """Add to the student view"""
+        return Fragment(self.FRAG_CONTENT)
+
+
+class AsideBar(XBlockAside):
+    """
+    Test xblock aside class
+    """
+    FRAG_CONTENT = u"<p>Aside Bar rendered</p>"
+
+    field21 = String(default="aside2_default_value1", scope=Scope.content)
+    field22 = String(default="aside2_default_value2", scope=Scope.settings)
+
+    @XBlockAside.aside_for('student_view')
+    def student_view_aside(self, block, context):  # pylint: disable=unused-argument
+        """Add to the student view"""
+        return Fragment(self.FRAG_CONTENT)
 
 
 @ddt.ddt
@@ -435,6 +474,68 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.course_locations[self.MONGO_COURSEID].course_key,
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
+
+    @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))
+    @ddt.unpack
+    def test_get_items_include_orphans(self, default_ms, expected_items_in_tree, orphan_in_items):
+        """
+        Test `include_orphans` option helps in returning only those items which are present in course tree.
+        It tests that orphans are not fetched when calling `get_item` with `include_orphans`.
+
+        Params:
+            expected_items_in_tree:
+                Number of items that will be returned after `get_items` would be called with `include_orphans`.
+                In split, it would not get orphan items.
+                In mongo, it would still get orphan items because `include_orphans` would not have any impact on mongo
+                    modulestore which will return same number of items as called without `include_orphans` kwarg.
+
+            orphan_in_items:
+                When `get_items` is called with `include_orphans` kwarg, then check if an orphan is returned or not.
+                False when called in split modulestore because in split get_items is expected to not retrieve orphans
+                    now because of `include_orphans`.
+                True when called in mongo modulstore because `include_orphans` does not have any effect on mongo.
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+        course_key = test_course.id
+
+        items = self.store.get_items(course_key)
+        # Check items found are either course or about type
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items])))
+        # Assert that about is a detached category found in get_items
+        self.assertIn(
+            [item.location.block_type for item in items if item.location.block_type == 'about'][0],
+            DETACHED_XBLOCK_TYPES
+        )
+        self.assertEqual(len(items), 2)
+
+        # Check that orphans are not found
+        orphans = self.store.get_orphans(course_key)
+        self.assertEqual(len(orphans), 0)
+
+        # Add an orphan to test course
+        orphan = course_key.make_usage_key('chapter', 'OrphanChapter')
+        self.store.create_item(self.user_id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
+
+        # Check that now an orphan is found
+        orphans = self.store.get_orphans(course_key)
+        self.assertIn(orphan, orphans)
+        self.assertEqual(len(orphans), 1)
+
+        # Check now `get_items` retrieves an extra item added above which is an orphan.
+        items = self.store.get_items(course_key)
+        self.assertIn(orphan, [item.location for item in items])
+        self.assertEqual(len(items), 3)
+
+        # Check now `get_items` with `include_orphans` kwarg does not retrieves an orphan block.
+        items_in_tree = self.store.get_items(course_key, include_orphans=False)
+
+        # Check that course and about blocks are found in get_items
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items_in_tree])))
+        # Check orphan is found or not - this is based on mongo/split modulestore. It should be found in mongo.
+        self.assertEqual(orphan in [item.location for item in items_in_tree], orphan_in_items)
+        self.assertEqual(len(items_in_tree), expected_items_in_tree)
 
     # draft: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
@@ -2915,3 +3016,307 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
             with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, source_course_key):
                 component = self.store.get_item(unit.location)
                 self.assertEqual(component.display_name, updated_display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_aside_crud(self, default_store):
+        """
+        Check that asides could be imported from XML and the modulestores handle asides crud
+        """
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default_store):
+                dest_course_key = self.store.make_course_key('edX', "aside_test", "2012_Fall")
+                courses = import_course_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['aside'],
+                    load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_id=dest_course_key,
+                    create_if_not_present=True,
+                )
+
+                # check that the imported blocks have the right asides and values
+                def check_block(block):
+                    """
+                    Check whether block has the expected aside w/ its fields and then recurse to the block's children
+                    """
+                    asides = block.runtime.get_asides(block)
+
+                    self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                    self.assertIsInstance(asides[0], AsideTestType)
+                    category = block.scope_ids.block_type
+                    self.assertEqual(asides[0].data_field, "{} aside data".format(category))
+                    self.assertEqual(asides[0].content, "{} Aside".format(category.capitalize()))
+
+                    for child in block.get_children():
+                        check_block(child)
+
+                check_block(courses[0])
+
+                # create a new block and ensure its aside magically appears with the right fields
+                new_chapter = self.store.create_child(self.user_id, courses[0].location, 'chapter', 'new_chapter')
+                asides = new_chapter.runtime.get_asides(new_chapter)
+
+                self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                chapter_aside = asides[0]
+                self.assertIsInstance(chapter_aside, AsideTestType)
+                self.assertFalse(
+                    chapter_aside.fields['data_field'].is_set_on(chapter_aside),
+                    "data_field says it's assigned to {}".format(chapter_aside.data_field)
+                )
+                self.assertFalse(
+                    chapter_aside.fields['content'].is_set_on(chapter_aside),
+                    "content says it's assigned to {}".format(chapter_aside.content)
+                )
+
+                # now update the values
+                chapter_aside.data_field = 'new value'
+                self.store.update_item(new_chapter, self.user_id, asides=[chapter_aside])
+
+                new_chapter = self.store.get_item(new_chapter.location)
+                chapter_aside = new_chapter.runtime.get_asides(new_chapter)[0]
+                self.assertEqual('new value', chapter_aside.data_field)
+
+                # update the values the second time
+                chapter_aside.data_field = 'another one value'
+                self.store.update_item(new_chapter, self.user_id, asides=[chapter_aside])
+
+                new_chapter2 = self.store.get_item(new_chapter.location)
+                chapter_aside2 = new_chapter2.runtime.get_asides(new_chapter2)[0]
+                self.assertEqual('another one value', chapter_aside2.data_field)
+
+
+@ddt.ddt
+@attr('mongo')
+class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
+    """
+    Tests of the MixedModulestore interface methods with XBlock asides.
+    """
+    def setUp(self):
+        """
+        Setup environment for testing
+        """
+        super(TestAsidesWithMixedModuleStore, self).setUp()
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+        self.runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
+    @XBlockAside.register_temp_plugin(AsideBar, 'test_aside2')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside1', 'test_aside2'])
+    def test_get_and_update_asides(self, default_store):
+        """
+        Tests that connected asides could be stored, received and updated along with connected course items
+        """
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+
+        self.initdb(default_store)
+
+        block_type1 = 'test_aside1'
+        def_id = self.runtime.id_generator.create_definition(block_type1)
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        # the first aside item
+        aside1 = AsideFoo(scope_ids=ScopeIds('user', block_type1, def_id, usage_id), runtime=self.runtime)
+        aside1.field11 = 'new_value11'
+        aside1.field12 = 'new_value12'
+
+        block_type2 = 'test_aside2'
+        def_id = self.runtime.id_generator.create_definition(block_type1)
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        # the second aside item
+        aside2 = AsideBar(scope_ids=ScopeIds('user', block_type2, def_id, usage_id), runtime=self.runtime)
+        aside2.field21 = 'new_value21'
+
+        # create new item with two asides
+        published_xblock = self.store.create_item(
+            self.user_id,
+            self.course.id,
+            'vertical',
+            block_id='test_vertical',
+            asides=[aside1, aside2]
+        )
+
+        def _check_asides(asides, field11, field12, field21, field22):
+            """ Helper function to check asides """
+            self.assertEqual(len(asides), 2)
+            self.assertEqual({type(asides[0]), type(asides[1])}, {AsideFoo, AsideBar})
+            self.assertEqual(asides[0].field11, field11)
+            self.assertEqual(asides[0].field12, field12)
+            self.assertEqual(asides[1].field21, field21)
+            self.assertEqual(asides[1].field22, field22)
+
+        # get saved item and check asides
+        component = self.store.get_item(published_xblock.location)
+        asides = component.runtime.get_asides(component)
+        _check_asides(asides, 'new_value11', 'new_value12', 'new_value21', 'aside2_default_value2')
+
+        asides[0].field11 = 'other_value11'
+
+        # update the first aside item and check that it was stored correctly
+        self.store.update_item(component, self.user_id, asides=[asides[0]])
+        cached_asides = component.runtime.get_asides(component)
+        _check_asides(cached_asides, 'other_value11', 'new_value12', 'new_value21', 'aside2_default_value2')
+
+        new_component = self.store.get_item(published_xblock.location)
+        new_asides = new_component.runtime.get_asides(new_component)
+        _check_asides(new_asides, 'other_value11', 'new_value12', 'new_value21', 'aside2_default_value2')
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside1'])
+    def test_clone_course_with_asides(self, default_store):
+        """
+        Tests that connected asides will be cloned together with the parent courses
+        """
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+
+        with MongoContentstoreBuilder().build() as contentstore:
+            # initialize the mixed modulestore
+            self._initialize_mixed(contentstore=contentstore, mappings={})
+
+            with self.store.default_store(default_store):
+                block_type1 = 'test_aside1'
+                def_id = self.runtime.id_generator.create_definition(block_type1)
+                usage_id = self.runtime.id_generator.create_usage(def_id)
+
+                aside1 = AsideFoo(scope_ids=ScopeIds('user', block_type1, def_id, usage_id), runtime=self.runtime)
+                aside1.field11 = 'test1'
+
+                source_course_key = self.store.make_course_key("org.source", "course.source", "run.source")
+                self._create_course(source_course_key, asides=[aside1])
+
+                dest_course_id = self.store.make_course_key("org.other", "course.other", "run.other")
+                self.store.clone_course(source_course_key, dest_course_id, self.user_id)
+
+            source_store = self.store._get_modulestore_by_type(default_store)  # pylint: disable=protected-access
+            self.assertCoursesEqual(source_store, source_course_key, source_store, dest_course_id)
+
+            # after clone get connected aside and check that it was cloned correctly
+            actual_items = source_store.get_items(dest_course_id,
+                                                  revision=ModuleStoreEnum.RevisionOption.published_only)
+            chapter_is_found = False
+
+            for block in actual_items:
+                if block.scope_ids.block_type == 'chapter':
+                    asides = block.runtime.get_asides(block)
+                    self.assertEqual(len(asides), 1)
+                    self.assertEqual(asides[0].field11, 'test1')
+                    self.assertEqual(asides[0].field12, 'aside1_default_value2')
+                    chapter_is_found = True
+                    break
+
+            self.assertTrue(chapter_is_found)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside1'])
+    def test_delete_item_with_asides(self, default_store):
+        """
+        Tests that connected asides will be removed together with the connected items
+        """
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+
+        self.initdb(default_store)
+
+        block_type1 = 'test_aside1'
+        def_id = self.runtime.id_generator.create_definition(block_type1)
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        aside1 = AsideFoo(scope_ids=ScopeIds('user', block_type1, def_id, usage_id), runtime=self.runtime)
+        aside1.field11 = 'new_value11'
+        aside1.field12 = 'new_value12'
+
+        published_xblock = self.store.create_item(
+            self.user_id,
+            self.course.id,
+            'vertical',
+            block_id='test_vertical',
+            asides=[aside1]
+        )
+
+        asides = published_xblock.runtime.get_asides(published_xblock)
+        self.assertEquals(asides[0].field11, 'new_value11')
+        self.assertEquals(asides[0].field12, 'new_value12')
+
+        # remove item
+        self.store.delete_item(published_xblock.location, self.user_id)
+
+        # create item again
+        published_xblock2 = self.store.create_item(
+            self.user_id,
+            self.course.id,
+            'vertical',
+            block_id='test_vertical'
+        )
+
+        # check that aside has default values
+        asides2 = published_xblock2.runtime.get_asides(published_xblock2)
+        self.assertEquals(asides2[0].field11, 'aside1_default_value1')
+        self.assertEquals(asides2[0].field12, 'aside1_default_value2')
+
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 2, 0))
+    @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside1'])
+    @ddt.unpack
+    def test_published_and_unpublish_item_with_asides(self, default_store, max_find, max_send):
+        """
+        Tests that public/unpublish doesn't affect connected stored asides
+        """
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+
+        self.initdb(default_store)
+
+        block_type1 = 'test_aside1'
+        def_id = self.runtime.id_generator.create_definition(block_type1)
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        aside1 = AsideFoo(scope_ids=ScopeIds('user', block_type1, def_id, usage_id), runtime=self.runtime)
+        aside1.field11 = 'new_value11'
+        aside1.field12 = 'new_value12'
+
+        def _check_asides(item):
+            """ Helper function to check asides """
+            asides = item.runtime.get_asides(item)
+            self.assertEquals(asides[0].field11, 'new_value11')
+            self.assertEquals(asides[0].field12, 'new_value12')
+
+        # start off as Private
+        item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem',
+                                       'test_compute_publish_state', asides=[aside1])
+        item_location = item.location
+        with check_mongo_calls(max_find, max_send):
+            self.assertFalse(self.store.has_published_version(item))
+        _check_asides(item)
+
+        # Private -> Public
+        self.store.publish(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertTrue(self.store.has_published_version(item))
+        _check_asides(item)
+
+        # Public -> Private
+        self.store.unpublish(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertFalse(self.store.has_published_version(item))
+        _check_asides(item)

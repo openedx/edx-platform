@@ -207,7 +207,7 @@ def get_next_url_for_login_page(request):
     """
     Determine the URL to redirect to following login/registration/third_party_auth
 
-    The user is currently on a login or reigration page.
+    The user is currently on a login or registration page.
     If 'course_id' is set, or other POST_AUTH_PARAMS, we will need to send the user to the
     /account/finish_auth/ view following login, which will take care of auto-enrollment in
     the specified course.

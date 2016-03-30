@@ -16,11 +16,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
 from student.views import get_course_enrollments, _get_recently_enrolled_courses
+from common.test.utils import XssTestMixin
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestRecentEnrollments(ModuleStoreTestCase):
+class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -125,6 +126,30 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, "Thank you for enrolling in")
+
+    def test_dashboard_escaped_rendering(self):
+        """
+        Tests that the dashboard renders the escaped recent enrollment messages appropriately.
+        """
+        self._configure_message_timeout(600)
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # New Course
+        course_location = locator.CourseLocator('TestOrg', 'TestCourse', 'TestRun')
+        xss_content = "<script>alert('XSS')</script>"
+        course = CourseFactory.create(
+            org=course_location.org,
+            number=course_location.course,
+            run=course_location.run,
+            display_name=xss_content
+        )
+        CourseEnrollment.enroll(self.student, course.id)
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(response, "Thank you for enrolling in")
+
+        # Check if response is escaped
+        self.assert_no_xss(response, xss_content)
 
     @ddt.data(
         # Register as honor in any course modes with no payment option

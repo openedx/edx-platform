@@ -38,14 +38,14 @@ lib_paths:
     - common_static/js/src/logger.js
     - common_static/js/vendor/jasmine-jquery.js
     - common_static/js/vendor/jasmine-imagediff.js
-    - common_static/js/vendor/require.js
+    - common_static/js/vendor/requirejs/require.js
     - RequireJS-namespace-undefine.js
     - common_static/js/vendor/jquery.min.js
     - common_static/js/vendor/jquery-ui.min.js
     - common_static/js/vendor/jquery.ui.draggable.js
     - common_static/js/vendor/jquery.cookie.js
     - common_static/js/vendor/json2.js
-    - common_static/js/vendor/underscore-min.js
+    - common_static/common/js/vendor/underscore.js
     - common_static/js/vendor/backbone-min.js
     - common_static/js/vendor/jquery.leanModal.js
     - common_static/js/vendor/CodeMirror/codemirror.js

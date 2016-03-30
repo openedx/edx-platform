@@ -4,6 +4,7 @@ Tests for xblock_utils.py
 from __future__ import unicode_literals, absolute_import
 
 import ddt
+from nose.plugins.attrib import attr
 import uuid
 
 from django.test.client import RequestFactory
@@ -27,6 +28,7 @@ from openedx.core.lib.xblock_utils import (
 )
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """
@@ -172,28 +174,6 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         )
         self.assertIsInstance(test_replace, Fragment)
         self.assertEqual(test_replace.content, anchor_tag)
-
-    @ddt.data('course_mongo', 'course_split')
-    def test_grade_histogram(self, course_id):
-        """
-        Verify that a histogram has been created.
-        """
-        course = getattr(self, course_id)
-        usage_key = course.id.make_usage_key('problem', 'first_problem')
-        StudentModule.objects.create(
-            student_id=1,
-            grade=100,
-            module_state_key=usage_key
-        )
-        StudentModule.objects.create(
-            student_id=2,
-            grade=50,
-            module_state_key=usage_key
-        )
-
-        grades = grade_histogram(usage_key)
-        self.assertEqual(grades[0], (50.0, 1))
-        self.assertEqual(grades[1], (100.0, 1))
 
     def test_sanitize_html_id(self):
         """

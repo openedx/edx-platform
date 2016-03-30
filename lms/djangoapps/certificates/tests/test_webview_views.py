@@ -7,12 +7,15 @@ import mock
 from uuid import uuid4
 from nose.plugins.attrib import attr
 from mock import patch
+from urllib import urlencode
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 
+from course_modes.models import CourseMode
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
@@ -81,6 +84,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
+        self.linknedin_url = 'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
@@ -96,7 +100,8 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         CourseEnrollmentFactory.create(
             user=self.user,
-            course_id=self.course_id
+            course_id=self.course_id,
+            mode=CourseMode.HONOR,
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
@@ -170,20 +175,129 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_url = get_certificate_url(course_id=self.course.id, uuid=self.cert.verify_uuid)
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
+        params = OrderedDict([
+            ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
+            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.PLATFORM_NAME,
+                course_name=self.course.display_name,
+            ),),
+            ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
+        ])
+        self.assertIn(
+            self.linknedin_url.format(params=urlencode(params)),
+            response.content
+        )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @mock.patch("microsite_configuration.microsite.is_request_in_microsite", _fake_is_request_in_microsite)
     def test_linkedin_share_microsites(self):
         """
-        Test: LinkedIn share URL should not be visible when called from within a microsite (for now)
+        Test: LinkedIn share URL should be visible when called from within a microsite.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(response.status_code, 200)
-        # the URL should not be present
-        self.assertNotIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
+        # the linkedIn share URL with appropriate parameters should be present
+        params = OrderedDict([
+            ('_ed', settings.MICROSITE_CONFIGURATION['test_microsite']['LINKEDIN_COMPANY_ID'],),
+            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.MICROSITE_CONFIGURATION['test_microsite']['platform_name'],
+                course_name=self.course.display_name,
+            ),),
+            ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
+        ])
+        self.assertIn(
+            self.linknedin_url.format(params=urlencode(params)),
+            response.content
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {"CERTIFICATE_FACEBOOK": True})
+    def test_facebook_share_microsites(self):
+        """
+        Test: Facebook share URL should be visible when web cert called from within a white label
+        site and it should use white label site's FACEBOOK_APP_ID.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Post on Facebook", response.content)
+        self.assertIn(settings.MICROSITE_CONFIGURATION['test_microsite']['FACEBOOK_APP_ID'], response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @ddt.data(
+        (False, False, False),
+        (False, False, True),
+        (False, True, True),
+        (True, True, True),
+        (True, True, False),
+    )
+    @ddt.unpack
+    def test_social_sharing_availablity_microsites(self, facebook_sharing, twitter_sharing, linkedin_sharing):
+        """
+        Test: Facebook, Twitter and LinkedIn sharing availability for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        social_sharing_settings = dict(
+            CERTIFICATE_FACEBOOK=facebook_sharing,
+            CERTIFICATE_TWITTER=twitter_sharing,
+            CERTIFICATE_LINKEDIN=linkedin_sharing,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_microsite": dict(
+                settings.MICROSITE_CONFIGURATION['test_microsite'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual("Post on Facebook" in response.content, facebook_sharing)
+            self.assertEqual("Share on Twitter" in response.content, twitter_sharing)
+            self.assertEqual("Add to LinkedIn Profile" in response.content, linkedin_sharing)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_facebook_default_text_microsites(self):
+        """
+        Test: Facebook sharing default text for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        facebook_text = "Facebook text on Test Microsite"
+        social_sharing_settings = dict(
+            CERTIFICATE_FACEBOOK=True,
+            CERTIFICATE_FACEBOOK_TEXT=facebook_text,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_microsite": dict(
+                settings.MICROSITE_CONFIGURATION['test_microsite'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertContains(response, facebook_text)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_twitter_default_text_microsites(self):
+        """
+        Test: Twitter sharing default text for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        twitter_text = "Twitter text on Test Microsite"
+        social_sharing_settings = dict(
+            CERTIFICATE_TWITTER=True,
+            CERTIFICATE_TWITTER_TEXT=twitter_text,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_microsite": dict(
+                settings.MICROSITE_CONFIGURATION['test_microsite'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertContains(response, twitter_text)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_rendering_course_organization_data(self):
@@ -378,6 +492,38 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
 
+    @ddt.data(
+        (CertificateStatuses.downloadable, True),
+        (CertificateStatuses.audit_passing, False),
+        (CertificateStatuses.audit_notpassing, False),
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_audit_certificate_display(self, status, eligible_for_certificate):
+        """
+        Ensure that audit-mode certs are only shown in the web view if they
+        are eligible for a certificate.
+        """
+        # Convert the cert to audit, with the specified eligibility
+        self.cert.mode = 'audit'
+        self.cert.status = status
+        self.cert.save()
+
+        self._add_course_certificates(count=1, signatory_count=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+
+        if eligible_for_certificate:
+            self.assertIn(str(self.cert.verify_uuid), response.content)
+        else:
+            self.assertIn("Invalid Certificate", response.content)
+            self.assertIn("Cannot Find Certificate", response.content)
+            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+            self.assertNotIn(str(self.cert.verify_uuid), response.content)
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_invalid_certificate(self):
         """
@@ -533,7 +679,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=unicode(self.course.id)
         )
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
 
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -556,7 +702,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         preview mode. Either the certificate is marked active or not.
         """
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,

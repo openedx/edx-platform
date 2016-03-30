@@ -160,25 +160,13 @@ def _get_index(passed_id=None):
     return 0
 
 
-def _get_html(course_updates_items):
-    """
-    Method to create course_updates_html from course_updates items
-    """
-    list_items = []
-    for update in reversed(course_updates_items):
-        # filter course update items which have status "deleted".
-        if update.get("status") != CourseInfoModule.STATUS_DELETED:
-            list_items.append(u"<article><h2>{date}</h2>{content}</article>".format(**update))
-    return u"<section>{list_items}</section>".format(list_items="".join(list_items))
-
-
 def save_course_update_items(location, course_updates, course_update_items, user=None):
     """
     Save list of course_updates data dictionaries in new field ("course_updates.items")
     and html related to course update in 'data' ("course_updates.data") field.
     """
     course_updates.items = course_update_items
-    course_updates.data = _get_html(course_update_items)
+    course_updates.data = ""
 
     # update db record
     modulestore().update_item(course_updates, user.id)

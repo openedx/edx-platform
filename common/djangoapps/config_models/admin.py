@@ -31,7 +31,17 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
         }
 
     def get_list_display(self, request):
-        return self.model._meta.get_all_field_names()
+        return self.get_displayable_field_names()
+
+    def get_displayable_field_names(self):
+        """
+        Return all field names, excluding reverse foreign key relationships.
+        """
+        return [
+            f.name
+            for f in self.model._meta.get_fields()
+            if not f.one_to_many
+        ]
 
     # Don't allow deletion of configuration
     def has_delete_permission(self, request, obj=None):
@@ -40,7 +50,7 @@ class ConfigurationModelAdmin(admin.ModelAdmin):
     # Make all fields read-only when editing an object
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return self.model._meta.get_all_field_names()
+            return self.get_displayable_field_names()
         return self.readonly_fields
 
     def add_view(self, request, form_url='', extra_context=None):
@@ -160,7 +170,7 @@ class KeyedConfigurationModelAdmin(ConfigurationModelAdmin):
 
     def get_list_display(self, request):
         """ Add a link to each row for creating a new row using the chosen row as a template """
-        return self.model._meta.get_all_field_names() + ['edit_link']
+        return self.get_displayable_field_names() + ['edit_link']
 
     def add_view(self, request, form_url='', extra_context=None):
         # Prepopulate new configuration entries with the value of the current config, if given:

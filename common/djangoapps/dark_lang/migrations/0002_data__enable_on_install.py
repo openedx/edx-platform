@@ -12,9 +12,8 @@ def create_dark_lang_config(apps, schema_editor):
     release of testing languages.
     """
     DarkLangConfig = apps.get_model("dark_lang", "DarkLangConfig")
-    db_alias = schema_editor.connection.alias
 
-    objects = DarkLangConfig.objects.using(db_alias)
+    objects = DarkLangConfig.objects
     if not objects.exists():
         objects.create(enabled=True)
 

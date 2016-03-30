@@ -1,68 +1,32 @@
 """
 Core logic for Comprehensive Theming.
 """
-from path import Path
-
+import os.path
+from path import Path as path
 from django.conf import settings
 
-import edxmako
+from .helpers import (
+    get_project_root_name,
+)
 
 
-def comprehensive_theme_changes(theme_dir):
-    """
-    Calculate the set of changes needed to enable a comprehensive theme.
-
-    Arguments:
-        theme_dir (path.path): the full path to the theming directory to use.
-
-    Returns:
-        A dict indicating the changes to make:
-
-            * 'settings': a dictionary of settings names and their new values.
-
-            * 'mako_paths': a list of directories to prepend to the edxmako
-                template lookup path.
-
-    """
-
-    changes = {
-        'settings': {},
-        'mako_paths': [],
-    }
-    root = Path(settings.PROJECT_ROOT)
-    if root.name == "":
-        root = root.parent
-
-    component_dir = theme_dir / root.name
-
-    templates_dir = component_dir / "templates"
-    if templates_dir.isdir():
-        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
-        changes['mako_paths'].append(templates_dir)
-
-    staticfiles_dir = component_dir / "static"
-    if staticfiles_dir.isdir():
-        changes['settings']['STATICFILES_DIRS'] = [staticfiles_dir] + settings.STATICFILES_DIRS
-
-    locale_dir = component_dir / "conf" / "locale"
-    if locale_dir.isdir():
-        changes['settings']['LOCALE_PATHS'] = [locale_dir] + settings.LOCALE_PATHS
-
-    favicon = component_dir / "static" / "images" / "favicon.ico"
-    if favicon.isfile():
-        changes['settings']['FAVICON_PATH'] = str(favicon)
-
-    return changes
-
-
-def enable_comprehensive_theme(theme_dir):
+def enable_comprehensive_theming(themes_dir):
     """
     Add directories to relevant paths for comprehensive theming.
+    :param themes_dir: path to base theme directory
     """
-    changes = comprehensive_theme_changes(theme_dir)
+    if isinstance(themes_dir, basestring):
+        themes_dir = path(themes_dir)
 
-    # Use the changes
-    for name, value in changes['settings'].iteritems():
-        setattr(settings, name, value)
-    for template_dir in changes['mako_paths']:
-        edxmako.paths.add_lookup('main', template_dir, prepend=True)
+    if themes_dir.isdir():
+        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, themes_dir)
+        settings.MAKO_TEMPLATES['main'].insert(0, themes_dir)
+
+    for theme_dir in os.listdir(themes_dir):
+        staticfiles_dir = os.path.join(themes_dir, theme_dir, get_project_root_name(), "static")
+        if staticfiles_dir.isdir():
+            settings.STATICFILES_DIRS = settings.STATICFILES_DIRS + [staticfiles_dir]
+
+        locale_dir = os.path.join(themes_dir, theme_dir, get_project_root_name(), "conf", "locale")
+        if locale_dir.isdir():
+            settings.LOCALE_PATHS = (locale_dir, ) + settings.LOCALE_PATHS

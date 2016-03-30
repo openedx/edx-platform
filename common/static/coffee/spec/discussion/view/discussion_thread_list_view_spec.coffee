@@ -6,17 +6,17 @@ describe "DiscussionThreadListView", ->
         appendSetFixtures("""
         <script type="text/template" id="thread-list-template">
             <div class="forum-nav-header">
-                <a href="#" class="forum-nav-browse" aria-haspopup="true">
-                    <i class="icon fa fa-bars"></i>
-                    <span class="sr">Discussion topics; current selection is: </span>
+                <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">
+                    <span class="icon fa fa-bars" aria-hidden="true"></span>
+                    <span class="sr">Discussion topics; currently listing: </span>
                     <span class="forum-nav-browse-current">All Discussions</span>
                     ▾
-                </a>
+                </button>
                 <form class="forum-nav-search">
                     <label>
-                        <span class="sr">Search</span>
-                        <input class="forum-nav-search-input" type="text" placeholder="Search all posts">
-                        <i class="icon fa fa-search"></i>
+                        <span class="sr">Search all posts</span>
+                        <input class="forum-nav-search-input" id="forum-nav-search" type="text" placeholder="Search all posts">
+                        <span class="icon fa fa-search" aria-hidden="true"></span>
                     </label>
                 </form>
             </div>
@@ -66,7 +66,7 @@ describe "DiscussionThreadListView", ->
                     </li>
                 </ul>
             </div>
-            <div class="forum-nav-thread-list-wrapper">
+            <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">
                 <div class="forum-nav-refine-bar">
                     <label class="forum-nav-filter-main">
                         <select class="forum-nav-filter-main-control">

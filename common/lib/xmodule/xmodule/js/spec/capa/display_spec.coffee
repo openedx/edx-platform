@@ -1,4 +1,6 @@
 describe 'Problem', ->
+  problem_content_default = readFixtures('problem_content.html')
+
   beforeEach ->
     # Stub MathJax
     window.MathJax =
@@ -20,7 +22,7 @@ describe 'Problem', ->
 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
-      $(@).html readFixtures('problem_content.html')
+      $(@).html problem_content_default
       callback()
 
   describe 'constructor', ->
@@ -96,12 +98,26 @@ describe 'Problem', ->
         @problem.renderProgressState()
         expect(@problem.$('.problem-progress').html()).toEqual "(1 point possible)"
 
+      it 'displays the number of points possible when rendering happens with the content', ->
+        @problem.el.data('progress_status', 'none')
+        @problem.el.data('progress_detail', '0/2')
+        expect(@problem.$('.problem-progress').html()).toEqual ""
+        @problem.render(problem_content_default)
+        expect(@problem.$('.problem-progress').html()).toEqual "(2 points possible)"
+
     describe 'with any other valid status', ->
       it 'reports the current score', ->
         @problem.el.data('progress_status', 'foo')
         @problem.el.data('progress_detail', '1/1')
         @problem.renderProgressState()
         expect(@problem.$('.problem-progress').html()).toEqual "(1/1 point)"
+
+      it 'shows current score when rendering happens with the content', ->
+        @problem.el.data('progress_status', 'test status')
+        @problem.el.data('progress_detail', '2/2')
+        expect(@problem.$('.problem-progress').html()).toEqual ""
+        @problem.render(problem_content_default)
+        expect(@problem.$('.problem-progress').html()).toEqual "(2/2 points)"
 
   describe 'render', ->
     beforeEach ->

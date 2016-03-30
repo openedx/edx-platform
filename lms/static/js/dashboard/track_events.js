@@ -15,68 +15,113 @@ var edx = edx || {};
             properties = {};
 
         properties.category = 'dashboard';
-        properties.label = $el.data("course-key");
+        properties.label = $el.data('course-key');
 
         return properties;
     };
 
-    edx.dashboard.TrackEvents = function() {
+    // Generate object to be passed with programs events
+    edx.dashboard.generateProgramProperties = function(element) {
+        var $el = $(element);
 
-         var course_title_link = $(".course-title > a"),
-            course_image_link = $(".cover"),
-            enter_course_link = $(".enter-course"),
-            options_dropdown = $(".wrapper-action-more"),
-            course_learn_verified = $(".verified-info"),
-            find_courses_btn = $(".btn-find-courses");
+        return {
+            category: 'dashboard',
+            course_id: $el.closest('.course-container').find('.info-course-id').html(),
+            program_id: $el.data('program-id')
+        };
+    };
 
-        // Emit an event when the "course title link" is clicked.
+    // Emit an event when the 'course title link' is clicked.
+    edx.dashboard.trackCourseTitleClicked = function($courseTitleLink, properties){
+        var trackProperty = properties || edx.dashboard.generateTrackProperties;
+
         window.analytics.trackLink(
-            course_title_link,
-            "edx.bi.dashboard.course_title.clicked",
-            edx.dashboard.generateTrackProperties
+            $courseTitleLink,
+            'edx.bi.dashboard.course_title.clicked',
+            trackProperty
         );
+    };
 
-        // Emit an event  when the "course image" is clicked.
+    // Emit an event  when the 'course image' is clicked.
+    edx.dashboard.trackCourseImageLinkClicked = function($courseImageLink, properties){
+        var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
-            course_image_link,
-            "edx.bi.dashboard.course_image.clicked",
-            edx.dashboard.generateTrackProperties
+            $courseImageLink,
+            'edx.bi.dashboard.course_image.clicked',
+            trackProperty
         );
+    };
 
-        // Emit an event  when the "View Course" button is clicked.
+    // Emit an event  when the 'View Course' button is clicked.
+    edx.dashboard.trackEnterCourseLinkClicked = function($enterCourseLink, properties){
+        var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
-            enter_course_link,
-            "edx.bi.dashboard.enter_course.clicked",
-            edx.dashboard.generateTrackProperties
+            $enterCourseLink,
+            'edx.bi.dashboard.enter_course.clicked',
+            trackProperty
         );
+    };
 
-        // Emit an event when the options dropdown is engaged.
+    // Emit an event when the options dropdown is engaged.
+    edx.dashboard.trackCourseOptionDropdownClicked = function($optionsDropdown, properties){
+        var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
-            options_dropdown,
-            "edx.bi.dashboard.course_options_dropdown.clicked",
-            edx.dashboard.generateTrackProperties
+            $optionsDropdown,
+            'edx.bi.dashboard.course_options_dropdown.clicked',
+            trackProperty
         );
+    };
 
-        // Emit an event  when the "Learn about verified" link is clicked.
+    // Emit an event  when the 'Learn about verified' link is clicked.
+    edx.dashboard.trackLearnVerifiedLinkClicked = function($courseLearnVerified, properties){
+        var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
-            course_learn_verified,
-            "edx.bi.dashboard.verified_info_link.clicked",
-            edx.dashboard.generateTrackProperties
+            $courseLearnVerified,
+            'edx.bi.dashboard.verified_info_link.clicked',
+            trackProperty
         );
+    };
 
-        // Emit an event  when the "Find Courses" button is clicked.
+    // Emit an event  when the 'Find Courses' button is clicked.
+    edx.dashboard.trackFindCourseBtnClicked = function($findCoursesBtn, properties){
+        var trackProperty = properties || { category: 'dashboard', label: null };
         window.analytics.trackLink(
-            find_courses_btn,
-            "edx.bi.dashboard.find_courses_button.clicked",
-            {
-                category: "dashboard",
-                label: null
-            }
+            $findCoursesBtn,
+            'edx.bi.dashboard.find_courses_button.clicked',
+            trackProperty
         );
+    };
 
+    // Emit an event when the 'View XSeries Details' button is clicked
+    edx.dashboard.trackXseriesBtnClicked = function($xseriesBtn, properties){
+        var trackProperty = properties || edx.dashboard.generateProgramProperties;
+        window.analytics.trackLink(
+            $xseriesBtn,
+            'edx.bi.dashboard.xseries_cta_message.clicked',
+            trackProperty
+        );
+    };
+
+    edx.dashboard.xseriesTrackMessages = function() {
+
+        $('.xseries-action .btn').each(function(i, element) {
+            var data = edx.dashboard.generateProgramProperties($(element));
+
+            window.analytics.track( 'edx.bi.dashboard.xseries_cta_message.viewed', data );
+        });
     };
 
     $(document).ready(function() {
-        edx.dashboard.TrackEvents();
+        if (!window.analytics) {
+            return;
+        }
+        edx.dashboard.trackCourseTitleClicked($('.course-title > a'));
+        edx.dashboard.trackCourseImageLinkClicked($('.cover'));
+        edx.dashboard.trackEnterCourseLinkClicked($('.enter-course'));
+        edx.dashboard.trackCourseOptionDropdownClicked($('.wrapper-action-more'));
+        edx.dashboard.trackLearnVerifiedLinkClicked($('.verified-info'));
+        edx.dashboard.trackFindCourseBtnClicked($('.btn-find-courses'));
+        edx.dashboard.trackXseriesBtnClicked($('.xseries-action .btn'));
+        edx.dashboard.xseriesTrackMessages();
     });
 })(jQuery);
