@@ -2010,6 +2010,9 @@ INSTALLED_APPS = (
 
     # API access administration
     'openedx.core.djangoapps.api_admin',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
 )
 
 # Migrations which are not in the standard module "migrations"

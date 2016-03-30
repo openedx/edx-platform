@@ -891,6 +891,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
 )
 
 
