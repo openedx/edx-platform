@@ -670,6 +670,31 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 self.assertTrue(url.startswith(expected_cdn_url))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn_with_external_image(self, modulestore_type):
+        """
+        Test that we return CDN prefixed URLs unless they're absolute.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org"
+
+            start_urls = {
+                'raw': 'http://google.com/image.png',
+                'small': '/static/overview.png',
+                'large': ''
+            }
+
+            modified_urls = overview.apply_cdn_to_urls(start_urls)
+            self.assertEqual(modified_urls['raw'], start_urls['raw'])
+            self.assertNotEqual(modified_urls['small'], start_urls['small'])
+            self.assertTrue(modified_urls['small'].startswith(expected_cdn_url))
+            self.assertEqual(modified_urls['large'], start_urls['large'])
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_error_generating_thumbnails(self, modulestore_type):
         """
         Test a scenario where thumbnails cannot be generated.

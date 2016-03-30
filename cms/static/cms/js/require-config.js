@@ -50,7 +50,7 @@
             "moment": "js/vendor/moment.min",
             "moment-with-locales": "js/vendor/moment-with-locales.min",
             "text": 'js/vendor/requirejs/text',
-            "underscore": "js/vendor/underscore-min",
+            "underscore": "common/js/vendor/underscore",
             "underscore.string": "js/vendor/underscore.string.min",
             "backbone": "js/vendor/backbone-min",
             "backbone-relational" : "js/vendor/backbone-relational.min",

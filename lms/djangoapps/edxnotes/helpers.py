@@ -99,7 +99,8 @@ def send_request(user, course_id, page, page_size, path="", text=None):
             headers={
                 "x-annotator-auth-token": get_edxnotes_id_token(user)
             },
-            params=params
+            params=params,
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
         log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))

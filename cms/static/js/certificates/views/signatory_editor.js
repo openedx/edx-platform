@@ -129,9 +129,9 @@ function ($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             var model = this.model;
             var self = this;
-            var titleText = gettext('Delete "<%= signatoryName %>" from the list of signatories?');
+            var titleTextTemplate = _.template(gettext('Delete "<%= signatoryName %>" from the list of signatories?'));
             var confirm = new PromptView.Warning({
-                title: _.template(titleText, {signatoryName: model.get('name')}),
+                title: titleTextTemplate({signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
                 actions: {
                     primary: {

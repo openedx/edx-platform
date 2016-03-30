@@ -361,9 +361,14 @@ function (VideoPlayer) {
 
         describe('onSeek', function () {
             beforeEach(function () {
+                // jasmine.Clock can't be used to fake out debounce with newer versions of underscore
+                spyOn(_, 'debounce').andCallFake(function (func) {
+                    return function () {
+                        func.apply(this, arguments);
+                    };
+                });
                 state = jasmine.initializePlayer();
                 state.videoEl = $('video, iframe');
-                jasmine.Clock.useMock();
                 spyOn(state.videoPlayer, 'duration').andReturn(120);
             });
 
@@ -384,9 +389,6 @@ function (VideoPlayer) {
                         spyOn(state.videoPlayer, 'stopTimer');
                         spyOn(state.videoPlayer, 'runTimer');
                         state.videoPlayer.seekTo(10);
-                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                        // That's why we have to do this tick(300).
-                        jasmine.Clock.tick(300);
                         expect(state.videoPlayer.currentTime).toBe(10);
                         expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
                         expect(state.videoPlayer.runTimer).toHaveBeenCalled();
@@ -399,9 +401,6 @@ function (VideoPlayer) {
                         state.videoProgressSlider.onSlide(
                             jQuery.Event('slide'), { value: 30 }
                         );
-                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                        // That's why we have to do this tick(300).
-                        jasmine.Clock.tick(300);
                         expect(state.videoPlayer.currentTime).toBe(30);
                         expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(30, true);
                     });
@@ -413,9 +412,6 @@ function (VideoPlayer) {
                         state.videoProgressSlider.onSlide(
                             jQuery.Event('slide'), { value: 30 }
                         );
-                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                        // That's why we have to do this tick(300).
-                        jasmine.Clock.tick(300);
                         expect(state.videoPlayer.currentTime).toBe(30);
                         expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(30, true);
                     });
@@ -426,17 +422,11 @@ function (VideoPlayer) {
                 state.videoProgressSlider.onSlide(
                     jQuery.Event('slide'), { value: 20 }
                 );
-                // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                // That's why we have to do this tick(300).
-                jasmine.Clock.tick(300);
                 state.videoPlayer.pause();
                 expect(state.videoPlayer.currentTime).toBe(20);
                 state.videoProgressSlider.onSlide(
                     jQuery.Event('slide'), { value: 10 }
                 );
-                // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
-                // That's why we have to do this tick(300).
-                jasmine.Clock.tick(300);
                 expect(state.videoPlayer.currentTime).toBe(10);
             });
 

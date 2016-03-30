@@ -37,7 +37,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(searchFieldTemplate, {
+                    this.$el.html(_.template(searchFieldTemplate)({
                         type: this.type,
                         searchString: this.collection.searchString,
                         searchLabel: this.label

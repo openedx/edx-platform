@@ -1,6 +1,9 @@
 """
 Javascript test tasks
 """
+
+from paver import tasks
+
 from pavelib import assets
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
@@ -31,13 +34,17 @@ class JsTestSuite(TestSuite):
 
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
-        self.report_dir.makedirs_p()
+        if tasks.environment.dry_run:
+            tasks.environment.info("make report_dir")
+        else:
+            self.report_dir.makedirs_p()
         if not self.skip_clean:
             test_utils.clean_test_files()
 
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
 
+        assets.process_npm_assets()
         assets.compile_coffeescript("`find lms cms common -type f -name \"*.coffee\"`")
 
     @property

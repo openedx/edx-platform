@@ -782,7 +782,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "highlight": True,
                 'page': 1,
                 'page_size': 25,
-            }
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
 
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
@@ -809,7 +810,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "course_id": unicode(self.course.id),
                 'page': helpers.DEFAULT_PAGE,
                 'page_size': helpers.DEFAULT_PAGE_SIZE,
-            }
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
 
     def test_get_course_position_no_chapter(self):

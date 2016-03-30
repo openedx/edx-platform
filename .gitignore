@@ -73,6 +73,7 @@ bin/
 lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
+common/static/common/js/vendor/
 
 ### Styling generated from templates
 lms/static/sass/*.css

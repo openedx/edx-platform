@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from django.core.validators import validate_email
+from django.core.urlresolvers import reverse
 
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
@@ -32,6 +33,28 @@ from lms.djangoapps.ccx.overrides import get_override_for_ccx
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 
 log = logging.getLogger("edx.ccx")
+
+
+def get_ccx_creation_dict(course):
+    """
+    Return dict of rendering create ccx form.
+
+    Arguments:
+        course (CourseDescriptorWithMixins): An edx course
+
+    Returns:
+        dict: A attribute dict for view rendering
+    """
+    context = {
+        'course': course,
+        'create_ccx_url': reverse('create_ccx', kwargs={'course_id': course.id}),
+        'has_ccx_connector': "true" if hasattr(course, 'ccx_connector') and course.ccx_connector else "false",
+        'use_ccx_con_error_message': _(
+            "A CCX can only be created on this course through an external service."
+            " Contact a course admin to give you access."
+        )
+    }
+    return context
 
 
 def get_ccx_from_ccx_locator(course_id):

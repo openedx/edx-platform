@@ -30,6 +30,9 @@ describe "ThreadResponseShowView", ->
         it "renders the vote state correctly", ->
             DiscussionViewSpecHelper.checkRenderVote(@view, @comment)
 
+        it "check the vote classes after renders", ->
+            DiscussionViewSpecHelper.checkVoteClasses(@view)
+
         it "votes correctly via click", ->
             DiscussionViewSpecHelper.checkUpvote(@view, @comment, @user, $.Event("click"))
 
@@ -115,7 +118,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
 
     it "allows a moderator to mark an answer in a question thread", ->
-        DiscussionUtil.loadRoles({"Moderator": parseInt(window.user.id)})
+        DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set({
             "thread_type": "question",
             "user_id": (parseInt(window.user.id) + 1).toString()

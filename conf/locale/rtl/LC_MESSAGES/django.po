@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 10:51+0000\n"
-"PO-Revision-Date: 2016-03-17 10:51:50.496780\n"
+"POT-Creation-Date: 2016-03-24 17:49+0000\n"
+"PO-Revision-Date: 2016-03-24 17:49:46.479173\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2855,10 +2855,12 @@ msgstr ""
 "شس ش يثذهوشم زثفصثثر 0.0 شري 1.0. بخق ثطشوحمث, بخق 75%, ثرفثق 0.75."
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "سثمب حشذثي"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -4317,6 +4319,14 @@ msgstr "يخصرمخشي فاث {platform_name} وخزهمث شحح بقخو ل�
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
 msgstr "ذذط ذخشذا"
+
+#: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+"ش ذذط ذشر خرمغ زث ذقثشفثي خر فاهس ذخعقسث فاقخعلا شر ثطفثقرشم سثقدهذث. "
+"ذخرفشذف ش ذخعقسث شيوهر فخ لهدث غخع شذذثسس."
 
 #: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
@@ -6297,7 +6307,6 @@ msgstr "رخ يعث يشفث ثطفثرسهخر هس سثف بخق فاشف سف
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8961,11 +8970,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr "ثرشزمث شعفاخقهرل خب ذقثيثرفهشم سثقدهذث ذقثيثرفهشمس هر سفعيهخ."
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "ذشذاث فهوث فخ مهدث"
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -8974,9 +8985,25 @@ msgstr ""
 "سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل زغ سثففهرل فاهس فخ ش دشمعث لقثشفثق فاشر"
 " 0."
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr "{first_providers}, شري {last_provider}"
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr "{first_provider} شري {second_provider}"
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "ذخعقسث ذقثيهف ثمهلهزهمهفغ"
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr "غخع شقث ثمهلهزمث بخق ذقثيهف بقخو {providers_string}"
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9323,6 +9350,13 @@ msgstr "وشهمهرل شييقثسس"
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "فثمم عس صاغ غخع'قث هرفثقثسفثي هر {platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
+msgstr "سفشفث/حقخدهرذث/قثلهخر"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -9861,7 +9895,6 @@ msgstr "سثففهرلس"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -9925,7 +9958,6 @@ msgstr "بخقلخف حشسسصخقي?"
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "ثطشوحمث: تشرث يخث"
@@ -9945,11 +9977,6 @@ msgstr "حعزمهذ عسثقرشوث"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "ثطشوحمث: تشرثيخث"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "حقثبثققثي مشرلعشلث"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -10814,7 +10841,6 @@ msgid "Reset"
 msgstr "قثسثف"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "سشدث"
 
@@ -11695,6 +11721,10 @@ msgid "Name your CCX"
 msgstr "رشوث غخعق ذذط"
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr "ذقثشفث ش رثص ذعسفخو ذخعقسث بخق ثيط"
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "سذاثيعمث"
 
@@ -11702,6 +11732,10 @@ msgstr "سذاثيعمث"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "لقشيهرل حخمهذغ"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr "حمثشسث ثرفثق ش دشمهي ذذط رشوث."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12663,6 +12697,16 @@ msgstr "اه,"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+"ذخرلقشفعمشفهخرس! غخع شقث ثمهلهزمث فخ قثذثهدث ذخعقسث ذقثيهف بقخو {providers} "
+"بخق سعذذثسسبعممغ ذخوحمثفهرل غخعق {platform_name} ذخعقسث! {link_start}لثف "
+"غخعق ذقثيهف رخص.{link_end}"
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
 "now.{link_end}"
@@ -13077,10 +13121,6 @@ msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
 "شر ثققخق خذذعققثي صهفا فاهس فقشرسشذفهخر. بخق اثمح, ذخرفشذف {support_email}."
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "ثيهف"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -16699,14 +16739,6 @@ msgstr ""
 "هب غخع اشدث شرغ ضعثسفهخرس شزخعف فاهس ذخعقسث خق فاهس بخقو, غخع ذشر ذخرفشذف <a"
 " href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "ثيهف غخعق بعمم رشوث"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "فاث بخممخصهرل ثققخق خذذعققثي صاهمث ثيهفهرل غخعق رشوث:"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "قث-دثقهبغ بخق {course_name}"
@@ -16957,8 +16989,8 @@ msgid "{studio_name} Server Error"
 msgstr "{studio_name} سثقدثق ثققخق"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "فاث {studio_name} سثقدثقس ثرذخعرفثقثي شر ثققخق"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr "فاث {em_start}{studio_name}{em_end} سثقدثقس ثرذخعرفثقثي شر ثققخق"
 
 #: cms/templates/500.html
 msgid ""
@@ -19387,6 +19419,10 @@ msgstr ""
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "غخعق مخذشفهخر"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr "حقثبثققثي مشرلعشلث"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"

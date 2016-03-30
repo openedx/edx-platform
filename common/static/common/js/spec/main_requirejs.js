@@ -22,7 +22,7 @@
             'jquery.url': 'js/vendor/url.min',
             'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
-            'underscore': 'js/vendor/underscore-min',
+            'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'js/vendor/underscore.string.min',
             'backbone': 'js/vendor/backbone-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',

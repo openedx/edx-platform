@@ -1,6 +1,7 @@
-<%page args="program_data, enrollment_mode, display_category" />
+<%page expression_filter="h" args="program_data, enrollment_mode, display_category" />
 <%!
     from django.utils.translation import ugettext as _
+    from openedx.core.djangolib.markup import Text, HTML
 %>
 <%namespace name='static' file='../static_content.html'/>
     <div class="message message-status is-shown credit-message">
@@ -10,10 +11,10 @@
                     ${_("{category} Program: Interested in more courses in this subject?").format(category=display_category)}
                 </p>
                 <p class="message-copy">
-                    ${_("This course is 1 of {course_count} courses in the {link_start}{program_display_name}{link_end} {program_category}.").format(
+                    ${Text(_("This course is 1 of {course_count} courses in the {link_start}{program_display_name}{link_end} {program_category}.")).format(
                         course_count=program_data['course_count'],
-                        link_start='<a href="{}">'.format(program_data['program_marketing_url']),
-                        link_end='</a>',
+                        link_start=HTML('<a href="{}">').format(program_data['program_marketing_url']),
+                        link_end=HTML('</a>'),
                         program_display_name=program_data['display_name'],
                         program_category=display_category,
                     )}

@@ -29,7 +29,7 @@
             'moment': 'xmodule_js/common_static/js/vendor/moment.min',
             'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
-            'underscore': 'xmodule_js/common_static/js/vendor/underscore-min',
+            'underscore': 'xmodule_js/common_static/common/js/vendor/underscore',
             'underscore.string': 'xmodule_js/common_static/js/vendor/underscore.string.min',
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
@@ -181,22 +181,7 @@
             },
             'underscore': {
                 deps: ['underscore.string'],
-                exports: '_',
-                init: function(UnderscoreString) {
-                    /* Mix non-conflicting functions from underscore.string
-                     * (all but include, contains, and reverse) into the
-                     * Underscore namespace. This allows the login, register,
-                     * and password reset templates to render independent of the
-                     * access view.
-                     */
-                    _.mixin(UnderscoreString.exports());
-
-                    /* Since the access view is not using RequireJS, we also
-                     * expose underscore.string at _.str, so that the access
-                     * view can perform the mixin on its own.
-                     */
-                    _.str = UnderscoreString;
-                }
+                exports: '_'
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
@@ -374,7 +359,12 @@
             },
             'js/verify_student/views/step_view': {
                 exports: 'edx.verify_student.StepView',
-                deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ]
+                deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ],
+                init: function() {
+                    // Set global variables that the payment code is expecting to be defined
+                    window._ = require('underscore');
+                    window._.str = require('underscore.string');
+                }
             },
             'js/verify_student/views/intro_step_view': {
                 exports: 'edx.verify_student.IntroStepView',
@@ -515,12 +505,6 @@
                 ],
                 exports: 'Discussion'
             },
-            'xmodule_js/common_static/coffee/src/discussion/discussion_filter': {
-                deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
-                ],
-                exports: 'DiscussionFilter'
-            },
             'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings': {
                 deps: [
                     'xmodule_js/common_static/coffee/src/discussion/utils'
@@ -614,7 +598,6 @@
                     'URI',
                     'xmodule_js/common_static/coffee/src/discussion/content',
                     'xmodule_js/common_static/coffee/src/discussion/discussion',
-                    'xmodule_js/common_static/coffee/src/discussion/discussion_filter',
                     'xmodule_js/common_static/coffee/src/discussion/utils',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_course_settings',
                     'xmodule_js/common_static/coffee/src/discussion/models/discussion_user',

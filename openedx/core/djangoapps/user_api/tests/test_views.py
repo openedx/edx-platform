@@ -1200,6 +1200,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             }
         )
 
+    def test_registration_form_state(self):
+        self._assert_reg_field(
+            {"state": "optional"},
+            {
+                "name": "state",
+                "type": "text",
+                "required": False,
+                "label": "State/Province/Region",
+            }
+        )
+
     def test_registration_form_country(self):
         country_options = (
             [{"name": "--", "value": "", "default": True}] +
@@ -1374,6 +1385,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             "mailing_address": "optional",
             "goals": "optional",
             "city": "optional",
+            "state": "optional",
             "country": "required",
             "honor_code": "required",
         },
@@ -1394,6 +1406,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             "favorite_movie",
             "favorite_editor",
             "city",
+            "state",
             "country",
             "gender",
             "year_of_birth",
