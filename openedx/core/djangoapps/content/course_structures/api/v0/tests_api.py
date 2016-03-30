@@ -1,13 +1,16 @@
 """
 Course Structure api.py tests
 """
+import mock
+from django.core import cache
+
 from .api import course_structure
-from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import mock
-from django.core import cache
+
+from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
 class CourseStructureApiTests(ModuleStoreTestCase):
@@ -44,14 +47,7 @@ class CourseStructureApiTests(ModuleStoreTestCase):
             parent_location=self.vertical.location, category="html", display_name="My HTML"
         )
 
-        self.addCleanup(self._disconnect_course_published_event)
-
-    def _disconnect_course_published_event(self):
-        """
-        Disconnect course_published event.
-        """
-        # If we don't disconnect then tests are getting failed in test_crud.py
-        SignalHandler.course_published.disconnect(listen_for_course_publish)
+        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
 
     def _expected_blocks(self, block_types=None, get_parent=False):
         """

@@ -1,3 +1,6 @@
+"""
+Module contains tests for finding and using the templates (boilerplates) for xblocks
+"""
 from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -7,9 +10,10 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.exceptions import DuplicateCourseError
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
-class TemplateTests(ModuleStoreTestCase):
+class TemplateTests(SignalDisconnectTestMixin, ModuleStoreTestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """

@@ -8,7 +8,7 @@ from xmodule.modulestore.django import SignalHandler
 from .models import CourseStructure
 
 
-@receiver(SignalHandler.course_published)
+@receiver(SignalHandler.course_published, dispatch_uid='openedx.core.djangoapps.content.course_structures')
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Course Structure application receiver for the course_published signal

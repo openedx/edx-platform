@@ -31,8 +31,11 @@ from xmodule.course_module import (
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_mongo_calls_range
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+from openedx.core.djangoapps.content.course_overviews.signals import listen_for_course_publish
 
 from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 
@@ -51,6 +54,11 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     NEXT_MONTH = TODAY + datetime.timedelta(days=30)
 
     COURSE_OVERVIEW_TABS = {'courseware', 'info', 'textbooks', 'discussion', 'wiki', 'progress'}
+
+    def setUp(self):
+        super(CourseOverviewTestCase, self).setUp()
+        SignalHandler.course_published.connect(listen_for_course_publish)
+        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
 
     def check_course_overview_against_course(self, course):
         """
