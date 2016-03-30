@@ -1,24 +1,14 @@
 ;(function (define) {
-  define(["underscore", "URI"], function (_, URI) {
-    var utils = {},
-        URL_BASE = "/teacher/api/v0",
-        URL_TEMPLATES;
+  define(["jquery", "underscore"], function ($, _) {
+    var utils = {};
 
-    URL_TEMPLATES = {
-      "licenses": _.template("<%= base %>/licenses/"),
-      "simulations": _.template("<%= base %>/licenses/<%=license_id %>/simulations/"),
-      "students": _.template("<%= base %>/licenses/<%=license_id %>/simulations/<%=simulation_id %>/students/"),
-      "attempts": _.template("<%= base %>/licenses/<%=license_id %>/simulations/<%=simulation_id %>/attempts/")
-    };
+    utils.getUrl = function(params) {
+      var url = window.Labster.url;
 
-    utils.getUrl = function(type, context, addUser) {
-      var url = "";
-
-      if (!URL_TEMPLATES[type]) {
-        throw new Error("Url with type `" + type + "` does not exist.");
+      if (params) {
+        url += '?' + $.param(params);
       }
-      context = _.extend({base: URL_BASE}, context);
-      url = URL_TEMPLATES[type](context);
+
       return url;
     };
 
@@ -47,6 +37,18 @@
       } else {
           return '' + minutes + ':' + _pad(seconds % 60);
       }
+    };
+
+    utils.fetch = function (collection, params) {
+      return $.ajax({
+        url: utils.getUrl(),
+        type: 'POST',
+        dataType: 'json',
+        data: params || {},
+        success: function(data) {
+          collection.reset(data, {parse: true});
+        }
+      });
     };
 
     return utils;

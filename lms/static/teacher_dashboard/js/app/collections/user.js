@@ -1,17 +1,12 @@
 ;(function (define) {
   'use strict';
-  define(["backbone", "teacher_dashboard/js/app/models/user", "teacher_dashboard/js/app/utils"], function(Backbone, UserModel, utils) {
+  define(["backbone", "teacher_dashboard/js/app/models/user"], function(Backbone, UserModel) {
     var UserCollection = Backbone.Collection.extend({
-      comparator: 'full_name',
+      comparator: 'email',
       model: UserModel
     }, {
-      factory: function(models, options, license_id, simulation_id) {
-        var collection = new UserCollection(models, options);
-        collection.url = utils.getUrl("students", {
-          license_id: license_id,
-          simulation_id: simulation_id
-        }, false);
-        return collection;
+      factory: function(models, options) {
+        return new UserCollection(models, options);
       }
     });
 

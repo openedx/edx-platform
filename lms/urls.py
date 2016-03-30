@@ -724,10 +724,9 @@ urlpatterns += (
     url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include('labster_course_license.urls')),
 )
 
-#Teacher Dashboard Tab
+# Teacher Dashboard Tab
 urlpatterns += (
     url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN), include('teacher_dashboard.urls')),
-    url(r'^teacher/api/v0/', include('teacher_dashboard.urls')),
 )
 
 # XDomain proxy

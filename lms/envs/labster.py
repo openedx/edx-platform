@@ -17,7 +17,10 @@ ENV_LABSTER_FEATURES = LABSTER_SETTINGS.get('LABSTER_FEATURES', LABSTER_FEATURES
 for feature, value in ENV_LABSTER_FEATURES.items():
     FEATURES[feature] = value
 
-INSTALLED_APPS += ('labster_course_license',)
+INSTALLED_APPS += (
+    'labster_course_license',
+    'teacher_dashboard',
+)
 
 LABSTER_WIKI_LINK = LABSTER_SETTINGS.get('LABSTER_WIKI_LINK', 'https://theory.labster.com/')
 LABSTER_API_AUTH_TOKEN = LABSTER_AUTH.get('LABSTER_API_AUTH_TOKEN', '')

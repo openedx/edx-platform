@@ -14,23 +14,29 @@
       render: function() {
         BaseView.prototype.render.apply(this, arguments);
         if (this.isExpanded) {
-          var userCollection = UserCollection.factory(null, null, this.model.get("license"), this.model.get("id")),
+          var userCollection = UserCollection.factory(),
               userListView = new UserListView({collection: userCollection});
 
           userListView.$el.appendTo(this.$el);
+
+          utils.fetch(userCollection, {
+            type: 'students',
+            license: this.model.get('license').get('id'),
+            simulation: this.model.get('id')
+          });
         }
         return this;
       },
 
       getContext: function() {
-        var csvUrl = utils.getUrl("attempts", {
-          license_id: this.model.get("license"),
-          simulation_id: this.model.get("id")
-        }) + "?format=csv";
         return {
           "display_name": this.model.get("display_name"),
           "is_expanded": this.isExpanded,
-          "csv_url": csvUrl
+          "csv_url": utils.getUrl({
+              type: 'attempts',
+              license: this.model.get('license').get('id'),
+              simulation: this.model.get('id')
+            })
         };
       },
 

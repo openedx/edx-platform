@@ -8,6 +8,7 @@
         "attempts_count": 0,
         "time": 0,
         "score": 0,
+        "context_id": null,
         "completion": 0
       },
 
