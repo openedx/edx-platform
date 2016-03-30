@@ -54,9 +54,9 @@
             </h2>
         </div>
     <% } %>
-    <p class="note">* <%- gettext("Required field") %></p>
-    <%= context.fields %>
 
+    <%= context.fields %>
+    <p class="note">* <%- gettext("Required field") %></p>
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
 </form>
 
