@@ -115,7 +115,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 10:59+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
 "PO-Revision-Date: 2016-02-29 15:27+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -135,7 +135,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2662,8 +2662,8 @@ msgstr ""
 "команды."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "Команда «%(team)s» успешно удалена."
+msgid "Team \"{team}\" successfully deleted."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -5055,8 +5055,8 @@ msgid "Please enter non-negative integer."
 msgstr "Пожалуйста, введите целое неотрицательное число."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5466,26 +5466,6 @@ msgstr "Отменить изменения"
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Change Manually"
 msgstr "Изменить вручную"
-
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "Свернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "Развернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "Дата выпуска:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} в {hour}:{minute} UTC"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "Редактировать дату выпуска раздела."
 
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore

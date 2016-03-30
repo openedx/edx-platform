@@ -66,7 +66,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 11:00+0000\n"
+"POT-Creation-Date: 2016-03-24 18:06+0000\n"
 "PO-Revision-Date: 2015-11-24 13:39+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -2638,10 +2638,12 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -3909,6 +3911,12 @@ msgstr ""
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
 msgstr ""
 
 #: lms/djangoapps/ccx/utils.py
@@ -5717,7 +5725,6 @@ msgstr ""
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8067,19 +8074,37 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
 msgstr ""
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
 msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
@@ -8390,6 +8415,13 @@ msgstr ""
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -8893,7 +8925,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr ""
 
@@ -8957,7 +8988,6 @@ msgstr ""
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr ""
@@ -8976,11 +9006,6 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
-msgstr ""
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -9812,7 +9837,6 @@ msgid "Reset"
 msgstr ""
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr ""
 
@@ -10651,6 +10675,10 @@ msgid "Name your CCX"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr ""
 
@@ -10658,6 +10686,10 @@ msgstr ""
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "תקנון ציונים"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11551,6 +11583,13 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
 "now.{link_end}"
@@ -11900,10 +11939,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -15145,14 +15180,6 @@ msgid ""
 " href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 msgstr ""
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr ""
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr ""
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr ""
@@ -15372,7 +15399,7 @@ msgid "{studio_name} Server Error"
 msgstr ""
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
 msgstr ""
 
 #: cms/templates/500.html
@@ -17440,6 +17467,10 @@ msgstr ""
 
 #: cms/templates/register.html
 msgid "Your Location"
+msgstr ""
+
+#: cms/templates/register.html
+msgid "Preferred Language"
 msgstr ""
 
 #: cms/templates/register.html
