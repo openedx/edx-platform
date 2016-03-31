@@ -28,7 +28,7 @@ from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
@@ -2152,6 +2152,80 @@ class CoursesApiTests(ModuleStoreTestCase):
         )
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_data_metrics_user_group_filter_for_empty_group(self):
+        group = GroupFactory.create()
+
+        # get course metrics for users in group
+        course_metrics_uri = '{}/{}/metrics/?groups={}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            group.id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 0)
+        self.assertGreaterEqual(response.data['users_started'], 0)
+
+    def test_course_data_metrics_user_group_filter_for_group_having_members(self):
+        group = GroupFactory.create()
+        users = UserFactory.create_batch(3, groups=(group,))
+
+        # enroll all users in course
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        # create course completions
+        for user in users:
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
+            completions_data = {
+                'content_id': unicode(self.course_content.scope_ids.usage_id),
+                'user_id': user.id,
+                'stage': 'First'
+            }
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        course_metrics_uri = '{}/{}/metrics/?groups={}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            group.id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 3)
+        self.assertGreaterEqual(response.data['users_started'], 3)
+
+    def test_course_data_metrics_user_group_filter_for_multiple_groups_having_members(self):
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(4, groups=(groups[0],))
+        users.append(UserFactory.create(groups=groups))
+
+        # enroll all users in course
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        # create course completions
+        for user in users:
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
+            completions_data = {
+                'content_id': unicode(self.course_content.scope_ids.usage_id),
+                'user_id': user.id,
+                'stage': 'First'
+            }
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        course_metrics_uri = '{}/{}/metrics/?groups={},{}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            groups[0].id,
+            groups[1].id,
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 5)
+        self.assertGreaterEqual(response.data['users_started'], 5)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'MARK_PROGRESS_ON_GRADING_EVENT': True,
                                                        'SIGNAL_ON_SCORE_CHANGED': True,
