@@ -30,6 +30,7 @@ from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.course_key_utils import from_string_or_404
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
 from xblock.fragment import Fragment
@@ -330,7 +331,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = from_string_or_404(course_id)
 
     # Gather metrics for New Relic so we can slice data in New Relic Insights
     newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
@@ -977,7 +978,7 @@ def course_about(request, course_id):
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = from_string_or_404(course_id)
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
@@ -1393,7 +1394,7 @@ def generate_user_cert(request, course_id):
         )
 
     student = request.user
-    course_key = CourseKey.from_string(course_id)
+    course_key = from_string_or_404(course_id)
 
     course = modulestore().get_course(course_key, depth=2)
     if not course:
@@ -1544,7 +1545,7 @@ def financial_assistance_request(request):
             return HttpResponseForbidden()
 
         course_id = data['course']
-        course = modulestore().get_course(CourseKey.from_string(course_id))
+        course = modulestore().get_course(from_string_or_404(course_id))
         legal_name = data['name']
         email = data['email']
         country = data['country']

@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 
 from course_structure_api.v0 import serializers
 from courseware import courses
@@ -64,7 +65,7 @@ class CourseViewMixin(object):
             """
             try:
                 course_id = self.kwargs.get('course_id')
-                self.course_key = CourseKey.from_string(course_id)
+                self.course_key = from_string_or_404(course_id)
                 self.check_course_permissions(self.request.user, self.course_key)
                 return func(self, *args, **kwargs)
             except CourseNotFoundError:
@@ -160,7 +161,7 @@ class CourseList(CourseViewMixin, ListAPIView):
         if course_ids:
             course_ids = course_ids.split(',')
             for course_id in course_ids:
-                course_key = CourseKey.from_string(course_id)
+                course_key = from_string_or_404(course_id)
                 course_descriptor = courses.get_course(course_key)
                 results.append(course_descriptor)
         else:

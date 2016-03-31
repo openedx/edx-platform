@@ -32,7 +32,7 @@ from django.views.decorators.http import require_http_methods
 
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.keys import AssetKey
 from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
@@ -45,6 +45,7 @@ from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
 from course_modes.models import CourseMode
 from contentstore.utils import get_lms_link_for_certificate_web_view
+from util.course_key_utils import from_string_or_404
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -300,7 +301,7 @@ def certificate_activation_handler(request, course_key_string):
     # Only global staff (PMs) are able to activate/deactivate certificate configuration
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = from_string_or_404(course_key_string)
     store = modulestore()
     try:
         course = _get_course_and_check_access(course_key, request.user)
@@ -337,7 +338,7 @@ def certificates_list_handler(request, course_key_string):
     POST
         json: create new Certificate
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         try:
@@ -436,7 +437,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
     DELETE
         json: remove the specified certificate from the course
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = from_string_or_404(course_key_string)
     course = _get_course_and_check_access(course_key, request.user)
 
     certificates_list = course.certificates.get('certificates', [])
@@ -510,7 +511,7 @@ def signatory_detail_handler(request, course_key_string, certificate_id, signato
     DELETE
         json: Remove the specified signatory from the specified certificate
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course = _get_course_and_check_access(course_key, request.user)

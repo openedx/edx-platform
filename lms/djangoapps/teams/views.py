@@ -31,6 +31,7 @@ from openedx.core.lib.api.paginators import paginate_search_results, DefaultPagi
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 
 from courseware.courses import get_course_with_access, has_access
 from student.models import CourseEnrollment, CourseAccessRole
@@ -124,7 +125,7 @@ class TeamsDashboardView(GenericAPIView):
         Raises a 404 if the course specified by course_id does not exist, the
         user is not registered for the course, or the teams feature is not enabled.
         """
-        course_key = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id)
         course = get_course_with_access(request.user, "load", course_key)
 
         if not is_feature_enabled(course):
@@ -1094,7 +1095,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         if requested_course_key is not None:
             course_keys = [requested_course_key]
         elif accessible_course_ids is not None:
-            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+            course_keys = [from_string_or_404(course_string) for course_string in accessible_course_ids]
 
         queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)

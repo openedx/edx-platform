@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, to_locale, ugettext as _
 from django.views.generic.base import View
 from ipware.ip import get_ip
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -67,7 +67,7 @@ class ChooseModeView(View):
             Response
 
         """
-        course_key = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id)
 
         # Check whether the user has access to this course
         # based on country access rules.
@@ -292,7 +292,7 @@ def create_mode(request, course_id):
         PARAMETERS[parameter] = request.GET.get(parameter, default)
 
     # Attempt to create the new mode for the given course
-    course_key = CourseKey.from_string(course_id)
+    course_key = from_string_or_404(course_id)
     CourseMode.objects.get_or_create(course_id=course_key, **PARAMETERS)
 
     # Return a success message and a 200 response

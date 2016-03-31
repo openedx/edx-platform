@@ -13,8 +13,8 @@ def from_string_or_404(course_key_string, message=None):
     Parses course key from string(containing course key) or raises 404 if the string's format is invalid.
 
     Arguments:
-        course_key_string(str): It is string containing the course key
-        message(str): It is string containing the exception message
+        course_key_string(str): It contains the course key
+        message(str): It contains the exception message
 
     Returns:
         CourseKey: A key that uniquely identifies a course

@@ -5,7 +5,7 @@ import json
 import logging
 
 from celery.task import task
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 from xmodule.modulestore.django import modulestore
 
 
@@ -73,7 +73,7 @@ def update_course_structure(course_key):
     if not isinstance(course_key, basestring):
         raise ValueError('course_key must be a string. {} is not acceptable.'.format(type(course_key)))
 
-    course_key = CourseKey.from_string(course_key)
+    course_key = from_string_or_404(course_key)
 
     try:
         structure = _generate_course_structure(course_key)

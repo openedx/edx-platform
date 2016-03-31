@@ -5,7 +5,7 @@ whether a user has satisfied those requirements.
 
 import logging
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
@@ -187,7 +187,7 @@ def get_eligibilities_for_user(username, course_key=None):
     """
     eligibilities = CreditEligibility.get_user_eligibilities(username)
     if course_key:
-        course_key = CourseKey.from_string(unicode(course_key))
+        course_key = from_string_or_404(unicode(course_key))
         eligibilities = eligibilities.filter(course__course_key=course_key)
 
     return [

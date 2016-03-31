@@ -2,7 +2,7 @@
 Support for converting a django user to an XBlock user
 """
 from django.contrib.auth.models import User
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 from xblock.reference.user_service import XBlockUser, UserService
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
 
@@ -48,7 +48,7 @@ class DjangoXBlockUserService(UserService):
         except User.DoesNotExist:
             return None
 
-        course_id = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id)
         return anonymous_id_for_user(user=user, course_id=course_id, save=False)
 
     def _convert_django_user_to_xblock_user(self, django_user):

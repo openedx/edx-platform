@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from student.models import CourseEnrollment
 from util.json_request import expect_json, JsonResponse
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 from xblock.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
@@ -63,7 +63,7 @@ def handle_ajax(request, course_key_string):
     The masquerade settings are stored in the Django session as a dict from course keys
     to CourseMasquerade objects.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = from_string_or_404(course_key_string)
     masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
     request_json = request.json
     role = request_json.get('role', 'student')

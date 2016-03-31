@@ -29,6 +29,7 @@ import analytics
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.course_key_utils import from_string_or_404
 
 from commerce.utils import audit_log
 from course_modes.models import CourseMode
@@ -235,7 +236,7 @@ class PayAndVerifyView(View):
         """
         # Parse the course key
         # The URL regex should guarantee that the key format is valid.
-        course_key = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id)
         course = modulestore().get_course(course_key)
 
         # Verify that the course exists
@@ -762,7 +763,7 @@ def create_order(request):
     immediate checkout.
     """
     course_id = request.POST['course_id']
-    course_id = CourseKey.from_string(course_id)
+    course_id = from_string_or_404(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
     contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
     try:
@@ -1411,7 +1412,7 @@ class InCourseReverifyView(View):
             HttpResponse
         """
         user = request.user
-        course_key = CourseKey.from_string(course_id)
+        course_key = from_string_or_404(course_id)
         course = modulestore().get_course(course_key)
         if course is None:
             log.error(u"Could not find course '%s' for in-course reverification.", course_key)

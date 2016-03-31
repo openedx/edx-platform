@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 import pytz
 from rest_framework import viewsets, mixins, permissions, views, generics
 from rest_framework.authentication import SessionAuthentication
@@ -183,6 +184,6 @@ class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.Re
         # so we can look up the object.
         course_key = self.kwargs.get(self.lookup_field)
         if course_key is not None:
-            self.kwargs[self.lookup_field] = CourseKey.from_string(course_key)
+            self.kwargs[self.lookup_field] = from_string_or_404(course_key)
 
         return super(CreditCourseViewSet, self).get_object()

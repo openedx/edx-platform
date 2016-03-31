@@ -14,7 +14,7 @@ from django.core.management.base import BaseCommand, CommandError
 from mailsnake import MailSnake
 
 from student.models import UserProfile, unique_id_for_user
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 
 
 BATCH_SIZE = 15000
@@ -176,7 +176,7 @@ def get_enrolled_students(course_id):
     in the course.
     """
     objects = UserProfile.objects
-    course_key = CourseKey.from_string(course_id)
+    course_key = from_string_or_404(course_id)
     students = objects.filter(user__courseenrollment__course_id=course_key,
                               user__courseenrollment__is_active=True)
     return students

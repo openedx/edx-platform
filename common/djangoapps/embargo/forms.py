@@ -9,7 +9,7 @@ import ipaddr
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import from_string_or_404
 
 from embargo.models import IPFilter, RestrictedCourse
 
@@ -46,7 +46,7 @@ class RestrictedCourseForm(forms.ModelForm):
         error_msg = _('COURSE NOT FOUND.  Please check that the course ID is valid.')
 
         try:
-            course_key = CourseKey.from_string(cleaned_id)
+            course_key = from_string_or_404(cleaned_id)
         except InvalidKeyError:
             raise forms.ValidationError(error_msg)
 
