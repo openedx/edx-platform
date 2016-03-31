@@ -10,6 +10,7 @@ import unittest
 from uuid import uuid4
 
 from django.conf import settings
+from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
@@ -270,6 +271,49 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
         self.assertEqual("Thu, 01 Dec 1983 20:00:55 GMT", near_expire_dt)
+
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_normal_request(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a normal request is made -- i.e. from an end user with their
+        browser -- that we don't classify the request as coming from a CDN.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront'
+
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
+
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, False)
+
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_cdn_request(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a CDN request is made -- i.e. from an edge node back to the
+        origin -- that we classify the request as coming from a CDN.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront'
+
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
+
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, True)
+
+    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    def test_cache_is_cdn_with_cdn_request_multiple_user_agents(self, mock_get_cdn_user_agents):
+        """
+        Tests that when a CDN request is made -- i.e. from an edge node back to the
+        origin -- that we classify the request as coming from a CDN when multiple UAs
+        are configured.
+        """
+        mock_get_cdn_user_agents.return_value = 'Amazon CloudFront\nAkamai GHost'
+
+        request_factory = RequestFactory()
+        browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
+
+        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        self.assertEqual(is_from_cdn, True)
 
 
 @ddt.ddt
