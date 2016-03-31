@@ -3,8 +3,7 @@
 define([ // jshint ignore:line
     'underscore',
     'backbone',
-    'backbone-relational',
-    'underscore.string'
+    'backbone-relational'
 ],
 function(_, Backbone) {
     'use strict';
