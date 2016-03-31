@@ -94,7 +94,8 @@
             "catch": "js/vendor/ova/catch/js/catch",
             "handlebars": "js/vendor/ova/catch/js/handlebars-1.1.2",
             "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
-            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min"
+            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
+            "picturefill": "common/js/vendor/picturefill.min"
             // end of files needed by OVA
         },
         shim: {

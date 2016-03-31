@@ -69,6 +69,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/slick.core.js
     - xmodule_js/common_static/js/vendor/slick.grid.js
     - xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js
+    - xmodule_js/common_static/common/js/vendor/picturefill.min.js
 
 # Paths to source JavaScript files
 src_paths:

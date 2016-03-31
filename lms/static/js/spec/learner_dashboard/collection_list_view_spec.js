@@ -29,7 +29,12 @@ define([
                             modified: '2016-03-25T13:45:21.220732Z',
                             marketing_slug: 'p_2?param=haha&test=b', 
                             id: 146,
-                            marketing_url: 'http://www.edx.org/xseries/p_2?param=haha&test=b'
+                            marketing_url: 'http://www.edx.org/xseries/p_2?param=haha&test=b',
+                            banner_image_urls: {
+                                w348h116: 'http://www.edx.org/images/org1/test1',
+                                w435h145: 'http://www.edx.org/images/org1/test2',
+                                w726h242: 'http://www.edx.org/images/org1/test3'
+                            }
                         },
                         {
                             category: 'xseries',
@@ -46,7 +51,12 @@ define([
                             modified: '2016-03-09T14:30:52.840898Z',
                             marketing_slug: 'gdaf', 
                             id: 147,
-                            marketing_url: 'http://www.edx.org/xseries/gdaf'
+                            marketing_url: 'http://www.edx.org/xseries/gdaf',
+                            banner_image_urls: {
+                                w348h116: 'http://www.edx.org/images/org2/test1',
+                                w435h145: 'http://www.edx.org/images/org2/test2',
+                                w726h242: 'http://www.edx.org/images/org2/test3'
+                            }
                         }
                     ]
                 };

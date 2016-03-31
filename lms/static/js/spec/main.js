@@ -66,6 +66,7 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
+            'picturefill': 'common/js/vendor/picturefill.min',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
