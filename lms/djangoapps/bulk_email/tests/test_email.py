@@ -20,7 +20,8 @@ from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 STAFF_COUNT = 3
@@ -44,44 +45,77 @@ class MockCourseEmailResult(object):
         return mock_update_subtask_status
 
 
-class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
+class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
     """
     Test that emails send correctly.
     """
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-    def setUp(self):
-        super(EmailSendFromDashboardTestCase, self).setUp()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        self.course = CourseFactory.create(display_name=course_title)
-
+    def create_staff_and_instructor(self):
+        """
+        Creates one instructor and several course staff for self.course. Assigns
+        them to self.instructor (single user) and self.staff (list of users),
+        respectively.
+        """
         self.instructor = InstructorFactory(course_key=self.course.id)
 
-        # Create staff
-        self.staff = [StaffFactory(course_key=self.course.id)
-                      for _ in xrange(STAFF_COUNT)]
+        self.staff = [
+            StaffFactory(course_key=self.course.id) for __ in xrange(STAFF_COUNT)
+        ]
 
-        # Create students
+    def create_students(self):
+        """
+        Creates users and enrolls them in self.course. Assigns these users to
+        self.students.
+        """
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
+    def login_as_user(self, user):
+        """
+        Log in self.client as user.
+        """
+        self.client.login(username=user.username, password="test")
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    def goto_instructor_dash_email_view(self):
+        """
+        Goes to the instructor dashboard to verify that the email section is
+        there.
+        """
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        # Response loads the whole instructor dashboard, so no need to explicitly
+        # navigate to a particular email section
+        response = self.client.get(url)
+        email_section = '<div class="vert-left send-email" id="section-send-email">'
+        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
+        self.assertIn(email_section, response.content)
+
+    @classmethod
+    def setUpClass(cls):
+        super(EmailSendFromDashboardTestCase, cls).setUpClass()
+        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        cls.course = CourseFactory.create(
+            display_name=course_title,
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+    def setUp(self):
+        super(EmailSendFromDashboardTestCase, self).setUp()
+        self.create_staff_and_instructor()
+        self.create_students()
+
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.client.login(username=self.instructor.username, password="test")
+        self.login_as_user(self.instructor)
 
-        # Pull up email view on instructor dashboard
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        # Response loads the whole instructor dashboard, so no need to explicitly
-        # navigate to a particular email section
-        response = self.client.get(self.url)
-        email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
-        self.assertTrue(email_section in response.content)
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.goto_instructor_dash_email_view()
+        self.send_mail_url = reverse(
+            'send_email', kwargs={'course_id': unicode(self.course.id)}
+        )
         self.success_content = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': unicode(self.course.id),
             'success': True,
         }
 
@@ -130,6 +164,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
         self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
+        self.assertEquals(
+            mail.outbox[0].from_email,
+            u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+                course_display_name=self.course.display_name,
+                course_name=self.course.id.course
+            )
+        )
 
     def test_send_to_staff(self):
         """
@@ -267,6 +308,42 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
+
+    def test_long_course_display_name(self):
+        """
+        This test tests that courses with exorbitantly large display names
+        can still send emails, since it appears that 320 appears to be the
+        character length limit of from emails for Amazon SES.
+        """
+        test_email = {
+            'action': 'Send email',
+            'send_to': 'myself',
+            'subject': 'test subject for self',
+            'message': 'test message for self'
+        }
+
+        # make very long display_name for course
+        long_name = u"x" * 321
+        course = CourseFactory.create(
+            display_name=long_name, number="bulk_email_course_name"
+        )
+        instructor = InstructorFactory(course_key=course.id)
+
+        self.login_as_user(instructor)
+        send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
+        response = self.client.post(send_mail_url, test_email)
+        self.assertTrue(json.loads(response.content)['success'])
+
+        self.assertEqual(len(mail.outbox), 1)
+        from_email = mail.outbox[0].from_email
+
+        self.assertEqual(
+            from_email,
+            u'"{course_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+                course_name=course.id.course
+            )
+        )
+        self.assertEqual(len(from_email), 83)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')
