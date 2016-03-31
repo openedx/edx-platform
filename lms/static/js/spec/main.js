@@ -364,6 +364,9 @@
                     // Set global variables that the payment code is expecting to be defined
                     window._ = require('underscore');
                     window._.str = require('underscore.string');
+                    window.edx = edx || {};
+                    window.edx.HtmlUtils = require('edx-ui-toolkit/js/utils/html-utils');
+                    window.edx.StringUtils = require('edx-ui-toolkit/js/utils/string-utils');
                 }
             },
             'js/verify_student/views/intro_step_view': {
