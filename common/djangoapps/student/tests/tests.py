@@ -249,11 +249,14 @@ class DashboardTest(ModuleStoreTestCase):
         Test that the certificate verification status for courses is visible on the dashboard.
         """
         self.client.login(username="jack", password="test")
-        self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
-        self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self._check_verification_status_on('verified', 'You&#39;re enrolled as a verified student')
+        self._check_verification_status_on('honor', 'You&#39;re enrolled as an honor code student')
         self._check_verification_status_off('audit', '')
-        self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
-        self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
+        self._check_verification_status_on('professional', 'You&#39;re enrolled as a professional education student')
+        self._check_verification_status_on(
+            'no-id-professional',
+            'You&#39;re enrolled as a professional education student',
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def _check_verification_status_off(self, mode, value):
