@@ -3,11 +3,12 @@ Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 from django.contrib.auth.models import User
 from django.forms import CharField
-from oauth2_provider.constants import SCOPE_NAMES
+from edx_oauth2_provider.constants import SCOPE_NAMES
 import provider.constants
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from requests import HTTPError
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException
@@ -21,9 +22,10 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
     scope = ScopeChoiceField(choices=SCOPE_NAMES, required=False)
     client_id = CharField(required=False)
 
-    def __init__(self, request, *args, **kwargs):
+    def __init__(self, request, oauth2_adapter, *args, **kwargs):
         super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)
         self.request = request
+        self.oauth2_adapter = oauth2_adapter
 
     def _require_oauth_field(self, field_name):
         """
@@ -68,15 +70,15 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
 
         client_id = self.cleaned_data["client_id"]
         try:
-            client = Client.objects.get(client_id=client_id)
-        except Client.DoesNotExist:
+            client = self.oauth2_adapter.get_client(client_id=client_id)
+        except (Client.DoesNotExist, Application.DoesNotExist):
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
                     "error_description": "{} is not a valid client_id".format(client_id),
                 }
             )
-        if client.client_type != provider.constants.PUBLIC:
+        if client.client_type not in [provider.constants.PUBLIC, Application.CLIENT_PUBLIC]:
             raise OAuthValidationError(
                 {
                     # invalid_client isn't really the right code, but this mirrors

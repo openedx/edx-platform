@@ -443,16 +443,16 @@ OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
 # OpenID Connect claim handlers
 
 OAUTH_OIDC_ID_TOKEN_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicIDTokenHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
+    'edx_oauth2_provider.oidc.handlers.BasicIDTokenHandler',
+    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
+    'edx_oauth2_provider.oidc.handlers.EmailHandler',
     'oauth2_handler.IDTokenHandler'
 )
 
 OAUTH_OIDC_USERINFO_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicUserInfoHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
+    'edx_oauth2_provider.oidc.handlers.BasicUserInfoHandler',
+    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
+    'edx_oauth2_provider.oidc.handlers.EmailHandler',
     'oauth2_handler.UserInfoHandler'
 )
 
@@ -1856,9 +1856,12 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
+    'edx_oauth2_provider',
+
+    # django-oauth-toolkit
     'oauth2_provider',
 
     'third_party_auth',

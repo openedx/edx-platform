@@ -876,9 +876,12 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
+    'edx_oauth2_provider',
+
+    # django-oauth-toolkit
     'oauth2_provider',
 
     # These are apps that aren't strictly needed by Studio, but are imported by
