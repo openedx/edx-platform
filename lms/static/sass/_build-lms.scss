@@ -17,6 +17,7 @@
 @import 'elements/controls';
 @import 'elements/pagination';
 @import 'elements/creative-commons';
+@import 'elements/program-card';
 
 // shared - course
 @import 'shared/fields';
@@ -57,6 +58,7 @@
 @import "views/financial-assistance";
 @import 'views/bookmarks';
 @import 'course/auto-cert';
+@import 'views/program-list';
 
 // app - discussion
 @import "discussion/utilities/variables";

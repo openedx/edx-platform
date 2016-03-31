@@ -1,0 +1,13 @@
+<div class="program-advertise">
+    <div class="advertise-message">
+        <%- gettext('Browse recently launched courses and see what\'s new in our favorite subjects') %>
+	</div>
+    <div class="ad-link">
+        <a href="<%- xseriesUrl %>" class="btn">
+            <i class="icon fa fa-search" aria-hidden="true"></i> 
+            <span><%- gettext('Explore New XSeries') %></span>
+        </a>
+    </div
+</div>
+<div class="certificate-container">
+</div>

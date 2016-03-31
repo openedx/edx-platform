@@ -2019,6 +2019,9 @@ INSTALLED_APPS = (
 
     # Verified Track Content Cohorting
     'verified_track_content',
+
+    # Learner's dashboard
+    'learner_dashboard',
 )
 
 # Migrations which are not in the standard module "migrations"

@@ -1,0 +1,86 @@
+// +Imports
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+$card-height: 150px;
+
+.program-card{
+  @include span-columns(12);  
+  height: $card-height;
+  border:1px solid $border-color-l3;
+  box-sizing:border-box;
+  padding: $baseline;
+  margin-bottom: $baseline;
+  position:relative;
+  .card-link{
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    left:0;
+    outline:0;
+    border:0;
+    z-index:1;
+    height: $card-height;
+  }
+  .text-section{
+    .meta-info{
+      @include outer-container;
+      margin-bottom: $baseline;
+      font-size: em(12);
+      .organization{
+        @include span-columns(6);
+        color: $gray;
+      }
+      .category{
+        @include span-columns(6);
+        text-align:right;
+        span{
+            @include float(right);
+        }
+        .xseries-icon{
+          @include float(right);
+          @include margin-right($baseline*0.2);
+          background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
+          background-color: transparent;
+
+          width: ($baseline*1);
+          height: ($baseline*1);
+        }
+      }
+    }
+    .title{
+      font-size:em(30);
+      color: $gray-l1;
+      margin-bottom: 10px;
+      line-height: 100%;
+    }
+  }
+}
+
+
+@include media($bp-medium) {
+  .program-card{
+    @include span-columns(8);
+  }
+}
+
+
+
+@include media($bp-large) {
+  .program-card{
+    @include omega(2n);
+    @include span-columns(6);
+    display:inline;
+  }
+}
+
+@include media($bp-huge) {
+  .program-card{
+    @include omega(2n);
+    @include span-columns(6);
+    display:inline;
+  }
+}
+
