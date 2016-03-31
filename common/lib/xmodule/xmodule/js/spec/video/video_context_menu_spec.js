@@ -31,7 +31,7 @@
         openSubmenuKeyboard = function (menuSubmenuItem, keyCode) {
             menuSubmenuItem.focus().trigger(keyPressEvent(keyCode || $.ui.keyCode.RIGHT));
             expect(menuSubmenuItem).toHaveClass('is-opened');
-            expect(menuSubmenuItem.children().first()).toBeFocused();
+            expect(menuSubmenuItem.children().last().children().first()).toBeFocused();
         };
 
         closeSubmenuMouse = function (menuSubmenuItem) {
@@ -61,7 +61,7 @@
                     return {
                         compare: function (actual, labelsList) {
                             return {
-                              pass: _.difference(labelsList, _.map(this.actual, function (item) {
+                              pass: _.difference(labelsList, _.map(actual, function (item) {
                                         return $(item).text();
                                     })).length === 0
                             };
@@ -97,7 +97,7 @@
                 */
 
                 // Only one context menu per video container
-                expect(menu).toExist();
+                expect(menu).toBeInDOM();
                 expect(menu).toHaveClass('is-opened');
                 expect(menuItems).toHaveCorrectLabels(['Play', 'Mute', 'Fill browser']);
                 expect(menuSubmenuItem.children('span')).toHaveText('Speed');
@@ -149,8 +149,8 @@
                     menuEvents = ['keydown', 'contextmenu', 'mouseleave', 'mouseover'];
 
                 menu.data('menu').destroy();
-                expect(menu).not.toExist();
-                expect(overlay).not.toExist();
+                expect(menu).not.toBeInDOM();
+                expect(overlay).not.toBeInDOM();
                 _.each(menuitemEvents, function (eventName) {
                     expect(menuItems.first()).not.toHandle(eventName);
                 })
@@ -185,7 +185,7 @@
 
             it('context menu opens', function () {
                 expect(menu).toHaveClass('is-opened');
-                expect(overlay).toExist();
+                expect(overlay).toBeInDOM();
             });
 
             it('mouseover and mouseleave behave as expected', function () {
@@ -201,21 +201,21 @@
                 // Left-click outside of open menu, for example on Play button
                 playButton.click();
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toExist();
+                expect(overlay).not.toBeInDOM();
             });
 
             it('mouse right-clicking outside of video will close it', function () {
                 // Right-click outside of open menu for example on Play button
                 playButton.trigger('contextmenu');
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toExist();
+                expect(overlay).not.toBeInDOM();
             });
 
             it('mouse right-clicking inside video but outside of context menu will not close it', function () {
                 spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
                 overlay.trigger('contextmenu');
                 expect(menu).toHaveClass('is-opened');
-                expect(overlay).toExist();
+                expect(overlay).toBeInDOM();
             });
 
             it('mouse right-clicking inside video but outside of context menu will close submenus', function () {
@@ -363,14 +363,14 @@
             it('close the menu on ESCAPE keydown', function () {
                 menu.trigger(keyPressEvent($.ui.keyCode.ESCAPE));
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toExist();
+                expect(overlay).not.toBeInDOM();
             });
 
             it('close the submenu on ESCAPE keydown', function () {
                 openSubmenuKeyboard(menuSubmenuItem);
                 menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.ESCAPE));
                 expect(menuSubmenuItem).not.toHaveClass('is-opened');
-                expect(overlay).not.toExist();
+                expect(overlay).not.toBeInDOM();
             });
 
             it('close the submenu on LEFT keydown on submenu items', function () {
@@ -403,9 +403,9 @@
 
                 menuItems.eq(0).trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuSubmenuItem).toBeFocused(); // Speed
-                menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.UP));
                 // Check if hidden item can be skipped correctly.
                 menuItems.eq(2).hide(); // hide Fullscreen item
+                menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuItems.eq(1)).toBeFocused(); // Mute
                 menuItems.eq(1).trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuItems.eq(0)).toBeFocused(); // Play

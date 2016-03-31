@@ -5,7 +5,11 @@ require(
 ['video/03_video_player.js'],
 function (VideoPlayer) {
     describe('VideoPlayer', function () {
-        var state, oldOTBD;
+        var state, oldOTBD, empty_arguments;
+
+        (function () {
+            empty_arguments = arguments;
+        })();
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
@@ -215,8 +219,8 @@ function (VideoPlayer) {
                 });
 
                 it('trigger pause and ended events', function () {
-                    expect($.fn.trigger).toHaveBeenCalledWith('pause', {});
-                    expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('pause', empty_arguments);
+                    expect($.fn.trigger).toHaveBeenCalledWith('ended', empty_arguments);
                 });
             });
         });
@@ -238,7 +242,7 @@ function (VideoPlayer) {
                 });
 
                 it('pause the video caption', function () {
-                    expect($.fn.trigger).toHaveBeenCalledWith('pause', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('pause', empty_arguments);
                 });
             });
 
@@ -277,7 +281,7 @@ function (VideoPlayer) {
                 });
 
                 it('play the video caption', function () {
-                    expect($.fn.trigger).toHaveBeenCalledWith('play', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('play', empty_arguments);
                 });
             });
 
@@ -310,7 +314,7 @@ function (VideoPlayer) {
                 });
 
                 it('pause the video caption', function () {
-                    expect($.fn.trigger).toHaveBeenCalledWith('pause', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('pause', empty_arguments);
                 });
             });
 
@@ -330,7 +334,7 @@ function (VideoPlayer) {
                 });
 
                 it('pause the video caption', function () {
-                    expect($.fn.trigger).toHaveBeenCalledWith('ended', {});
+                    expect($.fn.trigger).toHaveBeenCalledWith('ended', empty_arguments);
                 });
             });
         });

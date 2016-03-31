@@ -29,7 +29,6 @@
                         range: 'min',
                         min: 0,
                         max: null,
-                        change: state.videoProgressSlider.onChange,
                         slide: state.videoProgressSlider.onSlide,
                         stop: state.videoProgressSlider.onStop
                     });

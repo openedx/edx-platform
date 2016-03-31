@@ -25,13 +25,13 @@
         });
 
         it('can render the control', function () {
-            expect($('.video_control.play')).toExist();
+            expect($('.video_control.play')).toBeInDOM();
         });
 
         it('can update state on play', function () {
             state.el.trigger('play');
-            expect($('.video_control.play')).not.toExist();
-            expect($('.video_control.skip')).toExist();
+            expect($('.video_control.play')).not.toBeInDOM();
+            expect($('.video_control.skip')).toBeInDOM();
         });
 
         it('can start video playing on click', function () {
@@ -52,7 +52,7 @@
             spyOn($.fn, 'off').and.callThrough();
             plugin.destroy();
             expect(state.bumperState.videoPlaySkipControl).toBeUndefined();
-            expect(el).not.toExist();
+            expect(el).not.toBeInDOM();
             expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
         });
     });

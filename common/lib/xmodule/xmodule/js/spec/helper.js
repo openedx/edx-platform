@@ -1,5 +1,6 @@
 (function () {
     'use strict';
+    var origAjax = $.ajax;
 
     var stubbedYT = {
         Player: function () {
@@ -128,7 +129,6 @@
 
     jasmine.stubRequests = function () {
         var spy = $.ajax;
-        var origAjax = $.ajax;
         if (!jasmine.isSpy($.ajax)) {
             spy = spyOn($, 'ajax');
         }

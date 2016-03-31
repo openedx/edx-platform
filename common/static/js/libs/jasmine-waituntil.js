@@ -7,6 +7,8 @@
      Polls the latch function until the it returns true or the maximum timeout expires
      whichever comes first. */
     var MAX_TIMEOUT = 4500;
+    var realSetTimeout = setTimeout;
+    var realClearTimeout = clearTimeout;
     jasmine.waitUntil = function (conditionalFn, maxTimeout, message) {
         var deferred = $.Deferred(),
             elapsedTimeInMs = 0,
@@ -17,26 +19,25 @@
 
         var fn = function () {
             elapsedTimeInMs += 50;
-
             if (conditionalFn()) {
-                timeout && clearTimeout(timeout);
+                timeout && realClearTimeout(timeout);
                 deferred.resolve();
             } else {
                 if (elapsedTimeInMs >= maxTimeout) {
 
                     // clear timeout and reject the promise
-                    clearTimeout(timeout);
+                    realClearTimeout(timeout);
                     deferred.reject();
 
                     // explicitly fail the spec with the given message
                     fail(message);
                     return;
                 }
-                timeout = setTimeout(fn, 50);
+                timeout = realSetTimeout(fn, 50);
             }
         };
 
-        setTimeout(fn, 50);
+        realSetTimeout(fn, 50);
         return deferred.promise();
     };
 }));

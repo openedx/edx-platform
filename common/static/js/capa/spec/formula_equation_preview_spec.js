@@ -168,27 +168,28 @@ describe("Formula Equation Preview", function () {
                 $input.val(value).trigger('input');
             }
 
-            jasmine.waitUntil((function () {
-                var iter = 0;
-                return function () {
-                    inputAnother(iter++);
-                    return Date.now() > end;  // Stop when we get to `end`.
-                };
-            }())).then(function () {
-                return jasmine.waitUntil(function () {
+            var self = this;
+            var iter = 0;
+            jasmine.waitUntil(function () {
+                inputAnother(iter++);
+                return Date.now() > end;  // Stop when we get to `end`.
+            }).then(function () {
+                jasmine.waitUntil(function () {
                     return Problem.inputAjax.calls.count() > 0 &&
                         Problem.inputAjax.calls.mostRecent().args[3].formula == value;
-                });
-            }).then(_.bind(function () {
-                // There should be 2 or 3 calls (depending on leading edge).
-                expect(Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);
+                }).then(_.bind(function () {
+                    // There should be 2 or 3 calls (depending on leading edge).
+                    expect(Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);
 
-                // The calls should happen approximately `minDelay` apart.
-                for (var i =1; i < this.ajaxTimes.length; i ++) {
-                    var diff = this.ajaxTimes[i] - this.ajaxTimes[i - 1];
-                    expect(diff).toBeGreaterThan(minDelay - 10);
-                }
-            }, this)).always(done);
+                    // The calls should happen approximately `minDelay` apart.
+                    for (var i =1; i < this.ajaxTimes.length; i ++) {
+                        var diff = this.ajaxTimes[i] - this.ajaxTimes[i - 1];
+                        expect(diff).toBeGreaterThan(minDelay - 10);
+                    }
+                }, self)).then(function () {
+                    done();
+                })
+            });
         });
     });
 
@@ -221,6 +222,8 @@ describe("Formula Equation Preview", function () {
         it('updates MathJax and loading icon on callback', function (done) {
             formulaEquationPreview.enable();
 
+            jax = this.jax;
+
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
@@ -240,7 +243,7 @@ describe("Formula Equation Preview", function () {
 
                 // Refresh the MathJax.
                 expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                    ['Text', this.jax, 'THE_FORMULA']
+                    ['Text', jax, 'THE_FORMULA']
                 );
             }).always(done);
         });
@@ -280,6 +283,8 @@ describe("Formula Equation Preview", function () {
 
         it('displays errors from the server well', function (done) {
             var $img = $("img.loading");
+            jax = this.jax;
+
             formulaEquationPreview.enable();
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
@@ -293,16 +298,16 @@ describe("Formula Equation Preview", function () {
                 expect(MathJax.Hub.Queue).not.toHaveBeenCalled();
                 expect($img.css('visibility')).toEqual('visible');
             }).then(function () {
-                return jasmine.waitUntil(function () {
+                jasmine.waitUntil(function () {
                     return MathJax.Hub.Queue.calls.count() > 0;
-                });
-            }).then(function () {
-                // Refresh the MathJax.
-                expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                    ['Text', this.jax, '\\text{OOPSIE}']
-                );
-                expect($img.css('visibility')).toEqual('hidden');
-            }).then(done);
+                }).then(function () {
+                    // Refresh the MathJax.
+                    expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
+                        ['Text', jax, '\\text{OOPSIE}']
+                    );
+                    expect($img.css('visibility')).toEqual('hidden');
+                }).then(done);
+            });
         });
     });
 
@@ -310,30 +315,30 @@ describe("Formula Equation Preview", function () {
         beforeEach(function (done) {
             formulaEquationPreview.enable();
 
+            var self = this;
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
                 $('#input_THE_ID').val('different').trigger('input');
-            }).then(function () {
-                return jasmine.waitUntil(function () {
+                jasmine.waitUntil(function () {
                     return Problem.inputAjax.calls.count() > 1;
-                });
-            }).then(_.bind(function () {
-                var args0 = Problem.inputAjax.calls.argsFor(0);
-                var args1 = Problem.inputAjax.calls.argsFor(1);
-                var response0 = {
-                    preview: 'THE_FORMULA_0',
-                    request_start: args0[3].request_start
-                };
-                var response1 = {
-                    preview: 'THE_FORMULA_1',
-                    request_start: args1[3].request_start
-                };
+                }).then(_.bind(function () {
+                    var args0 = Problem.inputAjax.calls.argsFor(0);
+                    var args1 = Problem.inputAjax.calls.argsFor(1);
+                    var response0 = {
+                        preview: 'THE_FORMULA_0',
+                        request_start: args0[3].request_start
+                    };
+                    var response1 = {
+                        preview: 'THE_FORMULA_1',
+                        request_start: args1[3].request_start
+                    };
 
-                this.callbacks = [args0[4], args0[4]];
-                this.responses = [response0, response1];
-            }, this)).then(function () {
-                done();
+                    this.callbacks = [args0[4], args0[4]];
+                    this.responses = [response0, response1];
+                }, self)).then(function () {
+                    done();
+                });
             });
         });
 

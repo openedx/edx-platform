@@ -54,11 +54,11 @@ describe "XBlock", ->
       expect(window.initFnZ).toHaveBeenCalledWith(@runtimeZ, @vZNode, {})
 
     it "loads when missing versions", ->
-      expect(@missingVersionBlock.element[0]).toBe($('#missing-version')[0])
+      expect(@missingVersionBlock.element).toBe($('#missing-version')[0])
       expect(@missingVersionBlock.name).toBe('no-version')
 
     it "loads when missing init fn", ->
-      expect(@missingInitBlock.element[0]).toBe($('#missing-init')[0])
+      expect(@missingInitBlock.element).toBe($('#missing-init')[0])
       expect(@missingInitBlock.name).toBe('no-init')
 
     it "adds names to blocks", ->
@@ -68,10 +68,10 @@ describe "XBlock", ->
       expect(@vZBlock.name).toBeUndefined()
 
     it "attaches the element to the block", ->
-      expect(@vABlock.element[0]).toBe(@vANode)
-      expect(@vZBlock.element[0]).toBe(@vZNode)
-      expect(@missingVersionBlock.element[0]).toBe($('#missing-version')[0])
-      expect(@missingInitBlock.element[0]).toBe($('#missing-init')[0])
+      expect(@vABlock.element).toBe(@vANode)
+      expect(@vZBlock.element).toBe(@vZNode)
+      expect(@missingVersionBlock.element).toBe($('#missing-version')[0])
+      expect(@missingInitBlock.element).toBe($('#missing-init')[0])
 
     it "passes through the request token", ->
       expect(XBlock.initializeXBlocks).toHaveBeenCalledWith($(@vANode), 'req-token-a')

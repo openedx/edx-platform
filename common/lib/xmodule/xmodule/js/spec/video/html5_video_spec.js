@@ -46,7 +46,7 @@
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                             }).then(function () {
                                 expect(state.videoPlayer.player.getPlayerState())
-                                    .toBe(STATUS.PLAYING);
+                                    .toBeInArray([STATUS.BUFFERING, STATUS.PLAYING]);
                             }).always(done);
                         });
 

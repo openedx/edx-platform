@@ -10,12 +10,9 @@
 
             state = jasmine.initializePlayer();
             spyOn(state.videoCommands, 'execute');
-
-            spyOn(window.YT, 'Player').and.callThrough();
         });
 
         afterEach(function () {
-            window.YT.Player.calls.reset();
             $('source').remove();
             state.storage.clear();
             state.videoPlayer.destroy();
@@ -42,9 +39,15 @@
             }
         ];
 
+        beforeEach(function () {
+            jasmine.stubRequests();
+            spyOn(window.YT, 'Player').and.callThrough();
+        });
+
         it ('works correctly on calling proper methods', function () {
             var btnPlay;
 
+            state = jasmine.initializePlayer();
             btnPlay = state.el.find('.btn-play');
 
             state.videoPlayPlaceholder.show();
@@ -52,7 +55,7 @@
             expect(btnPlay).not.toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'false',
-                'tabindex': 0
+                'tabindex': '0'
             });
 
             state.videoPlayPlaceholder.hide();
@@ -60,7 +63,7 @@
             expect(btnPlay).toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'true',
-                'tabindex': -1
+                'tabindex': '-1'
             });
         });
 
@@ -75,6 +78,7 @@
                 var btnPlay;
 
                 window.onTouchBasedDevice.and.returnValue(data.isTouch);
+                state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
                 if (data.isShown) {
@@ -94,6 +98,7 @@
                 var btnPlay;
 
                 window.onTouchBasedDevice.and.returnValue([device]);
+                state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
                 state.el.trigger('play');
@@ -109,6 +114,7 @@
                 var btnPlay;
 
                 window.onTouchBasedDevice.and.returnValue([device]);
+                state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
                 state.el.trigger('play');

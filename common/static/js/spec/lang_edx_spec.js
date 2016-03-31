@@ -14,7 +14,7 @@
 
         it("can spy on language selector change event", function () {
             spyOnEvent(lang_selector, 'change');
-            lang_selector.trigger('change');
+            jasmine.$('#settings-language-value').trigger('change');
             expect('change').toHaveBeenTriggeredOn(lang_selector);
         });
 
