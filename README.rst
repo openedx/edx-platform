@@ -15,9 +15,9 @@ install edX:
    existing Ubuntu 12.04 server.
 
 .. _configuration repo: https://github.com/edx/configuration
-.. _edX Developer Stack: https://github.com/edx/configuration/wiki/edX-Developer-Stack
-.. _edX Full Stack: https://github.com/edx/configuration/wiki/edX-Full-Stack
-.. _edX Ubuntu 12.04 64-bit Installation: https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-64-bit-Installation
+.. _edX Developer Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Devstack
+.. _edX Full Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Fullstack
+.. _edX Ubuntu 12.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+12.04+64+bit+Installation
 
 
 License
