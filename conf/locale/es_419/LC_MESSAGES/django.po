@@ -183,7 +183,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 11:00+0000\n"
+"POT-Creation-Date: 2016-03-24 18:06+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -792,7 +792,7 @@ msgstr "El curso que está buscando comienza el {date}."
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for is closed for enrollment as of {date}."
-msgstr ""
+msgstr "El curso que busca está cerrado desde {date}."
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -2538,6 +2538,9 @@ msgid ""
 "name of the tab (usually the title of the book) as well as the URLs and "
 "titles of each chapter in the book."
 msgstr ""
+"Para los textos en HTML que aparecen como pestañas separadas en el curso, "
+"ingrese el nombre de la pestaña (usualmente, el nombre del libro) y el URL y"
+" título de cada capítulo del libro."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2650,6 +2653,8 @@ msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
+"Verdadero si las zonas horarias deben mostrarse en fechas dentro del curso. "
+"Se ha hecho obsoleto a favor de due_date_display_format."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2846,6 +2851,9 @@ msgid ""
 "course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
+"Ingrese el nombre de la organización que desea que aparezca en el curso. "
+"Esta opción anula lo que ingresó al crear el curso. Para reutilizar el mismo"
+" nombre que usó al crear el curso, ingrese nulo."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2858,6 +2866,9 @@ msgid ""
 " use the course number that you entered when you created the course, enter "
 "null."
 msgstr ""
+"Ingrese el número de curso que desea que sea mostrado en el curso. Esta "
+"configuración anula el número que ingresó al crear el curso. Para reutilizar"
+" dicho número, ingrese nulo."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -3077,10 +3088,12 @@ msgstr ""
 "ingrese 0.75."
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Ritmo propio."
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -4593,6 +4606,12 @@ msgid "CCX Coach"
 msgstr "Tutor CCX"
 
 #: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr "El curso está lleno: el límite es {max_student_enrollments_allowed}"
 
@@ -5739,7 +5758,7 @@ msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Incorrect data received from notes api."
-msgstr ""
+msgstr "Datos incorrectos recibidos de notas api."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -6154,7 +6173,7 @@ msgstr "No se puede repuntuar con all_students y unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The ORA data report is being generated."
-msgstr ""
+msgstr "El reporte de datos de ORA está siendo creado."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6579,7 +6598,6 @@ msgstr ""
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -8538,6 +8556,8 @@ msgid ""
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
 "      "
 msgstr ""
+"\n"
+"Tu contraseña se ha establecido. Puedes seguir adelante e %(link_start)sinciar sesión%(link_end)s ahora."
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8546,6 +8566,8 @@ msgid ""
 "      Reset Your %(platform_name)s Password\n"
 "  "
 msgstr ""
+"\n"
+"Restablece Tu Contraseña de %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8554,10 +8576,12 @@ msgid ""
 "          Reset Your %(platform_name)s Password\n"
 "          "
 msgstr ""
+"\n"
+"Restablece Tu Contraseña de %(platform_name)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr ""
+msgstr "Formulario de Restablecimiento de Contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -8565,24 +8589,29 @@ msgid ""
 "                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
 "            "
 msgstr ""
+"\n"
+"                Lo sentimos, pero esta versión de su navegador no está soportada. Intente nuevamente con un navegador distinto o una versión actualizada del mismo navegador.\n"
+"            "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
-msgstr ""
+msgstr "Ocurrieron los siguientes errores al procesar su registro:"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
-msgstr ""
+msgstr "Debes completar todos los campos."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "Los dos campos de contraseña no coinciden."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
 msgstr ""
+"Lo sentimos, nuestros sistemas parecen estar teniendo problemas para "
+"procesar su restablecimiento de contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8591,12 +8620,16 @@ msgid ""
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
 "            "
 msgstr ""
+"\n"
+"                Alguien ya ha sido avisado respecto a esta situación. Por favor intente nuevamente en unos minutos. Por favor %(start_link)scontáctenos%(end_link)s para transmitirnos cualquier inquietud.\n"
+"            "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Por favor ingrese su nueva contraseña dos veces para que sea verificada."
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8605,7 +8638,11 @@ msgid ""
 "        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
 "        "
 msgstr ""
+"\n"
+"        Los campos requeridos se denotan con %(bold_start)stexto en negrita y un asterisco (*)%(bold_end)s.\n"
+"        "
 
+#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -8620,19 +8657,19 @@ msgstr "Información Requerida"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
-msgstr ""
+msgstr "Tu Nueva Contraseña "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr ""
+msgstr "Tu Nueva Contraseña de Nuevo"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr ""
+msgstr "Cambiar Mi Contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
+msgstr "El restablecimiento de contraseña no tuvo éxito"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8641,11 +8678,15 @@ msgid ""
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
+"\n"
+"            El vínculo de restablecimiento de contraseña es inválido, posiblemente porque este vínculo ya fue utilizado. Por favor vuelva a la página de %(start_link)sinicio de sesión%(end_link)s y comience de nuevo el proceso de restablecer contraseña.\n"
+"        "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr ""
+msgstr "Ayuda con Restablecimiento de Contraseña"
 
+#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need Help?"
@@ -8658,6 +8699,9 @@ msgid ""
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
 "          "
 msgstr ""
+"\n"
+"              Visite nuestro %(start_link)sCentro de Ayuda para ver la información de contacto y las respuestas a las preguntas más frecuentes%(end_link)s\n"
+"          "
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -9254,11 +9298,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr "Habilitar la creación de Servicio de credenciales desde Studio"
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "Tiempo de vida del Cache"
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -9267,9 +9313,25 @@ msgstr ""
 "Especificado en segundos. Habilite el cache configurando este campo en un "
 "valor mayor que 0."
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr "{first_providers}, y {last_provider}"
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr "{first_provider} y {second_provider}"
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "Elegibilidad para créditos del curso"
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9624,6 +9686,13 @@ msgstr "Dirección de correspondencia"
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "Cuéntenos por qué está interesado en {platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
+msgstr "Estado/Provincia/Región"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -10136,7 +10205,7 @@ msgstr "Formato incorrecto para el campo '{name}'. {detailed_message}"
 
 #: cms/lib/xblock/tagging.py
 msgid "Difficulty"
-msgstr ""
+msgstr "Dificultad"
 
 #: cms/lib/xblock/tagging.py
 msgid "Dictionary with the available tags"
@@ -10172,7 +10241,6 @@ msgstr "Configuración"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -10236,7 +10304,6 @@ msgstr "¿Olvidó su contraseña?"
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "Ejemplo: Juliana Sánchez"
@@ -10256,11 +10323,6 @@ msgstr "Nombre público de usuario "
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "Ejemplo: JulianaSanchez"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "Preferencia de idioma"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -11143,7 +11205,6 @@ msgid "Reset"
 msgstr "Reiniciar"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Guardar"
 
@@ -11847,7 +11908,7 @@ msgstr "Descargar la transcripción"
 
 #: lms/templates/video.html
 msgid "Download Handout"
-msgstr "Descargar folleto."
+msgstr "Descargar documento"
 
 #: lms/templates/word_cloud.html
 msgid "Your words:"
@@ -12039,6 +12100,10 @@ msgid "Name your CCX"
 msgstr "Nombre para su CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr "Crear un nuevo curso personalizado para edX"
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "Calendario"
 
@@ -12046,6 +12111,10 @@ msgstr "Calendario"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "Política de Calificaciones"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr "Por favor ingrese un nombre CCX válido."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12853,7 +12922,7 @@ msgstr "Actualizaciones y noticias del curso"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
-msgstr "Navegación de apuntes"
+msgstr "Navegación de documentos"
 
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
@@ -13035,6 +13104,16 @@ msgstr "Hola {name},"
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid "Hi,"
 msgstr "Hola,"
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+"¡Felicitaciones! ¡Usted es elegible para recibir créditos de {providers} por"
+" haber completado exitosamente su curso en {platform_name}! "
+"{link_start}Obtenga sus créditos ahora.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -13246,7 +13325,7 @@ msgstr "Estoy aprendiendo en {platform_name}:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
-msgstr ""
+msgstr "Opciones de curso para"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
@@ -13458,10 +13537,6 @@ msgid ""
 msgstr ""
 "Ocurrió un error con esta transacción. Para obtener asistencia, contacte a "
 "{support_email}."
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "editar"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -14973,7 +15048,7 @@ msgstr "Generar Reportes de calificaciones de problemas"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
-msgstr ""
+msgstr "Crear reporte de datos de ORA"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -17187,14 +17262,6 @@ msgstr ""
 "Si tiene preguntas sobre este curso o formulario, puede contactar a <a "
 "href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "Edite su nombre completo"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "Ocurrió el siguiente error en la edición de su nombre:"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "Re-verificando el curso {course_name}"
@@ -17446,8 +17513,9 @@ msgid "{studio_name} Server Error"
 msgstr "{studio_name} Error del Servidor"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "Los servidores  {studio_name} encontrado un error"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
+"Los servidores de {em_start}{studio_name}{em_end} encontraron un error"
 
 #: cms/templates/500.html
 msgid ""
@@ -17512,7 +17580,7 @@ msgid ""
 "the URL you went to was correct, as e-mail programs will sometimes split it "
 "into two lines."
 msgstr ""
-"Lo sentimos. Algo salió mal con su activación. Asegúrese de que la URL que "
+"Lo sentimos. Algo salió mal con su activación. Asegúrese de que el URL que "
 "visitó fuera la correcta, ya que algunos programas de correo electrónico "
 "pueden modificarla, dividiéndola en dos líneas."
 
@@ -17611,8 +17679,8 @@ msgid ""
 "To copy a URL, double click the value in the URL column, then copy the "
 "selected text."
 msgstr ""
-"Para copiar una dirección URL, realice un doble clic en la columna de la "
-"URL, luego copie el texto seleccionado."
+"Para copiar un URL, realice un doble clic en la columna del URL, luego copie"
+" el texto seleccionado."
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
@@ -17855,7 +17923,7 @@ msgid ""
 "You enter the ID in the URL field."
 msgstr ""
 "Utilice este ID cuando cree vínculos a esta unidad desde otra parte del "
-"curso. Ingrese el ID en el campo de la URL."
+"curso. Ingrese el ID en el campo del URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
@@ -18234,8 +18302,8 @@ msgid ""
 "course."
 msgstr ""
 "Nota: Las páginas estarán disponibles públicamente. Si los usuarios conocen "
-"la dirección url de la página, podrán visitarla, incluso si no están "
-"registrados o no han iniciado sesión en el curso."
+"el URL de la página, podrán visitarla, incluso si no están registrados o no "
+"han iniciado sesión en el curso."
 
 #: cms/templates/edit-tabs.html
 msgid "Show this page"
@@ -18610,8 +18678,8 @@ msgstr "Exportar Curso a Git:"
 msgid ""
 "giturl must be defined in your course settings before you can export to git."
 msgstr ""
-"la url git debe estar definida en la configuración del curso  para que pueda"
-" exportar el curso a git."
+"giturl debe estar definida en la configuración del curso para que pueda "
+"exportar el curso a git."
 
 #: cms/templates/export_git.html
 msgid "Export Failed"
@@ -18627,7 +18695,7 @@ msgstr "Su curso:"
 
 #: cms/templates/export_git.html
 msgid "Course git url:"
-msgstr "Url Git del curso:"
+msgstr "Url git del curso:"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/visibility_editor.html
@@ -19280,6 +19348,10 @@ msgid ""
 "changed, but you can set a different display name in Advanced Settings "
 "later."
 msgstr ""
+"El nombre de la organización que patrocina el curso. {strong_start}Nota: El "
+"nombre de la organización es parte del URL del curso.{strong_end} Este no "
+"puede ser cambiado, pero puede establecer un nombre de usuario distinto en "
+"Configuración Avanzada posteriormente."
 
 #: cms/templates/index.html
 msgid ""
@@ -19287,6 +19359,10 @@ msgid ""
 "{strong_start}Note: This is part of your course URL, so no spaces or special"
 " characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
+"El número único que identifica a su curso dentro de su organización. "
+"{strong_start}Nota: Esto hará parte del URL de su curso, por lo tanto no se "
+"permiten espacios ni caracteres especiales y no puede ser "
+"cambiado.{strong_end}"
 
 #: cms/templates/index.html
 msgid ""
@@ -19294,6 +19370,9 @@ msgid ""
 "your course URL, so no spaces or special characters are allowed and it "
 "cannot be changed.{strong_end}"
 msgstr ""
+"El término en que su curso se ofrecerá. {strong_start}Nota: Esto hará parte "
+"del URL de su curso, por lo tanto no se permiten espacios ni caracteres "
+"especiales y no puede ser cambiado.{strong_end}"
 
 #: cms/templates/index.html
 msgid "Create"
@@ -19349,6 +19428,9 @@ msgid ""
 "part of your library URL, so no spaces or special characters are "
 "allowed.{strong_end} This cannot be changed."
 msgstr ""
+"El código único que identifica a esta biblioteca. {strong_start}Nota: Esto "
+"hará parte del URL de su biblioteca, por lo tanto no se permiten espacios ni"
+" caracteres especiales.{strong_end} Esto no puede ser cambiado."
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -19622,6 +19704,9 @@ msgid ""
 "email address ({email}). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
+"¡Ya casi terminamos! Para completar su registro, necesitamos que verifique "
+"su dirección de correo electrónico ({email}). Un mensaje de activación y los"
+" pasos a seguir le estarán esperando allí."
 
 #: cms/templates/index.html
 msgid "Need help?"
@@ -19914,6 +19999,10 @@ msgstr ""
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "Ubicación"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr "Preferencia de idioma"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -20226,7 +20315,7 @@ msgstr ""
 #. for a course image
 #: cms/templates/settings.html
 msgid "Your course image URL"
-msgstr "Imagen de su curso URL"
+msgstr "Imagen del URL de su curso"
 
 #: cms/templates/settings.html
 msgid ""

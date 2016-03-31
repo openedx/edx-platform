@@ -72,7 +72,7 @@
 # qrfahasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # Ahmed Jazzar <ajazzar@qrf.org>, 2015
-# Ahmed Jazzar <ajazzar@qrf.org>, 2015
+# Ahmed Jazzar <ajazzar@qrf.org>, 2015-2016
 # ayshibly <ayshibly@gmail.com>, 2014
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
@@ -146,7 +146,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 11:00+0000\n"
+"POT-Creation-Date: 2016-03-24 18:06+0000\n"
 "PO-Revision-Date: 2015-12-07 09:55+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -3008,10 +3008,12 @@ msgstr ""
 "كقيمة عشرية بين 0.0 و1.0. ومثلًا، تُدخل القيمة 0.75 للتعبير عن درجة 75%."
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "تعلّم ذاتيّ"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -4488,6 +4490,12 @@ msgid "CCX Coach"
 msgstr "مدرِّب CCX"
 
 #: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr ""
 "هذا المساق مُمتلئ: الحد المسموح به هو {max_student_enrollments_allowed}"
@@ -5217,7 +5225,7 @@ msgstr "مخطّط المنهج الدراسي"
 #: lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Progress"
-msgstr "التقدّم"
+msgstr "العلامات"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Textbooks' refers to the tab in the course that leads to the
@@ -6450,7 +6458,6 @@ msgstr "لم يجرِ تمديد تاريخ الاستحقاق لذلك الطا
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -9055,11 +9062,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr "فعّل خدمة إصدار الوثائق المُعتمدة في استديو"
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "مدّة بقاء البيانات في الذاكرة المؤقّتة \"Cache\""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -9068,9 +9077,25 @@ msgstr ""
 "محدّد بالثواني. فعّل ميزة الاحتفاظ بالبيانات في الذاكرة المؤقتة Cache بتعيين"
 " هذه القيمة لتصبح أكبر من 0."
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "الأهلية لمواد المساق الدراسيّة"
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9410,6 +9435,13 @@ msgstr "العنوان البريدي"
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "أخبرنا بالأسباب التي دفعتك للانضمام إلى {platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -9942,7 +9974,6 @@ msgstr "الإعدادات"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "إلغاء"
 
@@ -10006,7 +10037,6 @@ msgstr "هل نسيت كلمة السر؟"
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "مثال: عبد الحليم حافظ"
@@ -10026,11 +10056,6 @@ msgstr "اسم المستخدم"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "مثال: فاطمة_الفهري"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "اللغة المفضلة"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -10915,7 +10940,6 @@ msgid "Reset"
 msgstr "إعادة الضبط"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "حفظ"
 
@@ -11799,6 +11823,10 @@ msgid "Name your CCX"
 msgstr "سمِّ CCX الخاصة بك."
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "وضع الجدول"
 
@@ -11806,6 +11834,10 @@ msgstr "وضع الجدول"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "سياسة التقييم"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12762,6 +12794,13 @@ msgstr "مرحبًا،"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
 "now.{link_end}"
@@ -13177,10 +13216,6 @@ msgid ""
 msgstr ""
 "وقع خطأ أثناء إكمال هذه العملية. للحصول على المساعدة يرجى الاتصال مع "
 "{support_email}."
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "تعديل"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -16793,14 +16828,6 @@ msgstr ""
 "إذا كان لديك أي أسئلة حول المساق أو هذه الاستمارة، يُرجى الاتصال بـ <a "
 "href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "قم بتعديل اسمك الكامل  "
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "حدث الخاطئ التالي أثناء تعديل إسمك:"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "يرجى إعادة التحقق للمساق {course_name}"
@@ -17048,8 +17075,8 @@ msgid "{studio_name} Server Error"
 msgstr "خطأ في خادم الاستوديو {studio_name} "
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "نأسف مواجهة خطأ في خوادم الاستوديو {studio_name}"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
 
 #: cms/templates/500.html
 msgid ""
@@ -19462,6 +19489,10 @@ msgstr ""
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "موقعك"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
