@@ -29,6 +29,8 @@ from celery import task, current_task  # pylint: disable=no-name-in-module
 from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
 from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-module, import-error
 
+from django.utils.translation import ugettext as _
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -216,11 +218,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # Fetch the course object.
     course = get_course(course_id)
 
-    if course is None:
-        msg = u"Task %s: course not found: %s"
-        log.error(msg, task_id, course_id)
-        raise ValueError(msg % (task_id, course_id))
-
     # Get arguments that will be passed to every subtask.
     to_option = email_obj.to_option
     global_email_context = _get_course_email_context(course)
@@ -403,11 +400,35 @@ def _get_source_address(course_id, course_title):
     # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
-    )
+    course_name = re.sub(r"[^\w.-]", '_', course_id.course)
+
+    # Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+    course_staff_title = _('"{course_title}" Course Staff')
+
+    from_addr_format = course_staff_title + u' <{course_name}-{from_email}>'
+
+    def format_address(course_title_no_quotes):
+        """
+        Partial function for formatting the from_addr. Since
+        `course_title_no_quotes` may be truncated to make sure the returned
+        string has fewer than 320 characters, we define this function to make
+        it easy to determine quickly what the max length is for
+        `course_title_no_quotes`.
+        """
+        return from_addr_format.format(
+            course_title=course_title_no_quotes,
+            course_name=course_name,
+            from_email=settings.BULK_EMAIL_DEFAULT_FROM_EMAIL,
+        )
+
+    from_addr = format_address(course_title_no_quotes)
+
+    # If it's longer than 320 characters, reformat, but with the course name
+    # rather than course title. Amazon SES's from address field appears to have a maximum
+    # length of 320.
+    if len(from_addr) >= 320:
+        from_addr = format_address(course_name)
+
     return from_addr
 
 
