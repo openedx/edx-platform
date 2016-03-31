@@ -2016,6 +2016,9 @@ INSTALLED_APPS = (
 
     # Management commands used for configuration automation
     'edx_management_commands.management_commands',
+
+    # Verified Track Content Cohorting
+    'verified_track_content',
 )
 
 # Migrations which are not in the standard module "migrations"
