@@ -1539,9 +1539,21 @@ class CoursesMetrics(SecureAPIView):
             users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
             org_ids = [organization]
 
-        users_started = StudentProgress.get_num_users_started(course_key, exclude_users=exclude_users, org_ids=org_ids)
+        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        if group_ids:
+            try:
+                group_ids = map(int, group_ids.split(','))
+            except ValueError:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+            users_enrolled_qs = users_enrolled_qs.filter(groups__in=group_ids)
+
+        users_started = StudentProgress.get_num_users_started(course_key,
+                                                              exclude_users=exclude_users,
+                                                              org_ids=org_ids,
+                                                              group_ids=group_ids)
         data = {
-            'users_enrolled': users_enrolled_qs.count(),
+            'users_enrolled': users_enrolled_qs.distinct().count(),
             'users_started': users_started,
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
