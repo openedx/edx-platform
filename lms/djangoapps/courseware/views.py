@@ -558,9 +558,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         save_child_position(chapter_descriptor, section)
         section_render_context = {
             'activate_block_id': request.GET.get('activate_block_id'),
-            'redirect_url_func': (
-                get_redirect_url if settings.FEATURES.get('ENABLE_NEXT_BUTTON_ACROSS_SECTIONS') else None
-            ),
+            'redirect_url_func': get_redirect_url,
             'requested_child': request.GET.get("child"),
         }
         context['accordion'] = render_accordion(user, request, course, chapter, section, field_data_cache)
