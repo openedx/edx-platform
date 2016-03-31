@@ -22,22 +22,29 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
     USER_URL: The URL of the endpoint that the backend retrieves user data from
     UID_FIELD: The field in the user data that the backend uses as the user id
     """
+    social_uid = "test_social_uid"
+    access_token = "test_access_token"
+    client_id = "test_client_id"
+
     def setUp(self, create_user=True):
         super(ThirdPartyOAuthTestMixin, self).setUp()
-        self.social_uid = "test_social_uid"
-        self.access_token = "test_access_token"
-        self.client_id = "test_client_id"
-        self.oauth_client = Client.objects.create(
-            client_id=self.client_id,
-            client_type=PUBLIC
-        )
         if create_user:
             self.user = UserFactory()
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
+        self.oauth_client = self._create_client()
         if self.BACKEND == 'google-oauth2':
             self.configure_google_provider(enabled=True)
         elif self.BACKEND == 'facebook':
             self.configure_facebook_provider(enabled=True)
+
+    def _create_client(self):
+        """
+        Create an OAuth2 client application
+        """
+        return Client.objects.create(
+            client_id=self.client_id,
+            client_type=PUBLIC,
+        )
 
     def _setup_provider_response(self, success=False, email=''):
         """
@@ -65,7 +72,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             self.USER_URL,
             body=body,
             status=status,
-            content_type="application/json"
+            content_type="application/json",
         )
 
 
