@@ -460,6 +460,25 @@
             }
         }
 
+        &.button-oa2-azuread-oauth2 {
+            color: darken($microsoft-blue, 20%);
+
+            .icon {
+                background: $microsoft-blue;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $microsoft-blue;
+                border: 1px solid $microsoft-blue;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 darken($microsoft-blue, 10%);
+            }
+        }
+
     }
 
     .button-secondary-login {
