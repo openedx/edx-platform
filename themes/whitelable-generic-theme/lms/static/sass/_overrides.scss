@@ -1,7 +1,6 @@
 header.global {
   .nav-courseware {
     li, div {
-
       .cta {
         border: 1px solid $darkGrey;
         box-shadow: 0 0 0 0 $white;
@@ -15,6 +14,25 @@ header.global {
       a {
        font-size: 15px;
        font-weight: 100;
+      }
+    }
+  }
+}
+
+.footer {
+  background: $white;
+  .grid-manual {
+    margin-top: 10px;
+    .list-unstyled {
+      .main-item {
+        font-weight: 600;
+      }
+      li {
+        margin-bottom: 0.5rem;
+        a {
+          color: $extraDarkGrey;
+          text-decoration: none;
+        }
       }
     }
   }
