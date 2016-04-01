@@ -23,6 +23,7 @@ django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
 django-oauth-plus==2.2.8
+django-oauth-toolkit==0.10.0
 django-sekizai==0.8.2
 django-ses==0.7.0
 django-simple-history==1.6.3
@@ -35,10 +36,10 @@ git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc432894737119
 django==1.8.11
 djangorestframework-jwt==1.7.2
 djangorestframework-oauth==1.1.0
-edx-django-oauth2-provider==0.5.0
 edx-lint==0.4.3
 edx-management-commands==0.0.1
-edx-oauth2-provider==0.5.9
+edx-django-oauth2-provider==1.0.1
+edx-oauth2-provider==1.0.0
 edx-opaque-keys==0.2.1
 edx-organizations==0.4.0
 edx-rest-api-client==1.2.1
