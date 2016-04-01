@@ -24,6 +24,7 @@ from instructor_task.api import (
     generate_certificates_for_students,
     regenerate_certificates,
     submit_export_ora2_data,
+    SpecificStudentIdMissingError,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
@@ -294,6 +295,18 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
                 [CertificateStatuses.downloadable, CertificateStatuses.generating]
             )
         self._test_resubmission(api_call)
+
+    def test_certificate_generation_no_specific_student_id(self):
+        """
+        Raises ValueError when student_set is 'specific_student' and 'specific_student_id' is None.
+        """
+        with self.assertRaises(SpecificStudentIdMissingError):
+            generate_certificates_for_students(
+                self.create_task_request(self.instructor),
+                self.course.id,
+                student_set='specific_student',
+                specific_student_id=None
+            )
 
     def test_certificate_generation_history(self):
         """
