@@ -4,13 +4,13 @@
 import re
 from unittest import skipUnless
 from urllib import urlencode
-import json
 
 import mock
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
@@ -214,9 +214,15 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
-        # For these tests, two third party auth providers are enabled by default:
+
+        # For these tests, three third party auth providers are enabled by default:
         self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)
+        self.configure_dummy_provider(
+            enabled=True,
+            icon_class='',
+            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+        )
 
     @ddt.data(
         ("signin_user", "login"),
@@ -290,6 +296,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ("register_user", "google-oauth2", "Google"),
         ("signin_user", "facebook", "Facebook"),
         ("register_user", "facebook", "Facebook"),
+        ("signin_user", "dummy", "Dummy"),
+        ("register_user", "dummy", "Dummy"),
     )
     @ddt.unpack
     def test_third_party_auth(self, url_name, current_backend, current_provider):
@@ -314,9 +322,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
+                "id": "oa2-dummy",
+                "name": "Dummy",
+                "iconClass": None,
+                "iconImage": settings.MEDIA_URL + "icon.svg",
+                "loginUrl": self._third_party_login_url("dummy", "login", params),
+                "registerUrl": self._third_party_login_url("dummy", "register", params)
+            },
+            {
                 "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
+                "iconImage": None,
                 "loginUrl": self._third_party_login_url("facebook", "login", params),
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
@@ -324,9 +341,10 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
                 "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
+                "iconImage": None,
                 "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
-            }
+            },
         ]
         self._assert_third_party_auth_data(response, current_backend, current_provider, expected_providers)
 

@@ -13,6 +13,7 @@ import django.test
 from mako.template import Template
 import mock
 import os.path
+from storages.backends.overwrite import OverwriteStorage
 
 from third_party_auth.models import (
     OAuth2ProviderConfig,
@@ -51,6 +52,17 @@ class FakeDjangoSettings(object):
 
 class ThirdPartyAuthTestMixin(object):
     """ Helper methods useful for testing third party auth functionality """
+
+    def setUp(self, *args, **kwargs):
+        # Django's FileSystemStorage will rename files if they already exist.
+        # This storage backend overwrites files instead, which makes it easier
+        # to make assertions about filenames.
+        icon_image_field = OAuth2ProviderConfig._meta.get_field('icon_image')  # pylint: disable=protected-access
+        patch = mock.patch.object(icon_image_field, 'storage', OverwriteStorage())
+        patch.start()
+        self.addCleanup(patch.stop)
+
+        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)
 
     def tearDown(self):
         config_cache.clear()
@@ -134,7 +146,7 @@ class ThirdPartyAuthTestMixin(object):
 
     @classmethod
     def configure_dummy_provider(cls, **kwargs):
-        """ Update the settings for the Twitter third party auth provider/backend """
+        """ Update the settings for the Dummy third party auth provider/backend """
         kwargs.setdefault("name", "Dummy")
         kwargs.setdefault("backend_name", "dummy")
         return cls.configure_oauth_provider(**kwargs)
