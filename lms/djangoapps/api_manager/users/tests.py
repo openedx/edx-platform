@@ -1216,6 +1216,22 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_user_course_grades_user_not_enrolled(self):
+        course = CourseFactory.create(org='TUCGUNF', run='TUCGUNF1')
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, self.user.id, course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # now enroll user
+        post_uri = '{}/{}/courses'.format(self.users_base_uri, self.user.id)
+        data = {'course_id': unicode(course.id)}
+        response = self.do_post(post_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # get user grades after enrollment
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
     def test_user_preferences_user_list_get_not_found(self):
         test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
         response = self.do_get(test_uri)
@@ -1795,6 +1811,17 @@ class UsersApiTests(ModuleStoreTestCase):
             due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
 
+        # getting grades without user being enrolled in the course should raise 404
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # enroll user in the course
+        test_uri = '{}/{}/courses'.format(self.users_base_uri, user_id)
+        response = self.do_post(test_uri, {'course_id': unicode(course.id)})
+        self.assertEqual(response.status_code, 201)
+
+        # now we should be able to fetch grades of user
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
