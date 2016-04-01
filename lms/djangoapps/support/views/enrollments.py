@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 from opaque_keys import InvalidKeyError
-from util.course_key_utils import from_string_or_404
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -60,7 +60,7 @@ class EnrollmentSupportListView(GenericAPIView):
         for enrollment in enrollments:
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
-            course_key = from_string_or_404(enrollment['course_id'])
+            course_key = CourseKey.from_string(enrollment['course_id'])
             # Add the price of the course's verified mode.
             self.include_verified_mode_info(enrollment, course_key)
             # Add manual enrollment history, if it exists
@@ -73,7 +73,7 @@ class EnrollmentSupportListView(GenericAPIView):
         try:
             user = User.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
             course_id = request.data['course_id']
-            course_key = from_string_or_404(course_id)
+            course_key = CourseKey.from_string(course_id)
             old_mode = request.data['old_mode']
             new_mode = request.data['new_mode']
             reason = request.data['reason']

@@ -1545,7 +1545,7 @@ def financial_assistance_request(request):
             return HttpResponseForbidden()
 
         course_id = data['course']
-        course = modulestore().get_course(from_string_or_404(course_id))
+        course = modulestore().get_course(CourseKey.from_string(course_id))
         legal_name = data['name']
         email = data['email']
         country = data['country']
