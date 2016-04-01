@@ -1,6 +1,7 @@
 """
     Helpers for accessing comprehensive theming related variables.
 """
+import logging
 import re
 import os
 from path import Path
@@ -8,9 +9,12 @@ from path import Path
 from django.conf import settings, ImproperlyConfigured
 from django.core.cache import cache
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.db.transaction import TransactionManagementError
 
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
+
+log = logging.getLogger(__name__)
 
 
 def get_page_title_breadcrumbs(*args):
@@ -202,7 +206,17 @@ def get_current_site_theme_dir():
 
     # if site theme dir is not in cache and comprehensive theming is enabled then pull it from db.
     if not site_theme_dir and is_comprehensive_theming_enabled():
-        site_theme = site.themes.first()  # pylint: disable=no-member
+        # Protect against an odd case observed on sandboxes (not devstack) for the ORA2 XBlock.
+        # For some reason a TransactionManagementError is raised in certain assessment workflows
+        # Custom theme templates for the ORA2 XBlock are not currently a high priority, however
+        # so we're basically sweeping this situation under the rug until we can get to the bottom
+        # of why this is happening only for very specific workflows for the ORA2 XBlock.
+        # See https://openedx.atlassian.net/browse/WL-377 for more information
+        try:
+            site_theme = site.themes.first()  # pylint: disable=no-member
+        except TransactionManagementError:
+            site_theme = None
+            log.error("TransactionManagementError observed during Site Theme lookup.")
         if site_theme:
             site_theme_dir = site_theme.theme_dir_name
             cache_site_theme_dir(site, site_theme_dir)
