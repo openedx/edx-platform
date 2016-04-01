@@ -633,7 +633,6 @@
     define([
         // Run the LMS tests
         'lms/include/js/spec/components/header/header_spec.js',
-        'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
@@ -668,6 +667,11 @@
         'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
+        'lms/include/js/spec/student_profile/share_modal_view_spec.js',
+        'lms/include/js/spec/student_profile/badge_view_spec.js',
+        'lms/include/js/spec/student_profile/section_two_tab_spec.js',
+        'lms/include/js/spec/student_profile/badge_list_view_spec.js',
+        'lms/include/js/spec/student_profile/badge_list_container_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/reverify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',

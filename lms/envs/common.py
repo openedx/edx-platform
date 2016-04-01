@@ -2022,6 +2022,9 @@ INSTALLED_APPS = (
 
     # Learner's dashboard
     'learner_dashboard',
+
+    # Needed whether or not enabled, due to migrations
+    'badges',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2265,12 +2268,17 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
 
-#################### Badgr OpenBadges generation #######################
+#################### OpenBadges Settings #######################
+
+BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
+
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
 # Do not add the trailing slash here.
 BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
+# Number of seconds to wait on the badging server when contacting it before giving up.
+BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
@@ -2635,6 +2643,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'language_proficiencies',
         'bio',
         'account_privacy',
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
     ],
 
     # The list of account fields that are always public
@@ -2662,6 +2672,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "mailing_address",
         "requires_parental_consent",
         "account_privacy",
+        "accomplishments_shared",
     ]
 }
 

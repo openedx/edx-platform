@@ -21,10 +21,32 @@
     define(['backbone.paginator'], function (BackbonePaginator) {
         var PagingCollection = BackbonePaginator.requestPager.extend({
             initialize: function () {
+                var self = this;
                 // These must be initialized in the constructor because otherwise all PagingCollections would point
                 // to the same object references for sortableFields and filterableFields.
                 this.sortableFields = {};
                 this.filterableFields = {};
+
+                this.paginator_core = {
+                    type: 'GET',
+                    dataType: 'json',
+                    url: function () { return this.url; }
+                };
+                this.paginator_ui = {
+                    firstPage: function () { return self.isZeroIndexed ? 0 : 1; },
+                    // Specifies the initial page during collection initialization
+                    currentPage: self.isZeroIndexed ? 0 : 1,
+                    perPage: function () { return self.perPage; }
+                };
+
+                this.currentPage = this.paginator_ui.currentPage;
+
+                this.server_api = {
+                    page: function () { return self.currentPage; },
+                    page_size: function () { return self.perPage; },
+                    text_search: function () { return self.searchString ? self.searchString : ''; },
+                    sort_order: function () { return self.sortField; }
+                };
             },
 
             isZeroIndexed: false,
@@ -40,26 +62,6 @@
             filterableFields: {},
 
             searchString: null,
-
-            paginator_core: {
-                type: 'GET',
-                dataType: 'json',
-                url: function () { return this.url; }
-            },
-
-            paginator_ui: {
-                firstPage: function () { return this.isZeroIndexed ? 0 : 1; },
-                // Specifies the initial page during collection initialization
-                currentPage: function () { return this.isZeroIndexed ? 0 : 1; },
-                perPage: function () { return this.perPage; }
-            },
-
-            server_api: {
-                page: function () { return this.currentPage; },
-                page_size: function () { return this.perPage; },
-                text_search: function () { return this.searchString ? this.searchString : ''; },
-                sort_order: function () { return this.sortField; }
-            },
 
             parse: function (response) {
                 this.totalCount = response.count;
