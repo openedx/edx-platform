@@ -428,6 +428,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['first_name'], self.test_first_name)
         self.assertEqual(response.data['last_name'], self.test_last_name)
         self.assertEqual(response.data['is_active'], True)
+        self.assertIsNotNone(response.data['last_login'])
         self.assertEqual(len(response.data['resources']), 2)
 
     def test_user_detail_get_undefined(self):
