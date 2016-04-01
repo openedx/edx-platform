@@ -64,10 +64,8 @@ def _send_request(url, method=None, data=None, params=None, headers=None):
 def has_teacher_access(user, course):
     """
     Returns True when:
-        Teached dashboard feature is enabled
+        Teacher dashboard feature is enabled
         AND (
-            user has staff role
-            OR (
                 CCX feature is enabled AND user has coach role
             )
         )
@@ -75,16 +73,8 @@ def has_teacher_access(user, course):
     if not (user and settings.LABSTER_FEATURES.get('ENABLE_TEACHER_DASHBOARD', False)):
         return False
 
-    # Displays tab for course staff.
-    if bool(has_access(user, 'staff', course, course.id)):
-        return True
-
-    # The tab is hidden if the user is not staff and CCX feature is disabled.
+    # The tab is hidden if CCX feature is disabled.
     if not (settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx):
         return False
 
-    ccx = get_ccx_from_ccx_locator(course.id)
-    if ccx:
-        return CourseCcxCoachRole(ccx.course_id).has_user(user)
-
-    return False
+    return CourseCcxCoachRole(course.id).has_user(user)
