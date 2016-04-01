@@ -6,12 +6,15 @@ that would have been used in the settings.
 
 """
 import collections
+import os
 
+from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, pre_delete
 from django.db.models.base import ObjectDoesNotExist
 from django.contrib.sites.models import Site
+import sass
 
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
@@ -39,11 +42,28 @@ class Microsite(models.Model):
     def __unicode__(self):
         return self.key
 
+    def save(self, **kwargs):
+        # recompile SASS on every save
+        self.compile_microsite_sass()
+        return super(Microsite, self).save(**kwargs)
+
     def get_organizations(self):
         """
         Helper method to return a list of organizations associated with our particular Microsite
         """
         return MicrositeOrganizationMapping.get_organizations_for_microsite_by_pk(self.id)  # pylint: disable=no-member
+
+    def compile_microsite_sass(self):
+        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'src', 'main.scss')
+        output_path = os.path.join(settings.MICROSITE_ROOT_DIR, 'customer_themes', '{}.css'.format(self.key))
+        with open(output_path, 'w') as f:
+            sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
+            f.write(sass_output)
+
+    def _sass_var_override(self, path):
+        if 'branding-basics' in path:
+            return [(path, self.sass_variables)]
+        return None
 
     @classmethod
     def get_microsite_for_domain(cls, domain):
