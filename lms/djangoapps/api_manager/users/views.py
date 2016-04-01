@@ -1060,6 +1060,13 @@ class UsersCoursesGradesDetail(SecureAPIView):
                 gradebook_entry.grading_policy = json.dumps(grading_policy, cls=EdxJSONEncoder)
                 gradebook_entry.save()
         else:
+            if not CourseEnrollment.is_enrolled(student, course_key):
+                return Response(
+                    {
+                        'message': _("Student not enrolled in given course")
+                    }, status=status.HTTP_404_NOT_FOUND
+                )
+
             gradebook_values = _recalculate_grade(request, student, course_descriptor)
             current_grade = gradebook_values["current_grade"]
             proforma_grade = gradebook_values["proforma_grade"]
