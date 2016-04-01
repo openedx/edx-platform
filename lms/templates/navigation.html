@@ -112,6 +112,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
+    <%block name="parent_block" >
     <ol class="left nav-global">
       <%block name="navigation_global_links">
         % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
@@ -149,6 +150,7 @@ site_status_msg = get_site_status_msg(course_id)
         % endif
       </%block>
     </ol>
+    </%block>
 
     <ol class="right nav-courseware">
       <%block name="navigation_sign_in">

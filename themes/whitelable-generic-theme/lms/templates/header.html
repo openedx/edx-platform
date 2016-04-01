@@ -1,0 +1,31 @@
+## mako
+<%namespace name='static' file='/static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<%inherit file="/navigation.html"/>
+
+## TODO: this will eventually be moved to the Sass
+<%block name="navigation_logo">
+  <img src="${static.url('images/logo.png')}" height="60" width="200" alt="Home Page" />
+</%block>
+
+<%block name="navigation_other_global_links">
+  <li class="nav-global-05">
+    <a class="cta" href="/courses">${_("Courses")}</a>
+  </li>
+
+  <li class="nav-global-05">
+    <a class="cta" href="/login${login_query()}">${_("Sign in")}</a>
+  </li>
+
+</%block>
+
+
+<%block name="navigation_sign_in">
+<li class="nav-global-05">
+    <a class="cta" href="/register${login_query()}">${_("Register")}</a>
+  </li>
+</%block>

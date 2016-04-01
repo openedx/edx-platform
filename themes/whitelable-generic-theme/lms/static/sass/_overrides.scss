@@ -1,0 +1,21 @@
+header.global {
+  .nav-courseware {
+    li, div {
+
+      .cta {
+        border: 1px solid $darkGrey;
+        box-shadow: 0 0 0 0 $white;
+      }
+    }
+  }
+  .nav-global {
+    line-height: 20px;
+    li, div {
+      text-transform: capitalize ;
+      a {
+       font-size: 15px;
+       font-weight: 100;
+      }
+    }
+  }
+}
