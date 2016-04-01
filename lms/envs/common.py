@@ -372,9 +372,6 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
-
-    # Enable Next Button to jump sequences in Sequence Navigation bar.
-    'ENABLE_NEXT_BUTTON_ACROSS_SECTIONS': False,
 }
 
 # Ignore static asset files on import which match this pattern
