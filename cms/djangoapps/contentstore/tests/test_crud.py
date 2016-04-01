@@ -1,5 +1,8 @@
-import unittest
-
+"""
+Module contains tests for finding and using the templates (boilerplates) for xblocks
+"""
+from django.conf import settings
+from django.test.utils import override_settings
 from opaque_keys.edx.locator import LocalId
 
 from xmodule import templates
@@ -7,14 +10,23 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.html_module import HtmlDescriptor
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
-class TemplateTests(unittest.TestCase):
+# some tests are failed if course indexing is switced on
+# so we need to turn it off
+FEATURES_WITHOUT_COURSE_INDEXING = settings.FEATURES.copy()
+FEATURES_WITHOUT_COURSE_INDEXING['ENABLE_COURSEWARE_INDEX'] = False
+
+
+@override_settings(FEATURES=FEATURES_WITHOUT_COURSE_INDEXING)
+class TemplateTests(SignalDisconnectTestMixin, ModuleStoreTestCase):
     """
     Test finding and using the templates (boilerplates) for xblocks.
     """

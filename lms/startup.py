@@ -3,6 +3,7 @@ Module for code that should run during LMS startup
 """
 
 # pylint: disable=unused-argument
+# pylint: disable=invalid-name
 
 from django.conf import settings
 
@@ -53,6 +54,9 @@ def run():
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
+
+    if settings.FEATURES.get('DISABLE_COURSE_PUBLISHED_SIGNAL', False):
+        disable_course_published_signals()
 
 
 def add_mimetypes():
@@ -153,6 +157,14 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings)
+
+
+def disable_course_published_signals():
+    """
+    Disables course_published signal receivers in openedx.core.djangoapps
+    """
+    from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+    SignalDisconnectTestMixin.disconnect_course_published_signals()
 
 
 def startup_notification_subsystem():

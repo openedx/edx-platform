@@ -3,7 +3,7 @@ from django.dispatch.dispatcher import receiver
 from xmodule.modulestore.django import SignalHandler
 
 
-@receiver(SignalHandler.course_published)
+@receiver(SignalHandler.course_published, dispatch_uid='openedx.core.djangoapps.content.course_structures')
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     # Import tasks here to avoid a circular import.
     from .tasks import update_course_structure
