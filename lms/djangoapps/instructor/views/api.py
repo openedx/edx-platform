@@ -1620,7 +1620,7 @@ def generate_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Generated Codes.
     """
-    course_key = from_string_or_404(course_id)
+    course_id = from_string_or_404(course_id)
     invoice_copy = False
 
     # covert the course registration code number into integer

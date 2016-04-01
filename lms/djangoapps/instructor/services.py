@@ -37,7 +37,7 @@ class InstructorService(object):
             - content_id is a url-name of a problem
             - course_id is the id for the course
         """
-        course_key = from_string_or_404(course_id)
+        course_id = from_string_or_404(course_id)
 
         try:
             student = get_student_from_identifier(student_identifier)

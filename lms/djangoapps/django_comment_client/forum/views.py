@@ -178,7 +178,7 @@ def use_bulk_ops(view_func):
     """
     @wraps(view_func)
     def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
-        ccourse_key = from_string_or_404(course_id)
+        course_key = from_string_or_404(course_id)
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)
     return wrapped_view

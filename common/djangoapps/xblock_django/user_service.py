@@ -48,7 +48,7 @@ class DjangoXBlockUserService(UserService):
         except User.DoesNotExist:
             return None
 
-        course_key = from_string_or_404(course_id)
+        course_id = from_string_or_404(course_id)
         return anonymous_id_for_user(user=user, course_id=course_id, save=False)
 
     def _convert_django_user_to_xblock_user(self, django_user):
