@@ -1,3 +1,4 @@
 django-mailgun==0.8.0
+libsass==0.10.0
 python-intercom==0.2.13
 requests==2.8.1
