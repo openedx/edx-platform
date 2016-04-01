@@ -3032,41 +3032,24 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
     """
     course_key = CourseKey.from_string(course_id)
 
-    try:
-        certificate_white_list = json.loads(request.body)
-    except ValueError:
-        return JsonResponse({
-            'success': False,
-            'message': _('Invalid Json data, Please refresh the page and then try again.')
-        }, status=400)
-
-    users = [exception.get('user_id', False) for exception in certificate_white_list]
-
     if generate_for == 'all':
         # Generate Certificates for all white listed students
-        students = User.objects.filter(
-            certificatewhitelist__course_id=course_key,
-            certificatewhitelist__whitelist=True
-        )
-    elif not all(users):
-        # Invalid data, user_id must be present for all certificate exceptions
+        students = 'all_whitelisted'
+
+    elif generate_for == 'new':
+        students = 'whitelisted_not_generated'
+
+    else:
+        # Invalid data, generate_for must be present for all certificate exceptions
         return JsonResponse(
             {
                 'success': False,
-                'message': _('Invalid data, user_id must be present for all certificate exceptions.'),
+                'message': _('Invalid data, generate_for must be "new" or "all".'),
             },
             status=400
         )
-    else:
-        students = User.objects.filter(
-            id__in=users,
-            certificatewhitelist__course_id=course_key,
-            certificatewhitelist__whitelist=True
-        )
 
-    if students:
-        # generate certificates for students if 'students' list is not empty
-        instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+    instructor_task.api.generate_certificates_for_students(request, course_key, student_set=students)
 
     response_payload = {
         'success': True,
@@ -3275,8 +3258,10 @@ def re_validate_certificate(request, course_key, generated_certificate):
         certificate_invalidation.deactivate()
 
     # We need to generate certificate only for a single student here
-    students = [certificate_invalidation.generated_certificate.user]
-    instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+    student = certificate_invalidation.generated_certificate.user
+    instructor_task.api.generate_certificates_for_students(
+        request, course_key, student_set="specific_student", specific_student_id=student.id
+    )
 
 
 def validate_request_data_and_get_certificate(certificate_invalidation, course_key):
