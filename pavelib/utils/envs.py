@@ -116,14 +116,14 @@ class Env(object):
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
     # reason. See issue TE-415.
-    JS_TEST_ID_FILES = [
-        REPO_ROOT / 'lms/static/js_test.yml',
-        REPO_ROOT / 'lms/static/js_test_coffee.yml',
-        REPO_ROOT / 'cms/static/js_test.yml',
-        REPO_ROOT / 'cms/static/js_test_squire.yml',
-        REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
-        REPO_ROOT / 'common/static/js_test.yml',
-        REPO_ROOT / 'common/static/js_test_requirejs.yml',
+    JS_TEST_CONFIG_FILES = [
+        REPO_ROOT / 'lms/static/karma_lms.conf.js',
+        REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
+        REPO_ROOT / 'cms/static/karma_cms.conf.js',
+        REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
+        REPO_ROOT / 'common/lib/xmodule/xmodule/karma_xmodule.conf.js',
+        REPO_ROOT / 'common/static/karma_common.conf.js',
+        REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
 
     JS_TEST_ID_KEYS = [
