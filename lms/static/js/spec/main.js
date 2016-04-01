@@ -733,7 +733,10 @@
         'js/spec/bookmarks/bookmarks_list_view_spec.js',
         'js/spec/bookmarks/bookmark_button_view_spec.js',
         'js/spec/views/message_banner_spec.js',
-        'js/spec/markdown_editor_spec.js'
+        'js/spec/markdown_editor_spec.js',
+        'js/spec/learner_dashboard/collection_list_view_spec.js',
+        'js/spec/learner_dashboard/sidebar_view_spec.js',
+        'js/spec/learner_dashboard/program_card_view_spec.js'
     ];
 
     for (var i = 0; i < testFiles.length; i++) {

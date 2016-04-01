@@ -13,7 +13,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
 
                 $.fn.leanModal = function(param) {
                     return true;
-                }
+                };
 
                 data = [{
                     "category": "chapter",
@@ -44,10 +44,8 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                     ]
                 }];
                 view = new edx.ccx.schedule.ScheduleView({el: $('#new-ccx-schedule')});
-                view.schedule_collection.set(data)
+                view.schedule_collection.set(data);
                 view.render();
-
-
             });
 
             it("verifies correct view setup", function() {

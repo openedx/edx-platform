@@ -142,7 +142,6 @@ module.exports = function (config) {
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.timeago.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/jquery.leanModal.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/flot/jquery.flot.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: false},
@@ -158,10 +157,10 @@ module.exports = function (config) {
             {pattern: 'coffee/src/instructor_dashboard/**/*.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/sinon-1.17.0.js', included: false},
             {pattern: 'xmodule_js/src/capa/**/*.js', included: false},
-            {pattern: 'xmodule_js/src/video//**/*.js', included: false},
+            {pattern: 'xmodule_js/src/video/**/*.js', included: false},
             {pattern: 'xmodule_js/src/xmodule.js', included: false},
             {pattern: 'xmodule_js/common_static/js/src/**/*.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/underscore-min.js', included: false},
+            {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
@@ -179,9 +178,11 @@ module.exports = function (config) {
             {pattern: 'js/**/*.js', included: false},
             {pattern: 'coffee/src/**/*.js', included: false},
             {pattern: 'common/js/**/*.js', included: false},
+            {pattern: 'edx-pattern-library/js/**/*.js', included: false},
+            {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
+            {pattern: 'support/js/**/*.js', included: false},
             {pattern: 'teams/js/**/*.js', included: false},
             {pattern: 'xmodule_js/common_static/coffee/**/*.js', included: false},
-            {pattern: 'support/js/**/*.js', included: false},
 
             // Paths to spec (test) JavaScript files
             {pattern: 'js/spec/**/*.js', included: false},
@@ -208,7 +209,7 @@ module.exports = function (config) {
             {pattern: 'teams/templates/**/*.*', included: false},
             {pattern: 'support/templates/**/*.*', included: false},
             {pattern: 'templates/bookmarks/**/*.*', included: false},
-            {pattern: 'templates/ccx/**/*.*', included: false},
+            {pattern: 'templates/learner_dashboard/**/*.*', included: false},
 
             // override fixture path and other config.
             {pattern: 'test_config.js', included: true},
