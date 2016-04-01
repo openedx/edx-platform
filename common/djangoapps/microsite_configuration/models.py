@@ -34,6 +34,7 @@ class Microsite(models.Model):
     site = models.OneToOneField(Site, related_name='microsite')
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    sass_variables = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.key
