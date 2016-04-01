@@ -35,6 +35,8 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
 
+        image_path = u'/c4x/edX/toy/asset/just_a_test.jpg'
+        image_url = u'http://testserver' + image_path
         self.expected_data = {
             'id': u'edX/toy/2012_Fall',
             'name': u'Toy Course',
@@ -43,10 +45,15 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'short_description': u'A course about toys.',
             'media': {
                 'course_image': {
-                    'uri': u'/c4x/edX/toy/asset/just_a_test.jpg',
+                    'uri': image_path,
                 },
                 'course_video': {
                     'uri': u'http://www.youtube.com/watch?v=test_youtube_id',
+                },
+                'image': {
+                    'raw': image_url,
+                    'small': image_url,
+                    'large': image_url,
                 }
             },
             'start': u'2015-07-17T12:00:00Z',
