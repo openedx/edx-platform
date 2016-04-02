@@ -54,8 +54,8 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED)
-from student.forms import AccountCreationForm, PasswordResetFormNoActive
+    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED, MdlToEdx)
+from student.forms import AccountCreationForm, PasswordResetFormNoActive, DetailsResetFormNoActive
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -2377,7 +2377,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         validlink = False
         user = None
 
-
     if user is not None and select_user(user.id, link):
         validlink = True
         title = _('Update your details')
@@ -2400,6 +2399,7 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         password = request.POST['new_password1']
 
         conf_password = request.POST['new_password2']
+        username = request.POST['username']
 
         if not password == conf_password:
             err_msg = 'Password must match'
@@ -2411,6 +2411,18 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
             }
             return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
+
+        if User.objects.filter(username=request.POST['username']).exists() and user.username != username:
+            err_msg = 'Username already exist'
+            context = {
+                'user': user,
+                'validlink': True,
+                'title': _('Password reset unsuccessful'),
+                'err_msg': err_msg,
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            }
+            return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
+
 
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -2458,3 +2470,19 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
 
         else:
             return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
+
+def details_reset_confirm(request):
+    form_class = DetailsResetFormNoActive
+    template_name = 'registration/details_reset.html'
+
+    if request.method == 'POST':
+        form = DetailsResetFormNoActive(request.POST)
+        if form.is_valid():
+            form.save(use_https=request.is_secure(),
+                  from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  request=request,
+                  domain_override=request.get_host())
+
+        return TemplateResponse(request, 'registration/details_reset_done.html')
+
+    return TemplateResponse(request, 'registration/details_reset.html')
