@@ -101,6 +101,7 @@ urlpatterns = (
 
     # appsembler management console endpoint for student enrollment
     url(r'^appsembler/', include('appsembler_lms.urls')),
+    url(r'^api/microsite_configuration/', include('microsite_configuration.urls')),
 )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
