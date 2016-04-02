@@ -19,6 +19,7 @@ import sass
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
+from .utils import get_initial_sass_variables
 
 
 class Microsite(models.Model):
@@ -37,12 +38,16 @@ class Microsite(models.Model):
     site = models.OneToOneField(Site, related_name='microsite')
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
-    sass_variables = models.TextField(blank=True)
+    sass_variables = models.TextField(blank=True, default=get_initial_sass_variables)
 
     def __unicode__(self):
         return self.key
 
     def save(self, **kwargs):
+        # When creating a new object, save default microsite values. Not implemented as a default method on the field
+        # because it depends on other fields that should be already filled.
+        if not self.id:
+            self.values = self._get_initial_microsite_values()
         # recompile SASS on every save
         self.compile_microsite_sass()
         return super(Microsite, self).save(**kwargs)
@@ -64,6 +69,12 @@ class Microsite(models.Model):
         if 'branding-basics' in path:
             return [(path, self.sass_variables)]
         return None
+
+    def _get_initial_microsite_values(self):
+        return {
+            'platform_name': self.site.name,
+            'css_overrides_file': "customer_themes/{}.css".format(self.key)
+        }
 
     @classmethod
     def get_microsite_for_domain(cls, domain):
