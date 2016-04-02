@@ -14,5 +14,19 @@ def get_initial_sass_variables():
     with open(sass_var_file, 'r') as f:
         return f.read()
 
+
 def sass_to_json(sass_input):
-    pass
+    sass_vars = {}
+    lines = (line for line in sass_input.splitlines() if line and not line.startswith('//'))
+    for line in lines:
+        key, val = line.split(':')
+        val = val.split('//')[0]
+        val = val.strip().replace(";", "")
+        sass_vars[key] = val
+    return json.dumps(sass_vars, sort_keys=True, indent=2)
+
+
+def json_to_sass(json_input):
+    sass_vars = json.loads(json_input)
+    sass_text = ', '.join("{}={};".format(key, val) for (key, val) in sass_vars.iteritems())
+    return sass_text
