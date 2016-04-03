@@ -1,15 +1,20 @@
-<div class="status already-authenticated-msg">
+<div class="status already-authenticated-msg hidden">
     <% if (context.currentProvider) { %>
         <p class="message-copy">
-            <%- _.sprintf( gettext("You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password."), context ) %>
-        </p>
-    <% } else { %>
-    <p class="message-copy">
-           Have an account before and haven't updated your details? <a href="/reset_details">Click here</a> to
-           update your username and password
+            <%- _.sprintf( gettext("You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, Login now using your %(platformName)s password."), context ) %>
         </p>
     <% } %>
 </div>
+
+<% if (!context.currentProvider) { %>
+<div class="status already-authenticated-msg">
+
+        <p class="message-copy">
+           Have an account before and haven't updated your details? <a href="/reset_details" style="text-decoration: none; color: #27AAE1;">Click here</a> to
+           update your username and password
+        </p>
+</div>
+<% } %>
 
 <div class="js-reset-success status submission-success hidden">
     <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
