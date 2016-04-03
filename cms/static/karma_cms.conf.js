@@ -132,11 +132,11 @@ module.exports = function (config) {
         files: [
             {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
             {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
+            {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/underscore-min.js', included: false},
+            {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone-associations-min.js', included: false},
@@ -153,7 +153,7 @@ module.exports = function (config) {
             {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/**/*.js', included: false},
+            {pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/**/*.js', included: false},
             {pattern: 'xmodule_js/src/xmodule.js', included: false},
             {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/draggabilly.pkgd.js', included: false},
@@ -181,12 +181,19 @@ module.exports = function (config) {
             {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
 
             // Paths to source JavaScript files
-            {pattern: 'js/**/*.js', included: false},
             {pattern: 'coffee/src/**/*.js', included: false},
+            {pattern: 'js/**/*.js', included: false},
+            {pattern: 'js/certificates/**/*.js', included: false},
+            {pattern: 'js/factories/**/*.js', included: false},
             {pattern: 'common/js/**/*.js', included: false},
+            {pattern: 'edx-pattern-library/js/**/*.js', included: false},
+            {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
 
             // Paths to spec (test) JavaScript files
+            {pattern: 'coffee/spec/main.js', included: false},
             {pattern: 'coffee/spec/**/*.js', included: false},
+            {pattern: 'js/spec/**/*.js', included: false},
+            {pattern: 'js/certificates/spec/**/*.js', included: false},
 
             // Paths to fixture files
             {pattern: 'coffee/fixtures/**/*.underscore', included: false},

@@ -135,7 +135,7 @@ module.exports = function(config) {
             'xmodule_js/common_static/js/test/i18n.js',
             'xmodule_js/common_static/coffee/src/ajax_prefix.js',
             'xmodule_js/common_static/js/src/logger.js',
-            'xmodule_js/common_static/js/vendor/underscore-min.js',
+            'xmodule_js/common_static/common/js/vendor/underscore.js',
             'xmodule_js/common_static/js/vendor/jasmine-imagediff.js',
             'xmodule_js/common_static/js/vendor/requirejs/require.js',
             'js/RequireJS-namespace-undefine.js',

@@ -136,7 +136,7 @@ module.exports = function (config) {
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
-            {pattern: 'xmodule_js/common_static/js/vendor/underscore-min.js', included: false},
+            {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
             {pattern: 'xmodule_js/common_static/js/vendor/backbone-associations-min.js', included: false},

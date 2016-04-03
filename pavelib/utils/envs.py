@@ -121,7 +121,7 @@ class Env(object):
         REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
         REPO_ROOT / 'cms/static/karma_cms.conf.js',
         REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
-        REPO_ROOT / 'common/lib/xmodule/xmodule/karma_xmodule.conf.js',
+        REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
