@@ -244,6 +244,7 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
+THEME_CACHE_TIMEOUT = ENV_TOKENS.get('THEME_CACHE_TIMEOUT', THEME_CACHE_TIMEOUT)
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -575,6 +576,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'social.backends.google.GoogleOAuth2',
             'social.backends.linkedin.LinkedinOAuth2',
             'social.backends.facebook.FacebookOAuth2',
+            'social.backends.azuread.AzureADOAuth2',
             'third_party_auth.saml.SAMLAuthBackend',
             'third_party_auth.lti.LTIAuthBackend',
         ]) + list(AUTHENTICATION_BACKENDS)
@@ -619,6 +621,7 @@ if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(
         days=ENV_TOKENS.get('OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS', OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
     )
+    OAUTH_ID_TOKEN_EXPIRATION = ENV_TOKENS.get('OAUTH_ID_TOKEN_EXPIRATION', OAUTH_ID_TOKEN_EXPIRATION)
 
 
 ##### ADVANCED_SECURITY_CONFIG #####

@@ -198,7 +198,8 @@ def _third_party_auth_context(request, redirect_to):
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
-                "iconClass": enabled.icon_class,
+                "iconClass": enabled.icon_class or None,
+                "iconImage": enabled.icon_image.url if enabled.icon_image else None,
                 "loginUrl": pipeline.get_login_url(
                     enabled.provider_id,
                     pipeline.AUTH_ENTRY_LOGIN,

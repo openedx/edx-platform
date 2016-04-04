@@ -1,0 +1,24 @@
+
+<div class="banner-image">
+    <a href="<%- marketingUrl %>" class="card-link">
+        <img alt="<%- gettext(name)%>" src="" />
+    </a>
+</div>
+<div class="text-section">
+    <div class="meta-info">
+        <div class="organization">
+            <% _.each(organizations, function(org){ %>
+                <span><%- gettext(org.display_name) %></span>
+            <% }); %>
+        </div>
+        <div class="category">
+            <span><%- gettext(category) %></span>
+            <i class="xseries-icon" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="title" aria-hidden="true">
+        <%- gettext(name) %>
+    </div>
+</div>
+<div class="progress">
+</div>

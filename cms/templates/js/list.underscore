@@ -3,7 +3,7 @@
         <p>
             <%- emptyMessage %>
             <a href="#" class="button new-button"><i class="icon fa fa-plus"></i>
-            <%= interpolate(
+            <%- interpolate(
                 gettext("%(new_item_message)s"), {new_item_message: newItemMessage}, true
             ) %></a>
         </p>

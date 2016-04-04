@@ -371,7 +371,7 @@ FEATURES = {
     # This is the default, but can be disabled if all history
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
-    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True
+    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -397,7 +397,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMPREHENSIVE_THEME_DIR = ""
+COMPREHENSIVE_THEME_DIR = REPO_ROOT / "themes"
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -486,6 +486,7 @@ TEMPLATES = [
             'loaders': [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
+                'openedx.core.djangoapps.theming.template_loaders.ThemeFilesystemLoader',
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
@@ -785,7 +786,6 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 CMS_BASE = 'localhost:8001'
 
 # Site info
-SITE_ID = 1
 SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
@@ -1145,6 +1145,10 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+
+    # django current site middleware with default site
+    'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
+
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
@@ -1178,6 +1182,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1244,6 +1249,13 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'js/vendor/underscore.string.min.js',
+
+    # Make some edX UI Toolkit utilities available in the global "edx" namespace
+    'edx-ui-toolkit/js/utils/global-loader.js',
+    'edx-ui-toolkit/js/utils/string-utils.js',
+    'edx-ui-toolkit/js/utils/html-utils.js',
+
+    # Finally load RequireJS and dependent vendor libraries
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
@@ -1636,14 +1648,18 @@ REQUIRE_ENVIRONMENT = "node"
 # If you want to load JavaScript dependencies using RequireJS
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
-REQUIRE_JS_PATH_OVERRIDES = [
-    'js/bookmarks/views/bookmark_button.js',
-    'js/views/message_banner.js',
-    'js/vendor/moment.min.js',
-    'js/vendor/url.min.js',
-    'js/courseware/course_home_events.js',
-    'js/courseware/toggle_element_visibility.js'
-]
+REQUIRE_JS_PATH_OVERRIDES = {
+    'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'js/views/message_banner': 'js/views/message_banner.js',
+    'moment': 'js/vendor/moment.min.js',
+    'jquery.url': 'js/vendor/url.min.js',
+    'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
+    'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
+    'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
+    'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
+    'js/bookmarks/bookmarks_factory': 'js/bookmarks/bookmarks_factory.js',
+    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js'
+}
 ################################# CELERY ######################################
 
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
@@ -1809,6 +1825,9 @@ INSTALLED_APPS = (
 
     # Theming
     'openedx.core.djangoapps.theming',
+
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
 
     # Our courseware
     'courseware',
@@ -1991,6 +2010,18 @@ INSTALLED_APPS = (
 
     # Review widgets
     'openedx.core.djangoapps.coursetalk',
+
+    # API access administration
+    'openedx.core.djangoapps.api_admin',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
+
+    # Verified Track Content Cohorting
+    'verified_track_content',
+
+    # Learner's dashboard
+    'learner_dashboard',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2551,9 +2582,8 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 
-# for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
-if FEATURES['ENABLE_EDXNOTES']:
-    OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
+OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
 
 # These tabs are currently disabled
 NOTES_DISABLED_TABS = ['course_structure', 'tags']
@@ -2816,3 +2846,12 @@ AUDIT_CERT_CUTOFF_DATE = None
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
+
+# Dafault site id to use in case there is no site that matches with the request headers.
+DEFAULT_SITE_ID = 1
+
+# Cache time out settings
+# by Comprehensive Theme system
+THEME_CACHE_TIMEOUT = 30 * 60

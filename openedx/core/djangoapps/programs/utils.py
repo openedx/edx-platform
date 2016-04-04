@@ -25,8 +25,32 @@ def get_programs(user):
     # Bypass caching for staff users, who may be creating Programs and want
     # to see them displayed immediately.
     cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
-
     return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
+
+
+def flatten_programs(programs, course_ids):
+    """Flatten the result returned by the Programs API.
+
+    Arguments:
+        programs (list): Serialized programs
+        course_ids (list): Course IDs to key on.
+
+    Returns:
+        dict, programs keyed by course ID
+    """
+    flattened = {}
+
+    for program in programs:
+        try:
+            for course_code in program['course_codes']:
+                for run in course_code['run_modes']:
+                    run_id = run['course_key']
+                    if run_id in course_ids:
+                        flattened.setdefault(run_id, []).append(program)
+        except KeyError:
+            log.exception('Unable to parse Programs API response: %r', program)
+
+    return flattened
 
 
 def get_programs_for_dashboard(user, course_keys):
@@ -55,23 +79,8 @@ def get_programs_for_dashboard(user, course_keys):
         log.debug('No programs found for the user with ID %d.', user.id)
         return course_programs
 
-    # Convert course keys to Unicode representation for efficient lookup.
-    course_keys = map(unicode, course_keys)
-
-    # Reindex the result returned by the Programs API from:
-    #     program -> course code -> course run
-    # to:
-    #     course run -> program_array
-    # Ignore course runs not present in the user's active enrollments.
-    for program in programs:
-        try:
-            for course_code in program['course_codes']:
-                for run in course_code['run_modes']:
-                    course_key = run['course_key']
-                    if course_key in course_keys:
-                        course_programs.setdefault(course_key, []).append(program)
-        except KeyError:
-            log.exception('Unable to parse Programs API response: %r', program)
+    course_ids = [unicode(c) for c in course_keys]
+    course_programs = flatten_programs(programs, course_ids)
 
     return course_programs
 
@@ -102,3 +111,30 @@ def get_programs_for_credentials(user, programs_credentials):
                 certificate_programs.append(program)
 
     return certificate_programs
+
+
+def get_engaged_programs(user, enrollments):
+    """Derive a list of programs in which the given user is engaged.
+
+    Arguments:
+        user (User): The user for which to find programs.
+        enrollments (list): The user's enrollments.
+
+    Returns:
+        list of serialized programs, ordered by most recent enrollment
+    """
+    programs = get_programs(user)
+
+    enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
+    # enrollment.course_id is really a course key.
+    course_ids = [unicode(e.course_id) for e in enrollments]
+
+    flattened = flatten_programs(programs, course_ids)
+
+    engaged_programs = []
+    for course_id in course_ids:
+        for program in flattened.get(course_id, []):
+            if program not in engaged_programs:
+                engaged_programs.append(program)
+
+    return engaged_programs

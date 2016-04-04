@@ -61,13 +61,12 @@ STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
 )
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
-)
+]
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
 
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None

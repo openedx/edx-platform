@@ -1,6 +1,9 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
+
+from flaky import flaky
+
 from ...pages.studio.asset_index import AssetIndexPage
 
 from .base_studio_test import StudioCourseTest
@@ -29,6 +32,7 @@ class AssetIndexTest(StudioCourseTest):
         self.course_fixture.add_asset(['image.jpg', 'textbook.pdf'])
 
     @skip_if_browser('chrome')  # TODO Need to fix test_page_existance for this for chrome browser
+    @flaky      # TODO fix this TNL-4302
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.

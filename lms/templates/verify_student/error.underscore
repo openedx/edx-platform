@@ -7,7 +7,7 @@
         <%- errorTitle %>
       </h3>
       <div class="copy">
-        <p><%= errorMsg %></p>
+        <p><%- errorMsg %></p>
       </div>
     </div>
   </div>

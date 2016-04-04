@@ -94,7 +94,7 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         self.mock_credentials_api(self.user, reset_url=False)
 
         actual = get_user_program_credentials(self.user)
-        expected = self.PROGRAMS_API_RESPONSE['results']
+        expected = self.PROGRAMS_API_RESPONSE['results'][:2]
         expected[0]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[0]['certificate_url']
         expected[1]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[1]['certificate_url']
 

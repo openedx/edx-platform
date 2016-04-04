@@ -9,6 +9,7 @@ from mock import patch, Mock
 import ddt
 
 from django.conf import settings
+from ccx_keys.locator import CCXLocator
 from django.test import RequestFactory
 from django.test.client import Client
 
@@ -26,6 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import CourseLocator
+from opaque_keys.edx.keys import CourseKey
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
@@ -130,6 +132,39 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
 
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
+
+    def test_get_course_list_when_ccx(self):
+        """
+        Assert that courses with CCXLocator are filter in course listing.
+        """
+        course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
+        self._create_course_with_access_groups(course_location, self.user)
+
+        # get courses through iterating all courses
+        courses_list, __ = _accessible_courses_list(self.request)
+        self.assertEqual(len(courses_list), 1)
+
+        # get courses by reversing group name formats
+        courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
+        self.assertEqual(len(courses_list_by_groups), 1)
+
+        # assert no course in listing with ccx id
+        ccx_course = Mock()
+        course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
+        ccx_course.id = CCXLocator.from_course_locator(course_key, u"1")
+
+        with patch(
+            'xmodule.modulestore.mixed.MixedModuleStore.get_course',
+            return_value=ccx_course
+        ), patch(
+            'xmodule.modulestore.mixed.MixedModuleStore.get_courses',
+            Mock(return_value=[ccx_course])
+        ):
+            courses_list, __ = _accessible_courses_list_from_groups(self.request)
+            self.assertEqual(len(courses_list), 0)
+
+            courses_list, __ = _accessible_courses_list(self.request)
+            self.assertEqual(len(courses_list), 0)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),

@@ -16,7 +16,8 @@ define([
                 experimentsEnabled: true,
                 experimentGroupConfigurations: new GroupConfigurationCollection({
                     id: 0,
-                    name: 'Configuration 1'
+                    name: 'Configuration 1',
+                    courseOutlineUrl: "CourseOutlineUrl"
                 }),
                 contentGroupConfiguration: new GroupConfigurationModel({groups: []})
             });

@@ -364,6 +364,9 @@
                     // Set global variables that the payment code is expecting to be defined
                     window._ = require('underscore');
                     window._.str = require('underscore.string');
+                    window.edx = edx || {};
+                    window.edx.HtmlUtils = require('edx-ui-toolkit/js/utils/html-utils');
+                    window.edx.StringUtils = require('edx-ui-toolkit/js/utils/string-utils');
                 }
             },
             'js/verify_student/views/intro_step_view': {
@@ -735,7 +738,10 @@
         'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
         'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
         'lms/include/js/spec/views/message_banner_spec.js',
-        'lms/include/js/spec/markdown_editor_spec.js'
+        'lms/include/js/spec/markdown_editor_spec.js',
+        'lms/include/js/spec/learner_dashboard/collection_list_view_spec.js',
+        'lms/include/js/spec/learner_dashboard/sidebar_view_spec.js',
+        'lms/include/js/spec/learner_dashboard/program_card_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);

@@ -524,8 +524,9 @@
       margin-right: ($baseline/2);
 
       .icon {
-        color: inherit;
+        @extend %sso-icon;
         @include margin-right($baseline/2);
+        color: inherit;
       }
 
       &:last-child {

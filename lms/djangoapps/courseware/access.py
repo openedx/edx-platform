@@ -135,9 +135,6 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if isinstance(course_key, CCXLocator):
-        course_key = course_key.to_course_locator()
-
     if in_preview_mode():
         if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
             return ACCESS_DENIED
@@ -745,7 +742,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 
-    if is_masquerading_as_student(user, course_key):
+    if not in_preview_mode() and is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
     if GlobalStaff().has_user(user):

@@ -45,7 +45,6 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -250,11 +249,14 @@ class DashboardTest(ModuleStoreTestCase):
         Test that the certificate verification status for courses is visible on the dashboard.
         """
         self.client.login(username="jack", password="test")
-        self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
-        self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self._check_verification_status_on('verified', 'You&#39;re enrolled as a verified student')
+        self._check_verification_status_on('honor', 'You&#39;re enrolled as an honor code student')
         self._check_verification_status_off('audit', '')
-        self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
-        self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
+        self._check_verification_status_on('professional', 'You&#39;re enrolled as a professional education student')
+        self._check_verification_status_on(
+            'no-id-professional',
+            'You&#39;re enrolled as a professional education student',
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def _check_verification_status_off(self, mode, value):
@@ -493,7 +495,6 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @with_is_edx_domain(True)
     def test_dashboard_header_nav_has_find_courses(self):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))

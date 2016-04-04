@@ -53,6 +53,7 @@ from lms.djangoapps.ccx.overrides import (
     bulk_delete_ccx_override_fields,
 )
 from lms.djangoapps.ccx.utils import (
+    add_master_course_staff_to_ccx,
     assign_coach_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
@@ -155,6 +156,9 @@ def dashboard(request, course, ccx=None):
         context['grading_policy_url'] = reverse(
             'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
 
+        with ccx_course(ccx_locator) as course:
+            context['course'] = course
+
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -224,7 +228,7 @@ def create_ccx(request, course, ccx=None):
     )
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
-
+    add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
     return redirect(url)
 
 

@@ -7,7 +7,7 @@
                     <h3 class="subsection-title"><%- gettext('Course-Wide Discussion Topics') %></h3>
                     <p><%- gettext('Select the course-wide discussion topics that you want to divide by cohort.') %></p>
                     <div class="field">
-                        <ul class="discussions-wrapper"><%= courseWideTopics %></ul>
+                        <ul class="discussions-wrapper"><%= HtmlUtils.ensureHtml(courseWideTopicsHtml) %></ul>
                     </div>
                 </div>
             </div>

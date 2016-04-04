@@ -22,6 +22,9 @@
 #
 ############################################################################
 
+# Fail fast
+set -e
+
 DB_CACHE_DIR="common/test/db_cache"
 
 declare -A databases

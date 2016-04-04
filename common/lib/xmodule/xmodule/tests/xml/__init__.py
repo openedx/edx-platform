@@ -57,7 +57,8 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
 
 class XModuleXmlImportTest(TestCase):
     """Base class for tests that use basic XML parsing"""
-    def process_xml(self, xml_import_data):
+    @classmethod
+    def process_xml(cls, xml_import_data):
         """Use the `xml_import_data` to import an :class:`XBlock` from XML."""
         system = InMemorySystem(xml_import_data)
         return system.process_xml(xml_import_data.xml_string)

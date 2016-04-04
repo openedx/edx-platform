@@ -8,6 +8,7 @@ import pytz
 import string
 import urllib
 import urlparse
+from itertools import izip
 
 import ddt
 import mock
@@ -30,6 +31,8 @@ from rest_framework.test import APITestCase
 from courseware import courses
 from ccx_keys.locator import CCXLocator
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from instructor.access import allow_access, list_with_level
 from instructor.enrollment import (
     enroll_email,
     get_email_params,
@@ -39,6 +42,7 @@ from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import get_course_chapters
+from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
 from opaque_keys.edx.keys import CourseKey
 from student.roles import (
     CourseInstructorRole,
@@ -66,9 +70,14 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.master_course_key_str = unicode(self.master_course_key)
         # OAUTH2 setup
         # create a specific user for the application
-        app_user = User.objects.create_user('test_app_user', 'test_app_user@openedx.org', 'test')
+        app_user = UserFactory(username='test_app_user', email='test_app_user@openedx.org', password='test')
         # add staff role to the app user
         CourseStaffRole(self.master_course_key).add_users(app_user)
+
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+
         # create an oauth client app entry
         self.app_client = Client.objects.create(
             user=app_user,
@@ -172,7 +181,7 @@ class CcxListTest(CcxRestApiTest):
         Check authorization for staff users logged in without oauth
         """
         # create a staff user
-        staff_user = User.objects.create_user('test_staff_user', 'test_staff_user@openedx.org', 'test')
+        staff_user = UserFactory(username='test_staff_user', email='test_staff_user@openedx.org', password='test')
         # add staff role to the staff user
         CourseStaffRole(self.master_course_key).add_users(staff_user)
 
@@ -194,7 +203,9 @@ class CcxListTest(CcxRestApiTest):
         Check authorization for instructor users logged in without oauth
         """
         # create an instructor user
-        instructor_user = User.objects.create_user('test_instructor_user', 'test_instructor_user@openedx.org', 'test')
+        instructor_user = UserFactory(
+            username='test_instructor_user', email='test_instructor_user@openedx.org', password='test'
+        )
         # add instructor role to the instructor user
         CourseInstructorRole(self.master_course_key).add_users(instructor_user)
 
@@ -217,7 +228,9 @@ class CcxListTest(CcxRestApiTest):
         Check authorization for coach users logged in without oauth
         """
         # create an coach user
-        coach_user = User.objects.create_user('test_coach_user', 'test_coach_user@openedx.org', 'test')
+        coach_user = UserFactory(
+            username='test_coach_user', email='test_coach_user@openedx.org', password='test'
+        )
         # add coach role to the coach user
         CourseCcxCoachRole(self.master_course_key).add_users(coach_user)
 
@@ -606,6 +619,38 @@ class CcxListTest(CcxRestApiTest):
         resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(resp.data.get('course_modules'), chapters)  # pylint: disable=no-member
+
+    def test_post_list_staff_master_course_in_ccx(self):
+        """
+        Specific test to check that the staff and instructor of the master
+        course are assigned to the CCX.
+        """
+        outbox = self.get_outbox()
+        data = {
+            'master_course_id': self.master_course_key_str,
+            'max_students_allowed': 111,
+            'display_name': 'CCX Test Title',
+            'coach_email': self.coach.email
+        }
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # check that only one email has been sent and it is to to the coach
+        self.assertEqual(len(outbox), 1)
+        self.assertIn(self.coach.email, outbox[0].recipients())  # pylint: disable=no-member
+
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        course_key = CourseKey.from_string(resp.data.get('ccx_course_id'))  # pylint: disable=no-member
+        with ccx_course_cm(course_key) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+
+        self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+        for course_user, ccx_user in izip(sorted(list_staff_master_course), sorted(list_staff_ccx_course)):
+            self.assertEqual(course_user, ccx_user)
+        self.assertEqual(len(list_instructor_master_course), len(list_instructor_ccx_course))
+        for course_user, ccx_user in izip(sorted(list_instructor_master_course), sorted(list_instructor_ccx_course)):
+            self.assertEqual(course_user, ccx_user)
 
 
 @attr('shard_1')
