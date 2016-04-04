@@ -767,10 +767,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # some error messages are returned for one of the views only
         if view_name == 'ccx_manage_student' and not is_email(identifier):
-            error_message = 'Could not find a user with name or email "{identifier}" '.format(
-                identifier=identifier
-            )
-            self.assertContains(response, error_message, status_code=200)
+            self.assertContains(response, 'Could not find a user with name or email ', status_code=200)
 
         if is_email(identifier):
             if send_email:
