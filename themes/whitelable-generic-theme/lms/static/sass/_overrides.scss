@@ -19,20 +19,17 @@ header.global {
   }
 }
 
-.footer {
+.grid-manual {
   background: $white;
-  .grid-manual {
-    margin-top: 10px;
-    .list-unstyled {
-      .main-item {
-        font-weight: 600;
-      }
-      li {
-        margin-bottom: 0.5rem;
-        a {
-          color: $extraDarkGrey;
-          text-decoration: none;
-        }
+  .list-unstyled {
+    .main-item {
+      font-weight: 600;
+    }
+    li {
+      margin-bottom: 0.7rem;
+      a {
+        color: $extraDarkGrey;
+        text-decoration: none;
       }
     }
   }
