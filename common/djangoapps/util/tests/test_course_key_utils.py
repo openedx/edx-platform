@@ -8,8 +8,12 @@ from django.http import Http404
 import ddt
 import unittest
 
+
 @ddt.ddt
 class TestFromStringOr404(unittest.TestCase):
+    """
+    Base Test class for from_string_or_404 utility tests
+    """
     @ddt.data(
         ("/some.invalid.key/course-v1:TTT+CS01+2015_T0", "course-v1:TTT+CS01+2015_T0"),  # split style course keys
         ("/some.invalid.key/TTT/CS01/2015_T0", "TTT/CS01/2015_T0"),  # mongo style course keys
@@ -39,5 +43,5 @@ class TestFromStringOr404(unittest.TestCase):
         """
         try:
             from_string_or_404(course_string, message="Invalid Keys")
-        except Http404 as e:
-            assert_equals(str(e), "Invalid Keys")
+        except Http404 as exception:
+            assert_equals(str(exception), "Invalid Keys")
