@@ -25,7 +25,7 @@ class JsTestSuite(TestSuite):
         try:
             self.test_id = (Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
         except ValueError:
-            self.test_id = ' '.join(Env.JS_TEST_CONFIG_FILES)
+            self.test_id = Env.JS_TEST_CONFIG_FILES[3]
 
         self.root = self.root + ' javascript'
         self.report_dir = Env.JS_REPORT_DIR
