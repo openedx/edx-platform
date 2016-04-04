@@ -39,7 +39,7 @@ class StudentGradebook(models.Model):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
-    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=None):
+    def generate_leaderboard(cls, course_key, user_id=None, group_ids=None, count=3, exclude_users=None):
         """
         Assembles a data set representing the Top N users, by grade, for a given course.
         Optionally provide a user_id to include user-specific info.  For example, you
@@ -81,6 +81,10 @@ class StudentGradebook(models.Model):
                 .filter(course_id__exact=course_key, user__is_active=True, user__courseenrollment__is_active=True,
                         user__courseenrollment__course_id__exact=course_key,
                         user__in=enrolled_users_not_excluded)
+
+            if group_ids:
+                queryset.filter(user__groups__in=group_ids)
+
             gradebook_user_count = len(queryset)
 
             if gradebook_user_count:

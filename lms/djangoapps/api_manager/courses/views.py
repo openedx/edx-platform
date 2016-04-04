@@ -1470,12 +1470,23 @@ class CoursesMetricsGradesList(SecureListAPIView):
             user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
+        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        if group_ids:
+            try:
+                group_ids = map(int, group_ids.split(','))
+            except ValueError:
+                return Response({}, status.HTTP_400_BAD_REQUEST)
+
+            queryset = queryset.filter(user__groups__in=group_ids)
+
         queryset_grade_avg = queryset.aggregate(Avg('grade'))
         queryset_grade_max = queryset.aggregate(Max('grade'))
         queryset_grade_min = queryset.aggregate(Min('grade'))
         queryset_grade_count = queryset.aggregate(Count('grade'))
 
-        course_metrics = StudentGradebook.generate_leaderboard(course_key, exclude_users=exclude_users)
+        course_metrics = StudentGradebook.generate_leaderboard(course_key,
+                                                               group_ids=group_ids,
+                                                               exclude_users=exclude_users)
 
         response_data = {}
         base_uri = generate_base_uri(request)
