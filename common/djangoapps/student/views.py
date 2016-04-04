@@ -2483,6 +2483,10 @@ def details_reset_confirm(request):
                   request=request,
                   domain_override=request.get_host())
 
-        return TemplateResponse(request, 'registration/details_reset_done.html')
+            return TemplateResponse(request, 'registration/details_reset_done.html')
+        else:
+            err_msg = "No user with the provided email address exists"
+            context = {'err_msg': err_msg}
+            return TemplateResponse(request, 'registration/details_reset.html', context)
 
     return TemplateResponse(request, 'registration/details_reset.html')
