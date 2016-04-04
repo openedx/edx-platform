@@ -69,8 +69,8 @@
             // jQuery 1.7.x to 2.2.x.  This config allows developers
             // to depend on "jquery" which opaquely requires both
             // libraries.
-            "jquery": "js/vendor/jquery.min",
-            "jquery-migrate": "js/vendor/jquery-migrate.min",
+            "jquery": "common/js/vendor/jquery",
+            "jquery-migrate": "common/js/vendor/jquery-migrate",
             "jquery.cookie": "js/vendor/jquery.cookie",
             'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",
