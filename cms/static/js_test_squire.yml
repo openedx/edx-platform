@@ -31,7 +31,8 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/requirejs/require.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/utility.js
-    - xmodule_js/common_static/js/vendor/jquery.min.js
+    - xmodule_js/common_static/common/js/vendor/jquery.js
+    - xmodule_js/common_static/common/js/vendor/jquery-migrate.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
     - xmodule_js/common_static/common/js/vendor/underscore.js

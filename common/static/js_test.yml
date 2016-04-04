@@ -28,7 +28,8 @@ prepend_path: common/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - js/vendor/jquery.min.js
+    - common/js/vendor/jquery.js
+    - common/js/vendor/jquery-migrate.js
     - js/vendor/jasmine-jquery.js
     - js/vendor/jasmine-imagediff.js
     - js/vendor/jquery.truncate.js

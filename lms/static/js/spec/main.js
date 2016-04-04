@@ -4,8 +4,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
-            'jquery-migrate': 'xmodule_js/common_static/js/vendor/jquery-migrate.min',
+            'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
+            'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
