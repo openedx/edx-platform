@@ -18,6 +18,10 @@
 //   --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
 //
 // where `BROWSER` could be Chrome or Firefox.
+//
+//
+
+var path = require('path');
 
 /**
  * Customize the name attribute in xml testcase element
@@ -114,18 +118,54 @@ function junitSettings(config) {
     };
 }
 
+var frameFiles = [
+    '../../node_modules/jquery/dist/jquery.js',
+    '../../node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
+    '../../node_modules/karma-jasmine/lib/boot.js',
+    '../../node_modules/karma-jasmine/lib/adapter.js',
+    '../../node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+    '../../node_modules/karma-jasmine-jquery/lib/jasmine-jquery.js',
+    '../../node_modules/requirejs/require.js',
+    '../../node_modules/karma-requirejs/lib/adapter.js'
+];
+
+var customPlugin = {
+  'framework:custom': ['factory', function(/*config.files*/files) {
+      frameFiles.reverse().forEach(function (f) {
+          files.unshift({
+              pattern: path.join(__dirname, f),
+              included: true,
+              served: true,
+              watch: false
+          });
+      });
+
+      console.log(files);
+  }]
+};
+
 
 module.exports = function (config) {
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
-        baseUrl: '/base',
-
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['requirejs', 'jasmine-jquery', 'jasmine'],
+        frameworks: ['custom'],
+
+        plugins: [
+            'karma-jasmine',
+            'karma-jasmine-html-reporter',
+            'karma-jasmine-jquery',
+            'karma-requirejs',
+            'karma-junit-reporter',
+            'karma-coverage',
+            'karma-chrome-launcher',
+            'karma-firefox-launcher',
+            customPlugin
+        ],
 
 
         // list of files / patterns to load in the browser
