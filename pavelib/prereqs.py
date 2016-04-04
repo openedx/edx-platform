@@ -133,7 +133,7 @@ def node_prereqs_installation():
     sh("test `npm config get registry` = \"{reg}\" || "
        "(echo setting registry; npm config set registry"
        " {reg})".format(reg=NPM_REGISTRY))
-    sh('npm install')
+    sh('npm install --verbose')
 
 
 def python_prereqs_installation():
