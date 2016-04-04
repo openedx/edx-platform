@@ -21,6 +21,7 @@ class JsTestSuite(TestSuite):
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')
         self.port = kwargs.get('port')
+        suite = args[0]
 
         try:
             self.test_id = (Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
@@ -29,8 +30,8 @@ class JsTestSuite(TestSuite):
 
         self.root = self.root + ' javascript'
         self.report_dir = Env.JS_REPORT_DIR
-        self.coverage_report = self.report_dir / 'coverage.xml'
-        self.xunit_report = self.report_dir / 'javascript_xunit.xml'
+        self.coverage_report = self.report_dir / 'coverage-{suite}.xml'.format(suite=suite)
+        self.xunit_report = self.report_dir / 'javascript_xunit-{suite}.xml'.format(suite=suite)
 
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
