@@ -22,6 +22,7 @@
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014-2015
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
+# Maria Artemieva <maria.m.artemieva@gmail.com>, 2016
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Orlov <mike.orlv@gmail.com>, 2015
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -114,7 +115,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
 "PO-Revision-Date: 2016-02-29 15:27+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -134,7 +135,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2661,8 +2662,8 @@ msgstr ""
 "команды."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "Команда «%(team)s» успешно удалена."
+msgid "Team \"{team}\" successfully deleted."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2942,6 +2943,12 @@ msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Ошибка при создании подробного оценочного листа. Пожалуйста, попробуйте ещё "
 "раз."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
+"При создании отчета по заданию с ответами в свободной форме возникла ошибка."
+" Пожалуйста, попробуйте еще раз."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5048,8 +5055,8 @@ msgid "Please enter non-negative integer."
 msgstr "Пожалуйста, введите целое неотрицательное число."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5460,26 +5467,6 @@ msgstr "Отменить изменения"
 msgid "Change Manually"
 msgstr "Изменить вручную"
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "Свернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "Развернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "Дата выпуска:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} в {hour}:{minute} UTC"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "Редактировать дату выпуска раздела."
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5835,6 +5822,10 @@ msgstr "Новый %(component_type)s"
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "Предупреждение"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -7178,7 +7169,7 @@ msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
 msgstr[0] "Загрузить %(num_items)s результат"
 msgstr[1] "Загрузить следующие %(num_items)s результата"
-msgstr[2] ""
+msgstr[2] "Загрузить следующие %(num_items)s результаты"
 msgstr[3] "Загрузить следующие %(num_items)s результаты"
 
 #: lms/templates/search/course_search_results.underscore

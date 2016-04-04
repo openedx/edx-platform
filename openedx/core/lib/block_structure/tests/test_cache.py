@@ -1,12 +1,14 @@
 """
 Tests for block_structure/cache.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..cache import BlockStructureCache
 from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer
 
 
+@attr('shard_2')
 class TestBlockStructureCache(ChildrenMapTestMixin, TestCase):
     """
     Tests for BlockStructureFactory

@@ -91,7 +91,7 @@ from django.template.defaultfilters import escapejs
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + '</td></tr>';
+              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + '</td></tr>';
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.
@@ -131,7 +131,7 @@ from django.template.defaultfilters import escapejs
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + "</td><td>" + value['grade'] + "</td><td>" + value['percent'] + '</td></tr>';
+              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + "</td><td>" + _.escape(value['grade']) + "</td><td>" + _.escape(value['percent']) + '</td></tr>';
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.

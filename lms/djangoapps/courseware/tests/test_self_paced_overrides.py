@@ -1,7 +1,5 @@
-"""
-Tests for self-paced course due date overrides.
-"""
-
+"""Tests for self-paced course due date overrides."""
+# pylint: disable=missing-docstring
 import datetime
 import pytz
 
@@ -11,17 +9,17 @@ from mock import patch
 
 from courseware.tests.factories import BetaTesterFactory
 from courseware.access import has_access
-
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_modules
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @override_settings(
-    FIELD_OVERRIDE_PROVIDERS=('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',)
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.self_paced_overrides.SelfPacedDateOverrideProvider'],
 )
 class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
@@ -29,14 +27,19 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedDateOverrideTest, self).setUp()
-        self.due_date = datetime.datetime(2015, 5, 26, 8, 30, 00).replace(tzinfo=tzutc())
+
+        SelfPacedConfiguration(enabled=True).save()
+
         self.non_staff_user, __ = self.create_non_staff_user()
+        self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        self.future = self.now + datetime.timedelta(days=30)
 
     def tearDown(self):
         super(SelfPacedDateOverrideTest, self).tearDown()
+
         OverrideFieldData.provider_classes = None
+        OverrideModulestoreFieldData.provider_classes = None
 
     def setup_course(self, **course_kwargs):
         """Set up a course with provided course attributes.
@@ -45,22 +48,39 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         overrides are correctly applied for both blocks.
         """
         course = CourseFactory.create(**course_kwargs)
-        section = ItemFactory.create(parent=course, due=self.due_date)
+        section = ItemFactory.create(parent=course, due=self.now)
         inject_field_overrides((course, section), course, self.user)
         return (course, section)
 
-    def test_instructor_paced(self):
-        __, ip_section = self.setup_course(display_name="Instructor Paced Course", self_paced=False)
-        self.assertEqual(self.due_date, ip_section.due)
+    def create_discussion_modules(self, parent):
+        # Create a released discussion module
+        ItemFactory.create(
+            parent=parent,
+            category='discussion',
+            display_name='released',
+            start=self.now,
+        )
 
-    def test_self_paced(self):
+        # Create a scheduled discussion module
+        ItemFactory.create(
+            parent=parent,
+            category='discussion',
+            display_name='scheduled',
+            start=self.future,
+        )
+
+    def test_instructor_paced_due_date(self):
+        __, ip_section = self.setup_course(display_name="Instructor Paced Course", self_paced=False)
+        self.assertEqual(ip_section.due, self.now)
+
+    def test_self_paced_due_date(self):
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
         self.assertIsNone(sp_section.due)
 
-    def test_self_paced_disabled(self):
+    def test_self_paced_disabled_due_date(self):
         SelfPacedConfiguration(enabled=False).save()
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
-        self.assertEqual(self.due_date, sp_section.due)
+        self.assertEqual(sp_section.due, self.now)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_access_to_beta_users(self):
@@ -89,3 +109,34 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         # Verify beta tester can access the course as well as the course sections
         self.assertTrue(has_access(beta_tester, 'load', self_paced_course))
         self.assertTrue(has_access(beta_tester, 'load', self_paced_section, self_paced_course.id))
+
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_instructor_paced_discussion_module_visibility(self):
+        """
+        Verify that discussion modules scheduled for release in the future are
+        not visible to students in an instructor-paced course.
+        """
+        course, section = self.setup_course(start=self.now, self_paced=False)
+        self.create_discussion_modules(section)
+
+        # Only the released module should be visible when the course is instructor-paced.
+        modules = get_accessible_discussion_modules(course, self.non_staff_user)
+        self.assertTrue(
+            all(module.display_name == 'released' for module in modules)
+        )
+
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_self_paced_discussion_module_visibility(self):
+        """
+        Regression test. Verify that discussion modules scheduled for release
+        in the future are visible to students in a self-paced course.
+        """
+        course, section = self.setup_course(start=self.now, self_paced=True)
+        self.create_discussion_modules(section)
+
+        # The scheduled module should be visible when the course is self-paced.
+        modules = get_accessible_discussion_modules(course, self.non_staff_user)
+        self.assertEqual(len(modules), 2)
+        self.assertTrue(
+            any(module.display_name == 'scheduled' for module in modules)
+        )

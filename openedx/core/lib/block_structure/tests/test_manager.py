@@ -1,6 +1,7 @@
 """
 Tests for manager.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..exceptions import UsageKeyNotInBlockStructure
@@ -83,6 +84,7 @@ class TestTransformer1(MockTransformer):
         return data_key + 't1.val1.' + unicode(block_key)
 
 
+@attr('shard_2')
 class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
     """
     Test class for BlockStructureManager.

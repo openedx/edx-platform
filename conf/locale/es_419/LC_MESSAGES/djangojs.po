@@ -105,8 +105,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
-"PO-Revision-Date: 2016-02-11 19:09+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
+"PO-Revision-Date: 2016-03-25 17:23+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -125,7 +125,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2609,8 +2609,8 @@ msgstr ""
 "a ser accesadas."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "El equipo \"%(team)s\" fue borrado exitosamente."
+msgid "Team \"{team}\" successfully deleted."
+msgstr "Equipo \"{team}\" eliminado exitosamente."
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2887,6 +2887,11 @@ msgstr "Error al generar las calificaciones. Por favor inténtelo nuevamente."
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Error al generar el reporte de calificaciones. Por favor intente nuevamente."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
+"Error al generar el reporte de datos de ORA. Por favor, intente nuevamente."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5004,8 +5009,10 @@ msgid "Please enter non-negative integer."
 msgstr "Por favor ingrese un número entero no negativo."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "No se pueden borrar más <% attrs.types %> del que será asignado."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
+"No se pueden borrar más asignaciones de <%= types %> de los que son "
+"asignados."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5413,26 +5420,6 @@ msgstr "Deshacer Cambios"
 msgid "Change Manually"
 msgstr "Cambiar Manualmente"
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "Colapsar todas las secciones"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "Expandir todas las secciones"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "Fecha de liberación:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} a las {hour}:{minute} UTC"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "Editar la fecha de liberación de la sección"
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5791,6 +5778,10 @@ msgstr "Nuevo %(component_type)s"
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "Atención:"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr "Actualizando Etiquetas"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore

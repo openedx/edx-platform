@@ -10,7 +10,7 @@
             'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'js/vendor/jquery.scrollTo.min',
             'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'js/vendor/jquery.cookie',
             'jquery.qtip': 'js/vendor/jquery.qtip.min',
@@ -22,8 +22,8 @@
             'jquery.url': 'js/vendor/url.min',
             'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
-            'underscore': 'js/vendor/underscore-min',
-            'underscore.string': 'js/vendor/underscore.string.min',
+            'underscore': 'common/js/vendor/underscore',
+            'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'js/vendor/backbone-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
@@ -155,6 +155,7 @@
 
     define([
         // Run the common tests that use RequireJS.
+        'common-requirejs/include/common/js/spec/components/tabbed_view_spec.js',
         'common-requirejs/include/common/js/spec/components/feedback_spec.js',
         'common-requirejs/include/common/js/spec/components/list_spec.js',
         'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',

@@ -4,13 +4,23 @@
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        var defineDependency = function (globalVariable, name, noShim) {
-            if (window[globalVariable]) {
+        var defineDependency = function (globalName, name, noShim) {
+            var getGlobalValue = function(name) {
+                var globalNamePath = name.split('.'),
+                    result = window,
+                    i;
+                for (i = 0; i < globalNamePath.length; i++) {
+                    result = result[globalNamePath[i]];
+                }
+                return result;
+            },
+                globalValue = getGlobalValue(globalName);
+            if (globalValue) {
                 if (noShim) {
                     define(name, {});
                 }
                 else {
-                    define(name, [], function() {return window[globalVariable];});
+                    define(name, [], function() { return globalValue; });
                 }
             }
             else {
@@ -18,6 +28,8 @@
             }
         };
         defineDependency("jQuery", "jquery");
+        defineDependency("jQuery", "jquery-migrate");
+        defineDependency("_", "underscore");
         defineDependency("s", "underscore.string");
         // Underscore.string no longer installs itself directly on "_". For compatibility with existing
         // code, add it to "_" with its previous name.
@@ -28,6 +40,10 @@
         defineDependency("Logger", "logger");
         defineDependency("URI", "URI");
         defineDependency("Backbone", "backbone");
+
+        // Add the UI Toolkit helper classes that have been installed in the "edx" namespace
+        defineDependency("edx.HtmlUtils", "edx-ui-toolkit/js/utils/html-utils");
+        defineDependency("edx.StringUtils", "edx-ui-toolkit/js/utils/string-utils");
 
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency("isExternal", "utility", true);
@@ -46,9 +62,14 @@
             "backbone": "js/vendor/backbone-min",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
-            "underscore": "js/vendor/underscore-min",
-            "underscore.string": "js/vendor/underscore.string.min",
+            "underscore": "common/js/vendor/underscore",
+            "underscore.string": "common/js/vendor/underscore.string",
+            // The jquery-migrate library was added in upgrading from
+            // jQuery 1.7.x to 2.2.x.  This config allows developers
+            // to depend on "jquery" which opaquely requires both
+            // libraries.
             "jquery": "js/vendor/jquery.min",
+            "jquery-migrate": "js/vendor/jquery-migrate.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
             'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",
@@ -83,9 +104,6 @@
             // end of files needed by OVA
         },
         shim: {
-            "gettext": {
-                exports: "gettext"
-            },
             "annotator_1.2.9": {
                 deps: ["jquery"],
                 exports: "Annotator"
@@ -94,8 +112,10 @@
                 exports: "Date"
             },
             "jquery": {
-                exports: "$"
+                deps: ["_jquery"],
+                exports: "jQuery"
             },
+            "jquery-migrate": ['jquery'],
             "jquery.cookie": {
                 deps: ["jquery"],
                 exports: "jQuery.fn.cookie"
@@ -115,13 +135,6 @@
             "jquery.tinymce": {
                 deps: ["jquery", "tinymce"],
                 exports: "jQuery.fn.tinymce"
-            },
-            "underscore": {
-                exports: "_"
-            },
-            "backbone": {
-                deps: ["underscore", "jquery"],
-                exports: "Backbone"
             },
             "backbone.paginator": {
                 deps: ["backbone"],

@@ -180,16 +180,22 @@ Feature: LMS.Answer problems
 
         Examples:
         | ProblemType       | Points Possible    |
-        | drop down         | 1 point possible   |
-        | multiple choice   | 1 point possible   |
-        | checkbox          | 1 point possible   |
-        | radio             | 1 point possible   |
-        #| string            | 1 point possible   |
-        | numerical         | 1 point possible   |
-        | formula           | 1 point possible   |
-        | script            | 2 points possible  |
         | image             | 1 point possible   |
 
+    Scenario: I can't submit a blank answer
+        Given I am viewing a "<ProblemType>" problem
+        Then I can't check a problem
+
+        Examples:
+        | ProblemType       |
+        | drop down         |
+        | multiple choice   |
+        | checkbox          |
+        | radio             |
+        | string            |
+        | numerical         |
+        | formula           |
+        | script            |
 
     Scenario: I can reset the correctness of a problem after changing my answer
         Given I am viewing a "<ProblemType>" problem
@@ -223,10 +229,9 @@ Feature: LMS.Answer problems
         Given I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
         Then my "<ProblemType>" answer is marked "<InitialCorrectness>"
-        And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
+        And I reset the problem
         Then my "<ProblemType>" answer is NOT marked "<InitialCorrectness>"
         And my "<ProblemType>" answer is NOT marked "<OtherCorrectness>"
-        And I reset the problem
 
         Examples:
         | ProblemType     | InitialCorrectness | OtherCorrectness |
@@ -234,21 +239,3 @@ Feature: LMS.Answer problems
         | multiple choice | incorrect          | correct          |
         | radio           | correct            | incorrect        |
         | radio           | incorrect          | correct          |
-
-
-    Scenario: I can reset the correctness of a problem after submitting a blank answer
-        Given I am viewing a "<ProblemType>" problem
-        When I check a problem
-        And I input an answer on a "<ProblemType>" problem "correctly"
-        Then my "<ProblemType>" answer is marked "unanswered"
-
-        Examples:
-        | ProblemType       |
-        | drop down         |
-        | multiple choice   |
-        | checkbox          |
-        | radio             |
-        #| string            |
-        | numerical         |
-        | formula           |
-        | script            |

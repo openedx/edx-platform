@@ -15,8 +15,14 @@ from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
+from instructor.access import (
+    allow_access,
+    list_with_level,
+)
+
 from django.conf import settings
 from django.core.urlresolvers import reverse, resolve
+from django.utils.translation import ugettext as _
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
@@ -26,7 +32,7 @@ from opaque_keys.edx.keys import CourseKey
 from student.roles import (
     CourseCcxCoachRole,
     CourseInstructorRole,
-    CourseStaffRole
+    CourseStaffRole,
 )
 from student.models import (
     CourseEnrollment,
@@ -53,6 +59,7 @@ from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
+from lms.djangoapps.ccx.views import ccx_course
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import (
     CcxTestCase,
@@ -209,6 +216,16 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # Login with the instructor account
         self.client.login(username=self.coach.username, password="test")
 
+        # adding staff to master course.
+        staff = UserFactory()
+        allow_access(self.course, staff, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
+
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
+
     def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
         """
         Helper function to count visible elements in the schedule
@@ -264,6 +281,29 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             '<form action=".+create_ccx"',
             response.content))
 
+    def test_create_ccx_with_ccx_connector_set(self):
+        """
+        Assert that coach cannot create ccx when ``ccx_connector`` url is set.
+        """
+        course = CourseFactory.create()
+        course.ccx_connector = "http://ccx.com"
+        course.save()
+        self.store.update_item(course, 0)
+        role = CourseCcxCoachRole(course.id)
+        role.add_users(self.coach)
+
+        url = reverse(
+            'create_ccx',
+            kwargs={'course_id': unicode(course.id)})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        error_message = _(
+            "A CCX can only be created on this course through an external service."
+            " Contact a course admin to give you access."
+        )
+        self.assertTrue(re.search(error_message, response.content))
+
     def test_create_ccx(self, ccx_name='New CCX'):
         """
         Create CCX. Follow redirect to coach dashboard, confirm we see
@@ -299,6 +339,19 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # assert ccx creator has role=ccx_coach
         role = CourseCcxCoachRole(course_key)
         self.assertTrue(role.has_user(self.coach))
+
+        # assert that staff and instructors of master course has staff and instructor roles on ccx
+        list_staff_master_course = list_with_level(self.course, 'staff')
+        list_instructor_master_course = list_with_level(self.course, 'instructor')
+
+        with ccx_course(course_key) as course_ccx:
+            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
+            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
+
+            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
+            self.assertEqual(list_instructor_ccx_course[0].email, list_instructor_master_course[0].email)
 
     @ddt.data("CCX demo 1", "CCX demo 2", "CCX demo 3")
     def test_create_multiple_ccx(self, ccx_name):
@@ -714,10 +767,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # some error messages are returned for one of the views only
         if view_name == 'ccx_manage_student' and not is_email(identifier):
-            error_message = 'Could not find a user with name or email "{identifier}" '.format(
-                identifier=identifier
-            )
-            self.assertContains(response, error_message, status_code=200)
+            self.assertContains(response, 'Could not find a user with name or email ', status_code=200)
 
         if is_email(identifier):
             if send_email:

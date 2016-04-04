@@ -5,6 +5,7 @@ Tests for users API
 import datetime
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -34,6 +35,7 @@ from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTe
 from .serializers import CourseEnrollmentSerializer
 
 
+@attr('shard_2')
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>...
@@ -48,6 +50,7 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
+@attr('shard_2')
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
     Tests for /api/mobile/v0.5/my_user_info
@@ -63,6 +66,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertTrue(self.username in response['location'])
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
@@ -262,6 +266,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
 
+@attr('shard_2')
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
@@ -296,6 +301,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
+@attr('shard_2')
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -315,6 +321,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
+@attr('shard_2')
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -418,6 +425,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
+@attr('shard_2')
 class TestCourseEnrollmentSerializer(MobileAPITestCase):
     """
     Test the course enrollment serializer

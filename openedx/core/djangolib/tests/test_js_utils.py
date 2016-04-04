@@ -3,6 +3,7 @@
 Tests for js_utils.py
 """
 import json
+from nose.plugins.attrib import attr
 from unittest import TestCase
 import HTMLParser
 
@@ -13,6 +14,7 @@ from openedx.core.djangolib.js_utils import (
 )
 
 
+@attr('shard_2')
 class TestJSUtils(TestCase):
     """
     Test JS utils

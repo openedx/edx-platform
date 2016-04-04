@@ -10,13 +10,13 @@
                     BaseCollection.prototype.initialize.call(this, options);
 
                     this.server_api = _.extend(
+                        this.server_api,
                         {
                             topic_id: this.topic_id = options.topic_id,
                             expand: 'user',
                             course_id: function () { return encodeURIComponent(self.course_id); },
                             order_by: function () { return self.searchString ? '' : this.sortField; }
-                        },
-                        BaseCollection.prototype.server_api
+                        }
                     );
                     delete this.server_api.sort_order; // Sort order is not specified for the Team API
 

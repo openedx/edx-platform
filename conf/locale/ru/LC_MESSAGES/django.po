@@ -192,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:18+0000\n"
+"POT-Creation-Date: 2016-03-24 18:06+0000\n"
 "PO-Revision-Date: 2016-02-29 15:22+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -790,6 +790,10 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
 msgstr "Курс, который вы ищете, начнётся {date}."
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for is closed for enrollment as of {date}."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -2434,6 +2438,10 @@ msgid ""
 "sorted alphabetically. If false, they are sorted chronologically by creation"
 " date and time."
 msgstr ""
+"Введите true или false.  Если введено значение true, категории и "
+"подкатегории обсуждений будут показаны в алфавитном порядке. Если введено "
+"значение false, они будут показаны в хронологическом порядке, по дате и "
+"времени создания."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
@@ -3062,10 +3070,12 @@ msgstr ""
 "десятичной дроби от 0,0 до 1,0. Например, 75% вводятся в виде 0,75."
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr "Произвольный темп"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -3919,6 +3929,8 @@ msgstr "Разрешено ли очное проведение"
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "This setting indicates whether this exam is a proctored exam."
 msgstr ""
+"Эта настройка определяет, является ли данное испытание наблюдаемым "
+"испытанием."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Software Secure Review Rules"
@@ -4580,6 +4592,12 @@ msgid "CCX Coach"
 msgstr "Тьютор"
 
 #: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr ""
 "Курс полон, ограничение в {max_student_enrollments_allowed} не может быть "
@@ -5085,11 +5103,11 @@ msgstr "Курса {course_id} не существует."
 
 #: lms/djangoapps/commerce/models.py
 msgid "Use the checkout page hosted by the E-Commerce service."
-msgstr ""
+msgstr "Для оплаты используйте страницу на E-Commerce."
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to single course checkout page hosted by the E-Commerce service."
-msgstr ""
+msgstr "Ссылка на страницу E-Commerce для оплаты всех выбранных курсов."
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -5249,6 +5267,8 @@ msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
 msgstr ""
+"Вы все еще можете получить подтвержденный сертификат! Продолжайте, чтобы "
+"показать знания и навыки, полученные в этом курсе."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
@@ -5672,7 +5692,7 @@ msgstr "преподаватели"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
-msgstr "Информация о регистрации для всех курсов"
+msgstr "Информация о регистрации на всех курсах"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "role"
@@ -5716,9 +5736,12 @@ msgstr ""
 "минут."
 
 #: lms/djangoapps/edxnotes/helpers.py
-msgid "Server error. Please try again in a few minutes."
+msgid "Invalid JSON response received from notes api."
 msgstr ""
-"Ошибка на сервере.  Пожалуйста, попробуйте ещё раз через несколько минут."
+
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "Incorrect data received from notes api."
+msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -5952,30 +5975,22 @@ msgstr "Команда"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrolled learner profile report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
-"Подготавливается отчет об анкете слушателя. Чтобы просмотреть статус отчета,"
-" см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "This enrollment report is currently being created. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Данный отчет о регистрации находится на стадии подготовки. Чтобы просмотреть"
-" статус отчета, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда"
-" он будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrollment report is being created. This report contains information "
 "about learners who can enroll in the course. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"Отчет о регистрации на стадии подготовки. Данный отчет содержит информацию о"
-" слушателях, зарегистрированных на курс. Чтобы просмотреть отчет, см. ниже "
-"«Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6036,74 +6051,54 @@ msgstr "Общая сумма скидки"
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"Подробный отчет о регистрации на стадии подготовки. Чтобы просмотреть статус"
-" отчета, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Подробный отчет о регистрации на стадии подготовки. Чтобы просмотреть статус"
-" отчета, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда он "
-"будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
-"Административный итоговый отчет на стадии подготовки. Чтобы просмотреть "
-"статус отчета, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is currently being created. To view the status "
-"of the report, see Pending Instructor Tasks below. You will be able to "
-"download the report when it is complete."
+"of the report, see Pending Tasks below. You will be able to download the "
+"report when it is complete."
 msgstr ""
-"Административный итоговый отчет в настоящее время на стадии подготовки. "
-"Чтобы просмотреть статус отчета, см. ниже «Текущие задачи». Вы сможете "
-"загрузить отчет, когда он будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
-"Отчёт по опросу на стадии подготовки.  Состояние отчёта отображается ниже, в"
-" Текущих Задачах Преподавателя."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Отчёт по оценкам находится на стадии подготовки. Состояние отчёта "
-"отображается ниже, в Текущих Задачах Преподавателя. Когда отчёт будет готов,"
-" вы сможете скачать его."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
-"Отчёт о результатах наблюдаемого испытания на стадии подготовки.  Статус "
-"отчёта отображается ниже, в списке текущих задач преподавателя."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is currently being created. To view the "
-"status of the report, see Pending Instructor Tasks below. You will be able "
-"to download the report when it is complete."
+"status of the report, see Pending Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
-"Отчёт о результатах наблюдаемого испытания в настоящий момент на стадии "
-"подготовки.  Статус отчёта отображается ниже, в списке текущих задач "
-"преподавателя.  Готовый отчёт будет доступен для скачивания."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6160,40 +6155,41 @@ msgstr ""
 "Невозможно пересчитать баллы с all_students и unique_student_identifier."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "The ORA data report is being generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An ORA data report generation task is already in progress. Check the "
+"'Pending Tasks' table for the status of the task. When completed, the report"
+" will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
-" Отчет по оценкам на стадии подготовки. Чтобы просмотреть статус отчета, см."
-" ниже «Текущие задачи». "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Отчет по оценкам в настоящее время на стадии подготовки. Чтобы просмотреть "
-"статус отчета, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда "
-"он будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The problem grade report is being created. To view the status of the report,"
-" see Pending Instructor Tasks below."
+" see Pending Tasks below."
 msgstr ""
-"Отчет по оценкам за задания в настоящее время на стадии подготовки. Чтобы "
-"просмотреть статус отчета, см. ниже «Текущие задачи». "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A problem grade report is already being generated. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
-"Отчет по оценкам за задания уже подготавливается. Чтобы просмотреть статус "
-"отчета, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда он "
-"будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -6453,7 +6449,7 @@ msgstr "CourseMode цена успешно обновлена"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr "Новости и анонсы"
+msgstr "О курсе"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "No end date set"
@@ -6476,7 +6472,7 @@ msgstr "Группы"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
-msgstr "Данные обучающихся"
+msgstr "Оценки"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
@@ -6581,7 +6577,6 @@ msgstr "Срок сдачи задания для этого обучающег�
 #: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -6902,7 +6897,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
-msgstr ""
+msgstr "Навигация по курсу"
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -7983,7 +7978,7 @@ msgstr "Примечания"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "University"
-msgstr "Университет"
+msgstr "Организация"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Course Announce Date"
@@ -8139,7 +8134,7 @@ msgstr "Запись на курс"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and update learner enrollments."
-msgstr "Просмотреть и обновить зачисления слушателей."
+msgstr "Просмотреть и обновить информацию о регистрациях."
 
 #: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
@@ -8462,35 +8457,38 @@ msgid ""
 "    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
 "  "
 msgstr ""
+"\n"
+"    Приложение <strong>%(application_name)s</strong> запрашивает доступ к вашим данным с правом на нижеследующие операции:\n"
+"  "
 
 #: lms/templates/provider/authorize.html
 msgid "Read your user ID"
-msgstr ""
+msgstr "Чтение вашего идентификатора"
 
 #: lms/templates/provider/authorize.html
 msgid "Read your user profile"
-msgstr ""
+msgstr "Чтение вашего профиля"
 
 #: lms/templates/provider/authorize.html
 msgid "Read your email address"
-msgstr ""
+msgstr "Чтение вашего электронного адреса"
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are a staff member."
-msgstr ""
+msgstr "Чтение списка курсов, сотрудником которых вы являетесь."
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are an instructor."
-msgstr ""
+msgstr "Чтение списка курсов, которые вы преподаете."
 
 #: lms/templates/provider/authorize.html
 msgid "To see if you are a global staff user"
-msgstr ""
+msgstr "Проверить, что вы включены в команды всех курсов"
 
 #: lms/templates/provider/authorize.html
 #, python-format
 msgid "Manage your data: %(permission)s"
-msgstr ""
+msgstr "Управление вашими данными: %(permission)s"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
@@ -8537,7 +8535,7 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"К сожалению, текущая версия вашего браузера не поддерживается. Попробуйте ещё раз, используя другой браузер или более новую версию Вашего браузера."
+"К сожалению, текущая версия вашего браузера не поддерживается. Попробуйте ещё раз, используя другой браузер или более новую версию вашего браузера."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
@@ -8549,14 +8547,13 @@ msgstr "Вы должны заполнить все поля."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr "Имя пользователя и пароль не совпали."
+msgstr "Пароли не совпадают."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
-msgstr ""
-"К сожалению, кажется в системе возникли сложности со сбросом Bашего пароля"
+msgstr "К сожалению, возникли сложности со сбросом вашего пароля"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -9203,6 +9200,13 @@ msgstr ""
 msgid "A cohort with the same name already exists."
 msgstr "Группа с таким названием уже существует."
 
+#: openedx/core/djangoapps/coursetalk/models.py
+msgid ""
+"The platform key associates CourseTalk widgets with your platform. "
+"Generally, it is the domain name for your platform. For example, if your "
+"platform is http://edx.org, the platform key is \"edx\"."
+msgstr ""
+
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
@@ -9232,11 +9236,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "Период обновления кэша"
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -9244,9 +9250,25 @@ msgid ""
 msgstr ""
 "Задаётся в секундах. Для включения кэширования укажите значение больше 0."
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "Условия получения зачёта на курсе"
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9423,13 +9445,15 @@ msgstr "Разрешить выпуск сертификатов"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Maximum Certification Retries"
-msgstr ""
+msgstr "Максимальное количество попыток получения сертификата"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "When making requests to award certificates, make at most this many attempts "
 "to retry a failing request."
 msgstr ""
+"Это максимальное количество попыток повторной обработки запроса о получении "
+"сертификата при неуспешном завершении предыдущего запроса."
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -9596,6 +9620,13 @@ msgstr "Почтовый адрес"
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "Расскажите нам, почему вы заинтересовались {platform_name}"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -10104,8 +10135,8 @@ msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "Неверный формат для поля '{name}'. {detailed_message}"
 
 #: cms/lib/xblock/tagging.py
-msgid "Learning outcomes"
-msgstr "Результаты обучения"
+msgid "Difficulty"
+msgstr "Сложность"
 
 #: cms/lib/xblock/tagging.py
 msgid "Dictionary with the available tags"
@@ -10141,7 +10172,6 @@ msgstr "Настройки"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -10205,7 +10235,6 @@ msgstr "Забыли пароль?"
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "образец: Мария Иванова"
@@ -10225,11 +10254,6 @@ msgstr "Имя пользователя"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "образец: maria_ivanova"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "Предпочтительный язык"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -11096,7 +11120,7 @@ msgstr "Сисадмин"
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
-msgstr "Университеты"
+msgstr "Организации"
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -11116,7 +11140,6 @@ msgid "Reset"
 msgstr "Сбросить"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Сохранить"
 
@@ -12002,6 +12025,10 @@ msgid "Name your CCX"
 msgstr "Дайте название своему CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "Расписание"
 
@@ -12009,6 +12036,10 @@ msgstr "Расписание"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "Правила оценивания"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12575,14 +12606,6 @@ msgid "View About Page in studio"
 msgstr "Просмотр информационной страницы в Studio"
 
 #: lms/templates/courseware/course_about.html
-msgid "Course About"
-msgstr "О курсе"
-
-#: lms/templates/courseware/course_about.html
-msgid "Overview"
-msgstr "Обзор"
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "Начало курса"
 
@@ -12770,7 +12793,7 @@ msgstr "Оценочный лист"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
-msgstr "Поиск слушателей"
+msgstr "Поиск обучающихся"
 
 #: lms/templates/courseware/gradebook.html
 msgid "previous page"
@@ -12786,7 +12809,7 @@ msgstr "следующая страница"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
-msgstr "{course_number} Новости и анонсы"
+msgstr "{course_number} О курсе"
 
 #: lms/templates/courseware/info.html
 msgid "You are not enrolled yet"
@@ -12822,10 +12845,6 @@ msgstr "Навигация по наглядным материалам"
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
 msgstr "Важные даты курса"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates &amp; News"
-msgstr "Объявления и новости курса"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -12977,7 +12996,7 @@ msgstr "Нет баллов за выполненные в этом раздел
 
 #: lms/templates/courseware/syllabus.html
 msgid "{course.display_number_with_default} Course Info"
-msgstr "{course.display_number_with_default} Новости и анонсы"
+msgstr "{course.display_number_with_default} О курсе"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -12990,8 +13009,8 @@ msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
 msgstr ""
-"В последний раз вы были в разделе {section_link}. Если Вы закончили, "
-"выберите другой раздел слева."
+"В последний раз вы были в разделе {section_link}. Если вы закончили его "
+"изучение, выберите другой раздел слева."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -13002,6 +13021,13 @@ msgstr "Здравствуйте, {name},"
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid "Hi,"
 msgstr "Здравствуйте!"
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -13210,12 +13236,8 @@ msgid "I'm learning on {platform_name}:"
 msgstr "Я учусь на {platform_name}:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course options dropdown"
-msgstr "Список опций курса"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Additional Actions Menu"
-msgstr "Меню дополнительныx действий"
+msgid "Course options for"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
@@ -13430,10 +13452,6 @@ msgid ""
 msgstr ""
 "При выполнении операции возникла ошибка. Обращайтесь за помощью по адресу "
 "{support_email}."
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "редактировать"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -14182,7 +14200,7 @@ msgstr "Команда {platform_name}"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
-msgstr "Спасибо за оплату мест на курсе {course_name}."
+msgstr "Спасибо за оплату регистрации на {course_name}."
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
@@ -14941,6 +14959,10 @@ msgid "Generate Problem Grade Report"
 msgstr "Создать оценочный лист с подробными оценками задач"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Data Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
 msgstr "Оценочные листы, доступные для скачивания"
 
@@ -15296,7 +15318,7 @@ msgstr "Количество мест"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Number of Enrollments"
-msgstr "Количество участников"
+msgstr "Количество регистраций"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Gross Revenue Collected"
@@ -15478,7 +15500,7 @@ msgstr "Наименование организации"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "The organization that purchased enrollments in the course"
-msgstr "Организация, которая приобрела возможность записи на курс"
+msgstr "Организация, которая приобрела возможность регистрации на курс"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -16560,9 +16582,9 @@ msgid ""
 "generating a report with 'Start Letter' A and 'End Letter' C will generate "
 "reports for all universities starting with A, B, and C."
 msgstr ""
-"Эти отчёты упорядочены в алфавитном порядке по названию университета, т.е. "
-"создание отчёта с 'С буквы' A и 'До буквы' С сформирует отчёты для всех "
-"университетов, начинающихся с A, B и C."
+"Эти отчёты упорядочены в алфавитном порядке, т.е. создание отчёта \"с "
+"буквы\" A и \"до буквы\" C сформирует отчёты для всех организаций, "
+"начинающихся с A, B и C."
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "Start Letter: "
@@ -17127,14 +17149,6 @@ msgstr ""
 "Если у вас возникнут вопросы относительно курса или этой анкеты, свяжитесь с"
 "  <a href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "Отредактируйте Своё Полное Имя"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "Во время редактирования вашего имени возникла следующая ошибка:"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "Повторное подтверждение личности для курса {course_name}"
@@ -17335,7 +17349,7 @@ msgstr "Copyright {year}. Все права защищены."
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
-msgstr "Бесплатные курсы от университета <strong>{university_name}</strong>"
+msgstr "Бесплатные курсы от <strong>{university_name}</strong>"
 
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
@@ -17387,8 +17401,8 @@ msgid "{studio_name} Server Error"
 msgstr "{studio_name} Ошибка сервера"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "На серверах {studio_name} произошла ошибка"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
 
 #: cms/templates/500.html
 msgid ""
@@ -17863,7 +17877,7 @@ msgstr "Организация"
 #. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
-msgstr "например: УниверситетX или ОрганизацияX"
+msgstr "например: university_name или organization_name"
 
 #: cms/templates/course-create-rerun.html
 msgid ""
@@ -18211,6 +18225,9 @@ msgid ""
 "(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
 " custom pages that you create."
 msgstr ""
+"Названия страниц расположены горизонтально над содержимым курса.  После "
+"основных страниц (Главная, Курс, Обсуждение, Вики и Прогресс) отображаются "
+"учебники и добавленные вами дополнительные страницы."
 
 #: cms/templates/edit-tabs.html
 msgid "Custom pages"
@@ -18256,6 +18273,9 @@ msgid ""
 "Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
 " pages."
 msgstr ""
+"Названия страниц находятся на верхней навигационной панели.  После основных "
+"страниц (Главная, Курс, Обсуждение, Вики и Прогресс) отображаются учебники и"
+" дополнительные страницы."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
@@ -19201,6 +19221,10 @@ msgid ""
 "changed, but you can set a different display name in Advanced Settings "
 "later."
 msgstr ""
+"Название организации, финансирующей курс. {strong_start}Примечание: Название"
+" организации это часть URL курса.{strong_end} Это название нельзя будет "
+"изменить, однако позже вы сможете указать альтернативное отображаемое "
+"название в расширенных настройках."
 
 #: cms/templates/index.html
 msgid ""
@@ -19208,6 +19232,10 @@ msgid ""
 "{strong_start}Note: This is part of your course URL, so no spaces or special"
 " characters are allowed and it cannot be changed.{strong_end}"
 msgstr ""
+"Уникальный идентификационный номер курса, присвоенный ему вашей "
+"организацией. {strong_start}Примечание: это часть URL вашего курса, здесь не"
+" разрешается использовать пробелы и специальные символы; её нельзя будет "
+"изменить позже.{strong_end}"
 
 #: cms/templates/index.html
 msgid ""
@@ -19215,6 +19243,9 @@ msgid ""
 "your course URL, so no spaces or special characters are allowed and it "
 "cannot be changed.{strong_end}"
 msgstr ""
+"Семестр, в котором будет проходить ваш курс. {strong_start}Примечание: это "
+"часть URL вашего курса, здесь не разрешается использовать пробелы и "
+"специальные символы; её нельзя будет изменить позже.{strong_end}"
 
 #: cms/templates/index.html
 msgid "Create"
@@ -19528,7 +19559,7 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, {name}!"
-msgstr ""
+msgstr "Спасибо, что зарегистрировались, {name}!"
 
 #: cms/templates/index.html
 msgid "We need to verify your email address"
@@ -19540,6 +19571,8 @@ msgid ""
 "email address ({email}). An activation message and next steps should be "
 "waiting for you there."
 msgstr ""
+"Вы почти у цели! Для завершения регистрации подтвердите свой электронный "
+"адрес ({email}). Письмо с инструкциями по активации уже отправлено."
 
 #: cms/templates/index.html
 msgid "Need help?"
@@ -19828,6 +19861,10 @@ msgstr ""
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "Ваше местонахождение"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"

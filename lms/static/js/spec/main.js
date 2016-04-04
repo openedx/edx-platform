@@ -5,6 +5,7 @@
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
             'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
+            'jquery-migrate': 'xmodule_js/common_static/js/vendor/jquery-migrate.min',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -13,7 +14,7 @@
             'jquery.leanModal': 'xmodule_js/common_static/js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo.min',
             'jquery.timepicker': 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
@@ -29,8 +30,8 @@
             'moment': 'xmodule_js/common_static/js/vendor/moment.min',
             'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
-            'underscore': 'xmodule_js/common_static/js/vendor/underscore-min',
-            'underscore.string': 'xmodule_js/common_static/js/vendor/underscore.string.min',
+            'underscore': 'xmodule_js/common_static/common/js/vendor/underscore',
+            'underscore.string': 'xmodule_js/common_static/common/js/vendor/underscore.string',
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
@@ -112,6 +113,7 @@
             'date': {
                 exports: 'Date'
             },
+            "jquery-migrate": ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
                 exports: 'jQuery.ui'
@@ -285,6 +287,10 @@
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
             },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid']
+            },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
                 deps: ['jquery', 'gettext', 'underscore']
@@ -364,6 +370,9 @@
                     // Set global variables that the payment code is expecting to be defined
                     window._ = require('underscore');
                     window._.str = require('underscore.string');
+                    window.edx = edx || {};
+                    window.edx.HtmlUtils = require('edx-ui-toolkit/js/utils/html-utils');
+                    window.edx.StringUtils = require('edx-ui-toolkit/js/utils/string-utils');
                 }
             },
             'js/verify_student/views/intro_step_view': {
@@ -473,6 +482,14 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            'slick.core': {
+                deps: ['jquery'],
+                exports: 'Slick'
+            },
+            'slick.grid': {
+                deps: ['jquery', 'jquery.eventDrag', 'slick.core'],
+                exports: 'Slick'
             },
             // Discussions
             'xmodule_js/common_static/coffee/src/discussion/utils': {
@@ -630,7 +647,6 @@
     define([
         // Run the LMS tests
         'lms/include/js/spec/components/header/header_spec.js',
-        'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
         'lms/include/js/spec/components/card/card_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
@@ -665,6 +681,11 @@
         'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
         'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
+        'lms/include/js/spec/student_profile/share_modal_view_spec.js',
+        'lms/include/js/spec/student_profile/badge_view_spec.js',
+        'lms/include/js/spec/student_profile/section_two_tab_spec.js',
+        'lms/include/js/spec/student_profile/badge_list_view_spec.js',
+        'lms/include/js/spec/student_profile/badge_list_container_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/reverify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
@@ -735,7 +756,10 @@
         'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
         'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
         'lms/include/js/spec/views/message_banner_spec.js',
-        'lms/include/js/spec/markdown_editor_spec.js'
+        'lms/include/js/spec/markdown_editor_spec.js',
+        'lms/include/js/spec/learner_dashboard/collection_list_view_spec.js',
+        'lms/include/js/spec/learner_dashboard/sidebar_view_spec.js',
+        'lms/include/js/spec/learner_dashboard/program_card_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);

@@ -7,13 +7,17 @@
 # vingte <411029240@qq.com>, 2014
 # Alfred <alfredhuang211@qq.com>, 2015
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
+# ckyOL, 2015
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
+# freakylemon <freakylemon@ymail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
 # ckyOL, 2015
 # GoodLuck <1833447072@qq.com>, 2014
@@ -24,16 +28,21 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
 # Jiadong Zhang <fighting-dong@qq.com>, 2015
+# Jianfei Wang <me@thinxer.com>, 2013
 # Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
+# Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Michael Cao <ming.cao.ming@gmail.com>, 2015
 # Mingye Wang <arthur200126@gmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
+# riceball <snowyu.lee@gmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Rui Xu <xurui6376@gmail.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -44,24 +53,30 @@
 # Jianfei Wang <me@thinxer.com>, 2013
 # Tiffany Wang <tiffany.wang0524@gmail.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# vingte <411029240@qq.com>, 2014
 # wanghe <1636807295@qq.com>, 2014
+# wenheping <wenheping@gmail.com>, 2014
 # wenheping <wenheping@gmail.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013-2014
 # wuqiong <wuqiong417@gmail.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # Xiang Junfu <xiangjf.fnst@cn.fujitsu.com>, 2015
 # yan9yu, 2014
+# yan9yu, 2014
 # Yuelan Sheng <shengyl.cheryl@gmail.com>, 2015
+# Yu <inactive+harrycaoyu@transifex.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # zhouxuan <lion19930924@163.com>, 2014-2015
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 赵宏鑫 <zhaohongxinxin@aol.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -75,6 +90,8 @@
 # GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
+# hohomi <hohomi@gmail.com>, 2016
+# hohomi <hohomi@gmail.com>, 2016
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
@@ -113,12 +130,15 @@
 # Alfred <alfredhuang211@qq.com>, 2015
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
 # KaeChenn <cjh_0731@sina.com>, 2015
 # Yufei Xue <cmouse@163.com>, 2013
+# daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # Hanwei <chuxiking@163.com>, 2014
@@ -128,6 +148,7 @@
 # harry <i.jucao@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2014,2016
+# hohomi <hohomi@gmail.com>, 2014,2016
 # Hu Tong <buildmindht@outlook.com>, 2014
 # bnw, 2014
 # bnw, 2014
@@ -136,6 +157,8 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
+# Jianfei Wang <me@thinxer.com>, 2013
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jiazhen Tan <jessie12@live.cn>, 2016
 # Jie Li <jie.li@anu.edu.au>, 2013
@@ -143,14 +166,19 @@
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# Junjie, 2014
 # Junjie Weng <wengjunjie@gmail.com>, 2014
+# KaeChenn <cjh_0731@sina.com>, 2015
 # 匡冲 <kuangchong07@gmail.com>, 2013
+# Lingming Kong <klm123698745@gmail.com>, 2016
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # Junjie, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Lucas H. Xu <xuh@bu.edu>, 2015
 # Mingye Wang <arthur200126@gmail.com>, 2015
 # Wheathana <mr_wheat@sina.cn>, 2015
+# perypery <410224186@qq.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -163,13 +191,18 @@
 # tucunchao <tucunchao@gmail.com>, 2013
 # VainChan <fsszns@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# vingte <411029240@qq.com>, 2014
+# wendiyan420 <wendiyan420@gmail.com>, 2015
 # wendiyan420 <wendiyan420@gmail.com>, 2015
 # Wentao Han <wentao.han@gmail.com>, 2013
+# Wheathana <mr_wheat@sina.cn>, 2015
 # wuqiong <wuqiong417@gmail.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yan9yu, 2014
+# yan9yu, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
-# Yufei Xue <cmouse@163.com>, 2014
+# YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# Yufei Xue <cmouse@163.com>, 2013-2014
 # Yu-Hua Hsieh <beiluo.shimen@icloud.com>, 2014
 # yuki f <likemood@163.com>, 2015
 # Yu Zhao <zhaoyu62188@gmail.com>, 2013
@@ -182,13 +215,16 @@
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 李子豪 <178354170lizihao@gmail.com>, 2014
 # 李莉 <happylily0516@foxmail.com>, 2013
 # 汤和果 <hgtang93@163.com>, 2015
+# 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 胡超威 <chadennishu@gmail.com>, 2014
 # 顾翔 <c0710204@gmail.com>, 2014
 # 黄鸿飞 <853885165@qq.com>, 2015
@@ -200,11 +236,13 @@
 # Translators:
 # dcschwester <244876839@qq.com>, 2014
 # AdiaCheng <75707teen@gmail.com>, 2014
+# AdiaCheng <75707teen@gmail.com>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # BertZou <turingcat@gmail.com>, 2015
 # 肖寒 <bookman@vip.163.com>, 2013
 # Changyue Wang <peterwang.dut@gmail.com>, 2014
 # Yufei Xue <cmouse@163.com>, 2013
+# dcschwester <244876839@qq.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # natop <golfeng@gmail.com>, 2014
 # GoodLuck <1833447072@qq.com>, 2014
@@ -213,15 +251,21 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
+# Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
+# jsgang <jsgang9@gmail.com>, 2014
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Wheathana <mr_wheat@sina.cn>, 2015
+# natop <golfeng@gmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
 # Scott Huang <sc.h@aol.com>, 2014
@@ -231,18 +275,33 @@
 # tucunchao <tucunchao@gmail.com>, 2013
 # VainChan <fsszns@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# Wentao Han <wentao.han@gmail.com>, 2013
+# Wheathana <mr_wheat@sina.cn>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yezhixin20 <yezhixin20@gmail.com>, 2014
+# yezhixin20 <yezhixin20@gmail.com>, 2014
 # YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# YUAN Tian <Sweetyuantian@msn.cn>, 2014
+# Yufei Xue <cmouse@163.com>, 2013
+# Yu Zhao <zhaoyu62188@gmail.com>, 2013
 # YVONNE <yenyoong85@gmail.com>, 2014
 # YVONNE <yenyoong85@gmail.com>, 2014
+# Zhang Meng <zmlarry@foxmail.com>, 2013
 # Yu Zhao <zhaoyu62188@gmail.com>, 2013
 # zhouxuan <lion19930924@163.com>, 2015
 # 刘知远 <liuliudong@163.com>, 2013
 # Zhang Meng <zmlarry@foxmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 刘家骅 <alphaf52@gmail.com>, 2013
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# 匡冲 <kuangchong07@gmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 李莉 <happylily0516@foxmail.com>, 2013
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 黄鸿飞 <853885165@qq.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -259,10 +318,15 @@
 # 
 # Translators:
 # focusheart <focusheart@gmail.com>, 2014
+# focusheart <focusheart@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
+# louyihua <supermouselyh@hotmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
+# riceball <snowyu.lee@gmail.com>, 2015
 # riceball <snowyu.lee@gmail.com>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2015
 # Tianyu Huang <hty0508@gmail.com>, 2014
@@ -275,7 +339,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:18+0000\n"
+"POT-Creation-Date: 2016-03-24 18:06+0000\n"
 "PO-Revision-Date: 2015-12-13 04:46+0000\n"
 "Last-Translator: riceball <snowyu.lee@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -802,6 +866,10 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for does not start until {date}."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -2797,10 +2865,12 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
@@ -4058,6 +4128,12 @@ msgid "CCX Coach"
 msgstr "CCX指导"
 
 #: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr ""
 
@@ -5084,7 +5160,11 @@ msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
 msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
-msgid "Server error. Please try again in a few minutes."
+msgid "Invalid JSON response received from notes api."
+msgstr ""
+
+#: lms/djangoapps/edxnotes/helpers.py
+msgid "Incorrect data received from notes api."
 msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
@@ -5284,21 +5364,21 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrolled learner profile report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "This enrollment report is currently being created. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The enrollment report is being created. This report contains information "
 "about learners who can enroll in the course. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5356,53 +5436,53 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The detailed enrollment report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is being created. To view the status of the "
-"report, see Pending Instructor Tasks below."
+"report, see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is currently being created. To view the status "
-"of the report, see Pending Instructor Tasks below. You will be able to "
-"download the report when it is complete."
+"of the report, see Pending Tasks below. You will be able to download the "
+"report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is being created. To view the status of "
-"the report, see Pending Instructor Tasks below."
+"the report, see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is currently being created. To view the "
-"status of the report, see Pending Instructor Tasks below. You will be able "
-"to download the report when it is complete."
+"status of the report, see Pending Tasks below. You will be able to download "
+"the report when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5455,29 +5535,40 @@ msgid "Cannot rescore with all_students and unique_student_identifier."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "The ORA data report is being generated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An ORA data report generation task is already in progress. Check the "
+"'Pending Tasks' table for the status of the task. When completed, the report"
+" will be available for download in the table below."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is being created. To view the status of the report, see "
-"Pending Instructor Tasks below."
+"Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is currently being created. To view the status of the "
-"report, see Pending Instructor Tasks below. You will be able to download the"
-" report when it is complete."
+"report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The problem grade report is being created. To view the status of the report,"
-" see Pending Instructor Tasks below."
+" see Pending Tasks below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A problem grade report is already being generated. To view the status of the"
-" report, see Pending Instructor Tasks below. You will be able to download "
-"the report when it is complete."
+" report, see Pending Tasks below. You will be able to download the report "
+"when it is complete."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -5809,7 +5900,6 @@ msgstr ""
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7469,8 +7559,6 @@ msgid ""
 "      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
 "      "
 msgstr ""
-"\n"
-"您的密码已经设置。您现在可以继续 %(link_start)s 登录 %(link_end)s。"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -7479,8 +7567,6 @@ msgid ""
 "      Reset Your %(platform_name)s Password\n"
 "  "
 msgstr ""
-"\n"
-"重置您的 %(platform_name)s 密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -7489,12 +7575,10 @@ msgid ""
 "          Reset Your %(platform_name)s Password\n"
 "          "
 msgstr ""
-"\n"
-"重置您的 %(platform_name)s 密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Form"
-msgstr "密码重置申请表"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -7505,21 +7589,21 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The following errors occurred while processing your registration: "
-msgstr "在处理你注册的过程中出现以下问题："
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must complete all fields."
-msgstr "您必须完成所有的字段。"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The two password fields didn't match."
-msgstr "两次输入的密码不匹配。"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
-msgstr "很抱歉，系统在重置您的密码时似乎出现异常。"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -7528,8 +7612,6 @@ msgid ""
 "                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
 "            "
 msgstr ""
-"\n"
-"已将该问题知会相关人员。请稍后再试。如果您有任何顾虑请 %(start_link)s 联系我们 %(end_link)s "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
@@ -7545,7 +7627,6 @@ msgid ""
 "        "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -7560,19 +7641,19 @@ msgstr "必填信息"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password"
-msgstr "您的新密码"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your New Password Again"
-msgstr "再输一次您的新密码"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Change My Password"
-msgstr "修改我的密码"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Your Password Reset Was Unsuccessful"
-msgstr "您的密码重置失败"
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -7581,14 +7662,11 @@ msgid ""
 "            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
 "        "
 msgstr ""
-"\n"
-"密码重置链接无效，可能因为链接已经被使用。请回到 %(start_link)s 登录页面 %(end_link)s 重新开始密码重置过程。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Password Reset Help"
-msgstr "密码重置帮助"
+msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Need Help?"
@@ -7601,8 +7679,6 @@ msgid ""
 "              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
 "          "
 msgstr ""
-"\n"
-"查看我们的 %(start_link)s 帮助区以寻找联系信息和常见问题解答 %(end_link)s"
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -8129,6 +8205,13 @@ msgstr ""
 msgid "A cohort with the same name already exists."
 msgstr ""
 
+#: openedx/core/djangoapps/coursetalk/models.py
+msgid ""
+"The platform key associates CourseTalk widgets with your platform. "
+"Generally, it is the domain name for your platform. For example, if your "
+"platform is http://edx.org, the platform key is \"edx\"."
+msgstr ""
+
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
@@ -8156,19 +8239,37 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
 msgstr ""
 
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
 msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
@@ -8467,6 +8568,13 @@ msgstr "邮寄地址"
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -8944,7 +9052,7 @@ msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "“{name}”字段的格式不正确。{detailed_message}"
 
 #: cms/lib/xblock/tagging.py
-msgid "Learning outcomes"
+msgid "Difficulty"
 msgstr ""
 
 #: cms/lib/xblock/tagging.py
@@ -8981,7 +9089,6 @@ msgstr "设置"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "取消"
 
@@ -9045,7 +9152,6 @@ msgstr "忘记密码？"
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "例：Jane Doe"
@@ -9065,11 +9171,6 @@ msgstr "公开用户名"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "例：JaneDoe"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "常用语言"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -9907,7 +10008,6 @@ msgid "Reset"
 msgstr "重置"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "保存"
 
@@ -10750,6 +10850,10 @@ msgid "Name your CCX"
 msgstr "为你的CCX命名"
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "时间表"
 
@@ -10757,6 +10861,10 @@ msgstr "时间表"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "评分标准"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11251,14 +11359,6 @@ msgid "View About Page in studio"
 msgstr "在职员界面查看课程简介页面"
 
 #: lms/templates/courseware/course_about.html
-msgid "Course About"
-msgstr "课程介绍"
-
-#: lms/templates/courseware/course_about.html
-msgid "Overview"
-msgstr "课程概况"
-
-#: lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "课程开始"
 
@@ -11490,10 +11590,6 @@ msgstr "讲义导航"
 msgid "Important Course Dates"
 msgstr ""
 
-#: lms/templates/courseware/info.html
-msgid "Course Updates &amp; News"
-msgstr "课程动态＆新闻"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "新闻 - MITx 6.002x"
@@ -11656,6 +11752,13 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid "Hi,"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
@@ -11836,11 +11939,7 @@ msgid "I'm learning on {platform_name}:"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Course options dropdown"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Additional Actions Menu"
+msgid "Course options for"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12017,10 +12116,6 @@ msgstr ""
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "编辑"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -13309,6 +13404,10 @@ msgstr "生成得分报告"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Data Report"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -15265,14 +15364,6 @@ msgid ""
 " href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 msgstr ""
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "编辑你的全名"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "在编辑你的名字时出现下面的错误："
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr ""
@@ -15493,8 +15584,8 @@ msgid "{studio_name} Server Error"
 msgstr "{studio_name}服务器错误"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "{studio_name}服务器遇到一个错误"
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
 
 #: cms/templates/500.html
 msgid ""
@@ -17611,6 +17702,10 @@ msgstr "这将会被用于您课程的公开讨论中以及我们edX101课程的
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "您的位置"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"

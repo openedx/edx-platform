@@ -10,7 +10,7 @@ define([
             PagingCollection.prototype.initialize.call(this);
 
             this.perPage = options.perPage;
-            this.server_api = _.pick(PagingCollection.prototype.server_api, "page", "page_size");
+            this.server_api = _.pick(this.server_api, "page", "page_size");
             if (options.text) {
                 this.server_api.text = options.text;
             }

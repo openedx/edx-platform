@@ -57,7 +57,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
 "PO-Revision-Date: 2016-02-04 20:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -77,7 +77,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2402,7 +2402,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
+msgid "Team \"{team}\" successfully deleted."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
@@ -2651,6 +2651,10 @@ msgstr "성적 생성 중 오류가 발생했습니다. 다시 시도하세요."
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "성적 보고서 생성 중 오류가 발생했습니다. 다시 시도하세요."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4563,7 +4567,7 @@ msgid "Please enter non-negative integer."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -4936,26 +4940,6 @@ msgstr ""
 msgid "Change Manually"
 msgstr ""
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "모든 주제 접기"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "모든 주제 펼치기"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr ""
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5278,6 +5262,10 @@ msgstr ""
 #. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
+msgstr ""
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

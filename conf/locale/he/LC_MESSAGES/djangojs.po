@@ -9,6 +9,7 @@
 # dotanlaks <dotanlaks6@gmail.com>, 2014
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
 # yaaqov, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -21,6 +22,7 @@
 # Ido, 2014
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ron Rozen <Ronrozen@gmail.com>, 2016
 # yaaqov, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -30,6 +32,7 @@
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -39,14 +42,15 @@
 # Translators:
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
+# Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
-"PO-Revision-Date: 2016-02-04 20:03+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
+"PO-Revision-Date: 2016-03-19 21:01+0000\n"
+"Last-Translator: Ron Rozen <Ronrozen@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,7 +68,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2458,7 +2462,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
+msgid "Team \"{team}\" successfully deleted."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
@@ -2708,6 +2712,10 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -4607,7 +4615,7 @@ msgid "Please enter non-negative integer."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -4983,26 +4991,6 @@ msgstr ""
 msgid "Change Manually"
 msgstr ""
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr ""
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5326,6 +5314,10 @@ msgstr ""
 #. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
+msgstr ""
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore

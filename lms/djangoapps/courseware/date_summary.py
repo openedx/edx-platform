@@ -14,6 +14,7 @@ from lazy import lazy
 import pytz
 
 from course_modes.models import CourseMode
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment
 
@@ -181,7 +182,11 @@ class CourseEndDate(DateSummary):
     @property
     def description(self):
         if datetime.now(pytz.UTC) <= self.date:
-            return _('To earn a certificate, you must complete all requirements before this date.')
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            if is_active and CourseMode.is_eligible_for_certificate(mode):
+                return _('To earn a certificate, you must complete all requirements before this date.')
+            else:
+                return _('After this date, course content will be archived.')
         return _('This course is archived, which means you can review course content but it is no longer active.')
 
     @property
@@ -204,6 +209,12 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
 
     @property
     def link(self):
+        ecommerce_service = EcommerceService()
+        if ecommerce_service.is_enabled(self.user):
+            course_mode = CourseMode.objects.get(
+                course_id=self.course.id, mode_slug=CourseMode.VERIFIED
+            )
+            return ecommerce_service.checkout_page_url(course_mode.sku)
         return reverse('verify_student_upgrade_and_verify', args=(self.course.id,))
 
     @lazy

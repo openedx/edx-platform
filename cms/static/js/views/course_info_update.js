@@ -8,8 +8,8 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
         // collection is CourseUpdateCollection
         events: {
             "click .new-update-button" : "onNew",
-            "click #course-update-view .save-button" : "onSave",
-            "click #course-update-view .cancel-button" : "onCancel",
+            "click .save-button" : "onSave",
+            "click .cancel-button" : "onCancel",
             "click .post-actions > .edit-button" : "onEdit",
             "click .post-actions > .delete-button" : "onDelete"
         },

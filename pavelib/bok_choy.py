@@ -25,11 +25,13 @@ BOKCHOY_OPTS = [
     ('default_store=', 's', 'Default modulestore'),
     ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
     ('num_processes=', 'n', 'Number of test threads (for multiprocessing)'),
+    ('verify_xss', 'x', 'Run XSS vulnerability tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
-    make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version")
+    make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version"),
+    make_option("--save_screenshots", action='store_true', dest="save_screenshots"),
 ]
 
 
@@ -43,6 +45,7 @@ def parse_bokchoy_opts(options):
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
         'num_processes': int(getattr(options, 'num_processes', 1)),
+        'verify_xss': getattr(options, 'verify_xss', os.environ.get('VERIFY_XSS', False)),
         'serversonly': getattr(options, 'serversonly', False),
         'testsonly': getattr(options, 'testsonly', False),
         'default_store': getattr(options, 'default_store', os.environ.get('DEFAULT_STORE', 'split')),
@@ -50,6 +53,7 @@ def parse_bokchoy_opts(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'pdb': getattr(options, 'pdb', False),
         'test_dir': getattr(options, 'test_dir', 'tests'),
+        'save_screenshots': getattr(options, 'save_screenshots', False),
     }
 
 

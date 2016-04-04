@@ -94,7 +94,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
 "PO-Revision-Date: 2016-02-12 08:07+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -114,7 +114,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2645,8 +2645,8 @@ msgstr ""
 "أعضاء الفريق وسيتعذّر الوصول إلى مناقشات أعضاء الفريق في المستقبل."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "لقد جرى حذف الفرق \"%(team)s\" بنجاح."
+msgid "Team \"{team}\" successfully deleted."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2927,6 +2927,10 @@ msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرج�
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "نأسف لحدوث خطأ في إنشاء تقرير درجات المسائل. يُرجى إعادة المحاولة."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5025,8 +5029,8 @@ msgid "Please enter non-negative integer."
 msgstr "يُرجى إدخال عدد صحيح غير سالب."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "لا يمكن إسقاط <% attrs.types %> أكثر مما سيجري تعيينه."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5438,27 +5442,6 @@ msgstr "التراجع عن التغييرات"
 msgid "Change Manually"
 msgstr "التغيير يدويًّا "
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "تصغير جميع الأقسام"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "تكبير كل الأقسام"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "تاريخ الإصدار:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr ""
-"{month}/{day}/{year} عند الساعة {hour}:{minute} حسب التوقيت العالمي UTC."
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "تعديل تاريخ إصدار القسم"
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5811,6 +5794,10 @@ msgstr "إضافة %(component_type)s"
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "تحذير"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr "تحديث الشَارات"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore

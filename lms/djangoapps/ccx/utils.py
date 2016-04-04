@@ -12,26 +12,55 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from django.core.validators import validate_email
+from django.core.urlresolvers import reverse
+from smtplib import SMTPException
 
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from instructor.enrollment import (
     enroll_email,
+    get_email_params,
     unenroll_email,
 )
-from instructor.access import allow_access
+from instructor.access import (
+    allow_access,
+    list_with_level,
+    revoke_access,
+)
 from instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentException
 from student.roles import CourseCcxCoachRole
 
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 log = logging.getLogger("edx.ccx")
+
+
+def get_ccx_creation_dict(course):
+    """
+    Return dict of rendering create ccx form.
+
+    Arguments:
+        course (CourseDescriptorWithMixins): An edx course
+
+    Returns:
+        dict: A attribute dict for view rendering
+    """
+    context = {
+        'course': course,
+        'create_ccx_url': reverse('create_ccx', kwargs={'course_id': course.id}),
+        'has_ccx_connector': "true" if hasattr(course, 'ccx_connector') and course.ccx_connector else "false",
+        'use_ccx_con_error_message': _(
+            "A CCX can only be created on this course through an external service."
+            " Contact a course admin to give you access."
+        )
+    }
+    return context
 
 
 def get_ccx_from_ccx_locator(course_id):
@@ -311,3 +340,117 @@ def get_course_chapters(course_key):
         return course_struct['blocks'][course_struct['root']].get('children', [])
     except KeyError:
         return []
+
+
+def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_email=True):
+    """
+    Add staff and instructor roles on ccx to all the staff and instructors members of master course.
+
+    Arguments:
+        master_course (CourseDescriptorWithMixins): Master course instance.
+        ccx_key (CCXLocator): CCX course key.
+        display_name (str): ccx display name for email.
+        send_email (bool): flag to switch on or off email to the users on access grant.
+
+    """
+    list_staff = list_with_level(master_course, 'staff')
+    list_instructor = list_with_level(master_course, 'instructor')
+
+    with ccx_course(ccx_key) as course_ccx:
+        email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
+        list_staff_ccx = list_with_level(course_ccx, 'staff')
+        list_instructor_ccx = list_with_level(course_ccx, 'instructor')
+        for staff in list_staff:
+            # this call should be idempotent
+            if staff not in list_staff_ccx:
+                try:
+                    # Enroll the staff in the ccx
+                    enroll_email(
+                        course_id=ccx_key,
+                        student_email=staff.email,
+                        auto_enroll=True,
+                        email_students=send_email,
+                        email_params=email_params,
+                    )
+
+                    # allow 'staff' access on ccx to staff of master course
+                    allow_access(course_ccx, staff, 'staff')
+                except CourseEnrollmentException:
+                    log.warning(
+                        "Unable to enroll staff %s to course with id %s",
+                        staff.email,
+                        ccx_key
+                    )
+                    continue
+                except SMTPException:
+                    continue
+
+        for instructor in list_instructor:
+            # this call should be idempotent
+            if instructor not in list_instructor_ccx:
+                try:
+                    # Enroll the instructor in the ccx
+                    enroll_email(
+                        course_id=ccx_key,
+                        student_email=instructor.email,
+                        auto_enroll=True,
+                        email_students=send_email,
+                        email_params=email_params,
+                    )
+
+                    # allow 'instructor' access on ccx to instructor of master course
+                    allow_access(course_ccx, instructor, 'instructor')
+                except CourseEnrollmentException:
+                    log.warning(
+                        "Unable to enroll instructor %s to course with id %s",
+                        instructor.email,
+                        ccx_key
+                    )
+                    continue
+                except SMTPException:
+                    continue
+
+
+def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, send_email=True):
+    """
+    Remove staff and instructor roles on ccx to all the staff and instructors members of master course.
+
+    Arguments:
+        master_course (CourseDescriptorWithMixins): Master course instance.
+        ccx_key (CCXLocator): CCX course key.
+        display_name (str): ccx display name for email.
+        send_email (bool): flag to switch on or off email to the users on revoke access.
+
+    """
+    list_staff = list_with_level(master_course, 'staff')
+    list_instructor = list_with_level(master_course, 'instructor')
+
+    with ccx_course(ccx_key) as course_ccx:
+        list_staff_ccx = list_with_level(course_ccx, 'staff')
+        list_instructor_ccx = list_with_level(course_ccx, 'instructor')
+        email_params = get_email_params(course_ccx, auto_enroll=True, course_key=ccx_key, display_name=display_name)
+        for staff in list_staff:
+            if staff in list_staff_ccx:
+                # revoke 'staff' access on ccx.
+                revoke_access(course_ccx, staff, 'staff')
+
+                # Unenroll the staff on ccx.
+                unenroll_email(
+                    course_id=ccx_key,
+                    student_email=staff.email,
+                    email_students=send_email,
+                    email_params=email_params,
+                )
+
+        for instructor in list_instructor:
+            if instructor in list_instructor_ccx:
+                # revoke 'instructor' access on ccx.
+                revoke_access(course_ccx, instructor, 'instructor')
+
+                # Unenroll the instructor on ccx.
+                unenroll_email(
+                    course_id=ccx_key,
+                    student_email=instructor.email,
+                    email_students=send_email,
+                    email_params=email_params,
+                )

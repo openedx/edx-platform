@@ -27,6 +27,7 @@ from .component import (
 )
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
+from ccx_keys.locator import CCXLocator
 from contentstore import utils
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -90,6 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from util.course_key_utils import from_string_or_404
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -389,6 +391,11 @@ def _accessible_courses_list(request):
         if isinstance(course, ErrorDescriptor):
             return False
 
+        # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+        if isinstance(course.id, CCXLocator):
+            return False
+
         # pylint: disable=fixme
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
@@ -433,8 +440,11 @@ def _accessible_courses_list_from_groups(request):
             except ItemNotFoundError:
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
-            if course is not None and not isinstance(course, ErrorDescriptor):
-                # ignore deleted or errored courses
+
+            # Custom Courses for edX (CCX) is an edX feature for re-using course content.
+            # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
+            if course is not None and not isinstance(course, ErrorDescriptor) and not isinstance(course.id, CCXLocator):
+                # ignore deleted, errored or ccx courses
                 courses_list[course_key] = course
 
     return courses_list.values(), in_process_course_actions
@@ -553,11 +563,8 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     except errors.CourseStructureNotAvailableError:
         return data
 
-    blocks = []
     for block in structure_data['blocks'].values():
-        blocks.append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
-
-    data['blocks'].extend(blocks)
+        data['blocks'].append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
 
     return data
 
@@ -868,10 +875,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError:
-        raise Http404
+    course_key = from_string_or_404(course_key_string)
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)

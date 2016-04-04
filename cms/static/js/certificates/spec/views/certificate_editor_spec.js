@@ -76,23 +76,6 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         AjaxHelpers.respondWithJson(requests, {asset: {url: file_path}});
     };
 
-    beforeEach(function() {
-        window.course = new Course({
-            id: '5',
-            name: 'Course Name',
-            url_name: 'course_name',
-            org: 'course_org',
-            num: 'course_num',
-            revision: 'course_rev'
-        });
-        window.CMS.User = {isGlobalStaff: true};
-    });
-
-    afterEach(function() {
-        delete window.course;
-        delete window.CMS.User;
-    });
-
     describe('Certificate editor view', function() {
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
@@ -107,6 +90,16 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         uploadDialogTpl = readFixtures('upload-dialog.underscore');
 
         beforeEach(function() {
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.CMS.User = {isGlobalStaff: true};
+
             TemplateHelpers.installTemplates(['certificate-editor', 'signatory-editor'], true);
 
             this.newModelOptions = {add: true};
@@ -126,6 +119,11 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
             appendSetFixtures(this.view.render().el);
             CustomMatchers(this); // jshint ignore:line
+        });
+
+        afterEach(function() {
+            delete window.course;
+            delete window.CMS.User;
         });
 
         describe('Basic', function () {

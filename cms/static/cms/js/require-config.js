@@ -28,6 +28,7 @@
             "codemirror": "js/vendor/codemirror-compressed",
             "codemirror/stex": "js/vendor/CodeMirror/stex",
             "jquery": "js/vendor/jquery.min",
+            "jquery-migrate": "js/vendor/jquery-migrate.min",
             "jquery.ui": "js/vendor/jquery-ui.min",
             "jquery.form": "js/vendor/jquery.form",
             "jquery.markitup": "js/vendor/markitup/jquery.markitup",
@@ -37,7 +38,7 @@
             "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
             "jquery.cookie": "js/vendor/jquery.cookie",
             "jquery.qtip": "js/vendor/jquery.qtip.min",
-            "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
+            "jquery.scrollTo": "js/vendor/jquery.scrollTo.min",
             "jquery.flot": "js/vendor/flot/jquery.flot.min",
             "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
             "jquery.fileupload-process": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
@@ -50,8 +51,8 @@
             "moment": "js/vendor/moment.min",
             "moment-with-locales": "js/vendor/moment-with-locales.min",
             "text": 'js/vendor/requirejs/text',
-            "underscore": "js/vendor/underscore-min",
-            "underscore.string": "js/vendor/underscore.string.min",
+            "underscore": "common/js/vendor/underscore",
+            "underscore.string": "common/js/vendor/underscore.string",
             "backbone": "js/vendor/backbone-min",
             "backbone-relational" : "js/vendor/backbone-relational.min",
             "backbone.associations": "js/vendor/backbone-associations-min",
@@ -109,6 +110,7 @@
             "date": {
                 exports: "Date"
             },
+            "jquery-migrate": ['jquery'],
             "jquery.ui": {
                 deps: ["jquery"],
                 exports: "jQuery.ui"
@@ -143,7 +145,7 @@
             },
             "jquery.scrollTo": {
                 deps: ["jquery"],
-                exports: "jQuery.fn.scrollTo",
+                exports: "jQuery.fn.scrollTo"
             },
             "jquery.flot": {
                 deps: ["jquery"],

@@ -4,13 +4,14 @@ requirejs.config({
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
         "jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        "jquery-migrate": "xmodule_js/common_static/js/vendor/jquery-migrate.min",
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
-        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
+        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo.min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
@@ -26,8 +27,8 @@ requirejs.config({
         "moment": "xmodule_js/common_static/js/vendor/moment.min",
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
-        "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
-        "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
+        "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
+        "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
@@ -64,6 +65,7 @@ requirejs.config({
         "date": {
             exports: "Date"
         },
+        "jquery-migrate": ['jquery'],
         "jquery.ui": {
             deps: ["jquery"],
             exports: "jQuery.ui"
@@ -215,20 +217,25 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 define([
     "coffee/spec/main_spec",
 
-    "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
+    "coffee/spec/models/course_spec",
+    "coffee/spec/models/metadata_spec",
     "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
-    "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
+    "coffee/spec/models/settings_grading_spec",
+    "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
     "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
+
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
 
-    "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
-    "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
+    "js/spec/video/transcripts/utils_spec",
+    "js/spec/video/transcripts/editor_spec",
+    "js/spec/video/transcripts/videolist_spec",
+    "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
 
     "js/spec/models/component_template_spec",

@@ -6,27 +6,37 @@
 # Translators:
 # shuchuanchen <am15501@163.com>, 2014
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# chalow <charlotteouya@hotmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2014-2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
 # chalow <charlotteouya@hotmail.com>, 2015
+# ckyOL, 2015
 # shuchuanchen <am15501@163.com>, 2014
+# daisybellamy <linmiaoqiqi@hotmail.com>, 2014
+# felicitychou <felicitychou@hotmail.com>, 2014
 # felicitychou <felicitychou@hotmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
+# freakylemon <freakylemon@ymail.com>, 2014
 # freakylemon <freakylemon@ymail.com>, 2014
 # ckyOL, 2015
 # GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
-# hohomi <hohomi@gmail.com>, 2014
+# hohomi <hohomi@gmail.com>, 2014,2016
+# hohomi <hohomi@gmail.com>, 2014,2016
 # bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
+# Jianfei Wang <me@thinxer.com>, 2013
+# jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# pku9104038 <pku9104038@hotmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ranfish <ranfish@gmail.com>, 2015
 # ruiruillp <gaier1993@163.com>, 2015
@@ -40,17 +50,21 @@
 # wzhd <wzhdev@gmail.com>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # yan9yu, 2014
+# yan9yu, 2014
 # youjialin <hackeris@qq.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 亚仑 <fl_meng@163.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
+# 周歆荷 <zhxh401@126.com>, 2015
 # 周歆荷 <zhxh401@126.com>, 2015
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 汤和果 <hgtang93@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -61,6 +75,7 @@
 # vingte <411029240@qq.com>, 2014
 # Anna Hu <dejilibaobao@163.com>, 2014
 # BertZou <turingcat@gmail.com>, 2015
+# bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # shuchuanchen <am15501@163.com>, 2014
@@ -71,27 +86,38 @@
 # harry <i.jucao@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2016
+# hohomi <hohomi@gmail.com>, 2016
 # bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
+# Jianfei Wang <me@thinxer.com>, 2013
 # jsgang <jsgang9@gmail.com>, 2014-2016
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Na Liu <nanamadier@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
+# pku9104038 <pku9104038@hotmail.com>, 2014
+# Rom, 2015
 # Rom, 2015
 # ruiruillp <gaier1993@163.com>, 2015
 # San <github@zhujunsan.net>, 2015
+# shuchuanchen <am15501@163.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# vingte <411029240@qq.com>, 2014
 # wanghe <1636807295@qq.com>, 2014
-# Wentao Han <wentao.han@gmail.com>, 2015
+# Wentao Han <wentao.han@gmail.com>, 2013,2015
 # wzhd <wzhdev@gmail.com>, 2015
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # xianwei yang <yetie.net@gmail.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
+# 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 沈世奇 <vicapple22@gmail.com>, 2013
+# 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
+# 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -108,7 +134,9 @@
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # meelo <bbvy@qq.com>, 2015
 # Rom, 2015
+# Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
+# viztor <viztor@outlook.com>, 2015
 # viztor <viztor@outlook.com>, 2015
 # Zihui Cheng <z7cheng@ucsd.edu>, 2015
 # 代 兴旺 <525224259@qq.com>, 2016
@@ -130,9 +158,12 @@
 # jsgang <jsgang9@gmail.com>, 2015-2016
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # peipeixiang <peipei0903@gmail.com>, 2015
+# peipeixiang <peipei0903@gmail.com>, 2015
+# Rom, 2015
 # Rom, 2015
 # San <github@zhujunsan.net>, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015
+# Yu <inactive+harrycaoyu@transifex.com>, 2015
 # Yu <inactive+harrycaoyu@transifex.com>, 2015
 # 大芳 刘 <liuxiaolinfk@gmail.com>, 2016
 # 竹轩 <fmyzjs@gmail.com>, 2014
@@ -140,7 +171,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-04 14:17+0000\n"
+"POT-Creation-Date: 2016-03-24 18:05+0000\n"
 "PO-Revision-Date: 2016-02-04 20:03+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -160,7 +191,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2484,7 +2515,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
+msgid "Team \"{team}\" successfully deleted."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
@@ -2730,6 +2761,10 @@ msgstr "生成评分结果错误，请重试。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -4626,8 +4661,8 @@ msgid "Please enter non-negative integer."
 msgstr "请输入非负整数。"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "删除的<% attrs.types %>不能超过将分配的数量。"
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -4996,26 +5031,6 @@ msgstr "撤销更改"
 msgid "Change Manually"
 msgstr "手动更改"
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "折叠所有章节"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "展开所有章节"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "发布日期："
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{year} 年{month}月{day}日  {hour}时{minute}分 国际标准时间"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "修改章节发布日期"
-
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
 msgstr "尚未评分"
@@ -5336,6 +5351,10 @@ msgstr "新建%(component_type)s"
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "警告"
+
+#: cms/static/js/xblock_asides/structured_tags.js
+msgid "Updating Tags"
+msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore

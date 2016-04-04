@@ -12,27 +12,24 @@ structure:
 }
 """
 
-import pymongo
-import sys
-import logging
 import copy
+from datetime import datetime
+from importlib import import_module
+import logging
+import pymongo
 import re
+import sys
 from uuid import uuid4
 
 from bson.son import SON
-from datetime import datetime
+from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
+from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
-from contracts import contract, new_contract
-
-from importlib import import_module
-from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from opaque_keys.edx.locations import Location, BlockUsageLocator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
@@ -53,6 +50,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, 
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.services import SettingsService
+
 
 log = logging.getLogger(__name__)
 
@@ -317,6 +315,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                             *raw_metadata.get('published_date')[0:6]
                         ).replace(tzinfo=UTC)
                     module._edit_info['published_by'] = raw_metadata.get('published_by')
+
+                for wrapper in self.modulestore.xblock_field_data_wrappers:
+                    module._field_data = wrapper(module, module._field_data)  # pylint: disable=protected-access
 
                 # decache any computed pending field settings
                 module.save()

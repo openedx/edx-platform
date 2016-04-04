@@ -265,6 +265,7 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.google.GoogleOAuth2',
     'social.backends.linkedin.LinkedinOAuth2',
     'social.backends.facebook.FacebookOAuth2',
+    'social.backends.azuread.AzureADOAuth2',
     'social.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
@@ -394,6 +395,14 @@ YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 VIDEO_SOURCE_PORT = 8777
 
+FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+############### Module Store Items ##########
+PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
+    PREVIEW_DOMAIN: 'draft-preferred'
+}
+
+
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
@@ -419,6 +428,9 @@ openid.oidutil.log = lambda message, level=0: None
 
 PLATFORM_NAME = "edX"
 SITE_NAME = "edx.org"
+
+# use default site for tests
+SITE_ID = 1
 
 # set up some testing for microsites
 FEATURES['USE_MICROSITES'] = True
@@ -488,6 +500,8 @@ MICROSITE_CONFIGURATION = {
 
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
+
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([

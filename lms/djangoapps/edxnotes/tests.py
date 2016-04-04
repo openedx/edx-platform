@@ -20,7 +20,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -782,7 +782,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "highlight": True,
                 'page': 1,
                 'page_size': 25,
-            }
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
 
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
@@ -809,7 +810,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "course_id": unicode(self.course.id),
                 'page': helpers.DEFAULT_PAGE,
                 'page_size': helpers.DEFAULT_PAGE_SIZE,
-            }
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
 
     def test_get_course_position_no_chapter(self):
@@ -997,6 +999,21 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_page_url)
         self.assertContains(response, 'Highlights and notes you&#39;ve made in course content')
+
+    # pylint: disable=unused-argument
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    @patch("edxnotes.views.get_notes", return_value={'results': []})
+    @patch("edxnotes.views.get_course_position", return_value={'display_name': 'Section 1', 'url': 'test_url'})
+    def test_edxnotes_html_tags_should_not_be_escaped(self, mock_get_notes, mock_position):
+        """
+        Tests that explicit html tags rendered correctly.
+        """
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.get(self.notes_page_url)
+        self.assertContains(
+            response,
+            'Get started by making a note in something you just read, like <a href="test_url">Section 1</a>'
+        )
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):

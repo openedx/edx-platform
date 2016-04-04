@@ -1,6 +1,7 @@
 """
 Tests for `field_overrides` module.
 """
+# pylint: disable=missing-docstring
 import unittest
 from nose.plugins.attrib import attr
 
@@ -10,14 +11,37 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from ..field_overrides import (
+    resolve_dotted,
     disable_overrides,
     FieldOverrideProvider,
     OverrideFieldData,
-    resolve_dotted,
+    OverrideModulestoreFieldData,
 )
 
 
 TESTUSER = "testuser"
+
+
+class TestOverrideProvider(FieldOverrideProvider):
+    """
+    A concrete implementation of `FieldOverrideProvider` for testing.
+    """
+    def get(self, block, name, default):
+        if self.user:
+            assert self.user is TESTUSER
+
+        assert block == 'block'
+
+        if name == 'foo':
+            return 'fu'
+        elif name == 'oh':
+            return 'man'
+
+        return default
+
+    @classmethod
+    def enabled_for(cls, course):
+        return True
 
 
 @attr('shard_1')
@@ -101,6 +125,31 @@ class OverrideFieldDataTests(SharedModuleStoreTestCase):
 
 
 @attr('shard_1')
+@override_settings(
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.tests.test_field_overrides.TestOverrideProvider']
+)
+class OverrideModulestoreFieldDataTests(OverrideFieldDataTests):
+    def setUp(self):
+        super(OverrideModulestoreFieldDataTests, self).setUp()
+        OverrideModulestoreFieldData.provider_classes = None
+
+    def tearDown(self):
+        super(OverrideModulestoreFieldDataTests, self).tearDown()
+        OverrideModulestoreFieldData.provider_classes = None
+
+    def make_one(self):
+        return OverrideModulestoreFieldData.wrap(self.course, DictFieldData({
+            'foo': 'bar',
+            'bees': 'knees',
+        }))
+
+    @override_settings(MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[])
+    def test_no_overrides_configured(self):
+        data = self.make_one()
+        self.assertIsInstance(data, DictFieldData)
+
+
+@attr('shard_1')
 class ResolveDottedTests(unittest.TestCase):
     """
     Tests for `resolve_dotted`.
@@ -119,24 +168,6 @@ class ResolveDottedTests(unittest.TestCase):
             resolve_dotted('courseware.tests.animport.SOMENAME'),
             'bar'
         )
-
-
-class TestOverrideProvider(FieldOverrideProvider):
-    """
-    A concrete implementation of `FieldOverrideProvider` for testing.
-    """
-    def get(self, block, name, default):
-        assert self.user is TESTUSER
-        assert block == 'block'
-        if name == 'foo':
-            return 'fu'
-        if name == 'oh':
-            return 'man'
-        return default
-
-    @classmethod
-    def enabled_for(cls, course):
-        return True
 
 
 def inject_field_overrides(blocks, course, user):

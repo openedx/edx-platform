@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
-from lang_pref.api import released_languages
+from lang_pref.api import released_languages, all_languages
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
 
@@ -198,7 +198,8 @@ def _third_party_auth_context(request, redirect_to):
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
-                "iconClass": enabled.icon_class,
+                "iconClass": enabled.icon_class or None,
+                "iconImage": enabled.icon_image.url if enabled.icon_image else None,
                 "loginUrl": pipeline.get_login_url(
                     enabled.provider_id,
                     pipeline.AUTH_ENTRY_LOGIN,
@@ -385,7 +386,7 @@ def account_settings_context(request):
             }, 'year_of_birth': {
                 'options': year_of_birth_options,
             }, 'preferred_language': {
-                'options': settings.ALL_LANGUAGES,
+                'options': all_languages(),
             }
         },
         'platform_name': settings.PLATFORM_NAME,

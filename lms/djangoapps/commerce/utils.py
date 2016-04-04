@@ -44,9 +44,9 @@ class EcommerceService(object):
     def __init__(self):
         self.config = CommerceConfiguration.current()
 
-    def is_enabled(self, request):
+    def is_enabled(self, user):
         """ Check if the user is activated, if the service is enabled and that the site is not a microsite. """
-        return (request.user.is_active and self.config.checkout_on_ecommerce_service and not
+        return (user.is_active and self.config.checkout_on_ecommerce_service and not
                 helpers.is_request_in_themed_site())
 
     def payment_page_url(self):
@@ -55,7 +55,8 @@ class EcommerceService(object):
         Example:
             http://localhost:8002/basket/single_item/
         """
-        return urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, self.config.single_course_checkout_page)
+        ecommerce_url_root = helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
+        return urljoin(ecommerce_url_root, self.config.single_course_checkout_page)
 
     def checkout_page_url(self, sku):
         """ Construct the URL to the ecommerce checkout page and include a product.

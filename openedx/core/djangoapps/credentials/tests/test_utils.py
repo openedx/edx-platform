@@ -4,8 +4,9 @@ import unittest
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
+from nose.plugins.attrib import attr
 import httpretty
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
@@ -19,6 +20,7 @@ from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@attr('shard_2')
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, TestCase):
     """ Tests covering the retrieval of user credentials from the Credentials
@@ -92,7 +94,7 @@ class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin
         self.mock_credentials_api(self.user, reset_url=False)
 
         actual = get_user_program_credentials(self.user)
-        expected = self.PROGRAMS_API_RESPONSE['results']
+        expected = self.PROGRAMS_API_RESPONSE['results'][:2]
         expected[0]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[0]['certificate_url']
         expected[1]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[1]['certificate_url']
 

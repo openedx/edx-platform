@@ -23,6 +23,14 @@ class @DiscussionViewSpecHelper
         }
         $.extend(thread, props)
 
+    @checkVoteClasses = (view) ->
+        view.render()
+        display_button = view.$el.find(".display-vote")
+        expect(display_button.hasClass("is-hidden")).toBe(true)
+        action_button = view.$el.find(".action-vote")
+        # Check that inline css is not applied to the ".action-vote"
+        expect(action_button).not.toHaveAttr('style','display: inline; ');
+
     @expectVoteRendered = (view, model, user) ->
         button = view.$el.find(".action-vote")
         expect(button.hasClass("is-checked")).toBe(user.voted(model))

@@ -1,4 +1,6 @@
 describe 'Problem', ->
+  problem_content_default = readFixtures('problem_content.html')
+
   beforeEach ->
     # Stub MathJax
     window.MathJax =
@@ -20,7 +22,7 @@ describe 'Problem', ->
 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
-      $(@).html readFixtures('problem_content.html')
+      $(@).html problem_content_default
       callback()
 
   describe 'constructor', ->
@@ -96,12 +98,26 @@ describe 'Problem', ->
         @problem.renderProgressState()
         expect(@problem.$('.problem-progress').html()).toEqual "(1 point possible)"
 
+      it 'displays the number of points possible when rendering happens with the content', ->
+        @problem.el.data('progress_status', 'none')
+        @problem.el.data('progress_detail', '0/2')
+        expect(@problem.$('.problem-progress').html()).toEqual ""
+        @problem.render(problem_content_default)
+        expect(@problem.$('.problem-progress').html()).toEqual "(2 points possible)"
+
     describe 'with any other valid status', ->
       it 'reports the current score', ->
         @problem.el.data('progress_status', 'foo')
         @problem.el.data('progress_detail', '1/1')
         @problem.renderProgressState()
         expect(@problem.$('.problem-progress').html()).toEqual "(1/1 point)"
+
+      it 'shows current score when rendering happens with the content', ->
+        @problem.el.data('progress_status', 'test status')
+        @problem.el.data('progress_detail', '2/2')
+        expect(@problem.$('.problem-progress').html()).toEqual ""
+        @problem.render(problem_content_default)
+        expect(@problem.$('.problem-progress').html()).toEqual "(2/2 points)"
 
   describe 'render', ->
     beforeEach ->
@@ -230,6 +246,87 @@ describe 'Problem', ->
 
       runs ->
         expect(@problem.checkButtonLabel.text).toHaveBeenCalledWith 'Check'
+
+  describe 'check button on problems', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      @checkDisabled = (v) -> expect(@problem.checkButton.hasClass('is-disabled')).toBe(v)
+
+    describe 'some basic tests for check button', ->
+      it 'should become enabled after a value is entered into the text box', ->
+        $('#input_example_1').val('test').trigger('input')
+        @checkDisabled false
+        $('#input_example_1').val('').trigger('input')
+        @checkDisabled true
+
+    describe 'some advanced tests for check button', ->
+      it 'should become enabled after a checkbox is checked', ->
+        html = '''
+        <div class="choicegroup">
+        <label for="input_1_1_1"><input type="checkbox" name="input_1_1" id="input_1_1_1" value="1"> One</label>
+        <label for="input_1_1_2"><input type="checkbox" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
+        <label for="input_1_1_3"><input type="checkbox" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
+        </div>
+        '''
+        $('#input_example_1').replaceWith(html)
+        @problem.checkAnswersAndCheckButton true
+        @checkDisabled true
+        $('#input_1_1_1').attr('checked', true).trigger('click')
+        @checkDisabled false
+        $('#input_1_1_1').attr('checked', false).trigger('click')
+        @checkDisabled true
+
+      it 'should become enabled after a radiobutton is checked', ->
+        html = '''
+        <div class="choicegroup">
+        <label for="input_1_1_1"><input type="radio" name="input_1_1" id="input_1_1_1" value="1"> One</label>
+        <label for="input_1_1_2"><input type="radio" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
+        <label for="input_1_1_3"><input type="radio" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
+        </div>
+        '''
+        $('#input_example_1').replaceWith(html)
+        @problem.checkAnswersAndCheckButton true
+        @checkDisabled true
+        $('#input_1_1_1').attr('checked', true).trigger('click')
+        @checkDisabled false
+        $('#input_1_1_1').attr('checked', false).trigger('click')
+        @checkDisabled true
+
+      it 'should become enabled after a value is selected in a selector', ->
+        html = '''
+        <div id="problem_sel">
+        <select>
+        <option value="val0"></option>
+        <option value="val1">1</option>
+        <option value="val2">2</option>
+        </select>
+        </div>
+        '''
+        $('#input_example_1').replaceWith(html)
+        @problem.checkAnswersAndCheckButton true
+        @checkDisabled true
+        $("#problem_sel select").val("val2").trigger('change')
+        @checkDisabled false
+        $("#problem_sel select").val("val0").trigger('change')
+        @checkDisabled true
+
+      it 'should become enabled after a radiobutton is checked and a value is entered into the text box', ->
+        html = '''
+        <div class="choicegroup">
+        <label for="input_1_1_1"><input type="radio" name="input_1_1" id="input_1_1_1" value="1"> One</label>
+        <label for="input_1_1_2"><input type="radio" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
+        <label for="input_1_1_3"><input type="radio" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
+        </div>
+        '''
+        $(html).insertAfter('#input_example_1')
+        @problem.checkAnswersAndCheckButton true
+        @checkDisabled true
+        $('#input_1_1_1').attr('checked', true).trigger('click')
+        @checkDisabled true
+        $('#input_example_1').val('111').trigger('input')
+        @checkDisabled false
+        $('#input_1_1_1').attr('checked', false).trigger('click')
+        @checkDisabled true
 
   describe 'reset', ->
     beforeEach ->

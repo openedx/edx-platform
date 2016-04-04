@@ -53,7 +53,7 @@ DISPLAY_NAME = "Component Display Name"
 DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
-    ['Default Video URL', 'http://youtu.be/3_yD_cEKoCk, , ', False],
+    ['Default Video URL', 'https://www.youtube.com/watch?v=3_yD_cEKoCk, , ', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],

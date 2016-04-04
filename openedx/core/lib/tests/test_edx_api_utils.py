@@ -6,7 +6,8 @@ from django.core.cache import cache
 from django.test import TestCase
 import httpretty
 import mock
-from oauth2_provider.tests.factories import ClientFactory
+from nose.plugins.attrib import attr
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 from testfixtures import LogCapture
 
@@ -21,6 +22,7 @@ from student.tests.factories import UserFactory
 LOGGER_NAME = 'openedx.core.lib.edx_api_utils'
 
 
+@attr('shard_2')
 class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
                            TestCase):
     """Test utility for API data retrieval."""

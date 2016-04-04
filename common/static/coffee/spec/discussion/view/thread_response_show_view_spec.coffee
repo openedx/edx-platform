@@ -30,6 +30,9 @@ describe "ThreadResponseShowView", ->
         it "renders the vote state correctly", ->
             DiscussionViewSpecHelper.checkRenderVote(@view, @comment)
 
+        it "check the vote classes after renders", ->
+            DiscussionViewSpecHelper.checkVoteClasses(@view)
+
         it "votes correctly via click", ->
             DiscussionViewSpecHelper.checkUpvote(@view, @comment, @user, $.Event("click"))
 

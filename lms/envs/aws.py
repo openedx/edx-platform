@@ -244,6 +244,7 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
+THEME_CACHE_TIMEOUT = ENV_TOKENS.get('THEME_CACHE_TIMEOUT', THEME_CACHE_TIMEOUT)
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -289,6 +290,7 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 BADGR_API_TOKEN = ENV_TOKENS.get('BADGR_API_TOKEN', BADGR_API_TOKEN)
 BADGR_BASE_URL = ENV_TOKENS.get('BADGR_BASE_URL', BADGR_BASE_URL)
 BADGR_ISSUER_SLUG = ENV_TOKENS.get('BADGR_ISSUER_SLUG', BADGR_ISSUER_SLUG)
+BADGR_TIMEOUT = ENV_TOKENS.get('BADGR_TIMEOUT', BADGR_TIMEOUT)
 
 # git repo loading  environment
 GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
@@ -389,7 +391,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
     CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
 
 
-# Field overrides.  To use the IDDE feature, add
+# Field overrides. To use the IDDE feature, add
 # 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
 FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
 
@@ -405,6 +407,23 @@ if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
 
 ############### Module Store Items ##########
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', {})
+# PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
+if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
+    PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
+    # update dictionary with preview domain regex
+    HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS.update({
+        PREVIEW_DOMAIN: 'draft-preferred'
+    })
+
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ENV_TOKENS.get(
+    'MODULESTORE_FIELD_OVERRIDE_PROVIDERS',
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS
+)
+
+XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
+    'XBLOCK_FIELD_DATA_WRAPPERS',
+    XBLOCK_FIELD_DATA_WRAPPERS
+)
 
 ############### Mixed Related(Secure/Not-Secure) Items ##########
 LMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
@@ -558,6 +577,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'social.backends.google.GoogleOAuth2',
             'social.backends.linkedin.LinkedinOAuth2',
             'social.backends.facebook.FacebookOAuth2',
+            'social.backends.azuread.AzureADOAuth2',
             'third_party_auth.saml.SAMLAuthBackend',
             'third_party_auth.lti.LTIAuthBackend',
         ]) + list(AUTHENTICATION_BACKENDS)
@@ -602,6 +622,7 @@ if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_EXPIRE_DELTA_PUBLIC = datetime.timedelta(
         days=ENV_TOKENS.get('OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS', OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS)
     )
+    OAUTH_ID_TOKEN_EXPIRATION = ENV_TOKENS.get('OAUTH_ID_TOKEN_EXPIRATION', OAUTH_ID_TOKEN_EXPIRATION)
 
 
 ##### ADVANCED_SECURITY_CONFIG #####
@@ -693,7 +714,11 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     )
 
 ##### Self-Paced Course Due Dates #####
-FIELD_OVERRIDE_PROVIDERS += (
+XBLOCK_FIELD_DATA_WRAPPERS += (
+    'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',
+)
+
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
     'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
 )
 
@@ -708,6 +733,9 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
 
 EDXNOTES_PUBLIC_API = ENV_TOKENS.get('EDXNOTES_PUBLIC_API', EDXNOTES_PUBLIC_API)
 EDXNOTES_INTERNAL_API = ENV_TOKENS.get('EDXNOTES_INTERNAL_API', EDXNOTES_INTERNAL_API)
+
+EDXNOTES_CONNECT_TIMEOUT = ENV_TOKENS.get('EDXNOTES_CONNECT_TIMEOUT', EDXNOTES_CONNECT_TIMEOUT)
+EDXNOTES_READ_TIMEOUT = ENV_TOKENS.get('EDXNOTES_READ_TIMEOUT', EDXNOTES_READ_TIMEOUT)
 
 ##### Credit Provider Integration #####
 

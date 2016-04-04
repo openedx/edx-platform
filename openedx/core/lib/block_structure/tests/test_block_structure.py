@@ -6,6 +6,7 @@ from collections import namedtuple
 from copy import deepcopy
 import ddt
 import itertools
+from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from openedx.core.lib.graph_traversals import traverse_post_order
@@ -15,6 +16,7 @@ from ..exceptions import TransformerException
 from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
@@ -43,6 +45,7 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         self.assertNotIn(len(children_map) + 1, block_structure)
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """

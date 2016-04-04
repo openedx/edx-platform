@@ -22,6 +22,7 @@ from urllib import urlencode
 import uuid
 
 import analytics
+
 from config_models.models import ConfigurationModel
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -45,6 +46,7 @@ from simple_history.models import HistoricalRecords
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
+from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
@@ -1212,6 +1214,10 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
+        if badges_enabled():
+            from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
+            award_enrollment_badge(user)
+
         return enrollment
 
     @classmethod

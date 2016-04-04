@@ -24,6 +24,7 @@
 // * +Content - Text Wrap - Extend
 // * +Content - Text Truncate - Extend
 // * +Icon - Font-Awesome  - Extend
+// * +Icon - SSO icon images
 
 // +Font Sizing - Mixin
 // ====================
@@ -447,4 +448,18 @@
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+
+// * +Icon - SSO icon images
+// ====================
+
+%sso-icon {
+  .icon-image {
+    width: auto;
+    height: auto;
+    max-height: 1.4em;
+    max-width: 1.4em;
+    margin-top: -2px;
+  }
 }

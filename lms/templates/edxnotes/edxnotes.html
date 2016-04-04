@@ -5,6 +5,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from edxnotes.helpers import NoteJSONEncoder
+from openedx.core.djangolib.markup import Text, HTML
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
@@ -78,8 +79,8 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 
               % if position is not None:
               <div class="placeholder-cta student-notes-cta">
-                <p class="placeholder-cta-copy">${_('Get started by making a note in something you just read, like {section_link}.').format(
-                  section_link='<a href="{url}">{section_name}</a>'.format(
+                <p class="placeholder-cta-copy">${Text(_('Get started by making a note in something you just read, like {section_link}.')).format(
+                  section_link=HTML('<a href="{url}">{section_name}</a>').format(
                     url=position['url'],
                     section_name=position['display_name'],
                     )

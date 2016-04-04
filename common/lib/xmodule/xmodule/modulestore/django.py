@@ -120,11 +120,25 @@ def load_function(path):
     """
     Load a function by name.
 
-    path is a string of the form "path.to.module.function"
-    returns the imported python object `function` from `path.to.module`
+    Arguments:
+        path: String of the form 'path.to.module.function'. Strings of the form
+            'path.to.module:Class.function' are also valid.
+
+    Returns:
+        The imported object 'function'.
     """
-    module_path, _, name = path.rpartition('.')
-    return getattr(import_module(module_path), name)
+    if ':' in path:
+        module_path, _, method_path = path.rpartition(':')
+        module = import_module(module_path)
+
+        class_name, method_name = method_path.split('.')
+        _class = getattr(module, class_name)
+        function = getattr(_class, method_name)
+    else:
+        module_path, _, name = path.rpartition('.')
+        function = getattr(import_module(module_path), name)
+
+    return function
 
 
 def create_modulestore_instance(
@@ -179,12 +193,15 @@ def create_modulestore_instance(
     else:
         disabled_xblock_types = ()
 
+    xblock_field_data_wrappers = [load_function(path) for path in settings.XBLOCK_FIELD_DATA_WRAPPERS]
+
     return class_(
         contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
+        xblock_field_data_wrappers=xblock_field_data_wrappers,
         disabled_xblock_types=disabled_xblock_types,
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),

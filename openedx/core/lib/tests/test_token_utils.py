@@ -9,7 +9,8 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import freezegun
 import jwt
-from oauth2_provider.tests.factories import ClientFactory
+from nose.plugins.attrib import attr
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.lib.token_utils import get_id_token
@@ -17,6 +18,7 @@ from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
+@attr('shard_2')
 @ddt.ddt
 class TestIdTokenGeneration(TestCase):
     """Tests covering ID token generation."""
