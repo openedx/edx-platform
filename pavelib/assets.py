@@ -39,7 +39,8 @@ COMMON_LOOKUP_DIRS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'underscore/underscore.js'
+    'underscore/underscore.js',
+    'underscore.string/dist/underscore.string.js'
 ]
 
 # Directory to install static vendor files
