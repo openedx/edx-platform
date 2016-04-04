@@ -172,10 +172,11 @@ def set_license(request, course, ccx):
 
     try:
         consumer_key, secret_key = get_consumer_secret(request.user, license)
-    except LabsterApiError:
+    except LabsterApiError as api_err:
         messages.error(
             request, _('There are some issues with applying your license. Please try again in a few minutes.')
         )
+        log.error("Unable to get consumer secret for license {}: {}".format(license, api_err))
         return redirect(url)
     except ItemNotFoundError:
         messages.error(request, _('Ensure you are using correct License code.'))
