@@ -1,4 +1,6 @@
 import json
+from collections import OrderedDict
+
 import os
 
 from django.conf import settings
@@ -16,13 +18,13 @@ def get_initial_sass_variables():
 
 
 def sass_to_dict(sass_input):
-    sass_vars = {}
+    sass_vars = []
     lines = (line for line in sass_input.splitlines() if line and not line.startswith('//'))
     for line in lines:
         key, val = line.split(':')
         val = val.split('//')[0]
         val = val.strip().replace(";", "")
-        sass_vars[key] = val
+        sass_vars.append((key, val))
     return sass_vars
 
 
@@ -31,7 +33,10 @@ def sass_to_json_string(sass_input):
     return json.dumps(sass_dict, sort_keys=True, indent=2)
 
 
-def json_to_sass(json_input):
-    sass_vars = json.loads(json_input)
-    sass_text = ', '.join("{}={};".format(key, val) for (key, val) in sass_vars.iteritems())
+def dict_to_sass(dict_input):
+    sass_text = '\n'.join("{}: {};".format(key, val) for (key, val) in dict_input)
     return sass_text
+
+def json_to_sass(json_input):
+    sass_dict = json.loads(json_input)
+    return dict_to_sass(sass_dict)
