@@ -22,7 +22,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 __all__ = ['entrance_exam', ]
 
@@ -72,7 +72,7 @@ def entrance_exam(request, course_key_string):
     DELETE
         Removes the entrance exam from the course
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
 
     # Deny access if the user is valid, but they lack the proper object access privileges
     if not has_course_author_access(request.user, course_key):

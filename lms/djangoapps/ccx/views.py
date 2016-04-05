@@ -32,7 +32,7 @@ from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
 from courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
@@ -81,7 +81,7 @@ def coach_dashboard(view):
         Wraps the view function, performing access check, loading the course,
         and modifying the view's call signature.
         """
-        course_key = from_string_or_404(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         ccx = None
         if isinstance(course_key, CCXLocator):
             ccx_id = course_key.ccx

@@ -31,7 +31,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.db import connections
 
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from xmodule.modulestore.django import modulestore
 
 
@@ -88,9 +88,9 @@ class Command(BaseCommand):
 
         if only_courses is not None:
             only_courses = [
-                from_string_or_404(course_key.strip())
+                course_key_from_string_or_404(course_key.strip())
                 for course_key in only_courses.split(",")
-            ]
+                ]
             courses = list(set(courses) & set(only_courses))
 
         # Add in organizations from the course keys, to ensure

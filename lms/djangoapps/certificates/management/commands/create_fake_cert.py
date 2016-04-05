@@ -13,7 +13,7 @@ import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from optparse import make_option
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from certificates.models import GeneratedCertificate, CertificateStatuses
 
 
@@ -71,7 +71,7 @@ class Command(BaseCommand):
             raise CommandError(self.USAGE)
 
         user = User.objects.get(username=args[0])
-        course_key = from_string_or_404(args[1])
+        course_key = course_key_from_string_or_404(args[1])
         cert_mode = options.get('cert_mode', 'honor')
         status = options.get('status', CertificateStatuses.downloadable)
         grade = options.get('grade', '')

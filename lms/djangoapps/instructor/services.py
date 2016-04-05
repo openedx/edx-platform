@@ -6,7 +6,7 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
@@ -37,7 +37,7 @@ class InstructorService(object):
             - content_id is a url-name of a problem
             - course_id is the id for the course
         """
-        course_id = from_string_or_404(course_id)
+        course_id = course_key_from_string_or_404(course_id)
 
         try:
             student = get_student_from_identifier(student_identifier)
@@ -86,4 +86,4 @@ class InstructorService(object):
         Returns True if the user is the course staff
         else Returns False
         """
-        return auth.user_has_role(user, CourseStaffRole(from_string_or_404(course_id)))
+        return auth.user_has_role(user, CourseStaffRole(course_key_from_string_or_404(course_id)))

@@ -8,7 +8,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.locator import LibraryLocator
 from util.json_request import JsonResponse, expect_json
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
@@ -49,7 +49,7 @@ def course_team_handler(request, course_key_string=None, email=None):
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
-    course_key = from_string_or_404(course_key_string) if course_key_string else None
+    course_key = course_key_from_string_or_404(course_key_string) if course_key_string else None
     # No permissions check here - each helper method does its own check.
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):

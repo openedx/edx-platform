@@ -45,7 +45,7 @@ from contentstore.views.exception import AssetNotFoundException
 from django.core.exceptions import PermissionDenied
 from course_modes.models import CourseMode
 from contentstore.utils import get_lms_link_for_certificate_web_view
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -301,7 +301,7 @@ def certificate_activation_handler(request, course_key_string):
     # Only global staff (PMs) are able to activate/deactivate certificate configuration
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     try:
         course = _get_course_and_check_access(course_key, request.user)
@@ -338,7 +338,7 @@ def certificates_list_handler(request, course_key_string):
     POST
         json: create new Certificate
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         try:
@@ -437,7 +437,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
     DELETE
         json: remove the specified certificate from the course
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     course = _get_course_and_check_access(course_key, request.user)
 
     certificates_list = course.certificates.get('certificates', [])
@@ -511,7 +511,7 @@ def signatory_detail_handler(request, course_key_string, certificate_id, signato
     DELETE
         json: Remove the specified signatory from the specified certificate
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course = _get_course_and_check_access(course_key, request.user)

@@ -5,7 +5,7 @@ import logging
 from django.db import transaction
 
 from celery.task import task  # pylint: disable=import-error,no-name-in-module
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from xmodule.modulestore.django import modulestore
 
 from . import PathItem
@@ -153,7 +153,7 @@ def update_xblocks_cache(course_id):
     if not isinstance(course_id, basestring):
         raise ValueError('course_id must be a string. {} is not acceptable.'.format(type(course_id)))
 
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     log.info(u'Starting XBlockCaches update for course_key: %s', course_id)
     _update_xblocks_cache(course_key)
     log.info(u'Ending XBlockCaches update for course_key: %s', course_id)

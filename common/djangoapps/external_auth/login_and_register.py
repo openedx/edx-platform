@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 import external_auth.views
 
 from xmodule.modulestore.django import modulestore
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 
 # pylint: disable=fixme
@@ -25,7 +25,7 @@ def _parse_course_id_from_string(input_str):
     """
     m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
-        return from_string_or_404(m_obj.group('course_id'))
+        return course_key_from_string_or_404(m_obj.group('course_id'))
     return None
 
 

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from xmodule.modulestore.django import modulestore
 
 from discussion_api.api import (
@@ -60,7 +60,7 @@ class CourseView(DeveloperErrorViewMixin, APIView):
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
-        course_key = from_string_or_404(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         return Response(get_course(request, course_key))
 
 
@@ -93,7 +93,7 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
     """
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
-        course_key = from_string_or_404(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         with modulestore().bulk_operations(course_key):
             response = get_course_topics(request, course_key)
         return Response(response)

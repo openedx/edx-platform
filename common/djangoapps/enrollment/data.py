@@ -5,7 +5,7 @@ source to be used throughout the API.
 import logging
 
 from django.contrib.auth.models import User
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 from enrollment.errors import (
     CourseEnrollmentClosedError, CourseEnrollmentFullError,
@@ -75,7 +75,7 @@ def get_course_enrollment(username, course_id):
         A serializable dictionary representing the course enrollment.
 
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     try:
         enrollment = CourseEnrollment.objects.get(
             user__username=username, course_id=course_key
@@ -106,7 +106,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
         CourseEnrollmentExistsError
 
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
 
     try:
         user = User.objects.get(username=username)
@@ -144,7 +144,7 @@ def update_course_enrollment(username, course_id, mode=None, is_active=None):
         A serializable dictionary representing the modified course enrollment.
 
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
 
     try:
         user = User.objects.get(username=username)
@@ -182,7 +182,7 @@ def add_or_update_enrollment_attr(user_id, course_id, attributes):
             ]
         )
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     user = _get_user(user_id)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     if not _invalid_attribute(attributes) and enrollment is not None:
@@ -208,7 +208,7 @@ def get_enrollment_attributes(user_id, course_id):
 
     Returns: list
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     user = _get_user(user_id)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     return CourseEnrollmentAttribute.get_enrollment_attributes(enrollment)
@@ -284,7 +284,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
         CourseNotFoundError
 
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
 
     try:
         course = CourseOverview.get_from_id(course_key)

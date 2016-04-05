@@ -13,7 +13,7 @@ from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
 from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
@@ -193,7 +193,7 @@ def _get_and_validate_course(course_key_string, user):
     Given a course key, return the course if it exists, the given user has
     access to it, and it is properly configured for video uploads
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
 
     # For now, assume all studio users that have access to the course can upload videos.
     # In the future, we plan to add a new org-level role for video uploaders.

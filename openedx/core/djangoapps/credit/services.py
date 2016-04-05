@@ -7,7 +7,7 @@ import logging
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
@@ -21,7 +21,7 @@ def _get_course_key(course_key_or_id):
     where the CourseKey will simply be returned
     """
     return (
-        from_string_or_404(course_key_or_id)
+        course_key_from_string_or_404(course_key_or_id)
         if isinstance(course_key_or_id, basestring)
         else course_key_or_id
     )

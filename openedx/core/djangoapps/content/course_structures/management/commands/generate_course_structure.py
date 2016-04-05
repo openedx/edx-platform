@@ -7,7 +7,7 @@ import logging
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         if options['all']:
             course_keys = [course.id for course in modulestore().get_courses()]
         else:
-            course_keys = [from_string_or_404(arg) for arg in args]
+            course_keys = [course_key_from_string_or_404(arg) for arg in args]
 
         if not course_keys:
             log.fatal('No courses specified.')

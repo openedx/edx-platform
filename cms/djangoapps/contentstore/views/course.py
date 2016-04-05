@@ -91,7 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -168,7 +168,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
 
     response_format = request.GET.get('format') or request.POST.get('format') or 'html'
 
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
 
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if not has_studio_write_access(request.user, course_key):
@@ -255,13 +255,13 @@ def course_handler(request, course_key_string=None):
         response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
-                course_key = from_string_or_404(course_key_string)
+                course_key = course_key_from_string_or_404(course_key_string)
                 with modulestore().bulk_operations(course_key):
                     course_module = get_course_and_check_access(course_key, request.user, depth=None)
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
-            elif not has_studio_write_access(request.user, from_string_or_404(course_key_string)):
+            elif not has_studio_write_access(request.user, course_key_from_string_or_404(course_key_string)):
                 raise PermissionDenied()
             elif request.method == 'PUT':
                 raise NotImplementedError()
@@ -273,7 +273,7 @@ def course_handler(request, course_key_string=None):
             if course_key_string is None:
                 return redirect(reverse("home"))
             else:
-                return course_index(request, from_string_or_404(course_key_string))
+                return course_index(request, course_key_from_string_or_404(course_key_string))
         else:
             return HttpResponseNotFound()
     except InvalidKeyError:
@@ -292,7 +292,7 @@ def course_rerun_handler(request, course_key_string):
     # Only global staff (PMs) are able to rerun courses during the soft launch
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
@@ -318,7 +318,7 @@ def course_search_index_handler(request, course_key_string):
     # Only global staff (PMs) are able to index courses
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     content_type = request.META.get('CONTENT_TYPE', None)
     if content_type is None:
         content_type = "application/json; charset=utf-8"
@@ -878,7 +878,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -918,7 +918,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
 
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     usage_key = course_key.make_usage_key('course_info', 'updates')
     if provided_id == '':
         provided_id = None
@@ -965,7 +965,7 @@ def settings_handler(request, course_key_string):
     PUT
         json: update the Course and About xblocks through the CourseDetails model
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -1107,7 +1107,7 @@ def grading_handler(request, course_key_string, grader_index=None):
         json no grader_index: update the Course through the CourseGrading model
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
 
@@ -1202,7 +1202,7 @@ def advanced_settings_handler(request, course_key_string):
         json: update the Course's settings. The payload is a json rep of the
             metadata dicts.
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -1328,7 +1328,7 @@ def textbooks_list_handler(request, course_key_string):
     PUT
         json: overwrite all textbooks in the course with the given list
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
@@ -1404,7 +1404,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     DELETE
         json: remove textbook
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -1501,7 +1501,7 @@ def group_configurations_list_handler(request, course_key_string):
     POST
         json: create new group configuration
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
@@ -1558,7 +1558,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     POST or PUT
         json: update group configuration based on provided information
     """
-    course_key = from_string_or_404(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)

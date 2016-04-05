@@ -6,7 +6,7 @@ import logging
 
 from django.dispatch import receiver
 from django.utils import timezone
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from openedx.core.djangoapps.credit.verification_access import update_verification_partitions
@@ -73,7 +73,7 @@ def listen_for_grade_calculation(sender, username, grade_summary, course_key, de
     # that can cause syncdb to fail.
     from openedx.core.djangoapps.credit import api
 
-    course_id = from_string_or_404(unicode(course_key))
+    course_id = course_key_from_string_or_404(unicode(course_key))
     is_credit = api.is_credit_course(course_id)
     if is_credit:
         requirements = api.get_credit_requirements(course_id, namespace='grade')

@@ -11,7 +11,7 @@ from requests.exceptions import (
     TooManyRedirects
 )
 
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 
 from openedx.core.djangoapps.ccxcon import api
 
@@ -29,7 +29,7 @@ def update_ccxcon(course_id, cur_retry=0):
         course_id (str): string representing a course key
         cur_retry (int): integer representing the current task retry
     """
-    course_key = from_string_or_404(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     try:
         api.course_info_to_ccxcon(course_key)
         log.info('Course update to CCXCon returned no errors. Course key: %s', course_id)

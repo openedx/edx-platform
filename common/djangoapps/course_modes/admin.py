@@ -8,7 +8,7 @@ from django.contrib import admin
 
 from pytz import timezone, UTC
 
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 
@@ -88,7 +88,7 @@ class CourseModeForm(forms.ModelForm):
     def clean_course_id(self):
         course_id = self.cleaned_data['course_id']
         try:
-            course_key = from_string_or_404(course_id)
+            course_key = course_key_from_string_or_404(course_id)
         except InvalidKeyError:
             try:
                 course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)

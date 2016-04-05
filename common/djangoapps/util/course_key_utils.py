@@ -6,7 +6,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 
-def from_string_or_404(course_key_string, message=None):
+def course_key_from_string_or_404(course_key_string, message=None):
     """
     Gets CourseKey from the string passed as parameter.
 

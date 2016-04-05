@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
-from util.course_key_utils import from_string_or_404
+from util.course_key_utils import course_key_from_string_or_404
 from embargo import api as embargo_api
 from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
@@ -491,7 +491,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(enrollment_data)
         filtered_data = []
         for enrollment in enrollment_data:
-            course_key = from_string_or_404(enrollment["course_details"]["course_id"])
+            course_key = course_key_from_string_or_404(enrollment["course_details"]["course_id"])
             if user_has_role(request.user, CourseStaffRole(course_key)):
                 filtered_data.append(enrollment)
         return Response(filtered_data)
