@@ -119,8 +119,8 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
             response,
             "{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
         )
-        self.assertContains(response, "Completed {date}".format(date=self._now_formatted_date()))
-        self.assertContains(response, "95%")
+        self.assertContains(response, "Completed by {date}".format(date=self._now_formatted_date()))
+        self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
         # Mark the user as having failed both requirements
