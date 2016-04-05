@@ -365,6 +365,16 @@ class SelfPacedTestCase(unittest.TestCase):
         self.assertFalse(self.course.self_paced)
 
 
+class BypassHomeTestCase(unittest.TestCase):
+    """Tests for setting which allows course home to be bypassed."""
+    def setUp(self):
+        super(BypassHomeTestCase, self).setUp()
+        self.course = get_dummy_course('2012-12-02T12:00')
+
+    def test_default(self):
+        self.assertFalse(self.course.bypass_home)
+
+
 class CourseDescriptorTestCase(unittest.TestCase):
     """
     Tests for a select few functions from CourseDescriptor.
