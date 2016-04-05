@@ -824,13 +824,13 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(3, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Locked Subsection")
-        self.assertEqual(["Html Child in locked subsection"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
     def test_visible_to_student(self):
         """
@@ -846,10 +846,10 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(2, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
 @attr('shard_1')

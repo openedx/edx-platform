@@ -198,16 +198,27 @@ class ViewsTestCase(ModuleStoreTestCase):
             parent_location=self.chapter.location,
             due=datetime(2013, 9, 18, 11, 30, 00),
         )
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
-        self.component = ItemFactory.create(
+        self.vertical = ItemFactory.create(
+            category='vertical',
+            parent_location=self.section.location,
+            display_name='Vertical 1'
+        )
+        self.problem = ItemFactory.create(
             category='problem',
             parent_location=self.vertical.location,
             display_name='Problem 1',
         )
 
-        self.section2 = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical2 = ItemFactory.create(category='vertical', parent_location=self.section2.location)
-        ItemFactory.create(
+        self.section2 = ItemFactory.create(
+            category='sequential',
+            parent_location=self.chapter.location
+        )
+        self.vertical2 = ItemFactory.create(
+            category='vertical',
+            parent_location=self.section2.location,
+            display_name='Vertical 2'
+        )
+        self.problem2 = ItemFactory.create(
             category='problem',
             parent_location=self.vertical2.location,
             display_name='Problem 2',
@@ -229,15 +240,15 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def test_index_success(self):
         response = self._verify_index_response()
-        self.assertIn('Problem 2', response.content)
+        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
 
         # re-access to the main course page redirects to last accessed view.
         url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response.url)  # pylint: disable=no-member
-        self.assertNotIn('Problem 1', response.content)
-        self.assertIn('Problem 2', response.content)
+        self.assertNotIn(unicode(self.problem.location), response.content.decode("utf-8"))
+        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
 
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
@@ -540,7 +551,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': unicode(self.course_key),
             'student_username': 'dummy',
-            'location': unicode(self.component.location),
+            'location': unicode(self.problem.location),
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
