@@ -1827,7 +1827,12 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
         else:
             key = None
         if user:
-            user.profile.set_login_session(key)
+            user_profile, __ = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={'name': user.username}
+            )
+            if user_profile:
+                user.profile.set_login_session(key)
 
 
 class DashboardConfiguration(ConfigurationModel):
