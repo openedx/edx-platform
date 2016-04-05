@@ -2,10 +2,11 @@
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment',
             'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
+            'edx-ui-toolkit/js/utils/html-utils',
             'text!templates/bookmarks/bookmarks-list.underscore'
         ],
         function (gettext, $, _, Backbone, Logger, _moment,
-                  PagingHeaderView, PagingFooterView, BookmarksListTemplate) {
+                  PagingHeaderView, PagingFooterView, HtmlUtils, BookmarksListTemplate) {
 
         var moment = _moment || window.moment;
 
@@ -14,9 +15,6 @@
             el: '.courseware-results',
             coursewareContentEl: '#course-content',
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
-
-            errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-            loadingIcon: '<i class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
 
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),
@@ -28,7 +26,7 @@
             },
 
             initialize: function (options) {
-                this.template = _.template(BookmarksListTemplate);
+                this.template = HtmlUtils.template(BookmarksListTemplate);
                 this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');
@@ -43,7 +41,10 @@
                     bookmarksCollection: this.collection,
                     humanFriendlyDate: this.humanFriendlyDate
                 };
-                this.$el.html(this.template(data));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template(data)
+                );
                 this.pagingHeaderView.setElement(this.$('.paging-header')).render();
                 this.pagingFooterView.setElement(this.$('.paging-footer')).render();
                 this.delegateEvents();
@@ -109,7 +110,7 @@
             },
 
             showLoadingMessage: function () {
-                this.loadingMessageView.showMessage(this.loadingMessage, this.loadingIcon);
+                this.loadingMessageView.showMessage(this.loadingMessage);
             },
 
             hideLoadingMessage: function () {
@@ -117,7 +118,7 @@
             },
 
             showErrorMessage: function () {
-                this.errorMessageView.showMessage(this.errorMessage, this.errorIcon);
+                this.errorMessageView.showMessage(this.errorMessage);
             },
 
             hideErrorMessage: function () {
