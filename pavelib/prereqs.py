@@ -133,7 +133,7 @@ def node_prereqs_installation():
     sh("test `npm config get registry` = \"{reg}\" || "
        "(echo setting registry; npm config set registry"
        " {reg})".format(reg=NPM_REGISTRY))
-    sh('npm install --verbose')
+    sh('npm install')
 
 
 def python_prereqs_installation():
@@ -149,12 +149,11 @@ def install_node_prereqs():
     """
     Installs Node prerequisites
     """
-    # if no_prereq_install():
-    #     print NO_PREREQ_MESSAGE
-    #     return
+    if no_prereq_install():
+        print NO_PREREQ_MESSAGE
+        return
 
-    #prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
-    node_prereqs_installation()
+    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
 
 
 # To add a package to the uninstall list, just add it to this list! No need
