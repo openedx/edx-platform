@@ -198,7 +198,7 @@ def get_discussion_id_map(course, user):
     return dict(map(get_discussion_id_map_entry, get_accessible_discussion_modules(course, user)))
 
 
-def _filter_unstarted_categories(category_map):
+def _filter_unstarted_categories(category_map, course):
     """
     Returns a subset of categories from the provided map which have not yet met the start date
     Includes information about category children, subcategories (different), and entries
@@ -221,7 +221,7 @@ def _filter_unstarted_categories(category_map):
 
         for child in unfiltered_map["children"]:
             if child in unfiltered_map["entries"]:
-                if unfiltered_map["entries"][child]["start_date"] <= now:
+                if course.self_paced or unfiltered_map["entries"][child]["start_date"] <= now:
                     filtered_map["children"].append(child)
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
@@ -230,7 +230,7 @@ def _filter_unstarted_categories(category_map):
                 else:
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
-                if unfiltered_map["subcategories"][child]["start_date"] < now:
+                if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append(child)
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
@@ -382,7 +382,7 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
+    return _filter_unstarted_categories(category_map, course) if exclude_unstarted else category_map
 
 
 def discussion_category_id_access(course, user, discussion_id):
