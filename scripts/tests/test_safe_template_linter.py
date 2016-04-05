@@ -125,7 +125,6 @@ class TestMakoTemplateLinter(TestCase):
             ${'{{unbalanced-nested'}
             ${x | n}
             ${x | h}
-            ${x | n, dump_html_escaped_json}
             ${x | n, dump_js_escaped_json}
         """)
 
@@ -247,7 +246,6 @@ class TestMakoTemplateLinter(TestCase):
                 ${'{{unbalanced-nested'}
                 ${x | n}
                 ${x | h}
-                ${x | n, dump_html_escaped_json}
                 ${x | n, dump_js_escaped_json}
                 "${x-with-quotes | n, js_escaped_string}"
             </script>
@@ -255,7 +253,7 @@ class TestMakoTemplateLinter(TestCase):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 5)
+        self.assertEqual(len(results.violations), 4)
         self.assertEqual(results.violations[0].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[0].expression['expression'], "${x}")
         self.assertEqual(results.violations[1].rule, Rules.mako_unparsable_expression)
@@ -265,8 +263,6 @@ class TestMakoTemplateLinter(TestCase):
         self.assertEqual(results.violations[2].expression['expression'], "${x | n}")
         self.assertEqual(results.violations[3].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[3].expression['expression'], "${x | h}")
-        self.assertEqual(results.violations[4].rule, Rules.mako_invalid_js_filter)
-        self.assertEqual(results.violations[4].expression['expression'], "${x | n, dump_html_escaped_json}")
 
     def test_check_mako_expressions_in_require_js(self):
         """
