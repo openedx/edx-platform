@@ -15,7 +15,7 @@ class RequireJSPathOverridesTest(TestCase):
 
     OVERRIDES = {
         'jquery': 'js/vendor/jquery.min.js',
-        'backbone': 'js/vendor/backbone-min.js',
+        'backbone': 'common/js/vendor/backbone-min.js',
         'text': 'js/vendor/text.js'
     }
 

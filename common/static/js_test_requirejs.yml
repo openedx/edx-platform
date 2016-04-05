@@ -35,7 +35,7 @@ lib_paths:
     - js/vendor/jquery.truncate.js
     - common/js/vendor/underscore.js
     - common/js/vendor/underscore.string.js
-    - js/vendor/backbone-min.js
+    - common/js/vendor/backbone-min.js
     - js/vendor/backbone.paginator.min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
