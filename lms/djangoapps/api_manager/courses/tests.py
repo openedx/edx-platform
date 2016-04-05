@@ -2042,6 +2042,77 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['grades']), user_index)
 
+    def test_courses_metrics_grades_list_get_filter_users_by_group(self):
+        # Retrieve the list of grades for course and filter by groups
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(5)
+
+        for i, user in enumerate(users):
+            user.groups.add(groups[i % 2])
+
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        for j, user in enumerate(users):
+            points_scored = (j + 1) * 20
+            points_possible = 100
+            module = self.get_module_for_user(user, self.course, self.item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+        user_ids = ','.join([str(user.id) for user in users])
+        test_uri = '{}/{}/metrics/grades?user_id={}&groups={}'.format(self.base_courses_uri,
+                                                                      self.test_course_id,
+                                                                      user_ids,
+                                                                      groups[0].id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(response.data['grade_average'], 0)
+        self.assertGreater(response.data['grade_maximum'], 0)
+        self.assertGreater(response.data['grade_minimum'], 0)
+        self.assertEqual(response.data['grade_count'], 3)
+        self.assertGreater(response.data['course_grade_average'], 0)
+        self.assertGreater(response.data['course_grade_maximum'], 0)
+        self.assertGreater(response.data['course_grade_minimum'], 0)
+        self.assertEqual(response.data['course_grade_count'], USER_COUNT + 5)
+        self.assertEqual(len(response.data['grades']), 3)
+
+    def test_courses_metrics_grades_list_get_filter_users_by_multiple_groups(self):
+        # Retrieve the list of grades for course and filter by multiple groups and user_id
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(5)
+
+        for i, user in enumerate(users):
+            user.groups.add(groups[i % 2])
+
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        for j, user in enumerate(users):
+            points_scored = (j + 1) * 20
+            points_possible = 100
+            module = self.get_module_for_user(user, self.course, self.item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+        user_ids = ','.join([str(user.id) for user in users])
+        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id,)
+        user_group_filter_uri = '{}?user_id={}&groups={},{}'.format(test_uri,
+                                                                    user_ids,
+                                                                    groups[0].id,
+                                                                    groups[1].id)
+        response = self.do_get(user_group_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(response.data['grade_average'], 0)
+        self.assertGreater(response.data['grade_maximum'], 0)
+        self.assertGreater(response.data['grade_minimum'], 0)
+        self.assertEqual(response.data['grade_count'], 5)
+        self.assertGreater(response.data['course_grade_average'], 0)
+        self.assertGreater(response.data['course_grade_maximum'], 0)
+        self.assertGreater(response.data['course_grade_minimum'], 0)
+        self.assertEqual(response.data['course_grade_count'], USER_COUNT + 5)
+        self.assertEqual(len(response.data['grades']), 5)
+
     def test_courses_metrics_grades_list_get_empty_course(self):
         # Retrieve the list of grades for this course
         # All the course/item/user scaffolding was handled in Setup
