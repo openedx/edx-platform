@@ -57,6 +57,10 @@ def show_reference_template(request, template):
     e.g. /template/ux/reference/container.html?name=Foo
     """
     try:
-        return render_to_response(template, request.GET.dict())
+        context = {
+            "uses_pattern_library": True,
+        }
+        context.update(request.GET.dict())
+        return render_to_response(template, context)
     except TopLevelLookupException:
         return HttpResponseNotFound("Couldn't find template {template}".format(template=template))

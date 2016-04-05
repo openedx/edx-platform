@@ -21,6 +21,15 @@ from status.status import get_site_status_msg
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
 
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
+
 <%block>
 <%
 try:
