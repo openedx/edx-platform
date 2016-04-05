@@ -1390,20 +1390,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-main': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main.css',
-        ],
-        'output_filename': 'css/lms-main.css',
-    },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main-rtl.css',
-        ],
-        'output_filename': 'css/lms-main-rtl.css',
-    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',

@@ -104,8 +104,8 @@ class TestComprehensiveTheming(TestCase):
         """
         Test that static files finders are adjusted according to the applied comprehensive theme.
         """
-        result = staticfiles.finders.find('red-theme/css/lms-main.css')
-        self.assertEqual(result, settings.REPO_ROOT / "themes/red-theme/lms/static/css/lms-main.css")
+        result = staticfiles.finders.find('red-theme/css/lms-main-v1.css')
+        self.assertEqual(result, settings.REPO_ROOT / "themes/red-theme/lms/static/css/lms-main-v1.css")
 
         lms_main_css = ""
         with open(result) as css_file:
@@ -117,8 +117,8 @@ class TestComprehensiveTheming(TestCase):
         """
         Test default css is served if no theme is applied
         """
-        result = staticfiles.finders.find('css/lms-main.css')
-        self.assertEqual(result, settings.REPO_ROOT / "lms/static/css/lms-main.css")
+        result = staticfiles.finders.find('css/lms-main-v1.css')
+        self.assertEqual(result, settings.REPO_ROOT / "lms/static/css/lms-main-v1.css")
 
         lms_main_css = ""
         with open(result) as css_file:
