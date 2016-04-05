@@ -2866,3 +2866,7 @@ DEFAULT_SITE_ID = 1
 # Cache time out settings
 # by Comprehensive Theme system
 THEME_CACHE_TIMEOUT = 30 * 60
+
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
