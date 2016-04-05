@@ -90,7 +90,7 @@ class Command(BaseCommand):
             only_courses = [
                 course_key_from_string_or_404(course_key.strip())
                 for course_key in only_courses.split(",")
-                ]
+            ]
             courses = list(set(courses) & set(only_courses))
 
         # Add in organizations from the course keys, to ensure
