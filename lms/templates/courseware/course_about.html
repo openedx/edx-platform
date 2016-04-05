@@ -1,18 +1,23 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
-from courseware.courses import get_course_about_section
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.lib.courses import course_image_url
+
+from courseware.courses import get_course_about_section
 %>
 
 <%inherit file="../main.html" />
 <%block name="headextra">
   ## OG (Open Graph) title and description added below to give social media info to display
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
-  <meta property="og:title" content="${course.display_name_with_default_escaped}" />
+  <meta property="og:title" content="${course.display_name_with_default}" />
   <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 
@@ -31,21 +36,21 @@ from openedx.core.lib.courses import course_image_url
     % if can_add_course_to_cart:
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
-          location.href = "${cart_link}";
+          location.href = "${cart_link| n, js_escaped_string}";
         }
         if (jqXHR.status == 400) {
           $("#register_error")
-            .html(jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.")}")
+            .text(jqXHR.responseText ? jqXHR.responseText : "${_('An error occurred. Please try again later.')| n, js_escaped_string}")
             .css("display", "block");
         }
         else if (jqXHR.status == 403) {
-            location.href = "${reg_then_add_to_cart_link}";
+            location.href = "${reg_then_add_to_cart_link| n, js_escaped_string}";
         }
       };
 
       $("#add_to_cart_post").click(function(event){
         $.ajax({
-          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
+          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])| n, js_escaped_string}",
           type: "POST",
           /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
           complete: add_course_complete_handler
@@ -53,27 +58,32 @@ from openedx.core.lib.courses import course_image_url
         event.preventDefault();
       });
     % endif
-
     ## making the conditional around this entire JS block for sanity
     %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
       <%
-        perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
-                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
-                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
-                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
-                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
-                          )
+        perms_error = Text(
+                _('The currently logged-in user account does not have permission to enroll in this course. '
+                  'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
+                  'Please visit the {start_help_tag}help page{end_tag} for a possible solution.')
+                ).format(
+                  start_help_tag=HTML("<a href='{url}'>").format(url=marketing_link('FAQ')),
+                  end_tag=HTML('</a>'),
+                  start_logout_tag=HTML("<a href='{url}'>").format(url=reverse('logout'))
+                )
       %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
-        location.href = "${reverse('dashboard')}";
+          location.href = "${reverse('dashboard')| n, js_escaped_string}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id | u}&enrollment_action=enroll";
-      } else if (xhr.status == 400) { //This means the user did not have permission
-        $('#register_error').html("${perms_error}").css("display", "block");
+          location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])| n, js_escaped_string}?course_id=${course.id| n, js_escaped_string}&enrollment_action=enroll";
+      } else if (xhr.status == 400) {//This means the user did not have permission
+          edx.HtmlUtils.setHtml(
+                  $('#register_error'),
+                  "${perms_error}"
+          )
       } else {
-        $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')| n, js_escaped_string}")
         ).css("display", "block");
       }
     });
@@ -83,16 +93,16 @@ from openedx.core.lib.courses import course_image_url
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         if (xhr.responseText == "") {
-          location.href = "${reverse('dashboard')}";
+          location.href = "${reverse('dashboard')| n, js_escaped_string}";
         }
         else {
           location.href = xhr.responseText;
         }
       } else if (xhr.status == 403) {
-          location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
+          location.href = "${reverse('register_user')| n, js_escaped_string}?course_id=${course.id| n, js_escaped_string}&enrollment_action=enroll";
       } else {
-        $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')| n, js_escaped_string}")
         ).css("display", "block");
       }
     });
@@ -105,7 +115,7 @@ from openedx.core.lib.courses import course_image_url
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
+<%block name="pagetitle">${course.display_name_with_default}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -114,8 +124,8 @@ from openedx.core.lib.courses import course_image_url
       <section class="intro">
         <div class="heading-group">
           <h1>
-            ${course.display_name_with_default_escaped}
-            <a href="#">${course.display_org_with_default | h}</a>
+            ${course.display_name_with_default}
+            <a href="#">${course.display_org_with_default}</a>
           </h1>
         </div>
 
@@ -134,7 +144,10 @@ from openedx.core.lib.courses import course_image_url
 
         %elif in_cart:
           <span class="add-to-cart">
-            ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
+            ${Text(_('This course is in your {link_start}cart{link_end}.')).format(
+                link_start=HTML('<a href="{cart_link}">').format(cart_link=cart_link),
+                link_end=HTML('</a>')
+              )}
           </span>
         % elif is_course_full:
           <span class="register disabled">
@@ -161,8 +174,12 @@ from openedx.core.lib.courses import course_image_url
               reg_element_id = ""
           %>
           <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${_("Add {course_name} to Cart <span>({price} USD)</span>")\
-              .format(course_name=course.display_number_with_default, price=course_price)}
+            ${Text(_("Add {course_name} to Cart {span_start}({price} USD){span_end}")).format(
+                  course_name=course.display_number_with_default,
+                  price=course_price,
+                  span_start = HTML('<span>'),
+                  span_end = HTML('</span>')
+              )}
           </a>
           <div id="register_error"></div>
         %else:
@@ -177,7 +194,7 @@ from openedx.core.lib.courses import course_image_url
               href_class = "register"
           %>
           <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
+            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default)}
           </a>
           <div id="register_error"></div>
         %endif
@@ -211,7 +228,7 @@ from openedx.core.lib.courses import course_image_url
       % endif
 
       <div class="inner-wrapper">
-        ${get_course_about_section(request, course, "overview")}
+        ${HTML(get_course_about_section(request, course, "overview"))}
       </div>
     </section>
 
@@ -221,7 +238,7 @@ from openedx.core.lib.courses import course_image_url
         <%include file="course_about_sidebar_header.html" />
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><i class="icon fa fa-info-circle"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default}</span></li>
           % if not course.start_date_is_still_default:
             <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
@@ -263,9 +280,9 @@ from openedx.core.lib.courses import course_image_url
             ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
             <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
             <p class="tip">
-            ${_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.").format(
-              link_start='<a href="{}">'.format(prc_target),
-              link_end='</a>',
+            ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(
+              link_start=HTML('<a href="{}">').format(prc_target),
+              link_end=HTML('</a>'),
               prc_display=pre_requisite_courses[0]['display'],
             )}
             </p>
@@ -312,7 +329,7 @@ from openedx.core.lib.courses import course_image_url
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <legend class="sr">${_("Enroll")}</legend>
-        <input name="course_id" type="hidden" value="${course.id | h}">
+        <input name="course_id" type="hidden" value="${course.id}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
