@@ -1,0 +1,133 @@
+/*$gray-l1: #919191;
+$gray-l3: #c8c8c8;
+$border-color-2: #c8c8c8;
+$border-color-3: #646464;
+$border-color-4: #fcfcfc;
+$courseware-border-bottom-color: red;
+$shadow-l1: red;
+$header-bg: orange;
+$courseware-hover-color: red;
+$courseware-border-bottom-color: red;
+$link-color: red;
+$base-font-color: red;
+$sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+*/
+
+
+
+// edX theme: Global Header
+// ====================
+
+.header-global {
+  @extend %ui-depth1;
+  @include box-sizing(border-box);
+  position: relative;
+  width: 100%;
+  border-bottom: 4px solid $courseware-border-bottom-color;
+  box-shadow: 0 1px 5px 0 $shadow-l1;
+  background: $header-bg;
+
+  .wrapper-header {
+    @include clearfix();
+    @include box-sizing(border-box);
+    height: 74px;
+    margin: 0 auto;
+    padding: 17px 0;
+    width: 100%;
+    max-width: 1180px;
+
+    .logo {
+      @include float(left);
+      @include margin-right(39px);
+      @include margin-left(10px);
+      margin-top: -2px;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    .left {
+      @include float(left);
+    }
+
+    .wrapper-user-menu {
+      @include float(right);
+      width: auto;
+    }
+
+    .dropdown-menu {
+      top: inherit;
+    }
+
+    .nav-main {
+      @include float(left);
+      position: relative;
+
+      .list-inline {
+        margin-top: 5px;
+      }
+
+      .item {
+        display: inline-block;
+        font-size: em(14);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0 !important;
+
+        &.active {
+          a {
+            text-decoration: none;
+            color: $link-color;
+          }
+        }
+
+        a {
+          color: $courseware-navigation-color;
+          padding: 3px 10px;
+
+          &:hover,
+          &:focus {
+            background: inherit;
+            color: $courseware-hover-color;
+          }
+        }
+      }
+    }
+
+    .nav-courseware {
+      @include float(right);
+      margin-top: ($baseline/4);
+    }
+  }
+}
+
+
+/*.view-register header.global-new .cta-register {
+  text-decoration: none;
+  color: $courseware-hover-color;
+  border-bottom-color: $courseware-border-bottom-color;
+}
+
+.view-login header.global-new .cta-login {
+  text-decoration: none;
+  color: $courseware-hover-color;
+}
+
+// marketing site design syncing
+.view-register, .view-login {
+
+  header.global nav {
+    width: 960px;
+  }
+}
+
+// page-based nav states
+.view-howitworks .nav-global-01,
+.view-courses .nav-global-02,
+.view-schools .nav-global-03,
+.view-register .nav-global-04 {
+
+  a {
+    text-decoration: none;
+    color: $link-color !important;
+  }
+}*/

@@ -3,7 +3,31 @@
 // Version 2 - introduces the Pattern Library
 
 
-// Configuration
+// BASE  *default edX offerings*
+// ====================
+
+
+// ------------------------------
+// #CONFIG
+// ------------------------------
 @import 'config';
 
-// Extensions
+
+// ------------------------------
+// #COMMON PARTIALS
+// ------------------------------
+
+@import 'base/variables';
+
+// shared
+@import 'shared-v2/navigation';
+@import 'shared-v2/header';
+/*@import 'shared/fields';
+@import 'shared/forms';
+@import 'shared/footer';
+@import 'shared/footer-edx';
+@import 'shared/course_object';
+@import 'shared/course_filter';
+@import 'shared/modal';
+@import 'shared/activation_messages';
+@import 'shared/unsubscribe';*/
