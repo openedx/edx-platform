@@ -89,10 +89,22 @@ var files = [
     'coffee/spec/main_squire.js'
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'coffee/src/**/*.js': ['coverage'],
+    'js/collections/**/*.js': ['coverage'],
+    'js/models/**/*.js': ['coverage'],
+    'js/utils/**/*.js': ['coverage'],
+    'js/views/**/*.js': ['coverage'],
+    'common/js/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));

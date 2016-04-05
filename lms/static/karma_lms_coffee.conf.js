@@ -62,10 +62,17 @@ var files = [
     'coffee/fixtures/**/*.*'
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'coffee/src/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));

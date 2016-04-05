@@ -60,10 +60,20 @@ var files = [
     {pattern: 'common/templates/**/*.underscore', included: false}
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'js/xblock/**/*.js': ['coverage'],
+    'coffee/src/**/*.js': ['coverage'],
+    'js/src/**/*.js': ['coverage'],
+    'js/capa/src/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));

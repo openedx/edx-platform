@@ -100,10 +100,19 @@ var files = [
     'coffee/spec/main.js'
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'coffee/src/**/*.js': ['coverage'],
+    'js/**/!(*spec).js': ['coverage'],
+    'common/js/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));

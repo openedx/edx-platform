@@ -58,10 +58,17 @@ var files = [
     'common/js/spec/main_requirejs.js'
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'common/js/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));

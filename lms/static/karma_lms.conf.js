@@ -115,10 +115,24 @@ var files = [
     {pattern: 'js/spec/main.js', included: true}
 ];
 
+var preprocessors = {
+    // do not include tests or libraries
+    // (these files will be instrumented by Istanbul)
+    'js/**/*.js': ['coverage'],
+    'coffee/src/**/*.js': ['coverage'],
+    'common/js/**/*.js': ['coverage'],
+    'edx-pattern-library/js/**/*.js': ['coverage'],
+    'edx-ui-toolkit/js/**/*.js': ['coverage'],
+    'support/js/**/*.js': ['coverage'],
+    'teams/js/**/*.js': ['coverage'],
+    'xmodule_js/common_static/coffee/**/*.js': ['coverage']
+};
+
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
         localConfig = {
-            files: files
+            files: files,
+            preprocessors: preprocessors
         };
 
     config.set(_.extend(commonConfig, localConfig));
