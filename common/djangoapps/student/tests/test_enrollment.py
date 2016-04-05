@@ -13,7 +13,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
 from embargo.test_utils import restrict_course
 from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseFullError
+from student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+)
 
 
 @ddt.ddt
@@ -31,6 +35,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(EnrollmentTest, cls).setUpClass()
         cls.course = CourseFactory.create()
+        cls.course_limited = CourseFactory.create()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
@@ -38,7 +43,8 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         super(EnrollmentTest, self).setUp('embargo')
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
-
+        self.course_limited.max_student_enrollments_allowed = 1
+        self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
             reverse('course_modes_choose', kwargs={'course_id': unicode(self.course.id)})
         ]
@@ -201,6 +207,48 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
         resp = self._change_enrollment('unenroll', course_id="edx/")
         self.assertEqual(resp.status_code, 400)
+
+    def test_enrollment_limit(self):
+        """
+        Assert that in a course with max student limit set to 1, we can enroll staff and instructor along with
+        student. To make sure course full check excludes staff and instructors.
+        """
+        self.assertEqual(self.course_limited.max_student_enrollments_allowed, 1)
+        user1 = UserFactory.create(username="tester1", email="tester1@e.com", password="test")
+        user2 = UserFactory.create(username="tester2", email="tester2@e.com", password="test")
+
+        # create staff on course.
+        staff = UserFactory.create(username="staff", email="staff@e.com", password="test")
+        role = CourseStaffRole(self.course_limited.id)
+        role.add_users(staff)
+
+        # create instructor on course.
+        instructor = UserFactory.create(username="instructor", email="instructor@e.com", password="test")
+        role = CourseInstructorRole(self.course_limited.id)
+        role.add_users(instructor)
+
+        CourseEnrollment.enroll(staff, self.course_limited.id, check_access=True)
+        CourseEnrollment.enroll(instructor, self.course_limited.id, check_access=True)
+
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=staff).exists()
+        )
+
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=instructor).exists()
+        )
+
+        CourseEnrollment.enroll(user1, self.course_limited.id, check_access=True)
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user1).exists()
+        )
+
+        with self.assertRaises(CourseFullError):
+            CourseEnrollment.enroll(user2, self.course_limited.id, check_access=True)
+
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user2).exists()
+        )
 
     def _change_enrollment(self, action, course_id=None, email_opt_in=None):
         """Change the student's enrollment status in a course.
