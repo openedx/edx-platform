@@ -30,6 +30,13 @@ from status.status import get_site_status_msg
     </%block>
 % endif
 
+<%
+if uses_pattern_library:
+    dropdown_menu_classes = "left list-inline"
+else:
+    dropdown_menu_classes = "dropdown-menu"
+%>
+
 <%block>
 <%
 try:
@@ -101,13 +108,13 @@ site_status_msg = get_site_status_msg(course_id)
       </li>
       <li class="primary">
         <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
-        <ul class="dropdown-menu" aria-label="More Options" role="menu">
+        <ul class="${dropdown_menu_classes}" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
+            <li class="item"><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
+            <li class="item"><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
+            <li class="item"><a href="${reverse('account_settings')}">${_("Account")}</a></li>
           </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
+          <li class="item"><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
         </ul>
       </li>
     </ol>
