@@ -32,9 +32,15 @@ from status.status import get_site_status_msg
 
 <%
 if uses_pattern_library:
-    dropdown_menu_classes = "left list-inline"
+    dropdown_menu_classlist = "left list-inline"
+    main_nav_menu_classlist = "list-inline"
+    login_btn_classlist = "btn"
+    register_btn_classlist = "btn-neutral"
 else:
-    dropdown_menu_classes = "dropdown-menu"
+    dropdown_menu_classlist = "dropdown-menu"
+    main_nav_menu_classlist = "nav-global"
+    login_btn_classlist = "cta cta-login"
+    register_btn_classlist = "cta cta-register"
 %>
 
 <%block>
@@ -55,8 +61,8 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
-  <header id="global-navigation" class="global ${"slim" if course else ""}" >
-    <nav class="nav-wrapper" aria-label="${_('Global')}">
+  <header id="global-navigation" class="${"header-global" if uses_pattern_library else "global"} ${"slim" if course else ""}" >
+    <nav class="${"wrapper-header" if uses_pattern_library else "nav-wrapper"}" aria-label="${_('Global')}">
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
@@ -79,15 +85,15 @@ site_status_msg = get_site_status_msg(course_id)
     % endif
 
     % if user.is_authenticated():
-    <ol class="left nav-global authenticated">
+    <ol class="left ${main_nav_menu_classlist} authenticated">
       <%block name="navigation_global_links_authenticated">
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <li class="nav-global-01">
+          <li class="item nav-global-01">
             <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
           </li>
         % endif
         %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
-          <li>
+          <li class="item">
             ## Translators: This is short for "System administration".
             <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
           </li>
@@ -108,7 +114,7 @@ site_status_msg = get_site_status_msg(course_id)
       </li>
       <li class="primary">
         <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
-        <ul class="${dropdown_menu_classes}" aria-label="More Options" role="menu">
+        <ul class="${dropdown_menu_classlist}" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li class="item"><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
             <li class="item"><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
@@ -128,36 +134,42 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
-    <ol class="left nav-global">
+    <ol class="left ${main_nav_menu_classlist}">
       <%block name="navigation_global_links">
         % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-          <li class="nav-global-01">
+          <li class="item nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
           % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-            <li class="nav-global-02">
+            <li class="item nav-global-02">
               <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
             </li>
           % endif
-          <li class="nav-global-03">
+          <li class="item nav-global-03">
             <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>
         % endif
       </%block>
 
       <%block name="navigation_other_global_links">
+      <%
+      if uses_pattern_library:
+          register_btn_classlist = "btn-neutral"
+      else:
+          register_btn_classlist = "cta cta-register"
+      %>
         % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-            <li class="nav-global-05">
+            <li class="item nav-global-05">
               <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
             </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-            <li class="nav-global-04">
+            <li class="item nav-global-04">
               <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
             </li>
             % else:
-            <li class="nav-global-04">
+            <li class="item nav-global-04">
               <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
             </li>
             % endif
@@ -166,14 +178,20 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
 
-    <ol class="right nav-courseware">
+    <ol class="right nav-courseware ${"list-inline" if uses_pattern_library else ""}">
       <%block name="navigation_sign_in">
+      <%
+      if uses_pattern_library:
+          login_btn_classlist = "btn"
+      else:
+          login_btn_classlist = "cta cta-login"
+      %>
         <li class="nav-courseware-01">
           % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-              <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              <a class="${login_btn_classlist}" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
               % else:
-              <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
+              <a class="${login_btn_classlist}" href="/login${login_query()}">${_("Sign in")}</a>
               % endif
           % endif
         </li>

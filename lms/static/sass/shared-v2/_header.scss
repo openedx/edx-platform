@@ -58,37 +58,32 @@ $sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
       top: inherit;
     }
 
-    .nav-main {
-      @include float(left);
-      position: relative;
+    .list-inline {
+      margin-top: 5px;
+    }
 
-      .list-inline {
-        margin-top: 5px;
+    .item {
+      display: inline-block;
+      font-size: em(14);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0 !important;
+
+      &.active {
+        a {
+          text-decoration: none;
+          color: $link-color;
+        }
       }
 
-      .item {
-        display: inline-block;
-        font-size: em(14);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0 !important;
+      a {
+        color: $courseware-navigation-color;
+        padding: 3px 10px;
 
-        &.active {
-          a {
-            text-decoration: none;
-            color: $link-color;
-          }
-        }
-
-        a {
-          color: $courseware-navigation-color;
-          padding: 3px 10px;
-
-          &:hover,
-          &:focus {
-            background: inherit;
-            color: $courseware-hover-color;
-          }
+        &:hover,
+        &:focus {
+          background: inherit;
+          color: $courseware-hover-color;
         }
       }
     }
