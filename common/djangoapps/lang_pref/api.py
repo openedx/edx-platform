@@ -4,7 +4,6 @@
 from collections import namedtuple
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from dark_lang.models import DarkLangConfig
 
 
@@ -46,16 +45,3 @@ def released_languages():
     ]
 
     return released_languages
-
-
-def all_languages():
-    """Retrieve the list of all languages, translated and sorted.
-
-    Returns:
-        list of (language code (str), language name (str)): the language names
-        are translated in the current activated language and the results sorted
-        alphabetically.
-
-    """
-    languages = [(lang[0], _(lang[1])) for lang in settings.ALL_LANGUAGES]  # pylint: disable=translation-of-non-string
-    return sorted(languages, key=lambda lang: lang[1])
