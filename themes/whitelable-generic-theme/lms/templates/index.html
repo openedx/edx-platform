@@ -7,10 +7,13 @@ from django.core.urlresolvers import reverse
 
 <section class="home">
   <header>
-  <img src="${static.url('images/hero.png')}" height="300" width="1300" alt="Home Page" />
-
+    <img src="${static.url('images/hero.png')}" height="300" width="1300" alt="Home Page" />
   </header>
+
   <%include file="${courses_list}" />
+  <%include file="about_site.html" />
+  <%include file="testimonial.html" />
+
 </section>
 
 % if show_homepage_promo_video:
