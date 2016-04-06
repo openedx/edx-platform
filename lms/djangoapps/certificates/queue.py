@@ -357,7 +357,7 @@ class XQueueCertInterface(object):
                     }
                     if template_file:
                         contents['template_pdf'] = template_file
-                    if use_certs generate_pdf:
+                    if use_certs and generate_pdf:
                         new_status = status.generating
                     else:
                         new_status = status.downloadable
