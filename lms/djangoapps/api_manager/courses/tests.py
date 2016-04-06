@@ -28,6 +28,7 @@ from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
+from organizations.models import Organization
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -2298,328 +2299,6 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['users_enrolled'], 5)
         self.assertGreaterEqual(response.data['users_started'], 5)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'MARK_PROGRESS_ON_GRADING_EVENT': True,
-                                                       'SIGNAL_ON_SCORE_CHANGED': True,
-                                                       'STUDENT_GRADEBOOK': True,
-                                                       'STUDENT_PROGRESS': True})
-    def test_courses_data_time_series_metrics(self):
-        """
-        This is a rather large, rather complex test that runs through a range of scenarios related
-        to calculating time series metrics for users in a particular course.  It really should be
-        broken up into individual test cases at some point, although how is uncertain at present.
-        """
-        # Set some reference dates for anchoring the test case data to specific points in time
-        reference_date = datetime(2015, 8, 21, 0, 0, 0, 0, pytz.UTC)
-        course_start_date = reference_date + relativedelta(months=-2)
-        course_end_date = reference_date + relativedelta(years=5)
-
-        # Set up two courses, complete with chapters, sections, units, and items
-        course = CourseFactory.create(
-            number='3033',
-            name='metrics_in_timeseries',
-            start=course_start_date,
-            end=course_end_date
-        )
-
-        second_course = CourseFactory.create(
-            number='3034',
-            name='metrics_in_timeseries2',
-            start=course_start_date,
-            end=course_end_date
-        )
-
-        chapter = ItemFactory.create(
-            category="chapter",
-            parent_location=course.location,
-            data=self.test_data,
-            due=course_end_date,
-            display_name=u"3033 Overview"
-        )
-
-        sub_section = ItemFactory.create(
-            parent_location=chapter.location,
-            category="sequential",
-            display_name="3033 test subsection",
-        )
-        unit = ItemFactory.create(
-            parent_location=sub_section.location,
-            category="vertical",
-            metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"3033 test unit",
-        )
-
-        item = ItemFactory.create(
-            parent_location=unit.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem to test timeseries',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
-        )
-
-        item2 = ItemFactory.create(
-            parent_location=unit.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem 2 for test timeseries',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
-        )
-
-        # Create the set of users that will enroll in these courses
-        USER_COUNT = 25
-        users = [UserFactory.create(username="testuser_tstest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
-        user_ids = [user.id for user in users]
-
-        # Create a test organization that will be used for validation of org filtering
-        data = {
-            'name': 'Test Organization',
-            'display_name': 'Test Org Display Name',
-            'users': user_ids
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        org_id = response.data['id']
-
-        # Enroll the users in the courses using an old datestamp
-        enrolled_time = reference_date - timedelta(days=USER_COUNT, minutes=-30)
-        with freeze_time(enrolled_time):
-            for user in users:
-                CourseEnrollmentFactory.create(user=user, course_id=course.id)
-                CourseEnrollmentFactory.create(user=user, course_id=second_course.id)
-
-        # Set up the basic score container that will be used for student submissions
-        points_scored = .25
-        points_possible = 1
-        grade_dict = {'value': points_scored, 'max_value': points_possible}
-
-        # Submit user scores for the first module in the course
-        # The looping is a bit wacky here, but it actually does work out correctly
-        for j, user in enumerate(users):
-            # Ensure all database entries in this block record the same timestamps
-            # We record each user on a different day across the series to test the aggregations
-            submit_time = reference_date - timedelta(days=(USER_COUNT - j), minutes=-30)
-            with freeze_time(submit_time):
-                module = self.get_module_for_user(user, course, item)
-                grade_dict['user_id'] = user.id
-                module.system.publish(module, 'grade', grade_dict)
-
-                # For the final two users, submit an score for the second module
-                if j >= USER_COUNT - 2:
-                    second_module = self.get_module_for_user(user, course, item2)
-                    second_module.system.publish(second_module, 'grade', grade_dict)
-                    # Add an entry to the gradebook in addition to the scoring -- this is for completions
-                    try:
-                        sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
-                        sg_entry.grade = 0.9
-                        sg_entry.proforma_grade = 0.91
-                        sg_entry.save()
-                    except StudentGradebook.DoesNotExist:
-                        StudentGradebook.objects.create(user=user, course_id=course.id, grade=0.9,
-                                                        proforma_grade=0.91)
-
-        # Submit scores for the second module for the first five users
-        # Pretend the scores were submitted over the course of the final five days
-        for j, user in enumerate(users[:5]):
-            submit_time = reference_date - timedelta(days=(5 - j), minutes=-30)
-            with freeze_time(submit_time):
-                grade_dict['user_id'] = user.id
-                second_module = self.get_module_for_user(user, course, item2)
-                second_module.system.publish(second_module, 'grade', grade_dict)
-
-        ### OKAY, WE"VE FINISHED THE SETUP WORK FOR THIS INDIVIDUAL TEST CASE ###
-
-        # Generate the time series report for the first five days of the set, filtered by organization
-        # There should be one time series entry per day for each category, each day having varying counts
-        end_date = reference_date - timedelta(days=(USER_COUNT - 4))
-        start_date = reference_date - timedelta(days=USER_COUNT)
-        date_parameters = {
-            'start_date': start_date,
-            'end_date': end_date
-        }
-        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            urlencode(date_parameters),
-            org_id
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 5)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 110)  # Aggregate total in the first five days (24,23,22,21,20)
-        self.assertEqual(len(response.data['users_started']), 5)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 5)  # Five users started in the first five days
-        self.assertEqual(len(response.data['users_completed']), 5)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 0)  # Zero users completed in the first five days
-        self.assertEqual(len(response.data['modules_completed']), 5)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 5)  # Five modules completed in the first five days
-        self.assertEqual(len(response.data['active_users']), 5)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 4)  # Four active users in the first five days due to how 'active' is defined
-        self.assertEqual(len(response.data['users_enrolled']), 5)
-        self.assertEqual(response.data['users_enrolled'][0][1], 25)
-        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
-        self.assertEqual(total_enrolled, 25)  # Remember, everyone was enrolled on the first day
-
-        # Generate the time series report for the final five days, filtered by organization
-        end_date = reference_date
-        start_date = end_date - relativedelta(days=4)
-        date_parameters = {
-            'start_date': start_date,
-            'end_date': end_date
-        }
-        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            urlencode(date_parameters),
-            org_id
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 5)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 6)  # Ticking down the nonstarters -- 3, 2, 1, 0, 0
-        self.assertEqual(len(response.data['users_started']), 5)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 4)  # Four users started in the final five days
-        self.assertEqual(len(response.data['users_completed']), 5)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 2)  # Two users completed in the final five days (see setup above)
-        self.assertEqual(len(response.data['modules_completed']), 5)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 10)  # Ten modules completed in the final five days
-        self.assertEqual(len(response.data['active_users']), 5)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 10)  # Ten active users in the final five days
-        self.assertEqual(len(response.data['users_enrolled']), 5)
-        self.assertEqual(response.data['users_enrolled'][0][1], 0)
-        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
-        self.assertEqual(total_enrolled, 0)  # Remember, everyone was enrolled on the first day, so zero is correct here
-
-        # Change the time interval to three weeks, so we should now see three entries per category
-        end_date = reference_date
-        start_date = end_date - relativedelta(weeks=2)
-        date_parameters = {
-            'start_date': start_date,
-            'end_date': end_date
-        }
-        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=weeks'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            urlencode(date_parameters)
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 3)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 5)
-        self.assertEqual(len(response.data['users_started']), 3)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 18)
-        self.assertEqual(len(response.data['users_completed']), 3)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 2)
-        self.assertEqual(len(response.data['modules_completed']), 3)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 25)
-        self.assertEqual(len(response.data['active_users']), 3)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 23)  # Three weeks x one user per day
-        self.assertEqual(len(response.data['users_enrolled']), 3)
-        self.assertEqual(response.data['users_enrolled'][0][1], 0)
-        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
-        self.assertEqual(total_enrolled, 0)  # No users enrolled in this series
-
-        # Change the time interval to four months, so we're back to four entries per category
-        end_date = reference_date + relativedelta(months=1)
-        start_date = end_date - relativedelta(months=3)
-        date_parameters = {
-            'start_date': start_date,
-            'end_date': end_date
-        }
-        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=months'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            urlencode(date_parameters)
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 4)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 20)  # 5 users started in july from 27th to 31st
-        self.assertEqual(len(response.data['users_started']), 4)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 25)  # All users have started
-        self.assertEqual(len(response.data['users_completed']), 4)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 2)  # Two completions logged
-        self.assertEqual(len(response.data['modules_completed']), 4)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 32)  # 25 for all + 5 for some + 2 for two
-        self.assertEqual(len(response.data['active_users']), 4)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 30)  # All users active at some point in this timeframe
-        self.assertEqual(response.data['users_enrolled'][1][1], 25)
-        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
-        self.assertEqual(total_enrolled, 25)  # All users enrolled in third month of this series
-
-        # Unenroll five users from the course and run the time series report for the final eleven days
-        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
-        for j, user in enumerate(users[-5:]):
-            unenroll_uri = '{}/{}'.format(test_uri, user.id)
-            response = self.do_delete(unenroll_uri)
-            self.assertEqual(response.status_code, 204)
-        end_date = reference_date
-        start_date = end_date - relativedelta(days=10)
-        date_parameters = {
-            'start_date': start_date,
-            'end_date': end_date
-        }
-        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            urlencode(date_parameters),
-            org_id
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 11)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 10)  # 4,3,2,1, then all zeroes due to the unenrolling
-        self.assertEqual(len(response.data['users_started']), 11)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 5)  # Five, then nothin
-        self.assertEqual(len(response.data['users_completed']), 11)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 0)  # Only completions were on days 1 and 2
-        self.assertEqual(len(response.data['modules_completed']), 11)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 10)  # We maintain the module completions after unenrolling
-        self.assertEqual(len(response.data['active_users']), 11)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 11)
-
-        # Missing end date should raise an error
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            start_date
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 400)
-
-        # Unsupported interval should raise an error
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=hours'.format(
-            self.base_courses_uri,
-            unicode(course.id),
-            start_date,
-            end_date
-        )
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 400)
-
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
         data = {
@@ -2698,7 +2377,8 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['results'][0]['count'], 9)
 
         # filter counts by city
-        sf_uri = '{}/{}/metrics/cities/?city=new york city, San Francisco'.format(self.base_courses_uri, self.test_course_id)
+        sf_uri = '{}/{}/metrics/cities/?city=new york city, San Francisco'.format(self.base_courses_uri,
+                                                                                  self.test_course_id)
         response = self.do_get(sf_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 2)
@@ -2807,7 +2487,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         # Confirm this user no longer has forum moderation permissions
         role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
         try:
-            has_role = role.users.get(id=self.users[0].id)
+            role.users.get(id=self.users[0].id)
             self.assertTrue(False)
         except ObjectDoesNotExist:
             pass
@@ -2835,7 +2515,6 @@ class CoursesApiTests(ModuleStoreTestCase):
             self.base_courses_uri, unicode(self.course.id), self.content_subchild.location.block_id
         )
         response = self.do_get(test_uri)
-        self.maxDiff = None
         self.assertEqual(
             {
                 'chapter': unicode(self.chapter.location),
@@ -2847,3 +2526,512 @@ class CoursesApiTests(ModuleStoreTestCase):
             },
             response.data
         )
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@override_settings(EDX_API_KEY=TEST_API_KEY)
+@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
+                                                   'ADVANCED_SECURITY': False,
+                                                   'PREVENT_CONCURRENT_LOGINS': False,
+                                                   'MARK_PROGRESS_ON_GRADING_EVENT': True,
+                                                   'SIGNAL_ON_SCORE_CHANGED': True,
+                                                   'STUDENT_GRADEBOOK': True,
+                                                   'STUDENT_PROGRESS': True})
+class CoursesTimeSeriesMetricsApiTests(ModuleStoreTestCase):
+    """ Test suite for CoursesTimeSeriesMetrics API views """
+
+    def get_module_for_user(self, user, course, problem):
+        """Helper function to get useful module at self.location in self.course_id for user"""
+        mock_request = mock.MagicMock()
+        mock_request.user = user
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, user, course, depth=2)
+        module = module_render.get_module(  # pylint: disable=protected-access
+            user,
+            mock_request,
+            problem.location,
+            field_data_cache,
+        )
+        return module
+
+    def setUp(self):
+        super(CoursesTimeSeriesMetricsApiTests, self).setUp()
+        self.test_server_prefix = 'https://testserver'
+        self.base_courses_uri = '/api/server/courses'
+        self.base_groups_uri = '/api/server/groups'
+        self.base_organizations_uri = '/api/server/organizations/'
+        self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+
+        self.reference_date = datetime(2015, 8, 21, 0, 0, 0, 0, pytz.UTC)
+        course_start_date = self.reference_date + relativedelta(months=-2)
+        course_end_date = self.reference_date + relativedelta(years=5)
+
+        # Set up two courses, complete with chapters, sections, units, and items
+        self.course = CourseFactory.create(
+            number='3033',
+            name='metrics_in_timeseries',
+            start=course_start_date,
+            end=course_end_date
+        )
+
+        self.second_course = CourseFactory.create(
+            number='3034',
+            name='metrics_in_timeseries2',
+            start=course_start_date,
+            end=course_end_date
+        )
+
+        self.chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data=self.test_data,
+            due=course_end_date,
+            display_name=u"3033 Overview"
+        )
+
+        self.sub_section = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category="sequential",
+            display_name="3033 test subsection",
+        )
+        self.unit = ItemFactory.create(
+            parent_location=self.sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"3033 test unit",
+        )
+
+        self.item = ItemFactory.create(
+            parent_location=self.unit.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem to test timeseries',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
+        )
+
+        self.item2 = ItemFactory.create(
+            parent_location=self.unit.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem 2 for test timeseries',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
+        )
+
+        # Create the set of users that will enroll in these courses
+        self.user_count = 25
+        self.users = UserFactory.create_batch(self.user_count)
+        self.groups = GroupFactory.create_batch(2)
+        self.user_ids = []
+        for i, user in enumerate(self.users):
+            self.user_ids.append(user.id)
+            user.groups.add(self.groups[i % 2])
+
+        # Create a test organization that will be used for validation of org filtering
+        self.test_organization = Organization.objects.create(
+            name="Test Organization",
+            display_name='Test Org Display Name',
+        )
+        self.test_organization.users.add(*self.users)
+        self.org_id = self.test_organization.id
+
+        # Enroll the users in the courses using an old datestamp
+        enrolled_time = self.reference_date - timedelta(days=self.user_count, minutes=-30)
+        with freeze_time(enrolled_time):
+            for user in self.users:
+                CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+                CourseEnrollmentFactory.create(user=user, course_id=self.second_course.id)
+
+        # Set up the basic score container that will be used for student submissions
+        points_scored = .25
+        points_possible = 1
+        self.grade_dict = {'value': points_scored, 'max_value': points_possible}
+
+        self.client = SecureClient()
+        cache.clear()
+
+    def do_get(self, uri):
+        """Submit an HTTP GET request"""
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Edx-Api-Key': str(TEST_API_KEY),
+        }
+        response = self.client.get(uri, headers=headers)
+        return response
+
+    def do_post(self, uri, data):
+        """Submit an HTTP POST request"""
+        headers = {
+            'X-Edx-Api-Key': str(TEST_API_KEY),
+            'Content-Type': 'application/json'
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(uri, headers=headers, content_type='application/json', data=json_data)
+        return response
+
+    def do_delete(self, uri):
+        """Submit an HTTP DELETE request"""
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Edx-Api-Key': str(TEST_API_KEY),
+        }
+        response = self.client.delete(uri, headers=headers)
+        return response
+
+    def _submit_user_scores(self):
+        """Submit user scores for modules in the course"""
+        # Submit user scores for the first module in the course
+        # The looping is a bit wacky here, but it actually does work out correctly
+        for j, user in enumerate(self.users):
+            # Ensure all database entries in this block record the same timestamps
+            # We record each user on a different day across the series to test the aggregations
+            submit_time = self.reference_date - timedelta(days=(self.user_count - j), minutes=-30)
+            with freeze_time(submit_time):
+                module = self.get_module_for_user(user, self.course, self.item)
+                self.grade_dict['user_id'] = user.id
+                module.system.publish(module, 'grade', self.grade_dict)
+
+                # For the final two users, submit an score for the second module
+                if j >= self.user_count - 2:
+                    second_module = self.get_module_for_user(user, self.course, self.item2)
+                    second_module.system.publish(second_module, 'grade', self.grade_dict)
+                    # Add an entry to the gradebook in addition to the scoring -- this is for completions
+                    try:
+                        sg_entry = StudentGradebook.objects.get(user=user, course_id=self.course.id)
+                        sg_entry.grade = 0.9
+                        sg_entry.proforma_grade = 0.91
+                        sg_entry.save()
+                    except StudentGradebook.DoesNotExist:
+                        StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.9,
+                                                        proforma_grade=0.91)
+
+        # Submit scores for the second module for the first five users
+        # Pretend the scores were submitted over the course of the final five days
+        for j, user in enumerate(self.users[:5]):
+            submit_time = self.reference_date - timedelta(days=(5 - j), minutes=-30)
+            with freeze_time(submit_time):
+                self.grade_dict['user_id'] = user.id
+                second_module = self.get_module_for_user(user, self.course, self.item2)
+                second_module.system.publish(second_module, 'grade', self.grade_dict)
+
+    def test_courses_data_time_series_metrics_for_first_five_days(self):
+        """
+        Calculate time series metrics for users in a particular course for first five days.
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Generate the time series report for the first five days of the set, filtered by organization
+        # There should be one time series entry per day for each category, each day having varying counts
+        end_date = self.reference_date - timedelta(days=(self.user_count - 4))
+        start_date = self.reference_date - timedelta(days=self.user_count)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters),
+            self.org_id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 110)  # Aggregate total in the first five days (24,23,22,21,20)
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 5)  # Five users started in the first five days
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 0)  # Zero users completed in the first five days
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 5)  # Five modules completed in the first five days
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 4)  # Four active users in the first five days due to how 'active' is defined
+        self.assertEqual(len(response.data['users_enrolled']), 5)
+        self.assertEqual(response.data['users_enrolled'][0][1], 25)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 25)  # Remember, everyone was enrolled on the first day
+
+    def test_courses_data_time_series_metrics_for_final_five_days(self):
+        """
+        Calculate time series metrics for users in a particular course for final five days.
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Generate the time series report for the final five days, filtered by organization
+        end_date = self.reference_date
+        start_date = end_date - relativedelta(days=4)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters),
+            self.org_id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 6)  # Ticking down the nonstarters -- 3, 2, 1, 0, 0
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 4)  # Four users started in the final five days
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 2)  # Two users completed in the final five days (see setup above)
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 10)  # Ten modules completed in the final five days
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 10)  # Ten active users in the final five days
+        self.assertEqual(len(response.data['users_enrolled']), 5)
+        self.assertEqual(response.data['users_enrolled'][0][1], 0)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 0)  # Remember, everyone was enrolled on the first day, so zero is correct here
+
+    def test_courses_data_time_series_metrics_with_three_weeks_interval(self):
+        """
+        Calculate time series metrics for users in a particular course with three weeks interval.
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Change the time interval to three weeks, so we should now see three entries per category
+        end_date = self.reference_date
+        start_date = end_date - relativedelta(weeks=2)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=weeks'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters)
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 3)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 5)
+        self.assertEqual(len(response.data['users_started']), 3)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 18)
+        self.assertEqual(len(response.data['users_completed']), 3)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 2)
+        self.assertEqual(len(response.data['modules_completed']), 3)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 25)
+        self.assertEqual(len(response.data['active_users']), 3)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 23)  # Three weeks x one user per day
+        self.assertEqual(len(response.data['users_enrolled']), 3)
+        self.assertEqual(response.data['users_enrolled'][0][1], 0)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 0)  # No users enrolled in this series
+
+    def test_courses_data_time_series_metrics_with_four_months_interval(self):
+        """
+        Calculate time series metrics for users in a particular course with four months interval.
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Change the time interval to four months, so we're back to four entries per category
+        end_date = self.reference_date + relativedelta(months=1)
+        start_date = end_date - relativedelta(months=3)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&interval=months'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters)
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 4)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 20)  # 5 users started in july from 27th to 31st
+        self.assertEqual(len(response.data['users_started']), 4)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 25)  # All users have started
+        self.assertEqual(len(response.data['users_completed']), 4)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 2)  # Two completions logged
+        self.assertEqual(len(response.data['modules_completed']), 4)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 32)  # 25 for all + 5 for some + 2 for two
+        self.assertEqual(len(response.data['active_users']), 4)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 30)  # All users active at some point in this timeframe
+        self.assertEqual(response.data['users_enrolled'][1][1], 25)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 25)  # All users enrolled in third month of this series
+
+    def test_courses_data_time_series_metrics_after_unenrolling_users(self):
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Unenroll five users from the course and run the time series report for the final eleven days
+        test_uri = self.base_courses_uri + '/' + unicode(self.course.id) + '/users'
+        for user in self.users[-5:]:
+            unenroll_uri = '{}/{}'.format(test_uri, user.id)
+            response = self.do_delete(unenroll_uri)
+            self.assertEqual(response.status_code, 204)
+        end_date = self.reference_date
+        start_date = end_date - relativedelta(days=10)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters),
+            self.org_id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 11)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 10)  # 4,3,2,1, then all zeroes due to the unenrolling
+        self.assertEqual(len(response.data['users_started']), 11)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 5)  # Five, then nothin
+        self.assertEqual(len(response.data['users_completed']), 11)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 0)  # Only completions were on days 1 and 2
+        self.assertEqual(len(response.data['modules_completed']), 11)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 10)  # We maintain the module completions after unenrolling
+        self.assertEqual(len(response.data['active_users']), 11)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 11)
+
+    def test_courses_data_time_series_metrics_user_group_filter(self):
+        """
+        Test time series metrics for users in a particular course and filter by organizations and group
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Generate the time series report for the first five days of the set, filtered by organization and group
+        # There should be one time series entry per day for each category, each day having varying counts
+        end_date = self.reference_date - timedelta(days=(self.user_count - 4))
+        start_date = self.reference_date - timedelta(days=self.user_count)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}&groups={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters),
+            self.org_id,
+            self.groups[0].id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 56)  # Aggregate total in the first five days in group 1 (12,12,11,11,10)
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 3)  # Five users started in the first five days three in group 1
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 0)  # Zero users completed in the first five days
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        # Five modules completed in the first five days, 3 users in group 1
+        self.assertEqual(total_modules_completed, 3)
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        # Four active users in the first five days due to how 'active' is defined, 2 users in group 1
+        self.assertEqual(total_active, 2)
+        self.assertEqual(len(response.data['users_enrolled']), 5)
+        self.assertEqual(response.data['users_enrolled'][0][1], 13)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 13)  # Everyone was enrolled on the first day, 13 users in group 1
+
+    def test_courses_data_time_series_metrics_user_multiple_group_filter(self):
+        """
+        Calculate time series metrics for users in a particular course.
+        """
+        # Submit user scores for modules in the course
+        self._submit_user_scores()
+
+        # Generate the time series report for the first five days of the set, filtered by organization & multiple groups
+        # There should be one time series entry per day for each category, each day having varying counts
+        end_date = self.reference_date - timedelta(days=(self.user_count - 4))
+        start_date = self.reference_date - timedelta(days=self.user_count)
+        date_parameters = {
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        group_ids = ','.join([str(group.id) for group in self.groups])
+        course_metrics_uri = '{}/{}/time-series-metrics/?{}&organization={}&groups={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            urlencode(date_parameters),
+            self.org_id,
+            group_ids
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 110)  # Aggregate total in the first five days (24,23,22,21,20)
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 5)  # Five users started in the first five days
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 0)  # Zero users completed in the first five days
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 5)  # Five modules completed in the first five days
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 4)  # Four active users in the first five days due to how 'active' is defined
+        self.assertEqual(len(response.data['users_enrolled']), 5)
+        self.assertEqual(response.data['users_enrolled'][0][1], 25)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 25)  # Remember, everyone was enrolled on the first day
+
+    def test_courses_data_time_series_metrics_without_end_date(self):
+        # Missing end date should raise an error
+        start_date = self.reference_date - relativedelta(days=10)
+
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            start_date
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 400)
+
+    def test_courses_data_time_series_metrics_with_invalid_interval(self):
+        # Unsupported interval should raise an error
+        end_date = self.reference_date
+        start_date = end_date - relativedelta(days=10)
+
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=hours'.format(
+            self.base_courses_uri,
+            unicode(self.course.id),
+            start_date,
+            end_date
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 400)
