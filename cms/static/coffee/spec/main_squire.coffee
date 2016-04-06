@@ -1,4 +1,6 @@
 requirejs.config({
+    baseUrl: '/base/',
+
     paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
@@ -36,8 +38,8 @@ requirejs.config({
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
-        "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
-        "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
+        "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
+        "jasmine-waituntil": "xmodule_js/common_static/js/libs/jasmine-waituntil",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
@@ -156,11 +158,10 @@ requirejs.config({
             exports: "sinon"
         },
         "jasmine-stealth": {
-            deps: ["jasmine"]
+            deps: ["underscore", "underscore.string"]
         },
-        "jasmine.async": {
-            deps: ["jasmine"],
-            exports: "AsyncSpec"
+        "jasmine-waituntil": {
+            deps: ["jquery"]
         },
         "xblock/core": {
             exports: "XBlock",
@@ -182,9 +183,16 @@ requirejs.config({
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
-define([
-    "coffee/spec/views/assets_spec",
-    "js/spec/video/translations_editor_spec",
-    "js/spec/video/file_uploader_editor_spec",
-    "js/spec/models/group_configuration_spec"
-    ])
+testFiles = [
+    'coffee/spec/views/assets_spec'
+    'js/spec/video/translations_editor_spec'
+    'js/spec/video/file_uploader_editor_spec'
+    'js/spec/models/group_configuration_spec'
+]
+i = 0
+while i < testFiles.length
+    testFiles[i] = '/base/' + testFiles[i] + '.js'
+    i++
+require testFiles, ->
+# start test run, once Require.js is done
+    window.__karma__.start()
