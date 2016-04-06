@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-30 19:29+0000\n"
-"PO-Revision-Date: 2016-03-30 19:30:35.256767\n"
+"POT-Creation-Date: 2016-04-06 19:27+0000\n"
+"PO-Revision-Date: 2016-04-06 19:28:37.640637\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -195,6 +195,7 @@ msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: lms/templates/student_profile/share_modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -2142,6 +2143,19 @@ msgstr ""
 "Pléäsé dö nöt üsé äný späçés ör spéçïäl çhäräçtérs ïn thïs fïéld. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: common/static/common/js/components/views/paginated_view.js
+#: common/static/common/js/components/views/paging_footer.js
+msgid "Pagination"
+msgstr "Pägïnätïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/static/common/js/components/views/paginated_view.js
+msgid ""
+"Your request could not be completed. Reload the page and try again. If the "
+"issue persists, click the Help tab to report the problem."
+msgstr ""
+"Ýöür réqüést çöüld nöt ßé çömplétéd. Rélöäd thé pägé änd trý ägäïn. Ìf thé "
+"ïssüé pérsïsts, çlïçk thé Hélp täß tö répört thé prößlém. #"
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr ""
@@ -2466,6 +2480,7 @@ msgstr "öpén slöts Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "nämé Ⱡ'σяєм ι#"
 
@@ -2474,6 +2489,11 @@ msgstr "nämé Ⱡ'σяєм ι#"
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "téäm çöünt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/teams/static/teams/js/teams_tab_factory.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "Téäms Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: cms/templates/js/certificate-editor.underscore
@@ -2699,13 +2719,13 @@ msgstr[1] ""
 msgid "All teams"
 msgstr "Àll téäms Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Teams Pagination"
+msgstr "Téäms Pägïnätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Topics"
 msgstr "Töpïçs Ⱡ'σяєм ιρѕυ#"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "Téäms Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -4620,6 +4640,10 @@ msgstr "Lïnkïng Ⱡ'σяєм ιρѕυм #"
 msgid "Successfully unlinked."
 msgstr "Süççéssfüllý ünlïnkéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
+#: lms/static/js/student_profile/views/badge_list_container.js
+msgid "Accomplishments Pagination"
+msgstr "Àççömplïshménts Pägïnätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
 msgstr ""
@@ -4688,6 +4712,18 @@ msgstr "Pröfïlé Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile image for {username}"
 msgstr "Pröfïlé ïmägé för {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "About Me"
+msgstr "Àßöüt Mé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Accomplishments"
+msgstr "Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Profile"
+msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -6236,6 +6272,11 @@ msgstr "Ûnsçhédüléd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Date"
 msgstr "Däté Ⱡ'σяєм ι#"
 
+#: cms/templates/js/edit-chapter.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "gettext("
+msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -6261,8 +6302,9 @@ msgid "Zoom Out"
 msgstr "Zööm Öüt Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/components/paging-footer.underscore
-msgid "Page number"
-msgstr "Pägé nümßér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+#, python-format
+msgid "Page number out of %(total_pages)s"
+msgstr "Pägé nümßér öüt öf %(total_pages)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
@@ -6969,10 +7011,6 @@ msgid "remove all"
 msgstr "rémövé äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "gettext("
-msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "Séçtïön Ⱡ'σяєм ιρѕυм #"
 
@@ -7619,6 +7657,26 @@ msgstr "Ûséd Ⱡ'σяєм ι#"
 msgid "Valid"
 msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "org.display_name"
+msgstr "örg.dïspläý_nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "category"
+msgstr "çätégörý Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/learner_dashboard/sidebar.underscore
+msgid ""
+"Browse recently launched courses and see what\\'s new in our favorite "
+"subjects"
+msgstr ""
+"Bröwsé réçéntlý läünçhéd çöürsés änd séé whät\\'s néw ïn öür fävörïté "
+"süßjéçts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/learner_dashboard/sidebar.underscore
+msgid "Explore New XSeries"
+msgstr "Éxplöré Néw XSérïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 #, python-format
@@ -7668,7 +7726,6 @@ msgid "section.title"
 msgstr "séçtïön.tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/student_account/account_settings.underscore
-#: lms/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
 "Àn érrör öççürréd. Pléäsé rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -7886,17 +7943,91 @@ msgstr "Réqüïréd fïéld Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Already have an account?"
 msgstr "Àlréädý hävé än äççöünt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Share your \"%(display_name)s\" award"
+msgstr "Shäré ýöür \"%(display_name)s\" äwärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/student_profile/badge.underscore
+msgid "Share"
+msgstr "Shäré Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Earned %(created)s."
+msgstr "Éärnéd %(created)s. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "What's Your Next Accomplishment?"
+msgstr ""
+"Whät's Ýöür Néxt Àççömplïshmént? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Start working toward your next learning goal."
+msgstr ""
+"Stärt wörkïng töwärd ýöür néxt léärnïng göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Find a course"
+msgstr "Fïnd ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
 #: lms/templates/student_profile/learner_profile.underscore
+msgid "An error occurred. Try loading the page again."
+msgstr ""
+"Àn érrör öççürréd. Trý löädïng thé pägé ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr ""
 "Ýöü äré çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: lms/templates/student_profile/learner_profile.underscore
-msgid "This edX learner is currently sharing a limited profile."
+#: lms/templates/student_profile/section_two.underscore
+msgid "This learner is currently sharing a limited profile."
 msgstr ""
-"Thïs édX léärnér ïs çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thïs léärnér ïs çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Share on Mozilla Backpack"
+msgstr "Shäré ön Mözïllä Bäçkpäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid ""
+"To share your certificate on Mozilla Backpack, you must first have a "
+"Backpack account. Complete the following steps to add your certificate to "
+"Backpack."
+msgstr ""
+"Tö shäré ýöür çértïfïçäté ön Mözïllä Bäçkpäçk, ýöü müst fïrst hävé ä "
+"Bäçkpäçk äççöünt. Çömplété thé föllöwïng stéps tö ädd ýöür çértïfïçäté tö "
+"Bäçkpäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
+"your existing account"
+msgstr ""
+"Çréäté ä %(link_start)sMözïllä Bäçkpäçk%(link_end)s äççöünt, ör lög ïn tö "
+"ýöür éxïstïng äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"%(download_link_start)sDownload this image (right-click or option-click, "
+"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
+"your backpack.</li>"
+msgstr ""
+"%(download_link_start)sDöwnlöäd thïs ïmägé (rïght-çlïçk ör öptïön-çlïçk, "
+"sävé äs)%(link_end)s änd thén %(upload_link_start)süplöäd%(link_end)s ït tö "
+"ýöür ßäçkpäçk.</li> Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -7997,12 +8128,11 @@ msgid "Take Your Photo"
 msgstr "Täké Ýöür Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"When your face is in position, use the camera button %(icon)s below to take "
+"When your face is in position, use the camera button {icon} below to take "
 "your photo."
 msgstr ""
-"Whén ýöür fäçé ïs ïn pösïtïön, üsé thé çämérä ßüttön %(icon)s ßélöw tö täké "
+"Whén ýöür fäçé ïs ïn pösïtïön, üsé thé çämérä ßüttön {icon} ßélöw tö täké "
 "ýöür phötö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8028,13 +8158,12 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"To use the current photo, select the camera button %(icon)s. To take another"
-" photo, select the retake button %(icon)s."
+"To use the current photo, select the camera button {icon}. To take another "
+"photo, select the retake button {icon}."
 msgstr ""
-"Tö üsé thé çürrént phötö, séléçt thé çämérä ßüttön %(icon)s. Tö täké änöthér"
-" phötö, séléçt thé rétäké ßüttön %(icon)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"Tö üsé thé çürrént phötö, séléçt thé çämérä ßüttön {icon}. Tö täké änöthér "
+"phötö, séléçt thé rétäké ßüttön {icon}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8140,10 +8269,9 @@ msgid "Make sure your ID is well-lit"
 msgstr "Mäké süré ýöür ÌD ïs wéll-lït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your ID"
+msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
-"Önçé ïn pösïtïön, üsé thé çämérä ßüttön %(icon)s tö çäptüré ýöür ÌD Ⱡ'σяєм "
+"Önçé ïn pösïtïön, üsé thé çämérä ßüttön {icon} tö çäptüré ýöür ÌD Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8182,11 +8310,10 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
-"Önçé ïn pösïtïön, üsé thé çämérä ßüttön %(icon)s tö çäptüré ýöür phötö "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Önçé ïn pösïtïön, üsé thé çämérä ßüttön {icon} tö çäptüré ýöür phötö Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -8195,11 +8322,10 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/intro_step.underscore
-#, python-format
-msgid "Thanks for returning to verify your ID in: %(courseName)s"
+msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
-"Thänks för rétürnïng tö vérïfý ýöür ÌD ïn: %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thänks för rétürnïng tö vérïfý ýöür ÌD ïn: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -8243,17 +8369,15 @@ msgstr ""
 "änd phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are enrolling in: %(courseName)s"
-msgstr ""
-"Ýöü äré énröllïng ïn: %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "You are enrolling in: {courseName}"
+msgstr "Ýöü äré énröllïng ïn: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are upgrading your enrollment for: %(courseName)s"
+msgid "You are upgrading your enrollment for: {courseName}"
 msgstr ""
-"Ýöü äré üpgrädïng ýöür énröllmént för: %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя #"
+"Ýöü äré üpgrädïng ýöür énröllmént för: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8317,11 +8441,10 @@ msgstr ""
 "Ýöü hävé älréädý vérïfïéd ýöür ÌD! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "Your verification status is good until %(verificationGoodUntil)s."
+msgid "Your verification status is good until {verificationGoodUntil}."
 msgstr ""
-"Ýöür vérïfïçätïön stätüs ïs gööd üntïl %(verificationGoodUntil)s. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Ýöür vérïfïçätïön stätüs ïs gööd üntïl {verificationGoodUntil}. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -8332,15 +8455,9 @@ msgid "Account Not Activated"
 msgstr "Àççöünt Nöt Àçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "You are enrolling in %(courseName)s"
-msgstr "Ýöü äré énröllïng ïn %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgid "Upgrade to a Verified Certificate for {courseName}"
 msgstr ""
-"Ûpgrädé tö ä Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"Ûpgrädé tö ä Vérïfïéd Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8357,17 +8474,15 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Professional Certificate for %(courseName)s"
+msgid "Professional Certificate for {courseName}"
 msgstr ""
-"Pröféssïönäl Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Pröféssïönäl Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Verified Certificate for %(courseName)s"
+msgid "Verified Certificate for {courseName}"
 msgstr ""
-"Vérïfïéd Çértïfïçäté för %(courseName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+"Vérïfïéd Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -8407,10 +8522,9 @@ msgstr ""
 "gövérnmént-ïssüéd phötö ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid "Thank you! We have received your payment for %(courseName)s."
+msgid "Thank you! We have received your payment for {courseName}."
 msgstr ""
-"Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént för %(courseName)s. Ⱡ'σяєм ιρѕυм "
+"Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént för {courseName}. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -9059,11 +9173,6 @@ msgid "Chapter Name"
 msgstr "Çhäptér Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "Chapter %s"
-msgstr "Çhäptér %s Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr ""
 "prövïdé thé tïtlé/nämé öf thé çhäptér thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм"
@@ -9072,13 +9181,6 @@ msgstr ""
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
 msgstr "Çhäptér Àssét Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "path/to/introductionToCookieBaking-CH%d.pdf"
-msgstr ""
-"päth/tö/ïntrödüçtïönTöÇöökïéBäkïng-ÇH%d.pdf Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"

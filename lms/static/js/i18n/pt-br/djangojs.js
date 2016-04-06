@@ -67,8 +67,6 @@
       "%(num_students)s alunos abriram a Subse\u00e7\u00e3o"
     ], 
     "%(post_type)s posted %(time_ago)s by %(author)s": "%(post_type)s postado %(time_ago)s por %(author)s", 
-    "%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.": "%(screen_reader_start)sAviso:%(screen_reader_end)s N\u00e3o existe nenhum grupo de conte\u00fado", 
-    "%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.": "%(screen_reader_start)sAviso:%(screen_reader_end)s O grupo de conte\u00fado selecionado anteriormente foi removido. Selecionar um outro gupo de conte\u00fado", 
     "%(team_count)s Team": [
       "%(team_count)s equipe", 
       "%(team_count)s equipes"
@@ -391,10 +389,6 @@
     "Connect your {accountName} account": "Conectar sua conta {accountName} ", 
     "Connected Accounts": "Contas Vinculadas", 
     "Constrain proportions": "Restringir propor\u00e7\u00f5es", 
-    "Contains %(count)s group": [
-      "Cont\u00e9m %(count)s grupo", 
-      "Cont\u00e9m %(count)s grupos"
-    ], 
     "Contains staff only content": "Possui conte\u00fado vis\u00edvel apenas para a equipe", 
     "Content Group ID": "ID de Grupo de Conte\u00fado", 
     "Content Group Name": "Nome do Grupo de Conte\u00fado", 
@@ -422,7 +416,6 @@
     "Course Key": "Chave do Curso", 
     "Course Number": "N\u00famero do curso", 
     "Course Number Override": "Substitu\u00e7\u00e3o do n\u00famero do curso", 
-    "Course Outline": "Esbo\u00e7o do Curso", 
     "Course Start": "In\u00edcio do curso", 
     "Course Title": "T\u00edtulo do curso", 
     "Course Title Override": "Substitui\u00e7\u00e3o do T\u00edtulo do Curso", 
@@ -985,7 +978,6 @@
     "Please enter your %(field)s.": "Insira seu %(field)s.", 
     "Please enter your email address below and we will send you instructions for setting a new password.": "Por favor, insira seu endere\u00e7o de e-mail abaixo e n\u00f3s enviaremos as instru\u00e7\u00f5es para a cria\u00e7\u00e3o de uma nova senha. ", 
     "Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}": "Por favor siga as instru\u00e7\u00f5es daqui para enviar um arquivo \u00e0 outro lugar e criar um link para ele: {maxFileSizeRedirectUrl}", 
-    "Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.": "Por favor note que a valida\u00e7\u00e3o de sua chave de pol\u00edtica e pares de valor ainda n\u00e3o est\u00e1 implementada. Se voc\u00ea tiver problemas, por favor revise seus pares referentes \u00e0 pol\u00edtica. ", 
     "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information.": "Por favor, imprima esta p\u00e1gina para seu controle; ela serve como recibo. Voc\u00ea tamb\u00e9m receber\u00e1 um e-mail com as mesmas informa\u00e7\u00f5es. ", 
     "Please select a PDF file to upload.": "Por favor, selecione um arquivo PDF para enviar.", 
     "Please select a file in .srt format.": "Selecione um arquivo no formato .srt.", 
@@ -1347,7 +1339,6 @@
     "These users were successfully removed as beta testers:": "Os seguintes usu\u00e1rios foram removidos do grupo de testadores beta com sucesso:", 
     "These users will be allowed to enroll once they register:": "Os seguintes usu\u00e1rios poder\u00e3o se inscrever ap\u00f3s realizar o cadastro:", 
     "These users will be enrolled once they register:": "Os seguintes usu\u00e1rios ser\u00e3o inscritos ap\u00f3s o cadastro:", 
-    "This Group Configuration is not in use. Start by adding a content experiment to any Unit via the %(outlineAnchor)s.": "Esta configura\u00e7\u00e3o de grupo n\u00e3o est\u00e1 em uso. Comece adicionando uma experi\u00eancia de conte\u00fado para qualquer Unidade atrav\u00e9s do %(outlineAnchor)s.", 
     "This Group Configuration is used in:": "A Configura\u00e7\u00e3o deste Grupo \u00e9 usada em:", 
     "This action cannot be undone.": "Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.", 
     "This annotation has %(count)s flag.": [
@@ -1358,7 +1349,6 @@
     "This certificate has already been activated and is live. Are you sure you want to continue editing?": "Este certificado j\u00e1 foi ativado. Tem certeza que gostaria de seguir com a edi\u00e7\u00e3o.", 
     "This component has validation issues.": "Este componente tem problemas de valida\u00e7\u00e3o.", 
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Essa configura\u00e7\u00e3o est\u00e1 sendo usada em experimentos de conte\u00fado. Se fizer altera\u00e7\u00f5es aos grupos, voc\u00ea vai precisar editar os experimentos.", 
-    "This content group is not in use. Add a content group to any unit from the %(outlineAnchor)s.": "Este Grupo de Conte\u00fado n\u00e3o est\u00e1 em uso. Adicione um Grupo de Conte\u00fado a qualquer unidade a partir do %(outlineAnchor)s.", 
     "This content group is used in one or more units.": "Este grupo de conte\u00fado \u00e9 utilizado em uma ou mais unidades.", 
     "This content group is used in:": "Esse grupo de conte\u00fado \u00e9 utilizado em:", 
     "This edX learner is currently sharing a limited profile.": "Este estudante da edX est\u00e1 atualmente compartilhando um perfil limitado.", 
@@ -1394,7 +1384,6 @@
     "To invalidate a certificate for a particular learner, add the username or email address below.": "Para invalidar um certificado para um aluno em particular, adicionar o nome do usu\u00e1rio ou endere\u00e7o de e-mail abaixo", 
     "To receive a certificate, you must also verify your identity before %(date)s.": "Para receber um certificado, voc\u00ea tamb\u00e9m deve verificar sua identidade antes de %(date)s.", 
     "To receive a certificate, you must also verify your identity.": "Para receber um certificado, voc\u00ea tamb\u00e9m deve verificar a sua identidade.", 
-    "To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on %(link_start)s the Data Download page. %(link_end)s": "Para revisar atribui\u00e7\u00f5es entre grupos e alunos ou ver os resultados de um upload de arquivo CSV, baixe as informa\u00e7\u00f5es sobre o perfil do curso ou os resultados do grupo na %(link_start)s p\u00e1gina de Download de Dados %(link_end)s .", 
     "To take a successful photo, make sure that:": "Para tirar uma foto corretamente, certifique-se que:", 
     "To use the current photo, select the camera button %(icon)s. To take another photo, select the retake button %(icon)s.": "Para usar a foto atual, selecione o %(icon)s do bot\u00e3o da c\u00e2mera. Para tirar outra foto, selecione o %(icon)s do bot\u00e3o tirar novamente.", 
     "To verify your identity, you need a webcam and a government-issued photo ID.": "Para verificar sua identidade, voc\u00ea precisa de uma webcam e um documento com foto emitido pelo governo.", 
@@ -1479,10 +1468,6 @@
     "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Use a webcam para tirar uma foto do seu documento. N\u00f3s vamos conferir esta foto com a foto do seu rosto e o nome na sua conta.", 
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Use a webcam para tirar uma foto do seu rosto. N\u00f3s vamos conferir essa foto com a do seu documento de identidade.", 
     "Used": "Usado", 
-    "Used in %(count)s unit": [
-      "Utilizado em %(count)s unidade", 
-      "Utilizado em %(count)s unidades"
-    ], 
     "User": "Usu\u00e1rio", 
     "User Email": "E-mail do Usu\u00e1rio", 
     "Username": "Nome de usu\u00e1rio", 
@@ -1686,7 +1671,6 @@
     "anonymous": "an\u00f4nimo", 
     "answer": "resposta", 
     "answered question": "quest\u00e3o respondida", 
-    "as a percent, e.g. 40": "como um percentual, Ex. 40", 
     "asset_path is required": "vari\u00e1vel_ativa \u00e9 obrigat\u00f3ria", 
     "bytes": "bytes", 
     "certificate": "certificado", 
@@ -1702,8 +1686,6 @@
     "dragging out of slider": "Arrastando para fora da barra deslizante", 
     "dropped in slider": "solta na barra deslizante", 
     "dropped on target": "solta no destino", 
-    "e.g. HW, Midterm": "Ex. Tarefas para Casa, Exames Intermedi\u00e1rios", 
-    "e.g. Homework, Midterm Exams": "Ex. Tarefas para Casa, Exames Intermedi\u00e1rios", 
     "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com": "ex. johndoe@example.com, JaneDoe, joeydoe@example.com", 
     "emphasized text": "texto enfatizado", 
     "endorsed %(time_ago)s": "aprovado %(time_ago)s", 
@@ -1753,8 +1735,6 @@
     ], 
     "timed": "Cronometrado.", 
     "title": "t\u00edtulo", 
-    "total exercises assigned": "total de exerc\u00edcios atribu\u00eddos", 
-    "total exercises that won't be graded": "total de exerc\u00edcios que n\u00e3o ser\u00e3o avaliados", 
     "unanswered question": "quest\u00e3o n\u00e3o respondida", 
     "unit": "unidade", 
     "upload a PDF file or provide the path to a Studio asset file": "envie um arquivo PDF ou forne\u00e7a o caminho para um arquivo de ativo de Studio", 
