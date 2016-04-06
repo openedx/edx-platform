@@ -72,6 +72,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
 
     // Paths to source JavaScript files
     {pattern: 'js/**/*.js', included: false},
@@ -109,6 +110,7 @@ var files = [
     {pattern: 'support/templates/**/*.*', included: false},
     {pattern: 'templates/bookmarks/**/*.*', included: false},
     {pattern: 'templates/learner_dashboard/**/*.*', included: false},
+    {pattern: 'templates/ccx/**/*.*', included: false},
 
     // override fixture path and other config.
     {pattern: 'test_config.js', included: true},

@@ -16,13 +16,9 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
             },
             waitForElementToBeFocused = function(element, desc) {
                 // This is being used instead of toBeFocused which is flaky
-                waitsFor(
-                    function () {
-                        return element === document.activeElement;
-                    },
-                    desc + ' element to have focus',
-                    500
-                );
+                jasmine.waitUntil(function () {
+                    return element === document.activeElement;
+                });
             },
             openDropDownMenu = function() {
                 verifyDropdownNotVisible();

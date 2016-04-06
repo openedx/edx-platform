@@ -121,7 +121,7 @@ define([
 
         it('loads more', function () {
             var requests = AjaxHelpers.requests(this);
-            jasmine.Clock.useMock();
+            jasmine.clock().install();
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -129,12 +129,14 @@ define([
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
-            jasmine.Clock.tick(500);
+            jasmine.clock().tick(500);
 
             // TODO: determine why the search API is invoked twice
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(2);
+
+            jasmine.clock().uninstall();
         });
 
         it('displays not found message', function () {
