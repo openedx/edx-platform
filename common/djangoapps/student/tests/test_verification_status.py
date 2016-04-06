@@ -245,7 +245,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Adding another verification with different course.
         # Its created_at is greater than course deadline.
         course2 = CourseFactory.create()
-        CourseModeFactory.create(
+        CourseModeFactory(
             course_id=course2.id,
             mode_slug="verified",
             expiration_datetime=self.PAST
@@ -277,7 +277,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             enrollment_mode (str): The mode of the enrollment.
 
         """
-        CourseModeFactory.create(
+        CourseModeFactory(
             course_id=self.course.id,
             mode_slug="verified",
             expiration_datetime=deadline

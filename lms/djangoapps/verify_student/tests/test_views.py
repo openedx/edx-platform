@@ -822,7 +822,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         for course_mode in course_modes:
             min_price = (0 if course_mode in ["honor", "audit"] else self.MIN_PRICE)
-            CourseModeFactory.create(
+            CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
@@ -1012,7 +1012,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         course = CourseFactory.create(display_name=mode_display_name)
         for course_mode in [CourseMode.DEFAULT_MODE_SLUG, "verified"]:
             min_price = (self.MIN_PRICE if course_mode != CourseMode.DEFAULT_MODE_SLUG else 0)
-            CourseModeFactory.create(
+            CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=mode_display_name,
@@ -1074,7 +1074,7 @@ class CheckoutTestMixin(object):
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
         self.client.login(username="test", password="test")
 
     def _assert_checked_out(
@@ -1119,7 +1119,7 @@ class CheckoutTestMixin(object):
     def test_create_order_prof_ed(self, patched_create_order):
         # Create a prof ed course
         course = CourseFactory.create()
-        CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'professional')
@@ -1127,7 +1127,7 @@ class CheckoutTestMixin(object):
     def test_create_order_no_id_professional(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
@@ -1135,8 +1135,8 @@ class CheckoutTestMixin(object):
     def test_create_order_for_multiple_paid_modes(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
-        CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         # TODO jsa - is this the intended behavior?
@@ -1227,7 +1227,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         ecommerce api, we correctly call to that api to create a basket.
         """
         user = UserFactory.create(username="test-username")
-        course_mode = CourseModeFactory.create(sku="test-sku").to_tuple()  # pylint: disable=no-member
+        course_mode = CourseModeFactory(sku="test-sku").to_tuple()  # pylint: disable=no-member
         expected_payment_data = {'foo': 'bar'}
         # mock out the payment processors endpoint
         httpretty.register_uri(
@@ -2079,7 +2079,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -2280,7 +2280,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -2483,7 +2483,7 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
