@@ -131,8 +131,8 @@ describe "DiscussionThreadListView", ->
             created_at: '2013-04-03T20:05:39Z',
           }),
         ]
-
-        spyOn($, "ajax")
+        deferred = $.Deferred()
+        spyOn($, "ajax").and.returnValue(deferred);
 
         @discussion = new Discussion([])
         @view = new DiscussionThreadListView(
@@ -143,7 +143,7 @@ describe "DiscussionThreadListView", ->
         @view.render()
 
     setupAjax = (callback) ->
-      $.ajax.andCallFake(
+      $.ajax.and.callFake(
         (params) =>
           if callback
             callback(params)
@@ -162,7 +162,7 @@ describe "DiscussionThreadListView", ->
       )
 
     expectFilter = (filterVal) ->
-        $.ajax.andCallFake((params) ->
+        $.ajax.and.callFake((params) ->
             _.each(["unread", "unanswered", "flagged"], (paramName)->
                 if paramName == filterVal
                     expect(params.data[paramName]).toEqual(true)
@@ -199,7 +199,7 @@ describe "DiscussionThreadListView", ->
                     expectedGroupId = optionInfo.expectedGroupId
                     @view.$(".forum-nav-filter-cohort-control").val(optionInfo.val).change()
                     expect($.ajax).toHaveBeenCalled()
-                    $.ajax.reset()
+                    $.ajax.calls.reset()
             )
 
     it "search should clear filter", ->
@@ -255,7 +255,7 @@ describe "DiscussionThreadListView", ->
           sorted_threads = [threads[0], threads[3], threads[2], threads[1]]
         else if new_type == 'votes'
           sorted_threads = [threads[3], threads[0], threads[1], threads[2]]
-        $.ajax.andCallFake((params) =>
+        $.ajax.and.callFake((params) =>
           params.success(
                 {"discussion_data":sorted_threads, page:1, num_pages:1}
           )
@@ -307,7 +307,7 @@ describe "DiscussionThreadListView", ->
 
         testCorrection = (view, correctedText) ->
             spyOn(view, "addSearchAlert")
-            $.ajax.andCallFake(
+            $.ajax.and.callFake(
                 (params) =>
                     params.success(
                         {discussion_data: [], page: 42, num_pages: 99, corrected_text: correctedText}, 'success'
@@ -319,13 +319,13 @@ describe "DiscussionThreadListView", ->
 
         it "adds a search alert when an alternate term was searched", ->
             testCorrection(@view, "foo")
-            expect(@view.addSearchAlert.callCount).toEqual(1)
-            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/foo/)
+            expect(@view.addSearchAlert.calls.count()).toEqual(1)
+            expect(@view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/foo/)
 
         it "does not add a search alert when no alternate term was searched", ->
             testCorrection(@view, null)
-            expect(@view.addSearchAlert.callCount).toEqual(1)
-            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/no threads matched/i)
+            expect(@view.addSearchAlert.calls.count()).toEqual(1)
+            expect(@view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no threads matched/i)
 
         it "clears search alerts when a new search is performed", ->
             spyOn(@view, "clearSearchAlerts")
@@ -356,7 +356,7 @@ describe "DiscussionThreadListView", ->
     describe "username search", ->
 
         it "makes correct ajax calls", ->
-            $.ajax.andCallFake(
+            $.ajax.and.callFake(
                 (params) =>
                     expect(params.data.username).toEqual("testing-username")
                     expect(params.url.path()).toEqual(DiscussionUtil.urlFor("users"))
@@ -371,7 +371,7 @@ describe "DiscussionThreadListView", ->
         setAjaxResults = (threadSuccess, userResult) ->
             # threadSuccess is a boolean indicating whether the thread search ajax call should succeed
             # userResult is the value that should be returned as data from the username search ajax call
-            $.ajax.andCallFake(
+            $.ajax.and.callFake(
                 (params) =>
                     if params.data.text and threadSuccess
                         params.success(
@@ -387,14 +387,14 @@ describe "DiscussionThreadListView", ->
             )
 
         it "gets called after a thread search succeeds", ->
-            spyOn(@view, "searchForUser").andCallThrough()
+            spyOn(@view, "searchForUser").and.callThrough()
             setAjaxResults(true, [])
             @view.searchFor("gizmo")
             expect(@view.searchForUser).toHaveBeenCalled()
-            expect($.ajax.mostRecentCall.args[0].data.username).toEqual("gizmo")
+            expect($.ajax.calls.mostRecent().args[0].data.username).toEqual("gizmo")
 
         it "does not get called after a thread search fails", ->
-            spyOn(@view, "searchForUser").andCallThrough()
+            spyOn(@view, "searchForUser").and.callThrough()
             setAjaxResults(false, [])
             @view.searchFor("gizmo")
             expect(@view.searchForUser).not.toHaveBeenCalled()
@@ -405,7 +405,7 @@ describe "DiscussionThreadListView", ->
             @view.searchForUser("dummy")
             expect($.ajax).toHaveBeenCalled()
             expect(@view.addSearchAlert).toHaveBeenCalled()
-            expect(@view.addSearchAlert.mostRecentCall.args[0]).toMatch(/gizmo/)
+            expect(@view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/gizmo/)
 
         it "does not add a search alert when no username was matched", ->
             spyOn(@view, "addSearchAlert")
@@ -581,7 +581,7 @@ describe "DiscussionThreadListView", ->
             ,
             "Following"
           )
-          expect($.ajax.mostRecentCall.args[0].data.group_id).toBeUndefined();
+          expect($.ajax.calls.mostRecent().args[0].data.group_id).toBeUndefined();
 
         it "should get threads for the selected leaf", ->
           testSelectionRequest(

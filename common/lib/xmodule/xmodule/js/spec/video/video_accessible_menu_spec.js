@@ -101,7 +101,7 @@
                     menuList = container.children('ol.a11y-menu-list');
                     menuItems = menuList.children('li.a11y-menu-item');
                     menuItemsLinks = menuItems.children('a.a11y-menu-item-link');
-                    spyOn($.fn, 'focus').andCallThrough();
+                    spyOn($.fn, 'focus').and.callThrough();
                 });
 
                 it('open/close the menu on mouseenter/mouseleave', function () {
@@ -173,7 +173,7 @@
                     }
 
                     // Test if each element has been called twice.
-                    expect($.fn.focus.calls.length)
+                    expect($.fn.focus.calls.count())
                         .toEqual(2*menuItemsLinks.length+1);
                 });
 
@@ -258,7 +258,7 @@
                 beforeEach(function () {
                     state = jasmine.initializePlayer();
                     state.videoSpeedControl.setSpeed(1.0);
-                    spyOn(state.videoPlayer, 'onSpeedChange').andCallThrough();
+                    spyOn(state.videoPlayer, 'onSpeedChange').and.callThrough();
 
                     $('li[data-speed="0.75"] .speed-link').click();
                 });

@@ -32,6 +32,7 @@
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'js/libs/jasmine-stealth',
             'jasmine-waituntil': 'js/libs/jasmine-waituntil',
+            'jasmine-extensions': 'js/libs/jasmine-extensions',
             'URI': 'js/vendor/URI.min'
         },
         shim: {
@@ -139,6 +140,9 @@
                 deps: ['underscore', 'underscore.string']
             },
             'jasmine-waituntil': {
+                deps: ['jquery']
+            },
+            'jasmine-extensions': {
                 deps: ['jquery']
             },
             "sinon": {

@@ -28,10 +28,12 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * Get a reference to the mocked server, and respond
      * to all requests with the specified statusCode.
      */
-    fakeServer = function (that, response) {
+    fakeServer = function (response) {
         var server = sinon.fakeServer.create();
-        that.after(function() {
-            server.restore();
+        afterEach(function() {
+            if (server) {
+                server.restore();
+            }
         });
         server.respondWith(response);
         return server;
@@ -42,16 +44,19 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * return a reference to the Array. This allows tests
      * to respond for individual requests.
      */
-    fakeRequests = function (that) {
+    fakeRequests = function () {
         var requests = [],
-            xhr = sinon.useFakeXMLHttpRequest();
+          xhr = sinon.useFakeXMLHttpRequest();
+
         requests.currentIndex = 0;
         xhr.onCreate = function(request) {
             requests.push(request);
         };
 
-        that.after(function() {
-            xhr.restore();
+        afterEach(function() {
+            if (xhr && xhr.hasOwnProperty('restore')) {
+                xhr.restore();
+            }
         });
         return requests;
     };
@@ -72,7 +77,7 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
-        expect(request.requestBody).toEqual(body);
+        expect(request.requestBody).toEqual(body === undefined ? null : body);
     };
 
     /**
@@ -83,11 +88,12 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     };
 
     expectJsonRequest = function(requests, method, url, jsonRequest) {
+        jsonRequest = jsonRequest || null;
         var request = currentRequest(requests);
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
-        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest);
+        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest === undefined ? null : jsonRequest);
     };
 
     /**
