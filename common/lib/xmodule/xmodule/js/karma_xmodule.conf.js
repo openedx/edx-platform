@@ -37,6 +37,7 @@ var files = [
     {pattern: 'common_static/js/src/logger.js', included: true},
     {pattern: 'common_static/js/vendor/jasmine-imagediff.js', included: true},
     {pattern: 'common_static/js/libs/jasmine-waituntil.js', included: true},
+    {pattern: 'common_static/js/libs/jasmine-extensions.js', included: true},
     {pattern: 'common_static/js/vendor/requirejs/require.js', included: true},
     {pattern: 'RequireJS-namespace-undefine.js', included: true},
     {pattern: 'common_static/js/vendor/jquery-ui.min.js', included: true},

@@ -28,14 +28,14 @@ describe "XBlock", ->
       window.TestRuntime = {}
       @runtimeA = {name: 'runtimeA'}
       @runtimeZ = {name: 'runtimeZ'}
-      TestRuntime.vA = jasmine.createSpy().andReturn(@runtimeA)
-      TestRuntime.vZ = jasmine.createSpy().andReturn(@runtimeZ)
+      TestRuntime.vA = jasmine.createSpy().and.returnValue(@runtimeA)
+      TestRuntime.vZ = jasmine.createSpy().and.returnValue(@runtimeZ)
 
       window.initFnA = jasmine.createSpy()
       window.initFnZ = jasmine.createSpy()
 
       @fakeChildren = ['list', 'of', 'children']
-      spyOn(XBlock, 'initializeXBlocks').andReturn(@fakeChildren)
+      spyOn(XBlock, 'initializeXBlocks').and.returnValue(@fakeChildren)
 
       @vANode = $('#vA')[0]
       @vZNode = $('#vZ')[0]
@@ -54,11 +54,11 @@ describe "XBlock", ->
       expect(window.initFnZ).toHaveBeenCalledWith(@runtimeZ, @vZNode, {})
 
     it "loads when missing versions", ->
-      expect(@missingVersionBlock.element).toBe($('#missing-version'))
+      expect(@missingVersionBlock.element).toBe($('#missing-version')[0])
       expect(@missingVersionBlock.name).toBe('no-version')
 
     it "loads when missing init fn", ->
-      expect(@missingInitBlock.element).toBe($('#missing-init'))
+      expect(@missingInitBlock.element).toBe($('#missing-init')[0])
       expect(@missingInitBlock.name).toBe('no-init')
 
     it "adds names to blocks", ->

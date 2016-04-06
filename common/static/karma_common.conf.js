@@ -34,6 +34,7 @@ var files = [
     {pattern: 'js/vendor/jquery.min.js', included: true},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
     {pattern: 'js/libs/jasmine-waituntil.js', included: true},
+    {pattern: 'js/libs/jasmine-extensions.js', included: true},
     {pattern: 'js/vendor/jquery.truncate.js', included: true},
     {pattern: 'js/vendor/mustache.js', included: true},
     {pattern: 'common/js/vendor/underscore.js', included: true},
@@ -45,6 +46,7 @@ var files = [
     {pattern: 'js/test/add_ajax_prefix.js', included: true},
     {pattern: 'js/test/i18n.js', included: true},
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
+    {pattern: 'js/vendor/jquery.leanModal.js', included: true},
 
     // Paths to source JavaScript files
     {pattern: 'js/xblock/**/*.js', included: true, nocache: true},

@@ -36,7 +36,9 @@
             'edxicons': 'edx-pattern-library/js/edx-icons',
             'draggabilly': 'js/vendor/draggabilly',
             'jasmine-stealth': 'js/libs/jasmine-stealth',
-            'jasmine-waituntil': 'js/libs/jasmine-waituntil'
+            'jasmine-waituntil': 'js/libs/jasmine-waituntil',
+            'jasmine-extensions': 'js/libs/jasmine-extensions',
+            'URI': 'js/vendor/URI.min'
         },
         shim: {
             'gettext': {
@@ -143,6 +145,9 @@
                 deps: ['underscore', 'underscore.string']
             },
             'jasmine-waituntil': {
+                deps: ['jquery']
+            },
+            'jasmine-extensions': {
                 deps: ['jquery']
             },
             "sinon": {
