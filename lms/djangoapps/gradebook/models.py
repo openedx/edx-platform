@@ -82,9 +82,6 @@ class StudentGradebook(models.Model):
                         user__courseenrollment__course_id__exact=course_key,
                         user__in=enrolled_users_not_excluded)
 
-            if group_ids:
-                queryset.filter(user__groups__in=group_ids)
-
             gradebook_user_count = len(queryset)
 
             if gradebook_user_count:
@@ -99,6 +96,9 @@ class StudentGradebook(models.Model):
                     data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
                     data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
                     data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
+
+                if group_ids:
+                    queryset = queryset.filter(user__groups__in=group_ids)
 
                 # Construct the leaderboard as a queryset
                 data['queryset'] = queryset.values(

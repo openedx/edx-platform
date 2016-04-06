@@ -1748,6 +1748,13 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         GET /api/courses/{course_id}/grades/leaders/
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        if group_ids:
+            try:
+                group_ids = map(int, group_ids.split(','))
+            except ValueError:
+                return Response({}, status.HTTP_400_BAD_REQUEST)
+
         count = self.request.QUERY_PARAMS.get('count', 3)
         data = {}
         course_avg = 0
@@ -1756,7 +1763,12 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         course_key = get_course_key(course_id)
         # Users having certain roles (such as an Observer) are excluded from aggregations
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        leaderboard_data = StudentGradebook.generate_leaderboard(course_key, user_id=user_id, count=count, exclude_users=exclude_users)
+        leaderboard_data = StudentGradebook.generate_leaderboard(course_key,
+                                                                 user_id=user_id,
+                                                                 group_ids=group_ids,
+                                                                 count=count,
+                                                                 exclude_users=exclude_users)
+
         serializer = CourseLeadersSerializer(leaderboard_data['queryset'], many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
         data['course_avg'] = leaderboard_data['course_avg']
