@@ -52,7 +52,7 @@
             "text": 'js/vendor/requirejs/text',
             "underscore": "common/js/vendor/underscore",
             "underscore.string": "common/js/vendor/underscore.string",
-            "backbone": "common/js/vendor/backbone-min",
+            "backbone": "common/js/vendor/backbone/backbone-min",
             "backbone-relational" : "js/vendor/backbone-relational.min",
             "backbone.associations": "js/vendor/backbone-associations-min",
             "backbone.paginator": "js/vendor/backbone.paginator.min",

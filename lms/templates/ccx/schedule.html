@@ -13,7 +13,7 @@ from openedx.core.djangolib.js_utils import (
     var save_url = '${save_url | n, js_escaped_string}';
     var schedule = ${schedule | n, dump_js_escaped_json};
   </script>
-  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('common/js/vendor/backbone/backbone-min.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <style>
