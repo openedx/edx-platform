@@ -30,11 +30,10 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/logger.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: false},
     {pattern: 'js/RequireJS-namespace-undefine.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
@@ -70,10 +69,9 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/moment.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/moment-with-locales.min.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/utils/edx.utils.validate.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
 
     // Paths to source JavaScript files
     {pattern: 'js/**/*.js', included: false, nocache: true},
@@ -84,6 +82,10 @@ var files = [
     {pattern: 'support/js/**/*.js', included: false, nocache: true},
     {pattern: 'teams/js/**/*.js', included: false, nocache: true},
     {pattern: 'xmodule_js/common_static/coffee/**/*.js', included: false, nocache: true},
+
+    // Paths to Jasmine plugins
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
 
     // Paths to spec (test) JavaScript files
     {pattern: 'js/spec/**/*.js', included: false, nocache: true},

@@ -127,7 +127,7 @@
                 // spying on `view.validate` twice
                 if ( !_.isUndefined(validationSuccess) ) {
                     // Force validation to return as expected
-                    spyOn(view, 'validate').andReturn({
+                    spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
                     });
@@ -173,7 +173,7 @@
 
                 // Simulate that the user is attempting to enroll in a course
                 // by setting the course_id query string param.
-                spyOn($, 'url').andCallFake(function( param ) {
+                spyOn($, 'url').and.callFake(function( param ) {
                     if (param === '?course_id') {
                         return encodeURIComponent( COURSE_ID );
                     }
