@@ -27,7 +27,7 @@
         });
 
         testUpdate = function(view, thread, newTopicId, newTopicName) {
-            spyOn($, 'ajax').andCallFake(function(params) {
+            spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');
                 expect(params.data.commentable_id).toBe(newTopicId);
@@ -35,7 +35,10 @@
                 params.success();
                 return {always: function() {}};
             });
-            view.$el.find('a.topic-title[data-discussion-id="'+newTopicId+'"]').click(); // set new topic
+
+            view.$el.find('a.topic-title').filter(function (idx, el) {
+                return $(el).data('discussionId') === newTopicId;
+            }).click(); // set new topic
             view.$('.edit-post-title').val('changed thread title'); // set new title
             view.$("label[for$='post-type-discussion']").click(); // set new thread type
             view.$('.post-update').click();
@@ -62,7 +65,7 @@
         testCancel = function(view) {
             view.$('.post-cancel').click();
             expect($('.edit-post-form')).not.toExist();
-        }
+        };
 
         it('can close the view in tab mode', function() {
             this.createEditView();
@@ -104,11 +107,11 @@
 
             it('can save new data correctly for current discussion id with dots', function () {
                 this.createEditView({topicId: "6.00.1x_General"});
-                testUpdate(this.view, this.thread, "6>00'1x\"Basic_Question", "Basic Question");
+                testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", "Basic Question");
             });
 
             it('can save new data correctly for current discussion id with special characters', function () {
-                this.createEditView({topicId: "6>00'1x\"Basic_Question"});
+                this.createEditView({topicId: "6>00\'1x\"Basic_Question"});
                 testUpdate(this.view, this.thread, "6.00.1x_General", "General");
             });
         });

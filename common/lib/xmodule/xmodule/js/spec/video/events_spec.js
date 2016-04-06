@@ -7,9 +7,7 @@
                 oldOTBD = window.onTouchBasedDevice;
                 window.onTouchBasedDevice = jasmine
                     .createSpy('onTouchBasedDevice')
-                    .andReturn(null);
-
-                jasmine.stubRequests();
+                    .and.returnValue(null);
 
                 state = jasmine.initializePlayer();
 
@@ -22,24 +20,20 @@
                 state.storage.clear();
             });
 
-            it('initialize', function () {
-                waitsFor(function () {
+            it('initialize', function (done) {
+                jasmine.waitUntil(function () {
                     return state.el.hasClass('is-initialized');
-                }, 'Player is not initialized.', WAIT_TIMEOUT);
-
-                runs(function () {
+                }).then(function () {
                     expect('initialize').not.toHaveBeenTriggeredOn('.video');
-                });
+                }).always(done);
             });
 
-            it('ready', function () {
-                waitsFor(function () {
+            it('ready', function (done) {
+                jasmine.waitUntil(function () {
                     return state.el.hasClass('is-initialized');
-                }, 'Player is not initialized.', WAIT_TIMEOUT);
-
-                runs(function () {
+                }).then(function () {
                     expect('ready').not.toHaveBeenTriggeredOn('.video');
-                });
+                }).always(done);
             });
 
             it('play', function () {
@@ -86,9 +80,7 @@
                 oldOTBD = window.onTouchBasedDevice;
                 window.onTouchBasedDevice = jasmine
                     .createSpy('onTouchBasedDevice')
-                    .andReturn(null);
-
-                jasmine.stubRequests();
+                    .and.returnValue(null);
 
                 state = jasmine.initializePlayerYouTube();
             });

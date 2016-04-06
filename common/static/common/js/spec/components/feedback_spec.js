@@ -4,7 +4,7 @@
   define(["jquery", "common/js/components/views/feedback", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_alert", "common/js/components/views/feedback_prompt", 'common/js/spec_helpers/view_helpers', "sinon", "jquery.simulate"],
     function($, SystemFeedback, NotificationView, AlertView, PromptView, ViewHelpers, sinon) {
     var tpl;
-    tpl = readFixtures('system-feedback.underscore');
+    tpl = readFixtures('common/templates/components/system-feedback.underscore');
     beforeEach(function() {
       setFixtures(sandbox({
         id: "page-alert"
@@ -19,30 +19,57 @@
         id: "system-feedback-tpl",
         type: "text/template"
       }).text(tpl));
-      return this.addMatchers({
+      return jasmine.addMatchers({
         toBeShown: function() {
-          return this.actual.hasClass("is-shown") && !this.actual.hasClass("is-hiding");
+          return {
+            compare: function (actual) {
+              return {
+                pass: actual.hasClass("is-shown") && !actual.hasClass("is-hiding")
+              };
+            }
+          };
         },
         toBeHiding: function() {
-          return this.actual.hasClass("is-hiding") && !this.actual.hasClass("is-shown");
+          return {
+            compare: function (actual) {
+              return {
+                pass: actual.hasClass("is-hiding") && !actual.hasClass("is-shown")
+              };
+            }
+          };
         },
-        toContainText: function(text) {
-          var trimmedText;
-          trimmedText = $.trim(this.actual.text());
-          if (text && $.isFunction(text.test)) {
-            return text.test(trimmedText);
-          } else {
-            return trimmedText.indexOf(text) !== -1;
-          }
+        toContainText: function() {
+          return {
+            compare: function (text) {
+              var trimmedText,
+                  passed;
+
+              trimmedText = $.trim(this.actual.text());
+              if (text && $.isFunction(text.test)) {
+                passed = text.test(trimmedText);
+              } else {
+                passed = trimmedText.indexOf(text) !== -1;
+              }
+              return {
+                pass: passed
+              };
+            }
+          };
         },
         toHaveBeenPrevented: function() {
-          var eventName, selector;
-          eventName = this.actual.eventName;
-          selector = this.actual.selector;
-          this.message = function() {
-            return ["Expected event " + eventName + " to have been prevented on " + selector, "Expected event " + eventName + " not to have been prevented on " + selector];
+          return {
+            compare: function (actual) {
+              var eventName, selector;
+              eventName = actual.eventName;
+              selector = actual.selector;
+
+              return {
+                pass: jasmine.JQuery.events.wasPrevented(selector, eventName),
+                message: "Expected event " + eventName + " to have been prevented on " + selector +
+                "and Expected event " + eventName + " not to have been prevented on " + selector
+              };
+            }
           };
-          return jasmine.JQuery.events.wasPrevented(selector, eventName);
         }
       });
     });
@@ -52,9 +79,9 @@
           title: "Portal",
           message: "Welcome to the Aperture Science Computer-Aided Enrichment Center"
         };
-        this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').andCallThrough();
-        this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').andCallThrough();
-        this.hideSpy = spyOn(AlertView.Confirmation.prototype, 'hide').andCallThrough();
+        this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').and.callThrough();
+        this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').and.callThrough();
+        this.hideSpy = spyOn(AlertView.Confirmation.prototype, 'hide').and.callThrough();
         return this.clock = sinon.useFakeTimers();
       });
       afterEach(function() {
@@ -122,30 +149,37 @@
           actions: {
             primary: {
               text: "Yes, I'm sure.",
-              "class": "confirm-button",
+              "class": "confirm-button"
             },
             secondary: {
               text: "Cancel",
-              "class": "cancel-button",
+              "class": "cancel-button"
             }
           }
-        }
-        this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').andCallThrough();
-        return this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').andCallThrough();
+        };
+        this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').and.callThrough();
+        return this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').and.callThrough();
       });
-      it("is focused on show", function() {
+      it("is focused on show", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
-        return ViewHelpers.verifyElementInFocus(view, ".wrapper-prompt")
+        setTimeout(function () {
+          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
-      it("is not focused on hide", function() {
+      it("is not focused on hide", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).hide();
         expect(this.outFocusSpy).toHaveBeenCalled();
-        return ViewHelpers.verifyElementNotInFocus(view, ".wrapper-prompt")
+
+        setTimeout(function () {
+          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(0);
+          done();
+        }, 500);
       });
-      it("traps keyboard focus when moving forward", function() {
+      it("traps keyboard focus when moving forward", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
@@ -153,9 +187,13 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-primary")
+
+        setTimeout(function () {
+          expect(view.$(".action-primary" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
-      it("traps keyboard focus when moving backward", function() {
+      it("traps keyboard focus when moving backward", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
@@ -163,9 +201,14 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB, shiftKey: true }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-secondary")
+
+        setTimeout(function () {
+          expect(view.$(".action-secondary" + ':focus').length).toBe(1);
+          done();
+        }, 500);
       });
       return it("changes class on body", function() {
+        // TODO: add expectation here
         var view;
         view = new PromptView.Confirmation({
           title: "Portal",
@@ -301,9 +344,9 @@
     return describe("NotificationView minShown and maxShown", function() {
       beforeEach(function() {
         this.showSpy = spyOn(NotificationView.Confirmation.prototype, 'show');
-        this.showSpy.andCallThrough();
+        this.showSpy.and.callThrough();
         this.hideSpy = spyOn(NotificationView.Confirmation.prototype, 'hide');
-        this.hideSpy.andCallThrough();
+        this.hideSpy.and.callThrough();
         return this.clock = sinon.useFakeTimers();
       });
       afterEach(function() {

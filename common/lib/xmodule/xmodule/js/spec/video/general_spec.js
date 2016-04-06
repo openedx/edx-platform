@@ -2,21 +2,18 @@
     describe('Video', function () {
         var oldOTBD, state;
 
-        beforeEach(function () {
-            jasmine.stubRequests();
-        });
-
         afterEach(function () {
             $('source').remove();
             window.VideoState = {};
             window.VideoState.id = {};
+            window.YT = jasmine.YT;
         });
 
         describe('constructor', function () {
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
-                    $.cookie.andReturn('0.50');
+                    $.cookie.and.returnValue('0.50');
                     this.state = jasmine.initializePlayerYouTube('video_html5.html');
                 });
 
@@ -30,7 +27,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(this.state.el).toBe('#video_id');
+                        expect(this.state.el).toEqual('#video_id');
                     });
 
                     it('parse the videos', function () {
@@ -55,7 +52,7 @@
                 var state;
 
                 beforeEach(function () {
-                    $.cookie.andReturn('0.75');
+                    $.cookie.and.returnValue('0.75');
                     state = jasmine.initializePlayer('video_html5.html');
                 });
 
@@ -70,7 +67,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(state.el).toBe('#video_id');
+                        expect(state.el).toEqual('#video_id');
                     });
 
                     it('doesn\'t have `videos` dictionary', function () {
@@ -110,21 +107,20 @@
                 state.videoPlayer.destroy();
             });
 
-            it('callback, to be called after YouTube API loads, exists and is called', function () {
-                waitsFor(function () {
+            it('callback, to be called after YouTube API loads, exists and is called', function (done) {
+                jasmine.waitUntil(function () {
                     return state.youtubeApiAvailable === true;
-                }, 'YouTube API is loaded', 3000);
+                }).done(function(){
+                    window.YT = jasmine.YT;
 
-                window.YT = jasmine.YT;
-
-                // Call the callback that must be called when YouTube API is
-                // loaded. By specification.
-                window.onYouTubeIframeAPIReady();
-
-                runs(function () {
+                    // Call the callback that must be called when YouTube API is
+                    // loaded. By specification.
+                    window.onYouTubeIframeAPIReady();
+                }).always(function () {
                     // If YouTube API is not loaded, then the code will should create
                     // a global callback that will be called by API once it is loaded.
                     expect(window.onYouTubeIframeAPIReady).not.toBeUndefined();
+                    done();
                 });
             });
         });

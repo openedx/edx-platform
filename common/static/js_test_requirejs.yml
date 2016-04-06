@@ -29,8 +29,9 @@ prepend_path: common/static
 # Paths to library JavaScript files (optional)
 lib_paths:
     - js/vendor/jquery.min.js
-    - js/vendor/jasmine-jquery.js
     - js/vendor/jasmine-imagediff.js
+    - js/libs/jasmine-stealth.js
+    - js/libs/jasmine-waituntil.js
     - js/vendor/jquery.simulate.js
     - js/vendor/jquery.truncate.js
     - js/vendor/underscore-min.js
@@ -45,7 +46,6 @@ lib_paths:
     - coffee/src/jquery.immediateDescendents.js
     - js/vendor/requirejs/text.js
     - js/vendor/sinon-1.17.0.js
-    - js/vendor/jasmine-stealth.js
 
 # Paths to source JavaScript files
 src_paths:

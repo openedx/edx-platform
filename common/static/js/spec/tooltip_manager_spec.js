@@ -11,24 +11,38 @@ describe('TooltipManager', function () {
         this.element = $('#test-id');
 
         this.tooltip = new TooltipManager(document.body);
-        jasmine.Clock.useMock();
+        jasmine.clock().uninstall();
+        jasmine.clock().install();
         // Set default dimensions to make testing easer.
         $('.tooltip').height(HEIGHT).width(WIDTH);
 
         // Re-write default jasmine-jquery to consider opacity.
-        this.addMatchers({
+        jasmine.addMatchers({
             toBeVisible: function() {
-              return this.actual.is(':visible') || parseFloat(this.actual.css('opacity'));
+              return {
+                  compare: function (actual) {
+                      return {
+                          pass: actual.is(':visible') || parseFloat(actual.css('opacity'))
+                      };
+                  }
+              }
             },
 
-            toBeHidden: function() {
-              return this.actual.is(':hidden') || !parseFloat(this.actual.css('opacity'));
-            },
+            toBeHidden: function () {
+                return {
+                    compare: function (actual) {
+                        return {
+                            pass: actual.is(':hidden') || !parseFloat(actual.css('opacity'))
+                        };
+                    }
+                }
+            }
         });
     });
 
     afterEach(function () {
         this.tooltip.destroy();
+        jasmine.clock().uninstall();
     });
 
     showTooltip = function (element) {
@@ -36,7 +50,7 @@ describe('TooltipManager', function () {
             pageX: PAGE_X,
             pageY: PAGE_Y
         }));
-        jasmine.Clock.tick(500);
+        jasmine.clock().tick(500);
     };
 
     it('can destroy itself', function () {
@@ -58,7 +72,7 @@ describe('TooltipManager', function () {
         showTooltip(this.element);
         expect($('.tooltip')).toBeVisible();
         this.element.trigger($.Event("mouseout"));
-        jasmine.Clock.tick(50);
+        jasmine.clock().tick(50);
         expect($('.tooltip')).toBeHidden();
     });
 
@@ -66,7 +80,7 @@ describe('TooltipManager', function () {
         showTooltip(this.element);
         expect($('.tooltip')).toBeVisible();
         this.element.trigger($.Event("click"));
-        jasmine.Clock.tick(50);
+        jasmine.clock().tick(50);
         expect($('.tooltip')).toBeHidden();
     });
 
