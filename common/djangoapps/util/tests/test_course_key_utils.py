@@ -1,7 +1,6 @@
 """
 Tests for util.course_key_utils
 """
-from nose.tools import assert_equals, assert_raises  # pylint: disable=no-name-in-module
 from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.keys import CourseKey
 from django.http import Http404
@@ -22,12 +21,12 @@ class TestFromStringOr404(unittest.TestCase):
         """
         Tests course_key_from_string_or_404 for valid and invalid split style course keys and mongo style course keys.
         """
-        assert_raises(
+        self.assertRaises(
             Http404,
             course_key_from_string_or_404,
             invalid_course_key,
         )
-        assert_equals(
+        self.assertEquals(
             CourseKey.from_string(valid_course_key),
             course_key_from_string_or_404(valid_course_key)
         )
@@ -44,4 +43,4 @@ class TestFromStringOr404(unittest.TestCase):
         try:
             course_key_from_string_or_404(course_string, message="Invalid Keys")
         except Http404 as exception:
-            assert_equals(str(exception), "Invalid Keys")
+            self.assertEquals(str(exception), "Invalid Keys")

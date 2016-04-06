@@ -13,7 +13,7 @@ from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
 import lti_provider.outcomes as outcomes
 from lti_provider.views import parse_course_and_usage_keys
-from util.course_key_utils import course_key_from_string_or_404
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.lti_provider")
@@ -105,7 +105,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
             assignment.id
         )
         return
-    course_key = course_key_from_string_or_404(course_id)
+    course_key = CourseKey.from_string(course_id)
     mapped_usage_key = assignment.usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     course = modulestore().get_course(course_key, depth=0)

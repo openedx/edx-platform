@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from util.course_key_utils import course_key_from_string_or_404
+from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course
 
@@ -14,7 +14,7 @@ class Command(BaseCommand):
             raise CommandError("Only one course id may be specifiied")
         course_id = args[0]
 
-        course_key = course_key_from_string_or_404(course_id)
+        course_key = CourseKey.from_string(course_id)
 
         course = get_course(course_key)
         if not course:
