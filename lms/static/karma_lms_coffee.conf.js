@@ -38,6 +38,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
     {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},

@@ -47,7 +47,8 @@
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
-            'jasmine-waituntil': 'xmodule_js/common_static/js/vendor/jasmine-waituntil',
+            'jasmine-waituntil': 'xmodule_js/common_static/js/libs/jasmine-waituntil',
+            'jasmine-extensions': 'xmodule_js/common_static/js/libs/jasmine-extensions',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
@@ -104,8 +105,8 @@
 
             // Common edx utils
             'common/js/utils/edx.utils.validate': 'xmodule_js/common_static/common/js/utils/edx.utils.validate',
-            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid',
-            'slick.core': 'xmodule_js/common_static/js/vendor/slick.core'
+            'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
+            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
         },
         shim: {
             'gettext': {
@@ -265,6 +266,9 @@
             'jasmine-waituntil': {
                 deps: ['jquery']
             },
+            'jasmine-extensions': {
+                deps: ['jquery']
+            },
             'xblock/core': {
                 exports: 'XBlock',
                 deps: ['jquery', 'jquery.immediateDescendents']
@@ -362,11 +366,18 @@
                 deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    window._ = require('underscore');
-                    window._.str = require('underscore.string');
-                    window.edx = edx || {};
-                    window.edx.HtmlUtils = require('edx-ui-toolkit/js/utils/html-utils');
-                    window.edx.StringUtils = require('edx-ui-toolkit/js/utils/string-utils');
+                    require([
+                        'underscore',
+                        'underscore.string',
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function (_, str, HtmlUtils, StringUtils) {
+                        window._ = _;
+                        window._.str = str;
+                        window.edx = edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
                 }
             },
             'js/verify_student/views/intro_step_view': {
@@ -491,8 +502,10 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    window.Backbone = require('backbone');
-                    window.URI = require('URI');
+                    require(['backbone', 'URI'], function (Backbone, URI) {
+                        window.Backbone = Backbone;
+                        window.URI = URI;
+                    });
                 }
             },
             'xmodule_js/common_static/coffee/src/discussion/content': {
@@ -546,13 +559,15 @@
             },
             'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view': {
                 deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadShowView'
             },
             'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view': {
                 deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadView'
             },

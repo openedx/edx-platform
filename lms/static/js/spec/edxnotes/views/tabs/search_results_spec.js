@@ -1,10 +1,9 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_helpers',
     'logger', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
-    'js/spec/edxnotes/custom_matchers', 'js/spec/edxnotes/helpers', 'jasmine-jquery'
+    'js/spec/edxnotes/helpers'
 ], function(
-    $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView,
-    customMatchers, Helpers
+    $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers
 ) {
     'use strict';
     describe('EdxNotes SearchResultsView', function() {
@@ -69,7 +68,6 @@ define([
         searchResultsTabId = "#search-results-panel";
 
         beforeEach(function () {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -146,7 +144,7 @@ define([
         it('can clear search results if tab is closed', function () {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
-            spyOn(view.searchBox, 'clearInput').andCallThrough();
+            spyOn(view.searchBox, 'clearInput').and.callThrough();
 
             submitForm(view.searchBox, 'test_query');
             Helpers.respondToRequest(requests, responseJson, true);

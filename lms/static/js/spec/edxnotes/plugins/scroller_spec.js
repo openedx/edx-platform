@@ -1,7 +1,6 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
-    'js/spec/edxnotes/custom_matchers'
-], function($, _, Annotator, NotesFactory, customMatchers) {
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
+], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Scroll Plugin', function() {
         var annotators, highlights;
@@ -19,7 +18,6 @@ define([
         }
 
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             annotators = [
                 NotesFactory.factory($('div#edx-notes-wrapper-123').get(0), {
@@ -31,9 +29,9 @@ define([
             ];
 
             highlights = _.map(annotators, function(annotator) {
-                spyOn(annotator, 'onHighlightClick').andCallThrough();
-                spyOn(annotator, 'onHighlightMouseover').andCallThrough();
-                spyOn(annotator, 'startViewerHideTimer').andCallThrough();
+                spyOn(annotator, 'onHighlightClick').and.callThrough();
+                spyOn(annotator, 'onHighlightMouseover').and.callThrough();
+                spyOn(annotator, 'startViewerHideTimer').and.callThrough();
                 return $('<span></span>', {
                     'class': 'annotator-hl',
                     'tabindex': -1,
@@ -41,8 +39,8 @@ define([
                 }).appendTo(annotator.element);
             });
 
-            spyOn(annotators[0].plugins.Scroller, 'getIdFromLocationHash').andReturn('abc123');
-            spyOn($.fn, 'unbind').andCallThrough();
+            spyOn(annotators[0].plugins.Scroller, 'getIdFromLocationHash').and.returnValue('abc123');
+            spyOn($.fn, 'unbind').and.callThrough();
         });
 
         afterEach(function () {
@@ -56,7 +54,7 @@ define([
                 id: 'abc123',
                 highlights: [highlights[0]]
             }]);
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             expect(highlights[0]).toBeFocused();
             highlights[0].mouseover();
             highlights[0].mouseout();
