@@ -58,7 +58,7 @@ lib_paths:
     - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/common/js/vendor/underscore.js
     - xmodule_js/common_static/common/js/vendor/underscore.string.js
-    - xmodule_js/common_static/common/js/vendor/backbone-min.js
+    - xmodule_js/common_static/common/js/vendor/backbone/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
     - xmodule_js/common_static/js/test/i18n.js
