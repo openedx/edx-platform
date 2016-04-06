@@ -36,8 +36,8 @@ lib_paths:
     - common_static/js/test/i18n.js
     - common_static/coffee/src/ajax_prefix.js
     - common_static/js/src/logger.js
-    - common_static/js/vendor/jasmine-jquery.js
     - common_static/js/vendor/jasmine-imagediff.js
+    - common_static/js/libs/jasmine-waituntil.js
     - common_static/js/vendor/requirejs/require.js
     - RequireJS-namespace-undefine.js
     - common_static/js/vendor/jquery.min.js

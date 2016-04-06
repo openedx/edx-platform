@@ -108,6 +108,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
 
     it "re-renders correctly when endorsement changes", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set("thread_type", "question")
         @view.render()
@@ -118,6 +119,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
 
     it "allows a moderator to mark an answer in a question thread", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set({
             "thread_type": "question",
@@ -131,6 +133,7 @@ describe "ThreadResponseShowView", ->
         expect(endorseButton).toHaveClass("is-checked")
 
     it "allows the author of a question thread to mark an answer", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         @thread.set({
             "thread_type": "question",
             "user_id": window.user.id
@@ -199,7 +202,7 @@ describe "ThreadResponseShowView", ->
                 "username": "test_endorser",
                 "time": new Date().toISOString()
             })
-            spyOn(DiscussionUtil, 'urlFor').andReturn('test_endorser_url')
+            spyOn(DiscussionUtil, 'urlFor').and.returnValue('test_endorser_url')
 
         checkUserLink = (element, is_ta, is_staff) ->
             expect(element.find('a.username').length).toEqual(1)
@@ -217,11 +220,11 @@ describe "ThreadResponseShowView", ->
             checkUserLink($el, false, false)
 
         it "renders correctly for a community TA-endorsed response", ->
-            spyOn(DiscussionUtil, 'isTA').andReturn(true)
+            spyOn(DiscussionUtil, 'isTA').and.returnValue(true)
             $el = $('#fixture-element').html(@view.getEndorserDisplay())
             checkUserLink($el, true, false)
 
         it "renders correctly for a staff-endorsed response", ->
-            spyOn(DiscussionUtil, 'isStaff').andReturn(true)
+            spyOn(DiscussionUtil, 'isStaff').and.returnValue(true)
             $el = $('#fixture-element').html(@view.getEndorserDisplay())
             checkUserLink($el, false, true)
