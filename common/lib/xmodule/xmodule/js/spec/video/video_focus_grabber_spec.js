@@ -15,17 +15,19 @@
             // stack.
             jQuery.fx.off = true;
 
+            jasmine.stubRequests();
             loadFixtures('video_html5.html');
             state = new Video('#example');
 
             spyOnEvent(state.el, 'mousemove');
-            spyOn(state.focusGrabber, 'disableFocusGrabber').andCallThrough();
-            spyOn(state.focusGrabber, 'enableFocusGrabber').andCallThrough();
+            spyOn(state.focusGrabber, 'disableFocusGrabber').and.callThrough();
+            spyOn(state.focusGrabber, 'enableFocusGrabber').and.callThrough();
         });
 
         afterEach(function () {
             // Turn jQuery animations back on.
             jQuery.fx.off = true;
+            state.storage.clear();
             state.videoPlayer.destroy();
         });
 

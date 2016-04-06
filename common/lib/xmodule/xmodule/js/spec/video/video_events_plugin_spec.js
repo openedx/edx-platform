@@ -7,12 +7,11 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
 
-            jasmine.stubRequests();
             state = jasmine.initializePlayer();
             spyOn(Logger, 'log');
-            spyOn(state.videoEventsPlugin, 'getCurrentTime').andReturn(10);
+            spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
         });
 
         afterEach(function () {
@@ -90,7 +89,7 @@
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
-            Logger.log.reset();
+            Logger.log.calls.reset();
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
@@ -154,7 +153,7 @@
 
         it('can destroy itself', function () {
             var plugin = state.videoEventsPlugin;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
