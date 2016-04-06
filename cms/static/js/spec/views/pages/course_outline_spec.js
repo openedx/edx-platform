@@ -1,14 +1,15 @@
 define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils", "js/views/pages/course_outline",
         "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
-        "common/js/spec_helpers/template_helpers"],
-    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
+        "common/js/spec_helpers/template_helpers", 'js/models/course',],
+    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils,
+             EditHelpers, TemplateHelpers, Course) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
                 getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState,
                 collapseItemsAndVerifyState, createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
                 verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
-                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON
+                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
                 mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
                 mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
@@ -214,6 +215,15 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
             };
 
             beforeEach(function () {
+                window.course = new Course({
+                    id: '5',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
+
                 EditHelpers.installMockAnalytics();
                 EditHelpers.installViewTemplates();
                 TemplateHelpers.installTemplates([
@@ -252,6 +262,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 $("#start_date").datepicker( "destroy" );
                 $("#due_date").datepicker( "destroy" );
                 $('.ui-datepicker').remove();
+                delete window.course;
             });
 
             describe('Initial display', function() {
@@ -346,8 +357,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('can start reindex of a course', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
                     reindexButton.attr('href', test_url)
@@ -360,11 +371,11 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('shows an error message when reindexing fails', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var errorSpy = spyOn(outlinePage, 'onIndexError').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var errorSpy = spyOn(outlinePage, 'onIndexError').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
-                    reindexButton.attr('href', test_url)
+                    reindexButton.attr('href', test_url);
                     reindexButton.trigger('click');
                     AjaxHelpers.expectJsonRequest(requests, 'GET', test_url);
                     AjaxHelpers.respondWithError(requests, 500, createMockIndexJSON(false));
