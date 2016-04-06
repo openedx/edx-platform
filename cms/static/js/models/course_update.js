@@ -11,7 +11,7 @@ define(["backbone", "jquery", "jquery.ui"], function(Backbone, $) {
             var date_exists = (attrs.date !== null && attrs.date !== "");
             var date_is_valid_string = ($.datepicker.formatDate('MM d, yy', new Date(attrs.date)) === attrs.date);
             if (!(date_exists && date_is_valid_string)) {
-                return {"date_required": gettext("This field must contain a valid date.")};
+                return {"date_required": gettext("Action required: Enter a valid date.")};
             }
         }
     });
