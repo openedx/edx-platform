@@ -32,7 +32,7 @@
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.loaded', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 duration: 20
             });
@@ -42,7 +42,7 @@
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.played', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -53,7 +53,7 @@
             state.el.trigger('ended');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.stopped', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -63,7 +63,7 @@
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.stopped', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -74,7 +74,7 @@
             state.el.trigger('skip', [false]);
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.skipped', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -85,7 +85,7 @@
             state.el.trigger('skip', [true]);
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.dismissed', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -96,7 +96,7 @@
             state.el.trigger('language_menu:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.shown', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 duration: 20
             });
@@ -106,7 +106,7 @@
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.menu.hidden', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 duration: 20
             });
@@ -116,7 +116,7 @@
             state.el.trigger('captions:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.shown', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20
@@ -127,7 +127,7 @@
             state.el.trigger('captions:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.bumper.transcript.hidden', {
                 host_component_id: 'id',
-                bumper_id: 'xmodule/include/fixtures/test.mp4',
+                bumper_id: '/base/fixtures/test.mp4',
                 code: 'html5',
                 currentTime: 10,
                 duration: 20

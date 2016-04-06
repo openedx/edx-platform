@@ -1,9 +1,10 @@
 define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "common/js/components/views/feedback_prompt", "js/views/pages/container",
-        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils"],
+        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils",
+        'js/models/course'],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
-              XBlockInfo, XBlockUtils) {
+              XBlockInfo, XBlockUtils, Course) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
         describe("Container Subviews", function() {
@@ -13,6 +14,15 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+
             beforeEach(function () {
                 TemplateHelpers.installTemplate('xblock-string-field-editor');
                 TemplateHelpers.installTemplate('publish-xblock');
@@ -20,6 +30,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 TemplateHelpers.installTemplate('unit-outline');
                 TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
+                requests = AjaxHelpers.requests(this);
             });
 
             defaultXBlockInfo = {
@@ -39,7 +50,6 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
             };
 
             createContainerPage = function (test, options) {
-                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,

@@ -107,25 +107,26 @@ describe("Formula Equation Preview", function () {
             ]);
         });
         
-        it('does not request again if the initial request has already been made', function () {
+        it('does not request again if the initial request has already been made', function (done) {
             // jshint undef:false
-            expect(Problem.inputAjax.callCount).toEqual(1);
+            expect(Problem.inputAjax.calls.count()).toEqual(1);
 
             // Reset the spy in order to check calls again.
-            Problem.inputAjax.reset();
+            Problem.inputAjax.calls.reset();
 
             // Enabling the formulaEquationPreview again to see if this will
             // reinitialize input request once again.
             formulaEquationPreview.enable();
 
             // This part may be asynchronous, so wait.
-            waitsFor(function () {
+            jasmine.waitUntil(function () {
+                debugger;
                 return !Problem.inputAjax.wasCalled;
-            }, "times out in case of AJAX call", 1000);
-
-            // Expect Problem.inputAjax was not called as input request was
-            // initialized before.
-            expect(Problem.inputAjax).not.toHaveBeenCalled();
+            }).then(function () {
+                // Expect Problem.inputAjax was not called as input request was
+                // initialized before.
+                expect(Problem.inputAjax).not.toHaveBeenCalled();
+            }).always(done);
         });
 
         it('makes a request on user input', function (done) {

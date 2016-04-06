@@ -12,7 +12,6 @@ __test__ = False  # do not collect
 @task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
-    'pavelib.prereqs.install_python_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
@@ -49,8 +48,13 @@ def test_js(options):
         )
         return
 
-    test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
-    test_suite.run()
+    suites = Env.JS_TEST_ID_KEYS if suite == 'all' else [suite]
+    for suite in suites:
+        try:
+            test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
+            test_suite.run()
+        except SystemExit as e:
+            print(e)
 
 
 @task

@@ -146,7 +146,7 @@ define([
         it('can clear search results if tab is closed', function () {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
-            spyOn(view.searchBox, 'clearInput').andCallThrough();
+            spyOn(view.searchBox, 'clearInput').and.callThrough();
 
             submitForm(view.searchBox, 'test_query');
             Helpers.respondToRequest(requests, responseJson, true);

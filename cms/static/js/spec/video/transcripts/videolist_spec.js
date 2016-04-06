@@ -179,7 +179,8 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
                   expect(abstractEditor.initialize).toHaveBeenCalled();
                   expect(messenger.initialize).toHaveBeenCalled();
                   expect(view.component_locator).toBe(component_locator);
-                  expect(view.$el).toHandle('input');
+                  // expect(view.$el).toHandle('input'); [jquery-mismatch]
+                  expect($._data($(view.$el).get(0), "events")["input"]).toBeDefined();
               }).always(done);
         });
 
