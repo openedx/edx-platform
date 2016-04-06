@@ -3,6 +3,7 @@
 A linting tool to check if templates are safe
 """
 from __future__ import print_function
+import argparse
 from enum import Enum
 import os
 import re
@@ -205,8 +206,8 @@ class Rules(Enum):
         'mako-multiple-page-tags',
         'A Mako template can only have one <%page> tag.'
     )
-    mako_unparsable_expression = (
-        'mako-unparsable-expression',
+    mako_unparseable_expression = (
+        'mako-unparseable-expression',
         'The expression could not be properly parsed.'
     )
     mako_unwanted_html_filter = (
@@ -217,15 +218,30 @@ class Rules(Enum):
         'mako-invalid-html-filter',
         'The expression is using an invalid filter in an HTML context.'
     )
-    mako_deprecated_display_name = (
-        'mako-deprecated-display-name',
-        'Replace deprecated display_name_with_default_escaped with display_name_with_default.'
-    )
     mako_invalid_js_filter = (
         'mako-invalid-js-filter',
         'The expression is using an invalid filter in a JavaScript context.'
     )
-
+    mako_deprecated_display_name = (
+        'mako-deprecated-display-name',
+        'Replace deprecated display_name_with_default_escaped with display_name_with_default.'
+    )
+    mako_html_requires_text = (
+        'mako-html-requires-text',
+        'You must begin with Text() if you use HTML() during interpolation.'
+    )
+    mako_close_before_format = (
+        'mako-close-before-format',
+        'You must close any call to Text() or HTML() before calling format().'
+    )
+    mako_text_redundant = (
+        'mako-text-redundant',
+        'Using Text() function without HTML() is unnecessary.'
+    )
+    mako_html_alone = (
+        'mako-html-alone',
+        "Only use HTML() alone with properly escaped HTML(), and make sure it is really alone."
+    )
     underscore_not_escaped = (
         'underscore-not-escaped',
         'Expressions should be escaped using <%- expression %>.'
@@ -421,7 +437,7 @@ class ExpressionRuleViolation(RuleViolation):
                 line_number,
                 column,
                 rule_id,
-                self.lines[line_number - self.start_line - 1].encode(encoding='utf-8')
+                self.lines[line_number - self.start_line].encode(encoding='utf-8')
             ), file=out)
 
 
@@ -630,13 +646,14 @@ class MakoTemplateLinter(object):
         for expression in expressions:
             if expression['expression'] is None:
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_unparsable_expression, expression
+                    Rules.mako_unparseable_expression, expression
                 ))
                 continue
 
             context = self._get_context(contexts, expression['start_index'])
             self._check_filters(mako_template, expression, context, has_page_default, results)
             self._check_deprecated_display_name(expression, results)
+            self._check_html_and_text(expression, results)
 
     def _check_deprecated_display_name(self, expression, results):
         """
@@ -653,6 +670,52 @@ class MakoTemplateLinter(object):
             results.violations.append(ExpressionRuleViolation(
                 Rules.mako_deprecated_display_name, expression
             ))
+
+    def _check_html_and_text(self, expression, results):
+        """
+        Checks rules related to proper use of HTML() and Text().
+
+        Rule 1: If HTML() is called, the expression must begin with Text(), or
+        Rule 2: If HTML() is called alone, it must be the only call.
+        Rule 3: Both HTML() and Text() must be closed before any call to
+            format().
+        Rule 4: Using Text() without HTML() is unnecessary.
+
+        Arguments:
+            expression: A dict containing the start_index, end_index, and
+                expression (text) of the expression.
+            results: A list of results into which violations will be added.
+
+        """
+        # strip '${' and '}' and whitespace from ends
+        expression_inner = expression['expression'][2:-1].strip()
+        if 'HTML(' in expression_inner:
+            if expression_inner.startswith('HTML('):
+                close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, len('HTML('), 0)
+                # check that the close paren is at the end of the expression.
+                if close_paren_index != len(expression_inner) - 1:
+                    results.violations.append(ExpressionRuleViolation(
+                        Rules.mako_html_alone, expression
+                    ))
+            elif expression_inner.startswith('Text(') is False:
+                results.violations.append(ExpressionRuleViolation(
+                    Rules.mako_html_requires_text, expression
+                ))
+        else:
+            if 'Text(' in expression_inner:
+                results.violations.append(ExpressionRuleViolation(
+                    Rules.mako_text_redundant, expression
+                ))
+
+        for match in re.finditer("(HTML\(|Text\()", expression_inner):
+            close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, match.end(), 0)
+            if 0 <= close_paren_index:
+                # the argument sent to HTML() or Text()
+                argument = expression_inner[match.end():close_paren_index]
+                if ".format(" in argument:
+                    results.violations.append(ExpressionRuleViolation(
+                        Rules.mako_close_before_format, expression
+                    ))
 
     def _check_filters(self, mako_template, expression, context, has_page_default, results):
         """
@@ -796,9 +859,9 @@ class MakoTemplateLinter(object):
 
         while True:
             start_index = mako_template.find(start_delim, start_index)
-            if (start_index < 0):
+            if start_index < 0:
                 break
-            end_index = self._find_balanced_end_curly(mako_template, start_index + len(start_delim), 0)
+            end_index = self._find_closing_char_index(start_delim, '{', '}', mako_template, start_index + len(start_delim), 0)
 
             if end_index < 0:
                 expression = None
@@ -817,39 +880,117 @@ class MakoTemplateLinter(object):
 
         return expressions
 
-    def _find_balanced_end_curly(self, mako_template, start_index, num_open_curlies):
+    def _find_closing_char_index(self, start_delim, open_char, close_char, template, start_index, num_open_chars):
         """
-        Finds the end index of the Mako expression's ending curly brace.  Skips
-        any additional open/closed braces that are balanced inside.  Does not
-        take into consideration strings.
+        Finds the index of the closing char that matches the opening char.
+
+        For example, this could be used to find the end of a Mako expression,
+        where the open and close characters would be '{' and '}'.
 
         Arguments:
-            mako_template: The template text.
-            start_index: The start index of the Mako expression.
-            num_open_curlies: The current number of open expressions.
+            start_delim: If provided (e.g. '${' for Mako expressions), the
+                closing character must be found before the next start_delim.
+            open_char: The opening character to be matched (e.g '{')
+            close_char: The closing character to be matched (e.g '}')
+            template: The template to be searched.
+            start_index: The start index of the last open char.
+            num_open_chars: The current number of open chars.
 
         Returns:
-            The end index of the expression, or -1 if unparseable.
+            The index of the closing character, or -1 if unparseable.
         """
-        end_curly_index = mako_template.find('}', start_index)
-        if end_curly_index < 0:
-            # if we can't find an end_curly, let's just quit
-            return end_curly_index
+        close_char_index = template.find(close_char, start_index)
+        if close_char_index < 0:
+            # if we can't find an end_char, let's just quit
+            return -1
 
-        open_curly_index = mako_template.find('{', start_index, end_curly_index)
+        open_char_index = template.find(open_char, start_index, close_char_index)
+        start_quote_index = self._find_string_start(template, start_index, close_char_index)
 
-        if (open_curly_index >= 0) and (open_curly_index < end_curly_index):
-            if mako_template[open_curly_index - 1] == '$':
-                # assume if we find "${" it is the start of the next expression
-                # and we have a parse error
+        if 0 <= start_quote_index:
+            string_end_index = self._parse_string(template, start_quote_index)['end_index']
+            if string_end_index < 0:
                 return -1
             else:
-                return self._find_balanced_end_curly(mako_template, open_curly_index + 1, num_open_curlies + 1)
+                return self._find_closing_char_index(start_delim, open_char, close_char, template, string_end_index, num_open_chars)
 
-        if num_open_curlies == 0:
-            return end_curly_index
+        if (open_char_index >= 0) and (open_char_index < close_char_index):
+            if start_delim is not None:
+                # if we find another starting delim, consider this unparseable
+                start_delim_index = template.find(start_delim, start_index, close_char_index)
+                if start_delim_index < open_char_index:
+                    return -1
+            return self._find_closing_char_index(start_delim, open_char, close_char, template, open_char_index + 1, num_open_chars + 1)
+
+        if num_open_chars == 0:
+            return close_char_index
         else:
-            return self._find_balanced_end_curly(mako_template, end_curly_index + 1, num_open_curlies - 1)
+            return self._find_closing_char_index(start_delim, open_char, close_char, template, close_char_index + 1, num_open_chars - 1)
+
+    def _find_string_start(self, template, start_index, end_index):
+        """
+        Finds the index of the end of start of a string.  In other words, the
+        first single or double quote.
+
+        Arguments:
+            template: The template to be searched.
+            start_index: The start index to search.
+            end_index: The end index to search before.
+            num_open_chars: The current number of open expressions.
+
+        Returns:
+            The start index of the first single or double quote, or -1 if
+            no quote was found.
+        """
+        double_quote_index = template.find('"', start_index, end_index)
+        single_quote_index = template.find("'", start_index, end_index)
+        if 0 <= single_quote_index or 0 <= double_quote_index:
+            if 0 <= single_quote_index and 0 <= double_quote_index:
+                return min(single_quote_index, double_quote_index)
+            else:
+                return max(single_quote_index, double_quote_index)
+        return -1
+
+    def _parse_string(self, template, start_index):
+        """
+        Finds the indices of a string inside a template.
+
+        Arguments:
+            template: The template to be searched.
+            start_index: The start index of the open quote.
+
+        Returns:
+            A dict containing the following:
+                start_index: The index of the first quote.
+                end_index: The index following the closing quote, or -1 if
+                    unparseable
+                quote_length: The length of the quote.  Could be 3 for a Python
+                    triple quote.
+        """
+        quote = template[start_index]
+        if quote not in ["'", '"']:
+            raise ValueError("start_index must refer to a single or double quote.")
+        triple_quote = quote * 3
+        if template.startswith(triple_quote, start_index):
+            quote = triple_quote
+
+        result = {
+            'start_index': start_index,
+            'end_index': -1,
+            'quote_length': len(quote),
+        }
+
+        start_index += len(quote)
+        while True:
+            quote_end_index = template.find(quote, start_index)
+            backslash_index = template.find("\\", start_index)
+            if quote_end_index < 0:
+                return result
+            if 0 <= backslash_index < quote_end_index:
+                start_index = backslash_index + 2
+            else:
+                result['end_index'] = quote_end_index + len(quote)
+                return result
 
 
 class UnderscoreTemplateLinter(object):
@@ -1001,6 +1142,25 @@ class UnderscoreTemplateLinter(object):
         return expressions
 
 
+def _process_file(full_path, template_linters, options, out):
+    """
+    For each linter, lints the provided file.  This means finding and printing
+    violations.
+
+    Arguments:
+        full_path: The full path of the file to lint.
+        template_linters: A list of linting objects.
+        options: A list of the options.
+        out: output file
+
+    """
+    directory = os.path.dirname(full_path)
+    file = os.path.basename(full_path)
+    for template_linter in template_linters:
+        results = template_linter.process_file(directory, file)
+        results.print_results(options, out)
+
+
 def _process_current_walk(current_walk, template_linters, options, out):
     """
     For each linter, lints all the files in the current os walk.  This means
@@ -1016,10 +1176,8 @@ def _process_current_walk(current_walk, template_linters, options, out):
     walk_directory = os.path.normpath(current_walk[0])
     walk_files = current_walk[2]
     for walk_file in walk_files:
-        walk_file = os.path.normpath(walk_file)
-        for template_linter in template_linters:
-            results = template_linter.process_file(walk_directory, walk_file)
-            results.print_results(options, out)
+        full_path = os.path.join(walk_directory, walk_file)
+        _process_file(full_path, template_linters, options, out)
 
 
 def _process_os_walk(starting_dir, template_linters, options, out):
@@ -1037,33 +1195,60 @@ def _process_os_walk(starting_dir, template_linters, options, out):
         _process_current_walk(current_walk, template_linters, options, out)
 
 
+def _parse_arg(arg, option):
+    """
+    Parses an argument searching for --[option]=[OPTION_VALUE]
+
+    Arguments:
+        arg: The system argument
+        option: The specific option to be searched for (e.g. "file")
+
+    Returns:
+        The option value for a match, or None if arg is not for this option
+    """
+    if arg.startswith('--{}='.format(option)):
+        option_value = arg.split('=')[1]
+        if option_value.startswith("'") or option_value.startswith('"'):
+            option_value = option_value[1:-1]
+        return option_value
+    else:
+        return None
+
+
 def main():
     """
     Used to execute the linter. Use --help option for help.
 
-    Prints all of the violations.
+    Prints all violations.
     """
+    epilog = 'rules:\n'
+    for rule in Rules.__members__.values():
+        epilog += "  {0[0]}: {0[1]}\n".format(rule.value)
 
-    #TODO: Use click
-    if '--help' in sys.argv:
-        print("Check that templates are safe.")
-        print("Options:")
-        print("   --quiet    Just display the filenames that have violations.")
-        print("")
-        print("Rules:")
-        for rule in Rules.__members__.values():
-            print("  {0[0]}: {0[1]}".format(rule.value))
-        return
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Checks that templates are safe.',
+        epilog=epilog
+    )
+    parser.add_argument('--quiet', dest='quiet', action='store_true', help='only display the filenames that contain violations')
+    parser.add_argument('--file', dest='file', nargs=1, default=None, help='a single file to lint')
+    parser.add_argument('--dir', dest='directory', nargs=1, default=['.'], help='the directory to lint (including sub-directories)')
 
-    is_quiet = '--quiet' in sys.argv
-    # TODO --file=...
+    args = parser.parse_args()
 
     options = {
-        'is_quiet': is_quiet,
+        'is_quiet': args.quiet,
     }
 
     template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter()]
-    _process_os_walk('.', template_linters, options, out=sys.stdout)
+    if args.file is not None:
+        if os.path.isfile(args.file[0]) is False:
+            raise ValueError("File [{}] is not a valid file.".format(args.file[0]))
+        _process_file(args.file[0], template_linters, options, out=sys.stdout)
+    else:
+        if os.path.exists(args.directory[0]) is False or os.path.isfile(args.directory[0]) is True:
+            raise ValueError("Directory [{}] is not a valid directory.".format(args.directory[0]))
+        _process_os_walk(args.directory[0], template_linters, options, out=sys.stdout)
 
 
 if __name__ == "__main__":
