@@ -9,9 +9,12 @@ define([ // jshint ignore:line
     'js/utils/templates',
     'common/js/components/utils/view_utils',
     'js/views/baseview',
-    'js/certificates/views/signatory_editor'
+    'js/certificates/views/signatory_editor',
+    'text!templates/signatory-details.underscore',
+    'text!templates/signatory-actions.underscore'
 ],
-function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView) {
+function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
+          signatoryDetailsTemplate, signatoryActionsTemplate) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',
@@ -39,8 +42,6 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
                 isEditingAllCollections: false,
                 eventAgg: this.eventAgg
             });
-            this.template = this.loadTemplate('signatory-details');
-            this.signatory_action_template = this.loadTemplate('signatory-actions');
         },
 
         loadTemplate: function(name) {
@@ -52,7 +53,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             this.$el.html(this.edit_view.render());
-            $(this.signatory_action_template()).appendTo(this.el);
+            $(_.template(signatoryActionsTemplate)()).appendTo(this.el);
             this.edit_view.delegateEvents();
             this.delegateEvents();
         },
@@ -93,7 +94,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             var attributes = $.extend({}, this.model.attributes, {
                 signatory_number: this.model.collection.indexOf(this.model) + 1
             });
-            return $(this.el).html(this.template(attributes));
+            return $(this.el).html(_.template(signatoryDetailsTemplate)(attributes));
         }
     });
     return SignatoryDetailsView;

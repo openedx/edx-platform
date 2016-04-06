@@ -10,7 +10,13 @@
 
 (function(root, factory) {
     /* jshint strict: false */
-    factory(root, root.jQuery);
+    if (typeof define === 'function' && define.amd) {
+        require(['jquery'], function ($) {
+            factory(root, $);
+        });
+    } else {
+        factory(root, root.jQuery);
+    }
 }((function() {
     /* jshint strict: false */
     return this;
@@ -20,7 +26,9 @@
     // Add custom Jasmine matchers.
     beforeEach(function() {
 
-        jasmine.addMatchers(window.imagediff.jasmine);
+        if (window.imagediff) {
+            jasmine.addMatchers(window.imagediff.jasmine);
+        }
 
         jasmine.addMatchers({
             toHaveAttrs: function() {
@@ -57,6 +65,16 @@
                     compare: function(actual, array) {
                         return {
                             pass: $.inArray(actual, array) > -1
+                        };
+                    }
+                };
+            },
+            toBeInstanceOf: function() {
+                // Assert the type of the value being tested matches the provided type
+                return {
+                    compare: function (actual, expected) {
+                        return {
+                            pass: actual instanceof expected
                         };
                     }
                 };

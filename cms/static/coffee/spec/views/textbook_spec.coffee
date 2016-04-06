@@ -5,16 +5,6 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     "js/spec_helpers/modal_helpers", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
 
-    beforeEach ->
-        # remove this when we upgrade jasmine-jquery
-        @addMatchers
-            toContainText: (text) ->
-                trimmedText = $.trim(@actual.text())
-                if text and $.isFunction(text.test)
-                    return text.test(trimmedText)
-                else
-                    return trimmedText.indexOf(text) != -1;
-
     describe "ShowTextbook", ->
         tpl = readFixtures('show-textbook.underscore')
 
@@ -23,12 +13,12 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             appendSetFixtures(sandbox({id: "page-notification"}))
             appendSetFixtures(sandbox({id: "page-prompt"}))
             @model = new Textbook({name: "Life Sciences", id: "0life-sciences"})
-            spyOn(@model, "destroy").andCallThrough()
+            spyOn(@model, "destroy").and.callThrough()
             @collection = new TextbookSet([@model])
             @view = new ShowTextbook({model: @model})
 
-            @promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"])
-            @promptSpies.show.andReturn(@promptSpies)
+            @promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"])
+            @promptSpies.show.and.returnValue(@promptSpies)
             window.course = new Course({
                 id: "5",
                 name: "Course Name",
@@ -53,7 +43,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             it "should pop a delete confirmation when the delete button is clicked", ->
                 @view.render().$(".delete").click()
                 expect(@promptSpies.constructor).toHaveBeenCalled()
-                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
                 expect(ctorOptions.title).toMatch(/Life Sciences/)
                 # hasn't actually been removed
                 expect(@model.destroy).not.toHaveBeenCalled()
@@ -73,9 +63,9 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
         describe "AJAX", ->
             beforeEach ->
-                @savingSpies = spyOnConstructor(Notification, "Mini",
+                @savingSpies = jasmine.stealth.spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
-                @savingSpies.show.andReturn(@savingSpies)
+                @savingSpies.show.and.returnValue(@savingSpies)
                 CMS.URL.TEXTBOOKS = "/textbooks"
 
             afterEach ->
@@ -85,7 +75,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".delete").click()
-                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
@@ -94,7 +84,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
-                savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
+                savingOptions = @savingSpies.constructor.calls.mostRecent().args[0]
                 expect(savingOptions.title).toMatch(/Deleting/)
                 # return a success response
                 requests[0].respond(200)
@@ -114,7 +104,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 @collection = new TextbookSet()
                 @collection.add(@model)
                 @view = new EditTextbook({model: @model})
-                spyOn(@view, 'render').andCallThrough()
+                spyOn(@view, 'render').and.callThrough()
 
             it "should render properly", ->
                 @view.render()
@@ -209,10 +199,16 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             expect(ViewUtils.setScrollOffset).toHaveBeenCalledWith($sectionEl, 0)
 
         it "should focus first input element of newly added textbook", ->
-            spyOn(jQuery.fn, 'focus').andCallThrough()
-            @addMatchers
-                toHaveBeenCalledOnJQueryObject: (actual, expected) ->
-                        pass: actual.calls && actual.calls.mostRecent() && actual.calls.mostRecent().object[0] == expected[0]
+            spyOn(jQuery.fn, 'focus').and.callThrough()
+            jasmine.addMatchers
+                toHaveBeenCalledOnJQueryObject: () ->
+                    return {
+                        compare: (actual, expected) ->
+                            return {
+                                pass: actual.calls && actual.calls.mostRecent() &&
+                                  actual.calls.mostRecent().object[0] == expected[0]
+                            }
+                        }
             @view.$(".new-button").click()
             $inputEl = @view.$el.find('section:last input:first')
             expect($inputEl.length).toEqual(1)
@@ -229,13 +225,13 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 #        beforeEach ->
 #            setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
 #            @showSpies = spyOnConstructor("ShowTextbook", ["render"])
-#            @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
+#            @showSpies.render.and.returnValue(@showSpies) # equivalent of `return this`
 #            showEl = $("<li>")
 #            @showSpies.$el = showEl
 #            @showSpies.el = showEl.get(0)
 #            @editSpies = spyOnConstructor("EditTextbook", ["render"])
 #            editEl = $("<li>")
-#            @editSpies.render.andReturn(@editSpies)
+#            @editSpies.render.and.returnValue(@editSpies)
 #            @editSpies.$el = editEl
 #            @editSpies.el= editEl.get(0)
 #
@@ -304,7 +300,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             @collection = new ChapterSet()
             @collection.add(@model)
             @view = new EditChapter({model: @model})
-            spyOn(@view, "remove").andCallThrough()
+            spyOn(@view, "remove").and.callThrough()
             CMS.URL.UPLOAD_ASSET = "/upload"
             window.course = new Course({name: "abcde"})
 
@@ -324,10 +320,10 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
 #        it "can open an upload dialog", ->
 #            uploadSpies = spyOnConstructor("UploadDialog", ["show", "el"])
-#            uploadSpies.show.andReturn(uploadSpies)
+#            uploadSpies.show.and.returnValue(uploadSpies)
 #
 #            @view.render().$(".action-upload").click()
-#            ctorOptions = uploadSpies.constructor.mostRecentCall.args[0]
+#            ctorOptions = uploadSpies.constructor.calls.mostRecent().args[0]
 #            expect(ctorOptions.model.get('title')).toMatch(/abcde/)
 #            expect(typeof ctorOptions.onSuccess).toBe('function')
 #            expect(uploadSpies.show).toHaveBeenCalled()
