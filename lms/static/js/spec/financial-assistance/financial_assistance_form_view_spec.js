@@ -108,7 +108,7 @@ define([
 
                 view.$('#financial-assistance-course').val(selectValue);
                 view.$('#financial-assistance-income').val(1312);
-                view.$('textarea').html('w'.repeat(801));
+                view.$('textarea').html(Array(802).join("w"));
             };
 
             validSubmission = function() {

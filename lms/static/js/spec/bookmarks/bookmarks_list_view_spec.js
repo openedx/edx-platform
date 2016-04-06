@@ -24,10 +24,16 @@ define(['backbone',
                         'templates/bookmarks/bookmarks-list'
                     ]
                 );
-                spyOn(Logger, 'log').andReturn($.Deferred().resolve());
-                this.addMatchers({
-                   toHaveBeenCalledWithUrl: function (expectedUrl) {
-                       return expectedUrl === this.actual.argsForCall[0][0].target.pathname;
+                spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
+                jasmine.addMatchers({
+                   toHaveBeenCalledWithUrl: function () {
+                       return {
+                         compare: function (actual, expectedUrl) {
+                             return {
+                                 pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname
+                             };
+                         }
+                       };
                    }
                 });
 
@@ -117,7 +123,7 @@ define(['backbone',
             it("has correct behavior for bookmarks button", function () {
                 var requests = AjaxHelpers.requests(this);
 
-                spyOn(bookmarksButtonView, 'toggleBookmarksListView').andCallThrough();
+                spyOn(bookmarksButtonView, 'toggleBookmarksListView').and.callThrough();
 
                 bookmarksButtonView.delegateEvents();
 

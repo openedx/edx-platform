@@ -5,7 +5,7 @@ describe 'FeedbackForm', ->
   describe 'constructor', ->
     beforeEach ->
       new FeedbackForm
-      spyOn($, 'postWithPrefix').andCallFake (url, data, callback, format) ->
+      spyOn($, 'postWithPrefix').and.callFake (url, data, callback, format) ->
         callback()
 
     it 'binds to the #feedback_button', ->
