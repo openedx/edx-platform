@@ -232,7 +232,7 @@ class XQueueCertInterface(object):
             cert_status = status.downloadable
 
         new_status = cert_status
-            cert = None
+        cert = None
 
         if cert_status not in valid_statuses:
             LOGGER.warning(
