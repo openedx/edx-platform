@@ -422,7 +422,7 @@ define([
             groups = this.model.get('groups');
             expect(groups.length).toBe(3);
             expect(groups.at(2).get('name')).toBe('Group C');
-            expect(this.view.$el).not.toExist();
+            expect(this.view.$el).not.toBeInDOM();
         });
 
         it('does not hide saving message if failure', function() {
@@ -487,7 +487,7 @@ define([
                 name: 'New Configuration'
             });
             // Error message disappear
-            expect(this.view.$(SELECTORS.errorMessage)).not.toExist();
+            expect(this.view.$(SELECTORS.errorMessage)).not.toBeInDOM();
             AjaxHelpers.expectNoRequests(requests);
         });
 
@@ -996,7 +996,7 @@ define([
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Content Group'
             });
-            expect(this.view.$el).not.toExist();
+            expect(this.view.$el).not.toBeInDOM();
         });
 
         it('does not hide saving message if failure', function() {
