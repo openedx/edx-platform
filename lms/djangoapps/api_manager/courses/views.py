@@ -1654,6 +1654,19 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
             modules_completed_qs = modules_completed_qs.filter(user__organizations=organization)
             active_users_qs = active_users_qs.filter(student__organizations=organization)
 
+        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        if group_ids:
+            try:
+                group_ids = map(int, group_ids.split(','))
+            except ValueError:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+            enrolled_qs = enrolled_qs.filter(user__groups__in=group_ids)
+            grades_complete_qs = grades_complete_qs.filter(user__groups__in=group_ids)
+            users_started_qs = users_started_qs.filter(user__groups__in=group_ids)
+            modules_completed_qs = modules_completed_qs.filter(user__groups__in=group_ids)
+            active_users_qs = active_users_qs.filter(student__groups__in=group_ids)
+
         total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
         total_started_count = users_started_qs.filter(created__lt=start_dt).aggregate(Count('user', distinct=True))
         total_started = total_started_count['user__count'] or 0
