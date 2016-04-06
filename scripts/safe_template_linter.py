@@ -775,9 +775,6 @@ class MakoTemplateLinter(object):
                     results.violations.append(ExpressionRuleViolation(
                         Rules.mako_unwanted_html_filter, expression
                     ))
-            elif (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'dump_html_escaped_json'):
-                # {x | n, dump_html_escaped_json} is valid
-                pass
             else:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_invalid_html_filter, expression
