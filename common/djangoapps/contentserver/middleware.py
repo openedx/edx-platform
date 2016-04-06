@@ -3,13 +3,14 @@ Middleware to serve assets.
 """
 
 import logging
-
 import datetime
+import newrelic.agent
+
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound)
 from student.models import CourseEnrollment
-from contentserver.models import CourseAssetCacheTtlConfig
+from contentserver.models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
 from header_control import force_header_for_response
 from xmodule.assetstore.assetmgr import AssetManager
@@ -54,6 +55,19 @@ class StaticContentServer(object):
                 content = self.load_asset_from_location(loc)
             except (ItemNotFoundError, NotFoundError):
                 return HttpResponseNotFound()
+
+            # Set the basics for this request.
+            newrelic.agent.add_custom_parameter('course_id', loc.course_key)
+            newrelic.agent.add_custom_parameter('org', loc.org)
+            newrelic.agent.add_custom_parameter('contentserver.path', loc.path)
+
+            # Figure out if this is a CDN using us as the origin.
+            is_from_cdn = StaticContentServer.is_cdn_request(request)
+            newrelic.agent.add_custom_parameter('contentserver.from_cdn', True if is_from_cdn else False)
+
+            # Check if this content is locked or not.
+            locked = self.is_content_locked(content)
+            newrelic.agent.add_custom_parameter('contentserver.locked', True if locked else False)
 
             # Check that user has access to the content.
             if not self.is_user_authorized(request, content, loc):
@@ -107,8 +121,11 @@ class StaticContentServer(object):
                             response['Content-Range'] = 'bytes {first}-{last}/{length}'.format(
                                 first=first, last=last, length=content.length
                             )
-                            response['Content-Length'] = str(last - first + 1)
+                            range_len = last - first + 1
+                            response['Content-Length'] = str(range_len)
                             response.status_code = 206  # Partial Content
+
+                            newrelic.agent.add_custom_parameter('contentserver.range_len', range_len)
                         else:
                             log.warning(
                                 u"Cannot satisfy ranges in Range header: %s for content: %s", header_value, unicode(loc)
@@ -119,6 +136,9 @@ class StaticContentServer(object):
             if response is None:
                 response = HttpResponse(content.stream_data())
                 response['Content-Length'] = content.length
+
+                newrelic.agent.add_custom_parameter('contentserver.content_len', content.length)
+                newrelic.agent.add_custom_parameter('contentserver.content_type', content.content_type)
 
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
@@ -146,9 +166,11 @@ class StaticContentServer(object):
         # indicate there should be no caching whatsoever.
         cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
         if cache_ttl > 0 and not is_locked:
+            newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
             response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
+            newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
             response['Cache-Control'] = "private, no-cache, no-store"
 
         response['Last-Modified'] = content.last_modified_at.strftime(HTTP_DATE_FORMAT)
@@ -159,18 +181,38 @@ class StaticContentServer(object):
         force_header_for_response(response, 'Vary', 'Origin')
 
     @staticmethod
+    def is_cdn_request(request):
+        """
+        Attempts to determine whether or not the given request is coming from a CDN.
+
+        Currently, this is a static check because edx.org only uses CloudFront, but may
+        be expanded in the future.
+        """
+        cdn_user_agents = CdnUserAgentsConfig.get_cdn_user_agents()
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        if user_agent in cdn_user_agents:
+            # This is a CDN request.
+            return True
+
+        return False
+
+    @staticmethod
     def get_expiration_value(now, cache_ttl):
         """Generates an RFC1123 datetime string based on a future offset."""
         expire_dt = now + datetime.timedelta(seconds=cache_ttl)
         return expire_dt.strftime(HTTP_DATE_FORMAT)
 
+    def is_content_locked(self, content):
+        """
+        Determines whether or not the given content is locked.
+        """
+        return getattr(content, "locked", False)
+
     def is_user_authorized(self, request, content, location):
         """
         Determines whether or not the user for this request is authorized to view the given asset.
         """
-
-        is_locked = getattr(content, "locked", False)
-        if not is_locked:
+        if not self.is_content_locked(content):
             return True
 
         if not hasattr(request, "user") or not request.user.is_authenticated():
