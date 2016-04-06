@@ -369,8 +369,8 @@ class GenerateExampleCertificatesTest(TestCase):
 
     def test_generate_example_certs_with_verified_mode(self):
         # Create verified and honor modes for the course
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='honor')
-        CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug='verified')
+        CourseModeFactory(course_id=self.COURSE_KEY, mode_slug='honor')
+        CourseModeFactory(course_id=self.COURSE_KEY, mode_slug='verified')
 
         # Generate certificates for the course
         with self._mock_xqueue() as mock_queue:
