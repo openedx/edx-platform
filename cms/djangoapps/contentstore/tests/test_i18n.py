@@ -101,11 +101,13 @@ class TestModuleI18nService(ModuleStoreTestCase):
         french_translation = translation.trans_real._active.value  # pylint: disable=protected-access
 
         # wrap the ugettext functions so that 'TEST ' will prefix each translation
+        old_ugettext = french_translation.ugettext
         french_translation.ugettext = wrap_with_xyz(french_translation.ugettext)
         self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ dummy language')
 
         # Turn back on our old translations
         translation.activate(old_lang)
+        french_translation.ugettext = old_ugettext
         del old_lang
         self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
