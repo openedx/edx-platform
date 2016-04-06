@@ -34,13 +34,9 @@ from status.status import get_site_status_msg
 if uses_pattern_library:
     dropdown_menu_classlist = "left list-inline"
     main_nav_menu_classlist = "list-inline"
-    login_btn_classlist = "btn"
-    register_btn_classlist = "btn-neutral"
 else:
     dropdown_menu_classlist = "dropdown-menu"
     main_nav_menu_classlist = "nav-global"
-    login_btn_classlist = "cta cta-login"
-    register_btn_classlist = "cta cta-register"
 %>
 
 <%block>
@@ -100,6 +96,33 @@ site_status_msg = get_site_status_msg(course_id)
         %endif
       </%block>
     </ol>
+    % if uses_pattern_library:
+    <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
+      <a href="${reverse('dashboard')}" class="menu-title">
+        <span class="sr-only">${_("Dashboard for:")}</span>
+        <%
+          username = user.username
+          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+        %>
+        <img class="menu-image" src="${profile_image_url}" alt="">
+        ${username}
+      </a>
+      <button type="button" class="menu-button button-more has-dropdown js-dropdown-button default-icon" aria-haspopup="true" aria-expanded="false" aria-controls="${_("Usermenu")}">
+        <span class="icon-fallback icon-fallback-img">
+          <span class="icon icon-angle-down" aria-hidden="true"></span>
+          <span class="text">${_("Usermenu dropdown")}</span>
+        </span>
+      </button>
+      <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
+        <%block name="navigation_dropdown_menu_links" >
+            <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" class="action">${_("Dashboard")}</a></li>
+            <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action">${_("Profile")}</a></li>
+            <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" class="action">${_("Account")}</a></li>
+          </%block>
+            <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action">${_("Sign Out")}</a></li>
+      </ul>
+    </div>
+    % else:
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -115,15 +138,12 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <button class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
         <ul class="${dropdown_menu_classlist}" aria-label="More Options" role="menu">
-          <%block name="navigation_dropdown_menu_links" >
-            <li class="item"><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-            <li class="item"><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-            <li class="item"><a href="${reverse('account_settings')}">${_("Account")}</a></li>
-          </%block>
+          ${navigation_dropdown_menu_links()}
           <li class="item"><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></li>
         </ul>
       </li>
     </ol>
+    % endif
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
@@ -154,23 +174,25 @@ site_status_msg = get_site_status_msg(course_id)
       <%block name="navigation_other_global_links">
       <%
       if uses_pattern_library:
+          discovery_btn_classlist = "btn"
           register_btn_classlist = "btn-neutral"
       else:
+          discovery_btn_classlist = "cta cta-discovery"
           register_btn_classlist = "cta cta-register"
       %>
         % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
             <li class="item nav-global-05">
-              <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
+              <a class="${discovery_btn_classlist}" href="/courses">${_("Find Courses")}</a>
             </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             <li class="item nav-global-04">
-              <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              <a class="${register_btn_classlist}" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
             </li>
             % else:
             <li class="item nav-global-04">
-              <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
+              <a class="${register_btn_classlist}" href="/register${login_query()}">${_("Register")}</a>
             </li>
             % endif
 

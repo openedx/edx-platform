@@ -1,20 +1,3 @@
-/*$gray-l1: #919191;
-$gray-l3: #c8c8c8;
-$border-color-2: #c8c8c8;
-$border-color-3: #646464;
-$border-color-4: #fcfcfc;
-$courseware-border-bottom-color: red;
-$shadow-l1: red;
-$header-bg: orange;
-$courseware-hover-color: red;
-$courseware-border-bottom-color: red;
-$link-color: red;
-$base-font-color: red;
-$sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-*/
-
-
-
 // edX theme: Global Header
 // ====================
 
@@ -55,35 +38,36 @@ $sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
     }
 
     .dropdown-menu {
+      @include text-align(left);
       top: inherit;
     }
 
     .list-inline {
       margin-top: 5px;
-    }
 
-    .item {
-      display: inline-block;
-      font-size: em(14);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0 !important;
+      .item {
+        display: inline-block;
+        font-size: em(14);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0 !important;
 
-      &.active {
-        a {
-          text-decoration: none;
-          color: $link-color;
+        &.active {
+          a {
+            text-decoration: none;
+            color: $link-color;
+          }
         }
-      }
 
-      a {
-        color: $courseware-navigation-color;
-        padding: 3px 10px;
+        a {
+          color: $courseware-navigation-color;
+          padding: 3px 10px;
 
-        &:hover,
-        &:focus {
-          background: inherit;
-          color: $courseware-hover-color;
+          &:hover,
+          &:focus {
+            background: inherit;
+            color: $courseware-hover-color;
+          }
         }
       }
     }
@@ -94,35 +78,3 @@ $sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
     }
   }
 }
-
-
-/*.view-register header.global-new .cta-register {
-  text-decoration: none;
-  color: $courseware-hover-color;
-  border-bottom-color: $courseware-border-bottom-color;
-}
-
-.view-login header.global-new .cta-login {
-  text-decoration: none;
-  color: $courseware-hover-color;
-}
-
-// marketing site design syncing
-.view-register, .view-login {
-
-  header.global nav {
-    width: 960px;
-  }
-}
-
-// page-based nav states
-.view-howitworks .nav-global-01,
-.view-courses .nav-global-02,
-.view-schools .nav-global-03,
-.view-register .nav-global-04 {
-
-  a {
-    text-decoration: none;
-    color: $link-color !important;
-  }
-}*/
