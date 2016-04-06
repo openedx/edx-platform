@@ -122,7 +122,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
             it('certificate web preview should be removed when method "remove" called', function () {
                 this.view.remove();
-                expect(this.view.el.innerHTML).toContain("");
+                expect(this.view.el.innerHTML).toBe('');
             });
 
             it('method "show" should call the render function', function () {

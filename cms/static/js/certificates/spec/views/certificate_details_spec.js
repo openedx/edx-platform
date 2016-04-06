@@ -97,7 +97,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this); // jshint ignore:line
+            CustomMatchers(); // jshint ignore:line
         });
 
         describe('The Certificate Details view', function() {
