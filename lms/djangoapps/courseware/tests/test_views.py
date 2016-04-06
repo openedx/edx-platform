@@ -649,9 +649,9 @@ class ViewsTestCase(ModuleStoreTestCase):
             (verified_course_deadline_passed, CourseMode.AUDIT, datetime.now(UTC) - timedelta(days=1))
         )
         for course, mode, expiration in enrollments:
-            CourseModeFactory(mode_slug=CourseMode.AUDIT, course_id=course)
+            CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
             if course != non_verified_course:
-                CourseModeFactory(mode_slug=CourseMode.VERIFIED, course_id=course, expiration_datetime=expiration)
+                CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course, expiration_datetime=expiration)
             CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
 
         self.client.login(username=self.user.username, password=self.password)

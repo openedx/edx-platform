@@ -226,7 +226,7 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the css class and the status message are in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
@@ -263,7 +263,7 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
