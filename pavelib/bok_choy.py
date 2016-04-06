@@ -3,7 +3,7 @@ Run acceptance tests that use the bok-choy framework
 http://bok-choy.readthedocs.org/en/latest/
 """
 from paver.easy import task, needs, cmdopts, sh
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
+from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, A11yCrawler
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from optparse import make_option
@@ -115,28 +115,42 @@ def test_a11y(options):
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
-@cmdopts([
-    ('test_spec=', 't', 'Specific test to run'),
-    ('fasttest', 'a', 'Skip some setup'),
+@cmdopts(BOKCHOY_OPTS + [
     ('imports_dir=', 'd', 'Directory containing (un-archived) courses to be imported'),
-    ('default_store=', 's', 'Default modulestore'),
-    make_option("--verbose", action="store_const", const=2, dest="verbosity"),
-    make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
-    make_option("-v", "--verbosity", action="count", dest="verbosity"),
 ])
 def perf_report_bokchoy(options):
     """
     Generates a har file for with page performance info.
     """
-    opts = {
-        'test_spec': getattr(options, 'test_spec', None),
-        'fasttest': getattr(options, 'fasttest', False),
-        'default_store': getattr(options, 'default_store', os.environ.get('DEFAULT_STORE', 'split')),
-        'imports_dir': getattr(options, 'imports_dir', None),
-        'verbosity': getattr(options, 'verbosity', 2),
-        'test_dir': 'performance',
-    }
+    opts = parse_bokchoy_opts(options)
+    opts['imports_dir'] = getattr(options, 'imports_dir', None)
+    opts['test_dir'] = 'performance'
+
     run_bokchoy(**opts)
+
+
+@task
+@needs('pavelib.prereqs.install_prereqs')
+@cmdopts(BOKCHOY_OPTS + [
+    ('with-html', 'w', 'Include html reports'),
+])
+def pa11ycrawler(options):
+    """
+    Runs pa11ycrawler against the demo-test-course to generates accessibility
+    reports. (See https://github.com/edx/demo-test-course)
+
+    Note: Like the bok-choy tests, this can be used with the `serversonly`
+    flag to get an environment running. The setup for this is the same as
+    for bok-choy tests, only test course is imported as well.
+    """
+    opts = parse_bokchoy_opts(options)
+    opts['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
+    opts['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
+    test_suite = A11yCrawler('a11y_crawler', **opts)
+    test_suite.run()
+
+    if getattr(options, 'with_html', False):
+        test_suite.generate_html_reports()
 
 
 def run_bokchoy(**opts):
@@ -196,4 +210,15 @@ def a11y_coverage():
     parse_coverage(
         Env.BOK_CHOY_A11Y_REPORT_DIR,
         Env.BOK_CHOY_A11Y_COVERAGERC
+    )
+
+
+@task
+def pa11ycrawler_coverage():
+    """
+    Generate coverage reports for bok-choy tests
+    """
+    parse_coverage(
+        Env.PA11YCRAWLER_REPORT_DIR,
+        Env.PA11YCRAWLER_COVERAGERC
     )

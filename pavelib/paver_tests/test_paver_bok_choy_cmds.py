@@ -4,9 +4,11 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 """
 import os
 import unittest
+
+from mock import patch, call
 from test.test_support import EnvironmentVarGuard
 from paver.easy import BuildFailure
-from pavelib.utils.test.suites import BokChoyTestSuite
+from pavelib.utils.test.suites import BokChoyTestSuite, A11yCrawler
 
 REPO_DIR = os.getcwd()
 
@@ -167,3 +169,72 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         suite = BokChoyTestSuite('', num_processes=2, verbosity=3)
         with self.assertRaises(BuildFailure):
             BokChoyTestSuite.verbosity_processes_string(suite)
+
+
+class TestPaverPa11ycrawlerCmd(unittest.TestCase):
+
+    """
+    Paver pa11ycrawler command test cases.  Most of the functionality is
+    inherited from BokChoyTestSuite, so those tests aren't duplicated.
+    """
+
+    def setUp(self):
+        super(TestPaverPa11ycrawlerCmd, self).setUp()
+
+        # Mock shell commands
+        mock_sh = patch('pavelib.utils.test.suites.bokchoy_suite.sh')
+        self._mock_sh = mock_sh.start()
+
+        # Cleanup mocks
+        self.addCleanup(mock_sh.stop)
+
+    def _expected_command(self, report_dir):
+        """
+        Returns the expected command to run pa11ycrawler.
+        """
+        cms_start_url = (
+            "http://localhost:8031/auto_auth?redirect=true&course_id=course-v1"
+            "%3AedX%2BTest101%2Bcourse&staff=true"
+        )
+
+        lms_start_url = (
+            "http://localhost:8003/auto_auth?redirect=true&course_id=course-v1"
+            "%3AedX%2BTest101%2Bcourse&staff=true"
+        )
+
+        expected_statement = (
+            'pa11ycrawler run "{cms_start_url}" "{lms_start_url}" '
+            '--pa11ycrawler-allowed-domains=localhost '
+            '--pa11ycrawler-reports-dir={report_dir} '
+            '--pa11ycrawler-deny-url-matcher=logout '
+            '--pa11y-reporter="1.0-json" '
+            '--depth-limit=6 '
+        ).format(
+            cms_start_url=cms_start_url,
+            lms_start_url=lms_start_url,
+            report_dir=report_dir,
+        )
+        return expected_statement
+
+    def test_default(self):
+        suite = A11yCrawler('')
+        self.assertEqual(
+            suite.cmd, self._expected_command(suite.pa11y_report_dir))
+
+    def test_get_test_course(self):
+        suite = A11yCrawler('')
+        suite.get_test_course()
+        self._mock_sh.assert_has_calls([
+            call(
+                'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=suite.tar_gz_file, dir=suite.imports_dir)),
+            call(
+                'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=suite.imports_dir)),
+        ])
+
+    def test_generate_html_reports(self):
+        suite = A11yCrawler('')
+        suite.generate_html_reports()
+        self._mock_sh.assert_has_calls([
+            call(
+                'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={}'.format(suite.pa11y_report_dir)),
+        ])

@@ -13,6 +13,8 @@
   "devDependencies": {
     "jshint": "^2.7.0",
     "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules",
+    "pa11y": "3.6.0",
+    "pa11y-reporter-1.0-json": "1.0.2",
     "plato": "1.2.2"
   }
 }

@@ -2,9 +2,11 @@
 Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
+from urllib import urlencode
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
+from path import Path as path
 from paver.easy import sh, BuildFailure
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
@@ -162,6 +164,26 @@ class BokChoyTestSuite(TestSuite):
         # load data in db_fixtures
         self.load_data()
 
+        # load courses if self.imports_dir is set
+        self.load_courses()
+
+        # Ensure the test servers are available
+        msg = colorize('green', "Confirming servers are running...")
+        print msg
+        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+
+    def load_courses(self):
+        """
+        Loads courses from self.imports_dir.
+
+        Note: self.imports_dir is the directory that contains the directories
+        that have courses in them. For example, if the course is located in
+        `test_root/courses/test-example-course/`, self.imports_dir should be
+        `test_root/courses/`.
+        """
+        msg = colorize('green', "Importing courses from {}...".format(self.imports_dir))
+        print msg
+
         if self.imports_dir:
             sh(
                 "DEFAULT_STORE={default_store}"
@@ -170,11 +192,6 @@ class BokChoyTestSuite(TestSuite):
                     import_dir=self.imports_dir
                 )
             )
-
-        # Ensure the test servers are available
-        msg = colorize('green', "Confirming servers are running...")
-        print msg
-        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
 
     def load_data(self):
         """
@@ -241,3 +258,88 @@ class BokChoyTestSuite(TestSuite):
 
         cmd = (" ").join(cmd)
         return cmd
+
+
+class A11yCrawler(BokChoyTestSuite):
+    """
+    Sets up test environment with mega-course loaded, and runs pa11ycralwer
+    against it.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(A11yCrawler, self).__init__(*args, **kwargs)
+
+        self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
+        self.imports_dir = path('test_root/courses/')
+        self.tar_gz_file = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
+
+    def __enter__(self):
+        self.get_test_course()
+        super(A11yCrawler, self).__enter__()
+
+    def get_test_course(self):
+        """
+        Fetches the test course.
+        """
+        self.imports_dir.makedirs_p()
+        zipped_course = self.imports_dir + 'demo_course.tar.gz'
+
+        msg = colorize('green', "Fetching the test course from github...")
+        print msg
+
+        sh(
+            'wget {tar_gz_file} -O {zipped_course}'.format(
+                tar_gz_file=self.tar_gz_file,
+                zipped_course=zipped_course,
+            )
+        )
+
+        msg = colorize('green', "Uncompressing the test course...")
+        print msg
+
+        sh(
+            'tar zxf {zipped_course} -C {courses_dir}'.format(
+                zipped_course=zipped_course,
+                courses_dir=self.imports_dir,
+            )
+        )
+
+    def generate_html_reports(self):
+        """
+        Runs pa11ycrawler json-to-html
+        """
+        cmd_str = (
+            'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={report_dir}'
+        ).format(report_dir=self.pa11y_report_dir)
+
+        sh(cmd_str)
+
+    @property
+    def cmd(self):
+        """
+        Runs pa11ycrawler as staff user against the test course.
+        """
+        params = urlencode({
+            "redirect": 'true',
+            "staff": 'true',
+            "course_id": "course-v1:edX+Test101+course",
+        })
+        cms_start_url = 'http://localhost:8031/auto_auth?{}'.format(params)
+        lms_start_url = 'http://localhost:8003/auto_auth?{}'.format(params)
+        cmd_str = (
+            'pa11ycrawler run "{cms_start_url}" "{lms_start_url}" '
+            '--pa11ycrawler-allowed-domains={allowed_domains} '
+            '--pa11ycrawler-reports-dir={report_dir} '
+            '--pa11ycrawler-deny-url-matcher={dont_go_here} '
+            '--pa11y-reporter="{reporter}" '
+            '--depth-limit={depth} '
+        ).format(
+            cms_start_url=cms_start_url,
+            lms_start_url=lms_start_url,
+            allowed_domains='localhost',
+            report_dir=self.pa11y_report_dir,
+            reporter="1.0-json",
+            dont_go_here="logout",
+            depth="6",
+        )
+        return cmd_str
