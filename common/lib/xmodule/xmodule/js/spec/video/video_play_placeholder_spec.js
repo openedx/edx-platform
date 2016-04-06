@@ -55,7 +55,7 @@
             expect(btnPlay).not.toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'false',
-                'tabindex': 0
+                'tabindex': '0'
             });
 
             state.videoPlayPlaceholder.hide();
@@ -63,7 +63,7 @@
             expect(btnPlay).toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'true',
-                'tabindex': -1
+                'tabindex': '-1'
             });
         });
 
