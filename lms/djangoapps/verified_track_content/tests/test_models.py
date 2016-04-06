@@ -12,8 +12,8 @@ from student.models import CourseMode
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from verified_track_content.models import VerifiedTrackCohortedCourse
-from verified_track_content.tasks import sync_cohort_with_mode, VERIFIED_COHORT_NAME
+from verified_track_content.models import VerifiedTrackCohortedCourse, DEFAULT_VERIFIED_COHORT_NAME
+from verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
     set_course_cohort_settings, add_cohort, CourseCohort, DEFAULT_COHORT_NAME
 )
@@ -47,6 +47,20 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         config.save()
         self.assertEqual(unicode(config), "Course: {}, enabled: True".format(self.SAMPLE_COURSE))
 
+    def test_verified_cohort_name(self):
+        COHORT_NAME = 'verified cohort'
+        course_key = CourseKey.from_string(self.SAMPLE_COURSE)
+        config = VerifiedTrackCohortedCourse.objects.create(
+            course_key=course_key, enabled=True, verified_cohort_name=COHORT_NAME
+        )
+        config.save()
+        self.assertEqual(VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key), COHORT_NAME)
+
+    def test_unset_verified_cohort_name(self):
+        fake_course_id = 'fake/course/key'
+        course_key = CourseKey.from_string(fake_course_id)
+        self.assertEqual(VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key), None)
+
 
 class TestMoveToVerified(SharedModuleStoreTestCase):
     """ Tests for the post-save listener. """
@@ -69,12 +83,17 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
     def _enable_cohorting(self):
         set_course_cohort_settings(self.course.id, is_cohorted=True)
 
-    def _create_verified_cohort(self):
-        add_cohort(self.course.id, VERIFIED_COHORT_NAME, CourseCohort.MANUAL)
+    def _create_verified_cohort(self, name=DEFAULT_VERIFIED_COHORT_NAME):
+        add_cohort(self.course.id, name, CourseCohort.MANUAL)
 
-    def _enable_verified_track_cohorting(self):
+    def _enable_verified_track_cohorting(self, cohort_name=None):
         """ Enable verified track cohorting for the default course. """
-        config = VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True)
+        if cohort_name:
+            config = VerifiedTrackCohortedCourse.objects.create(
+                course_key=self.course.id, enabled=True, verified_cohort_name=cohort_name
+            )
+        else:
+            config = VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True)
         config.save()
 
     def _enroll_in_course(self):
@@ -140,7 +159,8 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertTrue(VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(self.course.id))
         self._verify_no_automatic_cohorting()
         self.assertTrue(error_logger.called)
-        self.assertIn("course does not have a verified cohort", error_logger.call_args[0][0])
+        error_message = "cohort named '%s' does not exist"
+        self.assertIn(error_message, error_logger.call_args[0][0])
 
     def test_automatic_cohorting_enabled(self):
         """
@@ -161,7 +181,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
 
         self._upgrade_to_verified()
         self.assertEqual(4, self.mocked_celery_task.call_count)
-        self.assertEqual(VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
 
     def test_unenrolled(self):
         """
@@ -174,12 +194,21 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self._enable_verified_track_cohorting()
         self._enroll_in_course()
         self._upgrade_to_verified()
-        self.assertEqual(VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
 
         # Un-enroll from the course and then re-enroll
         self._unenroll()
-        self.assertEqual(VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
         self._reenroll()
         self.assertEqual(DEFAULT_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
         self._upgrade_to_verified()
-        self.assertEqual(VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+
+    def test_custom_verified_cohort_name(self):
+        CUSTOM_COHORT_NAME = 'special verified cohort'
+        self._enable_cohorting()
+        self._create_verified_cohort(name=CUSTOM_COHORT_NAME)
+        self._enable_verified_track_cohorting(cohort_name=CUSTOM_COHORT_NAME)
+        self._enroll_in_course()
+        self._upgrade_to_verified()
+        self.assertEqual(CUSTOM_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)

@@ -10,7 +10,7 @@ from xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment
 from courseware.courses import get_course_by_id
 
-from verified_track_content.tasks import sync_cohort_with_mode, VERIFIED_COHORT_NAME
+from verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts, CourseCohort, is_course_cohorted
 )
@@ -18,6 +18,8 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 import logging
 
 log = logging.getLogger(__name__)
+
+DEFAULT_VERIFIED_COHORT_NAME = "Verified Learners"
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -28,14 +30,19 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
     """
     course_key = instance.course_id
     verified_cohort_enabled = VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key)
+    verified_cohort_name = VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key)
 
     if verified_cohort_enabled and (instance.mode != instance._old_mode):  # pylint: disable=protected-access
         if not is_course_cohorted(course_key):
             log.error("Automatic verified cohorting enabled for course '%s', but course is not cohorted", course_key)
         else:
             existing_cohorts = get_course_cohorts(get_course_by_id(course_key), CourseCohort.MANUAL)
-            if any(cohort.name == VERIFIED_COHORT_NAME for cohort in existing_cohorts):
-                args = {'course_id': unicode(course_key), 'user_id': instance.user.id}
+            if any(cohort.name == verified_cohort_name for cohort in existing_cohorts):
+                args = {
+                    'course_id': unicode(course_key),
+                    'user_id': instance.user.id,
+                    'verified_cohort_name': verified_cohort_name
+                }
                 # Do the update with a 3-second delay in hopes that the CourseEnrollment transaction has been
                 # completed before the celery task runs. We want a reasonably short delay in case the learner
                 # immediately goes to the courseware.
@@ -46,8 +53,9 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                 sync_cohort_with_mode.apply_async(kwargs=args, countdown=300)
             else:
                 log.error(
-                    "Automatic verified cohorting enabled for course '%s', but course does not have a verified cohort",
-                    course_key
+                    "Automatic verified cohorting enabled for course '%s', but cohort named '%s' does not exist.",
+                    course_key,
+                    verified_cohort_name,
                 )
 
 
@@ -72,10 +80,30 @@ class VerifiedTrackCohortedCourse(models.Model):
         help_text=ugettext_lazy(u"The course key for the course we would like to be auto-cohorted.")
     )
 
+    verified_cohort_name = models.CharField(max_length=100, default=DEFAULT_VERIFIED_COHORT_NAME)
+
     enabled = models.BooleanField()
 
     def __unicode__(self):
         return u"Course: {}, enabled: {}".format(unicode(self.course_key), self.enabled)
+
+    @classmethod
+    def verified_cohort_name_for_course(cls, course_key):
+        """
+        Returns the given cohort name for the specific course.
+
+        Args:
+            course_key (CourseKey): a course key representing the course we want the verified cohort name for
+
+        Returns:
+            The cohort name if the course key has one associated to it. None otherwise.
+
+        """
+        try:
+            config = cls.objects.get(course_key=course_key)
+            return config.verified_cohort_name
+        except cls.DoesNotExist:
+            return None
 
     @classmethod
     def is_verified_track_cohort_enabled(cls, course_key):

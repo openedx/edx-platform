@@ -23,12 +23,14 @@ class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def test_form_validation_success(self):
-        form_data = {'course_key': unicode(self.course.id), 'enabled': True}
+        form_data = {
+            'course_key': unicode(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
+        }
         form = VerifiedTrackCourseForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_form_validation_failure(self):
-        form_data = {'course_key': self.FAKE_COURSE, 'enabled': True}
+        form_data = {'course_key': self.FAKE_COURSE, 'verified_cohort_name': 'Verified Learners', 'enabled': True}
         form = VerifiedTrackCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
@@ -36,7 +38,7 @@ class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):
             ['COURSE NOT FOUND.  Please check that the course ID is valid.']
         )
 
-        form_data = {'course_key': self.BAD_COURSE_KEY, 'enabled': True}
+        form_data = {'course_key': self.BAD_COURSE_KEY, 'verified_cohort_name': 'Verified Learners', 'enabled': True}
         form = VerifiedTrackCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
