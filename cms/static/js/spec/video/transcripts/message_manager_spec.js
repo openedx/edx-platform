@@ -2,7 +2,7 @@ define(
     [
         "jquery", "underscore",
         "js/views/video/transcripts/utils", "js/views/video/transcripts/message_manager",
-        "js/views/video/transcripts/file_uploader", "sinon", "jasmine-jquery",
+        "js/views/video/transcripts/file_uploader", "sinon",
         "xmodule"
     ],
 function ($, _, Utils, MessageManager, FileUploader, sinon) {
@@ -67,10 +67,10 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
         });
 
         // Disabled 2/6/14 after intermittent failure in master
-        xdescribe('Render', function () {
+        describe('Render', function () {
 
             beforeEach(function () {
-                spyOn(_,'template').andCallThrough();
+                spyOn(_,'template').and.callThrough();
                 spyOn(fileUploader, 'render');
             });
 
@@ -101,7 +101,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             beforeEach(function () {
                 view.render('found');
                 spyOn(view, 'hideError');
-                spyOn($.fn, 'html').andCallThrough();
+                spyOn($.fn, 'html').and.callThrough();
                 $error = view.$el.find('.transcripts-error-message');
                 $buttons = view.$el.find('.wrapper-transcripts-buttons');
             });
@@ -147,10 +147,10 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
         $.each(handlers, function(key, value) {
              it(key, function () {
                 var eventObj = jasmine.createSpyObj('event', ['preventDefault']);
-                spyOn($.fn, 'data').andReturn('video_id');
+                spyOn($.fn, 'data').and.returnValue('video_id');
                 spyOn(view, 'processCommand');
                 view[key](eventObj);
-                expect(view.processCommand.mostRecentCall.args).toEqual(value);
+                expect(view.processCommand.calls.mostRecent().args).toEqual(value);
              });
         });
 
@@ -162,7 +162,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
 
             beforeEach(function () {
                 view.render('found');
-                spyOn(Utils, 'command').andCallThrough();
+                spyOn(Utils, 'command').and.callThrough();
                 spyOn(view, 'render');
                 spyOn(view, 'showError');
 
@@ -174,35 +174,19 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 sinonXhr.restore();
             });
 
-            var assertCommand = function (config, expectFunc) {
-                var flag = false,
-                    defaults = {
+            var assertCommand = function (config) {
+                var defaults = {
                         action: 'replace',
                         errorMessage: 'errorMessage',
                         extraParamas: void(0)
                     };
-                    args = $.extend({}, defaults, config);
+                var args = $.extend({}, defaults, config);
 
-                runs(function() {
-                    view
-                        .processCommand(
-                            args.action,
-                            args.errorMessage,
-                            args.extraParamas
-                        )
-                        .always(function () { flag = true; });
-                });
-
-                waitsFor(function() {
-                    return flag;
-                }, "Ajax Timeout", 750);
-
-
-                runs(expectFunc);
+                return view
+                    .processCommand(args.action, args.errorMessage, args.extraParamas);
             };
 
-            it('Invoke without extraParamas', function () {
-
+            it('Invoke without extraParamas', function (done) {
                 sinonXhr.respondWith([
                     200,
                     { "Content-Type": "application/json"},
@@ -212,9 +196,8 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                     })
                 ]);
 
-                assertCommand(
-                    { },
-                    function() {
+                assertCommand({})
+                    .then(function () {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_locator,
@@ -222,15 +205,14 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                             void(0)
                         );
                         expect(view.showError).not.toHaveBeenCalled();
-                        expect(view.render.mostRecentCall.args[0])
+                        expect(view.render.calls.mostRecent().args[0])
                             .toEqual('found');
                         expect(Utils.Storage.set).toHaveBeenCalled();
-                    }
-                );
+                    })
+                    .always(done);
             });
 
-            it('Invoke with extraParamas', function () {
-
+            it('Invoke with extraParamas', function (done) {
                 sinonXhr.respondWith([
                     200,
                     { "Content-Type": "application/json"},
@@ -242,9 +224,8 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
 
                 view.processCommand(action, errorMessage, extraParamas);
 
-                assertCommand(
-                    { extraParamas : extraParamas },
-                    function () {
+                assertCommand({extraParamas : extraParamas})
+                    .then(function () {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_locator,
@@ -254,20 +235,16 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                             }
                         );
                         expect(view.showError).not.toHaveBeenCalled();
-                        expect(view.render.mostRecentCall.args[0])
-                            .toEqual('found');
+                        expect(view.render.calls.mostRecent().args[0]).toEqual('found');
                         expect(Utils.Storage.set).toHaveBeenCalled();
-                    }
-                );
+                    })
+                    .always(done);
             });
 
-            it('Fail', function () {
-
+            it('Fail', function (done) {
                 sinonXhr.respondWith([400, {}, '']);
-
-                assertCommand(
-                    { },
-                    function () {
+                assertCommand({})
+                    .then(function () {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
                             view.component_locator,
@@ -277,8 +254,8 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                         expect(view.showError).toHaveBeenCalled();
                         expect(view.render).not.toHaveBeenCalled();
                         expect(Utils.Storage.set).not.toHaveBeenCalled();
-                    }
-                );
+                    })
+                    .always(done);
             });
         });
 

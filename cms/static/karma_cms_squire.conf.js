@@ -70,6 +70,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
 
     // Paths to source JavaScript files
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true, nocache: true},
     {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
     {pattern: 'js/collections/**/*.js', included: false, nocache: true},
     {pattern: 'js/models/**/*.js', included: false, nocache: true},
