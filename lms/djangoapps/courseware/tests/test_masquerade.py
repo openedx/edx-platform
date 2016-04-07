@@ -28,6 +28,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -279,6 +280,30 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         The return value is a string like u'1/2'.
         """
         return json.loads(self.look_at_question(self.problem_display_name).content)['progress_detail']
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_masquerade_as_specific_user_on_self_paced(self):
+        """
+        Test masquerading as a specific user for course info page when self paced configuration
+        "enable_course_home_improvements" flag is set
+
+        Login as a staff user and visit course info page.
+        set masquerade to view same page as a specific student and revisit the course info page.
+        """
+        # Log in as staff, and check we can see the info page.
+        self.login_staff()
+        response = self.get_course_info_page()
+        self.assertEqual(response.status_code, 200)
+        content = response.content
+        self.assertIn("OOGIE BLOOGIE", content)
+
+        # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
+        SelfPacedConfiguration(enable_course_home_improvements=True).save()
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+        response = self.get_course_info_page()
+        self.assertEqual(response.status_code, 200)
+        content = response.content
+        self.assertIn("OOGIE BLOOGIE", content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student(self):
