@@ -616,7 +616,9 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                 for module_descriptor in yield_dynamic_descriptor_descendants(
                         section_module, student.id, module_creator
                 ):
-                    locations_to_children[module_descriptor.parent].append(module_descriptor.location)
+                    location_parent = module_descriptor.parent.replace(version=None, branch=None)
+                    location_to_save = module_descriptor.location.replace(version=None, branch=None)
+                    locations_to_children[location_parent].append(location_to_save)
                     (correct, total) = get_score(
                         student,
                         module_descriptor,
@@ -637,7 +639,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                     )
 
                     scores.append(weighted_location_score)
-                    locations_to_weighted_scores[module_descriptor.location] = weighted_location_score
+                    locations_to_weighted_scores[location_to_save] = weighted_location_score
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(

@@ -1249,7 +1249,7 @@ base_vendor_js = [
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
-    'js/vendor/underscore.string.min.js',
+    'common/js/vendor/underscore.string.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -1390,20 +1390,6 @@ PIPELINE_CSS = {
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
-    },
-    'style-main': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main.css',
-        ],
-        'output_filename': 'css/lms-main.css',
-    },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
-        'source_filenames': [
-            'css/lms-main-rtl.css',
-        ],
-        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -2867,3 +2853,7 @@ DEFAULT_SITE_ID = 1
 # Cache time out settings
 # by Comprehensive Theme system
 THEME_CACHE_TIMEOUT = 30 * 60
+
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'

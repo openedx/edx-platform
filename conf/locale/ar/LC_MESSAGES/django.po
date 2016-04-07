@@ -146,7 +146,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-24 18:06+0000\n"
+"POT-Creation-Date: 2016-03-30 19:39+0000\n"
 "PO-Revision-Date: 2015-12-07 09:55+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -221,6 +221,11 @@ msgstr "الرقم التعريفي للفيديو"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "الحالة"
+
+#: cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Pending"
+msgstr "مُعلَّق"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -3024,6 +3029,18 @@ msgstr ""
 " في مواد  المساق بأي سرعة وفي أي وقت يسبق نهاية المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Bypass Course Home"
+msgstr "تجاوز الصفحة الرئيسية للمساق"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Bypass the course home tab when students arrive from the dashboard, sending "
+"them directly to course content."
+msgstr ""
+"تجاوز تبويب الصفحة الرئيسية عندما يصلها الطلاب من صفحة لوحة التحكّم، وذلك "
+"بإرسالهم مباشرةً إلى محتوى المساق."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
 msgstr "فعّل المتطلّبات الأساسية للقسم الفرعي"
 
@@ -4494,6 +4511,8 @@ msgid ""
 "A CCX can only be created on this course through an external service. "
 "Contact a course admin to give you access."
 msgstr ""
+"يمكن إنشاء \"CCX\" لهذا المساق فقط من خلال خدمة خارجية. يُرجى الاتصال بمدير "
+"المساق ليمنحك صلاحية الوصول."
 
 #: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
@@ -6361,10 +6380,6 @@ msgstr "عمليات التمديد"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "تنزيل البيانات"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "For analytics about your course, go to {analytics_dashboard_name}."
-msgstr "للحصول على تحليلات لمساقك، يُرجى زيارة  {analytics_dashboard_name}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
@@ -8351,132 +8366,73 @@ msgid "Your Password Reset is Complete"
 msgstr "استُكملت عملية تغيير كلمة المرور الخاصة بك"
 
 #: lms/templates/registration/password_reset_complete.html
+msgid "Password Reset Complete"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
-"      "
+"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
+"                "
 msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
 "\n"
-"      Reset Your %(platform_name)s Password\n"
-"  "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"          Reset Your %(platform_name)s Password\n"
-"          "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Form"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"\n"
-"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
-"            "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The following errors occurred while processing your registration: "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must complete all fields."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The two password fields didn't match."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
-msgstr ""
+"جرت إعادة ضبط كلمة المرور الخاصة بك. يمكنك %(link_start)s تسجيل الدخول إلى حسابك %(link_end)s"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
-"            "
+"    Reset Your %(platform_name)s Password\n"
+msgstr ""
+"\n"
+"إعادة ضبط كلمة السر الخاصة بك للمنصّة %(platform_name)s\n"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Error Resetting Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
+msgid "You must enter and confirm your new password."
 msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The text in both password fields must match."
+msgstr "لم يتطابق النص في حقلي كلمة المرور."
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Confirm Password"
+msgstr ""
+
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "تغيير السر الخاصة بي"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
+msgstr "رابط إعادة تعيين كلمة السر غير صحيح"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
-"        "
+"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
+"                "
 msgstr ""
-
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "معلومات مطلوبة"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password Again"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Change My Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
 "\n"
-"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
-"        "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Help"
-msgstr ""
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "هل تحتاج إلى مساعدة؟"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
-"          "
-msgstr ""
+"رابط إعادة ضبط كلمة السر هذا غير صحيح. ربما لأنّه مستخدم مسبقًا. لإعادة ضبط كلمة السر، يُرجى العودة إلى صفحة %(start_link)s تسجيل الدخول %(end_link)s  واختيار <strong>نسيت كلمة السر</strong>."
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -8983,6 +8939,26 @@ msgstr "جرى حذف هذه المراجعة."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "ستشير العودة إلى هذه المراجعة أنّ المقال قد حُذِف "
 
+#: cms/templates/index.html
+msgid "Denied"
+msgstr "مرفوض"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Approved"
+msgstr "موافق عليه"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Status of this API access request"
+msgstr "حالة طلب الوصول الخاص بواجهة التطبيق البرمجية."
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The URL of the website associated with this API user."
+msgstr "رابط الموقع الإلكتروني المرتبط بمستخدم واجهة التطبيق البرمجية هذه."
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The reason this user wants to access the API."
+msgstr "السبب وراء رغبة هذا المستخدم باستخدام واجهة التطبيق البرمجية."
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة."
@@ -9034,6 +9010,9 @@ msgid ""
 "Generally, it is the domain name for your platform. For example, if your "
 "platform is http://edx.org, the platform key is \"edx\"."
 msgstr ""
+"يربط مفتاح المنصّة أدوات الواجهة ’CourseTalk‘ مع المنصّة الخاصّة بك. بشكل "
+"عام، يكون ذلك اسم موضوع المنصّة الخاصة بك. مثلًا، إذا كانت منصّتك "
+"http://edx.org سيكون مفتاح المنصّة \"edx\"."
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -9077,25 +9056,25 @@ msgstr ""
 "محدّد بالثواني. فعّل ميزة الاحتفاظ بالبيانات في الذاكرة المؤقتة Cache بتعيين"
 " هذه القيمة لتصبح أكبر من 0."
 
-#. Translators: The join of three or more university names. The first of these
-#. formatting strings
-#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-#: openedx/core/djangoapps/credit/email_utils.py
-msgid "{first_providers}, and {last_provider}"
-msgstr ""
-
-#. Translators: The join of two university names (e.g., Harvard and MIT).
-#: openedx/core/djangoapps/credit/email_utils.py
-msgid "{first_provider} and {second_provider}"
-msgstr ""
-
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "الأهلية لمواد المساق الدراسيّة"
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "You are eligible for credit from {providers_string}"
-msgstr ""
+msgstr "أنت مؤهّل لحضور وحدة دراسية من {providers_string}"
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr "{first_provider} و{second_provider}"
+
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr "{first_providers}، و{last_provider}"
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9267,13 +9246,15 @@ msgstr "تفعيل إنشاء شهادة البرنامج"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Maximum Certification Retries"
-msgstr ""
+msgstr "العدد الأقصى لإعادة المحاولات والحصول على شهادة."
 
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "When making requests to award certificates, make at most this many attempts "
 "to retry a failing request."
 msgstr ""
+"عند تقديم طلبات لمنح شهادات، يمكن، وكحدّ أقصى، إجراء هذا العدد من المحاولات "
+"لإعادة تقديم الطلبات غير الناجحة. "
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -9338,6 +9319,7 @@ msgstr "عنوان البريد الإلكتروني الذي استخدمته �
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "كلمة المرور"
@@ -9441,7 +9423,7 @@ msgstr "أخبرنا بالأسباب التي دفعتك للانضمام إل�
 #. live.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "State/Province/Region"
-msgstr ""
+msgstr "الولاية/المقاطعة/المنطقة"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -9882,15 +9864,6 @@ msgstr "المدّة"
 msgid "Date Added"
 msgstr "تاريخ الإضافة "
 
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Pending"
-msgstr "مُعلَّق"
-
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -10009,10 +9982,28 @@ msgstr "رقم المساق: "
 msgid "Courses"
 msgstr "المساقات"
 
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
+
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -10024,13 +10015,14 @@ msgstr "عنوان البريد الإلكتروني"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "مثال:  username@domain.com "
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "هل نسيت كلمة السر؟"
 
@@ -10393,6 +10385,18 @@ msgstr ""
 "يُرجى إدخال عنوان بريدك الإلكتروني أدناه وسنرسل لك تعليمات تغيير كلمة سر "
 "جديدة."
 
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "معلومات مطلوبة"
+
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "عنوان بريدك الإلكتروني"
@@ -10400,10 +10404,6 @@ msgstr "عنوان بريدك الإلكتروني"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "هذا هو عنوان البريد الإلكتروني الذي استخدمته للتسجيل في {platform}"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "تغيير السر الخاصة بي"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -10656,6 +10656,11 @@ msgstr "هل أنت غير مسجَّل؟"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "سجّل عضويتك اليوم في {platform_name}!"
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "هل تحتاج إلى مساعدة؟"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -11824,7 +11829,7 @@ msgstr "سمِّ CCX الخاصة بك."
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Create a new Custom Course for edX"
-msgstr ""
+msgstr "إنشاء مقرّر مخصّص جديد لمنصّة edX"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
@@ -11837,7 +11842,7 @@ msgstr "سياسة التقييم"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Please enter a valid CCX name."
-msgstr ""
+msgstr "يُرجى إدخال اسم ’CCX‘ صالح."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12798,6 +12803,8 @@ msgid ""
 "for successfully completing your {platform_name} course! {link_start}Get "
 "your credit now.{link_end}"
 msgstr ""
+"تهانينا! أنت مؤهل للحصول على مادة دراسية من  {providers} لنجاحك في إتمام "
+"مساق {platform_name}! {link_start}احصل على موادك الآن{link_end}."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -13152,6 +13159,10 @@ msgid ""
 msgstr ""
 "لقد أتممت هذا المساق أصبحت مؤهّلًا لشراء مادة للمساق. يُرجى اختيار "
 "<strong>الحصول على مادّة</strong> للبدء."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "You are now eligible for credit from {provider}. Congratulations!"
+msgstr "أنت مؤهّل لوحدة دراسية من {provider}. تهانينا!"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
@@ -15291,6 +15302,14 @@ msgstr "أمر الشراء الخاص بالعميل أو غيره من الم�
 msgid "Send me a copy of the invoice"
 msgstr "أرسل لي نسخة من الفاتورة"
 
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"For analytics about your course, go to "
+"{link_start}{analytics_dashboard_name}{link_end}."
+msgstr ""
+"للحصول على تحليلات لمساقك، يُرجى زيارة الرابط "
+"{link_start}{analytics_dashboard_name}{link_end}."
+
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "لوحة المعلومات الخاصة بالأستاذ"
@@ -17076,7 +17095,7 @@ msgstr "خطأ في خادم الاستوديو {studio_name} "
 
 #: cms/templates/500.html
 msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
-msgstr ""
+msgstr "واجهت مخدّمات {em_start}{studio_name}{em_end} خطأ."
 
 #: cms/templates/500.html
 msgid ""
@@ -17154,9 +17173,9 @@ msgstr ""
 "ويمكنك العودة أيضًا في هذه الأثناء إلى {link_start}صفحة {studio_name} "
 "الرئيسية.{link_end}"
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "تحميل &amp; الملفات "
+#: cms/templates/asset_index.html
+msgid "Files & Uploads"
+msgstr "الملفات والتحميل "
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -19071,10 +19090,6 @@ msgid "Your Course Creator request is:"
 msgstr "إنّ الطلب الذي تقدّمت به لتسجيلك كمُنشئ مساق:"
 
 #: cms/templates/index.html
-msgid "Denied"
-msgstr "مرفوض"
-
-#: cms/templates/index.html
 msgid ""
 "Your request did not meet the criteria/guidelines specified by "
 "{platform_name} Staff."
@@ -19275,22 +19290,6 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "اعرف المزيد عن مكتبات المحتوى"
-
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "تسجيل الدخول"
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "تسجيل الدخول في {studio_name}"
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "أليس لديك حساب في {studio_name}؟ سجّل عضويتك!"
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "المعلومات المطلوبة لتسجيل الدخول في {studio_name}"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -20450,6 +20449,10 @@ msgstr "المخطّط الكلّي"
 #: cms/templates/widgets/header.html
 msgid "Updates"
 msgstr "التحديثات"
+
+#: cms/templates/widgets/header.html
+msgid "Files &amp; Uploads"
+msgstr "تحميل &amp; الملفات "
 
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"

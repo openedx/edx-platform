@@ -23,7 +23,7 @@
             'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
-            'underscore.string': 'js/vendor/underscore.string.min',
+            'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'js/vendor/backbone-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',

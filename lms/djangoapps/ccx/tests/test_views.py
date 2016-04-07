@@ -46,7 +46,6 @@ from student.tests.factories import (
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
@@ -133,26 +132,6 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     Tests for Custom Courses views.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
-    def make_staff(self):
-        """
-        create staff user
-        """
-        staff = AdminFactory.create(password="test")
-        role = CourseStaffRole(self.course.id)
-        role.add_users(staff)
-
-        return staff
-
-    def make_instructor(self):
-        """
-        create staff instructor
-        """
-        instructor = AdminFactory.create(password="test")
-        role = CourseInstructorRole(self.course.id)
-        role.add_users(instructor)
-
-        return instructor
 
     def test_staff_access_coach_dashboard(self):
         """
@@ -607,10 +586,14 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # create ccx and limit the maximum amount of students that can be enrolled to 2
         ccx = self.make_ccx(max_students_allowed=2)
         ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        staff = self.make_staff()
+        instructor = self.make_instructor()
+
         # create some users
-        students = [
+        students = [instructor, staff, self.coach] + [
             UserFactory.create(is_staff=False) for _ in range(3)
         ]
+
         url = reverse(
             'ccx_invite',
             kwargs={'course_id': ccx_course_key}
@@ -621,15 +604,26 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        # a CcxMembership exists for the first two students but not the third
+        # even if course is coach can enroll staff and admins of master course into ccx
         self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=instructor).exists()
         )
         self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
+        )
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=self.coach).exists()
+        )
+
+        # a CcxMembership exists for the first five students but not the sixth
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[3]).exists()
+        )
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[4]).exists()
         )
         self.assertFalse(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[2]).exists()
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[5]).exists()
         )
 
     def test_manage_student_enrollment_limit(self):
@@ -641,11 +635,13 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         students_limit = 1
         self.make_coach()
+        staff = self.make_staff()
         ccx = self.make_ccx(max_students_allowed=students_limit)
         ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         students = [
             UserFactory.create(is_staff=False) for _ in range(2)
         ]
+
         url = reverse(
             'ccx_manage_student',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
@@ -653,7 +649,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[0].email, ]),
+            'student-id': students[0].email,
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -661,11 +657,12 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertTrue(
             CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
         )
+
         # try to enroll the second student without success
         # enroll the first student
         data = {
             'student-action': 'add',
-            'student-id': u','.join([students[1].email, ]),
+            'student-id': students[1].email,
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -677,6 +674,27 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             students_limit=students_limit
         )
         self.assertContains(response, error_message, status_code=200)
+
+        # try to enroll the 3rd student which is staff
+        data = {
+            'student-action': 'add',
+            'student-id': staff.email,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # staff gets enroll
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
+        )
+
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key), 1)
+
+        # asert that number of enroll is still 0 because staff and instructor do not count.
+        CourseEnrollment.enroll(staff, self.course.id)
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(self.course.id), 0)
+        # assert that handles  wrong ccx id code
+        ccx_course_key_fake = CCXLocator.from_course_locator(self.course.id, 55)
+        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key_fake), 0)
 
     @ddt.data(
         ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
@@ -767,10 +785,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         # some error messages are returned for one of the views only
         if view_name == 'ccx_manage_student' and not is_email(identifier):
-            error_message = 'Could not find a user with name or email "{identifier}" '.format(
-                identifier=identifier
-            )
-            self.assertContains(response, error_message, status_code=200)
+            self.assertContains(response, 'Could not find a user with name or email ', status_code=200)
 
         if is_email(identifier):
             if send_email:

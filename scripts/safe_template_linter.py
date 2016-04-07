@@ -205,10 +205,6 @@ class Rules(Enum):
         'mako-multiple-page-tags',
         'A Mako template can only have one <%page> tag.'
     )
-    mako_include_with_violations = (
-        'mako-include-with-violations',
-        'Must fix violations in included templates first.'
-    )
     mako_unparsable_expression = (
         'mako-unparsable-expression',
         'The expression could not be properly parsed.'
@@ -446,42 +442,6 @@ class FileResults(object):
         self.directory = os.path.dirname(full_path)
         self.is_file = os.path.isfile(full_path)
         self.violations = []
-        self.includes = []
-
-    def resolve_include(self, include, include_results):
-        """
-        Resolves potential include violations and determines if they are real or
-        not. For real violations, adds the violations into the violation list.
-
-        If the include_results is not a file, it will be considered a violation
-        and will require a disable pragma.
-
-        Arguments:
-            include: The include with the potential violation to be resolved.
-            include_results: The results of processing the include file.
-
-        """
-        include_has_violations = (not include_results.is_file) or (len(include_results.violations) > 0)
-        if include_has_violations:
-            self.violations.append(include['potential_violation'])
-
-    def add_include(self, include_file, potential_violation):
-        """
-        Adds an include which also must have no violations.
-
-        Arguments:
-            include_file: The include file as provided in an include.
-            potential_violation: Represents the violation of the include, if the
-                included file has any violations.
-
-        """
-        include_full_path = os.path.normpath(self.directory + '/' + include_file)
-        self.includes.append({
-            'directory': os.path.dirname(include_full_path),
-            'file_name': os.path.split(include_full_path)[1],
-            'full_path': include_full_path,
-            'potential_violation': potential_violation,
-        })
 
     def prepare_results(self, file_string):
         """
@@ -494,8 +454,6 @@ class FileResults(object):
         string_lines = StringLines(file_string)
         for violation in self.violations:
             violation.prepare_results(self.full_path, string_lines)
-        for include in self.includes:
-            include['potential_violation'].prepare_results(self.full_path, string_lines)
 
     def print_results(self, options, out):
         """
@@ -524,18 +482,6 @@ class MakoTemplateLinter(object):
 
     _skip_mako_dirs = _skip_dirs
 
-    def __init__(self):
-        """
-        Init method.
-        """
-        self.results = {}
-
-    def supports_includes(self):
-        """
-        Mako template linter supports linting includes.
-        """
-        return True
-
     def process_file(self, directory, file_name):
         """
         Process file to determine if it is a Mako template file and
@@ -551,13 +497,6 @@ class MakoTemplateLinter(object):
         """
         mako_file_full_path = os.path.normpath(directory + '/' + file_name)
         results = FileResults(mako_file_full_path)
-
-        # don't process the same file twice. this could happen when we process
-        # files included by another file
-        if mako_file_full_path in self.results:
-            return self.results[mako_file_full_path]
-
-        self.results[mako_file_full_path] = results
 
         if not results.is_file:
             return results
@@ -633,7 +572,6 @@ class MakoTemplateLinter(object):
             if not has_page_default:
                 results.violations.append(RuleViolation(Rules.mako_missing_default))
         self._check_mako_expressions(mako_template, has_page_default, results)
-        self._check_include_files(mako_template, results)
         results.prepare_results(mako_template)
 
     def _is_django_template(self, mako_template):
@@ -674,30 +612,6 @@ class MakoTemplateLinter(object):
         page_h_filter_regex = re.compile('<%page[^>]*expression_filter=(?:"h"|\'h\')[^>]*/>')
         page_match = page_h_filter_regex.search(mako_template)
         return page_match
-
-    def _check_include_files(self, mako_template, results):
-        """
-        Checks if the Mako template includes other template files. If so, sets
-        up potential violations that will be checked later.
-
-        Arguments:
-            mako_template: The contents of the Mako template.
-
-        """
-        regex = re.compile('<%include[^>]*file=(?:"|\')(.+?)(?:"|\')[^>]*/>')
-        for match in regex.finditer(mako_template):
-            include_file = match.group(1)
-            expression = {
-                'start_index': match.start(),
-                'end_index': match.end(),
-                'expression': match.group()
-            }
-            results.add_include(
-                include_file,
-                ExpressionRuleViolation(
-                    Rules.mako_include_with_violations, expression
-                )
-            )
 
     def _check_mako_expressions(self, mako_template, has_page_default, results):
         """
@@ -775,9 +689,6 @@ class MakoTemplateLinter(object):
                     results.violations.append(ExpressionRuleViolation(
                         Rules.mako_unwanted_html_filter, expression
                     ))
-            elif (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'dump_html_escaped_json'):
-                # {x | n, dump_html_escaped_json} is valid
-                pass
             else:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_invalid_html_filter, expression
@@ -948,12 +859,6 @@ class UnderscoreTemplateLinter(object):
 
     _skip_underscore_dirs = _skip_dirs + ('test',)
 
-    def supports_includes(self):
-        """
-        Underscore template linter does not lint includes.
-        """
-        return False
-
     def process_file(self, directory, file_name):
         """
         Process file to determine if it is an Underscore template file and
@@ -1114,13 +1019,6 @@ def _process_current_walk(current_walk, template_linters, options, out):
         walk_file = os.path.normpath(walk_file)
         for template_linter in template_linters:
             results = template_linter.process_file(walk_directory, walk_file)
-            if template_linter.supports_includes():
-                for include in results.includes:
-                    include_results = template_linter.process_file(
-                        include['directory'],
-                        include['file_name']
-                    )
-                    results.resolve_include(include, include_results)
             results.print_results(options, out)
 
 

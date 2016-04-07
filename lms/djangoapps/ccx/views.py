@@ -447,7 +447,7 @@ def ccx_invite(request, course, ccx=None):
     course_key = CCXLocator.from_course_locator(course.id, ccx.id)
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
-    ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params)
+    ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
     return redirect(url)
@@ -470,7 +470,7 @@ def ccx_student_management(request, course, ccx=None):
     course_key = CCXLocator.from_course_locator(course.id, ccx.id)
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
-    errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params)
+    errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
 
     for error_message in errors:
         messages.error(request, error_message)
