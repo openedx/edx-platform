@@ -70,10 +70,23 @@ class ProviderConfig(ConfigurationModel):
     Abstract Base Class for configuring a third_party_auth provider
     """
     icon_class = models.CharField(
-        max_length=50, default='fa-sign-in',
+        max_length=50,
+        blank=True,
+        default='fa-sign-in',
         help_text=(
             'The Font Awesome (or custom) icon class to use on the login button for this provider. '
             'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university'
+        ),
+    )
+    # We use a FileField instead of an ImageField here because ImageField
+    # doesn't support SVG. This means we don't get any image validation, but
+    # that should be fine because only trusted users should be uploading these
+    # anyway.
+    icon_image = models.FileField(
+        blank=True,
+        help_text=(
+            'If there is no Font Awesome icon available for this provider, upload a custom image. '
+            'SVG images are recommended as they can scale to any size.'
         ),
     )
     name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
@@ -108,6 +121,12 @@ class ProviderConfig(ConfigurationModel):
     class Meta(object):
         app_label = "third_party_auth"
         abstract = True
+
+    def clean(self):
+        """ Ensure that either `icon_class` or `icon_image` is set """
+        super(ProviderConfig, self).clean()
+        if bool(self.icon_class) == bool(self.icon_image):
+            raise ValidationError('Either an icon class or an icon image must be given (but not both)')
 
     @property
     def provider_id(self):
@@ -500,9 +519,15 @@ class LTIProviderConfig(ProviderConfig):
     """
     prefix = 'lti'
     backend_name = 'lti'
-    icon_class = None  # This provider is not visible to users
-    secondary = False  # This provider is not visible to users
-    accepts_logins = False  # LTI login cannot be initiated by the tool provider
+
+    # This provider is not visible to users
+    icon_class = None
+    icon_image = None
+    secondary = False
+
+    # LTI login cannot be initiated by the tool provider
+    accepts_logins = False
+
     KEY_FIELDS = ('lti_consumer_key', )
 
     lti_consumer_key = models.CharField(
