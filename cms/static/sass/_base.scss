@@ -646,7 +646,8 @@ hr.divider {
 }
 
 // ui - skipnav
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @extend %t-action3;
   display: inline-block;
   position: absolute;

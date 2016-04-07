@@ -417,7 +417,7 @@
                 });
 
                 it('show explanation message', function () {
-                    expect($('.subtitles-menu li')).toHaveHtml(
+                    expect($('.subtitles-menu li')).toHaveText(
                         'Transcript will be displayed when you start playing the video.'
                     );
                 });

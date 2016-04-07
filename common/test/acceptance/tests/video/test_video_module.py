@@ -1210,13 +1210,18 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             super(LMSVideoModuleA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
-        self.navigate_to_video()
+        # load transcripts so we can test skipping to
+        self.assets.extend(['english_single_transcript.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'transcripts': {"en": "english_single_transcript.srt"}, 'sub': '3_yD_cEKoCk'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
-        # Limit the scope of the audit to the video player only.
-        self.video.a11y_audit.config.set_scope(include=["div.video"])
-        self.video.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-223
-            ],
-        })
+        # go to video
+        self.navigate_to_video()
+        self.video.show_captions()
+
+        # limit the scope of the audit to the video player only.
+        self.video.a11y_audit.config.set_scope(
+            include=["div.video"],
+            exclude=["a.ui-slider-handle"]
+        )
         self.video.a11y_audit.check_for_accessibility_errors()
