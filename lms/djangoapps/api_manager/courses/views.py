@@ -1,5 +1,6 @@
 """ API implementation for course-oriented interactions. """
 
+import sys
 from collections import OrderedDict
 import logging
 import itertools
@@ -53,7 +54,6 @@ from api_manager.users.serializers import UserSerializer, UserCountByCitySeriali
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
-from .tasks import cache_static_tab_contents
 from progress.serializers import CourseModuleCompletionSerializer
 
 
@@ -383,9 +383,20 @@ def _get_static_tab_contents(request, course, tab):
     contents = cache.get(cache_key)
     if contents is None:
         contents = get_static_tab_contents(request, course, tab, wrap_xmodule_display=False)
-        cache_static_tab_contents.delay(cache_key, contents)
+        _cache_static_tab_contents(cache_key, contents)
 
     return contents
+
+
+def _cache_static_tab_contents(cache_key, contents):
+    """
+    Caches course static tab contents.
+    """
+    cache_expiration = getattr(settings, 'STATIC_TAB_CONTENTS_CACHE_TTL', 60 * 5)
+    contents_max_size_limit = getattr(settings, 'STATIC_TAB_CONTENTS_CACHE_MAX_SIZE_LIMIT', 4000)
+
+    if not sys.getsizeof(contents) > contents_max_size_limit:
+        cache.set(cache_key, contents, cache_expiration)
 
 
 class CourseContentList(SecureAPIView):
