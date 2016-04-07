@@ -198,13 +198,9 @@
             describe('methods', function () {
                 var volume, seek, duration, playbackRate;
 
-                beforeEach(function (done) {
+                beforeEach(function () {
                     volume = state.videoPlayer.player.video.volume;
                     seek = state.videoPlayer.player.video.currentTime;
-
-                    jasmine.waitUntil(function () {
-                        return state.videoPlayer.player.playerState === STATUS.PAUSED;
-                    }).done(done);
                 });
 
                 it('pauseVideo', function () {
