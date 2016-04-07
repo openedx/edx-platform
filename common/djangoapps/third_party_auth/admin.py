@@ -13,14 +13,23 @@ from .models import (
     SAMLConfiguration,
     SAMLProviderData,
     LTIProviderConfig,
-    ProviderApiPermissions
+    ProviderApiPermissions,
+    _PSA_OAUTH2_BACKENDS,
+    _PSA_SAML_BACKENDS
 )
 from .tasks import fetch_saml_metadata
 from third_party_auth.provider import Registry
 
 
+class OAuth2ProviderConfigForm(forms.ModelForm):
+    """ Django Admin form class for OAuth2ProviderConfig """
+    backend_name = forms.ChoiceField(choices=((name, name) for name in _PSA_OAUTH2_BACKENDS))
+
+
 class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for OAuth2ProviderConfig """
+    form = OAuth2ProviderConfigForm
+
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
@@ -31,8 +40,15 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
 admin.site.register(OAuth2ProviderConfig, OAuth2ProviderConfigAdmin)
 
 
+class SAMLProviderConfigForm(forms.ModelForm):
+    """ Django Admin form class for SAMLProviderConfig """
+    backend_name = forms.ChoiceField(choices=((name, name) for name in _PSA_SAML_BACKENDS))
+
+
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
+    form = SAMLProviderConfigForm
+
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
