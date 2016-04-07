@@ -398,7 +398,7 @@ class CourseMode(models.Model):
 
     @classmethod
     def has_verified_mode(cls, course_mode_dict):
-        """Check whether the modes for a course allow a student to pursue a verfied certificate.
+        """Check whether the modes for a course allow a student to pursue a verified certificate.
 
         Args:
             course_mode_dict (dictionary mapping course mode slugs to Modes)
