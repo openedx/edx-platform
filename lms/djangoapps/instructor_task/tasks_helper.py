@@ -1409,30 +1409,56 @@ def generate_students_certificates(
     json column, otherwise generate certificates for all enrolled students.
     """
     start_time = time()
-    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    students_to_generate_certs_for = CourseEnrollment.objects.users_enrolled_in(course_id)
 
-    students = task_input.get('students', None)
+    student_set = task_input.get('student_set')
+    if student_set == 'all_whitelisted':
+        # Generate Certificates for all white listed students.
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(
+            certificatewhitelist__course_id=course_id,
+            certificatewhitelist__whitelist=True
+        )
 
-    if students is not None:
-        enrolled_students = enrolled_students.filter(id__in=students)
+    elif student_set == 'whitelisted_not_generated':
+        # All Whitelisted students
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(
+            certificatewhitelist__course_id=course_id,
+            certificatewhitelist__whitelist=True
+        )
 
-    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+        # Whitelisted students which got certificates already.
+        certificate_generated_students = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id=course_id,
+        )
+        certificate_generated_students_ids = set(certificate_generated_students.values_list('user_id', flat=True))
+
+        students_to_generate_certs_for = students_to_generate_certs_for.exclude(
+            id__in=certificate_generated_students_ids
+        )
+
+    elif student_set == "specific_student":
+        specific_student_id = task_input.get('specific_student_id')
+        students_to_generate_certs_for = students_to_generate_certs_for.filter(id=specific_student_id)
+
+    task_progress = TaskProgress(action_name, students_to_generate_certs_for.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
     statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
-    if students is not None and not statuses_to_regenerate:
+    if student_set is not None and not statuses_to_regenerate:
         # We want to skip 'filtering students' only when students are given and statuses to regenerate are not
-        students_require_certs = enrolled_students
+        students_require_certs = students_to_generate_certs_for
     else:
-        students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
+        students_require_certs = students_require_certificate(
+            course_id, students_to_generate_certs_for, statuses_to_regenerate
+        )
 
     if statuses_to_regenerate:
         # Mark existing generated certificates as 'unavailable' before regenerating
         # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
         # would return no results.
-        invalidate_generated_certificates(course_id, enrolled_students, statuses_to_regenerate)
+        invalidate_generated_certificates(course_id, students_to_generate_certs_for, statuses_to_regenerate)
 
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
