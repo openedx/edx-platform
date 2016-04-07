@@ -127,6 +127,8 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     def set(self, key, value):
         if key.scope == Scope.children:
             self._children = value
+        elif key.scope == Scope.parent:
+            self._parent = value
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:

@@ -17,8 +17,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.assetstore import AssetMetadata
 
-from . import ModuleStoreWriteBase
-from . import ModuleStoreEnum
+from . import ModuleStoreWriteBase, ModuleStoreEnum, XMODULE_FIELDS_WITH_USAGE_KEYS
 from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .split_migrator import SplitMigrator
@@ -67,8 +66,9 @@ def strip_key(func):
                 retval = retval.version_agnostic()
             if rem_branch and hasattr(retval, 'for_branch'):
                 retval = retval.for_branch(None)
-            if hasattr(retval, 'location'):
-                retval.location = strip_key_func(retval.location)
+            for field_name in XMODULE_FIELDS_WITH_USAGE_KEYS:
+                if hasattr(retval, field_name):
+                    setattr(retval, field_name, strip_key_func(getattr(retval, field_name)))
             return retval
 
         # function for stripping both, collection of, and individual, values
