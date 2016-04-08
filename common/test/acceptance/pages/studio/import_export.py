@@ -166,7 +166,7 @@ class ImportMixin(object):
         Wait for the upload button to appear.
         """
         return EmptyPromise(
-            lambda: self.q(css='#replace-courselike-button')[0],
+            lambda: self.q(css='#replace-courselike-button').visible,
             "Upload button appears",
             timeout=30
         ).fulfill()
@@ -177,6 +177,7 @@ class ImportMixin(object):
         """
         asset_file_path = self.file_path(tarball_filename)
         # Make the upload elements visible to the WebDriver.
+        # from nose.tools import set_trace; set_trace()
         self.browser.execute_script('$(".file-name-block").show();$(".file-input").show()')
         # Upload the file.
         self.q(css='input[type="file"]')[0].send_keys(asset_file_path)
