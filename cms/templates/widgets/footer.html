@@ -1,6 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.conf import settings
 %>
 
 <div class="wrapper-footer wrapper">
@@ -8,7 +9,7 @@ from django.core.urlresolvers import reverse
 
     <div class="footer-content-primary">
       <div class="colophon">
-        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${settings.FEATURES.get('STUDIO_COPYRIGHT_LINK', marketing_link('ROOT'))}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
       % if is_any_marketing_link_set(['TOS', 'PRIVACY']):
