@@ -33,12 +33,9 @@ SYSTEMS = {
 }
 
 # Common lookup paths that are added to the lookup paths for all sass compilations
-COMMON_LOOKUP_PATHS = [
+COMMON_LOOKUP_DIRS = [
     path("common/static"),
     path("common/static/sass"),
-    path("node_modules"),
-    path("node_modules/edx-pattern-library/node_modules"),
-
 ]
 
 # A list of NPM installed libraries that should be copied into the common
@@ -111,7 +108,10 @@ def get_common_sass_directories():
     applicable_directories.append({
         "sass_source_dir": path("common/static/sass"),
         "css_destination_dir": path("common/static/css"),
-        "lookup_paths": COMMON_LOOKUP_PATHS,
+        "lookup_paths": [
+            path("common/static"),
+            path("common/static/sass"),
+        ],
     })
 
     return applicable_directories
@@ -223,7 +223,7 @@ def get_watcher_dirs(themes_base_dir=None, themes=None):
         (list): dirs that need to be added to sass watchers.
     """
     dirs = []
-    dirs.extend(COMMON_LOOKUP_PATHS)
+    dirs.extend(COMMON_LOOKUP_DIRS)
     if themes_base_dir and themes:
         # Register sass watchers for all the given themes
         theme_dirs = [(path(themes_base_dir) / theme) for theme in themes if theme]
@@ -559,7 +559,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
         else:
             sass.compile(
                 dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
+                include_paths=COMMON_LOOKUP_DIRS + lookup_paths,
                 source_comments=source_comments,
                 output_style=output_style,
             )
