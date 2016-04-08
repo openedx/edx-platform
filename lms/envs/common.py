@@ -1398,9 +1398,9 @@ PIPELINE_CSS = {
     },
     'style-main-rtl': {
         'source_filenames': [
-            'css/lms-main-rtl-v1.css',
+            'css/lms-main-v1-rtl.css',
         ],
-        'output_filename': 'css/lms-main-rtl-v1.css',
+        'output_filename': 'css/lms-main-v1-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
