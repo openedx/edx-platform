@@ -337,6 +337,11 @@ if FEATURES.get('AUTH_USE_CAS'):
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
 VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
+# Whitelist of re-writable sources, only video sources from whitelisted domains
+# will be re-written.  Should be the "netloc" of the URL, for example, www.example.com
+VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS = ENV_TOKENS.get('VIDEO_CDN_REWRITABLE_SOURCES', [])
+
+
 # Branded footer
 FOOTER_OPENEDX_URL = ENV_TOKENS.get('FOOTER_OPENEDX_URL', FOOTER_OPENEDX_URL)
 FOOTER_OPENEDX_LOGO_IMAGE = ENV_TOKENS.get('FOOTER_OPENEDX_LOGO_IMAGE', FOOTER_OPENEDX_LOGO_IMAGE)

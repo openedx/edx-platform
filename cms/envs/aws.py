@@ -376,6 +376,10 @@ PARSE_KEYS = AUTH_TOKENS.get("PARSE_KEYS", {})
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
 VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
+# Whitelist of re-writable sources, only video sources from whitelisted domains
+# will be re-written.  Should be the "netloc" of the URL, for example, www.example.com
+VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS = ENV_TOKENS.get('VIDEO_CDN_REWRITABLE_SOURCES', [])
+
 if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"

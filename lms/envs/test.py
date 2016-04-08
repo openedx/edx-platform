@@ -516,6 +516,10 @@ VIDEO_CDN_URL = {
     'CN': 'http://api.xuetangx.com/edx/video?s3_url='
 }
 
+# Whitelist of re-writable sources, only video sources from whitelisted domains
+# will be re-written.  Should be the "netloc" of the URL, for example, www.example.com
+VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS = []
+
 ######### dashboard git log settings #########
 MONGODB_LOG = {
     'host': MONGO_HOST,

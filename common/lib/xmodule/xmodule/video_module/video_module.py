@@ -202,6 +202,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # based on user locale.  This exists to support cases where
         # we leverage a geography specific CDN, like China.
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+        cdn_rewritable_source_domains = getattr(settings, 'VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS', [])
 
         # If we have an edx_video_id, we prefer its values over what we store
         # internally for download links (source, html5_sources) and the youtube
@@ -223,7 +224,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                             sources.append(url)
                         if self.download_video:
                             # function returns None when the url cannot be re-written
-                            rewritten_link = rewrite_video_url(cdn_url, url)
+                            rewritten_link = rewrite_video_url(cdn_url, url, cdn_rewritable_source_domains)
                             if rewritten_link:
                                 download_video_link = rewritten_link
                             else:
@@ -247,7 +248,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
             for index, source_url in enumerate(sources):
-                new_url = rewrite_video_url(cdn_url, source_url)
+                new_url = rewrite_video_url(cdn_url, source_url, cdn_rewritable_source_domains)
                 if new_url:
                     sources[index] = new_url
 
