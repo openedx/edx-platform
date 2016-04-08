@@ -6,6 +6,7 @@ import logging
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
+from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from opaque_keys import InvalidKeyError
@@ -26,16 +27,28 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger(__name__)
 
 
-def _get_parent_content_id(html_content_id):
-    """ Gets parent block content id """
+def is_valid_progress_module(content_id):
+    """
+    Returns boolean indicating if given module is valid for marking progress
+    A valid module should be child of `vertical` and its category should be
+    one of the PROGRESS_DETACHED_CATEGORIES
+    """
     try:
-        html_usage_id = BlockUsageLocator.from_string(html_content_id)
-        html_module = modulestore().get_item(html_usage_id)
-        return unicode(html_module.parent)
+        detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+        usage_id = BlockUsageLocator.from_string(content_id)
+        module = modulestore().get_item(usage_id)
+        if module and module.parent and module.parent.category == "vertical" and \
+                module.category not in detached_categories:
+            return True
+        else:
+            return False
     except (InvalidKeyError, ItemNotFoundError) as exception:
-        # something has gone wrong - the best we can do is to return original content id
-        log.warn("Error getting parent content_id for html module: %s", exception.message)
-        return html_content_id
+        log.debug("Error getting module for content_id:%s %s", content_id, exception.message)
+        return False
+    except Exception as exception:  # pylint: disable=broad-except
+        # broad except to avoid wrong calculation of progress in case of unknown exception
+        log.exception("Error getting module for content_id:%s %s", content_id, exception.message)
+        return False
 
 
 @receiver(post_save, sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
@@ -44,15 +57,10 @@ def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
     Broadcast the progress change event
     """
     content_id = unicode(instance.content_id)
-    detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
-    # HTML modules can be children of progress-detached and progress-included modules, so using parent id for
-    # progress-detached check
-    if 'html' in content_id:
-        content_id = _get_parent_content_id(content_id)
-    if created and not any(category in content_id for category in detached_categories):
+    if is_valid_progress_module(content_id):
         try:
             progress = StudentProgress.objects.get(user=instance.user, course_id=instance.course_id)
-            progress.completions += 1
+            progress.completions = F('completions') + 1
             progress.save()
         except ObjectDoesNotExist:
             progress = StudentProgress(user=instance.user, course_id=instance.course_id, completions=1)
@@ -67,10 +75,12 @@ def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argumen
     """
     Event hook for creating progress entry copies
     """
+    # since instance.completions return F() ExpressionNode we have to pull completions from db
+    progress = StudentProgress.objects.get(pk=instance.id)
     history_entry = StudentProgressHistory(
         user=instance.user,
         course_id=instance.course_id,
-        completions=instance.completions
+        completions=progress.completions
     )
     history_entry.save()
 
