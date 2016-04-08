@@ -10,7 +10,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 def compressed_css(package_name, raw=False):
-    package = pipeline_css_info(package_name)
+    package = settings.PIPELINE_CSS.get(package_name, {})
     if package:
         package = {package_name: package}
     packager = Packager(css_packages=package, js_packages={})
@@ -22,28 +22,6 @@ def compressed_css(package_name, raw=False):
     else:
         paths = packager.compile(package.paths)
         return render_individual_css(package, paths, raw=raw)
-
-
-def pipeline_css_info(package_name):
-    """
-    Returns information about a CSS package needed for the Django pipeline.
-
-    Note: if the package name was not registered, then the information
-    returned is based on the package_name being a relative path to a
-    single CSS file.
-
-    Args:
-        package_name: The name of the CSS package.
-
-    Returns:
-        A dictionary with information about the CSS package.
-    """
-    if package_name in settings.PIPELINE_CSS:
-        return settings.PIPELINE_CSS[package_name]
-    return {
-        'source_filenames': [package_name],
-        'output_filename': package_name,
-    }
 
 
 def render_css(package, path, raw=False):
