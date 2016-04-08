@@ -14,7 +14,7 @@ import logging
 
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
-from provider.utils import short_token, long_token
+from provider.utils import short_token
 
 log = logging.getLogger("edx.lti_provider")
 

@@ -1,8 +1,6 @@
 # pylint: disable=missing-docstring
 
 from lettuce import world, step
-from selenium.webdriver.common.keys import Keys
-from xmodule.modulestore.django import modulestore
 
 SELECTORS = {
     'spinner': '.video-wrapper .spinner',

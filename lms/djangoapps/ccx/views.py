@@ -41,7 +41,6 @@ from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
 from instructor.enrollment import (
     enroll_email,
-    unenroll_email,
     get_email_params,
 )
 

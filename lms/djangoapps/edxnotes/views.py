@@ -4,7 +4,7 @@ Views related to EdxNotes.
 import json
 import logging
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest, Http404
+from django.http import HttpResponse, Http404
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_GET

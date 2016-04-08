@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
+
 import ddt
-import itertools
 import json
 from collections import OrderedDict
 from path import Path as path

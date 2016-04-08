@@ -18,7 +18,6 @@ from mock import patch
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer

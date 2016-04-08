@@ -1,7 +1,7 @@
 """
 Test courseware search
 """
-import os
+
 import json
 import uuid
 

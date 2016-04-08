@@ -11,7 +11,7 @@ import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.core.cache import cache
-from django.db import connection, transaction
+from django.db import connection
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
