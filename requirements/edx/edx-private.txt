@@ -31,7 +31,7 @@ git+https://github.com/open-craft/problem-builder.git@v2.0.3#egg=xblock-problem-
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
 # Peer instruction XBlock
-ubcpi-xblock==0.5.2
+ubcpi-xblock==0.5.3
 
 # Vector Drawing and ActiveTable XBlocks (Davidson)
 -e git+https://github.com/open-craft/xblock-vectordraw.git@ded76fc8f6c99ba4949ed57a7bf62a1f12e44683#egg=xblock-vectordraw
