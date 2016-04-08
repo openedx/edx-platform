@@ -12,12 +12,11 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_name, get_cohort, add_user_to_cohort, DEFAULT_COHORT_NAME
 )
 
-VERIFIED_COHORT_NAME = "verified"
 LOGGER = get_task_logger(__name__)
 
 
 @task()
-def sync_cohort_with_mode(course_id, user_id):
+def sync_cohort_with_mode(course_id, user_id, verified_cohort_name):
     """
     If the learner's mode does not match their assigned cohort, move the learner into the correct cohort.
     It is assumed that this task is only initiated for courses that are using the
@@ -31,7 +30,7 @@ def sync_cohort_with_mode(course_id, user_id):
     # Note that this will enroll the user in the default cohort on initial enrollment.
     # That's good because it will force creation of the default cohort if necessary.
     current_cohort = get_cohort(user, course_key)
-    verified_cohort = get_cohort_by_name(course_key, VERIFIED_COHORT_NAME)
+    verified_cohort = get_cohort_by_name(course_key, verified_cohort_name)
 
     if enrollment.mode == CourseMode.VERIFIED and (current_cohort.id != verified_cohort.id):
         LOGGER.info(
