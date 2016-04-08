@@ -1,8 +1,8 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
+    "js/views/uploads", "js/views/license", "js/models/license",
     "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext"],
        function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
-                FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, NotificationView,
+                FileUploadDialog, LicenseView, LicenseModel, NotificationView,
                 timepicker, date, gettext) {
 
 var DetailsView = ValidatingView.extend({
@@ -63,10 +63,10 @@ var DetailsView = ValidatingView.extend({
     },
 
     render: function() {
-        this.setupDatePicker('start_date');
-        this.setupDatePicker('end_date');
-        this.setupDatePicker('enrollment_start');
-        this.setupDatePicker('enrollment_end');
+        DateUtils.setupDatePicker('start_date', this);
+        DateUtils.setupDatePicker('end_date', this);
+        DateUtils.setupDatePicker('enrollment_start', this);
+        DateUtils.setupDatePicker('enrollment_end', this);
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
@@ -145,51 +145,6 @@ var DetailsView = ValidatingView.extend({
             'hours': hours,
             'minutes': minutes
         }, true));
-    },
-
-    setupDatePicker: function (fieldName) {
-        var cacheModel = this.model;
-        var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-        var datefield = $(div).find("input.date");
-        var timefield = $(div).find("input.time");
-        var cachethis = this;
-        var setfield = function () {
-            var newVal = DateUtils.getDate(datefield, timefield),
-                oldTime = new Date(cacheModel.get(fieldName)).getTime();
-            if (newVal) {
-                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
-                    cachethis.clearValidationErrors();
-                    cachethis.setAndValidate(fieldName, newVal);
-                }
-            }
-            else {
-                // Clear date (note that this clears the time as well, as date and time are linked).
-                // Note also that the validation logic prevents us from clearing the start date
-                // (start date is required by the back end).
-                cachethis.clearValidationErrors();
-                cachethis.setAndValidate(fieldName, null);
-            }
-        };
-
-        // instrument as date and time pickers
-        timefield.timepicker({'timeFormat' : 'H:i'});
-        datefield.datepicker();
-
-        // Using the change event causes setfield to be triggered twice, but it is necessary
-        // to pick up when the date is typed directly in the field.
-        datefield.change(setfield).keyup(TriggerChangeEventOnEnter);
-        timefield.on('changeTime', setfield);
-        timefield.on('input', setfield);
-
-        date = this.model.get(fieldName)
-        // timepicker doesn't let us set null, so check that we have a time
-        if (date) {
-            DateUtils.setDate(datefield, timefield, date);
-        } // but reset fields either way
-        else {
-            timefield.val('');
-            datefield.val('');
-        }
     },
 
     updateModel: function(event) {
