@@ -8,13 +8,17 @@ describe "DiscussionThreadView", ->
         @threadData = DiscussionViewSpecHelper.makeThreadWithProps({})
         @thread = new Thread(@threadData)
         @discussion = new Discussion(@thread)
-        spyOn($, "ajax")
+        deferred = $.Deferred();
+        spyOn($, "ajax").and.returnValue(deferred);
         # Avoid unnecessary boilerplate
         spyOn(DiscussionThreadShowView.prototype, "convertMath")
         spyOn(DiscussionContentView.prototype, "makeWmdEditor")
         spyOn(DiscussionUtil, "makeWmdEditor")
         spyOn(DiscussionUtil, "setWmdContent")
         spyOn(ThreadResponseShowView.prototype, "convertMath")
+
+    afterEach ->
+        $.ajax.calls.reset()
 
     renderWithContent = (view, content) ->
         $.ajax.and.callFake((params) =>

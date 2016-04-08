@@ -193,7 +193,8 @@ describe "DiscussionUserProfileView", ->
     describe "pagination interaction", ->
         beforeEach ->
             @view = makeView(makeThreads(3), 1, 2)
-            spyOn($, "ajax")
+            deferred = $.Deferred();
+            spyOn($, "ajax").and.returnValue(deferred);
 
         it "causes updated rendering", ->
             $.ajax.and.callFake(

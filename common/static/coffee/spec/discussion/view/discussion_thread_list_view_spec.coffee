@@ -131,8 +131,8 @@ describe "DiscussionThreadListView", ->
             created_at: '2013-04-03T20:05:39Z',
           }),
         ]
-
-        spyOn($, "ajax")
+        deferred = $.Deferred()
+        spyOn($, "ajax").and.returnValue(deferred);
 
         @discussion = new Discussion([])
         @view = new DiscussionThreadListView(

@@ -87,7 +87,6 @@ describe("Formula Equation Preview", function () {
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
             }).then(function () {
-                //debugger;
                 done();
             });
         });
@@ -120,8 +119,7 @@ describe("Formula Equation Preview", function () {
 
             // This part may be asynchronous, so wait.
             jasmine.waitUntil(function () {
-                debugger;
-                return !Problem.inputAjax.wasCalled;
+                return Problem.inputAjax.calls.count() === 0;
             }).then(function () {
                 // Expect Problem.inputAjax was not called as input request was
                 // initialized before.

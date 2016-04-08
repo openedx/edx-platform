@@ -45,6 +45,7 @@ var files = [
     {pattern: 'js/test/add_ajax_prefix.js', included: true},
     {pattern: 'js/test/i18n.js', included: true},
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
+    {pattern: 'js/vendor/jquery.leanModal.js', included: true},
 
     // Paths to source JavaScript files
     {pattern: 'js/xblock/**/*.js', included: true, nocache: true},
