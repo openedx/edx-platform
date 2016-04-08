@@ -2882,3 +2882,5 @@ THEME_CACHE_TIMEOUT = 30 * 60
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/overview.html'
+AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/authentication.html'
