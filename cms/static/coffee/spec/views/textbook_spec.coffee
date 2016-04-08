@@ -11,7 +11,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             toContainText: () ->
                 return {
                     compare: (actual, text) ->
-                        trimmedText = $.trim(@actual.text())
+                        trimmedText = $.trim(actual.text())
                         if text and $.isFunction(text.test)
                             passed = text.test(trimmedText)
                         else
