@@ -14,6 +14,7 @@ body{
 a{
   &:hover{
     text-decoration: none;
+    opacity: 0.8;
   }
 }
 
@@ -48,11 +49,14 @@ header.header-main {
   }
 
   .logo{
-    line-height: 100px;
+    line-height: 94px;
+    margin-left: 1em;
     a{
       img{
         max-width:190px;
         vertical-align: middle;
+        max-height: 60px;
+        width: auto;
       }
     }
   }
@@ -64,6 +68,7 @@ header.header-main {
     right: 0;
     left: 0;
     background-color: $white;
+    z-index: 1;
     li{
       float: right;
       display: inline-block;
@@ -88,12 +93,54 @@ header.header-main {
   }
 }
 
+//Hero
+
+.hero-main{
+  background: url("../images/hero-bg.jpg") no-repeat center center;
+  background-size: 100%;
+  min-height: 22em;
+  position: relative;
+  z-index: 0;
+  .text-tint{
+    background: -moz-linear-gradient(left,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 */
+    position: absolute;
+    top:0;
+    bottom:0;
+    left: 0px;
+    p{
+      padding: 1em 0 0 1em;
+      font-size: 24px;
+      color: $white;
+      line-height: 1.5em;
+    }
+    .btn-neutral{
+      border-color: $white;
+      padding: 0.8em 3em;
+      color: $white;
+      margin-left: 2.5em;
+      font-weight:normal;
+      background-color: transparent;
+      i.fa{
+        font-size: 0.6em;
+        margin-left: 1.5em;
+        vertical-align: middle;
+      }
+    }
+  }
+}
 
 //Footer
 
 .footer-main{
   padding: 2em 0;
+  .logo{
+    margin-bottom: 1em;
+  }
   ul{
+    margin-left: 1.5em;
     li{
       color: $dark;
       padding: .3em 0;
@@ -137,6 +184,7 @@ header.header-main {
       }
     }
   }
+
   .footer-main{
     .normalize-margin{
       margin-left: 0;
@@ -151,6 +199,13 @@ header.header-main {
   .footer-main{
     .normalize-margin{
       margin-left: 16%;
+    }
+  }
+  .hero-main {
+    .text-tint {
+      p {
+        font-size: 40px;
+      }
     }
   }
 }

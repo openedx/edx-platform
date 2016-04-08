@@ -6,8 +6,13 @@ from django.core.urlresolvers import reverse
 %>
 
 <section class="home">
-  <header>
-    <img src="${static.url('images/hero.png')}" height="300" width="1300" alt="Home Page" />
+  <header class="hero-main grid-manual">
+    <div class="row">
+      <div class="col col-10 sm-col-10 md-col-10 lg-col-8 xl-col-6 text-tint">
+        <p>A gateway to your institute for gifted nusicians, dancers, and actors from around the world</p>
+        <a href="#" class="btn-neutral btn-large">Watch video <i class="fa fa-play"></i></a>
+      </div>
+    </div>
   </header>
 
   <%include file="${courses_list}" />
