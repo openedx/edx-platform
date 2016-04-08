@@ -86,6 +86,9 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
     def _create_verified_cohort(self, name=DEFAULT_VERIFIED_COHORT_NAME):
         add_cohort(self.course.id, name, CourseCohort.MANUAL)
 
+    def _create_named_random_cohort(self, name):
+        return add_cohort(self.course.id, name, CourseCohort.RANDOM)
+
     def _enable_verified_track_cohorting(self, cohort_name=None):
         """ Enable verified track cohorting for the default course. """
         if cohort_name:
@@ -162,6 +165,27 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         error_message = "cohort named '%s' does not exist"
         self.assertIn(error_message, error_logger.call_args[0][0])
 
+    @mock.patch('verified_track_content.models.log.error')
+    def test_cohorting_enabled_too_many_random_cohorts(self, error_logger):
+        """
+        If the VerifiedTrackCohortedCourse feature is enabled for a course and the course is cohorted,
+        but the course has > 1 random cohorts, an error is logged and enrollment mode changes do not
+        move learners into a cohort.
+        """
+        # Enable cohorting, and create the verified cohort.
+        self._enable_cohorting()
+        self._create_verified_cohort()
+        # Create two random cohorts.
+        self._create_named_random_cohort("Random 1")
+        self._create_named_random_cohort("Random 2")
+        # Enable verified track cohorting feature
+        self._enable_verified_track_cohorting()
+        self.assertTrue(VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(self.course.id))
+        self._verify_no_automatic_cohorting()
+        self.assertTrue(error_logger.called)
+        error_message = "course does not have exactly one default cohort"
+        self.assertIn(error_message, error_logger.call_args[0][0])
+
     def test_automatic_cohorting_enabled(self):
         """
         If the VerifiedTrackCohortedCourse feature is enabled for a course (with course cohorting enabled
@@ -205,10 +229,43 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
 
     def test_custom_verified_cohort_name(self):
-        CUSTOM_COHORT_NAME = 'special verified cohort'
+        """
+        Test that enrolling in verified works correctly when the "verified cohort" has a custom name.
+        """
+        custom_cohort_name = 'special verified cohort'
         self._enable_cohorting()
-        self._create_verified_cohort(name=CUSTOM_COHORT_NAME)
-        self._enable_verified_track_cohorting(cohort_name=CUSTOM_COHORT_NAME)
+        self._create_verified_cohort(name=custom_cohort_name)
+        self._enable_verified_track_cohorting(cohort_name=custom_cohort_name)
         self._enroll_in_course()
         self._upgrade_to_verified()
-        self.assertEqual(CUSTOM_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+        self.assertEqual(custom_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
+
+    def test_custom_default_cohort_name(self):
+        """
+        Test that enrolling and un-enrolling works correctly when the single cohort
+        of type random has a different name from "Default Group".
+        """
+        random_cohort_name = "custom random cohort"
+        self._enable_cohorting()
+        self._create_verified_cohort()
+        default_cohort = self._create_named_random_cohort(random_cohort_name)
+        self._enable_verified_track_cohorting()
+        self._enroll_in_course()
+        self.assertEqual(random_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
+        self._upgrade_to_verified()
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+
+        # Un-enroll from the course. The learner stays in the verified cohort, but is no longer active.
+        self._unenroll()
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+
+        # Change the name of the "default" cohort.
+        modified_cohort_name = "renamed random cohort"
+        default_cohort.name = modified_cohort_name
+        default_cohort.save()
+
+        # Re-enroll in the course, which will downgrade the learner to audit.
+        self._reenroll()
+        self.assertEqual(modified_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
+        self._upgrade_to_verified()
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
