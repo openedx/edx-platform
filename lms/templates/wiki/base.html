@@ -47,8 +47,6 @@
 
 {% endblock %}
 
-{% block nav_skip %}#wiki-content{% endblock %}
-
 {% block body %}
   {% if request.course %}
   {% with course=request.course %}
@@ -56,6 +54,7 @@
   {% endwith %}
   {% endif %}
 
+<main id="main" aria-label="Content" tabindex="-1">
   <section class="container wiki {{ selected_tab }}" id="wiki-content">
     <div class="wiki-wrapper">
       {% block wiki_body %}
@@ -77,5 +76,6 @@
     </div>
 
   </section>
+</main>
 
 {% endblock %}
