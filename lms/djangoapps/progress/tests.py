@@ -52,7 +52,7 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             mock_request,
             problem.location,
             field_data_cache,
-        )._xmodule
+        )
 
     def setUp(self):
         super(CourseModuleCompletionTests, self).setUp()
@@ -68,7 +68,7 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
         )
         self.course.always_recalculate_grades = True
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
-        chapter1 = ItemFactory.create(
+        self.chapter1 = ItemFactory.create(
             category="chapter",
             parent_location=self.course.location,
             data=test_data,
@@ -80,20 +80,32 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             data=test_data,
             display_name="Chapter 2"
         )
-        ItemFactory.create(
+        sub_section = ItemFactory.create(
             category="sequential",
-            parent_location=chapter1.location,
+            parent_location=self.chapter1.location,
             data=test_data,
             display_name="Sequence 1",
         )
-        ItemFactory.create(
+        sub_section2 = ItemFactory.create(
             category="sequential",
             parent_location=chapter2.location,
             data=test_data,
             display_name="Sequence 2",
         )
+        self.vertical = ItemFactory.create(
+            parent_location=sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test vertical",
+        )
+        vertical2 = ItemFactory.create(
+            parent_location=sub_section2.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Lab'},
+            display_name=u"test vertical 2",
+        )
         ItemFactory.create(
-            parent_location=chapter2.location,
+            parent_location=vertical2.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='foo'),
             metadata={'rerandomize': 'always'},
@@ -101,35 +113,35 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             max_grade=45
         )
         self.problem = ItemFactory.create(
-            parent_location=chapter1.location,
+            parent_location=self.vertical.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="homework problem 1",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
         )
         self.problem2 = ItemFactory.create(
-            parent_location=chapter2.location,
+            parent_location=vertical2.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="homework problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
         )
         self.problem3 = ItemFactory.create(
-            parent_location=chapter2.location,
+            parent_location=vertical2.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="lab problem 1",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
         )
         self.problem4 = ItemFactory.create(
-            parent_location=chapter2.location,
+            parent_location=vertical2.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="midterm problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
         )
         self.problem5 = ItemFactory.create(
-            parent_location=chapter2.location,
+            parent_location=vertical2.location,
             category='problem',
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="final problem 2",
@@ -306,6 +318,45 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
                 course_id=self.course.id,
                 content_id=self.problem4.location
             )
+
+    def test_progress_calc_on_invalid_module(self):
+        """
+        Tests progress calculations for invalid modules.
+        We want to calculate progress of those module which are
+        direct children of verticals. Modules at any other level
+        of course tree should not be counted in progress.
+        """
+        self._create_course()
+        # create a module whose parent is not a vertical
+        module = ItemFactory.create(
+            parent_location=self.chapter1.location,
+            category='video',
+            data={'data': '<video display_name="Test Video" />'}
+        )
+        module = self.get_module_for_user(self.user, self.course, module)
+        module.system.publish(module, 'progress', {})
+
+        progress = StudentProgress.objects.all()
+        # assert there is no progress entry for a module whose parent is not a vertical
+        self.assertEqual(len(progress), 0)
+
+    @override_settings(PROGRESS_DETACHED_CATEGORIES=["group-project"])
+    def test_progress_calc_on_detached_module(self):
+        """
+        Tests progress calculations for modules having detached categories
+        """
+        self._create_course()
+        # create a module whose category is one of detached categories
+        module = ItemFactory.create(
+            parent_location=self.vertical.location,
+            category='group-project',
+        )
+        module = self.get_module_for_user(self.user, self.course, module)
+        module.system.publish(module, 'progress', {})
+
+        progress = StudentProgress.objects.all()
+        # assert there is no progress entry for a module whose category is in detached categories
+        self.assertEqual(len(progress), 0)
 
     def test_receiver_on_course_deleted(self):
         self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2020, 1, 1, tzinfo=UTC()))
