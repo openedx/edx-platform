@@ -14,7 +14,7 @@ file and check it in at the same time as your model changes. To do that,
 import logging
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db import models, transaction
+from django.db import models
 
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message

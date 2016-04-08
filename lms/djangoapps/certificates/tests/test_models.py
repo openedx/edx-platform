@@ -12,7 +12,6 @@ from certificates.models import (
     ExampleCertificateSet,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    EligibleCertificateManager,
     GeneratedCertificate,
     CertificateStatuses,
 )

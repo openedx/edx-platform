@@ -28,7 +28,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
 )
 from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.x_module import XModule
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -53,8 +53,6 @@ from util.milestones_helpers import (
     is_prerequisite_courses_enabled,
 )
 from ccx_keys.locator import CCXLocator
-
-import dogstats_wrapper as dog_stats_api
 
 from courseware.access_response import (
     MilestoneError,

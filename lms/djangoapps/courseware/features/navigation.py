@@ -5,7 +5,6 @@
 from lettuce import world, step
 from common import course_location
 from problems_setup import PROBLEM_DICT
-from nose.tools import assert_in
 
 
 @step(u'I am viewing a course with multiple sections')

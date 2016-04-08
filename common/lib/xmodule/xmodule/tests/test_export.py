@@ -5,12 +5,9 @@ Tests of XML export
 import ddt
 import lxml.etree
 import mock
-import os
 import pytz
 import shutil
-import tarfile
 import unittest
-import uuid
 
 from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
@@ -26,7 +23,6 @@ from opaque_keys.edx.locations import Location
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
-from xmodule.tests.helpers import directories_equal
 from xmodule.x_module import XModuleMixin
 
 
