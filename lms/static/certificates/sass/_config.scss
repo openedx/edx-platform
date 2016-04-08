@@ -1,10 +1,14 @@
 // ------------------------------
 // Open edX Certificates: Config
 
+// About: variable and configuration overrides
+
+// #VARIABLES
 
 // ------------------------------
 // #VARIABLES
 // ------------------------------
+$pattern-library-path: '../../edx-pattern-library' !default;
 
 // certificate characteristics
 $cert-base-color: palette(grayscale-cool, dark);
