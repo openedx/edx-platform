@@ -162,7 +162,8 @@ case "$TEST_SUITE" in
         # Back compatibility support for firefox upgrade:
         # Copy newer firefox version to project root,
         # set that as the path for bok-choy to use.
-        cp -R $HOME/firefox/ firefox/
+        curl -o ff45.tar.bz2 -L https://ftp.mozilla.org/pub/firefox/releases/45.0.1/linux-x86_64/en-US/firefox-45.0.1.tar.bz2
+        tar -xjf ff45.tar.bz2
         export SELENIUM_FIREFOX_PATH=firefox/firefox
 
         case "$SHARD" in
