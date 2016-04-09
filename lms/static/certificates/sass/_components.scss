@@ -637,3 +637,26 @@ p.accomplishment-statement-lead span.copy {
     height: rem(2);
     width: 100%;
 }
+
+.right-logo{
+    float: right;
+}
+
+.right-logo-img{
+    width: auto;
+    max-height: 70px
+}
+
+.left-logo {
+    float: left;
+    width: auto;
+    max-height: 70px;
+}
+
+.clear-logo {
+    clear: both;
+}
+
+.layout-accomplishment.certificate-honor .accomplishment-rendering .accomplishment-type{
+    margin-bottom: 0;
+}

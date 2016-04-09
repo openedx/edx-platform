@@ -337,3 +337,26 @@
         }
     }
 }
+
+.right-logo{
+    float: right;
+}
+
+.right-logo-img{
+    width: auto;
+    max-height: 40px
+}
+
+.left-logo {
+    float: left;
+    width: auto;
+    max-height: 40px;
+}
+
+.clear-logo {
+    clear: both;
+}
+
+.layout-accomplishment.certificate-honor .accomplishment-rendering .accomplishment-type{
+    margin-bottom: 0;
+}
