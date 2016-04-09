@@ -1422,6 +1422,7 @@ class CapaMixin(CapaFields):
         return {
             'success': True,
             'msg': msg,
+            'html': self.get_problem_html(encapsulate=False),
         }
 
     def reset_problem(self, _data):
