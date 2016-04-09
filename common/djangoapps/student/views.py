@@ -2401,6 +2401,17 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         conf_password = request.POST['new_password2']
         username = request.POST['username']
 
+        if not password:
+            err_msg = 'Password cannot be empty'
+            context = {
+                'user': user,
+                'validlink': True,
+                'title': _('Password reset unsuccessful'),
+                'err_msg': err_msg,
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            }
+            return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
+
         if not password == conf_password:
             err_msg = 'Password must match'
             context = {
@@ -2412,7 +2423,7 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
             }
             return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
-        if User.objects.filter(username=request.POST['username']).exists() and user.username != username:
+        if User.objects.filter(username=username).exists() and user.username != username:
             err_msg = 'Username already exist'
             context = {
                 'user': user,
