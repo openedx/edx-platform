@@ -50,12 +50,11 @@
                             }).always(done);
                         });
 
-                        it('callback was not called', function (done) {
+                        it('callback was called', function (done) {
                             jasmine.waitUntil(function () {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                             }).then(function () {
-                                expect(state.videoPlayer.player.callStateChangeCallback)
-                                    .not.toHaveBeenCalled();
+                                expect(state.videoPlayer.player.callStateChangeCallback.calls.count()).toEqual(1);
                             }).always(done);
                         });
                     });
@@ -163,6 +162,7 @@
                         'player state was changed, start/end was defined, ' +
                         'onReady called', function (done)
                     {
+                        jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
                         jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).then(function () {
@@ -177,6 +177,7 @@
 
                 describe('[ended]', function () {
                     beforeEach(function (done) {
+                        state.videoPlayer.player.playVideo();
                         jasmine.waitUntil(function () {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).done(done);
@@ -200,7 +201,6 @@
 
                 beforeEach(function () {
                     volume = state.videoPlayer.player.video.volume;
-                    seek = state.videoPlayer.player.video.currentTime;
                 });
 
                 it('pauseVideo', function () {
@@ -216,6 +216,7 @@
                     });
 
                     it('set new inccorrect values', function () {
+                        var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);
                         state.videoPlayer.player.seekTo('5');
@@ -265,9 +266,14 @@
                     expect(state.videoPlayer.player.getVolume()).toBe(volume);
                 });
 
-                it('getDuration', function () {
-                    duration = state.videoPlayer.player.video.duration;
-                    expect(state.videoPlayer.player.getDuration()).toBe(duration);
+                it('getDuration', function (done) {
+                    state.videoPlayer.player.playVideo();
+                    jasmine.waitUntil(function () {
+                        return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
+                    }).then(function () {
+                        duration = state.videoPlayer.player.video.duration;
+                        expect(state.videoPlayer.player.getDuration()).toBe(duration);
+                    }).always(done);
                 });
 
                 describe('setPlaybackRate', function () {
@@ -294,10 +300,17 @@
                         .toEqual(playbackRates);
                 });
 
-                it('_getLogs', function () {
-                    var logs = state.videoPlayer.player._getLogs();
-                    expect(logs).toEqual(jasmine.any(Array));
-                    expect(logs.length).toBeGreaterThan(0);
+                it('_getLogs', function (done) {
+                    state.videoPlayer.player.playVideo();
+                    jasmine.waitUntil(function () {
+                        return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
+                    }).then(function() {
+                        duration = state.videoPlayer.player.video.duration;
+                        expect(state.videoPlayer.player.getDuration()).toBe(duration);
+                        var logs = state.videoPlayer.player._getLogs();
+                        expect(logs).toEqual(jasmine.any(Array));
+                        expect(logs.length).toBeGreaterThan(0);
+                    }).done(done);
                 });
             });
         });

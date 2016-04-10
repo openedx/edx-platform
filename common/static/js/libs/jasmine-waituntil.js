@@ -24,13 +24,13 @@
                 deferred.resolve();
             } else {
                 if (elapsedTimeInMs >= maxTimeout) {
+                    // explicitly fail the spec with the given message
+                    fail(message);
 
                     // clear timeout and reject the promise
                     realClearTimeout(timeout);
                     deferred.reject();
 
-                    // explicitly fail the spec with the given message
-                    fail(message);
                     return;
                 }
                 timeout = realSetTimeout(fn, 50);
