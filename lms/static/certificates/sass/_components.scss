@@ -26,6 +26,11 @@
     padding-bottom: spacing-vertical(x-small);
 }
 
+div.signatory h4.hd-5 {
+    font-size: 1.15rem;
+    margin: -1rem 0 1rem 0;
+}
+
 // ------------------------------
 // #DEPTH
 // ------------------------------
@@ -195,7 +200,6 @@
 
 %rendering-section {
     margin-bottom: spacing-vertical(base);
-    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
     padding-bottom: spacing-vertical(base);
 }
 
@@ -211,17 +215,20 @@
     @extend %depth-card;
     position: relative;
     top: -(spacing-vertical(base));
-    border-top: rem(4) solid $cert-base-color;
+    border: 2rem solid #172D32;
+    background: #fff url("/static/images/bdu_book.png") center no-repeat;
+    background-size: 90%;
 
     // type
     .accomplishment-type {
         @include text-align(center);
-        margin-top: -(spacing-vertical(large));
+        margin-top: 0;
         margin-bottom: spacing-vertical(base);
     }
 
     .accomplishment-type-label, .accomplishment-type-symbol {
-        display: block;
+        display: inherit;
+	width: 20% !important;
     }
 
     .accomplishment-type-label {
@@ -247,6 +254,9 @@
 
     .accomplishment-recipient {
         @extend %rendering-accomplishment-line;
+        font-size: 60px;
+        font-weight: 100;
+        color: #0a222b;
     }
 
     .accomplishment-summary {
@@ -313,11 +323,23 @@
                 display: block;
             }
         }
+
+        .signatory {
+            width: 100% !important;
+        }
     }
 
     .accomplishment-signatories-title {
         @extend %rendering-hd-section;
     }
+}
+
+p.accomplishment-statement-lead span.accomplishment-summary {
+    margin-top: 2rem;
+}
+
+p.accomplishment-statement-lead span.copy {
+    color: #0A222B;
 }
 
 // metadata
@@ -446,7 +468,7 @@
         .accomplishment-recipient,
         .accomplishment-course,
          {
-            font-family: $font-family-serif;
+            font-family: "Source Sans Pro",sans-serif !important;
         }
 
         .accomplishment-recipient,
@@ -468,15 +490,17 @@
     }
 
     .accomplishment-rendering {
-
-        .accomplishment-type {
+     	background: palette(grayscale, white-t) url('/static/images/bdu_book.png') center no-repeat;
+        background-size: 80%;
+	
+	.accomplishment-type {
             margin-top: 0;
         }
 
         // hide the fancy
         .accomplishment-signatories .signatory-signature,
         .accomplishment-type-symbol {
-            display: none;
+            display: block;
         }
     }
 }
@@ -493,8 +517,8 @@
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('../images/bg-verified.png') center no-repeat;
-        background-size: 65%;
+        background: palette(grayscale, white-t) url('/static/images/bdu_book.png') center no-repeat;
+        background-size: 80%;
 
         .deco-corner-tl {
             @include triangle(20px, $cert-distinguished-color, up-right);
@@ -612,4 +636,27 @@
     background-color: palette(grayscale, light);
     height: rem(2);
     width: 100%;
+}
+
+.right-logo{
+    float: right;
+}
+
+.right-logo-img{
+    width: auto;
+    max-height: 70px
+}
+
+.left-logo {
+    float: left;
+    width: auto;
+    max-height: 70px;
+}
+
+.clear-logo {
+    clear: both;
+}
+
+.layout-accomplishment.certificate-honor .accomplishment-rendering .accomplishment-type{
+    margin-bottom: 0;
 }

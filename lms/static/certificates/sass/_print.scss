@@ -73,7 +73,7 @@
 
     body {
         height: auto;
-        margin: spacing-vertical(mid-large) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
+        margin: 0 auto !important;
         padding: 0;
     }
 
@@ -191,14 +191,12 @@
 
     .accomplishment-rendering {
         top: 0 !important;
-        border: rem(1) solid palette(grayscale, light);
-        border-top: rem(2) solid $cert-base-color;
+        border: 2rem solid #172D32;
+        zoom: 1.4;
         box-shadow: none;
-        padding: spacing-vertical(small) spacing-horizontal(mid-large);
-
 
         .accomplishment-type {
-            margin-top: -(spacing-vertical(mid-large));
+            margin-top: 0;
         }
 
         .accomplishment-type-symbol {
@@ -207,7 +205,7 @@
         }
 
         .wrapper-statement-and-signatories {
-            border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+            border-bottom: none;
         }
 
         .accomplishment-statement {
@@ -266,6 +264,10 @@
             .signatory-credentials {
                 margin-bottom: 0 !important;
             }
+
+            .signatory {
+                width: 100% !important;
+             }
 
             // CASE: > 4 signatures
             &.has-many {
@@ -336,3 +338,25 @@
     }
 }
 
+.right-logo{
+    float: right;
+}
+
+.right-logo-img{
+    width: auto;
+    max-height: 40px
+}
+
+.left-logo {
+    float: left;
+    width: auto;
+    max-height: 40px;
+}
+
+.clear-logo {
+    clear: both;
+}
+
+.layout-accomplishment.certificate-honor .accomplishment-rendering .accomplishment-type{
+    margin-bottom: 0;
+}
