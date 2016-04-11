@@ -229,9 +229,6 @@ var DetailsView = ValidatingView.extend({
             this.model.set('instructor_info', instructor_info);
             this.model.trigger("change:instructor_info");
             break;
-        case 'course-language':
-            this.setField(event);
-            break;
         case 'course-image-url':
             this.setField(event);
             var url = $(event.currentTarget).val();
