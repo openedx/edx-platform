@@ -18,6 +18,10 @@ from xmodule.modulestore.django import modulestore
 # handled separately; its value maps to an alternate key name.
 ABOUT_ATTRIBUTES = [
     'syllabus',
+    'title',
+    'subtitle',
+    'duration',
+    'description',
     'short_description',
     'overview',
     'effort',
@@ -43,6 +47,10 @@ class CourseDetails(object):
         self.enrollment_start = None
         self.enrollment_end = None
         self.syllabus = None  # a pdf file asset
+        self.title = ""
+        self.subtitle = ""
+        self.duration = ""
+        self.description = ""
         self.short_description = ""
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer

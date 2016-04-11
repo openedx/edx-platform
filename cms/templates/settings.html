@@ -27,7 +27,7 @@
   <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
   </script>
 </%block>
 
@@ -292,9 +292,33 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
+
+                % if enable_extended_course_details:
+                <li class="field text" id="field-course-title">
+                  <label for="course-title">${_("Course Title")}</label>
+                  <input type="text" id="course-title" data-display-name="${context_course.display_name}">
+                  <span class="tip tip-stacked">${_("Displayed as hero image overlay on the course details page. Limit to 50 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-subtitle">
+                  <label for="course-subtitle">${_("Course Subtitle")}</label>
+                  <input type="text" id="course-subtitle">
+                  <span class="tip tip-stacked">${_("Displayed as hero image overlay on the course details page below the Course Title in a smaller font. Limit to 150 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-duration">
+                  <label for="course-duration">${_("Course Duration")}</label>
+                  <input type="text" id="course-duration">
+                  <span class="tip tip-stacked">${_("Displayed on the course details page below the hero image. Limit to 50 characters.")}</span>
+                </li>
+                <li class="field text" id="field-course-description">
+                  <label for="course-description">${_("Course Description")}</label>
+                  <textarea class="text" id="course-description"></textarea>
+                  <span class="tip tip-stacked">${_("Displayed on the course details page. Limit to 1000 characters.")}</span>
+                </li>
+                % endif
+
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
-                  <label for="course-overview">${_("Course Short Description")}</label>
+                  <label for="course-short-description">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
@@ -315,7 +339,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 % endif
 
                 <li class="field image" id="field-course-image">
-                  <label>${_("Course Image")}</label>
+                  <label for="course-image-url">${_("Course Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
@@ -346,7 +370,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
                 % if about_page_editable:
                 <li class="field video" id="field-course-introduction-video">
-                  <label for="course-overview">${_("Course Introduction Video")}</label>
+                  <label for="course-introduction-video">${_("Course Introduction Video")}</label>
                   <div class="input input-existing">
                     <div class="current current-course-introduction-video">
                       <iframe width="618" height="350" title="${_('Course Introduction Video')}" src="" frameborder="0" allowfullscreen></iframe>
