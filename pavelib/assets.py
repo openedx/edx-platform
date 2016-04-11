@@ -45,7 +45,8 @@ COMMON_LOOKUP_PATHS = [
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
     'underscore/underscore.js',
-    'underscore.string/dist/underscore.string.js'
+    'underscore.string/dist/underscore.string.js',
+    'picturefill/dist/picturefill.min.js'
 ]
 
 # Directory to install static vendor files
