@@ -8,6 +8,7 @@ from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <%
@@ -200,7 +201,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 
     <header>
       <h2 id="email-settings-title">
-        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>')}
+        ${Text(_("Email Settings for {course_number}")).format(course_number=HTML('<span id="email_settings_course_number"></span>'))}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
