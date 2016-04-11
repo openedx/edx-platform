@@ -245,6 +245,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course Title")
+            self.assertNotContains(response, "Course Subtitle")
+            self.assertNotContains(response, "Course Duration")
+            self.assertNotContains(response, "Course Description")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
@@ -355,7 +359,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False,
+                                                               'ENABLE_EXTENDED_COURSE_DETAILS': True}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
@@ -369,6 +374,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Title")
+            self.assertContains(response, "Course Subtitle")
+            self.assertContains(response, "Course Duration")
+            self.assertContains(response, "Course Description")
             self.assertContains(response, "Course Short Description")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
@@ -1039,10 +1048,10 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX Partner Manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
-    NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
-id=\"course-enrollment-end-date\" placeholder=\"MM/DD/YYYY\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
+    NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" id=\"course-enrollment-end-date\" \
+placeholder=\"MM/DD/YYYY\" autocomplete=\"off\" readonly aria-readonly=&#34;true&#34; />"
     NOT_EDITABLE_TIME_FIELD = "<input type=\"text\" class=\"time end\" id=\"course-enrollment-end-time\" \
-value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
+value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\" readonly aria-readonly=&#34;true&#34; />"
 
     EDITABLE_DATE_WRAPPER = "<div class=\"field date \" id=\"field-enrollment-end-date\">"
     EDITABLE_TIME_WRAPPER = "<div class=\"field time \" id=\"field-enrollment-end-time\">"
@@ -1101,7 +1110,9 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         editable field content exists for enrollment end fields.
         """
         self.assertEqual(response.status_code, 200)
+        print response
         for element in self.NOT_EDITABLE_ELEMENTS:
+            print element
             self.assertContains(response, element)
 
         for element in self.EDITABLE_ELEMENTS:
