@@ -24,7 +24,7 @@
                 });
 
                 it('build the slider', function () {
-                    expect(state.videoProgressSlider.slider).toEqual('.slider');
+                    expect(state.videoProgressSlider.slider).toHaveClass('slider');
                     expect($.fn.slider).toHaveBeenCalledWith({
                         range: 'min',
                         min: 0,
@@ -36,7 +36,7 @@
 
                 it('build the seek handle', function () {
                     expect(state.videoProgressSlider.handle)
-                        .toEqual('.slider .ui-slider-handle');
+                        .toHaveClass('ui-slider-handle');
                 });
 
                 it('add ARIA attributes to time control', function () {

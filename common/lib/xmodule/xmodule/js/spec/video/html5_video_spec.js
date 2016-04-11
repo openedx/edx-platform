@@ -52,9 +52,9 @@
 
                         it('callback was called', function (done) {
                             jasmine.waitUntil(function () {
-                                return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
+                                return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                             }).then(function () {
-                                expect(state.videoPlayer.player.callStateChangeCallback.calls.count()).toEqual(1);
+                                expect(state.videoPlayer.player.callStateChangeCallback).toHaveBeenCalled();
                             }).always(done);
                         });
                     });
@@ -210,9 +210,14 @@
                 });
 
                 describe('seekTo', function () {
-                    it('set new correct value', function () {
-                        state.videoPlayer.player.seekTo(2);
-                        expect(state.videoPlayer.player.getCurrentTime()).toBe(2);
+                    it('set new correct value', function (done) {
+                        state.videoPlayer.player.playVideo();
+                        jasmine.waitUntil(function () {
+                            return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
+                        }).then(function() {
+                            state.videoPlayer.player.seekTo(2);
+                            expect(state.videoPlayer.player.getCurrentTime()).toBe(2);
+                        }).done(done);
                     });
 
                     it('set new inccorrect values', function () {
@@ -303,10 +308,8 @@
                 it('_getLogs', function (done) {
                     state.videoPlayer.player.playVideo();
                     jasmine.waitUntil(function () {
-                        return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
+                        return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                     }).then(function() {
-                        duration = state.videoPlayer.player.video.duration;
-                        expect(state.videoPlayer.player.getDuration()).toBe(duration);
                         var logs = state.videoPlayer.player._getLogs();
                         expect(logs).toEqual(jasmine.any(Array));
                         expect(logs.length).toBeGreaterThan(0);

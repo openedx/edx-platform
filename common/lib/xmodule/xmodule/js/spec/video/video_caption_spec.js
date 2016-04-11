@@ -326,7 +326,7 @@
 
                         expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                         expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
-                        expect(item.attr('tabindex')).toEqual("0");
+                        expect(item.attr('tabindex')).toEqual(0);
                         expect(item.text().trim()).toEqual(captionsData.text[index]);
                     });
                 });
@@ -415,7 +415,7 @@
 
                             expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                             expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
-                            expect(item.attr('tabindex')).toEqual("0");
+                            expect(item.attr('tabindex')).toEqual(0);
                             expect(item.text().trim()).toEqual(text);
                         });
                     }).always(done);
@@ -823,14 +823,14 @@
                         function (index, item) {
                         expect(parseIntAttribute($(item), 'data-index')).toEqual(index);
                         expect(parseIntAttribute($(item), 'data-start')).toEqual(captionsData.start[index]);
-                        expect($(item).attr('tabindex')).toEqual("0");
+                        expect($(item).attr('tabindex')).toEqual(0);
                         expect($(item).text().trim()).toEqual(captionsData.text[index]);
                     });
                 });
 
                 it('add a padding element to transcript', function () {
-                    expect($('.subtitles li:first')).toEqual('.spacing');
-                    expect($('.subtitles li:last')).toEqual('.spacing');
+                    expect($('.subtitles li:first')).toHaveClass('spacing');
+                    expect($('.subtitles li:last')).toHaveClass('spacing');
                 });
 
                 it('set rendered to true', function () {

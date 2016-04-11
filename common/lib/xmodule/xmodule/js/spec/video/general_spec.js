@@ -27,7 +27,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(this.state.el).toEqual('#video_id');
+                        expect(this.state.el).toHaveId('video_id');
                     });
 
                     it('parse the videos', function () {
@@ -67,7 +67,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(state.el).toEqual('#video_id');
+                        expect(state.el).toHaveId('video_id');
                     });
 
                     it('doesn\'t have `videos` dictionary', function () {
@@ -101,25 +101,24 @@
             beforeEach(function () {
                 window.YT = undefined;
                 state = jasmine.initializePlayerYouTube();
-            })
+            });
 
             afterEach(function () {
                 state.videoPlayer.destroy();
             });
 
             it('callback, to be called after YouTube API loads, exists and is called', function (done) {
+                window.YT = jasmine.YT;
+                // Call the callback that must be called when YouTube API is
+                // loaded. By specification.
+                window.onYouTubeIframeAPIReady();
                 jasmine.waitUntil(function () {
                     return state.youtubeApiAvailable === true;
                 }).done(function(){
-                    window.YT = jasmine.YT;
-
-                    // Call the callback that must be called when YouTube API is
-                    // loaded. By specification.
-                    window.onYouTubeIframeAPIReady();
-                }).always(function () {
                     // If YouTube API is not loaded, then the code will should create
                     // a global callback that will be called by API once it is loaded.
                     expect(window.onYouTubeIframeAPIReady).not.toBeUndefined();
+                }).always(function () {
                     done();
                 });
             });
