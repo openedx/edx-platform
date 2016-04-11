@@ -2,10 +2,12 @@
 """
 End-to-end tests for the LMS.
 """
+
+import json
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from ..helpers import UniqueCourseTest, EventsTestMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -66,7 +68,7 @@ class CoursewareTest(UniqueCourseTest):
         Open problem page with assertion.
         """
         self.courseware_page.visit()
-        self.problem_page = ProblemPage(self.browser)
+        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
     def _create_breadcrumb(self, index):
@@ -394,7 +396,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.course_outline.time_allotted_field_visible())
 
 
-class CoursewareMultipleVerticalsTest(UniqueCourseTest):
+class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
     """
     Test courseware with multiple verticals
     """
@@ -475,6 +477,87 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         # previous takes us to previous tab in sequential
         self.courseware_page.click_previous_button_on_bottom()
         self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 2, next_enabled=True, prev_enabled=True)
+
+        # test UI events emitted by navigation
+        filter_sequence_ui_event = lambda event: event.get('name', '').startswith('edx.ui.lms.sequence.')
+
+        sequence_ui_events = self.wait_for_events(event_filter=filter_sequence_ui_event, timeout=2)
+        legacy_events = [ev for ev in sequence_ui_events if ev['event_type'] in {'seq_next', 'seq_prev', 'seq_goto'}]
+        nonlegacy_events = [ev for ev in sequence_ui_events if ev not in legacy_events]
+
+        self.assertTrue(all('old' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertTrue(all('new' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertFalse(any('old' in json.loads(ev['event']) for ev in nonlegacy_events))
+        self.assertFalse(any('new' in json.loads(ev['event']) for ev in nonlegacy_events))
+
+        self.assert_events_match(
+            [
+                {
+                    'event_type': 'seq_next',
+                    'event': {
+                        'old': 1,
+                        'new': 2,
+                        'current_tab': 1,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'seq_goto',
+                    'event': {
+                        'old': 2,
+                        'new': 4,
+                        'current_tab': 2,
+                        'target_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'seq_prev',
+                    'event': {
+                        'old': 4,
+                        'new': 3,
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+            ],
+            sequence_ui_events
+        )
 
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
