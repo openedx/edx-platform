@@ -132,14 +132,26 @@ class @Sequence
     @$('.sequence-nav-button').unbind('click')
 
     # previous button
-    first_tab = @position == 1
+    is_first_tab = @position == 1
     previous_button_class = '.sequence-nav-button.button-previous'
-    @updateButtonState(previous_button_class, @previous, 'Previous', first_tab, @prevUrl)
+    @updateButtonState(
+      previous_button_class,  # bound element
+      @selectPrevious,  # action
+      'Previous',  # label prefix
+      is_first_tab,  # is boundary?
+      @prevUrl  # boundary_url
+    )
 
     # next button
-    last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
+    is_last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
     next_button_class = '.sequence-nav-button.button-next'
-    @updateButtonState(next_button_class, @next, 'Next', last_tab, @nextUrl)
+    @updateButtonState(
+      next_button_class,  # bound element
+      @selectNext,  # action
+      'Next',  # label prefix
+      is_last_tab,  # is boundary?
+      @nextUrl  # boundary_url
+    )
 
   render: (new_position) ->
     if @position != new_position
@@ -180,7 +192,7 @@ class @Sequence
 
       @el.find('.path').text(@el.find('.nav-item.active').data('path'))
 
-      @sr_container.focus();
+      @sr_container.focus()
 
   goto: (event) =>
     event.preventDefault()
@@ -190,7 +202,17 @@ class @Sequence
       new_position = $(event.currentTarget).data('element')
 
     if (1 <= new_position) and (new_position <= @num_contents)
-      Logger.log "seq_goto", old: @position, new: new_position, id: @id
+      is_bottom_nav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+      if is_bottom_nav
+        widget_placement = 'bottom'
+      else
+        widget_placement = 'top'
+      Logger.log "edx.ui.lms.sequence.tab_selected",  # Formerly known as seq_goto
+        current_tab: @position
+        target_tab: new_position
+        tab_count: @num_contents
+        id: @id
+        widget_placement: widget_placement
 
       # On Sequence change, destroy any existing polling thread
       # for queued submissions, see ../capa/display.coffee
@@ -204,32 +226,43 @@ class @Sequence
       alert_text = interpolate(alert_template, {tab_name: new_position}, true)
       alert alert_text
 
-  next: (event) => @_change_sequential 'seq_next', event
-  previous: (event) => @_change_sequential 'seq_prev', event
+  selectNext: (event) => @_change_sequential 'next', event
 
-  # `direction` can be 'seq_prev' or 'seq_next'
+  selectPrevious: (event) => @_change_sequential 'previous', event
+
+  # `direction` can be 'previous' or 'next'
   _change_sequential: (direction, event) =>
     # silently abort if direction is invalid.
-    return unless direction in ['seq_prev', 'seq_next']
+    return unless direction in ['previous', 'next']
 
     event.preventDefault()
-    offset =
-      seq_next: 1
-      seq_prev: -1
-    new_position = @position + offset[direction]
-    Logger.log direction,
-      old: @position
-      new: new_position
-      id: @id
 
-    if (direction == "seq_next") and (@position == @contents.length)
+    analytics_event_name = "edx.ui.lms.sequence.#{direction}_selected"
+    is_bottom_nav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+
+    if is_bottom_nav
+      widget_placement = 'bottom'
+    else
+      widget_placement = 'top'
+
+    Logger.log analytics_event_name,  # Formerly known as seq_next and seq_prev
+      id: @id
+      current_tab: @position
+      tab_count: @num_contents
+      widget_placement: widget_placement
+
+    if (direction == 'next') and (@position == @contents.length)
       window.location.href = @nextUrl
-    else if (direction == "seq_prev") and (@position == 1)
+    else if (direction == 'previous') and (@position == 1)
       window.location.href = @prevUrl
     else
       # If the bottom nav is used, scroll to the top of the page on change.
-      if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+      if is_bottom_nav 
         $.scrollTo 0, 150
+      offset =
+        next: 1
+        previous: -1
+      new_position = @position + offset[direction]
       @render new_position
 
   link_for: (position) ->

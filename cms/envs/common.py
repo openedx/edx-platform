@@ -684,8 +684,11 @@ REQUIRE_DEBUG = False
 REQUIRE_EXCLUDE = ("build.txt",)
 
 # The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and rhino if not.
-# It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
+# auto will autodetect the environment and make use of node if available and
+# rhino if not.
+# It can also be a path to a custom class that subclasses
+# require.environments.Environment and defines some "args" function that
+# returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
 
@@ -956,7 +959,7 @@ EVENT_TRACKING_BACKENDS = {
             },
             'processors': [
                 {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.VideoEventProcessor'}
+                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
             ]
         }
     },
