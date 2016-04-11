@@ -1298,3 +1298,31 @@ class LMSLanguageTest(UniqueCourseTest):
             get_selected_option_text(language_selector),
             u'English'
         )
+
+
+@attr('a11y')
+class CourseInfoA11yTest(UniqueCourseTest):
+    """Accessibility test for course home/info page."""
+
+    def setUp(self):
+        super(CourseInfoA11yTest, self).setUp()
+        self.course_fixture = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='January 29, 2014', content='Test course update1')
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='February 5th, 2014', content='Test course update2')
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='March 31st, 2014', content='Test course update3')
+        )
+        self.course_fixture.install()
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_course_home_a11y(self):
+        self.course_info_page.visit()
+        self.course_info_page.a11y_audit.check_for_accessibility_errors()
