@@ -20,6 +20,17 @@ ProgramListFactory({
 <%block name="pagetitle">${_("Programs")}</%block>
 
 <div class="program-list-wrapper">
-    <div class="program-cards-container"></div>
+    % if not len(programs):
+        <div class="xseries-epmty-section">
+        <section class="empty-dashboard-message">
+            <p>${_("You are not enrolled in any XSeries Programs yet.")}</p>
+              <a class="find-xseries-programs" href="${xseries_url}"><i class="action-xseries-icon" aria-hidden="true"></i>
+                ${_("Explore XSeries Programs")}
+              </a>
+          </section>
+        </div>
+    % else:
+        <div class="program-cards-container"></div>
+    % endif
     <div class="sidebar"></div>
 </div>
