@@ -292,6 +292,26 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
+
+                % if about_page_editable:
+                <li class="field" id="field-course-title">
+                  <label for="course-title">${_("Course Title")}</label>
+                  <input type="text" id="course-title" data-display-name="${context_course.display_name}">
+                </li>
+                <li class="field" id="field-course-subtitle">
+                  <label for="course-subtitle">${_("Course Subtitle")}</label>
+                  <input type="text" id="course-subtitle">
+                </li>
+                <li class="field" id="field-course-duration">
+                  <label for="course-duration">${_("Course Duration")}</label>
+                  <input type="text" id="course-duration">
+                </li>
+                <li class="field text" id="field-course-description">
+                  <label for="course-description">${_("Course Description")}</label>
+                  <textarea class="text" id="course-description"></textarea>
+                </li>
+                % endif
+
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
                   <label for="course-overview">${_("Course Short Description")}</label>
