@@ -71,6 +71,16 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
+        if (this.model.get('title') !== '') {
+            this.$el.find('#' + this.fieldToSelectorMap.title).val(this.model.get('title'));
+        } else {
+            var displayName = this.$el.find('#' + this.fieldToSelectorMap.title).attr('data-display-name');
+            this.$el.find('#' + this.fieldToSelectorMap.title).val(displayName);
+        }
+        this.$el.find('#' + this.fieldToSelectorMap.subtitle).val(this.model.get('subtitle'));
+        this.$el.find('#' + this.fieldToSelectorMap.duration).val(this.model.get('duration'));
+        this.$el.find('#' + this.fieldToSelectorMap.description).val(this.model.get('description'));
+
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
@@ -126,6 +136,10 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'title': 'course-title',
+        'subtitle': 'course-subtitle',
+        'duration': 'course-duration',
+        'description': 'course-description',
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
@@ -194,9 +208,6 @@ var DetailsView = ValidatingView.extend({
 
     updateModel: function(event) {
         switch (event.currentTarget.id) {
-        case 'course-language':
-            this.setField(event);
-            break;
         case 'course-image-url':
             this.setField(event);
             var url = $(event.currentTarget).val();
@@ -207,9 +218,6 @@ var DetailsView = ValidatingView.extend({
             this.imageTimer = setTimeout(function() {
                 $('#course-image').attr('src', $(event.currentTarget).val());
             }, 1000);
-            break;
-        case 'course-effort':
-            this.setField(event);
             break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
@@ -227,9 +235,6 @@ var DetailsView = ValidatingView.extend({
             else {
                 this.setField(event);
             }
-            break;
-        case 'course-short-description':
-            this.setField(event);
             break;
         case 'pre-requisite-course':
             var value = $(event.currentTarget).val();
@@ -256,6 +261,15 @@ var DetailsView = ValidatingView.extend({
             // Fallthrough to handle both radio buttons
         case 'course-pace-instructor-paced':
             this.model.set('self_paced', JSON.parse(event.currentTarget.value));
+            break;
+        case 'course-language':
+        case 'course-effort':
+        case 'course-title':
+        case 'course-subtitle':
+        case 'course-duration':
+        case 'course-description':
+        case 'course-short-description':
+            this.setField(event);
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
