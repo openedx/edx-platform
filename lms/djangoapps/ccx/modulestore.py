@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from functools import partial
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore import XMODULE_FIELDS_WITH_USAGE_KEYS
 
 
 def strip_ccx(val):
@@ -28,8 +29,11 @@ def strip_ccx(val):
     elif isinstance(retval, CCXBlockUsageLocator):
         ccx_id = retval.course_key.ccx
         retval = retval.to_block_locator()
-    elif hasattr(retval, 'location'):
-        retval.location, ccx_id = strip_ccx(retval.location)
+    else:
+        for field_name in XMODULE_FIELDS_WITH_USAGE_KEYS:
+            if hasattr(retval, field_name):
+                stripped_field_value, ccx_id = strip_ccx(getattr(retval, field_name))
+                setattr(retval, field_name, stripped_field_value)
     return retval, ccx_id
 
 
@@ -43,8 +47,9 @@ def restore_ccx(val, ccx_id):
     elif isinstance(val, BlockUsageLocator):
         ccx_key = restore_ccx(val.course_key, ccx_id)
         val = CCXBlockUsageLocator(ccx_key, val.block_type, val.block_id)
-    if hasattr(val, 'location'):
-        val.location = restore_ccx(val.location, ccx_id)
+    for field_name in XMODULE_FIELDS_WITH_USAGE_KEYS:
+        if hasattr(val, field_name):
+            setattr(val, field_name, restore_ccx(getattr(val, field_name), ccx_id))
     if hasattr(val, 'children'):
         val.children = restore_ccx_collection(val.children, ccx_id)
     return val
