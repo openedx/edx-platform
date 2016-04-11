@@ -1,4 +1,5 @@
 <%! main_css = "style-main-v2" %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -8,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 <section class="home">
   <header>
-    <img src="${static.url('images/hero.png')}" height="300" width="1300" alt="Home Page" />
+    <img src="${static.url('images/hero.jpg')}" height="300" width="1300" alt="Home Page" />
   </header>
 
   <%include file="${courses_list}" />
