@@ -27,7 +27,7 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
-  <div class="window-wrap" dir="${static.dir_rtl()}">
+  <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
     <a class="nav-skip" href="#main">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
       {% include "header.html"|microsite_template_path %}
