@@ -242,6 +242,10 @@ class Rules(Enum):
         'mako-html-alone',
         "Only use HTML() alone with properly escaped HTML(), and make sure it is really alone."
     )
+    mako_wrap_html = (
+        'mako-wrap-html',
+        "String containg HTML should be wrapped with call to HTML()."
+    )
     underscore_not_escaped = (
         'underscore-not-escaped',
         'Expressions should be escaped using <%- expression %>.'
@@ -491,6 +495,112 @@ class FileResults(object):
                     violation.print_results(out)
 
 
+class ParseString(object):
+    """
+    ParseString is the result of parsing a string out of a template.
+
+    A ParseString has the following attributes:
+        start_index: The index of the first quote, or -1 if none found
+        end_index: The index following the closing quote, or -1 if
+            unparseable
+        quote_length: The length of the quote.  Could be 3 for a Python
+            triple quote.  Or None if none found.
+        string: the text of the parsed string, or None if none found.
+        string_inner: the text inside the quotes of the parsed string, or None
+            if none found.
+
+    """
+
+    def __init__(self, template, start_index, end_index):
+        """
+        Init method.
+
+        Arguments:
+            template: The template to be searched.
+            start_index: The start index to search.
+            end_index: The end index to search before.
+
+        """
+        self.end_index = -1
+        self.quote_length = None
+        self.string = None
+        self.string_inner = None
+        self.start_index = self._find_string_start(template, start_index, end_index)
+        if 0 <= self.start_index:
+            result = self._parse_string(template, self.start_index)
+            if result is not None:
+                self.end_index = result['end_index']
+                self.quote_length = result['quote_length']
+                self.string = result['string']
+                self.string_inner = result['string_inner']
+
+    def _find_string_start(self, template, start_index, end_index):
+        """
+        Finds the index of the end of start of a string.  In other words, the
+        first single or double quote.
+
+        Arguments:
+            template: The template to be searched.
+            start_index: The start index to search.
+            end_index: The end index to search before.
+
+        Returns:
+            The start index of the first single or double quote, or -1 if
+            no quote was found.
+        """
+        double_quote_index = template.find('"', start_index, end_index)
+        single_quote_index = template.find("'", start_index, end_index)
+        if 0 <= single_quote_index or 0 <= double_quote_index:
+            if 0 <= single_quote_index and 0 <= double_quote_index:
+                return min(single_quote_index, double_quote_index)
+            else:
+                return max(single_quote_index, double_quote_index)
+        return -1
+
+    def _parse_string(self, template, start_index):
+        """
+        Finds the indices of a string inside a template.
+
+        Arguments:
+            template: The template to be searched.
+            start_index: The start index of the open quote.
+
+        Returns:
+            A dict containing the following, or None if not parseable:
+                end_index: The index following the closing quote
+                quote_length: The length of the quote.  Could be 3 for a Python
+                    triple quote.
+                string: the text of the parsed string
+                string_inner: the text inside the quotes of the parsed string
+
+        """
+        quote = template[start_index]
+        if quote not in ["'", '"']:
+            raise ValueError("start_index must refer to a single or double quote.")
+        triple_quote = quote * 3
+        if template.startswith(triple_quote, start_index):
+            quote = triple_quote
+
+        next_start_index = start_index + len(quote)
+        while True:
+            quote_end_index = template.find(quote, next_start_index)
+            backslash_index = template.find("\\", next_start_index)
+            if quote_end_index < 0:
+                return None
+            if 0 <= backslash_index < quote_end_index:
+                next_start_index = backslash_index + 2
+            else:
+                end_index = quote_end_index + len(quote)
+                quote_length = len(quote)
+                string = template[start_index:end_index]
+                return {
+                    'end_index': end_index,
+                    'quote_length': quote_length,
+                    'string': string,
+                    'string_inner': string[quote_length:-quote_length],
+                }
+
+
 class MakoTemplateLinter(object):
     """
     The linter for Mako template files.
@@ -689,9 +799,12 @@ class MakoTemplateLinter(object):
         """
         # strip '${' and '}' and whitespace from ends
         expression_inner = expression['expression'][2:-1].strip()
+        # find the template relative inner expression start index
+        # - find used to take into account above strip()
+        template_inner_start_index = expression['start_index'] + expression['expression'].find(expression_inner)
         if 'HTML(' in expression_inner:
             if expression_inner.startswith('HTML('):
-                close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, len('HTML('), 0)
+                close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, start_index=len('HTML('), num_open_chars=0, strings=[])['close_char_index']
                 # check that the close paren is at the end of the expression.
                 if close_paren_index != len(expression_inner) - 1:
                     results.violations.append(ExpressionRuleViolation(
@@ -707,8 +820,11 @@ class MakoTemplateLinter(object):
                     Rules.mako_text_redundant, expression
                 ))
 
+        # strings to be checked for HTML
+        check_html_strings = expression['strings']
         for match in re.finditer("(HTML\(|Text\()", expression_inner):
-            close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, match.end(), 0)
+            result = self._find_closing_char_index(None, "(", ")", expression_inner, start_index=match.end(), num_open_chars=0, strings=[])
+            close_paren_index = result['close_char_index']
             if 0 <= close_paren_index:
                 # the argument sent to HTML() or Text()
                 argument = expression_inner[match.end():close_paren_index]
@@ -716,6 +832,22 @@ class MakoTemplateLinter(object):
                     results.violations.append(ExpressionRuleViolation(
                         Rules.mako_close_before_format, expression
                     ))
+                if match.group() == "HTML(":
+                    # remove expression strings wrapped in HTML()
+                    for string in check_html_strings:
+                        html_inner_start_index = template_inner_start_index + match.end()
+                        html_inner_end_index = template_inner_start_index + close_paren_index
+                        if html_inner_start_index <= string.start_index and string.end_index <= html_inner_end_index:
+                            check_html_strings.remove(string)
+                            break
+
+        # check strings not wrapped in HTML()
+        for string in check_html_strings:
+            if string.string_inner.startswith("<") or string.string_inner.endswith(">"):
+                results.violations.append(ExpressionRuleViolation(
+                    Rules.mako_wrap_html, expression
+                ))
+                break
 
     def _check_filters(self, mako_template, expression, context, has_page_default, results):
         """
@@ -744,7 +876,10 @@ class MakoTemplateLinter(object):
             return
 
         filters = filters_match.group()[1:-1].replace(" ", "").split(",")
-        if context == 'html':
+        if (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'unicode'):
+                # {x | n, unicode} is valid in any context
+                pass
+        elif context == 'html':
             if (len(filters) == 1) and (filters[0] == 'h'):
                 if has_page_default:
                     # suppress this violation if the page default hasn't been set,
@@ -849,9 +984,11 @@ class MakoTemplateLinter(object):
             following:
 
                 start_index: The index of the start of the expression.
-                end_index: The index of the end of the expression, or -1 if
-                    unparseable.
+                end_index: The index immediately following the expression, or -1
+                    if unparseable.
                 expression: The text of the expression.
+                strings: a list of ParseStrings
+
         """
         start_delim = '${'
         start_index = 0
@@ -861,26 +998,28 @@ class MakoTemplateLinter(object):
             start_index = mako_template.find(start_delim, start_index)
             if start_index < 0:
                 break
-            end_index = self._find_closing_char_index(start_delim, '{', '}', mako_template, start_index + len(start_delim), 0)
 
-            if end_index < 0:
+            result = self._find_closing_char_index(start_delim, '{', '}', mako_template, start_index=start_index + len(start_delim), num_open_chars=0, strings=[])
+            close_char_index = result['close_char_index']
+            if close_char_index < 0:
                 expression = None
             else:
-                expression = mako_template[start_index:end_index + 1]
+                expression = mako_template[start_index:close_char_index + 1]
 
             expression = {
                 'start_index': start_index,
-                'end_index': end_index,
-                'expression': expression
+                'end_index': close_char_index + 1,
+                'expression': expression,
+                'strings': result['strings'],
             }
             expressions.append(expression)
 
             # end_index of -1 represents a parsing error and we may find others
-            start_index = max(start_index + len(start_delim), end_index)
+            start_index = max(start_index + len(start_delim), close_char_index)
 
         return expressions
 
-    def _find_closing_char_index(self, start_delim, open_char, close_char, template, start_index, num_open_chars):
+    def _find_closing_char_index(self, start_delim, open_char, close_char, template, start_index, num_open_chars, strings):
         """
         Finds the index of the closing char that matches the opening char.
 
@@ -895,102 +1034,45 @@ class MakoTemplateLinter(object):
             template: The template to be searched.
             start_index: The start index of the last open char.
             num_open_chars: The current number of open chars.
-
-        Returns:
-            The index of the closing character, or -1 if unparseable.
-        """
-        close_char_index = template.find(close_char, start_index)
-        if close_char_index < 0:
-            # if we can't find an end_char, let's just quit
-            return -1
-
-        open_char_index = template.find(open_char, start_index, close_char_index)
-        start_quote_index = self._find_string_start(template, start_index, close_char_index)
-
-        if 0 <= start_quote_index:
-            string_end_index = self._parse_string(template, start_quote_index)['end_index']
-            if string_end_index < 0:
-                return -1
-            else:
-                return self._find_closing_char_index(start_delim, open_char, close_char, template, string_end_index, num_open_chars)
-
-        if (open_char_index >= 0) and (open_char_index < close_char_index):
-            if start_delim is not None:
-                # if we find another starting delim, consider this unparseable
-                start_delim_index = template.find(start_delim, start_index, close_char_index)
-                if start_delim_index < open_char_index:
-                    return -1
-            return self._find_closing_char_index(start_delim, open_char, close_char, template, open_char_index + 1, num_open_chars + 1)
-
-        if num_open_chars == 0:
-            return close_char_index
-        else:
-            return self._find_closing_char_index(start_delim, open_char, close_char, template, close_char_index + 1, num_open_chars - 1)
-
-    def _find_string_start(self, template, start_index, end_index):
-        """
-        Finds the index of the end of start of a string.  In other words, the
-        first single or double quote.
-
-        Arguments:
-            template: The template to be searched.
-            start_index: The start index to search.
-            end_index: The end index to search before.
-            num_open_chars: The current number of open expressions.
-
-        Returns:
-            The start index of the first single or double quote, or -1 if
-            no quote was found.
-        """
-        double_quote_index = template.find('"', start_index, end_index)
-        single_quote_index = template.find("'", start_index, end_index)
-        if 0 <= single_quote_index or 0 <= double_quote_index:
-            if 0 <= single_quote_index and 0 <= double_quote_index:
-                return min(single_quote_index, double_quote_index)
-            else:
-                return max(single_quote_index, double_quote_index)
-        return -1
-
-    def _parse_string(self, template, start_index):
-        """
-        Finds the indices of a string inside a template.
-
-        Arguments:
-            template: The template to be searched.
-            start_index: The start index of the open quote.
+            strings: A list of ParseStrings already parsed
 
         Returns:
             A dict containing the following:
-                start_index: The index of the first quote.
-                end_index: The index following the closing quote, or -1 if
-                    unparseable
-                quote_length: The length of the quote.  Could be 3 for a Python
-                    triple quote.
+                close_char_index: The index of the closing character, or -1 if
+                unparseable.
+                strings: a list of ParseStrings
+
         """
-        quote = template[start_index]
-        if quote not in ["'", '"']:
-            raise ValueError("start_index must refer to a single or double quote.")
-        triple_quote = quote * 3
-        if template.startswith(triple_quote, start_index):
-            quote = triple_quote
+        unparseable_result = {'close_char_index': -1, 'strings': []}
+        close_char_index = template.find(close_char, start_index)
+        if close_char_index < 0:
+            # if we can't find an end_char, let's just quit
+            return unparseable_result
+        open_char_index = template.find(open_char, start_index, close_char_index)
+        parse_string = ParseString(template, start_index, close_char_index)
 
-        result = {
-            'start_index': start_index,
-            'end_index': -1,
-            'quote_length': len(quote),
-        }
-
-        start_index += len(quote)
-        while True:
-            quote_end_index = template.find(quote, start_index)
-            backslash_index = template.find("\\", start_index)
-            if quote_end_index < 0:
-                return result
-            if 0 <= backslash_index < quote_end_index:
-                start_index = backslash_index + 2
+        if 0 <= parse_string.start_index:
+            strings.append(parse_string)
+            if parse_string.end_index < 0:
+                return unparseable_result
             else:
-                result['end_index'] = quote_end_index + len(quote)
-                return result
+                return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=parse_string.end_index, num_open_chars=num_open_chars, strings=strings)
+
+        if 0 <= open_char_index < close_char_index:
+            if start_delim is not None:
+                # if we find another starting delim, consider this unparseable
+                start_delim_index = template.find(start_delim, start_index, close_char_index)
+                if 0 <= start_delim_index < open_char_index:
+                    return unparseable_result
+            return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=open_char_index + 1, num_open_chars=num_open_chars + 1, strings=strings)
+
+        if num_open_chars == 0:
+            return {
+                'close_char_index': close_char_index,
+                'strings': strings,
+            }
+        else:
+            return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=close_char_index + 1, num_open_chars=num_open_chars - 1, strings=strings)
 
 
 class UnderscoreTemplateLinter(object):

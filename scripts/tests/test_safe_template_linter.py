@@ -9,7 +9,7 @@ import textwrap
 from unittest import TestCase
 
 from ..safe_template_linter import (
-    _process_os_walk, FileResults, MakoTemplateLinter, UnderscoreTemplateLinter, Rules
+    _process_os_walk, FileResults, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
 )
 
 
@@ -113,6 +113,7 @@ class TestMakoTemplateLinter(TestCase):
         {'expression': '${x}', 'rule': None},
         {'expression': '${{unbalanced}', 'rule': Rules.mako_unparseable_expression},
         {'expression': '${x | n}', 'rule': Rules.mako_invalid_html_filter},
+        {'expression': '${x | n, unicode}', 'rule': None},
         {'expression': '${x | h}', 'rule': Rules.mako_unwanted_html_filter},
         {'expression': '${x | n, dump_js_escaped_json}', 'rule': Rules.mako_invalid_html_filter},
     )
@@ -203,15 +204,29 @@ class TestMakoTemplateLinter(TestCase):
             'rule': Rules.mako_close_before_format
         },
         {
-            'expression': """${ Text("text") }""",
+            'expression':
+                textwrap.dedent("""
+                    ${"Mixed {span_start}text{span_end}".format(
+                        span_start="<span>",
+                        span_end="</span>",
+                    )}
+                """),
+            'rule': Rules.mako_wrap_html
+        },
+        {
+            'expression': "${'<span></span>'}",
+            'rule': Rules.mako_wrap_html
+        },
+        {
+            'expression': "${ Text('text') }",
             'rule': Rules.mako_text_redundant
         },
         {
-            'expression': """${ HTML("<span></span>") }""",
+            'expression': "${ HTML('<span></span>') }",
             'rule': None
         },
         {
-            'expression': """${ HTML("<span></span>") + "some other text" }""",
+            'expression': "${ HTML('<span></span>') + 'some other text' }",
             'rule': Rules.mako_html_alone
         },
     )
@@ -309,6 +324,7 @@ class TestMakoTemplateLinter(TestCase):
         {'expression': '${x | n}', 'rule': Rules.mako_invalid_js_filter},
         {'expression': '${x | h}', 'rule': Rules.mako_invalid_js_filter},
         {'expression': '${x | n, dump_js_escaped_json}', 'rule': None},
+        {'expression': '${x | n, unicode}', 'rule': None},
     )
     def test_check_mako_expressions_in_javascript(self, data):
         """
@@ -440,7 +456,7 @@ class TestMakoTemplateLinter(TestCase):
         self.assertTrue(lines[violation.start_line - 1].startswith("${", violation.start_column - 1))
         if data['parseable']:
             self.assertTrue("}" in lines[violation.end_line - 1])
-            self.assertTrue(lines[violation.end_line - 1].startswith("}", violation.end_column - 1))
+            self.assertTrue(lines[violation.end_line - 1].startswith("}", violation.end_column - len("}") - 1))
         else:
             self.assertEqual(violation.start_line, violation.end_line)
             self.assertEqual(violation.end_column, "?")
@@ -468,14 +484,14 @@ class TestMakoTemplateLinter(TestCase):
         self.assertEqual(len(expressions), 1)
         start_index = expressions[0]['start_index']
         end_index = expressions[0]['end_index']
-        self.assertEqual(data['template'][start_index:end_index + 1], data['template'].strip())
+        self.assertEqual(data['template'][start_index:end_index], data['template'].strip())
         self.assertEqual(expressions[0]['expression'], data['template'].strip())
 
     @data(
         {'template': " ${{unparseable} ${}", 'start_index': 1},
         {'template': " ${'unparseable} ${}", 'start_index': 1},
     )
-    def test_find_mako_expressions(self, data):
+    def test_find_unparseable_mako_expressions(self, data):
         """
         Test _find_mako_expressions for unparseable expressions
         """
@@ -487,26 +503,12 @@ class TestMakoTemplateLinter(TestCase):
         self.assertIsNone(expressions[0]['expression'])
 
     @data(
-        {'template': """${""}""", 'start_index': 0, 'end_index': 5, 'expected_index': 2},
-        {'template': """${''}""", 'start_index': 0, 'end_index': 5, 'expected_index': 2},
-        {'template': """${"''"}""", 'start_index': 0, 'end_index': 7, 'expected_index': 2},
-        {'template': """${'""'}""", 'start_index': 0, 'end_index': 7, 'expected_index': 2},
-        {'template': """${'""'}""", 'start_index': 3, 'end_index': 7, 'expected_index': 3},
-        {'template': """${'""'}""", 'start_index': 0, 'end_index': 1, 'expected_index': -1},
-    )
-    def test_find_string_start(self, data):
-        """
-        Test _find_string_start helper
-        """
-        linter = MakoTemplateLinter()
-
-        string_start_index = linter._find_string_start(data['template'], data['start_index'], data['end_index'])
-
-        self.assertEqual(string_start_index, data['expected_index'])
-
-    @data(
         {
             'template': '${""}',
+            'result': {'start_index': 2, 'end_index': 4, 'quote_length': 1}
+        },
+        {
+            'template': "${''}",
             'result': {'start_index': 2, 'end_index': 4, 'quote_length': 1}
         },
         {
@@ -528,9 +530,19 @@ class TestMakoTemplateLinter(TestCase):
         """
         linter = MakoTemplateLinter()
 
-        result = linter._parse_string(data['template'], data['result']['start_index'])
 
-        self.assertDictEqual(result, data['result'])
+        parse_string = ParseString(data['template'], data['result']['start_index'], len(data['template']))
+        string_dict = {
+            'start_index': parse_string.start_index,
+            'end_index': parse_string.end_index,
+            'quote_length': parse_string.quote_length,
+        }
+
+        self.assertDictEqual(string_dict, data['result'])
+        self.assertEqual(data['template'][parse_string.start_index:parse_string.end_index], parse_string.string)
+        start_index = parse_string.start_index + parse_string.quote_length
+        end_index = parse_string.end_index - parse_string.quote_length
+        self.assertEqual(data['template'][start_index:end_index], parse_string.string_inner)
 
     def _validate_data_rule(self, data, results):
         if data['rule'] is None:
