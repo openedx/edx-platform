@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-{% load sekizai_tags i18n microsite pipeline optional_include %}
+{% load sekizai_tags i18n microsite pipeline optional_include staticfiles %}
 {% load url from future %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
   {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
- <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+
+  {% with "js/i18n/"|add:LANGUAGE_CODE|add:"/djangojs.js" as i18njs_path %}
+    <script type="text/javascript" src="{% static i18njs_path %}"></script>
+  {% endwith %}
 
   {% stylesheet 'style-vendor' %}
   {% stylesheet 'style-main-v1' %}
