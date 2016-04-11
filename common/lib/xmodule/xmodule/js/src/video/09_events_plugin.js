@@ -45,6 +45,8 @@ define('video/09_events_plugin.js', [], function() {
                 'speedchange': this.onSpeedChange,
                 'language_menu:show': this.onShowLanguageMenu,
                 'language_menu:hide': this.onHideLanguageMenu,
+                'transcript:show': this.onShowTranscript,
+                'transcript:hide': this.onHideTranscript,
                 'captions:show': this.onShowCaptions,
                 'captions:hide': this.onHideCaptions,
                 'destroy': this.destroy
@@ -109,10 +111,18 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onShowCaptions: function () {
-            this.log('show_transcript', {current_time: this.getCurrentTime()});
+            this.log('show_captions', {current_time: this.getCurrentTime()});
         },
 
         onHideCaptions: function () {
+            this.log('hide_captions', {current_time: this.getCurrentTime()});
+        },
+
+        onShowTransscript: function () {
+            this.log('show_transcript', {current_time: this.getCurrentTime()});
+        },
+
+        onHideTranscript: function () {
             this.log('hide_transcript', {current_time: this.getCurrentTime()});
         },
 
