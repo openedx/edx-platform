@@ -1,0 +1,42 @@
+<%page args="grade_summary, course"/>
+<%!
+  from django.utils.translation import ugettext as _
+%>
+<%
+  passing_grades = {g['type']: g['passing_grade'] for g in course.raw_grader};
+  passing_grades_enabled = {g['type']: g['passing_grade_enabled'] for g in course.raw_grader};
+  current_grades = {section['category']: section['percent'] for section in grade_summary['section_breakdown']}
+%>
+<div class="grade-category-detail">
+  <table class="grade-category-detail-table">
+    <thead>
+      <tr>
+        <th scope="col">${_('Assignment')}</th>
+        <th scope="col">${_('Passing grade')}</th>
+        <th scope="col">${_('Current grade')}</th>
+        <th scope="col">${_('Status')}</th>
+      </tr>
+    </thead>
+    <tbody>
+      %for section in grade_summary['grade_breakdown']:
+        <%
+          category = section['category']
+          passing_grade_enabled = passing_grades_enabled.get(category, False)
+          passing_grade = passing_grades.get(category, 0)
+        %>
+        %if passing_grade > 0 and passing_grade_enabled:
+        <tr>
+          <td scope="row">${category}</td>
+          <td>${"{0:.0f}".format( 100 * passing_grade)}</td>
+          <td>${"{0:.0f}".format( 100 * current_grades.get(category, 0))}</td>
+          %if section['is_passed']:
+            <td class="pass">${_('Pass')}</td>
+          %else:
+            <td class="fail">${_('Not pass')}</td>
+          %endif
+        </tr>
+        %endif
+      %endfor
+    </tbody>
+  </table>
+</div>

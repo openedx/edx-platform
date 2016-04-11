@@ -6,19 +6,17 @@ var CourseGrader = Backbone.Model.extend({
         "min_count" : 1,
         "drop_count" : 0,
         "short_label" : "", // what to use in place of type if space is an issue
-        "weight" : 0 // int 0..100
+        "weight" : 0, // int 0..100,
+        "passing_grade": 1, // int 1..100
+        "passing_grade_enabled": false
     },
     parse : function(attrs) {
         // round off values while converting them to integer
-        if (attrs['weight']) {
-            attrs.weight = Math.round(attrs.weight);
-        }
-        if (attrs['min_count']) {
-            attrs.min_count = Math.round(attrs.min_count);
-        }
-        if (attrs['drop_count']) {
-            attrs.drop_count = Math.round(attrs.drop_count);
-        }
+        _.each(['weight', 'min_count', 'drop_count', 'passing_grade'], function (attrName) {
+            if (_.has(attrs, attrName)) {
+                attrs[attrName] = Math.round(attrs[attrName]);
+            }
+        });
         return attrs;
     },
     validate : function(attrs) {
@@ -64,6 +62,16 @@ var CourseGrader = Backbone.Model.extend({
                 errors.drop_count = gettext("Please enter non-negative integer.");
             }
             else attrs.drop_count = intDropCount;
+        }
+        // show error if passing grade value is invalid
+        // else get its rounded value
+        if (_.has(attrs, 'passing_grade')) {
+            var passingGrade = attrs.passing_grade,
+                intPsGrade = Math.round(passingGrade); // see if this ensures value saved is int
+            if (!isFinite(intPsGrade) || /\D+/.test(passingGrade) || (_.isString(passingGrade) && _.isEmpty(passingGrade.trim())) || intPsGrade < 1 || intPsGrade > 100) {
+                errors.passing_grade = gettext("Please enter an integer between 1 and 100.");
+            }
+            else attrs.passing_grade = intPsGrade;
         }
         if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count > attrs.min_count) {
             var template = _.template(

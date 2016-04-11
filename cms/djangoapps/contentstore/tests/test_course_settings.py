@@ -406,6 +406,10 @@ class CourseGradingTest(CourseTestCase):
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
 
+        test_grader.graders[0]['passing_grade'] = 0.29
+        altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
+        self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "PassingGrade[0] == 0.29")
+
         # test for bug LMS-11485
         with modulestore().bulk_operations(self.course.id):
             new_grader = test_grader.graders[0].copy()
@@ -538,6 +542,7 @@ class CourseGradingTest(CourseTestCase):
         new_grader = {
             "type": "Extra Credit",
             "min_count": 1,
+            "passing_grade": 20.0,
             "drop_count": 2,
             "short_label": None,
             "weight": 15,
@@ -998,6 +1003,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "id": 0,
             "type": "manual",
             "min_count": 5,
+            "passing_grade": 12.2,
             "drop_count": 10,
             "short_label": "yo momma",
             "weight": 17.3,
@@ -1017,6 +1023,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
         grader = {
             "type": "manual",
             "min_count": 5,
+            "passing_grade": 12.5,
             "drop_count": 10,
             "short_label": "yo momma",
             "weight": 17.3,

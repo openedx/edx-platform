@@ -179,6 +179,29 @@
       width: 100%;
     }
 
+    .grade-category-detail {
+      margin: 3em 0;
+
+      .grade-category-detail-table {
+        margin: 0 auto;
+
+        td, th {
+          padding: .5em 0.7em;
+          border: 1px solid $black;
+          text-align: center;
+
+          &.pass {
+            color: $success-color;
+          }
+
+          &.fail {
+            color: $alert-color;
+          }
+        }
+      }
+    }
+
+
     > .credit-eligibility{
       border-top: 1px solid $lightGrey;
       margin-top: lh();

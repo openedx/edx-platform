@@ -2,6 +2,7 @@
 <%!
   import json
   import math
+  from django.utils.translation import ugettext as _
 %>
 
 $(function () {
@@ -88,7 +89,16 @@ $(function () {
             
             detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
   
-    ticks += [ [overviewBarX, "Total"] ]
+    totalLabel = _("Total")
+    passing_grade_enabled = filter(
+        lambda x: x,
+        [item['passing_grade_enabled'] for item in course.raw_grader]
+    )
+    if not grade_summary['sections_passed'] and passing_grade_enabled:
+        totalLabel += "<br><span style=\"color: #b60000;white-space: nowrap;\">({status})</span>" .format(
+        status = _('not pass')
+    )
+    ticks += [ [overviewBarX,  totalLabel] ]
     tickIndex += 1 + sectionSpacer
   
   totalScore = grade_summary['percent']
@@ -97,6 +107,8 @@ $(function () {
   
   ## ----------------------------- Grade cutoffs ------------------------- ##
   
+  grading_issues = []
+  grading_issues_tooltips = []
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
   if show_grade_cutoffs:
     grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
@@ -104,8 +116,13 @@ $(function () {
     for grade in descending_grades:
         percent = grade_cutoffs[grade]
         grade_cutoff_ticks.append( [ percent, u"{0} {1:.0%}".format(grade, percent) ] )
+        if not grade_summary['sections_passed']:
+            grading_issues.append([0.25, percent])
+            grading_issues_tooltips.append(_('One of the categories is not passed'))
   else:
     grade_cutoff_ticks = [ ]
+
+  detail_tooltips['not-passed-categories'] = grading_issues_tooltips
   %>
   
   var series = ${ json.dumps( series ) };
@@ -122,17 +139,31 @@ $(function () {
   var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; }); // Percentage point (in decimal) of each grade cutoff
   ascending_grades.sort();
 
+  var yaxisOptions = {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 100};
+
   var colors = ['#f3f3f3', '#e9e9e9', '#ddd'];
   var markings = [];
-  for(var i=1; i<ascending_grades.length-1; i++) // Skip the i=0 marking, which starts from 0%
-    markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
+
+  %if grade_summary['sections_passed']:
+    for(var i=1; i<ascending_grades.length-1; i++) // Skip the i=0 marking, which starts from 0%
+        markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
+  %else:
+    series.push({
+        label: 'not-passed-categories',
+        data: ${json.dumps(grading_issues)},
+        points: {symbol: "cross", show: true, radius: 3},
+        bars: {show: false},
+        color: "#b60000"
+    });
+    yaxisOptions['tickLength'] = 0;
+  %endif
 
   var options = {
     series: {stack: true,
               lines: {show: false, steps: false },
               bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
-    yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 100},
+    yaxis: yaxisOptions,
     grid: { hoverable: true, clickable: true, borderWidth: 1, markings: markings },
     legend: {show: false},
   };

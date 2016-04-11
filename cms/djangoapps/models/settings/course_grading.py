@@ -15,6 +15,7 @@ class CourseGradingModel(object):
         self.grade_cutoffs = course_descriptor.grade_cutoffs
         self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
         self.minimum_grade_credit = course_descriptor.minimum_grade_credit
+        self.passing_grade_enabled = False
 
     @classmethod
     def fetch(cls, course_key):
@@ -38,13 +39,16 @@ class CourseGradingModel(object):
 
         # return empty model
         else:
-            return {"id": index,
-                    "type": "",
-                    "min_count": 0,
-                    "drop_count": 0,
-                    "short_label": None,
-                    "weight": 0
-                    }
+            return {
+                "id": index,
+                "type": "",
+                "min_count": 0,
+                "drop_count": 0,
+                "short_label": None,
+                "weight": 0,
+                "passing_grade": 1,
+                "passing_grade_enabled": False
+            }
 
     @staticmethod
     def update_from_json(course_key, jsondict, user):
@@ -220,15 +224,17 @@ class CourseGradingModel(object):
                   "min_count": int(json_grader.get('min_count', 0)),
                   "drop_count": int(json_grader.get('drop_count', 0)),
                   "short_label": json_grader.get('short_label', None),
-                  "weight": float(json_grader.get('weight', 0)) / 100.0
+                  "weight": float(json_grader.get('weight', 0)) / 100.0,
+                  "passing_grade": float(json_grader.get('passing_grade', 1)) / 100.0,
+                  "passing_grade_enabled": json_grader.get('passing_grade_enabled', False),
                   }
 
         return result
 
     @staticmethod
     def jsonize_grader(i, grader):
-        # Warning: converting weight to integer might give unwanted results due
-        # to the reason how floating point arithmetic works
+        # Warning: converting weight and passing_grade to integer might give
+        # unwanted results due to the reason how floating point arithmetic works
         # e.g, "0.29 * 100 = 28.999999999999996"
         return {
             "id": i,
@@ -237,4 +243,6 @@ class CourseGradingModel(object):
             "drop_count": grader.get('drop_count', 0),
             "short_label": grader.get('short_label', ""),
             "weight": grader.get('weight', 0) * 100,
+            "passing_grade": grader.get('passing_grade', 1) * 100,
+            "passing_grade_enabled": grader.get('passing_grade_enabled', False),
         }

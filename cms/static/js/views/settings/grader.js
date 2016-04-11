@@ -11,15 +11,23 @@ var GraderView = ValidatingView.extend({
         "click .remove-grading-data" : "deleteModel",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
-        'blur :input' : "inputUnfocus"
+        'blur :input' : "inputUnfocus",
+        'click #assignment-passing-grade-enabled' : "togglePassingGrade"
     },
     initialize : function() {
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.listenTo(this.model, 'change:passing_grade_enabled', this.render);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         this.render();
     },
 
     render: function() {
+        var isPassingGradeEnabled = this.model.get('passing_grade_enabled');
+        var gradeInput = this.$('#' + this.fieldToSelectorMap['passing_grade_enabled']);
+
+        gradeInput.prop('checked', isPassingGradeEnabled);
+        this.$('.div-grade-section').toggle(isPassingGradeEnabled);
+
         return this;
     },
     fieldToSelectorMap : {
@@ -27,7 +35,9 @@ var GraderView = ValidatingView.extend({
         'short_label' : 'course-grading-assignment-shortname',
         'min_count' : 'course-grading-assignment-totalassignments',
         'drop_count' : 'course-grading-assignment-droppable',
-        'weight' : 'course-grading-assignment-gradeweight'
+        'weight' : 'course-grading-assignment-gradeweight',
+        'passing_grade' : 'assignment-passing-grade',
+        'passing_grade_enabled': 'passing-grade-enabled'
     },
     updateModel: function(event) {
         // HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving
@@ -62,6 +72,10 @@ var GraderView = ValidatingView.extend({
     deleteModel : function(e) {
         e.preventDefault();
         this.collection.remove(this.model);
+    },
+
+    togglePassingGrade: function() {
+        this.model.set({'passing_grade_enabled': !this.model.get('passing_grade_enabled')});
     }
 });
 

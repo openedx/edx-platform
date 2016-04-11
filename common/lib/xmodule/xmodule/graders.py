@@ -73,6 +73,7 @@ def grader_from_conf(conf):
     for subgraderconf in conf:
         subgraderconf = subgraderconf.copy()
         weight = subgraderconf.pop("weight", 0)
+        passing_grade = subgraderconf.pop("passing_grade", 1)
         # NOTE: 'name' used to exist in SingleSectionGrader. We are deprecating SingleSectionGrader
         # and converting everything into an AssignmentFormatGrader by adding 'min_count' and
         # 'drop_count'. AssignmentFormatGrader does not expect 'name', so if it appears
@@ -100,7 +101,9 @@ def grader_from_conf(conf):
                     del subgraderconf[key]
 
             subgrader = subgrader_class(**subgraderconf)
-            subgraders.append((subgrader, subgrader.category, weight))
+            subgraders.append(
+                (subgrader, subgrader.category, weight, passing_grade)
+            )
 
         except (TypeError, ValueError) as error:
             # Add info and re-raise
@@ -185,7 +188,7 @@ class WeightedSubsectionsGrader(CourseGrader):
         section_breakdown = []
         grade_breakdown = []
 
-        for subgrader, category, weight in self.sections:
+        for subgrader, category, weight, passing_grade in self.sections:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
@@ -193,11 +196,19 @@ class WeightedSubsectionsGrader(CourseGrader):
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category})
+            grade_breakdown.append({
+                'percent': weighted_percent,
+                'detail': section_detail,
+                'category': category,
+                'is_passed': subgrade_result['percent'] >= passing_grade
+            })
 
-        return {'percent': total_percent,
-                'section_breakdown': section_breakdown,
-                'grade_breakdown': grade_breakdown}
+        return {
+            'percent': total_percent,
+            'section_breakdown': section_breakdown,
+            'grade_breakdown': grade_breakdown,
+            'sections_passed': all(section['is_passed'] for section in grade_breakdown)
+        }
 
 
 class SingleSectionGrader(CourseGrader):
