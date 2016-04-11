@@ -247,10 +247,15 @@
                     });
                 });
 
-                it('getCurrentTime', function () {
-                    state.videoPlayer.player.video.currentTime = 3;
-                    expect(state.videoPlayer.player.getCurrentTime())
-                        .toBe(state.videoPlayer.player.video.currentTime);
+                it('getCurrentTime', function (done) {
+                    state.videoPlayer.player.playVideo();
+                    jasmine.waitUntil(function () {
+                        return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
+                    }).then(function() {
+                        state.videoPlayer.player.video.currentTime = 3;
+                        expect(state.videoPlayer.player.getCurrentTime())
+                            .toBe(state.videoPlayer.player.video.currentTime);
+                    }).done(done);
                 });
 
                 it('playVideo', function () {
