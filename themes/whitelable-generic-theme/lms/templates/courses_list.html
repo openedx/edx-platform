@@ -1,46 +1,48 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<section class="courses-container">
-  <section class="highlighted-courses">
+<section class="courses-section">
+  <div class="courses-container">
+    <div class="highlighted-courses">
 
-    % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-      <section class="courses">
+      % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+        <section class="courses">
 
-        <div class="grid-manual">
-          <div class="row">
-            <div class="col col-8 pre-4">
-              <h2> Checkout our most popular courses </h2>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col col-3 pre-1">
-              <div class="courses-listing-item">
-                <%include file="course.html" args="course=courses[0]" />
+          <div class="grid-manual">
+            <div class="row">
+              <div class="col col-12 text-center">
+                <h2> Checkout our most popular courses </h2>
               </div>
             </div>
-            <div class="col col-3">
-              <div class="courses-listing-item">
-                <%include file="course.html" args="course=courses[1]" />
+
+            <div class="row course-list">
+              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                <div class="courses-listing-item">
+                  <%include file="course.html" args="course=courses[0]" />
+                </div>
+              </div>
+              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                <div class="courses-listing-item">
+                  <%include file="course.html" args="course=courses[1]" />
+                </div>
+              </div>
+              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                <div class="courses-listing-item">
+                  <%include file="course.html" args="course=courses[2]" />
+                </div>
               </div>
             </div>
-            <div class="col col-3">
-              <div class="courses-listing-item">
-                <%include file="course.html" args="course=courses[2]" />
+
+            <div class="row">
+              <div class="col col-12 text-center">
+                <a href="#" class="btn-elevated btn-client">View all</a>
               </div>
             </div>
+
           </div>
+        </section>
+      % endif
 
-          <div class="row">
-            <div class="col col-7 pre-5">
-              <a href="#" class="btn-neutral">View all</a>
-            </div>
-          </div>
-
-        </div>
-      </section>
-    % endif
-
-  </section>
+    </div>
+  </div>
 </section>
