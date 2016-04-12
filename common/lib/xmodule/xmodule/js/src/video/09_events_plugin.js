@@ -103,19 +103,19 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onShowLanguageMenu: function () {
-            this.log('video_show_cc_menu');
+            this.log('video_show_language_menu');
         },
 
         onHideLanguageMenu: function () {
-            this.log('video_hide_cc_menu');
+            this.log('video_hide_language_menu');
         },
 
         onShowCaptions: function () {
-            this.log('show_captions', {current_time: this.getCurrentTime()});
+            this.log('show_closed_captions', {current_time: this.getCurrentTime()});
         },
 
         onHideCaptions: function () {
-            this.log('hide_captions', {current_time: this.getCurrentTime()});
+            this.log('hide_closed_captions', {current_time: this.getCurrentTime()});
         },
 
         onShowTransscript: function () {

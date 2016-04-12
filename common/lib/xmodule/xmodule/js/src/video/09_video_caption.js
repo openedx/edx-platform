@@ -381,7 +381,9 @@
             onContainerMouseEnter: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').addClass('is-opened');
-                this.state.el.trigger('language_menu:show');
+                if ($(event.currentTarget).find('.lang').length) {
+                    this.state.el.trigger('language_menu:show');
+                }
             },
 
             /**
@@ -392,7 +394,9 @@
             onContainerMouseLeave: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').removeClass('is-opened');
-                this.state.el.trigger('language_menu:hide');
+                if ($(event.currentTarget).find('.lang').length) {
+                    this.state.el.trigger('language_menu:hide');
+                }
             },
 
             /**
@@ -665,6 +669,7 @@
                 });
 
                 this.languageChooserEl.append(menu);
+                // event: video_show_cc_menu, video_hide_cc_menu
 
                 menu.on('click', '.control-lang', function (e) {
                     var el = $(e.currentTarget).parent(),
