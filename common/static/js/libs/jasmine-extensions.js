@@ -1,3 +1,13 @@
+// Extensions to Jasmine.
+//
+// This file adds the following:
+// 1. Custom matchers that may be helpful project-wise.
+// 2. Copies of event related matchers from Jasmine-JQuery.
+//    Because Jasmine-Jquery uses its own version of JQuery, events registered in the code
+//    using the platform version of JQuery are not "noticed" by Jasmine-Jquery matchers.
+//    So after the platform version of JQuery has been loaded, we set these matchers up again
+//    in this module.
+
 (function (root, factory) {
   factory(root, root.jQuery);
 }((function () {
