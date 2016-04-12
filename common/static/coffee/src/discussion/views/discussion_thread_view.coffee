@@ -20,6 +20,7 @@ if Backbone?
       super()
       @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
       @context = options.context or "course"  # allowed values are "course" or "standalone"
+      @course_settings = options.course_settings
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
@@ -307,7 +308,7 @@ if Backbone?
         model: @model
         mode: @mode
         context: @context
-        course_settings: @options.course_settings
+        course_settings: @course_settings
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView
       @editView.bind "comment:endorse", @endorseThread
