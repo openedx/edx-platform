@@ -322,7 +322,7 @@ from courseware.grades import grade
         </div>
         % endif
 
-        % if course.may_certify() and cert_status['status'] == 'downloadable':
+        % if course_overview.may_certify() and cert_status['status'] == 'downloadable':
           <%
             grade_summary = grade(request.user, request, course)
             nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]

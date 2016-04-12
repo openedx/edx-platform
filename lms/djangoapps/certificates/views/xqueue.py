@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 # InterSystems
 @csrf_exempt
 def request_grade(request):
-    result = request_certificate(request)
+    request_certificate(request)
     return redirect(reverse('dashboard'))
 
 

@@ -1413,7 +1413,7 @@ class CourseEnrollment(models.Model):
             If the course is re-published within the lifetime of this
             CourseEnrollment object, then the value of this property will
             become stale.
-       """
+        """
         if not self._course_overview:
             try:
                 self._course_overview = CourseOverview.get_from_id(self.course_id)

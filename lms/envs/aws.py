@@ -240,6 +240,10 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
 
+# Include theme locale path for django translations lookup
+theme_root = ENV_ROOT / "themes" / THEME_NAME
+LOCALE_PATHS = (theme_root / 'conf/locale',) + LOCALE_PATHS
+
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 

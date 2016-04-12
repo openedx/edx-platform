@@ -983,11 +983,13 @@ def _progress(request, course_key, student_id):
                     'cert_web_view_url': certs_api.get_certificate_url(course_id=course_key, uuid=cert_status['uuid']),
                 })
             else:
-                context.update({
-                    'is_downloadable': False,
-                    'is_generating': True,
-                    'download_url': None
-                })
+                # InterSystems sets USE_CERTIFICATES to False
+                if settings.FEATURES.get("USE_CERTIFICATES", True):
+                    context.update({
+                        'is_downloadable': False,
+                        'is_generating': True,
+                        'download_url': None
+                    })
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)

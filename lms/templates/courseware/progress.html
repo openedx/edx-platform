@@ -62,7 +62,7 @@ from django.utils.http import urlquote_plus
                   ${_("You can keep working for a higher grade, or request your certificate now.")}
                 </p>              
                 <p class="message-copy">${_("Your final grade:")}
-                  <span class="grade-value">${"{0:.0f}%".format(float(cert['grade'])*100)}</span>.
+                  <span class="grade-value">${"{0:.0f}%".format(float(grade)*100)}</span>.
                 </p>
               </div>
               <div class="msg-actions">
@@ -70,7 +70,7 @@ from django.utils.http import urlquote_plus
                 <a class="btn" href="${cert_web_view_url | h}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
                   ${_("View Certificate")}
                 </a>
-                %elif download_url:
+                %elif download_url and False:
                 <a class="btn" href="${download_url | h}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
                   ${_("Download Your Certificate")}
                 </a>

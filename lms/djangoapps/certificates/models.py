@@ -363,8 +363,10 @@ def certificate_status_for_student(student, course_id):
             # Short term fix to make sure old audit users with certs still see their certs
             # only do this if there if no honor mode
             if 'honor' not in course_mode_slugs:
-                cert_status['status'] = CertificateStatuses.auditing
-                return cert_status
+                # cert_status['status'] = CertificateStatuses.auditing
+                # InterSystems we want to allow auditors to get to downloadable state
+                cert_status['status'] = CertificateStatuses.downloadable
+                # return cert_status
 
         if generated_certificate.status == CertificateStatuses.downloadable:
             cert_status['download_url'] = generated_certificate.download_url

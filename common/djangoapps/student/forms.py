@@ -23,6 +23,8 @@ from util.password_policy_validators import (
     validate_password_dictionary,
 )
 
+from microsite_configuration import microsite
+
 
 class PasswordResetFormNoActive(PasswordResetForm):
     error_messages = {
@@ -256,10 +258,15 @@ def get_registration_extension_form(*args, **kwargs):
 
     An example form app for this can be found at http://github.com/open-craft/custom-form-app
     """
-    if not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
+    # make microsite aware
+    combined_login = microsite.get_value("ENABLE_COMBINED_LOGIN_REGISTRATION",
+                                         settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION", None))
+    if not combined_login:
         return None
-    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
+    extension_form = microsite.get_value("REGISTRATION_EXTENSION_FORM",
+                                         getattr(settings, "REGISTRATION_EXTENSION_FORM", None))
+    if not extension_form:
         return None
-    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
+    module, klass = extension_form.rsplit('.', 1)
     module = import_module(module)
     return getattr(module, klass)(*args, **kwargs)
