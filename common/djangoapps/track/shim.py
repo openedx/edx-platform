@@ -83,6 +83,10 @@ NAME_TO_EVENT_TYPE_MAP = {
     'edx.video.seeked': 'seek_video',
     'edx.video.transcript.shown': 'show_transcript',
     'edx.video.transcript.hidden': 'hide_transcript',
+    'edx.video.closed_captions.shown': 'show_closed_captions',
+    'edx.video.closed_captions.hidden': 'hide_closed_captions',
+    'edx.video.language_menu.shown': 'video_show_cc_menu',
+    'edx.video.language_menu.hidden': 'video_hide_cc_menu'
 }
 
 

@@ -17,7 +17,8 @@ define('video/09_events_plugin.js', [], function() {
 
         _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onEnded', 'onSeek',
             'onSpeedChange', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowCaptions', 'onHideCaptions', 'destroy');
+            'onShowCaptions', 'onHideCaptions', 'onShowTranscript', 'onHideTranscript',
+            'destroy');
         this.state = state;
         this.options = _.extend({}, options);
         this.state.videoEventsPlugin = this;
@@ -103,11 +104,11 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onShowLanguageMenu: function () {
-            this.log('video_show_language_menu');
+            this.log('video_show_cc_menu');
         },
 
         onHideLanguageMenu: function () {
-            this.log('video_hide_language_menu');
+            this.log('video_hide_cc_menu', { language: this.getCurrentLanguage() });
         },
 
         onShowCaptions: function () {
@@ -118,7 +119,7 @@ define('video/09_events_plugin.js', [], function() {
             this.log('hide_closed_captions', {current_time: this.getCurrentTime()});
         },
 
-        onShowTransscript: function () {
+        onShowTranscript: function () {
             this.log('show_transcript', {current_time: this.getCurrentTime()});
         },
 
@@ -129,6 +130,11 @@ define('video/09_events_plugin.js', [], function() {
         getCurrentTime: function () {
             var player = this.state.videoPlayer;
             return player ? player.currentTime : 0;
+        },
+
+        getCurrentLanguage: function() {
+            var language = this.state.lang;
+            return language;
         },
 
         log: function (eventName, data) {

@@ -130,12 +130,13 @@
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('video_hide_cc_menu', {
                 id: 'id',
-                code: 'html5'
+                code: 'html5',
+                language: 'en'
             });
         });
 
         it('can emit "show_transcript" event', function () {
-            state.el.trigger('captions:show');
+            state.el.trigger('transcript:show');
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
                 code: 'html5',
@@ -144,8 +145,26 @@
         });
 
         it('can emit "hide_transcript" event', function () {
-            state.el.trigger('captions:hide');
+            state.el.trigger('transcript:hide');
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can emit "show_closed_captions" event', function () {
+            state.el.trigger('captions:show');
+            expect(Logger.log).toHaveBeenCalledWith('show_closed_captions', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can emit "hide_closed_captions" event', function () {
+            state.el.trigger('captions:hide');
+            expect(Logger.log).toHaveBeenCalledWith('hide_closed_captions', {
                 id: 'id',
                 code: 'html5',
                 current_time: 10
@@ -167,6 +186,8 @@
                 'speedchange': plugin.onSpeedChange,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
+                'transcript:show': plugin.onShowTranscript,
+                'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
                 'destroy': plugin.destroy
