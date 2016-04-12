@@ -1,11 +1,15 @@
 #pylint: disable=missing-docstring
+import unittest
+
 import ddt
+from django.conf import settings
 from django.test import TestCase
 
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class ApiAccessFormTest(TestCase):
 

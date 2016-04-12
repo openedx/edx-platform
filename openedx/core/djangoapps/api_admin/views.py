@@ -8,9 +8,10 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.generic import View
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-
 from edxmako.shortcuts import render_to_response, render_to_string
+
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 
@@ -82,3 +83,9 @@ class ApiRequestStatusView(View):
             'api_support_link': _('TODO'),
             'api_support_email': settings.API_ACCESS_MANAGER_EMAIL,
         })
+
+
+class ApiTosView(TemplateView):
+    """View to show the API Terms of Service."""
+
+    template_name = 'api_admin/terms_of_service.html'

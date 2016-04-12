@@ -14,8 +14,15 @@ from openedx.core.djangoapps.api_admin.views import log as view_log
 from student.tests.factories import UserFactory
 
 
+class ApiAdminTest(TestCase):
+
+    def setUp(self):
+        super(ApiAdminTest, self).setUp()
+        ApiAccessConfig(enabled=True).save()
+
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ApiRequestViewTest(TestCase):
+class ApiRequestViewTest(ApiAdminTest):
 
     def setUp(self):
         super(ApiRequestViewTest, self).setUp()
@@ -23,7 +30,6 @@ class ApiRequestViewTest(TestCase):
         password = 'abc123'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
-        ApiAccessConfig(enabled=True).save()
 
     def test_get(self):
         """Verify that a logged-in can see the API request form."""
@@ -107,11 +113,10 @@ class ApiRequestViewTest(TestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ApiRequestStatusViewTest(TestCase):
+class ApiRequestStatusViewTest(ApiAdminTest):
 
     def setUp(self):
         super(ApiRequestStatusViewTest, self).setUp()
-        ApiAccessConfig(enabled=True).save()
         password = 'abc123'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
@@ -145,3 +150,14 @@ class ApiRequestStatusViewTest(TestCase):
         ApiAccessConfig(enabled=False).save()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class ApiTosViewTest(ApiAdminTest):
+
+    def test_get_api_tos(self):
+        """Verify that the terms of service can be read."""
+        url = reverse('api-tos')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Terms of Service', response.content)
