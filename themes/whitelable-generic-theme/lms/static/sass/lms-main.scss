@@ -1,21 +1,18 @@
-// lms - css application architecture
-// ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+// ------------------------------
+// LMS main styling
+// Version 2 - introduces the Pattern Library
 
-// BASE  *default edX offerings*
-// ====================
+// NOTE: This is the left-to-right (LTR) configured style compile.
+// It should mirror lms-main-v2-rtl w/ the exception of bi-app references.
 
-// base - utilities
-@import 'base/reset';
+
+// Load the RTL version of the edX Pattern Library
+$pattern-library-path: '../edx-pattern-library' !default;
+@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-ltr';
+
+// Load the shared build
+@import 'build-lms-v2';
 @import 'base/variables';
-@import 'base/mixins';
-
-// This comment is used by preprocess_assets.py to include resources from a
-// theme, for old-style deprecated theming.
-//<THEME-OVERRIDE>
-
-@import 'build-lms'; // shared app style assets/rendering
 @import "overrides";
+
