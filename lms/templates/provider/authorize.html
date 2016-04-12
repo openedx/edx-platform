@@ -1,59 +1,66 @@
-{% extends "main_django.html" %}
+## mako
 
-{% load scope i18n %}
+<%!
+from django.utils.translation import ugettext as _
+from provider.templatetags.scope import scopes
+from django.core.urlresolvers import reverse
+%>
 
-{% block bodyclass %}oauth2{% endblock %}
+<%inherit file="../main.html"/>
 
-{% block body %}
+<%block name="bodyclass">oauth2</%block>
+
+<%block name="body">
 <div class="authorization-confirmation">
-  {% if not error %}
+  % if not error:
   <p>
-  {% blocktrans with application_name=client.name %}
-    <strong>{{ application_name }}</strong> would like to access your data with the following permissions:
-  {% endblocktrans %}
+  ${_(
+    "<strong>{application_name}</strong> would like to access your data with the following permissions:"
+    .format(application_name=client.name)
+  )}
   </p>
   <ul>
-    {% for permission in oauth_data.scope|scopes %}
+    % for permission in scopes(oauth_data['scope']):
     <li>
-      {% if permission == "openid" %}
-        {% trans "Read your user ID" %}
-      {% elif permission == "profile" %}
-        {% trans "Read your user profile" %}
-      {% elif permission == "email" %}
-        {% trans "Read your email address" %}
-      {% elif permission == "course_staff" %}
-        {% trans "Read the list of courses in which you are a staff member." %}
-      {% elif permission == "course_instructor" %}
-        {% trans "Read the list of courses in which you are an instructor." %}
-      {% elif permission == "permissions" %}
-        {% trans "To see if you are a global staff user" %}
-      {% else %}
-        {% blocktrans %}Manage your data: {{ permission }}{% endblocktrans %}
-      {% endif %}
+      % if permission == "openid":
+        ${_("Read your user ID")}
+      % elif permission == "profile":
+        ${_("Read your user profile")}
+      % elif permission == "email":
+        ${_("Read your email address")}
+      % elif permission == "course_staff":
+        ${_("Read the list of courses in which you are a staff member.")}
+      % elif permission == "course_instructor":
+        ${_("Read the list of courses in which you are an instructor.")}
+      % elif permission == "permissions":
+        ${_("To see if you are a global staff user")}
+      % else:
+        ${_("Manage your data: {permission}".format(permission=permission))}
+      % endif
     </li>
-    {% endfor %}
+    % endfor
   </ul>
-  <form method="post" action="{% url "oauth2:authorize" %}">
-    {% csrf_token %}
-    {{ form.errors }}
-    {{ form.non_field_errors }}
+  <form method="post" action="${reverse('oauth2:authorize')}">
+    ${form.errors}
+    ${form.non_field_errors()}
     <fieldset>
       <div style="display: none;">
         <select type="select" name="scope" multiple="multiple">
-          {% for scope in oauth_data.scope|scopes %}
-          <option value="{{ scope }}" selected="selected">{{ scope }}</option>
-          {% endfor %}
+          % for scope in scopes(oauth_data['scope']):
+          <option value="${scope}" selected="selected">${scope}</option>
+          % endfor
         </select>
       </div>
       <input type="submit" class="btn login large danger" name="cancel" value="Cancel" />
       <input type="submit" class="btn login large primary" name="authorize" value="Authorize" />
     </fieldset>
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}" />
   </form>
-  {% else %}
+  % else:
   <p class="error">
-    {{ error }}
-    {{ error_description }}
+    ${error}
+    ${error_description}
   </p>
-  {% endif %}
+  % endif
 </div>
-{% endblock %}
+</%block>
