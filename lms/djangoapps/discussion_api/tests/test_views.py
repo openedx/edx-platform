@@ -237,6 +237,43 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.author = UserFactory.create()
         self.url = reverse("thread-list")
 
+    def make_expected_thread(self, overrides=None):
+        """
+        Create a sample expected thread for response
+        """
+        thread = {
+            "id": "test_thread",
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "author": "dummy",
+            "author_label": None,
+            "created_at": "1970-01-01T00:00:00Z",
+            "updated_at": "1970-01-01T00:00:00Z",
+            "type": "discussion",
+            "title": "dummy",
+            "raw_body": "dummy",
+            "rendered_body": "<p>dummy</p>",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "read": False,
+            "has_endorsed": False,
+            "response_count": 0,
+        }
+        thread.update(overrides or {})
+        return thread
+
     def test_course_id_missing(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
@@ -255,59 +292,32 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-        source_threads = [{
-            "type": "thread",
+        source_threads = [make_minimal_cs_thread({
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
-            "group_id": None,
             "user_id": str(self.author.id),
             "username": self.author.username,
-            "anonymous": False,
-            "anonymous_to_peers": False,
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
-            "thread_type": "discussion",
             "title": "Test Title",
             "body": "Test body",
-            "pinned": False,
-            "closed": False,
-            "abuse_flaggers": [],
             "votes": {"up_count": 4},
             "comments_count": 5,
             "unread_comments_count": 3,
-            "read": False,
-            "endorsed": False
-        }]
-        expected_threads = [{
-            "id": "test_thread",
-            "course_id": unicode(self.course.id),
-            "topic_id": "test_topic",
-            "group_id": None,
-            "group_name": None,
-            "author": self.author.username,
-            "author_label": None,
+        })]
+        expected_threads = [self.make_expected_thread({
             "created_at": "2015-04-28T00:00:00Z",
             "updated_at": "2015-04-28T11:11:11Z",
-            "type": "discussion",
-            "title": "Test Title",
             "raw_body": "Test body",
             "rendered_body": "<p>Test body</p>",
-            "pinned": False,
-            "closed": False,
-            "following": False,
-            "abuse_flagged": False,
-            "voted": True,
+            "title": "Test Title",
             "vote_count": 4,
             "comment_count": 6,
             "unread_comment_count": 4,
-            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-            "read": False,
-            "has_endorsed": False,
-        }]
+            "voted": True,
+            "author": self.author.username
+        })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
         expected_response = make_paginated_api_response(
@@ -520,6 +530,26 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "per_page": ["10"],
             "sort_order": [query],
         })
+
+    def test_mutually_exclusive(self):
+        """
+        Tests GET thread_list api does not allow filtering on mutually exclusive parameters
+        """
+        self.register_get_user_response(self.user)
+        self.register_get_threads_search_response([], None, num_pages=0)
+        response = self.client.get(self.url, {
+            "course_id": unicode(self.course.id),
+            "text_search": "test search string",
+            "topic_id": "topic1, topic2",
+        })
+        self.assert_response_correct(
+            response,
+            400,
+            {
+                "developer_message": "The following query parameters are mutually exclusive: topic_id, "
+                                     "text_search, following"
+            }
+        )
 
 
 @httpretty.activate
