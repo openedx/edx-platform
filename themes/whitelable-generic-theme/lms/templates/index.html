@@ -5,6 +5,10 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
 
+<%block name="headextra">
+<link rel="stylesheet" type="text/css" href="${static.url('css/slick.css')}"/>
+</%block>
+
 <section class="home">
   <header class="hero-main grid-manual">
     <div class="row">
@@ -14,6 +18,11 @@ from django.core.urlresolvers import reverse
       </div>
     </div>
   </header>
+
+
+
+
+
 
   <%include file="${courses_list}" />
   <%include file="about_site.html" />
@@ -37,6 +46,9 @@ from django.core.urlresolvers import reverse
          }
       })
    </script>
+
+<script type="text/javascript" src="${static.url('js/slick.min.js')}"></script>
+
 </%block>
 
 % if show_signup_immediately is not UNDEFINED:

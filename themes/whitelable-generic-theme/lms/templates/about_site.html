@@ -1,51 +1,78 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<section class="courses-container">
-  <section class="highlighted-courses">
 
-    % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-      <section class="courses">
+<section class="about-section">
 
-        <div class="grid-manual">
-          <div class="row">
-            <div class="col col-8 pre-4">
-              <h2> An Online Gateway to Knowledge </h2>
-            </div>
+  % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+    <div class="about-container">
+
+      <div class="grid-manual">
+        <div class="row">
+          <div class="col col-12 text-center">
+            <h2> An Online Gateway to Knowledge </h2>
           </div>
-
-          <div class="row">
-            <div class="col col-3 pre-1">
-              <div class="courses-listing-item pre-3">
-                <img src="${static.url('images/students.png')}" alt="" style="margin-left: 1%;"/>
-                <p >Students with diverse personel, business and academic background from the US and around the world</p>
-              </div>
-            </div>
-
-            <div class="col col-3">
-              <div class="courses-listing-item pre-3">
-                <img src="${static.url('images/faculty.png')}" alt="" />
-                <p >Faculty who have made the significant contribution to their fields and - in some cases invented them</p>
-              </div>
-            </div>
-
-            <div class="col col-3">
-              <div class="courses-listing-item pre-3">
-                <img src="${static.url('images/courses.png')}" alt="" />
-                <p >Courses representing world-class educational experience delivered through innovative content design</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col col-7 pre-5">
-              <a href="#" class="btn-neutral">View all</a>
-            </div>
-          </div>
-
         </div>
-      </section>
-    % endif
 
-  </section>
+        <div class="row about-list text-center">
+          <div class="col col-4 about-list-item">
+            <div class="">
+              <img src="${static.url('images/students.png')}" alt="" />
+              <p><span>Students</span> with diverse personel, business and academic background from the US and around the world</p>
+            </div>
+          </div>
+          <div class="col col-4 about-list-item">
+            <div class="">
+              <img src="${static.url('images/faculty.png')}" alt="" />
+              <p><span>Faculty</span> who have made the significant contribution to their fields and - in some cases invented them</p>
+            </div>
+          </div>
+          <div class="col col-4 about-list-item">
+            <div class="">
+              <img src="${static.url('images/courses.png')}" alt="" />
+              <p><span>Courses</span> representing world-class educational experience delivered through innovative content design</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-12 text-center">
+            <a href="#" class="btn-neutral">More about this site</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  % endif
+
 </section>
+
+<script>
+
+  $('document').ready(function() {
+
+    var addSlider = $(window).width() < 768;
+    $(".about-list").toggleClass("slidable", addSlider);
+
+    if (addSlider) {
+      $(".about-list").find(".about-list-item").removeClass('col col-4');
+      $(".slidable").slick({
+        nextArrow: '<i class="fa fa-angle-right"></i>',
+        prevArrow: '<i class="fa fa-angle-left"></i>',
+      });
+
+
+
+
+    } else {
+      $(".about-list").find(".about-list-item").addClass('col col-4');
+    }
+
+  });
+
+  $(window).resize(function() {
+    location.reload();
+  });
+
+
+</script>
