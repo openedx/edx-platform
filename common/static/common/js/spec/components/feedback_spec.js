@@ -164,20 +164,18 @@
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
-        setTimeout(function () {
-          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(1);
-          done();
-        }, 500);
+        jasmine.waitUntil(function () {
+          return view.$(".wrapper-prompt" + ':focus').length === 1;
+        }).always(done);
       });
       it("is not focused on hide", function(done) {
         var view;
         view = new PromptView.Confirmation(this.options).hide();
         expect(this.outFocusSpy).toHaveBeenCalled();
 
-        setTimeout(function () {
-          expect(view.$(".wrapper-prompt" + ':focus').length).toBe(0);
-          done();
-        }, 500);
+        jasmine.waitUntil(function () {
+          return view.$(".wrapper-prompt" + ':focus').length === 0;
+        }).always(done);
       });
       it("traps keyboard focus when moving forward", function(done) {
         var view;
@@ -188,10 +186,9 @@
           { keyCode: $.simulate.keyCode.TAB }
         );
 
-        setTimeout(function () {
-          expect(view.$(".action-primary" + ':focus').length).toBe(1);
-          done();
-        }, 500);
+        jasmine.waitUntil(function () {
+          return view.$(".action-primary" + ':focus').length === 1;
+        }).always(done);
       });
       it("traps keyboard focus when moving backward", function(done) {
         var view;
@@ -202,13 +199,11 @@
           { keyCode: $.simulate.keyCode.TAB, shiftKey: true }
         );
 
-        setTimeout(function () {
-          expect(view.$(".action-secondary" + ':focus').length).toBe(1);
-          done();
-        }, 500);
+        jasmine.waitUntil(function () {
+          return view.$(".action-secondary" + ':focus').length === 1;
+        }).always(done);
       });
       return it("changes class on body", function() {
-        // TODO: add expectation here
         var view;
         view = new PromptView.Confirmation({
           title: "Portal",
