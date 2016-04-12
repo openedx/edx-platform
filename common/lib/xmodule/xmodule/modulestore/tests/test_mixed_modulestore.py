@@ -88,7 +88,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         'collection': COLLECTION,
         'asset_collection': ASSET_COLLECTION,
     }
-    MAPPINGS = {}
     OPTIONS = {
         'stores': [
             {
@@ -241,7 +240,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         return self.store.has_changes(self.store.get_item(location))
 
     # pylint: disable=dangerous-default-value
-    def _initialize_mixed(self, mappings=MAPPINGS, contentstore=None):
+    def _initialize_mixed(self, mappings={}, contentstore=None):
         """
         initializes the mixed modulestore.
         """
