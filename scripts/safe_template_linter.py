@@ -548,14 +548,12 @@ class ParseString(object):
             The start index of the first single or double quote, or -1 if
             no quote was found.
         """
-        double_quote_index = template.find('"', start_index, end_index)
-        single_quote_index = template.find("'", start_index, end_index)
-        if 0 <= single_quote_index or 0 <= double_quote_index:
-            if 0 <= single_quote_index and 0 <= double_quote_index:
-                return min(single_quote_index, double_quote_index)
-            else:
-                return max(single_quote_index, double_quote_index)
-        return -1
+        quote_regex = re.compile(r"""['"]""")
+        start_match = quote_regex.search(template, start_index, end_index)
+        if start_match is None:
+            return -1
+        else:
+            return start_match.start()
 
     def _parse_string(self, template, start_index):
         """
@@ -801,7 +799,7 @@ class MakoTemplateLinter(object):
                 close_paren_index = self._find_closing_char_index(
                     None, "(", ")", expression_inner, start_index=len('HTML('), num_open_chars=0, strings=[]
                 )['close_char_index']
-                # check that the close paren is at the end of the expression.
+                # check that the close paren is at the end of the stripped expression.
                 if close_paren_index != len(expression_inner) - 1:
                     results.violations.append(ExpressionRuleViolation(
                         Rules.mako_html_alone, expression
