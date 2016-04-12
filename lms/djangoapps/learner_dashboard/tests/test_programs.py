@@ -43,7 +43,7 @@ class TestProgramListing(
         super(TestProgramListing, self).setUp()
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
-        self.create_programs_config(xseries_ad_enabled=True)
+        self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
 
     def _create_course_and_enroll(self, student, org, course, run):
         """
@@ -120,13 +120,13 @@ class TestProgramListing(
             self.assertIn(program_element, response.content)
 
     def test_get_programs_dashboard_not_enabled(self):
-        self.create_programs_config(enable_student_dashboard=False)
+        self.create_programs_config(program_listing_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("program_listing_view"))
         self.assertEqual(response.status_code, 404)
 
     def test_xseries_advertise_disabled(self):
-        self.create_programs_config(xseries_ad_enabled=False)
+        self.create_programs_config(program_listing_enabled=True, xseries_ad_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("program_listing_view"))
         self.assertEqual(response.status_code, 200)

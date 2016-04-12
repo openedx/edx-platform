@@ -18,6 +18,11 @@ Implementation
 ^^^^^^^^^^^^^^^^^^^^^
 The ``views`` module contains the Django views used to serve the Program listing page. The corresponding Backbone app is in the ``edx-platform/static/js/learner_dashboard``.
 
+Configuration
+^^^^^^^^^^^^^^^^^^^^^
+In order to turn on the Programs tab, you need to update the ``Programs API Config`` object in the lms Django admin. Make sure you set the values ``Enabled``, ``Do we want to show program listing page`` and ``Do we want to show xseries program advertising`` to be true
+
 Profile
 ---------------
 A page allowing learners to see what they have accomplished and view credits or certificates they have earned on the edX platform.
+
