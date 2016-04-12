@@ -3,9 +3,7 @@ Support for inheritance of fields down an XBlock hierarchy.
 """
 from __future__ import absolute_import
 
-from datetime import datetime
 from django.conf import settings
-from pytz import UTC
 
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List

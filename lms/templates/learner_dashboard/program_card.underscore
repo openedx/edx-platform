@@ -1,0 +1,30 @@
+
+<a href="<%- marketingUrl %>" class="card-link">
+    <div class="banner-image-container">
+        <picture>
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.tiny %>)">
+            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
+            <source srcset="<%- largeBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
+            <img class="banner-image" srcset="<%- mediumBannerUrl %>" alt="<%- gettext(name)%>">
+        </picture>
+    </div>
+</a>
+<div class="text-section">
+    <div class="meta-info">
+        <div class="organization">
+            <% _.each(organizations, function(org){ %>
+                <%- gettext(org.display_name) %>
+            <% }); %>
+        </div>
+        <div class="category">
+            <span class="category-text"><%- gettext(type) %></span>
+            <i class="xseries-icon" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="title" aria-hidden="true">
+        <%- gettext(name) %>
+    </div>
+</div>
+<div class="progress">
+</div>

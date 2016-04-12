@@ -3,11 +3,10 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview', 'underscore', 'underscore.string', 'gettext'
+    'js/views/baseview'
 ],
-function(BaseView, _, str, gettext) {
+function(BaseView) {
     'use strict';
-    _.str = str; // used in template
     var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {

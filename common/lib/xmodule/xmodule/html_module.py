@@ -439,7 +439,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
             return self.data
         else:
             course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-            course_updates.sort(key=lambda item: datetime.strptime(item['date'], '%B %d, %Y'), reverse=True)
+            course_updates.sort(key=lambda item: CourseInfoModule.safe_parse_date(item['date']), reverse=True)
 
             context = {
                 'visible_updates': course_updates[:3],
@@ -447,6 +447,16 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
             }
 
             return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
+
+    @staticmethod
+    def safe_parse_date(date):
+        """
+        Since this is used solely for ordering purposes, use today's date as a default
+        """
+        try:
+            return datetime.strptime(date, '%B %d, %Y')
+        except ValueError:  # occurs for ill-formatted date values
+            return datetime.today()
 
 
 @XBlock.tag("detached")

@@ -15,7 +15,6 @@ from django.utils.translation import override as override_language
 from nose.plugins.attrib import attr
 from ccx_keys.locator import CCXLocator
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory

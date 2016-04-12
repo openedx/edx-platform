@@ -1628,8 +1628,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         Verify that certificates generated for all eligible students enrolled in a course.
         """
         # create 10 students
-        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
-                    for i in xrange(1, 11)]
+        students = self._create_students(10)
 
         # mark 2 students to have certificates generated already
         for student in students[:2]:
@@ -1644,31 +1643,149 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[2:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-        current_task = Mock()
-        current_task.update_state = Mock()
-        instructor_task = Mock()
-        instructor_task.task_input = json.dumps({'students': None})
+        task_input = {'student_set': None}
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 8,
+            'succeeded': 5,
+            'failed': 3,
+            'skipped': 2
+        }
+
         with self.assertNumQueries(214):
-            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
-                mock_current_task.return_value = current_task
-                with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-                    mock_queue.return_value = (0, "Successfully queued")
-                    with patch('instructor_task.models.InstructorTask.objects.get') as instructor_task_object:
-                        instructor_task_object.return_value = instructor_task
-                        result = generate_students_certificates(
-                            None, None, self.course.id, {}, 'certificates generated'
-                        )
-        self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 8,
-                'succeeded': 5,
-                'failed': 3,
-                'skipped': 2
-            },
-            result
+            self.assertCertificatesGenerated(task_input, expected_results)
+
+    def test_certificate_generation_all_whitelisted(self):
+        """
+        Verify that certificates generated for all white-listed students when using semantic task_input as
+        `all_whitelisted`.
+        """
+        # create 5 students
+        students = self._create_students(5)
+
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        task_input = {'student_set': 'all_whitelisted'}
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 5,
+            'attempted': 5,
+            'succeeded': 5,
+            'failed': 0,
+            'skipped': 0
+        }
+        self.assertCertificatesGenerated(task_input, expected_results)
+
+    def test_certificate_generation_whitelist_already_generated(self):
+        """
+        Verify that certificates generated for all white-listed students having certifcates already when using
+        semantic task_input as `all_whitelisted`.
+        """
+        # create 5 students
+        students = self._create_students(5)
+
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        # mark 5 students to have certificates generated already
+        for student in students:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        task_input = {'student_set': 'all_whitelisted'}
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 5,
+            'attempted': 5,
+            'succeeded': 5,
+            'failed': 0,
+            'skipped': 0
+        }
+        self.assertCertificatesGenerated(task_input, expected_results)
+
+    def test_certificate_generation_whitelisted_not_generated(self):
+        """
+        Verify that certificates only generated for those students which does not have certificates yet when
+        using semantic task_input as `whitelisted_not_generated`.
+        """
+        # create 5 students
+        students = self._create_students(5)
+
+        # mark 2 students to have certificates generated already
+        for student in students[:2]:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        task_input = {'student_set': 'whitelisted_not_generated'}
+
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 3,
+            'attempted': 3,
+            'succeeded': 3,
+            'failed': 0,
+            'skipped': 0
+        }
+        self.assertCertificatesGenerated(
+            task_input,
+            expected_results
         )
+
+    def test_certificate_generation_specific_student(self):
+        """
+        Tests generating a certificate for a specific student.
+        """
+        student = self.create_student(username="Hamnet", email="ham@ardenforest.co.uk")
+        CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+        task_input = {
+            'student_set': 'specific_student',
+            'specific_student_id': student.id
+        }
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 1,
+            'attempted': 1,
+            'succeeded': 1,
+            'failed': 0,
+            'skipped': 0,
+        }
+        self.assertCertificatesGenerated(task_input, expected_results)
+
+    def test_specific_student_not_enrolled(self):
+        """
+        Tests generating a certificate for a specific student if that student
+        is not enrolled in the course.
+        """
+        student = self.create_student(username="jacques", email="antlers@ardenforest.co.uk")
+        task_input = {
+            'student_set': 'specific_student',
+            'specific_student_id': student.id
+        }
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 1,
+            'attempted': 1,
+            'succeeded': 0,
+            'failed': 1,
+            'skipped': 0,
+        }
+        self.assertCertificatesGenerated(task_input, expected_results)
 
     def test_certificate_regeneration_for_statuses_to_regenerate(self):
         """
@@ -1676,8 +1793,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
         """
         # create 10 students
-        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
-                    for i in xrange(1, 11)]
+        students = self._create_students(10)
 
         # mark 2 students to have certificates generated already
         for student in students[:2]:
@@ -1710,31 +1826,22 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-        current_task = Mock()
-        current_task.update_state = Mock()
-
         # Certificates should be regenerated for students having generated certificates with status
         # 'downloadable' or 'error' which are total of 5 students in this test case
         task_input = {'statuses_to_regenerate': [CertificateStatuses.downloadable, CertificateStatuses.error]}
 
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
-            mock_current_task.return_value = current_task
-            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-                mock_queue.return_value = (0, "Successfully queued")
-                result = generate_students_certificates(
-                    None, None, self.course.id, task_input, 'certificates generated'
-                )
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 5,
+            'succeeded': 5,
+            'failed': 0,
+            'skipped': 5
+        }
 
-        self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 5,
-                'succeeded': 5,
-                'failed': 0,
-                'skipped': 5
-            },
-            result
+        self.assertCertificatesGenerated(
+            task_input,
+            expected_results
         )
 
     def test_certificate_regeneration_with_expected_failures(self):
@@ -1746,8 +1853,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         default_grade = '-1'
 
         # create 10 students
-        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
-                    for i in xrange(1, 11)]
+        students = self._create_students(10)
 
         # mark 2 students to have certificates generated already
         for student in students[:2]:
@@ -1796,32 +1902,21 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-        current_task = Mock()
-        current_task.update_state = Mock()
-
         # Regenerated certificates for students having generated certificates with status
         # 'deleted' or 'generating'
         task_input = {'statuses_to_regenerate': [CertificateStatuses.deleted, CertificateStatuses.generating]}
 
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
-            mock_current_task.return_value = current_task
-            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-                mock_queue.return_value = (0, "Successfully queued")
-                result = generate_students_certificates(
-                    None, None, self.course.id, task_input, 'certificates generated'
-                )
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 5,
+            'succeeded': 2,
+            'failed': 3,
+            'skipped': 5
+        }
 
-        self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 5,
-                'succeeded': 2,
-                'failed': 3,
-                'skipped': 5
-            },
-            result
-        )
+        self.assertCertificatesGenerated(task_input, expected_results)
+
         generated_certificates = GeneratedCertificate.eligible_certificates.filter(
             user__in=students,
             course_id=self.course.id,
@@ -1852,8 +1947,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         default_grade = '-1'
 
         # create 10 students
-        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
-                    for i in xrange(1, 11)]
+        students = self._create_students(10)
 
         # mark 2 students to have certificates generated already
         for student in students[:2]:
@@ -1899,9 +1993,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[:]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-        current_task = Mock()
-        current_task.update_state = Mock()
-
         # Regenerated certificates for students having generated certificates with status
         # 'downloadable', 'error' or 'generating'
         task_input = {
@@ -1912,24 +2003,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             ]
         }
 
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
-            mock_current_task.return_value = current_task
-            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-                mock_queue.return_value = (0, "Successfully queued")
-                result = generate_students_certificates(
-                    None, None, self.course.id, task_input, 'certificates generated'
-                )
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 8,
+            'succeeded': 8,
+            'failed': 0,
+            'skipped': 2
+        }
 
-        self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 8,
-                'succeeded': 8,
-                'failed': 0,
-                'skipped': 2
-            },
-            result
+        self.assertCertificatesGenerated(
+            task_input,
+            expected_results
         )
 
         generated_certificates = GeneratedCertificate.eligible_certificates.filter(
@@ -1963,8 +2048,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         Verify that certificates are regenerated for all students passed in task_input.
         """
         # create 10 students
-        students = [self.create_student(username='student_{}'.format(i), email='student_{}@example.com'.format(i))
-                    for i in xrange(1, 11)]
+        students = self._create_students(10)
 
         # mark 2 students to have certificates generated already
         for student in students[:2]:
@@ -2006,12 +2090,27 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-        current_task = Mock()
-        current_task.update_state = Mock()
-
         # Certificates should be regenerated for students having generated certificates with status
         # 'downloadable' or 'error' which are total of 5 students in this test case
-        task_input = {'students': [student.id for student in students]}
+        task_input = {'student_set': "all_whitelisted"}
+
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 7,
+            'attempted': 7,
+            'succeeded': 7,
+            'failed': 0,
+            'skipped': 0,
+        }
+
+        self.assertCertificatesGenerated(task_input, expected_results)
+
+    def assertCertificatesGenerated(self, task_input, expected_results):
+        """
+        Generate certificates for the given task_input and compare with expected_results.
+        """
+        current_task = Mock()
+        current_task.update_state = Mock()
 
         with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
@@ -2022,16 +2121,21 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 )
 
         self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 10,
-                'succeeded': 7,
-                'failed': 3,
-                'skipped': 0,
-            },
+            expected_results,
             result
         )
+
+    def _create_students(self, number_of_students):
+        """
+        Create Students for course.
+        """
+        return [
+            self.create_student(
+                username='student_{}'.format(index),
+                email='student_{}@example.com'.format(index)
+            )
+            for index in xrange(number_of_students)
+        ]
 
 
 class TestInstructorOra2Report(SharedModuleStoreTestCase):

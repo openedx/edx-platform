@@ -23,7 +23,8 @@ nav {
 // ====================
 
 // skip navigation
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @include font-size(13);
   display: inline-block;
   position: absolute;

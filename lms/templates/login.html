@@ -220,7 +220,14 @@ from third_party_auth import provider, pipeline
 
     % for enabled in provider.Registry.accepting_logins():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary button-${enabled.provider_id} login-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.provider_id]}');"><span class="icon fa ${enabled.icon_class}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.name)}</button>
+      <button type="submit" class="button button-primary button-${enabled.provider_id} login-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.provider_id]}');">
+        % if enabled.icon_class:
+        <span class="icon fa ${enabled.icon_class}" aria-hidden="true"></span>
+        % else:
+        <span class="icon" aria-hidden="true"><img class="icon-image" src="${enabled.icon_image.url}" alt="${enabled.name} icon" /></span>
+        % endif
+        ${_('Sign in with {provider_name}').format(provider_name=enabled.name)}
+      </button>
     % endfor
 
     </div>

@@ -1,6 +1,6 @@
 """ Tests for course_team reindex command """
+
 import ddt
-import mock
 
 from mock import patch
 from django.core.management import call_command, CommandError

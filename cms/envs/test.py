@@ -325,6 +325,5 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
-# API access management. Necessary so that django-simple-history
-# doesn't break when running pre-test migrations.
+# API access management -- needed for simple-history to run.
 INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)

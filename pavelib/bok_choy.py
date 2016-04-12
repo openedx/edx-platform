@@ -30,7 +30,8 @@ BOKCHOY_OPTS = [
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
     make_option("--pdb", action="store_true", help="Drop into debugger on failures or errors"),
-    make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version")
+    make_option("--skip_firefox_version_validation", action='store_false', dest="validate_firefox_version"),
+    make_option("--save_screenshots", action='store_true', dest="save_screenshots"),
 ]
 
 
@@ -52,6 +53,7 @@ def parse_bokchoy_opts(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'pdb': getattr(options, 'pdb', False),
         'test_dir': getattr(options, 'test_dir', 'tests'),
+        'save_screenshots': getattr(options, 'save_screenshots', False),
     }
 
 

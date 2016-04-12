@@ -666,6 +666,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
         self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
 
+        self.assertFalse(self.course.self_paced)
         self.assert_category_map_equals(
             {
                 "entries": {},
@@ -696,7 +697,102 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 "children": ["Chapter 1", "Chapter 2"]
             }
         )
-        self.maxDiff = None
+
+    def test_self_paced_start_date_filter(self):
+        self.course.self_paced = True
+        self.course.save()
+
+        now = datetime.datetime.now()
+        later = datetime.datetime.max
+        self.create_discussion("Chapter 1", "Discussion 1", start=now)
+        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 2", "Discussion", start=now)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+
+        self.assertTrue(self.course.self_paced)
+        self.assert_category_map_equals(
+            {
+                "entries": {},
+                "subcategories": {
+                    "Chapter 1": {
+                        "entries": {
+                            "Discussion 1": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            },
+                            "Discussion 2": {
+                                "id": "discussion2",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            }
+                        },
+                        "subcategories": {},
+                        "children": ["Discussion 1", "Discussion 2"]
+                    },
+                    "Chapter 2": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion3",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            }
+                        },
+                        "subcategories": {
+                            "Section 1": {
+                                "entries": {},
+                                "subcategories": {
+                                    "Subsection 1": {
+                                        "entries": {
+                                            "Discussion": {
+                                                "id": "discussion4",
+                                                "sort_key": None,
+                                                "is_cohorted": False,
+                                            }
+                                        },
+                                        "subcategories": {},
+                                        "children": ["Discussion"]
+                                    },
+                                    "Subsection 2": {
+                                        "entries": {
+                                            "Discussion": {
+                                                "id": "discussion5",
+                                                "sort_key": None,
+                                                "is_cohorted": False,
+                                            }
+                                        },
+                                        "subcategories": {},
+                                        "children": ["Discussion"]
+                                    }
+                                },
+                                "children": ["Subsection 1", "Subsection 2"]
+                            }
+                        },
+                        "children": ["Discussion", "Section 1"]
+                    },
+                    "Chapter 3": {
+                        "entries": {},
+                        "subcategories": {
+                            "Section 1": {
+                                "entries": {
+                                    "Discussion": {
+                                        "id": "discussion6",
+                                        "sort_key": None,
+                                        "is_cohorted": False,
+                                    }
+                                },
+                                "subcategories": {},
+                                "children": ["Discussion"]
+                            }
+                        },
+                        "children": ["Section 1"]
+                    }
+                },
+                "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
+            }
+        )
 
     def test_sort_inline_explicit(self):
         self.create_discussion("Chapter", "Discussion 1", sort_key="D")
