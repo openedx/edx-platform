@@ -34,7 +34,7 @@ define([
             it('should load the xseries advertising based on passed in xseries URL', function() {
                 var $sidebar = view.$el;
                 expect($sidebar.find('.program-advertise .advertise-message').html().trim())
-                    .toEqual('Browse recently launched courses and see what\'s new in our favorite subjects');
+                    .toEqual('Browse recently launched courses and see what\'s new in your favorite subjects');
                 expect($sidebar.find('.program-advertise .ad-link a').attr('href')).toEqual(context.xseriesUrl);
             });
 
