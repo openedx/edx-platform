@@ -244,7 +244,7 @@ class Rules(Enum):
     )
     mako_wrap_html = (
         'mako-wrap-html',
-        "String containg HTML should be wrapped with call to HTML()."
+        "String containing HTML should be wrapped with call to HTML()."
     )
     underscore_not_escaped = (
         'underscore-not-escaped',
@@ -785,12 +785,6 @@ class MakoTemplateLinter(object):
         """
         Checks rules related to proper use of HTML() and Text().
 
-        Rule 1: If HTML() is called, the expression must begin with Text(), or
-        Rule 2: If HTML() is called alone, it must be the only call.
-        Rule 3: Both HTML() and Text() must be closed before any call to
-            format().
-        Rule 4: Using Text() without HTML() is unnecessary.
-
         Arguments:
             expression: A dict containing the start_index, end_index, and
                 expression (text) of the expression.
@@ -804,7 +798,9 @@ class MakoTemplateLinter(object):
         template_inner_start_index = expression['start_index'] + expression['expression'].find(expression_inner)
         if 'HTML(' in expression_inner:
             if expression_inner.startswith('HTML('):
-                close_paren_index = self._find_closing_char_index(None, "(", ")", expression_inner, start_index=len('HTML('), num_open_chars=0, strings=[])['close_char_index']
+                close_paren_index = self._find_closing_char_index(
+                    None, "(", ")", expression_inner, start_index=len('HTML('), num_open_chars=0, strings=[]
+                )['close_char_index']
                 # check that the close paren is at the end of the expression.
                 if close_paren_index != len(expression_inner) - 1:
                     results.violations.append(ExpressionRuleViolation(
@@ -821,9 +817,11 @@ class MakoTemplateLinter(object):
                 ))
 
         # strings to be checked for HTML
-        check_html_strings = expression['strings']
-        for match in re.finditer("(HTML\(|Text\()", expression_inner):
-            result = self._find_closing_char_index(None, "(", ")", expression_inner, start_index=match.end(), num_open_chars=0, strings=[])
+        unwrapped_html_strings = expression['strings']
+        for match in re.finditer(r"(HTML\(|Text\()", expression_inner):
+            result = self._find_closing_char_index(
+                None, "(", ")", expression_inner, start_index=match.end(), num_open_chars=0, strings=[]
+            )
             close_paren_index = result['close_char_index']
             if 0 <= close_paren_index:
                 # the argument sent to HTML() or Text()
@@ -834,16 +832,15 @@ class MakoTemplateLinter(object):
                     ))
                 if match.group() == "HTML(":
                     # remove expression strings wrapped in HTML()
-                    for string in check_html_strings:
+                    for string in list(unwrapped_html_strings):
                         html_inner_start_index = template_inner_start_index + match.end()
                         html_inner_end_index = template_inner_start_index + close_paren_index
                         if html_inner_start_index <= string.start_index and string.end_index <= html_inner_end_index:
-                            check_html_strings.remove(string)
-                            break
+                            unwrapped_html_strings.remove(string)
 
         # check strings not wrapped in HTML()
-        for string in check_html_strings:
-            if string.string_inner.startswith("<") or string.string_inner.endswith(">"):
+        for string in unwrapped_html_strings:
+            if '<' in string.string_inner:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_wrap_html, expression
                 ))
@@ -999,7 +996,10 @@ class MakoTemplateLinter(object):
             if start_index < 0:
                 break
 
-            result = self._find_closing_char_index(start_delim, '{', '}', mako_template, start_index=start_index + len(start_delim), num_open_chars=0, strings=[])
+            result = self._find_closing_char_index(
+                start_delim, '{', '}', mako_template, start_index=start_index + len(start_delim),
+                num_open_chars=0, strings=[]
+            )
             close_char_index = result['close_char_index']
             if close_char_index < 0:
                 expression = None
@@ -1019,7 +1019,9 @@ class MakoTemplateLinter(object):
 
         return expressions
 
-    def _find_closing_char_index(self, start_delim, open_char, close_char, template, start_index, num_open_chars, strings):
+    def _find_closing_char_index(
+            self, start_delim, open_char, close_char, template, start_index, num_open_chars, strings
+    ):
         """
         Finds the index of the closing char that matches the opening char.
 
@@ -1056,7 +1058,10 @@ class MakoTemplateLinter(object):
             if parse_string.end_index < 0:
                 return unparseable_result
             else:
-                return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=parse_string.end_index, num_open_chars=num_open_chars, strings=strings)
+                return self._find_closing_char_index(
+                    start_delim, open_char, close_char, template, start_index=parse_string.end_index,
+                    num_open_chars=num_open_chars, strings=strings
+                )
 
         if 0 <= open_char_index < close_char_index:
             if start_delim is not None:
@@ -1064,7 +1069,10 @@ class MakoTemplateLinter(object):
                 start_delim_index = template.find(start_delim, start_index, close_char_index)
                 if 0 <= start_delim_index < open_char_index:
                     return unparseable_result
-            return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=open_char_index + 1, num_open_chars=num_open_chars + 1, strings=strings)
+            return self._find_closing_char_index(
+                start_delim, open_char, close_char, template, start_index=open_char_index + 1,
+                num_open_chars=num_open_chars + 1, strings=strings
+            )
 
         if num_open_chars == 0:
             return {
@@ -1072,7 +1080,10 @@ class MakoTemplateLinter(object):
                 'strings': strings,
             }
         else:
-            return self._find_closing_char_index(start_delim, open_char, close_char, template, start_index=close_char_index + 1, num_open_chars=num_open_chars - 1, strings=strings)
+            return self._find_closing_char_index(
+                start_delim, open_char, close_char, template, start_index=close_char_index + 1,
+                num_open_chars=num_open_chars - 1, strings=strings
+            )
 
 
 class UnderscoreTemplateLinter(object):

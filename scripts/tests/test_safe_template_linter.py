@@ -214,7 +214,29 @@ class TestMakoTemplateLinter(TestCase):
             'rule': Rules.mako_wrap_html
         },
         {
+            'expression':
+                textwrap.dedent("""
+                    ${Text(_("String with multiple lines "
+                        "{link_start}unenroll{link_end} "
+                        "and final line")).format(
+                            link_start=HTML(
+                                '<a id="link__over_multiple_lines" '
+                                'data-course-id="{course_id}" '
+                                'href="#test-modal">'
+                            ).format(
+                                course_id=course_overview.id
+                            ),
+                            link_end=HTML('</a>'),
+                    )}
+                """),
+            'rule': None
+        },
+        {
             'expression': "${'<span></span>'}",
+            'rule': Rules.mako_wrap_html
+        },
+        {
+            'expression': "${'Embedded HTML <strong></strong>'}",
             'rule': Rules.mako_wrap_html
         },
         {
@@ -529,7 +551,6 @@ class TestMakoTemplateLinter(TestCase):
         Test _parse_string helper
         """
         linter = MakoTemplateLinter()
-
 
         parse_string = ParseString(data['template'], data['result']['start_index'], len(data['template']))
         string_dict = {
