@@ -117,23 +117,23 @@ class Env(object):
     # TODO:  Store this as a dict. Order seems to matter for some
     # reason. See issue TE-415.
     JS_TEST_ID_FILES = [
-        REPO_ROOT / 'lms/static/js_test.yml',
-        REPO_ROOT / 'lms/static/js_test_coffee.yml',
-        REPO_ROOT / 'cms/static/js_test.yml',
-        REPO_ROOT / 'cms/static/js_test_squire.yml',
-        REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
+        # REPO_ROOT / 'lms/static/js_test.yml',
+        # REPO_ROOT / 'lms/static/js_test_coffee.yml',
+        # REPO_ROOT / 'cms/static/js_test.yml',
+        # REPO_ROOT / 'cms/static/js_test_squire.yml',
+        # REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
         REPO_ROOT / 'common/static/js_test.yml',
-        REPO_ROOT / 'common/static/js_test_requirejs.yml',
+        # REPO_ROOT / 'common/static/js_test_requirejs.yml',
     ]
 
     JS_TEST_ID_KEYS = [
-        'lms',
-        'lms-coffee',
-        'cms',
-        'cms-squire',
-        'xmodule',
+        # 'lms',
+        # 'lms-coffee',
+        # 'cms',
+        # 'cms-squire',
+        # 'xmodule',
         'common',
-        'common-requirejs'
+        # 'common-requirejs'
     ]
 
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
