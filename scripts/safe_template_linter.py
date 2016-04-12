@@ -246,6 +246,10 @@ class Rules(Enum):
         'mako-wrap-html',
         "String containing HTML should be wrapped with call to HTML()."
     )
+    mako_html_entities = (
+        'mako-html-entities',
+        "HTML entities should be plain text or wrapped with HTML()."
+    )
     underscore_not_escaped = (
         'underscore-not-escaped',
         'Expressions should be escaped using <%- expression %>.'
@@ -761,7 +765,7 @@ class MakoTemplateLinter(object):
             context = self._get_context(contexts, expression['start_index'])
             self._check_filters(mako_template, expression, context, has_page_default, results)
             self._check_deprecated_display_name(expression, results)
-            self._check_html_and_text(expression, results)
+            self._check_html_and_text(expression, has_page_default, results)
 
     def _check_deprecated_display_name(self, expression, results):
         """
@@ -779,13 +783,15 @@ class MakoTemplateLinter(object):
                 Rules.mako_deprecated_display_name, expression
             ))
 
-    def _check_html_and_text(self, expression, results):
+    def _check_html_and_text(self, expression, has_page_default, results):
         """
         Checks rules related to proper use of HTML() and Text().
 
         Arguments:
             expression: A dict containing the start_index, end_index, and
                 expression (text) of the expression.
+            has_page_default: True if the page is marked as default, False
+                otherwise.
             results: A list of results into which violations will be added.
 
         """
@@ -836,13 +842,21 @@ class MakoTemplateLinter(object):
                         if html_inner_start_index <= string.start_index and string.end_index <= html_inner_end_index:
                             unwrapped_html_strings.remove(string)
 
-        # check strings not wrapped in HTML()
+        # check strings not wrapped in HTML() for '<'
         for string in unwrapped_html_strings:
             if '<' in string.string_inner:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_wrap_html, expression
                 ))
                 break
+        # check strings not wrapped in HTML() for HTML entities
+        if has_page_default:
+            for string in unwrapped_html_strings:
+                if re.search(r"&[#]?[a-zA-Z0-9]+;", string.string_inner):
+                    results.violations.append(ExpressionRuleViolation(
+                        Rules.mako_html_entities, expression
+                    ))
+                    break
 
     def _check_filters(self, mako_template, expression, context, has_page_default, results):
         """
