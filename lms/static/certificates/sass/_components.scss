@@ -216,7 +216,7 @@ div.signatory h4.hd-5 {
     position: relative;
     top: -(spacing-vertical(base));
     border: 2rem solid #172D32;
-    background: #fff url("/static/images/bdu_book.png") center no-repeat;
+    background: #fff url("http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png") center no-repeat;
     background-size: 90%;
 
     // type
@@ -490,9 +490,9 @@ p.accomplishment-statement-lead span.copy {
     }
 
     .accomplishment-rendering {
-     	background: palette(grayscale, white-t) url('/static/images/bdu_book.png') center no-repeat;
+     	background: palette(grayscale, white-t) url('http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png') center no-repeat;
         background-size: 80%;
-	
+
 	.accomplishment-type {
             margin-top: 0;
         }
@@ -517,7 +517,7 @@ p.accomplishment-statement-lead span.copy {
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('/static/images/bdu_book.png') center no-repeat;
+        background: palette(grayscale, white-t) url('http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png') center no-repeat;
         background-size: 80%;
 
         .deco-corner-tl {
