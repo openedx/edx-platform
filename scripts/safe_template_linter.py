@@ -874,8 +874,8 @@ class MakoTemplateLinter(object):
 
         filters = filters_match.group()[1:-1].replace(" ", "").split(",")
         if (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'unicode'):
-                # {x | n, unicode} is valid in any context
-                pass
+            # {x | n, unicode} is valid in any context
+            pass
         elif context == 'html':
             if (len(filters) == 1) and (filters[0] == 'h'):
                 if has_page_default:
@@ -1053,7 +1053,14 @@ class MakoTemplateLinter(object):
         open_char_index = template.find(open_char, start_index, close_char_index)
         parse_string = ParseString(template, start_index, close_char_index)
 
+        valid_index_list = [close_char_index]
+        if 0 <= open_char_index:
+            valid_index_list.append(open_char_index)
         if 0 <= parse_string.start_index:
+            valid_index_list.append(parse_string.start_index)
+        min_valid_index = min(valid_index_list)
+
+        if parse_string.start_index == min_valid_index:
             strings.append(parse_string)
             if parse_string.end_index < 0:
                 return unparseable_result
@@ -1063,7 +1070,7 @@ class MakoTemplateLinter(object):
                     num_open_chars=num_open_chars, strings=strings
                 )
 
-        if 0 <= open_char_index < close_char_index:
+        if open_char_index == min_valid_index:
             if start_delim is not None:
                 # if we find another starting delim, consider this unparseable
                 start_delim_index = template.find(start_delim, start_index, close_char_index)

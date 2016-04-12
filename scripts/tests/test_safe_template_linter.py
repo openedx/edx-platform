@@ -248,6 +248,10 @@ class TestMakoTemplateLinter(TestCase):
             'rule': None
         },
         {
+            'expression': "${HTML(render_entry(map['entries'], child))}",
+            'rule': None
+        },
+        {
             'expression': "${ HTML('<span></span>') + 'some other text' }",
             'rule': Rules.mako_html_alone
         },
