@@ -20,18 +20,11 @@ class JsTestSuite(TestSuite):
         super(JsTestSuite, self).__init__(*args, **kwargs)
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')
-        self.port = kwargs.get('port')
-        suite = args[0]
-
-        try:
-            self.test_id = (Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.root)])
-        except ValueError:
-            self.test_id = ' '.join(Env.JS_TEST_CONFIG_FILES)
-
-        self.root = self.root + ' javascript'
         self.report_dir = Env.JS_REPORT_DIR
-        self.coverage_report = self.report_dir / 'coverage-{suite}.xml'.format(suite=suite)
-        self.xunit_report = self.report_dir / 'javascript_xunit-{suite}.xml'.format(suite=suite)
+        self.opts = kwargs
+
+        suite = args[0]
+        self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
 
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
@@ -49,21 +42,44 @@ class JsTestSuite(TestSuite):
         assets.compile_coffeescript("`find lms cms common -type f -name \"*.coffee\"`")
 
     @property
+    def _default_subsuites(self):
+        return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS]
+
+
+class JsTestSubSuite(TestSuite):
+    """
+    JS Test suites lms, lms-coffee etc.
+    """
+    def __init__(self, *args, **kwargs):
+        super(JsTestSubSuite, self).__init__(*args, **kwargs)
+        self.test_id = args[0]
+        self.run_under_coverage = kwargs.get('with_coverage', True)
+        self.mode = kwargs.get('mode', 'run')
+        self.port = kwargs.get('port')
+        self.root = self.root + ' javascript'
+        self.report_dir = Env.JS_REPORT_DIR
+
+        try:
+            self.test_conf_file = Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.test_id)]
+        except ValueError:
+            self.test_conf_file = Env.JS_TEST_CONFIG_FILES[0]
+
+        self.coverage_report = self.report_dir / 'coverage-{suite}.xml'.format(suite=self.test_id)
+        self.xunit_report = self.report_dir / 'javascript_xunit-{suite}.xml'.format(suite=self.test_id)
+
+    @property
     def cmd(self):
         """
         Run the tests using karma runner.
         """
         cmd = (
-            "karma start {test_id} --single-run={single_run} --capture-timeout=60000 "
+            "karma start {test_conf_file} --single-run={single_run} --capture-timeout=60000 "
             "--junitreportpath={xunit_report}".format(
                 single_run='false' if self.mode == 'dev' else 'true',
-                test_id=self.test_id,
+                test_conf_file=self.test_conf_file,
                 xunit_report=self.xunit_report,
             )
         )
-
-        if self.mode == 'dev':
-            cmd += " --browsers=Chrome"
 
         if self.port:
             cmd += " --port {port}".format(port=self.port)

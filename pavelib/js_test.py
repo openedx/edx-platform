@@ -48,13 +48,8 @@ def test_js(options):
         )
         return
 
-    suites = Env.JS_TEST_ID_KEYS if suite == 'all' else [suite]
-    for suite in suites:
-        try:
-            test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
-            test_suite.run()
-        except SystemExit as e:
-            print(e)
+    test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
+    test_suite.run()
 
 
 @task
