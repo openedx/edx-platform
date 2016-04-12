@@ -31,7 +31,7 @@
                     className: this.type  + '-container',
                     itemViewClass: this.itemViewClass
                 });
-                this.listView = new ItemListView({collection: this.options.collection});
+                this.listView = new ItemListView({collection: this.collection});
                 this.headerView = this.createHeaderView();
                 this.footerView = this.createFooterView();
                 this.collection.on('page_changed', function () {
@@ -46,12 +46,12 @@
             paginationLabel: gettext("Pagination"),
 
             createHeaderView: function() {
-                return new PagingHeader({collection: this.options.collection, srInfo: this.srInfo});
+                return new PagingHeader({collection: this.collection, srInfo: this.srInfo});
             },
 
             createFooterView: function() {
                 return new PagingFooter({
-                    collection: this.options.collection, hideWhenOnePage: true,
+                    collection: this.collection, hideWhenOnePage: true,
                     paginationLabel: this.paginationLabel
                 });
             },
