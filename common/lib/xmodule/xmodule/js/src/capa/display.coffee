@@ -49,8 +49,6 @@ class @Problem
       window.globalTooltipManager.hide()
 
     @bindResetCorrectness()
-    if @checkButton.length
-      @checkAnswersAndCheckButton true
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -453,58 +451,6 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
-
-  checkAnswersAndCheckButton: (bind=false) =>
-    # Used to check available answers and if something is checked (or the answer is set in some textbox)
-    # "Check"/"Final check" button becomes enabled. Otherwise it is disabled by default.
-    # params:
-    #   'bind' used on the first check to attach event handlers to input fields
-    #     to change "Check"/"Final check" enable status in case of some manipulations with answers
-    answered = true
-
-    at_least_one_text_input_found = false
-    one_text_input_filled = false
-    @el.find("input:text").each (i, text_field) =>
-      at_least_one_text_input_found = true
-      if $(text_field).is(':visible')
-        if $(text_field).val() isnt ''
-          one_text_input_filled = true
-        if bind
-          $(text_field).on 'input', (e) =>
-            @checkAnswersAndCheckButton()
-            return
-          return
-    if at_least_one_text_input_found and not one_text_input_filled
-      answered = false
-
-    @el.find(".choicegroup").each (i, choicegroup_block) =>
-      checked = false
-      $(choicegroup_block).find("input[type=checkbox], input[type=radio]").each (j, checkbox_or_radio) =>
-        if $(checkbox_or_radio).is(':checked')
-          checked = true
-        if bind
-          $(checkbox_or_radio).on 'click', (e) =>
-            @checkAnswersAndCheckButton()
-            return
-          return
-      if not checked
-        answered = false
-        return
-
-    @el.find("select").each (i, select_field) =>
-      selected_option = $(select_field).find("option:selected").text().trim()
-      if selected_option is ''
-        answered = false
-      if bind
-        $(select_field).on 'change', (e) =>
-          @checkAnswersAndCheckButton()
-          return
-        return
-
-    if answered
-      @enableCheckButton true
-    else
-      @enableCheckButton false, false
 
   bindResetCorrectness: ->
     # Loop through all input types
