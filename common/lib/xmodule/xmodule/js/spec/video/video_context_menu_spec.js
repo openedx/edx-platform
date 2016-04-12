@@ -50,13 +50,6 @@
             // $.cookie is mocked, make sure we have a state with an unmuted volume.
             $.cookie.and.returnValue('100');
             jasmine.addMatchers({
-                toBeFocused: function () {
-                    return {
-                        compare: function (actual) {
-                            return { pass: $(actual)[0] === $(actual)[0].ownerDocument.activeElement };
-                        }
-                    };
-                },
                 toHaveCorrectLabels: function () {
                     return {
                         compare: function (actual, labelsList) {

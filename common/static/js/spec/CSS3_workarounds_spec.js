@@ -21,12 +21,7 @@ describe("CSS3 workarounds", function() {
 		});
 
 		it("should prevent default when pointerEvents is not Supported", function() {
-			// mock document.body.style so it does not include 'pointerEvents'
-			if ("pointerEvents" in document.body.style) {
-				delete document.body.style.pointerEvents;
-			}
-
-			pointerEventsNone(".is-disabled", document.body.style);
+			pointerEventsNone(".is-disabled", {});
 			spyOnEvent(".is-disabled", "click");
 			$(".is-disabled").click();
 			expect("click").toHaveBeenPreventedOn(".is-disabled");

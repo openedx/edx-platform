@@ -37,39 +37,6 @@
               };
             }
           };
-        },
-        toContainText: function() {
-          return {
-            compare: function (text) {
-              var trimmedText,
-                  passed;
-
-              trimmedText = $.trim(this.actual.text());
-              if (text && $.isFunction(text.test)) {
-                passed = text.test(trimmedText);
-              } else {
-                passed = trimmedText.indexOf(text) !== -1;
-              }
-              return {
-                pass: passed
-              };
-            }
-          };
-        },
-        toHaveBeenPrevented: function() {
-          return {
-            compare: function (actual) {
-              var eventName, selector;
-              eventName = actual.eventName;
-              selector = actual.selector;
-
-              return {
-                pass: jasmine.JQuery.events.wasPrevented(selector, eventName),
-                message: "Expected event " + eventName + " to have been prevented on " + selector +
-                "and Expected event " + eventName + " not to have been prevented on " + selector
-              };
-            }
-          };
         }
       });
     });

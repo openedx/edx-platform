@@ -34,6 +34,7 @@ var files = [
     {pattern: 'js/vendor/jquery.min.js', included: true},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
     {pattern: 'js/libs/jasmine-waituntil.js', included: true},
+    {pattern: 'js/libs/jasmine-extensions.js', included: true},
     {pattern: 'js/vendor/jquery.truncate.js', included: true},
     {pattern: 'js/vendor/mustache.js', included: true},
     {pattern: 'common/js/vendor/underscore.js', included: true},

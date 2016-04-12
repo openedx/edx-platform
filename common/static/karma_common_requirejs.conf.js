@@ -32,6 +32,7 @@ var files = [
     {pattern: 'js/vendor/jasmine-imagediff.js', included: false},
     {pattern: 'js/libs/jasmine-stealth.js', included: false},
     {pattern: 'js/libs/jasmine-waituntil.js', included: false},
+    {pattern: 'js/libs/jasmine-extensions.js', included: false},
     {pattern: 'js/vendor/jquery.simulate.js', included: false},
     {pattern: 'js/vendor/jquery.truncate.js', included: false},
     {pattern: 'common/js/vendor/underscore.js', included: false},
