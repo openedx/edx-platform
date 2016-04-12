@@ -3,6 +3,10 @@
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
+//Patern Library button colors
+$pl-button-border-color: #065683;
+$pl-button-color: #0079bc;
+
 .program-list-wrapper{
   @include outer-container;
   padding: $baseline $baseline;
@@ -20,20 +24,30 @@
     background-color: $body-bg;
     box-sizing: border-box;
     border: 1px solid $border-color-l3;
-    clear:both;
+    clear: both;
     .advertise-message{
-      font-size:em(12);
+      font-size: em(12);
       color: $gray-d4;
       margin-bottom: $baseline;
     }
     .ad-link{
-      padding:$baseline * 0.5; 
-      border: 1px solid $blue-t1;
-      font-size: em(16);
+      text-align:center;
       a{
+        padding: $baseline * 0.5; 
+        border: 1px solid $pl-button-border-color;
+        color: $pl-button-color;
+        font-size: em(16);
         text-decoration: none;
-        &:hover, &:focus, &:active{
-          background-color: $button-bg-hover-color;
+        display: block;
+        line-height: 1.2;
+        &:hover,
+        &:focus,
+        &:active{
+          color: $white;
+          background-color: $pl-button-color;
+        }
+        span{
+          @include margin-left($baseline*0.25);
         }
       }
     }

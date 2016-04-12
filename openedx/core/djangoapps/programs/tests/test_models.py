@@ -4,7 +4,6 @@ from django.test import TestCase
 import mock
 from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 

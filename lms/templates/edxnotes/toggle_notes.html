@@ -1,10 +1,10 @@
+<%page args="course" expression_filter="h"/>
 <%!
-import json
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 <%namespace name='static' file='/static_content.html'/>
-<%page args="course"/>
 
 <%
   edxnotes_visibility = course.edxnotes_visibility
@@ -23,5 +23,8 @@ from django.core.urlresolvers import reverse
 </div>
 
 <%static:require_module module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
-    NotesVisibilityFactory.ToggleVisibilityView(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
+    NotesVisibilityFactory.ToggleVisibilityView(
+        ${edxnotes_visibility | n, dump_js_escaped_json},
+        '${edxnotes_visibility_url | n, js_escaped_string}'
+    );
 </%static:require_module>

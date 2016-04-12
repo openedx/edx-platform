@@ -2446,7 +2446,7 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                             'xseries' + '/{}'
                         ).format(program['marketing_slug'])
                     })
-                    programs_for_course['display_category'] = 'XSeries'
+                    programs_for_course['display_category'] = program.get('display_category')
                     programs_for_course['category'] = program.get('category')
                 except KeyError:
                     log.warning('Program structure is invalid, skipping display: %r', program)

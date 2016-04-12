@@ -1250,6 +1250,8 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
+    'js/vendor/underscore.string.min.js',
+    'common/js/vendor/picturefill.min.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -1390,6 +1392,30 @@ PIPELINE_CSS = {
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
+    },
+    'style-main-v1': {
+        'source_filenames': [
+            'css/lms-main-v1.css',
+        ],
+        'output_filename': 'css/lms-main-v1.css',
+    },
+    'style-main-v1-rtl': {
+        'source_filenames': [
+            'css/lms-main-v1-rtl.css',
+        ],
+        'output_filename': 'css/lms-main-v1-rtl.css',
+    },
+    'style-main-v2': {
+        'source_filenames': [
+            'css/lms-main-v2.css',
+        ],
+        'output_filename': 'css/lms-main-v2.css',
+    },
+    'style-main-v2-rtl': {
+        'source_filenames': [
+            'css/lms-main-v2-rtl.css',
+        ],
+        'output_filename': 'css/lms-main-v2-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [

@@ -2,7 +2,7 @@
 """
 Tests courseware views.py
 """
-import cgi
+
 from urllib import urlencode
 import ddt
 import json

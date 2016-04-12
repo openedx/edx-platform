@@ -919,6 +919,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.course_3 = CourseFactory.create()
         self.program_name = 'Testing Program'
         self.category = 'xseries'
+        self.display_category = 'XSeries'
 
         CourseModeFactory.create(
             course_id=self.course_1.id,
@@ -938,6 +939,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             programs[unicode(course)] = [{
                 'id': _id,
                 'category': self.category,
+                'display_category': self.display_category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
                 'status': program_status,
@@ -980,6 +982,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 u'edx/demox/Run_1': [{
                     'id': 0,
                     'category': self.category,
+                    'display_category': self.display_category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
                     'status': program_status,

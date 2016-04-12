@@ -167,7 +167,7 @@ from openedx.core.djangolib.js_utils import (
   function validateForm(form) {
     var newCCXName = $(form).find('#ccx_name').val();
     var $errorMessage =  $('#ccx-create-message');
-    var hasCcxConnector = ${has_ccx_connector | n, dump_js_escaped_json};
+    var hasCcxConnector = ${has_ccx_connector | n, dump_js_escaped_json} === 'true';
 
     if (!newCCXName && !hasCcxConnector) {
       $errorMessage.text("${_('Please enter a valid CCX name.') | n, js_escaped_string}");

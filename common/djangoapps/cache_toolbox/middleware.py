@@ -78,7 +78,6 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
-from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import User
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from logging import getLogger

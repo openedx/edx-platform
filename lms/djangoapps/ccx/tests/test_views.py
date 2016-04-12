@@ -53,6 +53,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
+    SampleCourseFactory,
 )
 from ccx_keys.locator import CCXLocator
 
@@ -1049,9 +1050,9 @@ class CCXCoachTabTestCase(SharedModuleStoreTestCase):
             )
 
 
-class TestStudentDashboardWithCCX(ModuleStoreTestCase):
+class TestStudentViewsWithCCX(ModuleStoreTestCase):
     """
-    Test to ensure that the student dashboard works for users enrolled in CCX
+    Test to ensure that the student dashboard and courseware works for users enrolled in CCX
     courses.
     """
 
@@ -1059,13 +1060,13 @@ class TestStudentDashboardWithCCX(ModuleStoreTestCase):
         """
         Set up courses and enrollments.
         """
-        super(TestStudentDashboardWithCCX, self).setUp()
+        super(TestStudentViewsWithCCX, self).setUp()
 
         # Create a Draft Mongo and a Split Mongo course and enroll a student user in them.
         self.student_password = "foobar"
         self.student = UserFactory.create(username="test", password=self.student_password, is_staff=False)
-        self.draft_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        self.split_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.draft_course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        self.split_course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         CourseEnrollment.enroll(self.student, self.draft_course.id)
         CourseEnrollment.enroll(self.student, self.split_course.id)
 
@@ -1078,11 +1079,16 @@ class TestStudentDashboardWithCCX(ModuleStoreTestCase):
         self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
         last_week = datetime.datetime.now(UTC()) - datetime.timedelta(days=7)
         override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
-        course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
-        CourseEnrollment.enroll(self.student, course_key)
+        self.ccx_course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
+        CourseEnrollment.enroll(self.student, self.ccx_course_key)
 
     def test_load_student_dashboard(self):
         self.client.login(username=self.student.username, password=self.student_password)
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search('Test CCX', response.content))
+
+    def test_load_courseware(self):
+        self.client.login(username=self.student.username, password=self.student_password)
+        response = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.ccx_course_key)}))
+        self.assertEqual(response.status_code, 200)

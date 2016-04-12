@@ -16,7 +16,6 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
@@ -28,7 +27,6 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
-from models.settings.course_grading import CourseGradingModel
 from xblock_django.models import XBlockDisableConfig
 
 __all__ = [

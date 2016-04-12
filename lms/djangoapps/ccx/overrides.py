@@ -5,7 +5,7 @@ by the individual custom courses feature.
 import json
 import logging
 
-from django.db import transaction, IntegrityError
+from django.db import transaction
 
 import request_cache
 

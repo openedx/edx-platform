@@ -1,8 +1,13 @@
 ## coding=utf-8
 
+## This is the main Mako template that all page templates should include.
+## Note: there are a handful of pages that use Django Templates and which
+## instead include main_django.html. It is important that these two files
+## remain in sync, so changes made in one should be applied to the other.
+
 ## Pages currently use v1 styling by default. Once the Pattern Library
 ## rollout has been completed, this default can be switched to v2.
-<%! main_css = "css/lms-main-v1.css" %>
+<%! main_css = "style-main-v1" %>
 
 
 <%namespace name='static' file='static_content.html'/>

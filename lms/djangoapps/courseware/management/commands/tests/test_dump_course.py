@@ -16,7 +16,7 @@ from django.core.management import call_command
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 )

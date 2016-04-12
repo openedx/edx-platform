@@ -19,8 +19,6 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
-      <a href="#before-transcript_${id}" class="nav-skip sr">${_("Skip to a navigable version of this video's transcript.")}</a>
-
       <article class="video-wrapper">
           <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
           <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
@@ -37,11 +35,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                   <div class="secondary-controls"></div>
               </div>
           </section>
-          <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
     </div>
-
-    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
     <div class="focus_grabber last"></div>
   <ul class="wrapper-downloads">

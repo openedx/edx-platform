@@ -1,18 +1,24 @@
 
-<div class="banner-image">
-    <a href="<%- marketingUrl %>" class="card-link">
-        <img alt="<%- gettext(name)%>" src="" />
-    </a>
-</div>
+<a href="<%- marketingUrl %>" class="card-link">
+    <div class="banner-image-container">
+        <picture>
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.tiny %>)">
+            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
+            <source srcset="<%- largeBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
+            <img class="banner-image" srcset="<%- mediumBannerUrl %>" alt="<%- gettext(name)%>">
+        </picture>
+    </div>
+</a>
 <div class="text-section">
     <div class="meta-info">
         <div class="organization">
             <% _.each(organizations, function(org){ %>
-                <span><%- gettext(org.display_name) %></span>
+                <%- gettext(org.display_name) %>
             <% }); %>
         </div>
         <div class="category">
-            <span><%- gettext(category) %></span>
+            <span class="category-text"><%- gettext(type) %></span>
             <i class="xseries-icon" aria-hidden="true"></i>
         </div>
     </div>
