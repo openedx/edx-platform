@@ -581,7 +581,7 @@ function (VideoPlayer) {
                     }
 
                     return false;
-                }, 1000).then(function () {
+                }).then(function () {
                     state.videoPlayer.goToStartTime = false;
                     state.videoPlayer.updatePlayTime(60);
 

@@ -14,8 +14,8 @@
 
         it("can spy on language selector change event", function () {
             spyOnEvent(lang_selector, 'change');
-            $('#settings-language-value').trigger('change');
-            //expect('change').toHaveBeenTriggeredOn(lang_selector); [jquery-mismatch]
+            lang_selector.trigger('change');
+            expect('change').toHaveBeenTriggeredOn(lang_selector);
         });
 
         it("should make an AJAX request to the correct URL", function () {

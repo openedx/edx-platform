@@ -312,9 +312,7 @@
 
                     jasmine.waitUntil(function () {
                         return state.videoCaption.rendered;
-                    }).then(function(){
-                        done();
-                    });
+                    }).then(done);
                 });
 
                 it('render the transcript', function () {
@@ -450,9 +448,7 @@
                 jasmine.clock().tick(50);
                 jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
-                }).then(function () {
-                    done();
-                });
+                }).then(done);
             });
 
             afterEach(function () {
@@ -861,9 +857,7 @@
 
                 jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
-                }).then(function(){
-                    done();
-                });
+                }).then(done);
             });
 
             describe('when the video speed is 1.0x', function () {
@@ -1156,9 +1150,7 @@
 
                 jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
-                }).then(function(){
-                    done();
-                });
+                }).then(done);
             });
 
             describe('when getting focus through TAB key', function () {

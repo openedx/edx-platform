@@ -76,7 +76,6 @@ formulaEquationPreview.enable = function () {
      * Also send along the time it was sent, and store that locally.
      */
     function sendRequest(inputData, formula) {
-        console.log('throttling');
         // Save the time.
         var now = Date.now();
         inputData.lastSent = now;

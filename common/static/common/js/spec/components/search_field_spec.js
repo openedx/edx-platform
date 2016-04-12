@@ -46,14 +46,12 @@ define([
         });
 
         it('correctly displays itself', function () {
-            // TODO: fixit with toBe syntax
             searchFieldView = createSearchFieldView().render();
             expect(searchFieldView.$('.search-field').val(), '');
             expect(searchFieldView.$('.action-clear')).toHaveClass('is-hidden');
         });
 
         it('can display with an initial search string', function () {
-            // TODO: fixit with toBe syntax
             searchFieldView = createSearchFieldView({
                 searchString: 'foo'
             }).render();

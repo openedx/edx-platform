@@ -118,9 +118,7 @@
                     // If YouTube API is not loaded, then the code will should create
                     // a global callback that will be called by API once it is loaded.
                     expect(window.onYouTubeIframeAPIReady).not.toBeUndefined();
-                }).always(function () {
-                    done();
-                });
+                }).always(done);
             });
         });
 

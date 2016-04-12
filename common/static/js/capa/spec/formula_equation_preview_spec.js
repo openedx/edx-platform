@@ -86,9 +86,7 @@ describe("Formula Equation Preview", function () {
             // This part may be asynchronous, so wait.
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
-            }).then(function () {
-                done();
-            });
+            }).then(done);
         });
 
         it('has an initial request with the correct parameters', function () {
@@ -214,8 +212,8 @@ describe("Formula Equation Preview", function () {
                 return jasmine.waitUntil(function () {
                     var args = Problem.inputAjax.calls.mostRecent().args;
                     return args[3].formula == "different";
-                });
-            }).then(done);
+                }).then(done);
+            });
         });
 
         it('updates MathJax and loading icon on callback', function (done) {
@@ -335,9 +333,7 @@ describe("Formula Equation Preview", function () {
 
                     this.callbacks = [args0[4], args0[4]];
                     this.responses = [response0, response1];
-                }, self)).then(function () {
-                    done();
-                });
+                }, self)).then(done);
             });
         });
 

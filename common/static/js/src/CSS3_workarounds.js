@@ -8,7 +8,7 @@ var pointerEventsNone = function (selector, supportedStyles) {
 	$(selector).click(function (event) {
 		if (!('pointerEvents' in supportedStyles)) {
 			event.preventDefault();
-		}
+		};
 	});
 };
 
