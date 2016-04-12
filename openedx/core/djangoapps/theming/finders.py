@@ -17,80 +17,63 @@ interface, as well.
 .. _Django-Pipeline: http://django-pipeline.readthedocs.org/
 .. _Django-Require: https://github.com/etianen/django-require
 """
-import os
-from collections import OrderedDict
-
+from path import Path
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
-from django.utils import six
-
-from openedx.core.djangoapps.theming.helpers import get_themes
-from openedx.core.djangoapps.theming.storage import ThemeStorage
+from openedx.core.djangoapps.theming.storage import CachedComprehensiveThemingStorage
 
 
-class ThemeFilesFinder(BaseFinder):
+class ComprehensiveThemeFinder(BaseFinder):
     """
-    A static files finder that looks in the directory of each theme as
-    specified in the source_dir attribute.
+    A static files finder that searches the active comprehensive theme
+    for static files. If the ``COMPREHENSIVE_THEME_DIR`` setting is unset,
+    or the ``COMPREHENSIVE_THEME_DIR`` does not exist on the file system,
+    this finder will never find any files.
     """
-    storage_class = ThemeStorage
-    source_dir = 'static'
-
     def __init__(self, *args, **kwargs):
-        # The list of themes that are handled
-        self.themes = []
-        # Mapping of theme names to storage instances
-        self.storages = OrderedDict()
+        super(ComprehensiveThemeFinder, self).__init__(*args, **kwargs)
 
-        themes = get_themes()
-        for theme in themes:
-            theme_storage = self.storage_class(
-                os.path.join(theme.path, self.source_dir),
-                prefix=theme.theme_dir,
-            )
+        theme_dir = getattr(settings, "COMPREHENSIVE_THEME_DIR", "")
+        if not theme_dir:
+            self.storage = None
+            return
 
-            self.storages[theme.theme_dir] = theme_storage
-            if theme.theme_dir not in self.themes:
-                self.themes.append(theme.theme_dir)
+        if not isinstance(theme_dir, basestring):
+            raise ImproperlyConfigured("Your COMPREHENSIVE_THEME_DIR setting must be a string")
 
-        super(ThemeFilesFinder, self).__init__(*args, **kwargs)
+        root = Path(settings.PROJECT_ROOT)
+        if root.name == "":
+            root = root.parent
 
-    def list(self, ignore_patterns):
-        """
-        List all files in all app storages.
-        """
-        for storage in six.itervalues(self.storages):
-            if storage.exists(''):  # check if storage location exists
-                for path in utils.get_files(storage, ignore_patterns):
-                    yield path, storage
+        component_dir = Path(theme_dir) / root.name
+        static_dir = component_dir / "static"
+        self.storage = CachedComprehensiveThemingStorage(location=static_dir)
 
     def find(self, path, all=False):  # pylint: disable=redefined-builtin
         """
-        Looks for files in the theme directories.
+        Looks for files in the default file storage, if it's local.
         """
-        matches = []
-        theme_dir = path.split("/", 1)[0]
+        if not self.storage:
+            return []
 
-        themes = {t.theme_dir: t for t in get_themes()}
-        # if path is prefixed by theme name then search in the corresponding storage other wise search all storages.
-        if theme_dir in themes:
-            theme = themes[theme_dir]
-            path = "/".join(path.split("/")[1:])
-            match = self.find_in_theme(theme.theme_dir, path)
-            if match:
-                if not all:
-                    return match
-                matches.append(match)
-        return matches
+        if path.startswith(self.storage.prefix):
+            # strip the prefix
+            path = path[len(self.storage.prefix):]
 
-    def find_in_theme(self, theme, path):
+        if self.storage.exists(path):
+            match = self.storage.path(path)
+            if all:
+                match = [match]
+            return match
+
+        return []
+
+    def list(self, ignore_patterns):
         """
-        Find a requested static file in an theme's static locations.
+        List all files of the storage.
         """
-        storage = self.storages.get(theme, None)
-        if storage:
-            # only try to find a file if the source dir actually exists
-            if storage.exists(path):
-                matched_path = storage.path(path)
-                if matched_path:
-                    return matched_path
+        if self.storage and self.storage.exists(''):
+            for path in utils.get_files(self.storage, ignore_patterns):
+                yield path, self.storage
