@@ -13,14 +13,14 @@ class Command(BaseCommand):
     """
     help = 'Export all courses from mongo to the specified data directory and list the courses which failed to export'
 
+    def add_arguments(self, parser):
+        parser.add_argument('output_path')
+
     def handle(self, *args, **options):
         """
         Execute the command
         """
-        if len(args) != 1:
-            raise CommandError("export requires one argument: <output path>")
-
-        output_path = args[0]
+        output_path = options['output_path']
         courses, failed_export_courses = export_courses_to_output_path(output_path)
 
         print "=" * 80
