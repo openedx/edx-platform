@@ -1,0 +1,43 @@
+## mako
+<%namespace name='static' file='/static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+
+<header id="global-navigation" class="global" >
+  <nav class="nav-wrapper" aria-label="${_('Global')}">
+    <div class="grid-manual">
+      <div  class="row">
+        <div class="col col-2">
+          <h1 class="logo">
+            <a href="${marketing_link('ROOT')}">
+              <%block name="navigation_logo">
+                <img src="${static.url('images/logo.png')}" height="60" width="200" alt="Home Page" />
+              </%block>
+            </a>
+          </h1>
+        </div>
+      <div class="col col-2 pre-5">
+        <ol class="left nav-global">
+          <li class="nav-global-05">
+            <a class="cta" href="/courses">${_("Courses")}</a>
+          </li>
+          <li class="nav-global-05">
+            <a class="cta" href="/login${login_query()}">${_("Sign in")}</a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="col col-1 post-1">
+        <ol class="right nav-courseware">
+          <li class="nav-global-05">
+            <a class="cta" href="/register${login_query()}">${_("Register")}</a>
+          </li>
+        </ol>
+      </div>
+
+      </nav>
+</header>
