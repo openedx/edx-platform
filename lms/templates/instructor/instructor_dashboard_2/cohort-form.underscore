@@ -93,14 +93,13 @@
                                         <p class="copy-error">
                                             <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <%=
-                                            interpolate(
-                                                // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                                gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.'),
+                                            HtmlUtils.interpolateHtml(
+                                                // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                                                gettext('{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.'),
                                                 {
-                                                    screen_reader_start: '<span class="sr">',
-                                                    screen_reader_end: '</span>'
-                                                },
-                                                true
+                                                    screen_reader_start: HtmlUtils.HTML('<span class="sr">'),
+                                                    screen_reader_end: HtmlUtils.HTML('</span>')
+                                                }
                                             )
                                             %>
                                         </p>
@@ -113,14 +112,13 @@
                                     <p class="copy-error">
                                         <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
                                         <%=
-                                        interpolate(
-                                            // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                            gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.'),
+                                        HtmlUtils.interpolateHtml(
+                                            // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                                            gettext('{screen_reader_start}Warning:{screen_reader_end} No content groups exist.'),
                                             {
-                                                screen_reader_start: '<span class="sr">',
-                                                screen_reader_end: '</span>'
-                                            },
-                                            true
+                                                screen_reader_start: HtmlUtils.HTML('<span class="sr">'),
+                                                screen_reader_end: HtmlUtils.HTML('</span>')
+                                            }
                                         )
                                         %>
                                         <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a>

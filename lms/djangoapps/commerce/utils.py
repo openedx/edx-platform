@@ -55,7 +55,8 @@ class EcommerceService(object):
         Example:
             http://localhost:8002/basket/single_item/
         """
-        return urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, self.config.single_course_checkout_page)
+        ecommerce_url_root = helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
+        return urljoin(ecommerce_url_root, self.config.single_course_checkout_page)
 
     def checkout_page_url(self, sku):
         """ Construct the URL to the ecommerce checkout page and include a product.

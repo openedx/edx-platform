@@ -42,8 +42,7 @@ def i18n_fastgenerate():
     """
     Compile localizable strings from sources without re-extracting strings first.
     """
-    cmd = "i18n_tool generate"
-    sh(cmd)
+    sh("i18n_tool generate")
 
 
 @task
@@ -52,8 +51,7 @@ def i18n_generate():
     """
     Compile localizable strings from sources, extracting strings first.
     """
-    cmd = "i18n_tool generate"
-    sh(cmd)
+    sh("i18n_tool generate")
 
 
 @task
@@ -63,8 +61,7 @@ def i18n_generate_strict():
     Compile localizable strings from sources, extracting strings first.
     Complains if files are missing.
     """
-    cmd = "i18n_tool generate"
-    sh(cmd + " --strict")
+    sh("i18n_tool generate --strict")
 
 
 @task
@@ -74,11 +71,13 @@ def i18n_dummy():
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
-    cmd = "i18n_tool dummy"
-    sh(cmd)
+    sh("i18n_tool dummy")
     # Need to then compile the new dummy strings
-    cmd = "i18n_tool generate"
-    sh(cmd)
+    sh("i18n_tool generate")
+
+    # Generate static i18n JS files.
+    for system in ['lms', 'cms']:
+        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
 
 
 @task
@@ -131,8 +130,7 @@ def i18n_transifex_push():
     """
     Push source strings to Transifex for translation
     """
-    cmd = "i18n_tool transifex"
-    sh("{cmd} push".format(cmd=cmd))
+    sh("i18n_tool transifex push")
 
 
 @task
@@ -141,8 +139,7 @@ def i18n_transifex_pull():
     """
     Pull translated strings from Transifex
     """
-    cmd = "i18n_tool transifex"
-    sh("{cmd} pull".format(cmd=cmd))
+    sh("i18n_tool transifex pull")
 
 
 @task
@@ -150,14 +147,11 @@ def i18n_rtl():
     """
     Pull all RTL translations (reviewed AND unreviewed) from Transifex
     """
-    cmd = "i18n_tool transifex"
-    sh(cmd + " rtl")
+    sh("i18n_tool transifex rtl")
 
     print "Now generating langugage files..."
 
-    cmd = "i18n_tool generate"
-
-    sh(cmd + " --rtl")
+    sh("i18n_tool generate --rtl")
 
     print "Committing translations..."
     sh('git clean -fdX conf/locale')
@@ -170,14 +164,11 @@ def i18n_ltr():
     """
     Pull all LTR translations (reviewed AND unreviewed) from Transifex
     """
-    cmd = "i18n_tool transifex"
-    sh(cmd + " ltr")
+    sh("i18n_tool transifex ltr")
 
     print "Now generating langugage files..."
 
-    cmd = "i18n_tool generate"
-
-    sh(cmd + " --ltr")
+    sh("i18n_tool generate --ltr")
 
     print "Committing translations..."
     sh('git clean -fdX conf/locale')
@@ -203,13 +194,8 @@ def i18n_robot_pull():
     # TODO: Validate the recently pulled translations, and give a bail option
     sh('git clean -fdX conf/locale/rtl')
     sh('git clean -fdX conf/locale/eo')
-    cmd = "i18n_tool validate"
     print "\n\nValidating translations with `i18n_tool validate`..."
-    sh("{cmd}".format(cmd=cmd))
-
-    # Generate static i18n JS files.
-    for system in ['lms', 'cms']:
-        sh(django_cmd(system, DEFAULT_SETTINGS, 'compilejsi18n'))
+    sh("i18n_tool validate")
 
     con = raw_input("Continue with committing these translations (y/n)? ")
 

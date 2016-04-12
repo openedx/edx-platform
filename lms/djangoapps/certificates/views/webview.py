@@ -13,8 +13,9 @@ from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
-from django.core.urlresolvers import reverse
 
+from badges.events.course_complete import get_completion_badge
+from badges.utils import badges_enabled
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -42,9 +43,8 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    BadgeAssertion
-)
+    CertificateSocialNetworks)
+
 
 log = logging.getLogger(__name__)
 
@@ -355,21 +355,41 @@ def _track_certificate_events(request, context, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    badge = context['badge']
     # Badge Request Event Tracking Logic
-    if 'evidence_visit' in request.GET and badge:
-        tracker.emit(
-            'edx.badge.assertion.evidence_visited',
-            {
-                'user_id': user.id,
-                'course_id': unicode(course.id),
-                'enrollment_mode': badge.mode,
-                'assertion_id': badge.id,
-                'assertion_image_url': badge.data['image'],
-                'assertion_json_url': badge.data['json']['id'],
-                'issuer': badge.data['issuer'],
-            }
-        )
+    course_key = course.location.course_key
+
+    if 'evidence_visit' in request.GET:
+        badge_class = get_completion_badge(course_key, user)
+        if not badge_class:
+            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
+            badges = []
+        else:
+            badges = badge_class.get_for_user(user)
+        if badges:
+            # There should only ever be one of these.
+            badge = badges[0]
+            tracker.emit(
+                'edx.badge.assertion.evidence_visited',
+                {
+                    'badge_name': badge.badge_class.display_name,
+                    'badge_slug': badge.badge_class.slug,
+                    'badge_generator': badge.backend,
+                    'issuing_component': badge.badge_class.issuing_component,
+                    'user_id': user.id,
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': badge.badge_class.mode,
+                    'assertion_id': badge.id,
+                    'assertion_image_url': badge.image_url,
+                    'assertion_json_url': badge.assertion_url,
+                    'issuer': badge.data.get('issuer'),
+                }
+            )
+        else:
+            log.warn(
+                "Could not find badge for %s on course %s.",
+                user.id,
+                course_key,
+            )
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
@@ -425,10 +445,11 @@ def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
     """
-    try:
-        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
-    except BadgeAssertion.DoesNotExist:
-        badge = None
+    badge = None
+    if badges_enabled() and course.issue_badges:
+        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        if badges:
+            badge = badges[0]
     context['badge'] = badge
 
 

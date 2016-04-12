@@ -22,6 +22,7 @@ from urllib import urlencode
 import uuid
 
 import analytics
+
 from config_models.models import ConfigurationModel
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -45,6 +46,7 @@ from simple_history.models import HistoricalRecords
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
+from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
@@ -877,6 +879,33 @@ class CourseEnrollmentManager(models.Manager):
 
         return enrollment_number
 
+    def num_enrolled_in_exclude_admins(self, course_id):
+        """
+        Returns the count of active enrollments in a course excluding instructors, staff and CCX coaches.
+
+        Arguments:
+            course_id (CourseLocator): course_id to return enrollments (count).
+
+        Returns:
+            int: Count of enrollments excluding staff, instructors and CCX coaches.
+
+        """
+        # To avoid circular imports.
+        from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+        course_locator = course_id
+
+        if getattr(course_id, 'ccx', None):
+            course_locator = course_id.to_course_locator()
+
+        staff = CourseStaffRole(course_locator).users_with_role()
+        admins = CourseInstructorRole(course_locator).users_with_role()
+        coaches = CourseCcxCoachRole(course_locator).users_with_role()
+
+        return super(CourseEnrollmentManager, self).get_queryset().filter(
+            course_id=course_id,
+            is_active=1,
+        ).exclude(user__in=staff).exclude(user__in=admins).exclude(user__in=coaches).count()
+
     def is_course_full(self, course):
         """
         Returns a boolean value regarding whether a course has already reached it's max enrollment
@@ -884,7 +913,8 @@ class CourseEnrollmentManager(models.Manager):
         """
         is_course_full = False
         if course.max_student_enrollments_allowed is not None:
-            is_course_full = self.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
+            is_course_full = self.num_enrolled_in_exclude_admins(course.id) >= course.max_student_enrollments_allowed
+
         return is_course_full
 
     def users_enrolled_in(self, course_id):
@@ -1212,6 +1242,10 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
+        if badges_enabled():
+            from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
+            award_enrollment_badge(user)
+
         return enrollment
 
     @classmethod
@@ -1793,7 +1827,12 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
         else:
             key = None
         if user:
-            user.profile.set_login_session(key)
+            user_profile, __ = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={'name': user.username}
+            )
+            if user_profile:
+                user.profile.set_login_session(key)
 
 
 class DashboardConfiguration(ConfigurationModel):

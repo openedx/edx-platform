@@ -18,7 +18,7 @@ import mock
 import pytz
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit import api
-from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.credit.exceptions import (
     InvalidCreditRequirements,
     InvalidCreditCourse,
@@ -1204,3 +1204,21 @@ class CourseApiTests(CreditApiTestBase):
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         CreditProvider.objects.all().update(active=False)
         self.assertEqual(get_credit_provider_display_names(self.course_key), [])
+
+    @ddt.data(None, ['asu'], ['asu', 'co'], ['asu', 'co', 'mit'])
+    def test_make_providers_strings(self, providers):
+        """ Verify that method returns given provider list as comma separated string. """
+
+        provider_string = make_providers_strings(providers)
+
+        if not providers:
+            self.assertEqual(provider_string, None)
+
+        elif len(providers) == 1:
+            self.assertEqual(provider_string, providers[0])
+
+        elif len(providers) == 2:
+            self.assertEqual(provider_string, 'asu and co')
+
+        else:
+            self.assertEqual(provider_string, 'asu, co, and mit')

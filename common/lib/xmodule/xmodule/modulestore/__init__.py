@@ -38,6 +38,11 @@ new_contract('XBlock', XBlock)
 LIBRARY_ROOT = 'library.xml'
 COURSE_ROOT = 'course.xml'
 
+# List of names of computed fields on xmodules that are of type usage keys.
+# This list can be used to determine which fields need to be stripped of
+# extraneous usage key data when entering/exiting modulestores.
+XMODULE_FIELDS_WITH_USAGE_KEYS = ['location', 'parent']
+
 
 class ModuleStoreEnum(object):
     """

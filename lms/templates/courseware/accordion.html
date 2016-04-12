@@ -1,8 +1,10 @@
+<%page expression_filter="h"/>
 <%!
     from django.core.urlresolvers import reverse
     from util.date_utils import get_time_display
     from django.utils.translation import ugettext as _
     from django.conf import settings
+    from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <%def name="make_chapter(chapter)">
@@ -25,7 +27,10 @@ else:
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-                <p>${section['display_name']} ${'<span class="sr"> current section</span>' if 'active' in section and section['active'] else ''}</p>
+                <p>${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
+                        span_start=HTML('<span class="sr">'),
+                        span_end=HTML('</span>'),
+                    ) if 'active' in section and section['active'] else ''}</p>
                 <%
                 if section.get('due') is None:
                     due_date = ''

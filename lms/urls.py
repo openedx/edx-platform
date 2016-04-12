@@ -112,6 +112,10 @@ urlpatterns = (
     url(r'^verify_student/', include('verify_student.urls')),
 )
 
+urlpatterns += (
+    url(r'^dashboard/', include('learner_dashboard.urls')),
+)
+
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
@@ -130,6 +134,11 @@ else:
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+    )
+
+if settings.FEATURES["ENABLE_OPENBADGES"]:
+    urlpatterns += (
+        url(r'^api/badges/v1/', include('badges.api.urls', app_name="badges", namespace="badges_api")),
     )
 
 js_info_dict = {
@@ -991,3 +1000,8 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             name='submit_financial_assistance_request'
         )
     )
+
+# URLs for API access management
+urlpatterns += (
+    url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls')),
+)

@@ -2,12 +2,40 @@
 Tests for safe_template_linter.py
 """
 from ddt import ddt, data
+import mock
+import re
+from StringIO import StringIO
 import textwrap
 from unittest import TestCase
 
 from ..safe_template_linter import (
-    FileResults, MakoTemplateLinter, Rules
+    _process_os_walk, FileResults, MakoTemplateLinter, UnderscoreTemplateLinter, Rules
 )
+
+
+class TestSafeTemplateLinter(TestCase):
+    """
+    Test some top-level linter functions
+    """
+
+    def test_process_os_walk_with_includes(self):
+        """
+        Tests the top-level processing of template files, including Mako
+        includes.
+        """
+        out = StringIO()
+
+        options = {
+            'is_quiet': False,
+        }
+
+        template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter()]
+
+        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True) as mock_is_valid_directory:
+            _process_os_walk('scripts/tests/templates', template_linters, options, out)
+
+        output = out.getvalue()
+        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', out.getvalue()))
 
 
 @ddt
@@ -20,16 +48,17 @@ class TestMakoTemplateLinter(TestCase):
         {'directory': 'lms/templates', 'expected': True},
         {'directory': 'lms/templates/support', 'expected': True},
         {'directory': 'lms/templates/support', 'expected': True},
+        {'directory': 'test_root/staticfiles/templates', 'expected': False},
         {'directory': './test_root/staticfiles/templates', 'expected': False},
         {'directory': './some/random/path', 'expected': False},
     )
-    def test_is_mako_directory(self, data):
+    def test_is_valid_directory(self, data):
         """
-        Test _is_mako_directory correctly determines mako directories
+        Test _is_valid_directory correctly determines mako directories
         """
         linter = MakoTemplateLinter()
 
-        self.assertEqual(linter._is_mako_directory(data['directory']), data['expected'])
+        self.assertEqual(linter._is_valid_directory(data['directory']), data['expected'])
 
     @data(
         {
@@ -93,7 +122,6 @@ class TestMakoTemplateLinter(TestCase):
             ${'{{unbalanced-nested'}
             ${x | n}
             ${x | h}
-            ${x | n, dump_html_escaped_json}
             ${x | n, dump_js_escaped_json}
         """)
 
@@ -109,6 +137,79 @@ class TestMakoTemplateLinter(TestCase):
         self.assertEqual(results.violations[2].expression['expression'], "${x | h}")
         self.assertEqual(results.violations[3].rule, Rules.mako_invalid_html_filter)
         self.assertEqual(results.violations[3].expression['expression'], "${x | n, dump_js_escaped_json}")
+
+    def test_check_mako_expression_display_name(self):
+        """
+        Test _check_mako_file_is_safe with display_name_with_default_escaped
+        fails.
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            ${course.display_name_with_default_escaped}
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertEqual(results.violations[0].rule, Rules.mako_deprecated_display_name)
+
+    def test_check_mako_expression_default_disabled(self):
+        """
+        Test _check_mako_file_is_safe with disable pragma for safe-by-default
+        works to designate that this is not a Mako file
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            # This is anything but a Mako file.
+
+            # pragma can appear anywhere in file
+            # safe-lint: disable=mako-missing-default
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertTrue(results.violations[0].is_disabled)
+
+    def test_check_mako_expression_disabled(self):
+        """
+        Test _check_mako_file_is_safe with disable pragma results in no
+        violation
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            ## safe-lint: disable=mako-unwanted-html-filter
+            ${x | h}
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertTrue(results.violations[0].is_disabled)
+
+    @data(
+        {'template': '{% extends "wiki/base.html" %}'},
+        {'template': '{{ message }}'},
+    )
+    def test_check_mako_on_django_template(self, data):
+        """
+        Test _check_mako_file_is_safe with disable pragma results in no
+        violation
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        linter._check_mako_file_is_safe(data['template'], results)
+
+        self.assertEqual(len(results.violations), 0)
 
     def test_check_mako_expressions_in_html_without_default(self):
         """
@@ -142,17 +243,14 @@ class TestMakoTemplateLinter(TestCase):
                 ${'{{unbalanced-nested'}
                 ${x | n}
                 ${x | h}
-                ${x | n, dump_html_escaped_json}
                 ${x | n, dump_js_escaped_json}
                 "${x-with-quotes | n, js_escaped_string}"
-                '${x-with-quotes | n, js_escaped_string}'
-                ${x-missing-quotes | n, js_escaped_string}
             </script>
         """)
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 6)
+        self.assertEqual(len(results.violations), 4)
         self.assertEqual(results.violations[0].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[0].expression['expression'], "${x}")
         self.assertEqual(results.violations[1].rule, Rules.mako_unparsable_expression)
@@ -162,10 +260,6 @@ class TestMakoTemplateLinter(TestCase):
         self.assertEqual(results.violations[2].expression['expression'], "${x | n}")
         self.assertEqual(results.violations[3].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[3].expression['expression'], "${x | h}")
-        self.assertEqual(results.violations[4].rule, Rules.mako_invalid_js_filter)
-        self.assertEqual(results.violations[4].expression['expression'], "${x | n, dump_html_escaped_json}")
-        self.assertEqual(results.violations[5].rule, Rules.mako_js_string_missing_quotes)
-        self.assertEqual(results.violations[5].expression['expression'], "${x-missing-quotes | n, js_escaped_string}")
 
     def test_check_mako_expressions_in_require_js(self):
         """
@@ -185,11 +279,9 @@ class TestMakoTemplateLinter(TestCase):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 2)
+        self.assertEqual(len(results.violations), 1)
         self.assertEqual(results.violations[0].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[0].expression['expression'], "${x}")
-        self.assertEqual(results.violations[1].rule, Rules.mako_js_string_missing_quotes)
-        self.assertEqual(results.violations[1].expression['expression'], "${x | n, js_escaped_string}")
 
     @data(
         {'media_type': 'text/javascript', 'expected_violations': 0},
@@ -335,3 +427,150 @@ class TestMakoTemplateLinter(TestCase):
         end_index = expression['end_index']
         self.assertEqual(template_string[start_index:end_index + 1], expected_expression)
         self.assertEqual(expression['expression'], expected_expression)
+
+
+@ddt
+class TestUnderscoreTemplateLinter(TestCase):
+    """
+    Test UnderscoreTemplateLinter
+    """
+
+    def test_check_underscore_file_is_safe(self):
+        """
+        Test _check_underscore_file_is_safe with safe template
+        """
+        linter = UnderscoreTemplateLinter()
+        results = FileResults('')
+
+        template = textwrap.dedent("""
+            <%- gettext('Single Line') %>
+
+            <%-
+                gettext('Multiple Lines')
+            %>
+        """)
+
+        linter._check_underscore_file_is_safe(template, results)
+
+        self.assertEqual(len(results.violations), 0)
+
+    def test_check_underscore_file_is_not_safe(self):
+        """
+        Test _check_underscore_file_is_safe with unsafe template
+        """
+        linter = UnderscoreTemplateLinter()
+        results = FileResults('')
+
+        template = textwrap.dedent("""
+            <%= gettext('Single Line') %>
+
+            <%=
+                gettext('Multiple Lines')
+            %>
+        """)
+
+        linter._check_underscore_file_is_safe(template, results)
+
+        self.assertEqual(len(results.violations), 2)
+        self.assertEqual(results.violations[0].rule, Rules.underscore_not_escaped)
+        self.assertEqual(results.violations[1].rule, Rules.underscore_not_escaped)
+
+    @data(
+        {
+            'template':
+                '<% // safe-lint:   disable=underscore-not-escaped   %>\n'
+                '<%= message %>',
+            'is_disabled': [True],
+        },
+        {
+            'template':
+                '<% // safe-lint: disable=another-rule,underscore-not-escaped %>\n'
+                '<%= message %>',
+            'is_disabled': [True],
+        },
+        {
+            'template':
+                '<% // safe-lint: disable=another-rule %>\n'
+                '<%= message %>',
+            'is_disabled': [False],
+        },
+        {
+            'template':
+                '<% // safe-lint: disable=underscore-not-escaped %>\n'
+                '<%= message %>\n'
+                '<%= message %>',
+            'is_disabled': [True, False],
+        },
+        {
+            'template':
+                '// This test does not use proper Underscore.js Template syntax\n'
+                '// But, it is just testing that a maximum of 5 non-whitespace\n'
+                '// are used to designate start of line for disabling the next line.\n'
+                ' 1 2 3 4 5 safe-lint: disable=underscore-not-escaped %>\n'
+                '<%= message %>\n'
+                ' 1 2 3 4 5 6 safe-lint: disable=underscore-not-escaped %>\n'
+                '<%= message %>',
+            'is_disabled': [True, False],
+        },
+        {
+            'template':
+                '<%= message %><% // safe-lint: disable=underscore-not-escaped %>\n'
+                '<%= message %>',
+            'is_disabled': [True, False],
+        },
+        {
+            'template':
+                '<%= message %>\n'
+                '<% // safe-lint: disable=underscore-not-escaped %>',
+            'is_disabled': [False],
+        },
+    )
+    def test_check_underscore_file_disable_rule(self, data):
+        """
+        Test _check_underscore_file_is_safe with various disabled pragmas
+        """
+        linter = UnderscoreTemplateLinter()
+        results = FileResults('')
+
+        linter._check_underscore_file_is_safe(data['template'], results)
+
+        violation_count = len(data['is_disabled'])
+        self.assertEqual(len(results.violations), violation_count)
+        for index in range(0, violation_count - 1):
+            self.assertEqual(results.violations[index].is_disabled, data['is_disabled'][index])
+
+    def test_check_underscore_file_disables_one_violation(self):
+        """
+        Test _check_underscore_file_is_safe with disabled before a line only
+        disables for the violation following
+        """
+        linter = UnderscoreTemplateLinter()
+        results = FileResults('')
+
+        template = textwrap.dedent("""
+            <% // safe-lint: disable=underscore-not-escaped %>
+            <%= message %>
+            <%= message %>
+        """)
+
+        linter._check_underscore_file_is_safe(template, results)
+
+        self.assertEqual(len(results.violations), 2)
+        self.assertEqual(results.violations[0].is_disabled, True)
+        self.assertEqual(results.violations[1].is_disabled, False)
+
+    @data(
+        {'template': '<%= HtmlUtils.ensureHtml(message) %>'},
+        {'template': '<%= _.escape(message) %>'},
+    )
+    def test_check_underscore_no_escape_allowed(self, data):
+        """
+        Test _check_underscore_file_is_safe with expressions that are allowed
+        without escaping because the internal calls properly escape.
+        """
+        linter = UnderscoreTemplateLinter()
+        results = FileResults('')
+
+        linter._check_underscore_file_is_safe(data['template'], results)
+
+        self.assertEqual(len(results.violations), 0)

@@ -288,6 +288,7 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 BADGR_API_TOKEN = ENV_TOKENS.get('BADGR_API_TOKEN', BADGR_API_TOKEN)
 BADGR_BASE_URL = ENV_TOKENS.get('BADGR_BASE_URL', BADGR_BASE_URL)
 BADGR_ISSUER_SLUG = ENV_TOKENS.get('BADGR_ISSUER_SLUG', BADGR_ISSUER_SLUG)
+BADGR_TIMEOUT = ENV_TOKENS.get('BADGR_TIMEOUT', BADGR_TIMEOUT)
 
 # git repo loading  environment
 GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
@@ -439,6 +440,11 @@ if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
+
+# Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
+# normally appends to every returned URL.
+AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
+AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
@@ -794,3 +800,5 @@ CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 # The extended StudentModule history table
 if FEATURES.get('ENABLE_CSMH_EXTENDED'):
     INSTALLED_APPS += ('coursewarehistoryextended',)
+
+API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')

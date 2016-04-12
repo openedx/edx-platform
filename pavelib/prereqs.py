@@ -167,6 +167,7 @@ PACKAGES_TO_UNINSTALL = [
 ]
 
 
+@task
 def uninstall_python_packages():
     """
     Uninstall Python packages that need explicit uninstallation.

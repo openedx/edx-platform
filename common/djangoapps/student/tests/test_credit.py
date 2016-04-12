@@ -4,9 +4,9 @@ Tests for credit courses on the student dashboard.
 import unittest
 import datetime
 
+import ddt
 from mock import patch
 import pytz
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -28,6 +28,7 @@ TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
     "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY,
 })
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
+@ddt.ddt
 class CreditCourseDashboardTest(ModuleStoreTestCase):
     """
     Tests for credit courses on the student dashboard.
@@ -106,9 +107,12 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
         # The user should still have the option to purchase credit,
         # but there should also be a message urging the user to purchase soon.
+
         response = self._load_dashboard()
+
         self.assertContains(response, "credit-eligibility-msg")
         self.assertContains(response, "purchase-credit-btn")
+        self.assertContains(response, "You have completed this course and are eligible")
 
     def test_purchased_credit(self):
         # Simulate that the user has purchased credit, but has not
@@ -206,3 +210,35 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
     def _set_request_status(self, uuid, status):
         """Set the status of a request for credit, simulating the notification from the provider. """
         credit_api.update_credit_request_status(uuid, self.PROVIDER_ID, status)
+
+    @ddt.data(
+        (
+            [u'Arizona State University'],
+            'You are now eligible for credit from Arizona State University'),
+        (
+            [u'Arizona State University', u'Hogwarts School of Witchcraft'],
+            'You are now eligible for credit from Arizona State University and Hogwarts School of Witchcraft'
+        ),
+        (
+            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry', u'Charter Oak'],
+            'You are now eligible for credit from Arizona State University, Hogwarts School'
+            ' of Witchcraft and Wizardry, and Charter Oak'
+        ),
+        ([], 'You have completed this course and are eligible'),
+        (None, 'You have completed this course and are eligible')
+    )
+    @ddt.unpack
+    def test_eligible_for_credit_with_providers_names(self, providers_list, credit_string):
+        """Verify the message on dashboard with different number of providers."""
+        # Simulate that the user has completed the only requirement in the course
+        # so the user is eligible for credit.
+        self._make_eligible()
+
+        # The user should have the option to purchase credit
+        with patch('student.views.get_credit_provider_display_names') as mock_method:
+            mock_method.return_value = providers_list
+            response = self._load_dashboard()
+
+        self.assertContains(response, "credit-eligibility-msg")
+        self.assertContains(response, "purchase-credit-btn")
+        self.assertContains(response, credit_string)

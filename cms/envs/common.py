@@ -520,6 +520,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -814,6 +815,9 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
+
     # comment common
     'django_comment_common',
 
@@ -885,6 +889,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
 )
 
 

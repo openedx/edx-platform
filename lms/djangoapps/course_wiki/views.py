@@ -60,7 +60,10 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=unused-argument
         new_site.save()
         site_id = str(new_site.id)
         if site_id != str(settings.SITE_ID):
-            raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(site_id, settings.SITE_ID))
+            msg = "No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(
+                site_id, settings.SITE_ID
+            )
+            raise ImproperlyConfigured(msg)
 
     try:
         urlpath = URLPath.get_by_path(course_slug, select_related=True)

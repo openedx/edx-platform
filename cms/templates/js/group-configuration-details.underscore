@@ -80,8 +80,15 @@
       </ol>
     <% } else { %>
       <p class="group-configuration-usage-text">
-        <!-- This contains an anchor link and therefore can't be escaped. -->
-        <%= outlineAnchorMessage %>
+          <%= HtmlUtils.interpolateHtml(
+              gettext('This Group Configuration is not in use. Start by adding a content experiment to any Unit via the {linkStart}Course Outline{linkEnd}.'),
+              {
+                  linkStart: HtmlUtils.interpolateHtml(
+                      HtmlUtils.HTML('<a href="{courseOutlineUrl}" title="{courseOutlineTitle}">'),
+                      { courseOutlineUrl: courseOutlineUrl, courseOutlineTitle: gettext('Course Outline')}),
+                  linkEnd: HtmlUtils.HTML('</a>')
+              })
+          %>
       </p>
     <% } %>
   </div>

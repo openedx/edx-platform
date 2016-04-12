@@ -320,3 +320,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ######### custom courses #########
 INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
+
+# API access management -- needed for simple-history to run.
+INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)

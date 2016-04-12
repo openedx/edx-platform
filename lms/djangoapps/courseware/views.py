@@ -181,7 +181,7 @@ def render_accordion(user, request, course, chapter, section, field_data_cache):
     return render_to_string('courseware/accordion.html', context)
 
 
-def get_current_child(xmodule, min_depth=None):
+def get_current_child(xmodule, min_depth=None, requested_child=None):
     """
     Get the xmodule.position's display item of an xmodule that has a position and
     children.  If xmodule has no position or is out of bounds, return the first
@@ -193,23 +193,36 @@ def get_current_child(xmodule, min_depth=None):
 
     Returns None only if there are no children at all.
     """
+    def _get_child(children):
+        """
+        Returns either the first or last child based on the value of
+        the requested_child parameter.  If requested_child is None,
+        returns the first child.
+        """
+        if requested_child == 'first':
+            return children[0]
+        elif requested_child == 'last':
+            return children[-1]
+        else:
+            return children[0]
+
     def _get_default_child_module(child_modules):
         """Returns the first child of xmodule, subject to min_depth."""
         if not child_modules:
             default_child = None
         elif not min_depth > 0:
-            default_child = child_modules[0]
+            default_child = _get_child(child_modules)
         else:
             content_children = [child for child in child_modules if
                                 child.has_children_at_depth(min_depth - 1) and child.get_display_items()]
-            default_child = content_children[0] if content_children else None
+            default_child = _get_child(content_children) if content_children else None
 
         return default_child
 
     if not hasattr(xmodule, 'position'):
         return None
 
-    if xmodule.position is None:
+    if xmodule.position is None or requested_child:
         return _get_default_child_module(xmodule.get_display_items())
     else:
         # position is 1-indexed.
@@ -421,14 +434,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course_key, user, course, depth=2)
 
-        course_module = get_module_for_descriptor(
-            user, request, course, field_data_cache, course_key, course=course
-        )
-        if course_module is None:
-            log.warning(u'If you see this, something went wrong: if we got this'
-                        u' far, should have gotten a course module for this user')
-            return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
-
         studio_url = get_studio_url(course, 'course')
 
         language_preference = get_user_preference(request.user, LANGUAGE_KEY)
@@ -478,89 +483,87 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
-            return redirect_to_course_position(course_module, CONTENT_DEPTH)
+            return redirect_to_course_position(course, CONTENT_DEPTH)
 
         chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
         if chapter_descriptor is not None:
-            save_child_position(course_module, chapter)
+            save_child_position(course, chapter)
         else:
-            raise Http404('No chapter descriptor found with name {}'.format(chapter))
-
-        chapter_module = course_module.get_child_by(lambda m: m.location.name == chapter)
-        if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             if masquerade and masquerade.role == 'student':  # if staff is masquerading as student be kinder, don't 404
                 log.debug('staff masquerading as student: no chapter %s', chapter)
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
-            raise Http404
+            raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
         if course_has_entrance_exam(course):
             # Message should not appear outside the context of entrance exam subsection.
             # if section is none then we don't need to show message on welcome back screen also.
-            if getattr(chapter_module, 'is_entrance_exam', False) and section is not None:
+            if getattr(chapter_descriptor, 'is_entrance_exam', False) and section is not None:
                 context['entrance_exam_current_score'] = get_entrance_exam_score(request, course)
                 context['entrance_exam_passed'] = user_has_passed_entrance_exam(request, course)
 
-        if section is not None:
-            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
-
-            if section_descriptor is None:
-                # Specifically asked-for section doesn't exist
-                if masquerade and masquerade.role == 'student':  # don't 404 if staff is masquerading as student
-                    log.debug('staff masquerading as student: no section %s', section)
-                    return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
-                raise Http404
-
-            # Allow chromeless operation
-            if section_descriptor.chrome:
-                chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
-                if 'accordion' not in chrome:
-                    context['disable_accordion'] = True
-                if 'tabs' not in chrome:
-                    context['disable_tabs'] = True
-
-            if section_descriptor.default_tab:
-                context['default_tab'] = section_descriptor.default_tab
-
-            # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
-            # which will prefetch the children more efficiently than doing a recursive load
-            section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
-
-            # Load all descendants of the section, because we're going to display its
-            # html, which in general will need all of its children
-            field_data_cache.add_descriptor_descendents(
-                section_descriptor, depth=None
-            )
-
-            section_module = get_module_for_descriptor(
-                user,
-                request,
-                section_descriptor,
-                field_data_cache,
-                course_key,
-                position,
-                course=course
-            )
-
-            if section_module is None:
-                # User may be trying to be clever and access something
-                # they don't have access to.
-                raise Http404
-
-            # Save where we are in the chapter.
-            save_child_position(chapter_module, section)
-            section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
-            context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
-            context['section_title'] = section_descriptor.display_name_with_default_escaped
-        else:
-            prev_section = get_current_child(chapter_module)
-            if prev_section is None:
+        if section is None:
+            section_descriptor = get_current_child(chapter_descriptor, requested_child=request.GET.get("child"))
+            if section_descriptor:
+                section = section_descriptor.url_name
+            else:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user.
                 # Clearing out the last-visited state and showing "first-time" view by redirecting
                 # to courseware.
-                course_module.position = None
-                course_module.save()
+                course.position = None
+                course.save()
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+        else:
+            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
+
+        if section_descriptor is None:
+            # Specifically asked-for section doesn't exist
+            if masquerade and masquerade.role == 'student':  # don't 404 if staff is masquerading as student
+                log.debug('staff masquerading as student: no section %s', section)
+                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+            raise Http404
+
+        # Allow chromeless operation
+        if section_descriptor.chrome:
+            chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
+            if 'accordion' not in chrome:
+                context['disable_accordion'] = True
+            if 'tabs' not in chrome:
+                context['disable_tabs'] = True
+
+        if section_descriptor.default_tab:
+            context['default_tab'] = section_descriptor.default_tab
+
+        # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
+        # which will prefetch the children more efficiently than doing a recursive load
+        section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
+
+        # Load all descendants of the section, because we're going to display its
+        # html, which in general will need all of its children
+        field_data_cache.add_descriptor_descendents(
+            section_descriptor, depth=None
+        )
+
+        section_module = get_module_for_descriptor(
+            user,
+            request,
+            section_descriptor,
+            field_data_cache,
+            course_key,
+            position,
+            course=course
+        )
+
+        # Save where we are in the chapter.
+        save_child_position(chapter_descriptor, section)
+        section_render_context = {
+            'activate_block_id': request.GET.get('activate_block_id'),
+            'redirect_url_func': get_redirect_url,
+            'requested_child': request.GET.get("child"),
+        }
+        context['accordion'] = render_accordion(user, request, course, chapter, section, field_data_cache)
+        context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
+        context['section_title'] = section_descriptor.display_name_with_default_escaped
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
 
@@ -722,7 +725,7 @@ def course_info(request, course_id):
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['last_accessed_courseware_url'] = None
         if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request)
+            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request, user)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
@@ -737,16 +740,16 @@ def course_info(request, course_id):
         return render_to_response('courseware/info.html', context)
 
 
-def get_last_accessed_courseware(course, request):
+def get_last_accessed_courseware(course, request, user):
     """
-    Return the URL the courseware module that this request's user last
-    accessed, or None if it cannot be found.
+    Return the courseware module URL that the user last accessed,
+    or None if it cannot be found.
     """
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, course, depth=2
     )
     course_module = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id, course=course
+        user, request, course, field_data_cache, course.id, course=course
     )
     chapter_module = get_current_child(course_module)
     if chapter_module is not None:

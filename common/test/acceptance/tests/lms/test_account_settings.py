@@ -286,7 +286,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             u'email',
             u'Email Address',
             email,
-            u'@',
+            u'test@example.com' + XSS_INJECTION,
             [u'me@here.com', u'you@there.com'],
             success_message='Click the link in the message to update your email address.',
             assert_after_reload=False

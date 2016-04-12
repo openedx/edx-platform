@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
@@ -27,4 +28,4 @@
     </ul>
 </div>
 <span data-tooltip="${_("Drag to reorder")}" class="drag-handle action"></span>
-${preview}
+${preview | n}

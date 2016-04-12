@@ -857,7 +857,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplate('content-group-details', true);
-            this.model = new GroupModel({name: 'Content Group', id: 0});
+            this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: "CourseOutlineUrl"});
 
             var saveableModel = new GroupConfigurationModel({
                 name: 'Content Group Configuration',
@@ -888,7 +888,7 @@ define([
 
         it('should hide empty usage appropriately', function() {
             this.view.$('.hide-groups').click();
-            assertHideEmptyUsages(this.view)
+            assertHideEmptyUsages(this.view);
         });
 
         it('should show non-empty usage appropriately', function() {
@@ -1001,7 +1001,7 @@ define([
                 'content-group-editor', 'content-group-details'
             ], true);
 
-            this.model = new GroupModel({name: 'Content Group', id: 0});
+            this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: 'CourseOutlineUrl'});
 
             this.saveableModel = new GroupConfigurationModel({
                 name: 'Content Group Configuration',

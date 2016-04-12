@@ -34,6 +34,7 @@ from lms.djangoapps.ccx.overrides import (
     override_field_for_ccx,
 )
 from lms.djangoapps.ccx.utils import (
+    add_master_course_staff_to_ccx,
     assign_coach_role_to_ccx,
     is_email,
     get_course_chapters,
@@ -506,6 +507,13 @@ class CCXListView(GenericAPIView):
             )
             # assign coach role for the coach to the newly created ccx
             assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+            # assign staff role for all the staff and instructor of the master course to the newly created ccx
+            add_master_course_staff_to_ccx(
+                master_course_object,
+                ccx_course_key,
+                ccx_course_object.display_name,
+                send_email=False
+            )
 
         serializer = self.get_serializer(ccx_course_object)
         return Response(

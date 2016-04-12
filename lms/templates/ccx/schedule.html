@@ -1,13 +1,19 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
 
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="jsextra">
-  <script>  
-    var save_url = '${save_url}';
-    var schedule = ${schedule};
+  <script>
+    var save_url = '${save_url | n, js_escaped_string}';
+    var schedule = ${schedule | n, dump_js_escaped_json};
   </script>
-    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <style>

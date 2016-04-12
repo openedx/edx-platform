@@ -371,7 +371,7 @@ FEATURES = {
     # This is the default, but can be disabled if all history
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
-    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True
+    'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -940,7 +940,7 @@ LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Guidelines for translators
-TRANSLATORS_GUIDE = 'http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
+TRANSLATORS_GUIDE = 'http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
 
 #################################### GITHUB #######################################
 # gitreload is used in LMS-workflow to pull content from github
@@ -1178,6 +1178,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1243,7 +1244,14 @@ base_vendor_js = [
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
-    'js/vendor/underscore.string.min.js',
+    'common/js/vendor/underscore.string.js',
+
+    # Make some edX UI Toolkit utilities available in the global "edx" namespace
+    'edx-ui-toolkit/js/utils/global-loader.js',
+    'edx-ui-toolkit/js/utils/string-utils.js',
+    'edx-ui-toolkit/js/utils/html-utils.js',
+
+    # Finally load RequireJS and dependent vendor libraries
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
@@ -1636,14 +1644,18 @@ REQUIRE_ENVIRONMENT = "node"
 # If you want to load JavaScript dependencies using RequireJS
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
-REQUIRE_JS_PATH_OVERRIDES = [
-    'js/bookmarks/views/bookmark_button.js',
-    'js/views/message_banner.js',
-    'js/vendor/moment.min.js',
-    'js/vendor/url.min.js',
-    'js/courseware/course_home_events.js',
-    'js/courseware/toggle_element_visibility.js'
-]
+REQUIRE_JS_PATH_OVERRIDES = {
+    'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'js/views/message_banner': 'js/views/message_banner.js',
+    'moment': 'js/vendor/moment.min.js',
+    'jquery.url': 'js/vendor/url.min.js',
+    'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
+    'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
+    'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
+    'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
+    'js/bookmarks/bookmarks_factory': 'js/bookmarks/bookmarks_factory.js',
+    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js'
+}
 ################################# CELERY ######################################
 
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
@@ -1809,6 +1821,9 @@ INSTALLED_APPS = (
 
     # Theming
     'openedx.core.djangoapps.theming',
+
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
 
     # Our courseware
     'courseware',
@@ -1991,6 +2006,21 @@ INSTALLED_APPS = (
 
     # Review widgets
     'openedx.core.djangoapps.coursetalk',
+
+    # API access administration
+    'openedx.core.djangoapps.api_admin',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
+
+    # Verified Track Content Cohorting
+    'verified_track_content',
+
+    # Learner's dashboard
+    'learner_dashboard',
+
+    # Needed whether or not enabled, due to migrations
+    'badges',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2234,12 +2264,17 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
 
-#################### Badgr OpenBadges generation #######################
+#################### OpenBadges Settings #######################
+
+BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
+
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
 # Do not add the trailing slash here.
 BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
+# Number of seconds to wait on the badging server when contacting it before giving up.
+BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
@@ -2604,6 +2639,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'language_proficiencies',
         'bio',
         'account_privacy',
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
     ],
 
     # The list of account fields that are always public
@@ -2631,6 +2668,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "mailing_address",
         "requires_parental_consent",
         "account_privacy",
+        "accomplishments_shared",
     ]
 }
 
@@ -2815,3 +2853,12 @@ AUDIT_CERT_CUTOFF_DATE = None
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
+
+# Dafault site id to use in case there is no site that matches with the request headers.
+DEFAULT_SITE_ID = 1
+
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'

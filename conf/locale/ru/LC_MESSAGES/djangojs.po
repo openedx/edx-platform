@@ -115,9 +115,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 10:59+0000\n"
-"PO-Revision-Date: 2016-02-29 15:27+0000\n"
-"Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
+"POT-Creation-Date: 2016-03-30 19:38+0000\n"
+"PO-Revision-Date: 2016-04-06 16:22+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -135,7 +135,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2662,8 +2662,8 @@ msgstr ""
 "команды."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "Команда «%(team)s» успешно удалена."
+msgid "Team \"{team}\" successfully deleted."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -5055,8 +5055,8 @@ msgid "Please enter non-negative integer."
 msgstr "Пожалуйста, введите целое неотрицательное число."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5174,27 +5174,12 @@ msgstr "Не используется"
 #. configuration is used in.
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
-msgid "Used in %(count)s unit"
-msgid_plural "Used in %(count)s units"
-msgstr[0] "Используется в %(count)s блоке"
-msgstr[1] "Используется в %(count)s блоках"
-msgstr[2] "Используется в %(count)s блоках"
-msgstr[3] "Используется в %(count)s блоках"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/content_group_details.js
-msgid ""
-"This content group is not in use. Add a content group to any unit from the "
-"%(outlineAnchor)s."
-msgstr ""
-"Эта группа материалов не используется. Сначала добавьте группу материалов к "
-"любому блоку курса, пользуясь %(outlineAnchor)s."
-
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Course Outline"
-msgstr "Структура курса"
+msgid "Used in {count} unit"
+msgid_plural "Used in {count} units"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -5234,22 +5219,12 @@ msgstr "Пожалуйста, выберите файл в формате PDF д
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
-msgid "Contains %(count)s group"
-msgid_plural "Contains %(count)s groups"
-msgstr[0] "Включает в себя %(count)s группу"
-msgstr[1] "Включает в себя %(count)s группы"
-msgstr[2] "Включает в себя %(count)s групп"
-msgstr[3] "Включает в себя %(count)s групп"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/group_configuration_details.js
-msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment"
-" to any Unit via the %(outlineAnchor)s."
-msgstr ""
-"Эта конфигурация групп не используется.  Сначала добавьте экспериментальные "
-"материалы к любому блоку курса, пользуясь %(outlineAnchor)s."
+msgid "Contains {count} group"
+msgid_plural "Contains {count} groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5467,26 +5442,6 @@ msgstr "Отменить изменения"
 msgid "Change Manually"
 msgstr "Изменить вручную"
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "Свернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "Развернуть разделы"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "Дата выпуска:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} в {hour}:{minute} UTC"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "Редактировать дату выпуска раздела."
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5643,13 +5598,9 @@ msgstr "Ваши изменения были сохранены."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
-"Please note that validation of your policy key and value pairs is not "
-"currently in place yet. If you are having difficulties, please review your "
-"policy pairs."
+"No validation is performed on policy keys or value pairs. If you are having "
+"difficulties, check your formatting."
 msgstr ""
-"Пожалуйста, обратите внимание, что проверки пар ключей и значений в "
-"настоящее время еще нет. Если у вас возникли трудности, пожалуйста, ещё раз "
-"проверьте ваши пары вручную."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -7092,22 +7043,15 @@ msgid "Deleted Content Group"
 msgstr "Удалённая группа по изучаемым материалам"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
-" content group was deleted. Select another content group."
+"{screen_reader_start}Warning:{screen_reader_end} The previously selected "
+"content group was deleted. Select another content group."
 msgstr ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s Ранее выбранная группа "
-"по изучаемому материалу удалена. Выберите другую группу."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
-"exist."
+"{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s Нет групп по изучаемому"
-" материалу."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -7164,15 +7108,11 @@ msgid "Assign students to cohorts by uploading a CSV file"
 msgstr "Распределить слушателей по группам, загрузив файл CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#, python-format
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on "
-"%(link_start)s the Data Download page. %(link_end)s"
+"file, download course profile information or cohort results on {link_start} "
+"the Data Download page. {link_end}"
 msgstr ""
-"Чтобы просмотреть распределение по группам или проверить результат загрузки "
-"файла CSV, скачайте список личных данных слушателей или оценочный лист на "
-"%(link_start)sстранице загрузки данных%(link_end)s."
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -8254,6 +8194,17 @@ msgstr "Невозможно удалить, пока используется �
 msgid "This content group is used in:"
 msgstr "Эта группа по изучаемым материалам используется в следующих блоках:"
 
+#: cms/templates/js/content-group-details.underscore
+msgid ""
+"This content group is not in use. Add a content group to any unit from the "
+"{linkStart}Course Outline{linkEnd}."
+msgstr ""
+
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr ""
+
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
 msgstr "Название группы по изучаемому материалу"
@@ -8367,40 +8318,50 @@ msgid "Assignment Type Name"
 msgstr "Название типа задания"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. Homework, Midterm Exams"
-msgstr "например, Домашнее задание, Экзамен"
+msgid ""
+"The general category for this type of assignment, for example, Homework or "
+"Midterm Exam. This name is visible to learners."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
 msgstr "Аббревиатура"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. HW, Midterm"
-msgstr "например, ДЗ, Экз"
+msgid ""
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
 msgstr "Вес итоговой оценки"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "as a percent, e.g. 40"
-msgstr "в процентах, например, 40"
+msgid ""
+"The weight of all assignments of this type as a percentage of the total "
+"grade, for example, 40. Do not include the percent symbol."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Total Number"
 msgstr "Общее количество"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises assigned"
-msgstr "всего назначено заданий"
+msgid ""
+"The number of subsections in the course that contain problems of this "
+"assignment type."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
 msgstr "Количество отбрасываемых"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises that won't be graded"
-msgstr "всего упражнений, не подлежащих оценке"
+msgid ""
+"The number of assignments of this type that will be dropped. The lowest "
+"scoring assignments are dropped first."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -8517,6 +8478,12 @@ msgstr "Невозможно удалить, пока используется �
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
 msgstr "Эта конфигурация групп используется в:"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid ""
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
+msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"

@@ -92,7 +92,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 11:00+0000\n"
+"POT-Creation-Date: 2016-03-30 19:39+0000\n"
 "PO-Revision-Date: 2015-11-24 13:39+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -155,6 +155,11 @@ msgstr ""
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "상태"
+
+#: cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Pending"
+msgstr "대기중"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -2613,14 +2618,26 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
 " course at any rate before the course ends."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Bypass Course Home"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Bypass the course home tab when students arrive from the dashboard, sending "
+"them directly to course content."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3871,6 +3888,12 @@ msgstr ""
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
 msgstr ""
 
 #: lms/djangoapps/ccx/utils.py
@@ -5549,10 +5572,6 @@ msgid "Data Download"
 msgstr "데이터"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "For analytics about your course, go to {analytics_dashboard_name}."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
 msgstr ""
 
@@ -5631,7 +5650,6 @@ msgstr ""
 #: cms/templates/register.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7275,131 +7293,66 @@ msgid "Your Password Reset is Complete"
 msgstr "비밀번호 재설정이 완료되었습니다."
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
-"      "
+msgid "Password Reset Complete"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"      Reset Your %(platform_name)s Password\n"
-"  "
+"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
+"                "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"          Reset Your %(platform_name)s Password\n"
-"          "
+"    Reset Your %(platform_name)s Password\n"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Form"
+msgid "Error Resetting Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"\n"
-"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
-"            "
+msgid "You must enter and confirm your new password."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The following errors occurred while processing your registration: "
+msgid "The text in both password fields must match."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "You must complete all fields."
+msgid "Reset Your Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The two password fields didn't match."
+msgid "Enter and confirm your new password."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
+msgid "New Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
-"            "
+msgid "Confirm Password"
 msgstr ""
 
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "비밀번호 재설정"
+
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
+msgid "Invalid Password Reset Link"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
-"        "
-msgstr ""
-
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "필수 정보"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password Again"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Change My Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
-"        "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Help"
-msgstr ""
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "도움이 필요하세요?"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
-"          "
+"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
+"                "
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -7888,6 +7841,26 @@ msgstr "이 버전은 삭제되었습니다."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "이 버전으로 되돌리면 글이 삭제된 것으로 표시될 것입니다."
 
+#: cms/templates/index.html
+msgid "Denied"
+msgstr "거절됨"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Approved"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Status of this API access request"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The URL of the website associated with this API user."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The reason this user wants to access the API."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr ""
@@ -7965,11 +7938,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -7978,6 +7953,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
 msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
@@ -8192,6 +8183,7 @@ msgstr ""
 #: cms/templates/temp-course-landing.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "비밀번호"
@@ -8276,6 +8268,13 @@ msgstr "우편주소"
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -8686,11 +8685,6 @@ msgstr ""
 msgid "Date Added"
 msgstr ""
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Pending"
-msgstr "대기중"
-
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -8773,7 +8767,6 @@ msgstr "설정"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "취소"
 
@@ -8809,10 +8802,28 @@ msgstr "강좌 번호:"
 msgid "Courses"
 msgstr "강좌"
 
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
+
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -8824,20 +8835,20 @@ msgstr "이메일"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "예: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "비밀번호를 잊어버리셨나요?"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "예: 홍길동"
@@ -8857,11 +8868,6 @@ msgstr "아이디"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "예: HongGilDong"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "선호하는 언어"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -9193,6 +9199,18 @@ msgid ""
 "setting a new password."
 msgstr "아래에 이메일 주소를 입력 해주십시오, 새로운 비밀번호를 설정하기 위한 안내를 이메일로 보내드립니다."
 
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "필수 정보"
+
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "이메일 주소"
@@ -9200,10 +9218,6 @@ msgstr "이메일 주소"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "{platform} 계정을 만들 때 입력한 이메일입니다"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "비밀번호 재설정"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -9428,6 +9442,11 @@ msgstr "계정이 없으신가요?"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "{platform_name}에 가입하세요!"
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "도움이 필요하세요?"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -9707,7 +9726,6 @@ msgid "Reset"
 msgstr "초기화"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "저장"
 
@@ -10559,6 +10577,10 @@ msgid "Name your CCX"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "일정"
 
@@ -10566,6 +10588,10 @@ msgstr "일정"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "성적 규정"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11469,6 +11495,13 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
 "now.{link_end}"
@@ -11782,6 +11815,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "You are now eligible for credit from {provider}. Congratulations!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
 msgstr ""
 
@@ -11834,10 +11871,6 @@ msgstr ""
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}에게 문의하세요."
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "편집"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -13754,6 +13787,12 @@ msgstr "고객의 구매 주문 혹은 다른 고객정보"
 msgid "Send me a copy of the invoice"
 msgstr "청구서 사본을 보내주세요."
 
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"For analytics about your course, go to "
+"{link_start}{analytics_dashboard_name}{link_end}."
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "교수자 대시보드"
@@ -15192,14 +15231,6 @@ msgstr ""
 "이 강좌나 형식에 대해 질문이 있다면 <a href=\"{mail_to_link}\"\">{mail_to_link}</a>로 "
 "연락해주세요."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "실명 편집"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr "당신의 이름을 편집하는 동안 다음 오류가 발생했습니다 :"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "{course_name} 재인증"
@@ -15425,8 +15456,8 @@ msgid "{studio_name} Server Error"
 msgstr "{studio_name} 서버 오류"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "{studio_name}서버에서 오류가 발생했습니다."
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
 
 #: cms/templates/500.html
 msgid ""
@@ -15493,9 +15524,9 @@ msgstr ""
 "그래도 문제가 있다면, {platform_name} 지원 센터에 문의하세요. {link_start}{studio_name} 홈페이지로 "
 "되돌아 올수 있습니다{link_end} "
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "파일 업로드"
+#: cms/templates/asset_index.html
+msgid "Files & Uploads"
+msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -17235,10 +17266,6 @@ msgid "Your Course Creator request is:"
 msgstr "강좌 생성자 요청 :"
 
 #: cms/templates/index.html
-msgid "Denied"
-msgstr "거절됨"
-
-#: cms/templates/index.html
 msgid ""
 "Your request did not meet the criteria/guidelines specified by "
 "{platform_name} Staff."
@@ -17415,22 +17442,6 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "콘텐츠 보관함에 대해 자세히 알아보기"
-
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "로그인"
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "{studio_name} 로그인"
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "{studio_name}에 지금 가입하세요!"
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "{studio_name}에 로그인하기 위한 필요 정보"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -17609,6 +17620,10 @@ msgstr "edX101 지원 게시판이나, 강좌 게시판 등에서 나를 나타�
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "지역"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -18479,6 +18494,10 @@ msgstr "강좌 개요"
 #: cms/templates/widgets/header.html
 msgid "Updates"
 msgstr "공지사항"
+
+#: cms/templates/widgets/header.html
+msgid "Files &amp; Uploads"
+msgstr "파일 업로드"
 
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"

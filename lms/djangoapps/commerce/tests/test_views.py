@@ -4,7 +4,6 @@ from uuid import uuid4
 from nose.plugins.attrib import attr
 
 import ddt
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 import mock
