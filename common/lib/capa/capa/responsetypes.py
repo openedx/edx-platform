@@ -2819,6 +2819,7 @@ class CodeResponse(LoncapaResponse):
         student_info = {
             'anonymous_student_id': anonymous_student_id,
             'submission_time': qtime,
+            'random_seed': self.context['seed'],
         }
         contents.update({'student_info': json.dumps(student_info)})
 

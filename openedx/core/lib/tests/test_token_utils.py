@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 import freezegun
 import jwt
 from nose.plugins.attrib import attr
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.lib.token_utils import get_id_token

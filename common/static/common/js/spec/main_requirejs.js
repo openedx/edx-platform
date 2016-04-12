@@ -23,7 +23,7 @@
             'sinon': 'js/vendor/sinon-1.17.0',
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
-            'underscore.string': 'js/vendor/underscore.string.min',
+            'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'js/vendor/backbone-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
@@ -155,6 +155,7 @@
 
     define([
         // Run the common tests that use RequireJS.
+        'common-requirejs/include/common/js/spec/components/tabbed_view_spec.js',
         'common-requirejs/include/common/js/spec/components/feedback_spec.js',
         'common-requirejs/include/common/js/spec/components/list_spec.js',
         'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',

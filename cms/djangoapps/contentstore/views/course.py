@@ -563,11 +563,8 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     except errors.CourseStructureNotAvailableError:
         return data
 
-    blocks = []
     for block in structure_data['blocks'].values():
-        blocks.append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
-
-    data['blocks'].extend(blocks)
+        data['blocks'].append([reverse_usage_url('container_handler', block['parent']), block['display_name']])
 
     return data
 

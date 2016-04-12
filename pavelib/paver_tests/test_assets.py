@@ -6,7 +6,7 @@ from unittest import TestCase
 from paver.easy import call_task
 from paver.easy import path
 from mock import patch
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from .utils import PaverTestCase
 
 ROOT_PATH = path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -148,6 +148,8 @@ class TestPaverWatchAssetTasks(TestCase):
         self.expected_sass_directories = [
             path('common/static/sass'),
             path('common/static'),
+            path('node_modules'),
+            path('node_modules/edx-pattern-library/node_modules'),
             path('lms/static/sass/partials'),
             path('lms/static/sass'),
             path('lms/static/certificates/sass'),
@@ -156,12 +158,16 @@ class TestPaverWatchAssetTasks(TestCase):
         ]
         super(TestPaverWatchAssetTasks, self).setUp()
 
+    def tearDown(self):
+        self.expected_sass_directories = []
+        super(TestPaverWatchAssetTasks, self).tearDown()
+
     def test_watch_assets(self):
         """
         Test the "compile_sass" task.
         """
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.Observer.start'):
+            with patch('pavelib.assets.PollingObserver.start'):
                 call_task(
                     'pavelib.assets.watch_assets',
                     options={"background": True},
@@ -170,7 +176,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                 sass_watcher_args = mock_register.call_args_list[0][0]
 
-                self.assertIsInstance(sass_watcher_args[0], Observer)
+                self.assertIsInstance(sass_watcher_args[0], PollingObserver)
                 self.assertIsInstance(sass_watcher_args[1], list)
                 self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
@@ -186,7 +192,7 @@ class TestPaverWatchAssetTasks(TestCase):
         ])
 
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
-            with patch('pavelib.assets.Observer.start'):
+            with patch('pavelib.assets.PollingObserver.start'):
                 call_task(
                     'pavelib.assets.watch_assets',
                     options={"background": True, "themes_dir": TEST_THEME.dirname(),
@@ -195,10 +201,6 @@ class TestPaverWatchAssetTasks(TestCase):
                 self.assertEqual(mock_register.call_count, 2)
 
                 sass_watcher_args = mock_register.call_args_list[0][0]
-                self.assertIsInstance(sass_watcher_args[0], Observer)
+                self.assertIsInstance(sass_watcher_args[0], PollingObserver)
                 self.assertIsInstance(sass_watcher_args[1], list)
                 self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
-
-    def tearDown(self):
-        self.expected_sass_directories = []
-        super(TestPaverWatchAssetTasks, self).tearDown()

@@ -35,7 +35,7 @@
             this.updateContext( this.templateContext() ).done(
                 function( templateContext ) {
                     // Render the template into the DOM
-                    $( this.el ).html( _.template( templateHtml)( templateContext ) );
+                    edx.HtmlUtils.setHtml( $(this.el), edx.HtmlUtils.template(templateHtml)( templateContext ) );
 
                     // Allow subclasses to install custom event handlers
                     this.postRender();

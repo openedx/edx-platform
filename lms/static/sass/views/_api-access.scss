@@ -1,0 +1,75 @@
+#api-access-wrapper {
+
+  #api-access-request-header {
+    @extend %t-title4;
+    margin-bottom: 0;
+    padding: $baseline;
+    @include text-align(left);
+  }
+
+  .request-status {
+    margin: 0 $baseline;
+    padding: $baseline;
+    box-shadow: 0 1px 2px 1px $shadow-l1;
+
+    &.request-pending {
+      border-top: 2px solid $orange;
+    }
+  }
+
+  #api-access-status {
+    @extend %t-copy-base;
+  }
+
+  #api-access-request {
+
+    padding: 0 $baseline $baseline $baseline;
+
+    #api-form-fields {
+
+      li {
+        margin: $baseline 0;
+
+        .helptext {
+          @extend %t-copy-sub1;
+          display: block;
+        }
+      }
+
+      label {
+        @extend %t-copy-base;
+        display: block;
+        font-style: normal;
+      }
+
+      input, textarea {
+        @extend %t-copy-base;
+        font-family: 'Open Sans';
+        font-style: normal;
+      }
+
+      .errorlist {
+
+        padding: 0;
+        list-style-type: none;
+
+        li {
+          @extend %t-copy-base;
+          margin: 0;
+          color: $red;
+        }
+      }
+    }
+
+    #api-access-submit {
+      @extend %t-copy-base;
+      border-radius: 3px;
+      border: none;
+      background-color: $blue;
+      box-shadow: none;
+      background-image: none;
+      text-shadow: none;
+      text-transform: none;
+    }
+  }
+}

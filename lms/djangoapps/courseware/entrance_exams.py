@@ -1,7 +1,6 @@
 """
 This file contains all entrance exam related utils/logic.
 """
-from django.conf import settings
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient

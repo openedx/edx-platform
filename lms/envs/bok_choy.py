@@ -67,7 +67,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
 
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
@@ -162,6 +161,9 @@ FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Enable dashboard search for tests
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
+# Enable support for OpenBadges accomplishments
+FEATURES['ENABLE_OPENBADGES'] = True
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
@@ -184,6 +186,8 @@ PROFILE_IMAGE_BACKEND = {
 # Make sure we test with the extended history table
 FEATURES['ENABLE_CSMH_EXTENDED'] = True
 INSTALLED_APPS += ('coursewarehistoryextended',)
+
+BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

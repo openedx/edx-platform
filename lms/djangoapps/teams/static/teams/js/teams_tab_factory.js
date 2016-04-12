@@ -5,7 +5,8 @@
             return function (options) {
                 var teamsTab = new TeamsTabView({
                     el: $('.teams-content'),
-                    context: options
+                    context: options,
+                    viewLabel: gettext("Teams")
                 });
                 teamsTab.start();
             };

@@ -741,6 +741,15 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
+    def test_export_to_xml_with_transcripts_as_none(self):
+        """
+        Test XML export with transcripts being overridden to None.
+        """
+        self.descriptor.transcripts = None
+        xml = self.descriptor.definition_to_xml(None)
+        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """

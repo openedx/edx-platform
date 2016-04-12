@@ -2,7 +2,7 @@
 Models for contentserver
 """
 
-from django.db.models.fields import PositiveIntegerField
+from django.db.models.fields import PositiveIntegerField, TextField
 from config_models.models import ConfigurationModel
 
 
@@ -24,6 +24,29 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
 
     def __repr__(self):
         return '<CourseAssetCacheTtlConfig(cache_ttl={})>'.format(self.get_cache_ttl())
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
+class CdnUserAgentsConfig(ConfigurationModel):
+    """Configuration for the user agents we expect to see from CDNs."""
+
+    class Meta(object):
+        app_label = 'contentserver'
+
+    cdn_user_agents = TextField(
+        default='Amazon CloudFront',
+        help_text="A newline-separated list of user agents that should be considered CDNs."
+    )
+
+    @classmethod
+    def get_cdn_user_agents(cls):
+        """Gets the list of CDN user agents, if present"""
+        return cls.current().cdn_user_agents
+
+    def __repr__(self):
+        return '<WhitelistedCdnConfig(cdn_user_agents={})>'.format(self.get_cdn_user_agents())
 
     def __unicode__(self):
         return unicode(repr(self))

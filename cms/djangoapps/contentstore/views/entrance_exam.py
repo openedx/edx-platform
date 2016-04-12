@@ -3,7 +3,6 @@ Entrance Exams view module -- handles all requests related to entrance exam mana
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
 from functools import wraps
-import json
 import logging
 
 from django.contrib.auth.decorators import login_required

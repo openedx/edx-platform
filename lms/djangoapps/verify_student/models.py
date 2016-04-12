@@ -26,7 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.dispatch import receiver
-from django.db import models, transaction, IntegrityError
+from django.db import models, transaction
 from django.utils.translation import ugettext as _, ugettext_lazy
 
 from boto.s3.connection import S3Connection

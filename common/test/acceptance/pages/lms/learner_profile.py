@@ -1,6 +1,8 @@
 """
 Bok-Choy PageObject class for learner profile page.
 """
+from bok_choy.query import BrowserQuery
+
 from . import BASE_URL
 from bok_choy.page_object import PageObject
 from .fields import FieldsMixin
@@ -14,6 +16,49 @@ FIELD_ICONS = {
     'country': 'fa-map-marker',
     'language_proficiencies': 'fa-comment',
 }
+
+
+class Badge(PageObject):
+    """
+    Represents a single badge displayed on the learner profile page.
+    """
+    url = None
+
+    def __init__(self, element, browser):
+        self.full_view = browser
+        # Element API is similar to browser API, should allow subqueries.
+        super(Badge, self).__init__(element)
+
+    def is_browser_on_page(self):
+        return self.q(css=".badge-details").visible
+
+    def modal_displayed(self):
+        """
+        Verifies that the share modal is diplayed.
+        """
+        # The modal is on the page at large, and not a subelement of the badge div.
+        return BrowserQuery(self.full_view, css=".badges-modal").visible
+
+    def display_modal(self):
+        """
+        Click the share button to display the sharing modal for the badge.
+        """
+        self.q(css=".share-button").click()
+        EmptyPromise(self.modal_displayed, "Share modal displayed").fulfill()
+        EmptyPromise(self.modal_focused, "Focus handed to modal").fulfill()
+
+    def modal_focused(self):
+        """
+        Return True if the badges model has focus, False otherwise.
+        """
+        return BrowserQuery(self.full_view, css=".badges-modal").is_focused()
+
+    def close_modal(self):
+        """
+        Close the badges modal and check that it is no longer displayed.
+        """
+        BrowserQuery(self.full_view, css=".badges-modal .close").click()
+        EmptyPromise(lambda: not self.modal_displayed(), "Share modal dismissed").fulfill()
 
 
 class LearnerProfilePage(FieldsMixin, PageObject):
@@ -57,6 +102,27 @@ class LearnerProfilePage(FieldsMixin, PageObject):
             'all_users' or 'private'
         """
         return 'all_users' if self.q(css=PROFILE_VISIBILITY_SELECTOR.format('all_users')).selected else 'private'
+
+    def accomplishments_available(self):
+        """
+        Verify that the accomplishments tab is available.
+        """
+        return self.q(css="button[data-url='accomplishments']").visible
+
+    def display_accomplishments(self):
+        """
+        Click the accomplishments tab and wait for the accomplishments to load.
+        """
+        EmptyPromise(self.accomplishments_available, "Accomplishments tab is displayed").fulfill()
+        self.q(css="button[data-url='accomplishments']").click()
+        self.wait_for_element_visibility(".badge-list", "Badge list displayed")
+
+    @property
+    def badges(self):
+        """
+        Get all currently listed badges.
+        """
+        return [Badge(element, self.browser) for element in self.q(css=".badge-display:not(.badge-placeholder)")]
 
     @privacy.setter
     def privacy(self, privacy):

@@ -204,7 +204,7 @@ def create_modulestore_instance(
         xblock_field_data_wrappers=xblock_field_data_wrappers,
         disabled_xblock_types=disabled_xblock_types,
         doc_store_config=doc_store_config,
-        i18n_service=i18n_service or ModuleI18nService(),
+        i18n_service=i18n_service or ModuleI18nService,
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
         signal_handler=signal_handler or SignalHandler(class_),
@@ -274,7 +274,8 @@ class ModuleI18nService(object):
         """
         self.translator = django.utils.translation
         if block:
-            xblock_resource = block.unmixed_class.__module__
+            xblock_class = getattr(block, 'unmixed_class', block.__class__)
+            xblock_resource = xblock_class.__module__
             xblock_locale_dir = '/translations'
             xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
             xblock_domain = 'text'

@@ -2,9 +2,13 @@
   <article class="content-main">
   <% if ( hasPaid ) { %>
      <h3 class="title">
-      <%= _.sprintf(
-          gettext( "Thanks for returning to verify your ID in: %(courseName)s"),
-          { courseName: '<span class="course-title">' + courseName + '</span>' }
+      <%= HtmlUtils.interpolateHtml(
+          gettext( "Thanks for returning to verify your ID in: {courseName}"),
+          { courseName: HtmlUtils.joinHtml(
+            HtmlUtils.HTML('<span class="course-title">'),
+            courseName,
+            HtmlUtils.HTML('</span>')
+          ) }
         ) %>
      </h3>
   <% } else { %>

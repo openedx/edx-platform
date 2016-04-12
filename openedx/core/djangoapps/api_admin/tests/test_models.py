@@ -1,8 +1,9 @@
 # pylint: disable=missing-docstring
 import ddt
+from django.db import IntegrityError
 from django.test import TestCase
 
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
 from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory
 from student.tests.factories import UserFactory
 
@@ -42,3 +43,29 @@ class ApiAccessRequestTests(TestCase):
         self.request.status = status
         self.request.save()  # pylint: disable=no-member
         self.assertEqual(ApiAccessRequest.has_api_access(self.user), should_have_access)
+
+    def test_unique_per_user(self):
+        with self.assertRaises(IntegrityError):
+            ApiAccessRequestFactory(user=self.user)
+
+    def test_no_access(self):
+        self.request.delete()  # pylint: disable=no-member
+        self.assertIsNone(ApiAccessRequest.api_access_status(self.user))
+
+    def test_unicode(self):
+        request_unicode = unicode(self.request)
+        self.assertIn(self.request.website, request_unicode)  # pylint: disable=no-member
+        self.assertIn(self.request.status, request_unicode)
+
+
+class ApiAccessConfigTests(TestCase):
+
+    def test_unicode(self):
+        self.assertEqual(
+            unicode(ApiAccessConfig(enabled=True)),
+            u'ApiAccessConfig [enabled=True]'
+        )
+        self.assertEqual(
+            unicode(ApiAccessConfig(enabled=False)),
+            u'ApiAccessConfig [enabled=False]'
+        )
