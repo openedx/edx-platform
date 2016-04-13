@@ -48,7 +48,7 @@ NPM_INSTALLED_LIBRARIES = [
     'underscore/underscore.js',
     'underscore.string/dist/underscore.string.js',
     'picturefill/dist/picturefill.min.js',
-    'backbone',
+    'backbone/backbone-min.js',
 ]
 
 # Directory to install static vendor files
