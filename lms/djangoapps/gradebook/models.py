@@ -98,7 +98,7 @@ class StudentGradebook(models.Model):
                     data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
 
                 if group_ids:
-                    queryset = queryset.filter(user__groups__in=group_ids)
+                    queryset = queryset.filter(user__groups__in=group_ids).distinct()
 
                 # Construct the leaderboard as a queryset
                 data['queryset'] = queryset.values(
