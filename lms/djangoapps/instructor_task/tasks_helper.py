@@ -858,13 +858,16 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
+    course_id_prefix = course_filename_prefix_generator(course_id)
 
     # Perform the actual upload
     report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
     report_store.store_rows(
         course_id,
-        u"{}_responses_report_{}.csv".format(course_id_prefix, timestamp_str),
+        u"{course_id_prefix}_responses_report_{timestamp_str}.csv".format(
+            course_id_prefix=course_id_prefix,
+            timestamp_str=timestamp_str,
+        ),
         rows
     )
 
