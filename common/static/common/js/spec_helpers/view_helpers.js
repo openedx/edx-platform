@@ -19,7 +19,9 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
         createFeedbackSpy = function(type, intent) {
             var feedbackSpy = jasmine.stealth.spyOnConstructor(type, intent, ['show', 'hide']);
             feedbackSpy.show.and.returnValue(feedbackSpy);
-            afterEach && afterEach(jasmine.stealth.clearSpies);
+            if (afterEach) {
+               afterEach(jasmine.stealth.clearSpies);
+            }
             return feedbackSpy;
         };
 

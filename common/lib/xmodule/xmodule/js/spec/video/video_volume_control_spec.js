@@ -107,10 +107,10 @@ describe('VideoVolumeControl', function () {
                             actual.setVolume(volume, true, true);
                             return {
                                 pass: region.text() === getExpectedText(expectation)
-                            }
+                            };
 
                         }
-                    }
+                    };
                 }
             });
         });

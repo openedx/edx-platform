@@ -1,5 +1,6 @@
 (function (undefined) {
     describe('Video HTML5Video', function () {
+        var STATUS = window.STATUS;
         var state, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
         beforeEach(function () {

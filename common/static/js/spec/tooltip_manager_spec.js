@@ -25,7 +25,7 @@ describe('TooltipManager', function () {
                           pass: actual.is(':visible') || parseFloat(actual.css('opacity'))
                       };
                   }
-              }
+              };
             },
 
             toBeHidden: function () {
@@ -35,7 +35,7 @@ describe('TooltipManager', function () {
                             pass: actual.is(':hidden') || !parseFloat(actual.css('opacity'))
                         };
                     }
-                }
+                };
             }
         });
     });

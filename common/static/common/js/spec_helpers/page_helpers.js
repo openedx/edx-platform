@@ -32,7 +32,7 @@ define(["backbone"],
             };
 
             // Stub out the Backbone router so that the browser doesn't actually navigate
-            spyOn(Backbone.history, '_updateHash').and.callFake(function (location, fragment, replace) {
+            spyOn(Backbone.history, '_updateHash').and.callFake(function (location, fragment) {
                 history.currentFragment = fragment;
             });
 

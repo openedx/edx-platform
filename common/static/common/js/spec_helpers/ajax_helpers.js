@@ -31,7 +31,9 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     fakeServer = function (response) {
         var server = sinon.fakeServer.create();
         afterEach(function() {
-            server && server.restore();
+            if (server) {
+                server.restore();
+            }
         });
         server.respondWith(response);
         return server;

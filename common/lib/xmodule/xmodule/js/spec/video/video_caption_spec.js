@@ -453,7 +453,7 @@
 
             afterEach(function () {
                 jasmine.clock().uninstall();
-            })
+            });
 
             describe('when cursor is outside of the transcript box', function () {
                 it('does not set freezing timeout', function () {
@@ -1121,7 +1121,7 @@
 
                 afterEach(function () {
                     jasmine.clock().uninstall();
-                })
+                });
 
                 it('show the transcript', function () {
                     expect(state.el).not.toHaveClass('closed');

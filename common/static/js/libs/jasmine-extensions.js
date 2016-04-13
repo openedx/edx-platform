@@ -7,7 +7,7 @@
 //    using the platform version of JQuery are not "noticed" by Jasmine-Jquery matchers.
 //    So after the platform version of JQuery has been loaded, we set these matchers up again
 //    in this module.
-
+// jshint ignore: start
 (function (root, factory) {
   factory(root, root.jQuery);
 }((function () {

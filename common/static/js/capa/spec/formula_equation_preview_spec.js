@@ -1,4 +1,6 @@
 describe("Formula Equation Preview", function () {
+    var MathJax = window.MathJax;
+    var Problem = window.Problem;
     beforeEach(function () {
         // Simulate an environment conducive to a FormulaEquationInput
         var $fixture = this.$fixture = $('\
@@ -173,7 +175,7 @@ describe("Formula Equation Preview", function () {
             }).then(function () {
                 jasmine.waitUntil(function () {
                     return Problem.inputAjax.calls.count() > 0 &&
-                        Problem.inputAjax.calls.mostRecent().args[3].formula == value;
+                        Problem.inputAjax.calls.mostRecent().args[3].formula === value;
                 }).then(_.bind(function () {
                     // There should be 2 or 3 calls (depending on leading edge).
                     expect(Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);
@@ -185,7 +187,7 @@ describe("Formula Equation Preview", function () {
                     }
                 }, self)).then(function () {
                     done();
-                })
+                });
             });
         });
     });
@@ -211,7 +213,7 @@ describe("Formula Equation Preview", function () {
             }).then(function () {
                 return jasmine.waitUntil(function () {
                     var args = Problem.inputAjax.calls.mostRecent().args;
-                    return args[3].formula == "different";
+                    return args[3].formula === "different";
                 }).then(done);
             });
         });
@@ -219,7 +221,7 @@ describe("Formula Equation Preview", function () {
         it('updates MathJax and loading icon on callback', function (done) {
             formulaEquationPreview.enable();
 
-            jax = this.jax;
+            var jax = this.jax;
 
             jasmine.waitUntil(function () {
                 return Problem.inputAjax.calls.count() > 0;
@@ -280,7 +282,7 @@ describe("Formula Equation Preview", function () {
 
         it('displays errors from the server well', function (done) {
             var $img = $("img.loading");
-            jax = this.jax;
+            var jax = this.jax;
 
             formulaEquationPreview.enable();
             jasmine.waitUntil(function () {

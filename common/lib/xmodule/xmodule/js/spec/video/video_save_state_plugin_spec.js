@@ -41,7 +41,7 @@
 
             beforeEach(function () {
                 state.videoPlayer.currentTime = videoPlayerCurrentTime;
-                spyOn(Time, 'formatFull').and.callThrough();
+                spyOn(window.Time, 'formatFull').and.callThrough();
             });
 
             it('data is not an object, async is true', function () {

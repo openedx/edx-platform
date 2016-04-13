@@ -183,7 +183,7 @@
 
             afterEach(function () {
                 jasmine.clock().uninstall();
-            })
+            });
 
             // Disabled 12/30/13 due to flakiness in master
             xit('freeze the slider', function () {

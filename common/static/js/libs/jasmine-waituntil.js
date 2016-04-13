@@ -1,3 +1,4 @@
+// jshint ignore: start
 (function (root, factory) {
     factory(root, root.jQuery);
 }((function () { return this; }()), function (window, $) {
