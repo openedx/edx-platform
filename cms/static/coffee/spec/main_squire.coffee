@@ -184,9 +184,9 @@ requirejs.config({
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
 testFiles = [
-    'coffee/spec/views/assets_spec'
-    'js/spec/video/translations_editor_spec'
-    'js/spec/video/file_uploader_editor_spec'
+    'coffee/spec/views/assets_spec',
+    'js/spec/video/translations_editor_spec',
+    'js/spec/video/file_uploader_editor_spec',
     'js/spec/models/group_configuration_spec'
 ]
 i = 0

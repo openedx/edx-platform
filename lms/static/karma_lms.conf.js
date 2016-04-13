@@ -138,3 +138,4 @@ module.exports = function (config) {
 
     config.set(_.extend(commonConfig, localConfig));
 };
+

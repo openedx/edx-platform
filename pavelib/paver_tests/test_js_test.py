@@ -140,6 +140,4 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                 expected_test_tool_command += u" --port {port}".format(port=port)
             expected_messages.append(expected_test_tool_command)
 
-        # from nose.tools import set_trace;
-        # set_trace()
         self.assertEquals(self.task_messages, expected_messages)

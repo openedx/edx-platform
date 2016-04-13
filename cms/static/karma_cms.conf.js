@@ -2,18 +2,18 @@
 //
 // To run all the tests and print results to the console:
 //
-//   karma start lms/static/js_test_coffee.js
+//   karma start cms/static/karma_cms.conf.js
 //
 //
 // To run the tests for debugging: Debugging can be done in any browser
 // but Chrome's developer console debugging experience is best.
 //
-//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --single-run=false
+//   karma start cms/static/karma_cms.conf.js --browsers=BROWSER --single-run=false
 //
 //
 // To run the tests with coverage and junit reports:
 //
-//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --coverage
+//   karma start cms/static/karma_cms.conf.js --browsers=BROWSER --coverage
 // --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
 //
 // where `BROWSER` could be Chrome or Firefox.
@@ -119,3 +119,4 @@ module.exports = function (config) {
 
     config.set(_.extend(commonConfig, localConfig));
 };
+

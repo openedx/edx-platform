@@ -51,7 +51,8 @@ class JsTestSuite(TestSuite):
 
 class JsTestSubSuite(TestSuite):
     """
-    JS Test suites lms, lms-coffee etc.
+    Class for JS suites like cms, cms-squire, lms, lms-coffee, common,
+    common-requirejs and xmodule
     """
     def __init__(self, *args, **kwargs):
         super(JsTestSubSuite, self).__init__(*args, **kwargs)

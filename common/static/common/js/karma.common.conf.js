@@ -121,6 +121,12 @@ var getConfig = function (config, useRequireJs) {
         return files;
     };
 
+    // Manually prepends the framework files to the karma files array
+    // bypassing the karma's framework config. This is necessary if you want
+    // to add a library or framework that isn't a karma plugin. e.g. we add jasmine-jquery
+    // which isn't a karma plugin. Though a karma framework for jasmine-jquery is available
+    // but it's not actively maintained. In future we also wanna add jQuery at the top when
+    // we upgrade to jQuery 2
     var initFrameworks = function (files) {
         getFrameworkFiles().reverse().forEach(function (f) {
             files.unshift({
