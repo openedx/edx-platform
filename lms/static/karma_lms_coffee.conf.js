@@ -29,7 +29,7 @@ var configModule = require(path.join(__dirname, '../../common/static/common/js/k
 
 var files = [
     // override fixture path and other config.
-    'test_config.js',
+    {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
     // include vendor js files but don't add a <script> tag for each
     'xmodule_js/common_static/js/vendor/jquery.min.js',

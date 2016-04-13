@@ -98,7 +98,7 @@ var files = [
     {pattern: 'common/templates/**/*.underscore', included: false},
 
     // override fixture path and other config.
-    {pattern: 'test_config.js', included: true},
+    {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'coffee/spec/main.js'
 ];
 

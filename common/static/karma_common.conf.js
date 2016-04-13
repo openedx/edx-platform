@@ -29,7 +29,7 @@ var configModule = require(path.join(__dirname, '../../common/static/common/js/k
 // Files to load by Karma
 var files = [
     // override fixture path and other config.
-    {pattern: 'test_config.js', included: true},
+    {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
     {pattern: 'js/vendor/jquery.min.js', included: true},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
