@@ -85,7 +85,7 @@ class JsTestSubSuite(TestSuite):
             cmd += " --port {port}".format(port=self.port)
 
         if self.run_under_coverage:
-            cmd += " --coverage  --coveragereportpath={report_path}".format(
+            cmd += " --coverage --coveragereportpath={report_path}".format(
                 report_path=self.coverage_report
             )
 
