@@ -1,3 +1,5 @@
+<%! main_css = "style-main-v2" %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -18,11 +20,6 @@ from django.core.urlresolvers import reverse
       </div>
     </div>
   </header>
-
-
-
-
-
 
   <%include file="${courses_list}" />
   <%include file="about_site.html" />

@@ -1,4 +1,15 @@
 ## coding=utf-8
+
+## This is the main Mako template that all page templates should include.
+## Note: there are a handful of pages that use Django Templates and which
+## instead include main_django.html. It is important that these two files
+## remain in sync, so changes made in one should be applied to the other.
+
+## Pages currently use v1 styling by default. Once the Pattern Library
+## rollout has been completed, this default can be switched to v2.
+<%! main_css = "style-main-v1" %>
+
+
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.core.urlresolvers import reverse
@@ -49,21 +60,7 @@ from pipeline_mako import render_require_js_path_overrides
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  ## We could do <%static:css group='style-main'/>, but that's only useful
-  ## if the group contains multiple files, and the 'style-main' group doesn't.
-  ## Instead, we'll construct this <link> element manually, to improve clarity.
-  ## When nothing in the system is referencing the 'style-main' group, it can
-  ## be removed from the environment file.
-  <%
-  application_css_path = "css/lms-main{rtl}.css".format(
-    rtl="-rtl" if get_language_bidi() else "",
-  )
-  application_css_path_pattern = "/static/edx-pattern-library/pattern-library/css/edx-pattern-library-{rtl}.min.css".format(
-    rtl="rtl" if get_language_bidi() else "ltr",
-  )
-  %>
-  <link rel="stylesheet" href="${static.url(application_css_path)}" type="text/css" media="all" />
-  <link rel="stylesheet" href="${application_css_path_pattern}" type="text/css" media="all" />
+  <%static:css group='${self.attr.main_css}'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
