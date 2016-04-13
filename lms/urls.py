@@ -110,6 +110,9 @@ urlpatterns = (
     # TODO Namespace these!
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
+
+    # URLs for API access management
+    url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )
 
 urlpatterns += (
@@ -1000,8 +1003,3 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             name='submit_financial_assistance_request'
         )
     )
-
-# URLs for API access management
-urlpatterns += (
-    url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls')),
-)

@@ -24,7 +24,7 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
         # platform_name is the name of this Open edX installation.
         label = _('I, and my company, accept the {link_start}{platform_name} API Terms of Service{link_end}.').format(
             platform_name=settings.PLATFORM_NAME,
-            link_start='<a href="{url}" target="_blank">'.format(url=reverse('api-tos')),
+            link_start='<a href="{url}" target="_blank">'.format(url=reverse('api_admin:api-tos')),
             link_end='</a>',
         )
 
