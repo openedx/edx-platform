@@ -48,13 +48,13 @@ var files = [
     {pattern: 'js/vendor/sinon-1.17.0.js', included: false},
 
     // Paths to source JavaScript files
-    {pattern: 'common/js/**/*.js', included: false},
+    {pattern: 'common/js/**/*.js', included: false, nocache: true},
 
     // Paths to spec (test) JavaScript files
-    {pattern: 'common/js/spec/**/*.js', included: false},
+    {pattern: 'common/js/spec/**/*.js', included: false, nocache: true},
 
     // Paths to fixture files
-    {pattern: 'common/templates/**/*.*', included: false},
+    {pattern: 'common/templates/**/*.*', included: false, nocache: true},
 
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},

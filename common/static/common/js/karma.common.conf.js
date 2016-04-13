@@ -196,7 +196,7 @@ var getConfig = function (config, useRequireJs) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: true,
+        singleRun: config.singleRun,
 
         // Concurrency level
         // how many browser should be started simultaneous

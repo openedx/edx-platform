@@ -31,38 +31,38 @@ var files = [
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
-    // include vendor js files but don't add a <script> tag for each
-    'xmodule_js/common_static/js/vendor/jquery.min.js',
-    'xmodule_js/common_static/js/test/i18n.js',
-    'xmodule_js/common_static/coffee/src/ajax_prefix.js',
-    'xmodule_js/common_static/js/src/logger.js',
-    'xmodule_js/common_static/common/js/vendor/underscore.js',
-    'xmodule_js/common_static/js/vendor/jasmine-imagediff.js',
-    'xmodule_js/common_static/js/vendor/requirejs/require.js',
-    'js/RequireJS-namespace-undefine.js',
-    'xmodule_js/common_static/js/vendor/jquery-ui.min.js',
-    'xmodule_js/common_static/js/vendor/jquery.cookie.js',
-    'xmodule_js/common_static/js/vendor/flot/jquery.flot.js',
-    'xmodule_js/common_static/js/vendor/moment.min.js',
-    'xmodule_js/common_static/js/vendor/moment-with-locales.min.js',
-    'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js',
-    'xmodule_js/common_static/js/vendor/URI.min.js',
-    'xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js',
-    'xmodule_js/common_static/js/xblock/*.js',
-    'xmodule_js/common_static/coffee/src/xblock/*.js',
-    'moment_requirejs.js',
-    'xmodule_js/src/capa/*.js',
-    'xmodule_js/src/video/*.js',
-    'xmodule_js/src/xmodule.js',
+    // vendor files
+    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: true},
+    {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
+    {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/flot/jquery.flot.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/moment.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/moment-with-locales.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/xblock/*.js', included: true},
+    {pattern: 'xmodule_js/common_static/coffee/src/xblock/*.js', included: true},
+    {pattern: 'moment_requirejs.js', included: true},
+    {pattern: 'xmodule_js/src/capa/*.js', included: true},
+    {pattern: 'xmodule_js/src/video/*.js', included: true},
+    {pattern: 'xmodule_js/src/xmodule.js', included: true},
 
     // source files
-    'coffee/src/**/*.js',
+    {pattern: 'coffee/src/**/*.js', included: true, nocache: true},
 
     // spec files
-    'coffee/spec/**/*.js',
+    {pattern: 'coffee/spec/**/*.js', included: true, nocache: true},
 
     // Fixtures
-    'coffee/fixtures/**/*.*'
+    {pattern: 'coffee/fixtures/**/*.*', included: true, nocache: true}
 ];
 
 var preprocessors = {

@@ -70,21 +70,21 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
 
     // Paths to source JavaScript files
-    {pattern: 'coffee/src/**/*.js', included: false},
-    {pattern: 'js/collections/**/*.js', included: false},
-    {pattern: 'js/models/**/*.js', included: false},
-    {pattern: 'js/utils/**/*.js', included: false},
-    {pattern: 'js/views/**/*.js', included: false},
-    {pattern: 'common/js/**/*.js', included: false},
+    {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
+    {pattern: 'js/collections/**/*.js', included: false, nocache: true},
+    {pattern: 'js/models/**/*.js', included: false, nocache: true},
+    {pattern: 'js/utils/**/*.js', included: false, nocache: true},
+    {pattern: 'js/views/**/*.js', included: false, nocache: true},
+    {pattern: 'common/js/**/*.js', included: false, nocache: true},
 
     // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/**/*.js', included: false},
-    {pattern: 'js/spec/**/*.js', included: false},
+    {pattern: 'coffee/spec/**/*.js', included: false, nocache: true},
+    {pattern: 'js/spec/**/*.js', included: false, nocache: true},
 
     // Paths to fixture files
-    {pattern: 'coffee/fixtures/**/*.*', included: false},
-    {pattern: 'templates/**/*.*', included: false},
-    {pattern: 'common/templates/**/*.*', included: false},
+    {pattern: 'coffee/fixtures/**/*.*', included: false, nocache: true},
+    {pattern: 'templates/**/*.*', included: false, nocache: true},
+    {pattern: 'common/templates/**/*.*', included: false, nocache: true},
 
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},

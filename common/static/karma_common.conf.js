@@ -47,20 +47,20 @@ var files = [
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
 
     // Paths to source JavaScript files
-    {pattern: 'js/xblock/**/*.js', included: true},
-    {pattern: 'coffee/src/**/*.js', included: true},
-    {pattern: 'js/src/**/*.js', included: true},
-    {pattern: 'js/capa/src/**/*.js', included: true},
+    {pattern: 'js/xblock/**/*.js', included: true, nocache: true},
+    {pattern: 'coffee/src/**/*.js', included: true, nocache: true},
+    {pattern: 'js/src/**/*.js', included: true, nocache: true},
+    {pattern: 'js/capa/src/**/*.js', included: true, nocache: true},
 
     // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/**/*.js', included: true},
-    {pattern: 'js/spec/**/*.js', included: true},
-    {pattern: 'js/capa/spec/**/*.js', included: true},
+    {pattern: 'coffee/spec/**/*.js', included: true, nocache: true},
+    {pattern: 'js/spec/**/*.js', included: true, nocache: true},
+    {pattern: 'js/capa/spec/**/*.js', included: true, nocache: true},
 
     // Paths to fixture files
-    {pattern: 'js/fixtures/**/*.html', included: false},
-    {pattern: 'js/capa/fixtures/**/*.html', included: false},
-    {pattern: 'common/templates/**/*.underscore', included: false}
+    {pattern: 'js/fixtures/**/*.html', included: false, nocache: true},
+    {pattern: 'js/capa/fixtures/**/*.html', included: false, nocache: true},
+    {pattern: 'common/templates/**/*.underscore', included: false, nocache: true}
 ];
 
 var preprocessors = {

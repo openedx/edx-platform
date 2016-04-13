@@ -60,15 +60,15 @@ var files = [
     {pattern: 'src/word_cloud/d3.min.js', included: true},
 
     // Paths to source JavaScript files
-    {pattern: 'src/xmodule.js', included: true},
-    {pattern: 'src/**/*.js', included: true},
+    {pattern: 'src/xmodule.js', included: true, nocache: true},
+    {pattern: 'src/**/*.js', included: true, nocache: true},
 
     // Paths to spec (test) JavaScript files
-    {pattern: 'spec/helper.js', included: true},
-    {pattern: 'spec/**/*.js', included: true},
+    {pattern: 'spec/helper.js', included: true, nocache: true},
+    {pattern: 'spec/**/*.js', included: true, nocache: true},
 
     // Paths to fixture files
-    {pattern: 'fixtures/*.*', included: false, served: true},
+    {pattern: 'fixtures/*.*', included: false, served: true, nocache: true},
 
     {pattern: 'karma_runner.js', included: true}
 ];

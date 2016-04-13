@@ -78,24 +78,24 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
 
     // Paths to source JavaScript files
-    {pattern: 'coffee/src/**/*.js', included: false},
-    {pattern: 'js/**/*.js', included: false},
-    {pattern: 'js/certificates/**/*.js', included: false},
-    {pattern: 'js/factories/**/*.js', included: false},
-    {pattern: 'common/js/**/*.js', included: false},
-    {pattern: 'edx-pattern-library/js/**/*.js', included: false},
-    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
+    {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
+    {pattern: 'js/**/*.js', included: false, nocache: true},
+    {pattern: 'js/certificates/**/*.js', included: false, nocache: true},
+    {pattern: 'js/factories/**/*.js', included: false, nocache: true},
+    {pattern: 'common/js/**/*.js', included: false, nocache: true},
+    {pattern: 'edx-pattern-library/js/**/*.js', included: false, nocache: true},
+    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false, nocache: true},
 
     // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/main.js', included: false},
-    {pattern: 'coffee/spec/**/*.js', included: false},
-    {pattern: 'js/spec/**/*.js', included: false},
-    {pattern: 'js/certificates/spec/**/*.js', included: false},
+    {pattern: 'coffee/spec/main.js', included: false, nocache: true},
+    {pattern: 'coffee/spec/**/*.js', included: false, nocache: true},
+    {pattern: 'js/spec/**/*.js', included: false, nocache: true},
+    {pattern: 'js/certificates/spec/**/*.js', included: false, nocache: true},
 
     // Paths to fixture files
-    {pattern: 'coffee/fixtures/**/*.underscore', included: false},
-    {pattern: 'templates/**/*.underscore', included: false},
-    {pattern: 'common/templates/**/*.underscore', included: false},
+    {pattern: 'coffee/fixtures/**/*.underscore', included: false, nocache: true},
+    {pattern: 'templates/**/*.underscore', included: false, nocache: true},
+    {pattern: 'common/templates/**/*.underscore', included: false, nocache: true},
 
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
