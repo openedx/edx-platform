@@ -267,7 +267,8 @@ header.global {
         height: $baseline*1.75;
         font-size: em(16);
         color: $gray;
-        &:hover{
+        &:hover,
+        &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
@@ -393,7 +394,8 @@ header.global-new {
         height: 43px;
         font-size: em(16);
         color: $gray;
-        &:hover{
+        &:hover,
+        &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
         }
       }
