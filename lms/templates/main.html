@@ -61,6 +61,9 @@ from pipeline_mako import render_require_js_path_overrides
 
   <%static:css group='style-vendor'/>
   <%static:css group='${self.attr.main_css}'/>
+  <%static:css group='style-main-v2'/>
+
+
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
