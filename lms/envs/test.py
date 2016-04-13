@@ -164,8 +164,8 @@ update_module_store_settings(
     doc_store_settings={
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(THIS_UUID),
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'collection': 'test_modulestore',
     },
 )
 

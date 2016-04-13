@@ -93,8 +93,8 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule',
-                'collection': 'modulestore_{0}'.format(uuid4().hex[:5]),
+                'db': 'test_xmodule_{}'.format(uuid4().hex),
+                'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
         }
@@ -120,8 +120,8 @@ def split_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule',
-                'collection': 'modulestore_{0}'.format(uuid4().hex[:5]),
+                'db': 'test_xmodule_{}'.format(uuid4().hex),
+                'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
         }
@@ -154,17 +154,20 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 #   test course into this modulestore.
 # If your test needs a graded course to test against, import the common/test/data/graded
 #   test course into this modulestore.
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
-    TEST_DATA_DIR, {}
+TEST_DATA_MIXED_MODULESTORE = functools.partial(
+    mixed_store_config,
+    TEST_DATA_DIR,
+    {}
 )
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
-TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
+TEST_DATA_MONGO_MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
 
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
-TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
+TEST_DATA_SPLIT_MODULESTORE = functools.partial(
+    mixed_store_config,
     mkdtemp_clean(),
     {},
     store_order=[StoreConstructors.split, StoreConstructors.draft]
@@ -191,7 +194,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
 
     """
 
-    MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
+    MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
     ENABLED_CACHES = ['mongo_metadata_inheritance', 'loc_cache']
     __settings_overrides = []
     __old_modulestores = []
@@ -205,7 +208,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         """
         cls.start_cache_isolation()
         override = override_settings(
-            MODULESTORE=cls.MODULESTORE,
+            MODULESTORE=cls.MODULESTORE(),
         )
 
         cls.__old_modulestores.append(copy.deepcopy(settings.MODULESTORE))
