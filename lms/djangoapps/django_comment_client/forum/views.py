@@ -94,7 +94,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     default_query_params = {
         'page': 1,
         'per_page': per_page,
-        'sort_key': 'date',
+        'sort_key': 'activity',
         'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
