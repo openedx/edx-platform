@@ -66,7 +66,7 @@ from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.course_tabs import CourseTabPluginManager
@@ -467,7 +467,7 @@ def course_listing(request):
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
-    programs_config = ProgramsApiConfig.current()
+    programs_config = ProgramsConfig.current()
     raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
 
     # Sort programs alphabetically by name.

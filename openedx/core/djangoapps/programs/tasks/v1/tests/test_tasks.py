@@ -15,7 +15,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 from edx_oauth2_provider.tests.factories import ClientFactory
 
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
 from student.tests.factories import UserFactory
 
@@ -24,7 +24,7 @@ TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
+class GetApiClientTestCase(TestCase, ProgramsConfigMixin):
     """
     Test the get_api_client function
     """
@@ -196,7 +196,7 @@ class AwardProgramCertificateTestCase(TestCase):
 @mock.patch(TASKS_MODULE + '.get_completed_programs')
 @mock.patch(TASKS_MODULE + '.get_completed_courses')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-class AwardProgramCertificatesTestCase(TestCase, ProgramsApiConfigMixin, CredentialsApiConfigMixin):
+class AwardProgramCertificatesTestCase(TestCase, ProgramsConfigMixin, CredentialsApiConfigMixin):
     """
     Tests for the 'award_program_certificates' celery task.
     """

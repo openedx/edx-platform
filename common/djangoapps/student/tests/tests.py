@@ -44,7 +44,7 @@ from certificates.models import CertificateStatuses  # pylint: disable=import-er
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -904,7 +904,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 # TODO: Clean up these tests so that they use the ProgramsDataMixin.
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
+class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsConfigMixin):
     """
     Tests for dashboard for xseries program courses. Enroll student into
     programs and then try different combinations to see xseries upsell

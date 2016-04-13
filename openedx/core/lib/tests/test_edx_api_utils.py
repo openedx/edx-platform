@@ -13,8 +13,8 @@ from testfixtures import LogCapture
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangoapps.programs.models import ProgramsConfig
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin, ProgramsDataMixin
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
 
@@ -23,13 +23,13 @@ LOGGER_NAME = 'openedx.core.lib.edx_api_utils'
 
 
 @attr('shard_2')
-class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
+class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsConfigMixin, ProgramsDataMixin,
                            TestCase):
     """Test utility for API data retrieval."""
     def setUp(self):
         super(TestApiDataRetrieval, self).setUp()
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ClientFactory(name=ProgramsConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.user = UserFactory()
 
         cache.clear()

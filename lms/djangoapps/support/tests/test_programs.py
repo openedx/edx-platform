@@ -4,11 +4,11 @@ from django.test import TestCase
 import mock
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin
 from student.tests.factories import UserFactory
 
 
-class IssueProgramCertificatesViewTests(TestCase, ProgramsApiConfigMixin):
+class IssueProgramCertificatesViewTests(TestCase, ProgramsConfigMixin):
     password = 'password'
 
     def setUp(self):

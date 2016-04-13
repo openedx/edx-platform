@@ -12,7 +12,7 @@ from microsite_configuration import microsite
 import auth_exchange.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 # Uncomment the next two lines to enable the admin:
@@ -945,7 +945,7 @@ if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):
 
 urlpatterns += (
     url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
-    url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
+    url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsConfig)),
 )
 
 urlpatterns = patterns(*urlpatterns)

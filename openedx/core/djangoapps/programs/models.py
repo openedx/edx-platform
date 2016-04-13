@@ -11,7 +11,7 @@ from config_models.models import ConfigurationModel
 AuthoringAppConfig = namedtuple('AuthoringAppConfig', ['js_url', 'css_url'])
 
 
-class ProgramsApiConfig(ConfigurationModel):
+class ProgramsConfig(ConfigurationModel):
     """
     Manages configuration for connecting to the Programs service and using its
     API.
@@ -19,6 +19,9 @@ class ProgramsApiConfig(ConfigurationModel):
     OAUTH2_CLIENT_NAME = 'programs'
     CACHE_KEY = 'programs.api.data'
     API_NAME = 'programs'
+
+    class Meta:
+        db_table = 'programs_programsapiconfig'
 
     api_version_number = models.IntegerField(verbose_name=_("API Version"))
 

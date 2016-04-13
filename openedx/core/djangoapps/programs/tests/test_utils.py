@@ -11,8 +11,8 @@ from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangoapps.programs.models import ProgramsConfig
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.utils import (
     get_programs,
     get_programs_for_dashboard,
@@ -25,13 +25,13 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @attr('shard_2')
-class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
+class TestProgramRetrieval(ProgramsConfigMixin, ProgramsDataMixin,
                            CredentialsApiConfigMixin, TestCase):
     """Tests covering the retrieval of programs from the Programs service."""
     def setUp(self):
         super(TestProgramRetrieval, self).setUp()
 
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ClientFactory(name=ProgramsConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.user = UserFactory()
 
         cache.clear()

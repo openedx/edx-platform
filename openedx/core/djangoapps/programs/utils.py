@@ -1,7 +1,7 @@
 """Helper functions for working with Programs."""
 import logging
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
@@ -20,7 +20,7 @@ def get_programs(user):
     Returns:
         list of dict, representing programs returned by the Programs service.
     """
-    programs_config = ProgramsApiConfig.current()
+    programs_config = ProgramsConfig.current()
 
     # Bypass caching for staff users, who may be creating Programs and want
     # to see them displayed immediately.
@@ -68,7 +68,7 @@ def get_programs_for_dashboard(user, course_keys):
     Returns:
         dict, containing programs keyed by course. Empty if programs cannot be retrieved.
     """
-    programs_config = ProgramsApiConfig.current()
+    programs_config = ProgramsConfig.current()
     course_programs = {}
 
     if not programs_config.is_student_dashboard_enabled:
