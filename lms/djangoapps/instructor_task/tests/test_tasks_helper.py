@@ -1674,6 +1674,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
+@ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
@@ -1716,65 +1717,70 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         with self.assertNumQueries(214):
             self.assertCertificatesGenerated(task_input, expected_results)
 
-    def test_certificate_generation_all_whitelisted(self):
+    @ddt.data(
+        CertificateStatuses.downloadable,
+        CertificateStatuses.generating,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.audit_passing,
+    )
+    def test_certificate_generation_all_whitelisted(self, status):
         """
-        Verify that certificates generated for all white-listed students when using semantic task_input as
-        `all_whitelisted`.
+        Verify that certificates are generated for all white-listed students,
+        whether or not they already had certs generated for them.
         """
-        # create 5 students
         students = self._create_students(5)
 
-        # white-list 5 students
-        for student in students:
-            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+        # whitelist 3
+        for student in students[:3]:
+            CertificateWhitelistFactory.create(
+                user=student, course_id=self.course.id, whitelist=True
+            )
 
-        task_input = {'student_set': 'all_whitelisted'}
-        expected_results = {
-            'action_name': 'certificates generated',
-            'total': 5,
-            'attempted': 5,
-            'succeeded': 5,
-            'failed': 0,
-            'skipped': 0
-        }
-        self.assertCertificatesGenerated(task_input, expected_results)
-
-    def test_certificate_generation_whitelist_already_generated(self):
-        """
-        Verify that certificates generated for all white-listed students having certifcates already when using
-        semantic task_input as `all_whitelisted`.
-        """
-        # create 5 students
-        students = self._create_students(5)
-
-        # white-list 5 students
-        for student in students:
-            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
-
-        # mark 5 students to have certificates generated already
-        for student in students:
+        # generate certs for 2
+        for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
-                status=CertificateStatuses.downloadable,
-                mode='honor'
+                status=status,
             )
 
         task_input = {'student_set': 'all_whitelisted'}
+        # only certificates for the 3 whitelisted students should have been run
         expected_results = {
             'action_name': 'certificates generated',
-            'total': 5,
-            'attempted': 5,
-            'succeeded': 5,
+            'total': 3,
+            'attempted': 3,
+            'succeeded': 3,
             'failed': 0,
             'skipped': 0
         }
         self.assertCertificatesGenerated(task_input, expected_results)
 
-    def test_certificate_generation_whitelisted_not_generated(self):
+        # the first 3 students (who were whitelisted) have passing
+        # certificate statuses
+        for student in students[:3]:
+            self.assertIn(
+                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
+                CertificateStatuses.PASSED_STATUSES
+            )
+
+        # The last 2 students still don't have certs
+        for student in students[3:]:
+            self.assertIsNone(
+                GeneratedCertificate.certificate_for_student(student, self.course.id)
+            )
+
+    @ddt.data(
+        (CertificateStatuses.downloadable, 2),
+        (CertificateStatuses.generating, 2),
+        (CertificateStatuses.notpassing, 4),
+        (CertificateStatuses.audit_passing, 4),
+    )
+    @ddt.unpack
+    def test_certificate_generation_whitelisted_not_generated(self, status, expected_certs):
         """
-        Verify that certificates only generated for those students which does not have certificates yet when
-        using semantic task_input as `whitelisted_not_generated`.
+        Verify that certificates are generated only for those students
+        who do not have `downloadable` or `generating` certificates.
         """
         # create 5 students
         students = self._create_students(5)
@@ -1784,27 +1790,43 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
-                status=CertificateStatuses.downloadable,
-                mode='honor'
+                status=status,
             )
 
-        # white-list 5 students
-        for student in students:
-            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+        # white-list 4 students
+        for student in students[:4]:
+            CertificateWhitelistFactory.create(
+                user=student, course_id=self.course.id, whitelist=True
+            )
 
         task_input = {'student_set': 'whitelisted_not_generated'}
 
+        # certificates should only be generated for the whitelisted students
+        # who do not yet have passing certificates.
         expected_results = {
             'action_name': 'certificates generated',
-            'total': 3,
-            'attempted': 3,
-            'succeeded': 3,
+            'total': expected_certs,
+            'attempted': expected_certs,
+            'succeeded': expected_certs,
             'failed': 0,
             'skipped': 0
         }
         self.assertCertificatesGenerated(
             task_input,
             expected_results
+        )
+
+        # the first 4 students have passing certificate statuses since
+        # they either were whitelisted or had one before
+        for student in students[:4]:
+            self.assertIn(
+                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
+                CertificateStatuses.PASSED_STATUSES
+            )
+
+        # The last student still doesn't have a cert
+        self.assertIsNone(
+            GeneratedCertificate.certificate_for_student(students[4], self.course.id)
         )
 
     def test_certificate_generation_specific_student(self):
