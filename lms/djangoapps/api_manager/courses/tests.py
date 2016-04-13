@@ -348,6 +348,8 @@ class CoursesApiTests(ModuleStoreTestCase):
             user.groups.add(groups[i % 2])
             CourseEnrollmentFactory.create(user=user, course_id=course.id)
 
+        users[0].groups.add(groups[1])
+
         for i in xrange(SAMPLE_GRADE_DATA_COUNT - 1):
             section = 'Midterm Exam'
             if i % 2 is 0:
@@ -2195,6 +2197,8 @@ class CoursesApiTests(ModuleStoreTestCase):
         for i, user in enumerate(users):
             user.groups.add(groups[i % 2])
 
+        users[0].groups.add(groups[1])
+
         for user in users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
@@ -2734,6 +2738,8 @@ class CoursesTimeSeriesMetricsApiTests(ModuleStoreTestCase):
         for i, user in enumerate(self.users):
             self.user_ids.append(user.id)
             user.groups.add(self.groups[i % 2])
+
+        self.users[0].groups.add(self.groups[1])
 
         # Create a test organization that will be used for validation of org filtering
         self.test_organization = Organization.objects.create(

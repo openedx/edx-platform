@@ -1488,12 +1488,13 @@ class CoursesMetricsGradesList(SecureListAPIView):
             except ValueError:
                 return Response({}, status.HTTP_400_BAD_REQUEST)
 
-            queryset = queryset.filter(user__groups__in=group_ids)
+            queryset = queryset.filter(user__groups__in=group_ids).distinct()
 
-        queryset_grade_avg = queryset.aggregate(Avg('grade'))
+        sum_of_grades = sum([gradebook.grade for gradebook in queryset])
+        queryset_grade_avg = sum_of_grades / len(queryset) if len(queryset) > 0 else 0
+        queryset_grade_count = len(queryset)
         queryset_grade_max = queryset.aggregate(Max('grade'))
         queryset_grade_min = queryset.aggregate(Min('grade'))
-        queryset_grade_count = queryset.aggregate(Count('grade'))
 
         course_metrics = StudentGradebook.generate_leaderboard(course_key,
                                                                group_ids=group_ids,
@@ -1503,10 +1504,10 @@ class CoursesMetricsGradesList(SecureListAPIView):
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
 
-        response_data['grade_average'] = queryset_grade_avg['grade__avg']
+        response_data['grade_average'] = queryset_grade_avg
+        response_data['grade_count'] = queryset_grade_count
         response_data['grade_maximum'] = queryset_grade_max['grade__max']
         response_data['grade_minimum'] = queryset_grade_min['grade__min']
-        response_data['grade_count'] = queryset_grade_count['grade__count']
 
         response_data['course_grade_average'] = course_metrics['course_avg']
         response_data['course_grade_maximum'] = course_metrics['course_max']
@@ -1672,11 +1673,11 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
             except ValueError:
                 return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-            enrolled_qs = enrolled_qs.filter(user__groups__in=group_ids)
-            grades_complete_qs = grades_complete_qs.filter(user__groups__in=group_ids)
-            users_started_qs = users_started_qs.filter(user__groups__in=group_ids)
-            modules_completed_qs = modules_completed_qs.filter(user__groups__in=group_ids)
-            active_users_qs = active_users_qs.filter(student__groups__in=group_ids)
+            enrolled_qs = enrolled_qs.filter(user__groups__in=group_ids).distinct()
+            grades_complete_qs = grades_complete_qs.filter(user__groups__in=group_ids).distinct()
+            users_started_qs = users_started_qs.filter(user__groups__in=group_ids).distinct()
+            modules_completed_qs = modules_completed_qs.filter(user__groups__in=group_ids).distinct()
+            active_users_qs = active_users_qs.filter(student__groups__in=group_ids).distinct()
 
         total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
         total_started_count = users_started_qs.filter(created__lt=start_dt).aggregate(Count('user', distinct=True))
@@ -1684,22 +1685,22 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         enrolled_series = get_time_series_data(
             enrolled_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=CourseEnrollment,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
         started_series = get_time_series_data(
             users_started_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=StudentProgress,
-            aggregate=Count('user')
+            aggregate=Count('user', distinct=True)
         )
         completed_series = get_time_series_data(
             grades_complete_qs, start_dt, end_dt, interval=interval,
             date_field='modified', date_field_model=StudentGradebook,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
         modules_completed_series = get_time_series_data(
             modules_completed_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=CourseModuleCompletion,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
 
         # active users are those who accessed course in last 24 hours
