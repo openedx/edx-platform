@@ -1,4 +1,5 @@
 // Common configuration for Karma
+/* jshint node: true */
 'use strict';
 
 var path = require('path');
@@ -18,10 +19,9 @@ function junitNameFormatter(browser, result) {
 /**
  * Customize the classname attribute in xml testcase element
  * @param {Object} browser
- * @param {Object} result
  * @return {String}
  */
-function junitClassNameFormatter(browser, result) {
+function junitClassNameFormatter(browser) {
     return "Javascript." + browser.name.split(" ")[0];
 }
 
@@ -34,7 +34,7 @@ function junitClassNameFormatter(browser, result) {
 function reporters(config) {
     var defaultReporters = ['dots', 'junit', 'kjhtml'];
     if (config.coverage) {
-        defaultReporters.push('coverage')
+        defaultReporters.push('coverage');
     }
     return defaultReporters;
 }
@@ -60,7 +60,7 @@ function getBasepathAndFilename(filepath) {
     return {
         dir: dir,
         file: file
-    }
+    };
 }
 
 
@@ -180,7 +180,8 @@ var getConfig = function (config, useRequireJs) {
 
 
         // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+        /* possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
+         || config.LOG_INFO || config.LOG_DEBUG */
         logLevel: config.LOG_DEBUG,
 
 

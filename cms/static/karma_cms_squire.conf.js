@@ -1,24 +1,26 @@
 // Common JavaScript tests, using RequireJS.
 //
-//
 // To run all the tests and print results to the console:
 //
 //   karma start lms/static/js_test_coffee.js
 //
 //
-// To run the tests for debugging: Debugging can be done in any browser but Chrome's developer console debugging experience is best.
+// To run the tests for debugging: Debugging can be done in any browser
+// but Chrome's developer console debugging experience is best.
 //
 //   karma start lms/static/js_test_coffee.js --browsers=BROWSER --single-run=false
 //
 //
 // To run the tests with coverage and junit reports:
 //
-//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
+//   karma start lms/static/js_test_coffee.js --browsers=BROWSER --coverage
+// --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
 //
 // where `BROWSER` could be Chrome or Firefox.
 //
-//
 
+/* jshint node: true */
+/*jshint -W079 */
 'use strict';
 var path = require('path');
 var _ = require('underscore');

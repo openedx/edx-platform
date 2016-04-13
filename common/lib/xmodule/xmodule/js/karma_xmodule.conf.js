@@ -1,6 +1,5 @@
 // Xmodule Tests
 //
-//
 // To run all the tests and print results to the console:
 //
 //   karma start common/lib/xmodule/xmodule/js/karma_xmodule.conf.js
@@ -19,7 +18,9 @@
 //
 // where `BROWSER` could be Chrome or Firefox.
 //
-//
+
+/* jshint node: true */
+/*jshint -W079 */
 
 'use strict';
 var path = require('path');

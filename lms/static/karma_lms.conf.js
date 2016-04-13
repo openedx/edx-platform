@@ -1,6 +1,5 @@
 // LMS JavaScript tests, using RequireJS.
 //
-//
 // To run all the tests and print results to the console:
 //
 //   karma start lms/static/karma_lms.conf.js
@@ -19,7 +18,9 @@
 //
 // where `BROWSER` could be Chrome or Firefox.
 //
-//
+
+/* jshint node: true */
+/*jshint -W079 */
 'use strict';
 var path = require('path');
 var _ = require('underscore');
