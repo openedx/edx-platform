@@ -251,7 +251,7 @@ def diff_coverage(options):
     xml_reports = []
 
     for filepath in Env.REPORT_DIR.walk():
-        if bool(re.match('^coverage.*\.xml$', filepath.basename())):
+        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
             xml_reports.append(filepath)
 
     if not xml_reports:

@@ -43,6 +43,9 @@ class JsTestSuite(TestSuite):
 
     @property
     def _default_subsuites(self):
+        """
+        Returns all JS test suites
+        """
         return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS]
 
 
