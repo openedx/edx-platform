@@ -108,6 +108,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
 
     it "re-renders correctly when endorsement changes", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set("thread_type", "question")
         @view.render()
@@ -118,6 +119,7 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
 
     it "allows a moderator to mark an answer in a question thread", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set({
             "thread_type": "question",
@@ -131,6 +133,7 @@ describe "ThreadResponseShowView", ->
         expect(endorseButton).toHaveClass("is-checked")
 
     it "allows the author of a question thread to mark an answer", ->
+        spyOn($, "ajax").and.returnValue($.Deferred())
         @thread.set({
             "thread_type": "question",
             "user_id": window.user.id

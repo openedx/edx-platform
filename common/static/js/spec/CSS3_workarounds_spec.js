@@ -1,4 +1,5 @@
 describe("CSS3 workarounds", function() {
+	var pointerEventsNone = window.pointerEventsNone;
 	describe("pointer-events", function() {
 		beforeEach(function() {
 			var html = "<a href='#' class='is-disabled'>What wondrous life in this I lead</a>";
