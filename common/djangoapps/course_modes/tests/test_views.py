@@ -50,7 +50,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_redirect_to_dashboard(self, is_active, enrollment_mode, redirect):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # Enroll the user in the test course
         if enrollment_mode is not None:
@@ -73,7 +73,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
     def test_no_id_redirect(self):
         # Create the course modes
-        CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=self.course.id, min_price=100)
+        CourseModeFactory.create(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=self.course.id, min_price=100)
 
         # Enroll the user in the test course
         CourseEnrollmentFactory(
@@ -112,7 +112,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # User visits the track selection page directly without ever enrolling
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -130,9 +130,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Create the course modes
         for mode in ('audit', 'honor'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
-        CourseModeFactory(
+        CourseModeFactory.create(
             mode_slug='verified',
             course_id=self.course.id,
             suggested_prices=price_list
@@ -164,7 +164,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_credit_upsell_message(self, available_modes, show_upsell):
         # Create the course modes
         for mode in available_modes:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # Check whether credit upsell is shown on the page
         # This should *only* be shown when a credit mode is available
@@ -179,7 +179,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     @ddt.data('professional', 'no-id-professional')
     def test_professional_enrollment(self, mode):
         # The only course mode is professional ed
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=1)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=1)
 
         # Go to the "choose your track" page
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -219,8 +219,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_choose_mode_redirect(self, course_mode, expected_redirect):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
-            min_price = 0 if course_mode in ["honor", "audit"] else 1
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
+            min_price = 0 if mode in ["honor", "audit"] else 1
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         # Choose the mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -241,8 +241,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
     def test_remember_donation_for_course(self):
         # Create the course modes
-        for mode in ('honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug='honor', course_id=self.course.id)
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id, min_price=1)
 
         # Choose the mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -259,7 +259,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_successful_default_enrollment(self):
         # Create the course modes
         for mode in (CourseMode.DEFAULT_MODE_SLUG, 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # Enroll the user in the default mode (honor) to emulate
         # automatic enrollment
@@ -281,7 +281,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_unsupported_enrollment_mode_failure(self):
         # Create the supported course modes
         for mode in ('honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # Choose an unsupported mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -356,7 +356,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         # Load the track selection page
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -393,8 +393,8 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Create a course and course modes
         self.course = CourseFactory.create()
-        CourseModeFactory(mode_slug='honor', course_id=self.course.id)
-        CourseModeFactory(mode_slug='verified', course_id=self.course.id, min_price=10)
+        CourseModeFactory.create(mode_slug='honor', course_id=self.course.id)
+        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id, min_price=10)
 
         # Create a user and log in
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")

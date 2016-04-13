@@ -182,7 +182,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Create the course mode(s)
         for mode, min_price in course_modes:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         self.enrollment.mode = enrollment_mode
         self.enrollment.save()
@@ -203,7 +203,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Create a white-label course mode
         # (honor mode with a price set)
-        CourseModeFactory(mode_slug="honor", course_id=self.course.id, min_price=100)
+        CourseModeFactory.create(mode_slug="honor", course_id=self.course.id, min_price=100)
 
         # Check that the donate button is NOT displayed
         self.client.login(username=self.student.username, password=self.PASSWORD)
