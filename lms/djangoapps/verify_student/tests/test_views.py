@@ -35,7 +35,8 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.models import CommerceConfiguration
+from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
@@ -133,6 +134,34 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.WEBCAM_REQ,
         ])
         self._assert_upgrade_session_flag(False)
+
+    @httpretty.activate
+    @override_settings(
+        ECOMMERCE_API_URL=TEST_API_URL,
+        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+        ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
+    )
+    def test_start_flow_with_ecommerce(self):
+        """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
+        checkout_page = '/test_basket/'
+        sku = 'TESTSKU'
+        # When passing a SKU ecommerce api gets called.
+        httpretty.register_uri(
+            httpretty.GET,
+            "{}/payment/processors/".format(TEST_API_URL),
+            body=json.dumps(['foo', 'bar']),
+            content_type="application/json",
+        )
+        httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
+        CommerceConfiguration.objects.create(
+            checkout_on_ecommerce_service=True,
+            single_course_checkout_page=checkout_page
+        )
+        course = self._create_course('verified', sku=sku)
+        self._enroll(course.id)
+        response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+        expected_page = '{}{}?sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+        self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
         ("no-id-professional", "verify_student_start_flow"),
