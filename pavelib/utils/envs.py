@@ -116,7 +116,7 @@ class Env(object):
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
     # reason. See issue TE-415.
-    JS_TEST_CONFIG_FILES = [
+    KARMA_CONFIG_FILES = [
         REPO_ROOT / 'lms/static/karma_lms.conf.js',
         REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
         REPO_ROOT / 'cms/static/karma_cms.conf.js',

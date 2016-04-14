@@ -64,9 +64,9 @@ class JsTestSubSuite(TestSuite):
         self.report_dir = Env.JS_REPORT_DIR
 
         try:
-            self.test_conf_file = Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.test_id)]
+            self.test_conf_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(self.test_id)]
         except ValueError:
-            self.test_conf_file = Env.JS_TEST_CONFIG_FILES[0]
+            self.test_conf_file = Env.KARMA_CONFIG_FILES[0]
 
         self.coverage_report = self.report_dir / 'coverage-{suite}.xml'.format(suite=self.test_id)
         self.xunit_report = self.report_dir / 'javascript_xunit-{suite}.xml'.format(suite=self.test_id)
