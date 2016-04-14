@@ -3,7 +3,7 @@ Functions for accessing and displaying courses within the
 courseware.
 """
 from datetime import datetime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from fs.errors import ResourceNotFoundError
 import logging
 
@@ -371,6 +371,28 @@ def get_course_syllabus_section(course, section_key):
             return "! Syllabus missing !"
 
     raise KeyError("Invalid about key " + str(section_key))
+
+
+def get_courses_by_university(user, domain=None):
+    '''
+    Returns dict of lists of courses available, keyed by course.org (ie university).
+    Courses are sorted by course.number.
+    '''
+    # TODO: Clean up how 'error' is done.
+    # filter out any courses that errored.
+    visible_courses = get_courses(user, domain)
+
+    universities = defaultdict(list)
+    for course in visible_courses:
+        universities[course.org].append(course)
+
+    # we will return them ordered by reverse alpha... get around Mako issues
+    # specific to ISC.
+    rev_lower_keys = sorted(universities.keys(), key=lambda k: k.lower(), reverse=True)
+    ordered = OrderedDict()
+    for k in rev_lower_keys:
+        ordered[k] = universities[k]
+    return ordered
 
 
 def get_courses(user, domain=None):
