@@ -166,7 +166,7 @@ class TestAuthorizationView(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # check form is in context and form params are valid
-        context = response.context  # pylint: disable=no-member
+        context = response.context_data  # pylint: disable=no-member
         self.assertIn('form', context)
         self.assertIsNone(context['form']['authorize'].value())
 
