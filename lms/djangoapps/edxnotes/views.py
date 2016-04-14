@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_GET
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -41,7 +41,7 @@ def edxnotes(request, course_id):
     Returns:
         Rendered HTTP response.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     course = get_course_with_access(request.user, "load", course_key)
 
     if not is_feature_enabled(course):
@@ -145,7 +145,7 @@ def notes(request, course_id):
           "previous": null
         }
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
     if not is_feature_enabled(course):
@@ -183,7 +183,7 @@ def edxnotes_visibility(request, course_id):
     """
     Handle ajax call from "Show notes" checkbox.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     course = get_course_with_access(request.user, "load", course_key)
     field_data_cache = FieldDataCache([course], course_key, request.user)
     course_module = get_module_for_descriptor(

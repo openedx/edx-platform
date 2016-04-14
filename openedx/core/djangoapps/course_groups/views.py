@@ -17,7 +17,7 @@ from django.utils.translation import ugettext
 import logging
 import re
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
@@ -128,7 +128,7 @@ def course_cohort_settings_handler(request, course_key_string):
     PATCH
         Updates the cohort settings for the course. Returns the JSON representation of updated settings.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
     cohort_settings = cohorts.get_course_cohort_settings(course_key)
 
@@ -465,7 +465,7 @@ def cohort_discussion_topics(request, course_key_string):
         >>>               }
         >>>          }
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
 
     discussion_topics = {}

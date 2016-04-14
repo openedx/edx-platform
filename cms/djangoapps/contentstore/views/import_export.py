@@ -26,7 +26,6 @@ from edxmako.shortcuts import render_to_response
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
@@ -44,6 +43,7 @@ from contentstore.views.entrance_exam import (
 )
 
 from contentstore.utils import reverse_course_url, reverse_usage_url, reverse_library_url
+from util.course_key_utils import course_key_from_string_or_404
 
 
 __all__ = [
@@ -73,7 +73,7 @@ def import_handler(request, course_key_string):
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    courselike_key = CourseKey.from_string(course_key_string)
+    courselike_key = course_key_from_string_or_404(course_key_string)
     library = isinstance(courselike_key, LibraryLocator)
     if library:
         root_name = LIBRARY_ROOT
@@ -374,7 +374,7 @@ def import_status_handler(request, course_key_string, filename=None):
         4 : Import successful
 
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
@@ -475,7 +475,7 @@ def export_handler(request, course_key_string):
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course_key = course_key_from_string_or_404(course_key_string)
     export_url = reverse_course_url('export_handler', course_key)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()

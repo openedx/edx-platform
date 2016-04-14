@@ -23,13 +23,14 @@ from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
+from util.course_key_utils import course_key_from_string_or_404
 
 import static_replace
 from openedx.core.lib.gating import api as gating_api
@@ -812,7 +813,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
     Load a single XBlock identified by usage_key_string.
     """
     usage_key = UsageKey.from_string(usage_key_string)
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     usage_key = usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -847,7 +848,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
 
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key, depth=0)
@@ -879,7 +880,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
     """
     request.user.known = False
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key, depth=0)
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
@@ -903,10 +904,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     if not request.user.is_authenticated():
         return HttpResponse('Unauthenticated', status=403)
 
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404("Invalid location")
+    course_key = course_key_from_string_or_404(course_id, message="Invalid location")
 
     with modulestore().bulk_operations(course_key):
         try:
@@ -997,10 +995,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404
+    course_key = course_key_from_string_or_404(course_id)
 
     # Gather metrics for New Relic so we can slice data in New Relic Insights
     newrelic.agent.add_custom_parameter('course_id', unicode(course_key))

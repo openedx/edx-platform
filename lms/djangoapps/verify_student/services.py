@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 
 from student.models import User, CourseEnrollment
 from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
@@ -37,7 +37,7 @@ class ReverificationService(object):
         Returns: str or None
         """
         user = User.objects.get(id=user_id)
-        course_key = CourseKey.from_string(course_id)
+        course_key = course_key_from_string_or_404(course_id)
 
         if not CourseEnrollment.is_enrolled_as_verified(user, course_key):
             return self.NON_VERIFIED_TRACK
@@ -64,7 +64,7 @@ class ReverificationService(object):
         Returns:
             Re-verification link
         """
-        course_key = CourseKey.from_string(course_id)
+        course_key = course_key_from_string_or_404(course_id)
 
         # Get-or-create the verification checkpoint
         VerificationCheckpoint.get_or_create_verification_checkpoint(course_key, related_assessment_location)
@@ -90,7 +90,7 @@ class ReverificationService(object):
         Returns:
             None
         """
-        course_key = CourseKey.from_string(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         checkpoint = VerificationCheckpoint.objects.get(
             course_id=course_key,
             checkpoint_location=related_assessment_location
@@ -134,5 +134,5 @@ class ReverificationService(object):
         Returns:
             Number of re-verification attempts of a user
         """
-        course_key = CourseKey.from_string(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         return VerificationStatus.get_user_attempts(user_id, course_key, related_assessment_location)

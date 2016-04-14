@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.views.decorators.cache import cache_control
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
@@ -107,7 +107,7 @@ def spoc_gradebook(request, course_id):
     - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     - Only displayed to course staff
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     course = get_course_with_access(request.user, 'staff', course_key, depth=None)
     student_info, page = get_grade_book_page(request, course, course_key)
 

@@ -12,7 +12,8 @@ from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
 from lti_provider.users import authenticate_lti_user
 from lms_xblock.runtime import unquote_slashes
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import UsageKey
+from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys import InvalidKeyError
 from util.views import add_p3p_header
 
@@ -152,7 +153,7 @@ def parse_course_and_usage_keys(course_id, usage_id):
     (course_key, usage_key), or throw an InvalidKeyError if the translation
     fails.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     usage_id = unquote_slashes(usage_id)
     usage_key = UsageKey.from_string(usage_id).map_into_course(course_key)
     return course_key, usage_key

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from ratelimitbackend import admin
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 
 from config_models.admin import ConfigurationModelAdmin
 from student.models import (
@@ -34,7 +34,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             course_id = self.cleaned_data['course_id']
 
             try:
-                course_key = CourseKey.from_string(course_id)
+                course_key = course_key_from_string_or_404(course_id)
             except InvalidKeyError:
                 raise forms.ValidationError(u"Invalid CourseID. Please check the format and re-try.")
 

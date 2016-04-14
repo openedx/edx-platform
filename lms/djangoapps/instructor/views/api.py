@@ -107,6 +107,7 @@ from .tools import (
     bulk_email_is_enabled_for_course,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
@@ -233,7 +234,7 @@ def require_level(level):
     def decorator(func):  # pylint: disable=missing-docstring
         def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
-            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
+            course = get_course_by_id(course_key_from_string_or_404(kwargs['course_id']))
 
             if has_access(request.user, level, course):
                 return func(*args, **kwargs)
@@ -994,7 +995,7 @@ def get_problem_responses(request, course_id):
 
     Responds with BadRequest if problem location is faulty.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     problem_location = request.GET.get('problem_location', '')
 
     try:
@@ -1194,7 +1195,7 @@ def get_issued_certificates(request, course_id):
         {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     csv_required = request.GET.get('csv', 'false')
 
     query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
@@ -1234,7 +1235,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
     TO DO accept requests for different attribute sets.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
@@ -1313,7 +1314,7 @@ def get_students_who_may_enroll(request, course_id):
         {"status": "... status message ..."}
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     query_features = ['email']
     try:
         instructor_task.api.submit_calculate_may_enroll_csv(request, course_key, query_features)
@@ -1499,7 +1500,7 @@ def get_proctored_exam_results(request, course_id):
         'status',
     ]
 
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     try:
         instructor_task.api.submit_proctored_exam_results_report(request, course_key, query_features)
         status_response = _("The proctored exam results report is being created."
@@ -1619,7 +1620,7 @@ def generate_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Generated Codes.
     """
-    course_id = CourseKey.from_string(course_id)
+    course_id = course_key_from_string_or_404(course_id)
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -2737,7 +2738,7 @@ def generate_example_certificates(request, course_id=None):  # pylint: disable=u
     generation has begun.
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     certs_api.generate_example_certificates(course_key)
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
@@ -2754,7 +2755,7 @@ def enable_certificate_generation(request, course_id=None):
     setting has been updated.
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
     certs_api.set_cert_generation_enabled(course_key, is_enabled)
     return redirect(_instructor_dash_url(course_key, section='certificates'))
@@ -2793,7 +2794,7 @@ def start_certificate_generation(request, course_id):
     """
     Start generating certificates for all students enrolled in given course.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     task = instructor_task.api.generate_certificates_for_students(request, course_key)
     message = _('Certificate generation task for all students of this course has been started. '
                 'You can view the status of the generation task in the "Pending Tasks" section.')
@@ -2814,7 +2815,7 @@ def start_certificate_regeneration(request, course_id):
     Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
     entry in POST data.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     certificates_statuses = request.POST.getlist('certificate_statuses', [])
     if not certificates_statuses:
         return JsonResponse(
@@ -2855,7 +2856,7 @@ def certificate_exception_view(request, course_id):
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
     :return: JsonResponse object with success/error message or certificate exception data.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     # Validate request data and return error response in case of invalid data
     try:
         certificate_exception, student = parse_request_data_and_get_user(request, course_key)
@@ -3030,7 +3031,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
             additions to the certificate white-list
     :return: JsonResponse object containing success/failure message and certificate exception data
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
 
     if generate_for == 'all':
         # Generate Certificates for all white listed students
@@ -3081,7 +3082,7 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
     user_index = 0
     notes_index = 1
     row_errors_key = ['data_format_error', 'user_not_exist', 'user_already_white_listed', 'user_not_enrolled']
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     students, general_errors, success = [], [], []
     row_errors = {key: [] for key in row_errors_key}
 
@@ -3166,7 +3167,7 @@ def certificate_invalidation_view(request, course_id):
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
     :return: JsonResponse object with success/error message or certificate invalidation data.
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = course_key_from_string_or_404(course_id)
     # Validate request data and return error response in case of invalid data
     try:
         certificate_invalidation_data = parse_request_data(request)
