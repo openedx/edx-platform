@@ -4,15 +4,15 @@ from django.test import TestCase
 import mock
 from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin
 
 
 @attr('shard_2')
 @ddt.ddt
 # ConfigurationModels use the cache. Make every cache get a miss.
 @mock.patch('config_models.models.cache.get', return_value=None)
-class TestProgramsApiConfig(ProgramsApiConfigMixin, TestCase):
-    """Tests covering the ProgramsApiConfig model."""
+class TestProgramsConfig(ProgramsConfigMixin, TestCase):
+    """Tests covering the ProgramsConfig model."""
     def test_url_construction(self, _mock_cache):
         """Verify that URLs returned by the model are constructed correctly."""
         programs_config = self.create_programs_config()

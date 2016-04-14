@@ -8,19 +8,19 @@ import mock
 from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangoapps.programs.models import ProgramsConfig
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsConfigMixin, ProgramsDataMixin
 from openedx.core.djangolib.markup import Text
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModuleStoreTestCase):
+class TestProgramListing(ProgramsConfigMixin, ProgramsDataMixin, SharedModuleStoreTestCase):
     """Verify Program listing behavior."""
     def setUp(self):
         super(TestProgramListing, self).setUp()
 
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ClientFactory(name=ProgramsConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         self.staff = UserFactory(is_staff=True)
         self.client.login(username=self.staff.username, password='test')
@@ -74,7 +74,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
             self.assertIn(program_name, response.content)
 
 
-class TestProgramAuthoringView(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
+class TestProgramAuthoringView(ProgramsConfigMixin, SharedModuleStoreTestCase):
     """Verify the behavior of the program authoring app's host view."""
     def setUp(self):
         super(TestProgramAuthoringView, self).setUp()
@@ -124,7 +124,7 @@ class TestProgramAuthoringView(ProgramsApiConfigMixin, SharedModuleStoreTestCase
         self._assert_status(404)
 
 
-class TestProgramsIdTokenView(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
+class TestProgramsIdTokenView(ProgramsConfigMixin, SharedModuleStoreTestCase):
     """Tests for the programs id_token endpoint."""
 
     def setUp(self):

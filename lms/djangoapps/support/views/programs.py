@@ -6,7 +6,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
 
 
@@ -38,7 +38,7 @@ class IssueProgramCertificatesView(views.APIView):
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser,)
 
     def post(self, request):
-        if not ProgramsApiConfig.current().is_certification_enabled:
+        if not ProgramsConfig.current().is_certification_enabled:
             return Response(
                 {'error': 'Program certification is disabled.'},
                 status=status.HTTP_400_BAD_REQUEST

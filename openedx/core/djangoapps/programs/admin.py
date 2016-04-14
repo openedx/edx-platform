@@ -5,11 +5,11 @@ from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 
 
-class ProgramsApiConfigAdmin(ConfigurationModelAdmin):  # pylint: disable=missing-docstring
+class ProgramsConfigAdmin(ConfigurationModelAdmin):  # pylint: disable=missing-docstring
     pass
 
 
-admin.site.register(ProgramsApiConfig, ProgramsApiConfigAdmin)
+admin.site.register(ProgramsConfig, ProgramsConfigAdmin)

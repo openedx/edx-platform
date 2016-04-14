@@ -15,9 +15,9 @@ from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.tests.mixins import (
-    ProgramsApiConfigMixin,
+    ProgramsConfigMixin,
     ProgramsDataMixin)
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -28,7 +28,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 @override_settings(MKTG_URLS={'ROOT': 'http://edx.org'})
 class TestProgramListing(
         ModuleStoreTestCase,
-        ProgramsApiConfigMixin,
+        ProgramsConfigMixin,
         ProgramsDataMixin):
 
     """
@@ -41,7 +41,7 @@ class TestProgramListing(
             Add a student
         """
         super(TestProgramListing, self).setUp()
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
+        ClientFactory(name=ProgramsConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
         self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
 

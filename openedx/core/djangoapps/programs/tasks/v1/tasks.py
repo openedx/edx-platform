@@ -12,7 +12,7 @@ from lms.djangoapps.certificates.api import get_certificates_for_user, is_passin
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_user_credentials
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.lib.token_utils import get_id_token
 
 
@@ -26,7 +26,7 @@ def get_api_client(api_config, student):
     Create and configure an API client for authenticated HTTP requests.
 
     Args:
-        api_config: ProgramsApiConfig or CredentialsApiConfig object
+        api_config: ProgramsConfig or CredentialsApiConfig object
         student: User object as whom to authenticate to the API
 
     Returns:
@@ -142,7 +142,7 @@ def award_program_certificates(self, username):
     """
     LOGGER.info('Running task award_program_certificates for username %s', username)
 
-    config = ProgramsApiConfig.current()
+    config = ProgramsConfig.current()
     countdown = 2 ** self.request.retries
 
     # If either programs or credentials config models are disabled for this

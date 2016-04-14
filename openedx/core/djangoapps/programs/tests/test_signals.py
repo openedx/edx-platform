@@ -18,7 +18,7 @@ TEST_USERNAME = 'test-user'
 @attr('shard_2')
 @mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates.delay')
 @mock.patch(
-    'openedx.core.djangoapps.programs.models.ProgramsApiConfig.is_certification_enabled',
+    'openedx.core.djangoapps.programs.models.ProgramsConfig.is_certification_enabled',
     new_callable=mock.PropertyMock,
     return_value=False,
 )

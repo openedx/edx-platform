@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 from openedx.core.lib.token_utils import get_id_token
 
 
@@ -22,7 +22,7 @@ class ProgramAuthoringView(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         """Populate the template context with values required for the authoring app to run."""
-        programs_config = ProgramsApiConfig.current()
+        programs_config = ProgramsConfig.current()
 
         if programs_config.is_studio_tab_enabled and request.user.is_staff:
             return render_to_response('program_authoring.html', {
@@ -43,7 +43,7 @@ class ProgramsIdTokenView(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         """Generate and return a token, if the integration is enabled."""
-        if ProgramsApiConfig.current().is_studio_tab_enabled:
+        if ProgramsConfig.current().is_studio_tab_enabled:
             id_token = get_id_token(request.user, 'programs')
             return JsonResponse({'id_token': id_token})
         else:

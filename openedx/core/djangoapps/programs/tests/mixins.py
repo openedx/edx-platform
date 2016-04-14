@@ -3,10 +3,10 @@ import json
 
 import httpretty
 
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.models import ProgramsConfig
 
 
-class ProgramsApiConfigMixin(object):
+class ProgramsConfigMixin(object):
     """Utilities for working with Programs configuration during testing."""
 
     DEFAULTS = {
@@ -24,11 +24,11 @@ class ProgramsApiConfigMixin(object):
     }
 
     def create_programs_config(self, **kwargs):
-        """Creates a new ProgramsApiConfig with DEFAULTS, updated with any provided overrides."""
+        """Creates a new ProgramsConfig with DEFAULTS, updated with any provided overrides."""
         fields = dict(self.DEFAULTS, **kwargs)
-        ProgramsApiConfig(**fields).save()
+        ProgramsConfig(**fields).save()
 
-        return ProgramsApiConfig.current()
+        return ProgramsConfig.current()
 
 
 class ProgramsDataMixin(object):
@@ -252,7 +252,7 @@ class ProgramsDataMixin(object):
         """Utility for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+        url = ProgramsConfig.current().internal_api_url.strip('/') + '/programs/'
 
         if data is None:
             data = self.PROGRAMS_API_RESPONSE
