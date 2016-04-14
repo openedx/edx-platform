@@ -15,6 +15,8 @@
                 text: gettext('All teams')
             },
 
+            paginationLabel: gettext('Teams Pagination'),
+
             initialize: function (options) {
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({

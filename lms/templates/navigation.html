@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
@@ -8,6 +9,7 @@ from django.utils.translation import ugettext as _
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
+from openedx.core.djangolib.markup import Text, HTML
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
@@ -48,10 +50,10 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
-      <span class="course-number">${course.display_number_with_default | h}</span>
+    <h2 class="course-header"><span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
       <%
-        display_name = course.display_name_with_default_escaped
+        display_name = course.display_name_with_default
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
           ccx = get_current_ccx(course.id)
           if ccx:
@@ -194,7 +196,15 @@ site_status_msg = get_site_status_msg(course_id)
 </header>
 % if course:
 <!--[if lte IE 9]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/chrome" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>')}</div>
+<div class="ie-banner" aria-hidden="true">
+${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+  )
+}
+</div>
 <![endif]-->
 % endif
 

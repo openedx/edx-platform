@@ -34,7 +34,7 @@
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2015
 # Linda B.A <siria242@gmail.com>, 2016
 # Marco Morales, 2014
-# moocit-france <contact@moocit.fr>, 2014-2015
+# moocit-france <contact@moocit.fr>, 2014-2016
 # mtyaka <mtyaka@gmail.com>, 2015-2016
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
@@ -120,7 +120,7 @@
 # Maghjina <Maghjina@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
 # Minusc <olegine@gmail.com>, 2015
-# moocit-france <contact@moocit.fr>, 2015
+# moocit-france <contact@moocit.fr>, 2015-2016
 # Manjari <mringuet@gmail.com>, 2014
 # Ramarohetra Malalatiana <mtiana8@gmail.com>, 2014
 # eddy01 <ngwa.edwin@yahoo.com>, 2014
@@ -189,7 +189,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 11:00+0000\n"
+"POT-Creation-Date: 2016-03-30 19:39+0000\n"
 "PO-Revision-Date: 2016-01-12 23:32+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -265,6 +265,16 @@ msgstr "Vidéo ID"
 msgid "Status"
 msgstr "Statut"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Pending"
+msgstr "En attente"
+
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
 msgstr ""
@@ -279,7 +289,7 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Current Configuration"
-msgstr ""
+msgstr "Configuration actuelle"
 
 #: common/djangoapps/config_models/admin.py
 msgid "All (Show History)"
@@ -291,7 +301,7 @@ msgstr "Mettre à jour"
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
-msgstr ""
+msgstr "Modifier la date"
 
 #. Translators: this label indicates the name of the user who made this
 #. change:
@@ -535,106 +545,116 @@ msgid ""
 "The user account associated with this e-mail address cannot reset the "
 "password."
 msgstr ""
+"Le compte utilisateur associé à cette adresse e-mail ne peut pas "
+"réinitialiser le mot de passe."
 
 #: common/djangoapps/student/forms.py
 msgid "Username must be minimum of two characters long"
-msgstr ""
+msgstr "Le nom d'utilisateur doit contenir au-moins deux caractères"
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
-msgstr ""
+msgstr "Une adresse e-mail valide est requise"
 
 #: common/djangoapps/student/forms.py
 msgid "A valid password is required"
-msgstr ""
+msgstr "Un mot de passe valide est requis"
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of two characters long"
-msgstr ""
+msgstr "Votre nom complet doit contenir au minimum deux caractères"
 
 #: common/djangoapps/student/forms.py
 msgid ""
 "Usernames must contain only letters, numbers, underscores (_), and hyphens "
 "(-)."
 msgstr ""
+"Les noms d'utilisateur doivent contenir uniquement des lettres, chiffres, "
+"underscore (_), et tiret (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
 msgid "Username cannot be more than %(limit_value)s characters long"
 msgstr ""
+"Le nom d'utilisateur ne peut pas avoir plus de %(limit_value)s caractères"
 
 #: common/djangoapps/student/forms.py
 #, python-format
 msgid "Email cannot be more than %(limit_value)s characters long"
-msgstr ""
+msgstr "L'e-mail ne peut pas contenir plus de %(limit_value)s caractères "
 
 #: common/djangoapps/student/forms.py
 msgid "You must accept the terms of service."
-msgstr ""
+msgstr "Vous devez accepter les conditions d'utilisation."
 
 #: common/djangoapps/student/forms.py
 msgid "A level of education is required"
-msgstr ""
+msgstr "Un niveau d'études est requis"
 
 #: common/djangoapps/student/forms.py
 msgid "Your gender is required"
-msgstr ""
+msgstr "Votre genre est requis"
 
 #: common/djangoapps/student/forms.py
 msgid "Your year of birth is required"
-msgstr ""
+msgstr "Votre année de naissance est requise"
 
 #: common/djangoapps/student/forms.py
 msgid "Your mailing address is required"
-msgstr ""
+msgstr "Votre adresse postale est requise"
 
 #: common/djangoapps/student/forms.py
 msgid "A description of your goals is required"
-msgstr ""
+msgstr "Une description de vos objectifs est requise"
 
 #: common/djangoapps/student/forms.py
 msgid "A city is required"
-msgstr ""
+msgstr "Une ville est requise"
 
 #: common/djangoapps/student/forms.py
 msgid "A country is required"
-msgstr ""
+msgstr "Un pays est requis"
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
-msgstr ""
+msgstr "Pour vous inscrire, vous devez accepter le code d'honneur."
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
-msgstr ""
+msgstr "Il vous manque un ou plusieurs champs obligatoires"
 
 #: common/djangoapps/student/forms.py
 msgid "Username and password fields cannot match"
 msgstr ""
+"Le nom d'utilisateur et le mot de passe ne peuvent pas être identiques "
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
-msgstr ""
+msgstr "Mot de passe : "
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
-msgstr ""
+msgstr "Adresse email non autorisée."
 
 #: common/djangoapps/student/forms.py
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
 msgstr ""
+"Il semblerait que {email} appartient à un compte existant. Réessayez avec "
+"une adresse email différente."
 
 #: common/djangoapps/student/middleware.py
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
 msgstr ""
+"Votre compte a été désactivé. Si vous pensez que cela a été fait par erreur,"
+" veuillez nous contacter à {support_email}"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
-msgstr ""
+msgstr "Compte désactivé"
 
 #: common/djangoapps/student/models.py
 msgid "Male"
@@ -647,63 +667,65 @@ msgstr "Femme"
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py
 msgid "Other/Prefer Not to Say"
-msgstr ""
+msgstr "Autre/Non renseigné "
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr ""
+msgstr "Doctorat"
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
-msgstr ""
+msgstr "Master ou diplôme professionnel"
 
 #: common/djangoapps/student/models.py
 msgid "Bachelor's degree"
-msgstr ""
+msgstr "Diplôme de premier cycle supérieur"
 
 #: common/djangoapps/student/models.py
 msgid "Associate degree"
-msgstr ""
+msgstr "Niveau associé"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
-msgstr ""
+msgstr "Lycée / enseignement secondaire"
 
 #: common/djangoapps/student/models.py
 msgid "Junior secondary/junior high/middle school"
-msgstr ""
+msgstr "Collège / enseignement secondaire inférieur"
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
-msgstr ""
+msgstr "Enseignement primaire"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "No Formal Education"
-msgstr ""
+msgstr "Pas de Formation Scolaire"
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other Education"
-msgstr ""
+msgstr " Autres Etudes"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
-msgstr ""
+msgstr "{platform_name} Certificat sur l'honneur pour {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr ""
+msgstr "{platform_name} Certificat Vérifié pour {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Professional Certificate for {course_name}"
-msgstr ""
+msgstr "{platform_name} Certificat professionnel {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid ""
 "The company identifier for the LinkedIn Add-to-Profile button e.g "
 "0_0dPSPyS070e0HsE9HNz_13_d11_"
 msgstr ""
+"Identifiant de l'entreprise pour le bouton Add-to-Profile de LinkedIn  "
+"exemple 0_0dPSPyS070e0HsE9HNz_13_d11_"
 
 #: common/djangoapps/student/models.py
 msgid ""
@@ -714,15 +736,15 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Certificate for {course_name}"
-msgstr ""
+msgstr "{platform_name} Certificat pour {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid "The ISO 639-1 language code for this language."
-msgstr ""
+msgstr "Le code linguistique ISO 639-1 pour cette langue."
 
 #: common/djangoapps/student/models.py
 msgid "Namespace of enrollment attribute"
-msgstr ""
+msgstr "Espace de nommage des attributs d'inscription"
 
 #: common/djangoapps/student/models.py
 msgid "Name of the enrollment attribute"
@@ -779,6 +801,8 @@ msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
+"Vous êtes connecté avec succès à votre compte {provider_name}, mais ce "
+"compte n'est pas encore lié avec un compte {platform_name}."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -850,7 +874,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
+msgstr "Un compte avec le même nom d'utilisateur '{username}' existe déjà."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
@@ -2733,6 +2757,8 @@ msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
 "course."
 msgstr ""
+"Entrer true ou false. Si la valeur est true, les examens minutés sont "
+"disponibles dans le cours."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -2745,14 +2771,26 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Self Paced"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Set this to \"true\" to mark this course as self-paced. Self-paced courses "
 "do not have due dates for assignments, and students can progress through the"
 " course at any rate before the course ends."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Bypass Course Home"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Bypass the course home tab when students arrive from the dashboard, sending "
+"them directly to course content."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4004,6 +4042,12 @@ msgid "CCX Coach"
 msgstr ""
 
 #: lms/djangoapps/ccx/utils.py
+msgid ""
+"A CCX can only be created on this course through an external service. "
+"Contact a course admin to give you access."
+msgstr ""
+
+#: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr ""
 
@@ -4081,7 +4125,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/models.py
 msgid "The full name that will appear on the certificate."
-msgstr ""
+msgstr "Le nom complet tel qu'il apparaîtra sur le certificat."
 
 #: lms/djangoapps/certificates/models.py
 msgid "The template file to use when generating the certificate."
@@ -4409,7 +4453,7 @@ msgstr ""
 #. certificate that a student has been awarded
 #: lms/djangoapps/certificates/views/webview.py
 msgid "More about {fullname}'s accomplishment"
-msgstr ""
+msgstr "En savoir plus sur les résultats de {fullname}"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -4582,7 +4626,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
-msgstr ""
+msgstr "Début du cours"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
@@ -4850,7 +4894,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide full name"
-msgstr ""
+msgstr "Vous devez fournir un nom complet"
 
 #. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -4903,13 +4947,13 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
-msgstr ""
+msgstr "Nombre total d'utilisateurs"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
 msgstr ""
 
-#: lms/templates/tracking_log.html
+#: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
 msgid "username"
 msgstr "nom d'utilisateur"
 
@@ -4937,8 +4981,8 @@ msgstr ""
 msgid "Added Course"
 msgstr ""
 
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: lms/templates/shoppingcart/receipt.html
+#: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
+#: cms/templates/index.html lms/templates/shoppingcart/receipt.html
 msgid "Course Name"
 msgstr "Nom du cours"
 
@@ -4962,7 +5006,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Information about all courses"
-msgstr ""
+msgstr "Informations sur tous les cours"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
@@ -4970,7 +5014,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted"
-msgstr ""
+msgstr "Supprimé"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "course_id"
@@ -4986,19 +5030,19 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "instructors"
-msgstr ""
+msgstr "Enseignants"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
-msgstr ""
+msgstr "Information d'inscription pour tous les cours"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "role"
-msgstr ""
+msgstr "rôle"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
-msgstr ""
+msgstr "nom complet"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -5023,7 +5067,7 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
-msgstr ""
+msgstr "Bien"
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -5051,7 +5095,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
-msgstr ""
+msgstr "Équipe pédagogique"
 
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -5084,7 +5128,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
-msgstr ""
+msgstr "La tâche est déjà en cours."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5104,7 +5148,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid email {email_address}."
-msgstr ""
+msgstr "Email non valide {email_address}."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5185,25 +5229,41 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: openedx/core/djangoapps/user_api/views.py
 #: cms/templates/temp-course-landing.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
-msgstr "E-mail"
+msgstr "Email"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Language"
-msgstr ""
+msgstr "Langue"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
-msgstr ""
+msgstr "Adresse"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Birth Year"
-msgstr ""
+msgstr "Année de naissance"
 
-#: lms/templates/register-form.html lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's gender.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
 msgstr "Genre"
@@ -5211,8 +5271,10 @@ msgstr "Genre"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Level of Education"
-msgstr ""
+msgstr "Niveau de formation"
 
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
@@ -5225,11 +5287,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
-msgstr ""
+msgstr "Cohorte"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Team"
-msgstr ""
+msgstr "Equipe"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5268,12 +5330,14 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course Id"
-msgstr ""
+msgstr "ID de Cours"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "% Discount"
 msgstr ""
 
+#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -5281,6 +5345,7 @@ msgstr ""
 msgid "Description"
 msgstr "Description"
 
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Expiration Date"
@@ -5377,7 +5442,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course has no entrance exam section."
-msgstr ""
+msgstr "Le cours n'a pas d'examen d'entrée."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "all_students and unique_student_identifier are mutually exclusive."
@@ -5397,7 +5462,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "All Students"
-msgstr ""
+msgstr "Tous les étudiants"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cannot rescore with all_students and unique_student_identifier."
@@ -5621,7 +5686,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Instructor"
-msgstr ""
+msgstr "Enseignant"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
@@ -5631,14 +5696,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
-msgstr ""
+msgstr "E-Commerce"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
 msgstr ""
 
-#: cms/templates/certificates.html cms/templates/export.html
-#: cms/templates/widgets/header.html
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/support/views/index.py cms/templates/certificates.html
+#: cms/templates/export.html cms/templates/widgets/header.html
 msgid "Certificates"
 msgstr "Certificats"
 
@@ -5656,7 +5722,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr ""
+msgstr "Infos du cours"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "No end date set"
@@ -5668,40 +5734,38 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr ""
+msgstr "Inscription"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
-msgstr ""
+msgstr "Cohortes"
 
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "Admin Étudiant"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
-msgstr ""
+msgstr "Extensions"
 
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "Téléchargement des données"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "For analytics about your course, go to {analytics_dashboard_name}."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
-msgstr ""
+msgstr "Analyses"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Metrics"
-msgstr ""
+msgstr "Métriques"
 
 #. Translators: number sent refers to the number of emails sent
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "0 sent"
-msgstr ""
+msgstr "0 envoyé"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} sent"
@@ -5717,11 +5781,11 @@ msgstr[1] ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
-msgstr ""
+msgstr "Complet"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
-msgstr ""
+msgstr "Incomplet"
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid ""
@@ -5768,10 +5832,10 @@ msgstr ""
 msgid "No due date extension is set for that student and unit."
 msgstr ""
 
-#: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/face_upload.html
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -5817,13 +5881,13 @@ msgstr "supprimé"
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "emailed"
-msgstr ""
+msgstr "envoyé par email"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
-msgstr ""
+msgstr "noté"
 
 #. Translators: This is a past-tense phrase that is inserted into task
 #. progress messages as {action}.
@@ -5853,33 +5917,43 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "First Name"
-msgstr ""
+msgstr "Prénom"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Last Name"
-msgstr ""
+msgstr "Nom"
 
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "Nom Entreprise"
 
-#: wiki/forms.py
+#: lms/djangoapps/instructor_task/tasks_helper.py wiki/forms.py
 msgid "Title"
 msgstr "Titre"
 
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Année de naissance"
 
-#: lms/templates/register-form.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "Ville"
 
-#: lms/templates/register-form.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -5888,7 +5962,7 @@ msgstr "Pays"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
-msgstr ""
+msgstr "Date d'inscription"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Currently Enrolled"
@@ -6033,12 +6107,13 @@ msgstr ""
 #: lms/djangoapps/instructor_task/views.py
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
+"Echec du message à être {action} pour chacun des {attempted} récipients"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Message successfully {action} for {attempted} recipients"
-msgstr ""
+msgstr "Le message a été {action} avec succès pour les {attempted} récipients"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
@@ -6092,7 +6167,7 @@ msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Default Tab"
-msgstr ""
+msgstr "Onglet par défaut"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
@@ -6126,7 +6201,7 @@ msgstr ""
 msgid "This component refers to deleted or invalid content groups."
 msgstr ""
 
-#: lms/templates/notes.html
+#: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mes Notes"
 
@@ -7067,6 +7142,7 @@ msgstr "Remboursement manuel"
 msgid "Track refunds issued directly through CyberSource."
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
@@ -7076,10 +7152,12 @@ msgstr "Inscriptions"
 msgid "View and update learner enrollments."
 msgstr ""
 
+#: lms/djangoapps/support/views/refund.py
 #: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
-msgstr "Adresse e-mail"
+msgstr "Adresse email"
 
+#: lms/djangoapps/support/views/refund.py
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -7111,9 +7189,8 @@ msgid "Optional language the team uses as ISO 639-1 code."
 msgstr ""
 
 #: lms/djangoapps/teams/plugins.py
-#: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
-msgstr ""
+msgstr "Équipes"
 
 #: lms/djangoapps/teams/views.py
 msgid "The supplied course id {course_id} is not valid."
@@ -7275,7 +7352,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
-msgstr ""
+msgstr "Pas de profil trouvé pour cet utilisateur"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Name must be at least {min_length} characters long."
@@ -7313,7 +7390,7 @@ msgstr ""
 
 #: lms/envs/common.py
 msgid "Follow {platform_name} on LinkedIn"
-msgstr ""
+msgstr "Suivre {platform_name} sur LinkedIn"
 
 #. Translators: This is the website name of plus.google.com.  Please
 #. translate this the way that Google+ advertises in your language.
@@ -7323,7 +7400,7 @@ msgstr ""
 
 #: lms/envs/common.py
 msgid "Follow {platform_name} on Google+"
-msgstr ""
+msgstr "Suivre {platform_name} sur Google+"
 
 #. Translators: This is the website name of www.tumblr.com.  Please
 #. translate this the way that Tumblr advertises in your language.
@@ -7416,131 +7493,67 @@ msgid "Your Password Reset is Complete"
 msgstr "Votre mot de passe a été réinitialisé"
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
-"      "
+msgid "Password Reset Complete"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"      Reset Your %(platform_name)s Password\n"
-"  "
+"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
+"                "
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"          Reset Your %(platform_name)s Password\n"
-"          "
+"    Reset Your %(platform_name)s Password\n"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Form"
+msgid "Error Resetting Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"\n"
-"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
-"            "
+msgid "You must enter and confirm your new password."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The following errors occurred while processing your registration: "
+msgid "The text in both password fields must match."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "You must complete all fields."
+msgid "Reset Your Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The two password fields didn't match."
+msgid "Enter and confirm your new password."
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
+msgid "New Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
-"            "
+msgid "Confirm Password"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "Réinitialiser mon mot de passe"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
 msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
-"        "
-msgstr ""
-
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "Information requise"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password Again"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Change My Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your Password Reset Was Unsuccessful"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
-"        "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Help"
-msgstr ""
-
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "Besoin d'aide ?"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
-"          "
+"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
+"                "
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -8052,6 +8065,26 @@ msgstr "Cette révision a été supprimée."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Restaurer cette révision marquera cet article comme supprimé."
 
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Denied"
+msgstr "Refusée"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Approved"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Status of this API access request"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The URL of the website associated with this API user."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The reason this user wants to access the API."
+msgstr ""
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr ""
@@ -8093,7 +8126,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
-msgstr ""
+msgstr "Une cohorte avec le même nom existe déjà."
 
 #: openedx/core/djangoapps/coursetalk/models.py
 msgid ""
@@ -8129,11 +8162,13 @@ msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
+#: openedx/core/djangoapps/credit/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
@@ -8142,6 +8177,22 @@ msgstr ""
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
+msgstr ""
+
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "You are eligible for credit from {providers_string}"
+msgstr ""
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr ""
+
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
 msgstr ""
 
 #: openedx/core/djangoapps/credit/exceptions.py
@@ -8247,15 +8298,15 @@ msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "bytes"
-msgstr ""
+msgstr "bytes"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: openedx/core/djangoapps/profile_images/views.py
 msgid "No file provided for profile image"
@@ -8306,7 +8357,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
-msgstr ""
+msgstr "Le champ '{field_name}' ne peut pas être modifié."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 msgid "Delete failed for user preference '{preference_key}'."
@@ -8342,7 +8393,7 @@ msgstr ""
 #. a field on the password reset form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "username@domain.com"
-msgstr ""
+msgstr "utilisateur@exemple.com"
 
 #. Translators: These instructions appear on the login form, immediately
 #. below a field meant to hold the user's email address.
@@ -8351,16 +8402,24 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
+"L'adresse email utilisée lors de votre inscription sur {platform_name}"
 
-#: cms/templates/login.html cms/templates/register.html
-#: cms/templates/temp-course-landing.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: openedx/core/djangoapps/user_api/views.py cms/templates/login.html
+#: cms/templates/register.html cms/templates/temp-course-landing.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Mot de passe"
 
-#: lms/templates/login.html
+#: openedx/core/djangoapps/user_api/views.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Se souvenir de moi"
 
@@ -8371,6 +8430,8 @@ msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
 msgstr ""
+"Il semblerait que {email_address} appartient à un compte existant. Essayez "
+"avec une adresse email différente."
 
 #. Translators: This message is shown to users who attempt to create a new
 #. account using a username associated with an existing account.
@@ -8379,12 +8440,14 @@ msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
 "different username."
 msgstr ""
+"Il semblerait que {username} appartient à un compte existant. Essayez avec "
+"un nom d'utilisateur différent."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
-msgstr ""
+msgstr "Nom complet"
 
 #. Translators: This example name is used as a placeholder in
 #. a field on the registration form meant to hold the user's name.
@@ -8400,12 +8463,13 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
 msgstr ""
+"Votre nom complet, utilisé pout tous certificats que vous pourriez obtenir"
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Public username"
-msgstr ""
+msgstr "Nom d'utilisateur public"
 
 #. Translators: These instructions appear on the registration form,
 #. immediately
@@ -8415,6 +8479,8 @@ msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
 "changed later){bold_end}"
 msgstr ""
+"Vous apparaîtrez sous ce nom dans vos cours  - {bold_start}(ne peut être "
+"modifié){bold_end}"
 
 #. Translators: This example username is used as a placeholder in
 #. a field on the registration form meant to hold the user's username.
@@ -8426,13 +8492,19 @@ msgstr ""
 #. form used to select the user's highest completed level of education.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Highest level of education completed"
-msgstr ""
+msgstr "Plus haut niveau de formation obtenu"
 
-#: lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Year of birth"
 msgstr "Année de naissance"
 
-#: lms/templates/signup_modal.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/signup_modal.html
 msgid "Mailing address"
 msgstr "Adresse postale"
 
@@ -8440,6 +8512,13 @@ msgstr "Adresse postale"
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "State/Province/Region"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
@@ -8450,7 +8529,7 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
-msgstr ""
+msgstr "Conditions générales du service et code d'honneur"
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
@@ -8458,7 +8537,7 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
-msgstr ""
+msgstr "J'accepte les {terms_of_service} {platform_name}."
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
@@ -8466,15 +8545,15 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
-msgstr ""
+msgstr "Vous devez accepter les {terms_of_service} {platform_name}."
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
-msgstr ""
+msgstr "Cette valeur est invalide."
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This field is not editable"
-msgstr ""
+msgstr "Ce champ n'est pas modifiable"
 
 #: openedx/core/lib/gating/api.py
 #, python-format
@@ -8508,11 +8587,11 @@ msgstr "Mise à jour du cours non trouvée."
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "Could not index item: {}"
-msgstr ""
+msgstr "Impossible d’indexer l'élément: {}"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "General indexing error occurred"
-msgstr ""
+msgstr "Une erreur générale d’indexation s'est produite"
 
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
@@ -8883,15 +8962,6 @@ msgstr "Durée"
 msgid "Date Added"
 msgstr "Date ajoutée"
 
-#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Pending"
-msgstr "En attente"
-
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -8976,7 +9046,6 @@ msgstr "Paramètres"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -9012,10 +9081,28 @@ msgstr "Numéro du cours :"
 msgid "Courses"
 msgstr "Cours"
 
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "Se Connecter"
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
+
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -9027,20 +9114,20 @@ msgstr "E-mail"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "exemple : jean.dupont@domaine.com"
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "Mot de passe oublié ?"
 
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register-form.html
-#: lms/templates/verify_student/face_upload.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "example: Jane Doe"
 msgstr "exemple : Jean Dupont"
@@ -9060,11 +9147,6 @@ msgstr "Nom d'utilisateur public"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: JaneDoe"
 msgstr "exemple : jdupont"
-
-#: cms/templates/register.html
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "Preferred Language"
-msgstr "Langue préférée"
 
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
@@ -9248,7 +9330,7 @@ msgstr "EN SAVOIR PLUS"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr "Commence"
+msgstr "Début"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -9262,7 +9344,7 @@ msgstr "Tableau de bord"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
-msgstr ""
+msgstr "Mes Cours"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Looks like you haven't enrolled in any courses yet."
@@ -9402,6 +9484,18 @@ msgstr ""
 "Merci d'entrer votre adresse e-mail ci-dessous, nous vous enverrons des "
 "instructions pour choisir un nouveau mot de passe"
 
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "Information requise"
+
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "Votre adresse e-mail"
@@ -9411,10 +9505,6 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
 "Voici l'adresse e-mail que vous avez utilisée pour vous inscrire sur "
 "{platform}"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "Réinitialiser mon mot de passe"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -9653,6 +9743,11 @@ msgstr "Pas encore inscrit ?"
 #: lms/templates/login-sidebar.html
 msgid "Sign up for {platform_name} today!"
 msgstr "Inscrivez-vous dès maintenant sur {platform_name} !"
+
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "Besoin d'aide ?"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
@@ -9940,7 +10035,6 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 #: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/verify_student/face_upload.html
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -10820,6 +10914,10 @@ msgid "Name your CCX"
 msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
+msgid "Create a new Custom Course for edX"
+msgstr ""
+
+#: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
 msgstr "Planifier"
 
@@ -10827,6 +10925,10 @@ msgstr "Planifier"
 #: lms/templates/ccx/grading_policy.html
 msgid "Grading Policy"
 msgstr "Règles de notation"
+
+#: lms/templates/ccx/coach_dashboard.html
+msgid "Please enter a valid CCX name."
+msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11741,6 +11843,13 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
+"Congratulations! You are eligible to receive course credit from {providers} "
+"for successfully completing your {platform_name} course! {link_start}Get "
+"your credit now.{link_end}"
+msgstr ""
+
+#: lms/templates/credit_notifications/credit_eligibility_email.html
+msgid ""
 "Congratulations! You are eligible to receive course credit for successfully "
 "completing your {platform_name} course! {link_start}Get your credit "
 "now.{link_end}"
@@ -11918,7 +12027,7 @@ msgstr "Bientôt"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {start_date}"
-msgstr "Commence - {start_date}"
+msgstr "Début: {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -12063,6 +12172,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "You are now eligible for credit from {provider}. Congratulations!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
 msgstr ""
 
@@ -12115,10 +12228,6 @@ msgstr ""
 msgid ""
 "An error occurred with this transaction. For help, contact {support_email}."
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_info_language.html
-msgid "edit"
-msgstr "éditer"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID Verification Status"
@@ -13770,11 +13879,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Entrez une adresse email valide"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the recipient name."
-msgstr ""
+msgstr "Entrez le nom du destinataire"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "The recipient name cannot be a number."
@@ -13894,7 +14003,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Rank"
-msgstr ""
+msgstr "Rang"
 
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Percent Discount"
@@ -14133,6 +14242,12 @@ msgstr ""
 msgid "Send me a copy of the invoice"
 msgstr "Envoyez-moi une copie de la facture"
 
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"For analytics about your course, go to "
+"{link_start}{analytics_dashboard_name}{link_end}."
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "Tableau de bord enseignant"
@@ -14175,7 +14290,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Reason"
-msgstr ""
+msgstr "Raison"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
@@ -14466,7 +14581,7 @@ msgstr "Répartition des notes par problème"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Opened as a CSV"
-msgstr ""
+msgstr "Télécharger les étudiant en CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Student Grades as a CSV"
@@ -15651,15 +15766,6 @@ msgstr ""
 "Si vous avez une question à propos de ce cours ou de ce questionnaire, vous "
 "pouvez contacter <a href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
-#: lms/templates/verify_student/face_upload.html
-msgid "Edit Your Full Name"
-msgstr "Éditer votre nom complet"
-
-#: lms/templates/verify_student/face_upload.html
-msgid "The following error occurred while editing your name:"
-msgstr ""
-"L'erreur suivante s'est produite lors de la modification de votre nom :"
-
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "Re-Vérification pour {course_name}"
@@ -15786,7 +15892,7 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Find New Courses"
-msgstr ""
+msgstr "Rechercher un cours"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
@@ -15824,11 +15930,11 @@ msgstr ""
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
-msgstr ""
+msgstr "Mon profil"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
-msgstr ""
+msgstr "Inscription"
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -15893,8 +15999,8 @@ msgid "{studio_name} Server Error"
 msgstr "Erreur sur les serveurs {studio_name}"
 
 #: cms/templates/500.html
-msgid "The {studio_name} servers encountered an error"
-msgstr "Une erreur est survenue sur les serveurs {studio_name} "
+msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
+msgstr ""
 
 #: cms/templates/500.html
 msgid ""
@@ -15970,9 +16076,9 @@ msgstr ""
 "Pendant ce temps, vous pouvez toujours retourner sur {link_start} l'accueil "
 "{studio_name}.{link_end}"
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "Fichiers et uploads"
+#: cms/templates/asset_index.html
+msgid "Files & Uploads"
+msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -17792,10 +17898,6 @@ msgid "Your Course Creator request is:"
 msgstr "Votre requête de création de Cours est :"
 
 #: cms/templates/index.html
-msgid "Denied"
-msgstr "Refusée"
-
-#: cms/templates/index.html
 msgid ""
 "Your request did not meet the criteria/guidelines specified by "
 "{platform_name} Staff."
@@ -17970,22 +18072,6 @@ msgstr ""
 msgid "Learn more about content libraries"
 msgstr "En savoir plus à propos des bibliothèques de contenu"
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Se Connecter"
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Se connecter à {studio_name}"
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Pas de compte {studio_name}? Inscrivez vous !"
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Information requise pour se connecter à {studio_name}"
-
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
 msgstr "Paramètres de l'équipe pédagogique"
@@ -18159,6 +18245,10 @@ msgstr ""
 #: cms/templates/register.html
 msgid "Your Location"
 msgstr "Votre emplacement géographique"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -19049,6 +19139,10 @@ msgstr "Plan du Cours"
 #: cms/templates/widgets/header.html
 msgid "Updates"
 msgstr "Annonces"
+
+#: cms/templates/widgets/header.html
+msgid "Files &amp; Uploads"
+msgstr "Fichiers et uploads"
 
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"

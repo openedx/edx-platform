@@ -16,6 +16,7 @@ from microsite_configuration import microsite
 from request_cache.middleware import RequestCache
 from student.models import UNENROLL_DONE
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
+from openedx.core.djangoapps.theming.helpers import get_value
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +197,8 @@ def generate_refund_notification_body(student, refund_ids):  # pylint: disable=i
         "To process this request, please visit the link(s) below."
     ).format(username=student.username, email=student.email)
 
-    refund_urls = [urljoin(settings.ECOMMERCE_PUBLIC_URL_ROOT, '/dashboard/refunds/{}/'.format(refund_id))
+    ecommerce_url_root = get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
+    refund_urls = [urljoin(ecommerce_url_root, '/dashboard/refunds/{}/'.format(refund_id))
                    for refund_id in refund_ids]
 
     return '{msg}\n\n{urls}'.format(msg=msg, urls='\n'.join(refund_urls))

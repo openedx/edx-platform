@@ -15,10 +15,8 @@ from xmodule.modulestore.store_utilities import draft_node_constructor, get_draf
 from xmodule.modulestore import LIBRARY_ROOT
 from fs.osfs import OSFS
 from json import dumps
-import json
 import os
-from path import Path as path
-import shutil
+
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 

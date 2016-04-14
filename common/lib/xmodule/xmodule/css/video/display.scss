@@ -196,7 +196,7 @@ html:not('.afontgarde') .icon-fallback-img {
     background-color: black;
     position: relative;
 
-    .video-player-pre, 
+    .video-player-pre,
     .video-player-post {
        height: 50px;
        background-color: rgb(17, 16, 16) // UXPL grayscale black;
@@ -273,6 +273,12 @@ html:not('.afontgarde') .icon-fallback-img {
         &.hidden {
           display: none;
         }
+      }
+
+      .video-error {
+        padding: ($baseline / 5);
+        background: black;
+        color: white !important; // the pattern library headings shim is more scoped
       }
 
       object,
@@ -722,6 +728,10 @@ html:not('.afontgarde') .icon-fallback-img {
     padding: 0;
     font-size: 14px;
     visibility: visible;
+
+    a {
+        color: #0074b5;
+    }
 
     .subtitles-menu {
       height: 100%;

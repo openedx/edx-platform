@@ -5,7 +5,7 @@
     'use strict';
 
     define([
-        'js/components/tabbed/views/tabbed_view',
+        'common/js/components/views/tabbed_view',
         'teams/js/utils/team_analytics'
     ], function (TabbedView, TeamAnalytics) {
         var TeamsTabbedView = TabbedView.extend({

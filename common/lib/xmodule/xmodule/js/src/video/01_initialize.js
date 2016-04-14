@@ -132,7 +132,6 @@ function (VideoPlayer, i18n, moment) {
 
             onYTApiReady = function () {
                 console.log('[Video info]: YouTube API is available and is loaded.');
-
                 if (state.htmlPlayerLoaded) { return; }
 
                 console.log('[Video info]: Starting YouTube player.');
@@ -140,7 +139,6 @@ function (VideoPlayer, i18n, moment) {
 
                 state.modules.push(video);
                 state.__dfd__.resolve();
-
                 state.youtubeApiAvailable = true;
             };
 
@@ -211,7 +209,6 @@ function (VideoPlayer, i18n, moment) {
 
     function _waitForYoutubeApi(state) {
         console.log('[Video info]: Starting to wait for YouTube API to load.');
-
         window.setTimeout(function () {
             // If YouTube API will load OK, it will run `onYouTubeIframeAPIReady`
             // callback, which will set `state.youtubeApiAvailable` to `true`.

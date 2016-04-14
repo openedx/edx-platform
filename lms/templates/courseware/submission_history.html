@@ -1,5 +1,6 @@
+<%page expression_filter="h"/>
 <% import json  %>
-<h3>${username | h} > ${course_id | h} > ${location | h}</h3>
+<h3>${username} > ${course_id} > ${location}</h3>
 
 % for i, (entry, score) in enumerate(zip(history_entries, scores)):
 <hr/>
@@ -7,7 +8,7 @@
 <b>#${len(history_entries) - i}</b>: ${entry.updated} UTC</br>
 Score: ${score.grade} / ${score.max_grade}
 <pre>
-${json.dumps(entry.state, indent=2, sort_keys=True) | h}
+${json.dumps(entry.state, indent=2, sort_keys=True)}
 </pre>
 </div>
 % endfor

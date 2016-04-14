@@ -163,9 +163,11 @@ PACKAGES_TO_UNINSTALL = [
     "edxval",                       # Because it was bork-installed somehow.
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
+    "edx-oauth2-provider",          # Because it moved from github to pypi
 ]
 
 
+@task
 def uninstall_python_packages():
     """
     Uninstall Python packages that need explicit uninstallation.
@@ -203,7 +205,6 @@ def uninstall_python_packages():
                 # Uninstall the pacakge
                 sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
-
         if not uninstalled:
             break
     else:

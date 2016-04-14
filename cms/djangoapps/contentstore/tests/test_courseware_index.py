@@ -7,7 +7,7 @@ from lazy.lazy import lazy
 import time
 from datetime import datetime
 from dateutil.tz import tzutc
-from mock import patch, call
+from mock import patch
 from pytz import UTC
 from uuid import uuid4
 from unittest import skip
@@ -488,7 +488,8 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         verified_mode = CourseMode(
             course_id=unicode(self.course.id),
             mode_slug=CourseMode.VERIFIED,
-            mode_display_name=CourseMode.VERIFIED
+            mode_display_name=CourseMode.VERIFIED,
+            min_price=1
         )
         verified_mode.save()
         self.reindex_course(store)

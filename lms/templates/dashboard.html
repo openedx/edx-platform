@@ -1,12 +1,13 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
-from django.core.urlresolvers import reverse
-import json
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <%
@@ -39,9 +40,9 @@ import json
   <script type="text/javascript">
     $(document).ready(function() {
       edx.dashboard.legacy.init({
-        dashboard: "${reverse('dashboard')}",
-        signInUser: "${reverse('signin_user')}",
-        changeEmailSettings: "${reverse('change_email_settings')}"
+        dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+        signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}"
       });
     });
   </script>
@@ -54,7 +55,7 @@ import json
     <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
         var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
         $('#content').prepend(banner.$el);
-        banner.showMessage(${json.dumps(redirect_message)})
+        banner.showMessage(${redirect_message | n, dump_js_escaped_json})
     </%static:require_module>
   % endif
 </%block>
@@ -62,13 +63,13 @@ import json
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message}
+            ${message | n, unicode}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message}
+            ${enrollment_message | n, unicode}
         </section>
     %endif
 </div>
@@ -117,7 +118,7 @@ import json
         <h2>${_("Course-loading errors")}</h2>
 
       % for course_dir, errors in errored_courses.items():
-         <h3>${course_dir | h}</h3>
+         <h3>${course_dir}</h3>
              <ul>
            % for (msg, err) in errors:
                <li>${msg}

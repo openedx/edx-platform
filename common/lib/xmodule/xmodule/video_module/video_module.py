@@ -573,12 +573,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', self.handout)
             xml.append(ele)
 
-        # sorting for easy testing of resulting xml
-        for transcript_language in sorted(self.transcripts.keys()):
-            ele = etree.Element('transcript')
-            ele.set('language', transcript_language)
-            ele.set('src', self.transcripts[transcript_language])
-            xml.append(ele)
+        if self.transcripts is not None:
+            # sorting for easy testing of resulting xml
+            for transcript_language in sorted(self.transcripts.keys()):
+                ele = etree.Element('transcript')
+                ele.set('language', transcript_language)
+                ele.set('src', self.transcripts[transcript_language])
+                xml.append(ele)
 
         if self.edx_video_id and edxval_api:
             try:

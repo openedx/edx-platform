@@ -9,6 +9,7 @@ import django_extensions.db.fields
 import django_extensions.db.fields.json
 import django.db.models.deletion
 import django.utils.timezone
+from badges.models import validate_badge_image
 from django.conf import settings
 
 
@@ -34,7 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('mode', models.CharField(help_text='The course mode for this badge image. For example, "verified" or "honor".', unique=True, max_length=125)),
-                ('icon', models.ImageField(help_text='Badge images must be square PNG files. The file size should be under 250KB.', upload_to=b'badges', validators=[certificates.models.validate_badge_image])),
+                ('icon', models.ImageField(help_text='Badge images must be square PNG files. The file size should be under 250KB.', upload_to=b'badges', validators=[validate_badge_image])),
                 ('default', models.BooleanField(default=False, help_text='Set this value to True if you want this image to be the default image for any course modes that do not have a specified badge image. You can have only one default image.')),
             ],
         ),

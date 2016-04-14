@@ -57,6 +57,7 @@
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
+# William Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
@@ -170,9 +171,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-17 10:59+0000\n"
-"PO-Revision-Date: 2016-02-13 17:13+0000\n"
-"Last-Translator: Fabio Eis <fabio@fabioeis.com>\n"
+"POT-Creation-Date: 2016-03-30 19:38+0000\n"
+"PO-Revision-Date: 2016-03-30 19:43+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -190,7 +191,7 @@ msgstr ""
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
-#: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/overview.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
 #: lms/static/js/views/fields.js
@@ -2664,8 +2665,8 @@ msgstr ""
 "membros serão removidos da equipe, bem como todas as discussões. "
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"%(team)s\" successfully deleted."
-msgstr "A equipe \"%(team)s\" foi apagada com sucesso."
+msgid "Team \"{team}\" successfully deleted."
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -5022,8 +5023,8 @@ msgid "Please enter non-negative integer."
 msgstr "Insira um número inteiro não negativo."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "Não é possível arrastar mais <% attrs.types %> do que os assinalados."
+msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5142,25 +5143,10 @@ msgstr "Não utilizado"
 #. configuration is used in.
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
-msgid "Used in %(count)s unit"
-msgid_plural "Used in %(count)s units"
-msgstr[0] "Utilizado em %(count)s unidade"
-msgstr[1] "Utilizado em %(count)s unidades"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/content_group_details.js
-msgid ""
-"This content group is not in use. Add a content group to any unit from the "
-"%(outlineAnchor)s."
-msgstr ""
-"Este Grupo de Conteúdo não está em uso. Adicione um Grupo de Conteúdo a "
-"qualquer unidade a partir do %(outlineAnchor)s."
-
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Course Outline"
-msgstr "Esboço do Curso"
+msgid "Used in {count} unit"
+msgid_plural "Used in {count} units"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -5200,20 +5186,10 @@ msgstr "Por favor, selecione um arquivo PDF para enviar."
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
-msgid "Contains %(count)s group"
-msgid_plural "Contains %(count)s groups"
-msgstr[0] "Contém %(count)s grupo"
-msgstr[1] "Contém %(count)s grupos"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/group_configuration_details.js
-msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment"
-" to any Unit via the %(outlineAnchor)s."
-msgstr ""
-"Esta configuração de grupo não está em uso. Comece adicionando uma "
-"experiência de conteúdo para qualquer Unidade através do %(outlineAnchor)s."
+msgid "Contains {count} group"
+msgid_plural "Contains {count} groups"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5433,26 +5409,6 @@ msgstr "Desfazer alterações"
 msgid "Change Manually"
 msgstr "Alterar manualmente"
 
-#: cms/static/js/views/overview.js
-msgid "Collapse All Sections"
-msgstr "Contrair todas as Seções"
-
-#: cms/static/js/views/overview.js
-msgid "Expand All Sections"
-msgstr "Expandir todas as Seções"
-
-#: cms/static/js/views/overview.js
-msgid "Release date:"
-msgstr "Data de lançamento:"
-
-#: cms/static/js/views/overview.js
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} às {hour}:{minute} UTC"
-
-#: cms/static/js/views/overview.js
-msgid "Edit section release date"
-msgstr "Editar data de lançamento da seção"
-
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
@@ -5607,13 +5563,9 @@ msgstr "As alterações na política foram salvas."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
-"Please note that validation of your policy key and value pairs is not "
-"currently in place yet. If you are having difficulties, please review your "
-"policy pairs."
+"No validation is performed on policy keys or value pairs. If you are having "
+"difficulties, check your formatting."
 msgstr ""
-"Por favor note que a validação de sua chave de política e pares de valor "
-"ainda não está implementada. Se você tiver problemas, por favor revise seus "
-"pares referentes à política. "
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -7051,22 +7003,15 @@ msgid "Deleted Content Group"
 msgstr "Grupo de conteúdo deletado"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
-" content group was deleted. Select another content group."
+"{screen_reader_start}Warning:{screen_reader_end} The previously selected "
+"content group was deleted. Select another content group."
 msgstr ""
-"%(screen_reader_start)sAviso:%(screen_reader_end)s O grupo de conteúdo "
-"selecionado anteriormente foi removido. Selecionar um outro gupo de conteúdo"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
-"exist."
+"{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
-"%(screen_reader_start)sAviso:%(screen_reader_end)s Não existe nenhum grupo "
-"de conteúdo"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -7121,16 +7066,11 @@ msgid "Assign students to cohorts by uploading a CSV file"
 msgstr "Vincule alunos a grupos enviando um arquivo CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#, python-format
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on "
-"%(link_start)s the Data Download page. %(link_end)s"
+"file, download course profile information or cohort results on {link_start} "
+"the Data Download page. {link_end}"
 msgstr ""
-"Para revisar atribuições entre grupos e alunos ou ver os resultados de um "
-"upload de arquivo CSV, baixe as informações sobre o perfil do curso ou os "
-"resultados do grupo na %(link_start)s página de Download de Dados "
-"%(link_end)s ."
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -8207,6 +8147,17 @@ msgstr "Não pode ser deletado se estiver sendo utilizado por uma unidade"
 msgid "This content group is used in:"
 msgstr "Esse grupo de conteúdo é utilizado em:"
 
+#: cms/templates/js/content-group-details.underscore
+msgid ""
+"This content group is not in use. Add a content group to any unit from the "
+"{linkStart}Course Outline{linkEnd}."
+msgstr ""
+
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr ""
+
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
 msgstr "Nome do Grupo de Conteúdo"
@@ -8317,40 +8268,50 @@ msgid "Assignment Type Name"
 msgstr "Nome do Tipo de Tarefa"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. Homework, Midterm Exams"
-msgstr "Ex. Tarefas para Casa, Exames Intermediários"
+msgid ""
+"The general category for this type of assignment, for example, Homework or "
+"Midterm Exam. This name is visible to learners."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
 msgstr "Abreviação"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. HW, Midterm"
-msgstr "Ex. Tarefas para Casa, Exames Intermediários"
+msgid ""
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
 msgstr "Peso da nota total"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "as a percent, e.g. 40"
-msgstr "como um percentual, Ex. 40"
+msgid ""
+"The weight of all assignments of this type as a percentage of the total "
+"grade, for example, 40. Do not include the percent symbol."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Total Number"
 msgstr "Número Total"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises assigned"
-msgstr "total de exercícios atribuídos"
+msgid ""
+"The number of subsections in the course that contain problems of this "
+"assignment type."
+msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
 msgstr "Número de Canceláveis"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises that won't be graded"
-msgstr "total de exercícios que não serão avaliados"
+msgid ""
+"The number of assignments of this type that will be dropped. The lowest "
+"scoring assignments are dropped first."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -8470,6 +8431,12 @@ msgstr "Não pode ser apagada se estiver sendo utilizada numa experiência"
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
 msgstr "A Configuração deste Grupo é usada em:"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid ""
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
+msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"

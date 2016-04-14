@@ -3,7 +3,6 @@
 import datetime
 import pytz
 
-from dateutil.tz import tzutc
 from django.test.utils import override_settings
 from mock import patch
 

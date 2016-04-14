@@ -62,6 +62,7 @@ class BokChoyTestSuite(TestSuite):
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
         self.imports_dir = kwargs.get('imports_dir', None)
         self.coveragerc = kwargs.get('coveragerc', None)
+        self.save_screenshots = kwargs.get('save_screenshots', False)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -234,6 +235,8 @@ class BokChoyTestSuite(TestSuite):
         ]
         if self.pdb:
             cmd.append("--pdb")
+        if self.save_screenshots:
+            cmd.append("--with-save-baseline")
         cmd.append(self.extra_args)
 
         cmd = (" ").join(cmd)

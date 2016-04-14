@@ -45,6 +45,13 @@ from bulk_email.models import CourseEmail
 from util import milestones_helpers
 
 
+class SpecificStudentIdMissingError(Exception):
+    """
+    Exception indicating that a student id was not provided when generating a certificate for a specific student.
+    """
+    pass
+
+
 def get_running_instructor_tasks(course_id):
     """
     Returns a query of InstructorTask objects of running tasks for a given course.
@@ -437,17 +444,34 @@ def submit_export_ora2_data(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
+def generate_certificates_for_students(request, course_key, student_set=None, specific_student_id=None):  # pylint: disable=invalid-name
     """
-    Submits a task to generate certificates for given students enrolled in the course or
-    all students if argument 'students' is None
+    Submits a task to generate certificates for given students enrolled in the course.
+
+     Arguments:
+        course_key  : Course Key
+        student_set : Semantic for student collection for certificate generation.
+                      Options are:
+                      'all_whitelisted': All Whitelisted students.
+                      'whitelisted_not_generated': Whitelisted students which does not got certificates yet.
+                      'specific_student': Single student for certificate generation.
+        specific_student_id : Student ID when student_set is 'specific_student'
 
     Raises AlreadyRunningError if certificates are currently being generated.
+    Raises SpecificStudentIdMissingError if student_set is 'specific_student' and specific_student_id is 'None'
     """
-    if students:
-        task_type = 'generate_certificates_certain_student'
-        students = [student.id for student in students]
-        task_input = {'students': students}
+    if student_set:
+        task_type = 'generate_certificates_student_set'
+        task_input = {'student_set': student_set}
+
+        if student_set == 'specific_student':
+            task_type = 'generate_certificates_certain_student'
+            if specific_student_id is None:
+                raise SpecificStudentIdMissingError(
+                    "Attempted to generate certificate for a single student, "
+                    "but no specific student id provided"
+                )
+            task_input.update({'specific_student_id': specific_student_id})
     else:
         task_type = 'generate_certificates_all_student'
         task_input = {}
@@ -466,22 +490,16 @@ def generate_certificates_for_students(request, course_key, students=None):  # p
     return instructor_task
 
 
-def regenerate_certificates(request, course_key, statuses_to_regenerate, students=None):
+def regenerate_certificates(request, course_key, statuses_to_regenerate):
     """
-    Submits a task to regenerate certificates for given students enrolled in the course or
-    all students if argument 'students' is None.
+    Submits a task to regenerate certificates for given students enrolled in the course.
     Regenerate Certificate only if the status of the existing generated certificate is in 'statuses_to_regenerate'
     list passed in the arguments.
 
     Raises AlreadyRunningError if certificates are currently being generated.
     """
-    if students:
-        task_type = 'regenerate_certificates_certain_student'
-        students = [student.id for student in students]
-        task_input = {'students': students}
-    else:
-        task_type = 'regenerate_certificates_all_student'
-        task_input = {}
+    task_type = 'regenerate_certificates_all_student'
+    task_input = {}
 
     task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
     task_class = generate_certificates

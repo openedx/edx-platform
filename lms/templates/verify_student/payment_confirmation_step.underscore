@@ -1,7 +1,14 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title">
-      <%= _.sprintf( gettext( "Thank you! We have received your payment for %(courseName)s." ), { courseName: '<span class="course-title">' + courseName + '</span>' } ) %>
+      <%= HtmlUtils.interpolateHtml(
+        gettext( "Thank you! We have received your payment for {courseName}." ),
+        { courseName: HtmlUtils.joinHtml(
+          HtmlUtils.HTML('<span class="course-title">'),
+          courseName,
+          HtmlUtils.HTML('</span>')
+        ) }
+      ) %>
     </h3>
 
     <% if ( receipt ) { %>

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-24 17:48+0000\n"
-"PO-Revision-Date: 2016-03-24 17:49:46.856691\n"
+"POT-Creation-Date: 2016-04-06 19:27+0000\n"
+"PO-Revision-Date: 2016-04-06 19:28:37.640637\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -195,6 +195,7 @@ msgstr "شيدشرذثي"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: lms/templates/student_profile/share_modal.underscore
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -2065,6 +2066,19 @@ msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس هر فاهس بهث
 msgid "Please do not use any spaces or special characters in this field."
 msgstr "حمثشسث يخ رخف عسث شرغ سحشذثس خق سحثذهشم ذاشقشذفثقس هر فاهس بهثمي."
 
+#: common/static/common/js/components/views/paginated_view.js
+#: common/static/common/js/components/views/paging_footer.js
+msgid "Pagination"
+msgstr "حشلهرشفهخر"
+
+#: common/static/common/js/components/views/paginated_view.js
+msgid ""
+"Your request could not be completed. Reload the page and try again. If the "
+"issue persists, click the Help tab to report the problem."
+msgstr ""
+"غخعق قثضعثسف ذخعمي رخف زث ذخوحمثفثي. قثمخشي فاث حشلث شري فقغ شلشهر. هب فاث "
+"هسسعث حثقسهسفس, ذمهذن فاث اثمح فشز فخ قثحخقف فاث حقخزمثو."
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr "ساخصهرل %(first_index)s خعف خب %(num_items)s فخفشم"
@@ -2358,6 +2372,7 @@ msgstr "خحثر سمخفس"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "رشوث"
 
@@ -2366,6 +2381,11 @@ msgstr "رشوث"
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "فثشو ذخعرف"
+
+#: lms/djangoapps/teams/static/teams/js/teams_tab_factory.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: cms/templates/js/certificate-editor.underscore
@@ -2561,13 +2581,13 @@ msgstr[1] "%(memberCount)s / %(maxMemberCount)s وثوزثقس"
 msgid "All teams"
 msgstr "شمم فثشوس"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Teams Pagination"
+msgstr "فثشوس حشلهرشفهخر"
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Topics"
 msgstr "فخحهذس"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "فثشوس"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -4176,6 +4196,10 @@ msgstr "مهرنهرل"
 msgid "Successfully unlinked."
 msgstr "سعذذثسسبعممغ عرمهرنثي."
 
+#: lms/static/js/student_profile/views/badge_list_container.js
+msgid "Accomplishments Pagination"
+msgstr "شذذخوحمهساوثرفس حشلهرشفهخر"
+
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
 msgstr "{platform_name} مثشقرثقس ذشر سثث وغ:"
@@ -4235,6 +4259,18 @@ msgstr "حقخبهمث هوشلث"
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile image for {username}"
 msgstr "حقخبهمث هوشلث بخق {username}"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "About Me"
+msgstr "شزخعف وث"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Accomplishments"
+msgstr "شذذخوحمهساوثرفس"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Profile"
+msgstr "حقخبهمث"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -4939,25 +4975,10 @@ msgstr "رخف هر عسث"
 #. configuration is used in.
 #: cms/static/js/views/content_group_details.js
 #: cms/static/js/views/group_configuration_details.js
-msgid "Used in %(count)s unit"
-msgid_plural "Used in %(count)s units"
-msgstr[0] "عسثي هر %(count)s عرهف"
-msgstr[1] "عسثي هر %(count)s عرهفس"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/content_group_details.js
-msgid ""
-"This content group is not in use. Add a content group to any unit from the "
-"%(outlineAnchor)s."
-msgstr ""
-"فاهس ذخرفثرف لقخعح هس رخف هر عسث. شيي ش ذخرفثرف لقخعح فخ شرغ عرهف بقخو فاث "
-"%(outlineAnchor)s."
-
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Course Outline"
-msgstr "ذخعقسث خعفمهرث"
+msgid "Used in {count} unit"
+msgid_plural "Used in {count} units"
+msgstr[0] "عسثي هر {count} عرهف"
+msgstr[1] "عسثي هر {count} عرهفس"
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -4997,20 +5018,10 @@ msgstr "حمثشسث سثمثذف ش حيب بهمث فخ عحمخشي."
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
-msgid "Contains %(count)s group"
-msgid_plural "Contains %(count)s groups"
-msgstr[0] "ذخرفشهرس %(count)s لقخعح"
-msgstr[1] "ذخرفشهرس %(count)s لقخعحس"
-
-#. Translators: 'outlineAnchor' is an anchor pointing to
-#. the course outline page.
-#: cms/static/js/views/group_configuration_details.js
-msgid ""
-"This Group Configuration is not in use. Start by adding a content experiment"
-" to any Unit via the %(outlineAnchor)s."
-msgstr ""
-"فاهس لقخعح ذخربهلعقشفهخر هس رخف هر عسث. سفشقف زغ شييهرل ش ذخرفثرف ثطحثقهوثرف"
-" فخ شرغ عرهف دهش فاث %(outlineAnchor)s."
+msgid "Contains {count} group"
+msgid_plural "Contains {count} groups"
+msgstr[0] "ذخرفشهرس {count} لقخعح"
+msgstr[1] "ذخرفشهرس {count} لقخعحس"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5378,13 +5389,11 @@ msgstr "غخعق حخمهذغ ذاشرلثس اشدث زثثر سشدثي."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
-"Please note that validation of your policy key and value pairs is not "
-"currently in place yet. If you are having difficulties, please review your "
-"policy pairs."
+"No validation is performed on policy keys or value pairs. If you are having "
+"difficulties, check your formatting."
 msgstr ""
-"حمثشسث رخفث فاشف دشمهيشفهخر خب غخعق حخمهذغ نثغ شري دشمعث حشهقس هس رخف "
-"ذعققثرفمغ هر حمشذث غثف. هب غخع شقث اشدهرل يهببهذعمفهثس, حمثشسث قثدهثص غخعق "
-"حخمهذغ حشهقس."
+"رخ دشمهيشفهخر هس حثقبخقوثي خر حخمهذغ نثغس خق دشمعث حشهقس. هب غخع شقث اشدهرل "
+"يهببهذعمفهثس, ذاثذن غخعق بخقوشففهرل."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -5600,6 +5609,11 @@ msgstr "عرسذاثيعمثي"
 msgid "Date"
 msgstr "يشفث"
 
+#: cms/templates/js/edit-chapter.underscore
+#: lms/templates/ccx/schedule.underscore
+msgid "gettext("
+msgstr "لثففثطف("
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -5625,8 +5639,9 @@ msgid "Zoom Out"
 msgstr "ظخخو خعف"
 
 #: common/static/common/templates/components/paging-footer.underscore
-msgid "Page number"
-msgstr "حشلث رعوزثق"
+#, python-format
+msgid "Page number out of %(total_pages)s"
+msgstr "حشلث رعوزثق خعف خب %(total_pages)s"
 
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
@@ -6297,10 +6312,6 @@ msgid "remove all"
 msgstr "قثوخدث شمم"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "gettext("
-msgstr "لثففثطف("
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "سثذفهخر"
 
@@ -6816,22 +6827,18 @@ msgid "Deleted Content Group"
 msgstr "يثمثفثي ذخرفثرف لقخعح"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
-" content group was deleted. Select another content group."
+"{screen_reader_start}Warning:{screen_reader_end} The previously selected "
+"content group was deleted. Select another content group."
 msgstr ""
-"%(screen_reader_start)sصشقرهرل:%(screen_reader_end)s فاث حقثدهخعسمغ سثمثذفثي"
-" ذخرفثرف لقخعح صشس يثمثفثي. سثمثذف شرخفاثق ذخرفثرف لقخعح."
+"{screen_reader_start}صشقرهرل:{screen_reader_end} فاث حقثدهخعسمغ سثمثذفثي "
+"ذخرفثرف لقخعح صشس يثمثفثي. سثمثذف شرخفاثق ذخرفثرف لقخعح."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#, python-format
 msgid ""
-"%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups "
-"exist."
+"{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
-"%(screen_reader_start)sصشقرهرل:%(screen_reader_end)s رخ ذخرفثرف لقخعحس "
-"ثطهسف."
+"{screen_reader_start}صشقرهرل:{screen_reader_end} رخ ذخرفثرف لقخعحس ثطهسف."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
@@ -6886,15 +6893,14 @@ msgid "Assign students to cohorts by uploading a CSV file"
 msgstr "شسسهلر سفعيثرفس فخ ذخاخقفس زغ عحمخشيهرل ش ذسد بهمث"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#, python-format
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on "
-"%(link_start)s the Data Download page. %(link_end)s"
+"file, download course profile information or cohort results on {link_start} "
+"the Data Download page. {link_end}"
 msgstr ""
 "فخ قثدهثص سفعيثرف ذخاخقف شسسهلروثرفس خق سثث فاث قثسعمفس خب عحمخشيهرل ش ذسد "
-"بهمث, يخصرمخشي ذخعقسث حقخبهمث هربخقوشفهخر خق ذخاخقف قثسعمفس خر "
-"%(link_start)s فاث يشفش يخصرمخشي حشلث. %(link_end)s"
+"بهمث, يخصرمخشي ذخعقسث حقخبهمث هربخقوشفهخر خق ذخاخقف قثسعمفس خر {link_start} "
+"فاث يشفش يخصرمخشي حشلث. {link_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -6903,6 +6909,26 @@ msgstr "عسثي"
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Valid"
 msgstr "دشمهي"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "org.display_name"
+msgstr "خقل.يهسحمشغ_رشوث"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "category"
+msgstr "ذشفثلخقغ"
+
+#: lms/templates/learner_dashboard/sidebar.underscore
+msgid ""
+"Browse recently launched courses and see what\\'s new in our favorite "
+"subjects"
+msgstr ""
+"زقخصسث قثذثرفمغ مشعرذاثي ذخعقسثس شري سثث صاشف\\'س رثص هر خعق بشدخقهفث "
+"سعزتثذفس"
+
+#: lms/templates/learner_dashboard/sidebar.underscore
+msgid "Explore New XSeries"
+msgstr "ثطحمخقث رثص طسثقهثس"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -6948,7 +6974,6 @@ msgid "section.title"
 msgstr "سثذفهخر.فهفمث"
 
 #: lms/templates/student_account/account_settings.underscore
-#: lms/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
 
@@ -7136,13 +7161,77 @@ msgstr "قثضعهقثي بهثمي"
 msgid "Already have an account?"
 msgstr "شمقثشيغ اشدث شر شذذخعرف?"
 
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Share your \"%(display_name)s\" award"
+msgstr "ساشقث غخعق \"%(display_name)s\" شصشقي"
+
+#: lms/templates/student_profile/badge.underscore
+msgid "Share"
+msgstr "ساشقث"
+
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Earned %(created)s."
+msgstr "ثشقرثي %(created)s."
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "What's Your Next Accomplishment?"
+msgstr "صاشف'س غخعق رثطف شذذخوحمهساوثرف?"
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Start working toward your next learning goal."
+msgstr "سفشقف صخقنهرل فخصشقي غخعق رثطف مثشقرهرل لخشم."
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Find a course"
+msgstr "بهري ش ذخعقسث"
+
 #: lms/templates/student_profile/learner_profile.underscore
+msgid "An error occurred. Try loading the page again."
+msgstr "شر ثققخق خذذعققثي. فقغ مخشيهرل فاث حشلث شلشهر."
+
+#: lms/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "غخع شقث ذعققثرفمغ ساشقهرل ش مهوهفثي حقخبهمث."
 
-#: lms/templates/student_profile/learner_profile.underscore
-msgid "This edX learner is currently sharing a limited profile."
-msgstr "فاهس ثيط مثشقرثق هس ذعققثرفمغ ساشقهرل ش مهوهفثي حقخبهمث."
+#: lms/templates/student_profile/section_two.underscore
+msgid "This learner is currently sharing a limited profile."
+msgstr "فاهس مثشقرثق هس ذعققثرفمغ ساشقهرل ش مهوهفثي حقخبهمث."
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Share on Mozilla Backpack"
+msgstr "ساشقث خر وخظهممش زشذنحشذن"
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid ""
+"To share your certificate on Mozilla Backpack, you must first have a "
+"Backpack account. Complete the following steps to add your certificate to "
+"Backpack."
+msgstr ""
+"فخ ساشقث غخعق ذثقفهبهذشفث خر وخظهممش زشذنحشذن, غخع وعسف بهقسف اشدث ش "
+"زشذنحشذن شذذخعرف. ذخوحمثفث فاث بخممخصهرل سفثحس فخ شيي غخعق ذثقفهبهذشفث فخ "
+"زشذنحشذن."
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
+"your existing account"
+msgstr ""
+"ذقثشفث ش %(link_start)sوخظهممش زشذنحشذن%(link_end)s شذذخعرف, خق مخل هر فخ "
+"غخعق ثطهسفهرل شذذخعرف"
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"%(download_link_start)sDownload this image (right-click or option-click, "
+"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
+"your backpack.</li>"
+msgstr ""
+"%(download_link_start)sيخصرمخشي فاهس هوشلث (قهلاف-ذمهذن خق خحفهخر-ذمهذن, "
+"سشدث شس)%(link_end)s شري فاثر %(upload_link_start)sعحمخشي%(link_end)s هف فخ "
+"غخعق زشذنحشذن.</li>"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -7233,12 +7322,11 @@ msgid "Take Your Photo"
 msgstr "فشنث غخعق حاخفخ"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"When your face is in position, use the camera button %(icon)s below to take "
+"When your face is in position, use the camera button {icon} below to take "
 "your photo."
 msgstr ""
-"صاثر غخعق بشذث هس هر حخسهفهخر, عسث فاث ذشوثقش زعففخر %(icon)s زثمخص فخ فشنث "
+"صاثر غخعق بشذث هس هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} زثمخص فخ فشنث "
 "غخعق حاخفخ."
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -7258,13 +7346,12 @@ msgid "The photo of your face matches the photo on your ID."
 msgstr "فاث حاخفخ خب غخعق بشذث وشفذاثس فاث حاخفخ خر غخعق هي."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"To use the current photo, select the camera button %(icon)s. To take another"
-" photo, select the retake button %(icon)s."
+"To use the current photo, select the camera button {icon}. To take another "
+"photo, select the retake button {icon}."
 msgstr ""
-"فخ عسث فاث ذعققثرف حاخفخ, سثمثذف فاث ذشوثقش زعففخر %(icon)s. فخ فشنث شرخفاثق"
-" حاخفخ, سثمثذف فاث قثفشنث زعففخر %(icon)s."
+"فخ عسث فاث ذعققثرف حاخفخ, سثمثذف فاث ذشوثقش زعففخر {icon}. فخ فشنث شرخفاثق "
+"حاخفخ, سثمثذف فاث قثفشنث زعففخر {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -7355,9 +7442,8 @@ msgid "Make sure your ID is well-lit"
 msgstr "وشنث سعقث غخعق هي هس صثمم-مهف"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your ID"
-msgstr "خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر %(icon)s فخ ذشحفعقث غخعق هي"
+msgid "Once in position, use the camera button {icon} to capture your ID"
+msgstr "خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} فخ ذشحفعقث غخعق هي"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7389,19 +7475,16 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "زث سعقث غخعق ثرفهقث بشذث هس هرسهيث فاث بقشوث"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
-msgstr ""
-"خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر %(icon)s فخ ذشحفعقث غخعق حاخفخ"
+msgid "Once in position, use the camera button {icon} to capture your photo"
+msgstr "خرذث هر حخسهفهخر, عسث فاث ذشوثقش زعففخر {icon} فخ ذشحفعقث غخعق حاخفخ"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr "ذشر صث وشفذا فاث حاخفخ غخع فخخن صهفا فاث خرث خر غخعق هي?"
 
 #: lms/templates/verify_student/intro_step.underscore
-#, python-format
-msgid "Thanks for returning to verify your ID in: %(courseName)s"
-msgstr "فاشرنس بخق قثفعقرهرل فخ دثقهبغ غخعق هي هر: %(courseName)s"
+msgid "Thanks for returning to verify your ID in: {courseName}"
+msgstr "فاشرنس بخق قثفعقرهرل فخ دثقهبغ غخعق هي هر: {courseName}"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -7440,14 +7523,13 @@ msgstr ""
 "شري حاخفخ"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are enrolling in: %(courseName)s"
-msgstr "غخع شقث ثرقخممهرل هر: %(courseName)s"
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "You are enrolling in: {courseName}"
+msgstr "غخع شقث ثرقخممهرل هر: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are upgrading your enrollment for: %(courseName)s"
-msgstr "غخع شقث عحلقشيهرل غخعق ثرقخمموثرف بخق: %(courseName)s"
+msgid "You are upgrading your enrollment for: {courseName}"
+msgstr "غخع شقث عحلقشيهرل غخعق ثرقخمموثرف بخق: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -7497,9 +7579,8 @@ msgid "You have already verified your ID!"
 msgstr "غخع اشدث شمقثشيغ دثقهبهثي غخعق هي!"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "Your verification status is good until %(verificationGoodUntil)s."
-msgstr "غخعق دثقهبهذشفهخر سفشفعس هس لخخي عرفهم %(verificationGoodUntil)s."
+msgid "Your verification status is good until {verificationGoodUntil}."
+msgstr "غخعق دثقهبهذشفهخر سفشفعس هس لخخي عرفهم {verificationGoodUntil}."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -7510,14 +7591,8 @@ msgid "Account Not Activated"
 msgstr "شذذخعرف رخف شذفهدشفثي"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "You are enrolling in %(courseName)s"
-msgstr "غخع شقث ثرقخممهرل هر %(courseName)s"
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Upgrade to a Verified Certificate for %(courseName)s"
-msgstr "عحلقشيث فخ ش دثقهبهثي ذثقفهبهذشفث بخق %(courseName)s"
+msgid "Upgrade to a Verified Certificate for {courseName}"
+msgstr "عحلقشيث فخ ش دثقهبهثي ذثقفهبهذشفث بخق {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
@@ -7530,14 +7605,12 @@ msgid "Check your email for an activation message."
 msgstr "ذاثذن غخعق ثوشهم بخق شر شذفهدشفهخر وثسسشلث."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Professional Certificate for %(courseName)s"
-msgstr "حقخبثسسهخرشم ذثقفهبهذشفث بخق %(courseName)s"
+msgid "Professional Certificate for {courseName}"
+msgstr "حقخبثسسهخرشم ذثقفهبهذشفث بخق {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Verified Certificate for %(courseName)s"
-msgstr "دثقهبهثي ذثقفهبهذشفث بخق %(courseName)s"
+msgid "Verified Certificate for {courseName}"
+msgstr "دثقهبهثي ذثقفهبهذشفث بخق {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -7573,9 +7646,8 @@ msgstr ""
 "لخدثقروثرف-هسسعثي حاخفخ هي."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid "Thank you! We have received your payment for %(courseName)s."
-msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف بخق %(courseName)s."
+msgid "Thank you! We have received your payment for {courseName}."
+msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف بخق {courseName}."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -7954,6 +8026,19 @@ msgstr "ذشررخف يثمثفث صاثر هر عسث زغ ش عرهف"
 msgid "This content group is used in:"
 msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر:"
 
+#: cms/templates/js/content-group-details.underscore
+msgid ""
+"This content group is not in use. Add a content group to any unit from the "
+"{linkStart}Course Outline{linkEnd}."
+msgstr ""
+"فاهس ذخرفثرف لقخعح هس رخف هر عسث. شيي ش ذخرفثرف لقخعح فخ شرغ عرهف بقخو فاث "
+"{linkStart}ذخعقسث خعفمهرث{linkEnd}."
+
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr "ذخعقسث خعفمهرث"
+
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
 msgstr "ذخرفثرف لقخعح رشوث"
@@ -8064,40 +8149,60 @@ msgid "Assignment Type Name"
 msgstr "شسسهلروثرف فغحث رشوث"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. Homework, Midterm Exams"
-msgstr "ث.ل. اخوثصخقن, وهيفثقو ثطشوس"
+msgid ""
+"The general category for this type of assignment, for example, Homework or "
+"Midterm Exam. This name is visible to learners."
+msgstr ""
+"فاث لثرثقشم ذشفثلخقغ بخق فاهس فغحث خب شسسهلروثرف, بخق ثطشوحمث, اخوثصخقن خق "
+"وهيفثقو ثطشو. فاهس رشوث هس دهسهزمث فخ مثشقرثقس."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
 msgstr "شززقثدهشفهخر"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "e.g. HW, Midterm"
-msgstr "ث.ل. اص, وهيفثقو"
+msgid ""
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
+msgstr ""
+"فاهس ساخقف رشوث بخق فاث شسسهلروثرف فغحث (بخق ثطشوحمث, اص خق وهيفثقو) شححثشقس"
+" رثطف فخ شسسهلروثرفس خر ش مثشقرثق'س حقخلقثسس حشلث."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
 msgstr "صثهلاف خب فخفشم لقشيث"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "as a percent, e.g. 40"
-msgstr "شس ش حثقذثرف, ث.ل. 40"
+msgid ""
+"The weight of all assignments of this type as a percentage of the total "
+"grade, for example, 40. Do not include the percent symbol."
+msgstr ""
+"فاث صثهلاف خب شمم شسسهلروثرفس خب فاهس فغحث شس ش حثقذثرفشلث خب فاث فخفشم "
+"لقشيث, بخق ثطشوحمث, 40. يخ رخف هرذمعيث فاث حثقذثرف سغوزخم."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Total Number"
 msgstr "فخفشم رعوزثق"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises assigned"
-msgstr "فخفشم ثطثقذهسثس شسسهلرثي"
+msgid ""
+"The number of subsections in the course that contain problems of this "
+"assignment type."
+msgstr ""
+"فاث رعوزثق خب سعزسثذفهخرس هر فاث ذخعقسث فاشف ذخرفشهر حقخزمثوس خب فاهس "
+"شسسهلروثرف فغحث."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
 msgstr "رعوزثق خب يقخححشزمث"
 
 #: cms/templates/js/course_grade_policy.underscore
-msgid "total exercises that won't be graded"
-msgstr "فخفشم ثطثقذهسثس فاشف صخر'ف زث لقشيثي"
+msgid ""
+"The number of assignments of this type that will be dropped. The lowest "
+"scoring assignments are dropped first."
+msgstr ""
+"فاث رعوزثق خب شسسهلروثرفس خب فاهس فغحث فاشف صهمم زث يقخححثي. فاث مخصثسف "
+"سذخقهرل شسسهلروثرفس شقث يقخححثي بهقسف."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -8144,22 +8249,12 @@ msgid "Chapter Name"
 msgstr "ذاشحفثق رشوث"
 
 #: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "Chapter %s"
-msgstr "ذاشحفثق %s"
-
-#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr "حقخدهيث فاث فهفمث/رشوث خب فاث ذاشحفثق فاشف صهمم زث عسثي هر رشدهلشفهرل"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
 msgstr "ذاشحفثق شسسثف"
-
-#: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "path/to/introductionToCookieBaking-CH%d.pdf"
-msgstr "حشفا/فخ/هرفقخيعذفهخرفخذخخنهثزشنهرل-ذا%d.حيب"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -8217,6 +8312,14 @@ msgstr "ذشررخف يثمثفث صاثر هر عسث زغ شر ثطحثقهو�
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
 msgstr "فاهس لقخعح ذخربهلعقشفهخر هس عسثي هر:"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid ""
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
+msgstr ""
+"فاهس لقخعح ذخربهلعقشفهخر هس رخف هر عسث. سفشقف زغ شييهرل ش ذخرفثرف ثطحثقهوثرف"
+" فخ شرغ عرهف دهش فاث {linkStart}ذخعقسث خعفمهرث{linkEnd}."
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"

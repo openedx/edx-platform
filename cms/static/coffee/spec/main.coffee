@@ -27,7 +27,7 @@ requirejs.config({
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
-        "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
+        "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",

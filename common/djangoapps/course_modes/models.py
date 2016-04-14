@@ -137,6 +137,8 @@ class CourseMode(models.Model):
             raise ValidationError(
                 _(u"Professional education modes are not allowed to have expiration_datetime set.")
             )
+        if self.is_verified_slug(self.mode_slug) and self.min_price <= 0:
+            raise ValidationError(_(u"Verified modes cannot be free."))
 
     def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
@@ -398,7 +400,7 @@ class CourseMode(models.Model):
 
     @classmethod
     def has_verified_mode(cls, course_mode_dict):
-        """Check whether the modes for a course allow a student to pursue a verfied certificate.
+        """Check whether the modes for a course allow a student to pursue a verified certificate.
 
         Args:
             course_mode_dict (dictionary mapping course mode slugs to Modes)

@@ -8,8 +8,9 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from badges.events.course_complete import get_completion_badge
 from xmodule.modulestore.django import modulestore
-from certificates.models import BadgeAssertion
 from certificates.api import regenerate_user_certificates
 
 LOGGER = logging.getLogger(__name__)
@@ -110,6 +111,14 @@ class Command(BaseCommand):
                 course_id
             )
 
+            if course.issue_badges:
+                badge_class = get_completion_badge(course_id, student)
+                badge = badge_class.get_for_user(student)
+
+                if badge:
+                    badge.delete()
+                    LOGGER.info(u"Cleared badge for student %s.", student.id)
+
             # Add the certificate request to the queue
             ret = regenerate_user_certificates(
                 student, course_id, course=course,
@@ -117,13 +126,6 @@ class Command(BaseCommand):
                 template_file=options['template_file'],
                 insecure=options['insecure']
             )
-
-            try:
-                badge = BadgeAssertion.objects.get(user=student, course_id=course_id)
-                badge.delete()
-                LOGGER.info(u"Cleared badge for student %s.", student.id)
-            except BadgeAssertion.DoesNotExist:
-                pass
 
             LOGGER.info(
                 (

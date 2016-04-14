@@ -104,11 +104,9 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     describe "EditTextbook", ->
         describe "Basic", ->
             tpl = readFixtures('edit-textbook.underscore')
-            chapterTpl = readFixtures('edit-chapter.underscore')
 
             beforeEach ->
                 setFixtures($("<script>", {id: "edit-textbook-tpl", type: "text/template"}).text(tpl))
-                appendSetFixtures($("<script>", {id: "edit-chapter-tpl", type: "text/template"}).text(chapterTpl))
                 appendSetFixtures(sandbox({id: "page-notification"}))
                 appendSetFixtures(sandbox({id: "page-prompt"}))
                 @model = new Textbook({name: "Life Sciences", editing: true})
@@ -298,11 +296,8 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
 
     describe "EditChapter", ->
-        tpl = readFixtures("edit-chapter.underscore")
-
         beforeEach ->
             modal_helpers.installModalTemplates()
-            appendSetFixtures($("<script>", {id: "edit-chapter-tpl", type: "text/template"}).text(tpl))
             @model = new Chapter
                 name: "Chapter 1"
                 asset_path: "/ch1.pdf"

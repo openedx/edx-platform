@@ -1,16 +1,16 @@
 <h3 class="header-facet">
-    <%= displayName %>
+    <%- displayName %>
 </h3>
-<ul data-facet="<%= name %>" class="facet-list collapse">
-    <%= options %>
+<ul data-facet="<%- name %>" class="facet-list collapse">
+    <%= HtmlUtils.ensureHtml(optionsHtml) %>
 </ul>
 <% if (listIsHuge) { %>
     <div class="toggle ">
         <button class="show-more discovery-button">
-            <%= gettext("More") %>
+            <%- gettext("More") %>
         </button>
         <button class="show-less hidden discovery-button">
-            <%= gettext("Less") %>
+            <%- gettext("Less") %>
         </button>
     </div>
 <% } %>

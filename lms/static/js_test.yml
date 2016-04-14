@@ -57,7 +57,7 @@ lib_paths:
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/common/js/vendor/underscore.js
-    - xmodule_js/common_static/js/vendor/underscore.string.min.js
+    - xmodule_js/common_static/common/js/vendor/underscore.string.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
@@ -69,6 +69,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/slick.core.js
     - xmodule_js/common_static/js/vendor/slick.grid.js
     - xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js
+    - xmodule_js/common_static/common/js/vendor/picturefill.min.js
 
 # Paths to source JavaScript files
 src_paths:
@@ -107,7 +108,6 @@ fixture_paths:
     - templates/verify_student
     - templates/file-upload.underscore
     - templates/components/header
-    - templates/components/tabbed
     - templates/components/card
     - templates/financial-assistance/
     - js/fixtures/edxnotes
@@ -119,6 +119,7 @@ fixture_paths:
     - support/templates
     - js/fixtures/bookmarks
     - templates/bookmarks
+    - templates/learner_dashboard
 
 requirejs:
   paths:

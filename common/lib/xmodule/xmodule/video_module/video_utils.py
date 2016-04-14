@@ -2,19 +2,15 @@
 """
 Module contains utils specific for video_module but not for transcripts.
 """
-import json
+
 from collections import OrderedDict
 import logging
-import urllib
-import requests
 from urllib import urlencode
 from urlparse import parse_qs, urlsplit, urlunsplit, urlparse
 
 from django.conf import settings
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-
-from requests.exceptions import RequestException
 
 log = logging.getLogger(__name__)
 

@@ -568,19 +568,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-main': {
-        # this is unnecessary and can be removed
+    'style-main-v1': {
         'source_filenames': [
-            'css/studio-main.css',
+            'css/studio-main-v1.css',
         ],
-        'output_filename': 'css/studio-main.css',
+        'output_filename': 'css/studio-main-v1.css',
     },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
+    'style-main-v1-rtl': {
         'source_filenames': [
-            'css/studio-main-rtl.css',
+            'css/studio-main-v1-rtl.css',
         ],
-        'output_filename': 'css/studio-main-rtl.css',
+        'output_filename': 'css/studio-main-v1-rtl.css',
+    },
+    'style-main-v2': {
+        'source_filenames': [
+            'css/studio-main-v2.css',
+        ],
+        'output_filename': 'css/studio-main-v2.css',
+    },
+    'style-main-v2-rtl': {
+        'source_filenames': [
+            'css/studio-main-v2-rtl.css',
+        ],
+        'output_filename': 'css/studio-main-v2-rtl.css',
     },
     'style-edx-icons': {
         'source_filenames': [
@@ -823,6 +833,9 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
+
     # comment common
     'django_comment_common',
 
@@ -873,9 +886,12 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
+    'edx_oauth2_provider',
+
+    # django-oauth-toolkit
     'oauth2_provider',
 
     # These are apps that aren't strictly needed by Studio, but are imported by
@@ -891,6 +907,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
 )
 
 
