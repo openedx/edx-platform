@@ -438,20 +438,24 @@
             });
         });
 
+        var originalClearTimeout;
+
         describe('mouse movement', function () {
             beforeEach(function (done) {
-                jasmine.clock().uninstall();
                 jasmine.clock().install();
-                spyOn(window, 'clearTimeout');
-
                 state = jasmine.initializePlayer();
                 jasmine.clock().tick(50);
                 jasmine.waitUntil(function () {
                     return state.videoCaption.rendered;
                 }).then(done);
+
+                // Why we can't use spyOn(): https://github.com/jasmine/jasmine/issues/826
+                originalClearTimeout = window.clearTimeout;
+                window.clearTimeout = jasmine.createSpy().and.callFake(originalClearTimeout);
             });
 
             afterEach(function () {
+                window.clearTimeout = originalClearTimeout;
                 jasmine.clock().uninstall();
             });
 
@@ -1115,7 +1119,6 @@
                 beforeEach(function () {
                     state.el.addClass('closed');
                     state.videoCaption.toggle(jQuery.Event('click'));
-                    jasmine.clock().uninstall();
                     jasmine.clock().install();
                 });
 

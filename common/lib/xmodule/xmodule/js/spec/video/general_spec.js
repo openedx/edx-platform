@@ -14,11 +14,15 @@
                 beforeEach(function () {
                     loadFixtures('video.html');
                     $.cookie.and.returnValue('0.50');
-                    this.state = jasmine.initializePlayerYouTube('video_html5.html');
                 });
 
                 describe('by default', function () {
+                    beforeEach(function () {
+                        this.state = jasmine.initializePlayerYouTube('video_html5.html');
+                    });
+
                     afterEach(function () {
+                        this.state.storage.clear();
                         this.state.videoPlayer.destroy();
                     });
 
@@ -57,8 +61,8 @@
                 });
 
                 afterEach(function () {
+                    state.storage.clear();
                     state.videoPlayer.destroy();
-                    state = undefined;
                 });
 
                 describe('by default', function () {
@@ -98,12 +102,14 @@
         });
 
         describe('YouTube API is not loaded', function () {
+            var state;
             beforeEach(function () {
                 window.YT = undefined;
                 state = jasmine.initializePlayerYouTube();
             });
 
             afterEach(function () {
+                state.storage.clear();
                 state.videoPlayer.destroy();
             });
 
@@ -123,6 +129,7 @@
         });
 
         describe('checking start and end times', function () {
+            var state;
             var miniTestSuite = [
                 {
                     itDescription: 'both times are proper',
@@ -152,6 +159,7 @@
             ];
 
             afterEach(function () {
+                state.storage.clear();
                 state.videoPlayer.destroy();
             });
 

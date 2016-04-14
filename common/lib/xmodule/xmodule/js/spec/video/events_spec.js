@@ -18,6 +18,7 @@
                 $('source').remove();
                 window.onTouchBasedDevice = oldOTBD;
                 state.storage.clear();
+                state.videoPlayer.destroy();
             });
 
             it('initialize', function (done) {
@@ -88,6 +89,8 @@
             afterEach(function () {
                 $('source').remove();
                 window.onTouchBasedDevice = oldOTBD;
+                state.storage.clear();
+                state.videoPlayer.destroy();
             });
 
             it('qualitychange', function () {

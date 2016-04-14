@@ -387,8 +387,8 @@ function (VideoPlayer) {
 
 
                 it('call runTimer in seekTo on player', function () {
-                    spyOn(state.videoPlayer, 'stopTimer');
-                    spyOn(state.videoPlayer, 'runTimer');
+                    spyOn(state.videoPlayer, 'stopTimer').and.callThrough();
+                    spyOn(state.videoPlayer, 'runTimer').and.callThrough();
                     state.videoPlayer.seekTo(10);
                     expect(state.videoPlayer.currentTime).toBe(10);
                     expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
@@ -869,15 +869,15 @@ function (VideoPlayer) {
                     }).then(function () {
                         expect(controls).toHaveClass('is-hidden');
                         state.videoPlayer.play();
-                    }).always(done);
-
-                    jasmine.waitUntil(function () {
-                        var duration = state.videoPlayer.duration();
-
-                        return duration > 0 && state.videoPlayer.isPlaying();
-                    }).then(function () {
-                        expect(controls).not.toHaveClass('is-hidden');
-                    }).always(done);
+                        jasmine.waitUntil(function () {
+                            var duration = state.videoPlayer.duration();
+                            // Firefox does not return duration for videos until they have reached the end.
+                            // return duration > 0 && state.videoPlayer.isPlaying();
+                            return state.videoPlayer.isPlaying();
+                        }).then(function () {
+                            expect(controls).not.toHaveClass('is-hidden');
+                        }).always(done);
+                    })
                 });
             });
         });

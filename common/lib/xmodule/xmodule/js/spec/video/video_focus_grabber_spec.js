@@ -15,6 +15,7 @@
             // stack.
             jQuery.fx.off = true;
 
+            jasmine.stubRequests();
             loadFixtures('video_html5.html');
             state = new Video('#example');
 
@@ -26,6 +27,7 @@
         afterEach(function () {
             // Turn jQuery animations back on.
             jQuery.fx.off = true;
+            state.storage.clear();
             state.videoPlayer.destroy();
         });
 
