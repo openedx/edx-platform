@@ -32,7 +32,7 @@ function junitClassNameFormatter(browser) {
  * @return {Array}
  */
 function reporters(config) {
-    var defaultReporters = ['dots', 'junit', 'kjhtml'];
+    var defaultReporters = ['dots', 'junit', 'kjhtml', 'verbose'];
     if (config.coverage) {
         defaultReporters.push('coverage');
     }

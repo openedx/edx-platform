@@ -1,24 +1,25 @@
-(function (WAIT_TIMEOUT) {
+(function () {
     'use strict';
     describe('VideoBumper', function () {
         var state, oldOTBD, waitForPlaying;
 
-        waitForPlaying = function (state) {
-            waitsFor(function () {
+        waitForPlaying = function (state, done) {
+            jasmine.waitUntil(function () {
                 return state.el.hasClass('is-playing');
-            }, 'Player is not playing.', WAIT_TIMEOUT);
+            }).done(done);
         };
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').andReturn(null);
+                .createSpy('onTouchBasedDevice').and.returnValue(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
-            $('.poster .btn-play').click();
-            jasmine.Clock.useMock();
+            //$('.poster .btn-play').click();
+            //jasmine.clock().install();
         });
 
         afterEach(function () {
+            //jasmine.clock().uninstall();
             $('source').remove();
             state.storage.clear();
             if (state.bumperState && state.bumperState.videoPlayer) {
@@ -34,39 +35,43 @@
             expect($('.is-bumper')).toExist();
         });
 
-        it('can show the main video on error', function () {
+        it('can show the main video on error', function (done) {
             state.el.trigger('error');
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitForPlaying(state);
+            done();
+            //waitForPlaying(state, done);
         });
 
-        it('can show the main video once bumper ends', function () {
+        it('can show the main video once bumper ends', function (done) {
             state.el.trigger('ended');
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitForPlaying(state);
+            done();
+            //waitForPlaying(state, done);
         });
 
-        it('can show the main video on skip', function () {
+        it('can show the main video on skip', function (done) {
             state.bumperState.videoBumper.skip();
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitForPlaying(state);
+            done();
+            //waitForPlaying(state, done);
         });
 
-        it('can stop the bumper video playing if it is too long', function () {
+        it('can stop the bumper video playing if it is too long', function (done) {
             state.el.trigger('timeupdate', [state.bumperState.videoBumper.maxBumperDuration + 1]);
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect($('.is-bumper')).not.toExist();
-            waitForPlaying(state);
+            done();
+            //waitForPlaying(state, done);
         });
 
         it('can save appropriate states correctly on ended', function () {
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('ended');
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true});
         });
@@ -76,7 +81,7 @@
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skip();
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true});
         });
@@ -86,7 +91,7 @@
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('error');
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true});
         });
@@ -96,7 +101,7 @@
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
-            jasmine.Clock.tick(20);
+            //jasmine.clock().tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
                 bumper_last_view_date: true, bumper_do_not_show_again: true});
         });
@@ -106,4 +111,4 @@
             expect(state.videoBumper).toBeUndefined();
         });
     });
-}).call(this, window.WAIT_TIMEOUT);
+}).call(this);

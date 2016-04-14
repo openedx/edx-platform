@@ -117,20 +117,20 @@ class Env(object):
     # TODO:  Store this as a dict. Order seems to matter for some
     # reason. See issue TE-415.
     JS_TEST_CONFIG_FILES = [
-        REPO_ROOT / 'lms/static/karma_lms.conf.js',
-        REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
-        REPO_ROOT / 'cms/static/karma_cms.conf.js',
-        REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
+        # REPO_ROOT / 'lms/static/karma_lms.conf.js',
+        # REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
+        # REPO_ROOT / 'cms/static/karma_cms.conf.js',
+        # REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
 
     JS_TEST_ID_KEYS = [
-        'lms',
-        'lms-coffee',
-        'cms',
-        'cms-squire',
+        # 'lms',
+        # 'lms-coffee',
+        # 'cms',
+        # 'cms-squire',
         'xmodule',
         'common',
         'common-requirejs'

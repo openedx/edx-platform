@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').andReturn(null);
+                .createSpy('onTouchBasedDevice').and.returnValue(null);
         });
 
         afterEach(function () {
@@ -83,7 +83,7 @@
         });
 
         it('Controls height is actual on switch to fullscreen', function () {
-            spyOn($.fn, 'height').andCallFake(function (val) {
+            spyOn($.fn, 'height').and.callFake(function (val) {
                 return _.isUndefined(val) ? 100: this;
             });
 

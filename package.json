@@ -23,6 +23,7 @@
     "karma-jasmine-html-reporter": "^0.2.0",
     "karma-junit-reporter": "^0.4.1",
     "karma-requirejs": "^0.2.6",
+    "karma-verbose-reporter": "0.0.3",
     "plato": "1.2.2"
   }
 }
