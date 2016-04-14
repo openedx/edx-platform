@@ -506,6 +506,11 @@ def render_html_view(request, user_id, course_id):
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
     if not has_html_certificates_enabled(course_id):
+        log.info(
+            "Invalid cert: HTML certificates disabled for %s. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Load the course and user objects
@@ -515,12 +520,22 @@ def render_html_view(request, user_id, course_id):
         course = modulestore().get_course(course_key)
 
     # For any other expected exceptions, kick the user back to the "Invalid" screen
-    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist):
+    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist) as exception:
+        error_str = (
+            "Invalid cert: error finding course %s or user with id "
+            "%d. Specific error: %s"
+        )
+        log.info(error_str, course_id, user_id, str(exception))
         return render_to_response(invalid_template_path, context)
 
     # Load user's certificate
     user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
     if not user_certificate:
+        log.info(
+            "Invalid cert: User %d does not have eligible cert for %s.",
+            user_id,
+            course_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Get the active certificate configuration for this course
@@ -528,7 +543,13 @@ def render_html_view(request, user_id, course_id):
     # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
     active_configuration = get_active_web_certificate(course, preview_mode)
     if active_configuration is None:
+        log.info(
+            "Invalid cert: course %s does not have an active configuration. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
+
     context['certificate_data'] = active_configuration
 
     # Append/Override the existing view context values with any mode-specific ConfigurationModel values
