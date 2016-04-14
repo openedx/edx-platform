@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, F, Count
+from django.utils.translation import ugettext as _
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -88,7 +89,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
 
         return Response(response_data, status=status.HTTP_200_OK)
 
-    @action(methods=['get', 'post'])
+    @action(methods=['get', 'post', 'delete'])
     def users(self, request, pk):
         """
         - URI: ```/api/organizations/{org_id}/users/```
@@ -100,7 +101,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             * view parameter can be used to get a particular data .i.e. view=ids to
             * get list of user ids
         - POST: Adds a User to an Organization
-
+        - DELETE: Removes the user(s) given in the `users` param from an Organization.
         """
         if request.method == 'GET':
             include_course_counts = request.QUERY_PARAMS.get('include_course_counts', None)
@@ -152,6 +153,30 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
 
                     response_data.append(user_data)
             return Response(response_data, status=status.HTTP_200_OK)
+        elif request.method == 'DELETE':
+            user_ids = request.DATA.get('users')
+            if not user_ids:
+                return Response({"detail": _('users parameter is missing.')}, status.HTTP_400_BAD_REQUEST)
+            try:
+                user_ids = [int(user_id) for user_id in filter(None, user_ids.split(','))]
+            except ValueError:
+                return Response({
+                    "detail": _('users parameter must be comma separated list of integers.')
+                }, status.HTTP_400_BAD_REQUEST)
+
+            users_removed = 0
+            organization = self.get_object()
+            for user_id in user_ids:
+                try:
+                    user = User.objects.get(id=user_id)
+                except ObjectDoesNotExist:
+                    continue
+                organization.users.remove(user)
+                users_removed += 1
+            organization.save()
+            return Response({
+                "detail": _("{users_removed} users removed from organization").format(users_removed=users_removed)
+            }, status=status.HTTP_200_OK)
         else:
             user_id = request.DATA.get('id')
             try:
