@@ -122,7 +122,7 @@ header.header-main {
 //Hero
 
 .hero-main{
-  background: url("../images/hero-bg.jpg") no-repeat center center;
+  background: url("../images/hero-home-page.jpg") no-repeat center center;
   background-size: 100%;
   min-height: 22em;
   position: relative;
@@ -153,6 +153,57 @@ header.header-main {
         font-size: 0.6em;
         margin-left: 1.5em;
         vertical-align: middle;
+      }
+    }
+  }
+  &.hero-video{
+    background: rgba(0,0,0,0.6);
+    .grid-container{
+      .row{
+        height: 22rem;
+        .description{
+          .data{
+            padding: 11.5% 2% 0 0;
+            h1{
+            font-size: 2.5rem;
+            color: $white;
+            line-height: normal;
+            padding-left: 1rem;
+            text-align: left;
+              span{
+                display: block;
+              }
+            }
+            p{
+                font-size: 1.3rem;
+                padding-left: 1rem;
+                color:$white;
+                line-height: normal;
+                margin-top: 1.2rem;
+            }
+          }
+        }
+        .video{
+          float: none;
+          .video-data{
+            position: relative;
+            text-align: center;
+            line-height: 352px;
+            max-width: 95%;
+            img{
+              border: 3px solid $white;
+            }
+            &:before{
+              content: "";
+              background: url("../images/vid-btn.png") no-repeat center center;
+              width: 80px;
+              height: 80px;
+              position: absolute;
+              left: calc(50% - 40px);
+              top: calc(50% - 40px);
+            }
+          }
+        }
       }
     }
   }
@@ -361,9 +412,22 @@ header.header-main {
       }
     }
   }
-  .hero-main .text-tint .btn-neutral{
-    padding: 0.8em 2em;
-    margin-left: 2.5em;
+  .hero-main{
+    .text-tint{
+      .btn-neutral{
+        padding: 0.8em 2em;
+        margin-left: 2.5em;
+      }
+    }
+    &.hero-video{
+      .grid-container{
+        .row{
+          .video{
+            float: right;
+          }
+        }
+      }
+    }
   }
   .courses-section {
     .courses-container {
