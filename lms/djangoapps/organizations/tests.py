@@ -12,8 +12,9 @@ from urllib import urlencode
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import Client
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
+from rest_framework.test import APIClient
 
 from gradebook.models import StudentGradebook
 from student.models import UserProfile
@@ -25,7 +26,7 @@ TEST_API_KEY = str(uuid.uuid4())
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
-class SecureClient(Client):
+class SecureClient(APIClient):
 
     """ Django test client using a "secure" connection. """
 
@@ -103,14 +104,36 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.client.get(uri, headers=headers)
         return response
 
-    def do_delete(self, uri):
+    def do_delete(self, uri, data):
         """Submit an HTTP DELETE request"""
         headers = {
             'Content-Type': 'application/json',
             'X-Edx-Api-Key': str(TEST_API_KEY),
         }
-        response = self.client.delete(uri, headers=headers)
+        response = self.client.delete(uri, data, headers=headers)
         return response
+
+    def setup_test_organization(self, org_data=None):
+        """
+        Creates a new organization with given org_data
+        if org_data is not present it would create organization with test values
+        :param org_data: Dictionary witch each item represents organization attribute
+        :return: newly created organization
+        """
+        org_data = org_data if org_data else {}
+        data = {
+            'name': org_data.get('name', self.test_organization_name),
+            'display_name': org_data.get('display_name', self.test_organization_display_name),
+            'contact_name': org_data.get('contact_name', self.test_organization_contact_name),
+            'contact_email': org_data.get('contact_email', self.test_organization_contact_email),
+            'contact_phone': org_data.get('contact_phone', self.test_organization_contact_phone),
+            'logo_url': org_data.get('logo_url', self.test_organization_logo_url),
+            'users': org_data.get('users', []),
+            'groups': org_data.get('groups', [])
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        return response.data
 
     def test_organizations_list_post(self):
         users = []
@@ -127,49 +150,30 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 201)
             users.append(response.data['id'])
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone,
-            'logo_url': self.test_organization_logo_url,
-            'users': users
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        self.assertGreater(response.data['id'], 0)
+        organization = self.setup_test_organization(org_data={'users': users})
         confirm_uri = '{}{}{}/'.format(
             self.test_server_prefix,
             self.base_organizations_uri,
-            str(response.data['id'])
+            organization['id']
         )
-        self.assertEqual(response.data['url'], confirm_uri)
-        self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['name'], self.test_organization_name)
-        self.assertEqual(response.data['display_name'], self.test_organization_display_name)
-        self.assertEqual(response.data['contact_name'], self.test_organization_contact_name)
-        self.assertEqual(response.data['contact_email'], self.test_organization_contact_email)
-        self.assertEqual(response.data['contact_phone'], self.test_organization_contact_phone)
-        self.assertEqual(response.data['logo_url'], self.test_organization_logo_url)
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
+        self.assertEqual(organization['url'], confirm_uri)
+        self.assertGreater(organization['id'], 0)
+        self.assertEqual(organization['name'], self.test_organization_name)
+        self.assertEqual(organization['display_name'], self.test_organization_display_name)
+        self.assertEqual(organization['contact_name'], self.test_organization_contact_name)
+        self.assertEqual(organization['contact_email'], self.test_organization_contact_email)
+        self.assertEqual(organization['contact_phone'], self.test_organization_contact_phone)
+        self.assertEqual(organization['logo_url'], self.test_organization_logo_url)
+        self.assertIsNotNone(organization['created'])
+        self.assertIsNotNone(organization['modified'])
 
         users_get_uri = "{}users/?view=ids".format(confirm_uri)
         response = self.do_get(users_get_uri)
         self.assertEqual(len(response.data), len(users))
 
     def test_organizations_detail_get(self):
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        org = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, org['id'])
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = self.test_server_prefix + test_uri
@@ -195,10 +199,10 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         data = {'name': self.test_organization_name}
         response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, response.data['id'])
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        response = self.do_delete(test_uri)
+        response = self.do_delete(test_uri, data={})
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
@@ -226,32 +230,17 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 201)
             groups.append(response.data['id'])
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'groups': groups
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        organization_id = response.data['id']
+        organization = self.setup_test_organization(org_data={'groups': groups})
         groups_get_uri = "{base_url}{organization_id}/groups/?view=ids".format(
             base_url=self.base_organizations_uri,
-            organization_id=organization_id,
+            organization_id=organization['id'],
         )
         response = self.do_get(groups_get_uri)
         self.assertEqual(len(response.data), len(groups))
 
     def test_organizations_users_post(self):
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
@@ -263,32 +252,15 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[0], self.test_user.id)
 
     def test_organizations_users_post_invalid_user(self):
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"id": 123456}
         response = self.do_post(users_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_organizations_groups_get_post(self):
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        org_id = response.data['id']
+        organization = self.setup_test_organization()
 
         # create groups
         max_groups, groups, contactgroup_count = 4, [], 2
@@ -303,7 +275,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 201)
             groups.append(response.data['id'])
 
-        test_uri = '{}{}/'.format(self.base_organizations_uri, org_id)
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         groups_uri = '{}groups/'.format(test_uri)
         for group in groups:
             data = {"id": group}
@@ -324,16 +296,8 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_organizations_users_get(self):
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
@@ -349,16 +313,8 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.test_user2, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.test_user, course_id=self.second_course.id)
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
@@ -388,16 +344,8 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=grades[0],
                                             proforma_grade=grades[1])
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         for user in users:
             data = {"id": user.id}
@@ -411,6 +359,62 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         proforma_grade_sum = sum([user['proforma_grade'] for user in response.data])
         self.assertEqual(grade_sum, 0.75 + 0.75 + 0.9 + 0.9)
         self.assertEqual(proforma_grade_sum, 0.85 + 0.85 + 0.91 + 0.91)
+
+    def test_organizations_users_delete(self):
+        """
+        Tests organization user link removal API works as expected if given user ids are valid
+        """
+        organization = self.setup_test_organization(org_data={'users': [self.test_user.id, self.test_user2.id]})
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        data = {"users": "{user_id1},{user_id2}".format(user_id1=self.test_user.id, user_id2=self.test_user2.id)}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['detail'], _("2 users removed from organization"))
+        response = self.do_get("{}?view=ids".format(users_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_organizations_users_delete_invalid(self):
+        """
+        Tests organization user link removal API returns bad request response if given user ids are not valid
+        """
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        data = {"users": 'invalid'}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 400)
+
+        data = {"users": 'invalid,112323333329'}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 400)
+
+        data = {"users": 112323333329}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_organizations_users_delete_non_existing(self):
+        """
+        Tests organization user link removal API with non existing user
+        """
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        data = {"users": 112323333329}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['detail'], _("0 users removed from organization"))
+
+    def test_organizations_users_delete_without_param(self):
+        """
+        Tests organization user link removal API without users param
+        """
+        organization = self.setup_test_organization()
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        response = self.do_delete(users_uri, data={})
+        self.assertEqual(response.status_code, 400)
 
     def test_organizations_metrics_get(self):
         users = []
@@ -436,18 +440,8 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             else:
                 StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.90, proforma_grade=0.91)
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone,
-            'logo_url': self.test_organization_logo_url,
-            'users': users
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
-        users_uri = '{}users/'.format(test_uri)
+        organization = self.setup_test_organization(org_data={'users': users})
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         metrics_uri = '{}metrics/'.format(test_uri)
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
@@ -494,19 +488,8 @@ class OrganizationsApiTests(ModuleStoreTestCase):
                 CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.00, proforma_grade=0.00, course_id=course2.id)
 
-        data = {
-            'name': self.test_organization_name,
-            'display_name': self.test_organization_display_name,
-            'contact_name': self.test_organization_contact_name,
-            'contact_email': self.test_organization_contact_email,
-            'contact_phone': self.test_organization_contact_phone,
-            'logo_url': self.test_organization_logo_url,
-            'users': users
-        }
-
-        response = self.do_post(self.base_organizations_uri, data)
-        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
-        users_uri = '{}users/'.format(test_uri)
+        organization = self.setup_test_organization(org_data={'users': users})
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         metrics_uri = '{}metrics/'.format(test_uri)
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
