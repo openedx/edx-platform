@@ -134,7 +134,8 @@ DATABASES = {
 MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
 
 LMS_BASE = "localhost:8000"
-FEATURES['PREVIEW_LMS_BASE'] = "preview"
+FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
