@@ -13,22 +13,22 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
-            state = jasmine.initializePlayer('video_with_bumper.html');
-            $('.poster .btn-play').click();
+            //state = jasmine.initializePlayer('video_with_bumper.html');
+            //$('.poster .btn-play').click();
             jasmine.clock().install();
         });
 
         afterEach(function () {
-            $('source').remove();
-            state.storage.clear();
-            if (state.bumperState && state.bumperState.videoPlayer) {
-                state.bumperState.videoPlayer.destroy();
-            }
-            if (state.videoPlayer) {
-                state.videoPlayer.destroy();
-            }
-            window.onTouchBasedDevice = oldOTBD;
             jasmine.clock().uninstall();
+            //$('source').remove();
+            //state.storage.clear();
+            //if (state.bumperState && state.bumperState.videoPlayer) {
+            //    state.bumperState.videoPlayer.destroy();
+            //}
+            //if (state.videoPlayer) {
+            //    state.videoPlayer.destroy();
+            //}
+            window.onTouchBasedDevice = oldOTBD;
         });
 
         it('can render the bumper video', function () {
