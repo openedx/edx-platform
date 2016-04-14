@@ -198,14 +198,19 @@ class UsersList(SecureListAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
-    - GET: Provides paginated list of users, it supports email, username, has_organizations and id filters
+    - GET: Provides paginated list of users, it supports email, username, name, organizations, courses enrolled,
+           has_organizations and id filters
         Possible use cases
         GET /api/users?ids=23
         GET /api/users?ids=11,12,13&page=2
+        GET /api/users?organizations=1,2,3
+        GET /api/users?courses={course_id},{course_id2}
         GET /api/users?email={john@example.com}
+        GET /api/users?name={john doe}
         GET /api/users?username={john}
             * email: string, filters user set by email address
             * username: string, filters user set by username
+            * name: string, filters user set by full name
         GET /api/users?has_organizations={true}
             * has_organizations: boolean, filters user set with organization association
         GET /api/users?has_organizations={false}
@@ -258,18 +263,36 @@ class UsersList(SecureListAPIView):
     filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend, HasOrgsFilterBackend)
     filter_fields = ('email', 'username', )
 
+    def get_queryset(self):
+        """
+        Optionally filter users by organizations and course enrollments
+        """
+        queryset = self.queryset
+        org_ids = self.request.QUERY_PARAMS.get('organizations', None)
+        if org_ids is not None:
+            org_ids = map(int, org_ids.split(','))
+            queryset = queryset.filter(organizations__id__in=org_ids).distinct()
+
+        course_ids = self.request.QUERY_PARAMS.get('courses', None)
+        if course_ids is not None:
+            course_ids = map(CourseKey.from_string, course_ids.split(','))
+            queryset = queryset.filter(courseenrollment__course_id__in=course_ids).distinct()
+
+        name = self.request.QUERY_PARAMS.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(profile__name=name)
+
+        queryset = queryset.prefetch_related('organizations')\
+            .select_related('courseenrollment_set', 'profile')\
+            .annotate(courses_enrolled=Count('courseenrollment'))
+
+        return queryset
+
     def get(self, request, *args, **kwargs):
         """
         GET /api/users?ids=11,12,13.....&page=2
         """
-        email = request.QUERY_PARAMS.get('email', None)
-        username = request.QUERY_PARAMS.get('username', None)
-        ids = request.QUERY_PARAMS.get('ids', None)
-        has_orgs = request.QUERY_PARAMS.get('has_organizations', None)
-        if email or username or ids or has_orgs:
-            return self.list(request, *args, **kwargs)
-        else:
-            return Response({'message': _('Unfiltered request is not allowed.')}, status=status.HTTP_400_BAD_REQUEST)
+        return self.list(request, *args, **kwargs)
 
     def post(self, request):
         """
