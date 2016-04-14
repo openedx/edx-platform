@@ -1,11 +1,9 @@
-// LMS - CSS application architecture
-// Version 1 styling (pre-Pattern Library)
+// lms - css application architecture
 // ====================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
-@import 'base/variables-rtl';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // BASE  *default edX offerings*
 // ====================
@@ -19,4 +17,4 @@
 // theme, for old-style deprecated theming.
 //<THEME-OVERRIDE>
 
-@import 'build-lms-v1'; // shared app style assets/rendering
+@import 'build-lms'; // shared app style assets/rendering
