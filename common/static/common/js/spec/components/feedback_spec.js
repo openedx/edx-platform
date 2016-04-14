@@ -186,6 +186,7 @@
       });
     });
     describe("NotificationView.Mini", function() {
+      var view;
       beforeEach(function() {
         return this.view = new NotificationView.Mini();
       });

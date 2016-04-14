@@ -870,14 +870,14 @@ function (VideoPlayer) {
                         expect(controls).toHaveClass('is-hidden');
                         state.videoPlayer.play();
                         jasmine.waitUntil(function () {
-                            var duration = state.videoPlayer.duration();
                             // Firefox does not return duration for videos until they have reached the end.
+                            // var duration = state.videoPlayer.duration();
                             // return duration > 0 && state.videoPlayer.isPlaying();
                             return state.videoPlayer.isPlaying();
                         }).then(function () {
                             expect(controls).not.toHaveClass('is-hidden');
                         }).always(done);
-                    })
+                    });
                 });
             });
         });
