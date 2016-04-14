@@ -21,14 +21,14 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrosite
 
 INSTALLED_APPS += ('appsembler_lms',)
 
-MIDDLEWARE_CLASSES = (
-    'db_multitenant.middleware.MultiTenantMiddleware',
-    ) + MIDDLEWARE_CLASSES
+# MIDDLEWARE_CLASSES = (
+#     'db_multitenant.middleware.MultiTenantMiddleware',
+#     ) + MIDDLEWARE_CLASSES
+#
+# SOUTH_DATABASE_ADAPTERS = {
+#     'default': 'south.db.mysql'
+# }
+#
+# MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
 
-SOUTH_DATABASE_ADAPTERS = {
-    'default': 'south.db.mysql'
-}
-
-MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
-
-DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
+#DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
