@@ -312,6 +312,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "abuse_flaggers": [],
             "votes": {"up_count": 4},
             "children": [],
+            "child_count": 0,
         }
         expected = {
             "id": "test_comment",
@@ -332,6 +333,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "vote_count": 4,
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
+            "child_count": 0,
         }
         self.assertEqual(self.serialize(comment), expected)
 
