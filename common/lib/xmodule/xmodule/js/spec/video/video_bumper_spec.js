@@ -13,21 +13,21 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
-            //state = jasmine.initializePlayer('video_with_bumper.html');
+            state = jasmine.initializePlayer('video_with_bumper.html');
             //$('.poster .btn-play').click();
-            jasmine.clock().install();
+            //jasmine.clock().install();
         });
 
         afterEach(function () {
-            jasmine.clock().uninstall();
-            //$('source').remove();
-            //state.storage.clear();
-            //if (state.bumperState && state.bumperState.videoPlayer) {
-            //    state.bumperState.videoPlayer.destroy();
-            //}
-            //if (state.videoPlayer) {
-            //    state.videoPlayer.destroy();
-            //}
+            //jasmine.clock().uninstall();
+            $('source').remove();
+            state.storage.clear();
+            if (state.bumperState && state.bumperState.videoPlayer) {
+                state.bumperState.videoPlayer.destroy();
+            }
+            if (state.videoPlayer) {
+                state.videoPlayer.destroy();
+            }
             window.onTouchBasedDevice = oldOTBD;
         });
 
