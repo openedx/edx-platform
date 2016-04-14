@@ -42,6 +42,7 @@
 # gvidushiin <gvidushiin@gmail.com>, 2014-2015
 # TheIllusionistMirage <koushtav@fleptic.eu>, 2014
 # Nitin Madhok <nmadhok@clemson.edu>, 2014
+# plankton rules <planktonrules0@gmail.com>, 2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -72,13 +73,14 @@
 # Translators:
 # Anant Vima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
+# plankton rules <planktonrules0@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-03-30 19:39+0000\n"
-"PO-Revision-Date: 2015-11-24 13:39+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"PO-Revision-Date: 2016-04-09 18:35+0000\n"
+"Last-Translator: plankton rules <planktonrules0@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
