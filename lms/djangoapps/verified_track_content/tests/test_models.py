@@ -165,27 +165,6 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         error_message = "cohort named '%s' does not exist"
         self.assertIn(error_message, error_logger.call_args[0][0])
 
-    @mock.patch('verified_track_content.models.log.error')
-    def test_cohorting_enabled_too_many_random_cohorts(self, error_logger):
-        """
-        If the VerifiedTrackCohortedCourse feature is enabled for a course and the course is cohorted,
-        but the course has > 1 random cohorts, an error is logged and enrollment mode changes do not
-        move learners into a cohort.
-        """
-        # Enable cohorting, and create the verified cohort.
-        self._enable_cohorting()
-        self._create_verified_cohort()
-        # Create two random cohorts.
-        self._create_named_random_cohort("Random 1")
-        self._create_named_random_cohort("Random 2")
-        # Enable verified track cohorting feature
-        self._enable_verified_track_cohorting()
-        self.assertTrue(VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(self.course.id))
-        self._verify_no_automatic_cohorting()
-        self.assertTrue(error_logger.called)
-        error_message = "course does not have exactly one default cohort"
-        self.assertIn(error_message, error_logger.call_args[0][0])
-
     def test_automatic_cohorting_enabled(self):
         """
         If the VerifiedTrackCohortedCourse feature is enabled for a course (with course cohorting enabled
@@ -206,6 +185,30 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self._upgrade_to_verified()
         self.assertEqual(4, self.mocked_celery_task.call_count)
         self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+
+    def test_cohorting_enabled_multiple_random_cohorts(self):
+        """
+        If the VerifiedTrackCohortedCourse feature is enabled for a course, and the course is cohorted
+        with > 1 random cohorts, the learner is randomly assigned to one of the random
+        cohorts when in the audit track.
+        """
+        # Enable cohorting, and create the verified cohort.
+        self._enable_cohorting()
+        self._create_verified_cohort()
+        # Create two random cohorts.
+        self._create_named_random_cohort("Random 1")
+        self._create_named_random_cohort("Random 2")
+        # Enable verified track cohorting feature
+        self._enable_verified_track_cohorting()
+
+        self._enroll_in_course()
+        self.assertIn(get_cohort(self.user, self.course.id, assign=False).name, ["Random 1", "Random 2"])
+        self._upgrade_to_verified()
+        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
+
+        self._unenroll()
+        self._reenroll()
+        self.assertIn(get_cohort(self.user, self.course.id, assign=False).name, ["Random 1", "Random 2"])
 
     def test_unenrolled(self):
         """
