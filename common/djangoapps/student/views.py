@@ -127,6 +127,7 @@ from openedx.core.djangoapps.credentials.utils import get_user_program_credentia
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
 log = logging.getLogger("edx.student")
@@ -741,6 +742,7 @@ def dashboard(request):
         'course_programs': course_programs,
         'disable_courseware_js': True,
         'xseries_credentials': xseries_credentials,
+        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
     }
 
     ecommerce_service = EcommerceService()
