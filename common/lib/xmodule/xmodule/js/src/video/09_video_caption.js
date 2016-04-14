@@ -2,11 +2,14 @@
 // VideoCaption module.
     'use strict';
 
-    define('video/09_video_caption.js', [
+    define('video/09_video_caption.js',[
         'video/00_sjson.js',
-        'video/00_async_process.js'
-    ],
-    function (Sjson, AsyncProcess) {
+        'video/00_async_process.js',
+        'draggabilly',
+        'modernizr',
+        'afontgarde',
+        'edxicons'
+    ], function (Sjson, AsyncProcess, Draggabilly) {
 
         /**
          * @desc VideoCaption module exports a function.
@@ -33,12 +36,14 @@
                 'handleKeypress', 'handleKeypressLink', 'openLanguageMenu', 'closeLanguageMenu',
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
-                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle'
+                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
+                'listenForDragDrop'
             );
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
+            this.listenForDragDrop();
 
             return $.Deferred().resolve().promise();
         };
@@ -531,7 +536,7 @@
                             if (state.isTouch) {
                                 self.subtitlesEl.find('.subtitles-menu')
                                     .text(gettext('Transcript will be displayed when you start playing the video.')) // jshint ignore: line
-                                        .wrapInner('<li></li>');
+                                    .wrapInner('<li></li>');
                             } else {
                                 self.renderCaption(start, captions);
                             }
@@ -1144,6 +1149,17 @@
                     $.cookie('show_closed_captions', null, {
                         path: '/'
                     });
+                }
+            },
+
+            listenForDragDrop: function() {
+                var captions = document.querySelector('.closed-captions'),
+                    draggable;
+
+                if (typeof Draggabilly === "function") {
+                    draggable = new Draggabilly(captions, { containment: true });
+                } else {
+                    console.log('Closed captioning available but not draggable');
                 }
             },
 

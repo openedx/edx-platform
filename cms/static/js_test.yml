@@ -56,7 +56,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
-    - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
+    - xmodule_js/common_static/js/vendor/draggabilly.js
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/domReady.js
     - xmodule_js/common_static/js/vendor/URI.min.js
@@ -70,6 +70,9 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js
     - xmodule_js/common_static/js/vendor/mock-ajax.js
     - xmodule_js/common_static/js/vendor/requirejs/text.js
+    - xmodule_js/common_static/edx-pattern-library/js/modernizr-custom.js
+    - xmodule_js/common_static/edx-pattern-library/js/afontgarde.js
+    - xmodule_js/common_static/edx-pattern-library/js/edx-icons.js
 
 # Paths to source JavaScript files
 src_paths:

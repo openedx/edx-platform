@@ -38,10 +38,14 @@ lib_paths:
     - js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
+    - js/vendor/draggabilly.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
     - js/test/i18n.js
     - coffee/src/jquery.immediateDescendents.js
+    - edx-pattern-library/js/modernizr-custom.js
+    - edx-pattern-library/js/afontgarde.js
+    - edx-pattern-library/js/edx-icons.js
 
 # Paths to source JavaScript files
 src_paths:
