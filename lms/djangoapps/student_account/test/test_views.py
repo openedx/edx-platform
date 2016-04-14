@@ -22,6 +22,7 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -31,7 +32,7 @@ from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
-class StudentAccountUpdateTest(UrlResetMixin, TestCase):
+class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
@@ -63,6 +64,8 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(StudentAccountUpdateTest, self).setUp()

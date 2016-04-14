@@ -1707,6 +1707,9 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @classmethod
     def setUpClass(cls):
         super(RegistrationCodeRedemptionCourseEnrollment, cls).setUpClass()

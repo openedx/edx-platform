@@ -970,6 +970,8 @@ class ProgressPageTests(ModuleStoreTestCase):
     Tests that verify that the progress page works correctly.
     """
 
+    ENABLED_CACHES = ['default', 'mongo_modulestore_inheritance', 'loc_cache']
+
     def setUp(self):
         super(ProgressPageTests, self).setUp()
         self.request_factory = RequestFactory()

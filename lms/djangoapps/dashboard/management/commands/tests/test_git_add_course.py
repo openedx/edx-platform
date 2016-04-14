@@ -51,6 +51,8 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
     GIT_REPO_DIR = settings.GIT_REPO_DIR
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def assertCommandFailureRegexp(self, regex, *args):
         """
         Convenience function for testing command failures

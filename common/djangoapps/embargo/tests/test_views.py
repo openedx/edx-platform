@@ -10,11 +10,12 @@ import ddt
 
 from util.testing import UrlResetMixin
 from embargo import messages
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
+class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     """Tests for the courseware access message view.
 
     These end-points serve static content.
@@ -31,6 +32,8 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
     update the configuration appropriately).
 
     """
+
+    ENABLED_CACHES = ['default']
 
     URLCONF_MODULES = ['embargo']
 

@@ -17,6 +17,7 @@ from openedx.core.djangoapps.programs import utils
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
@@ -26,8 +27,11 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @attr('shard_2')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
-                           CredentialsApiConfigMixin, TestCase):
+                           CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests covering the retrieval of programs from the Programs service."""
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestProgramRetrieval, self).setUp()
 

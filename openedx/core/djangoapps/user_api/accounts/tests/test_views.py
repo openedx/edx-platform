@@ -25,6 +25,7 @@ from student.tests.factories import UserFactory
 from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
@@ -121,10 +122,13 @@ class UserAPITestCase(APITestCase):
     clear=True
 )
 @attr('shard_2')
-class TestAccountAPI(UserAPITestCase):
+class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Account API.
     """
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestAccountAPI, self).setUp()
 
@@ -244,7 +248,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(14):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -259,7 +263,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(14):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
 
@@ -307,11 +311,11 @@ class TestAccountAPI(UserAPITestCase):
         Test that a client (logged in) can get her own account information (using default legacy profile information,
         as created by the test UserFactory).
         """
-        def verify_get_own_information():
+        def verify_get_own_information(queries):
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(9):
+            with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
             self.assertEqual(17, len(data))
@@ -333,12 +337,12 @@ class TestAccountAPI(UserAPITestCase):
             self.assertEqual(False, data["accomplishments_shared"])
 
         self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_information()
+        verify_get_own_information(12)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information()
+        verify_get_own_information(9)
 
     def test_get_account_empty_string(self):
         """
@@ -352,7 +356,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=self.test_password)
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(12):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
             self.assertIsNone(response.data[empty_field])

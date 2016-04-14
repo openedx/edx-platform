@@ -16,16 +16,20 @@ from openedx.core.djangoapps.credentials.utils import (
 )
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @attr('shard_2')
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
-                               ProgramsDataMixin, TestCase):
+                               ProgramsDataMixin, CacheIsolationTestCase):
     """ Tests covering the retrieval of user credentials from the Credentials
     service.
     """
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestCredentialsRetrieval, self).setUp()
 

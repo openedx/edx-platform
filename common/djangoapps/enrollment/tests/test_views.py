@@ -141,6 +141,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     OTHER_USERNAME = "Jane"
     OTHER_EMAIL = "jane@example.com"
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp()

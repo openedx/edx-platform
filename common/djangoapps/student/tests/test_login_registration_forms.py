@@ -158,7 +158,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
     """Test rendering of the registration form. """
 
     URLCONF_MODULES = ['lms.urls']
-    
+
     @classmethod
     def setUpClass(cls):
         super(RegisterFormTest, cls).setUpClass()

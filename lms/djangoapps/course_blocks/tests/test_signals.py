@@ -15,6 +15,7 @@ class CourseBlocksSignalTest(EnableTransformerRegistryMixin, ModuleStoreTestCase
     """
     Tests for the Course Blocks signal
     """
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         super(CourseBlocksSignalTest, self).setUp()

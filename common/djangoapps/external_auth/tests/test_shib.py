@@ -23,11 +23,12 @@ from mock import patch
 from nose.plugins.attrib import attr
 from urllib import urlencode
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -76,11 +77,14 @@ def gen_all_identities():
 @attr('shard_3')
 @ddt
 @override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
-class ShibSPTest(SharedModuleStoreTestCase):
+class ShibSPTest(CacheIsolationTestCase):
     """
     Tests for the Shibboleth SP, which communicates via request.META
     (Apache environment variables set by mod_shib)
     """
+
+    ENABLED_CACHES = ['default']
+
     request_factory = RequestFactory()
 
     def setUp(self):
@@ -377,8 +381,23 @@ class ShibSPTest(SharedModuleStoreTestCase):
             self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
             self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
 
+
+@ddt
+@override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
+class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
+    """
+    Tests for the Shibboleth SP which modify the courseware
+    """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
+    request_factory = RequestFactory()
+
+    def setUp(self):
+        super(ShibSPTestModifiedCourseware, self).setUp()
+        self.test_user_id = ModuleStoreEnum.UserID.test
+
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @SharedModuleStoreTestCase.modifies_courseware
     @data(None, "", "shib:https://idp.stanford.edu/")
     def test_course_specific_login_and_reg(self, domain):
         """
@@ -457,7 +476,6 @@ class ShibSPTest(SharedModuleStoreTestCase):
                          '&enrollment_action=enroll')
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @SharedModuleStoreTestCase.modifies_courseware
     def test_enrollment_limit_by_domain(self):
         """
             Tests that the enrollmentDomain setting is properly limiting enrollment to those who have
@@ -525,7 +543,6 @@ class ShibSPTest(SharedModuleStoreTestCase):
                     self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @SharedModuleStoreTestCase.modifies_courseware
     def test_shib_login_enrollment(self):
         """
             A functionality test that a student with an existing shib login
