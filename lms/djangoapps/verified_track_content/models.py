@@ -12,7 +12,7 @@ from courseware.courses import get_course_by_id
 
 from verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
-    get_course_cohorts, CourseCohort, is_course_cohorted, get_random_cohort, is_default_cohort
+    get_course_cohorts, CourseCohort, is_course_cohorted, get_random_cohort
 )
 
 import logging
