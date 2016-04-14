@@ -383,16 +383,16 @@ class ModuleStoreTestCase(TestCase):
     """
 
     MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
+
+    CREATE_USER = True
+
     # Tell Django to clean out all databases, not just default
     multi_db = True
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         """
-        Creates a test User if `create_user` is True.
-        Returns the password for the test User.
-
-        Args:
-            create_user - specifies whether or not to create a test User.  Default is True.
+        Creates a test User if `self.CREATE_USER` is True.
+        Sets the password as self.user_password.
         """
         settings_override = override_settings(MODULESTORE=self.MODULESTORE)
         settings_override.__enter__()
@@ -422,11 +422,11 @@ class ModuleStoreTestCase(TestCase):
 
         uname = 'testuser'
         email = 'test+courses@edx.org'
-        password = 'foo'
+        self.user_password = 'foo'
 
-        if kwargs.pop('create_user', True):
+        if self.CREATE_USER:
             # Create the user so we can log them in.
-            self.user = User.objects.create_user(uname, email, password)
+            self.user = User.objects.create_user(uname, email, self.user_password)
 
             # Note that we do not actually need to do anything
             # for registration if we directly mark them active.
@@ -436,7 +436,6 @@ class ModuleStoreTestCase(TestCase):
             self.user.is_staff = True
             self.user.save()
 
-        return password
 
     def create_non_staff_user(self):
         """

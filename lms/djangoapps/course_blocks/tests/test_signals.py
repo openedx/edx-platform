@@ -17,7 +17,7 @@ class CourseBlocksSignalTest(EnableTransformerRegistryMixin, ModuleStoreTestCase
     """
 
     def setUp(self):
-        super(CourseBlocksSignalTest, self).setUp(create_user=True)
+        super(CourseBlocksSignalTest, self).setUp()
         self.course = CourseFactory.create()
         self.course_usage_key = self.store.make_course_usage_key(self.course.id)
 

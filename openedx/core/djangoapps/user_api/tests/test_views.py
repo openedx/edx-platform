@@ -1729,8 +1729,10 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin):
     """
     Tests for the User API registration endpoint with 3rd party authentication.
     """
+    CREATE_USER = False
+
     def setUp(self):
-        super(ThirdPartyRegistrationTestMixin, self).setUp(create_user=False)
+        super(ThirdPartyRegistrationTestMixin, self).setUp()
         self.url = reverse('user_api_registration')
 
     def data(self, user=None):

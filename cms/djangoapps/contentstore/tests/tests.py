@@ -88,9 +88,11 @@ class ContentStoreTestCase(ModuleStoreTestCase):
 
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
+    
+    CREATE_USER = False
 
     def setUp(self):
-        super(AuthTestCase, self).setUp(create_user=False)
+        super(AuthTestCase, self).setUp()
 
         self.email = 'a@b.com'
         self.pw = 'xyz'

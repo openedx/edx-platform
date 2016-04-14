@@ -350,9 +350,11 @@ class ViewsTestCaseMixin(object):
 @disable_signal(views, 'thread_edited')
 class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
 
+    CREATE_USER = False
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(ViewsQueryCountTestCase, self).setUp(create_user=False)
+        super(ViewsQueryCountTestCase, self).setUp()
 
     def clear_caches(self):
         """Clears caches so that query count numbers are accurate."""
