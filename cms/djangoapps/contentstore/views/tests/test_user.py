@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student import auth
+from django.http import Http404
 
 
 class UsersTestCase(CourseTestCase):
@@ -315,3 +316,12 @@ class UsersTestCase(CourseTestCase):
             CourseEnrollment.is_enrolled(self.ext_user, self.course.id),
             'User ext_user should have been enrolled in the course'
         )
+
+    def test_invalid_course_id(self):
+        """ Asserts that Http404 is raised when the course id is not valid. """
+        wrong_url = reverse_course_url(
+            'course_team_handler', "/some.invalid.key/TTT/CS01/2015_T0",
+            kwargs={'email': self.ext_user.email}
+        )
+        with self.assertRaises(Http404):
+            self.client.get(wrong_url)

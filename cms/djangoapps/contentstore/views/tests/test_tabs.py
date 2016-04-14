@@ -10,6 +10,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.django import modulestore
+from django.http import Http404
 
 
 class TabsPageTests(CourseTestCase):
@@ -190,6 +191,13 @@ class TabsPageTests(CourseTestCase):
         self.assertIn('<span class="sr">Duplicate this component</span>', html)
         self.assertIn('<span class="sr">Delete this component</span>', html)
         self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle action"></span>', html)
+
+    def test_invalid_course_id(self):
+        """ Asserts that Http404 is raised when the course id is not valid. """
+        invalid_tab_url = reverse_course_url('tabs_handler', "/some.invalid.key/TTT/CS01/2015_T0")
+        with self.assertRaises(Http404):
+            self.client.get(invalid_tab_url)
+
 
 
 class PrimitiveTabEdit(ModuleStoreTestCase):
