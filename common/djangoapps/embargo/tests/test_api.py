@@ -238,9 +238,11 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp('embargo')
+        super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
 
     def tearDown(self):

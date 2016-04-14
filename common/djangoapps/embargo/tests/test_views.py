@@ -32,9 +32,11 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
 
     """
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(CourseAccessMessageViewTest, self).setUp('embargo')
+        super(CourseAccessMessageViewTest, self).setUp()
 
     @ddt.data(*messages.ENROLL_MESSAGES.keys())
     def test_enrollment_messages(self, msg_key):

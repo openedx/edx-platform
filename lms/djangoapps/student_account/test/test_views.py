@@ -62,8 +62,10 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
     INVALID_KEY = u"123abc"
 
+    URLCONF_MODULES = ['student_accounts.urls']
+
     def setUp(self):
-        super(StudentAccountUpdateTest, self).setUp("student_account.urls")
+        super(StudentAccountUpdateTest, self).setUp()
 
         # Create/activate a new account
         activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -213,9 +215,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
+    URLCONF_MODULES = ['embargo']
+
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
+        super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # For these tests, three third party auth providers are enabled by default:
         self.configure_google_provider(enabled=True)

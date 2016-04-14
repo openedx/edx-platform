@@ -32,6 +32,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
+    URLCONF_MODULES = ['embargo']
 
     @classmethod
     def setUpClass(cls):
@@ -42,7 +43,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp('embargo')
+        super(EnrollmentTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1
