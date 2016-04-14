@@ -67,7 +67,7 @@ site_status_msg = get_site_status_msg(course_id)
       <%block name="navigation_global_links_authenticated">
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
           <li class="nav-global-01">
-            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+            <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
           </li>
         % endif
         % if show_program_listing:
@@ -145,7 +145,7 @@ site_status_msg = get_site_status_msg(course_id)
         % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
             <li class="nav-global-05">
-              <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
+              <a class="cta cta-discovery" href="/courses">${_("Explore courses")}</a>
             </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
