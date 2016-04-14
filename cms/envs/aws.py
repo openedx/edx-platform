@@ -12,6 +12,7 @@ This is the default template for our main set of AWS servers.
 # pylint: disable=invalid-name
 
 import json
+import importlib
 
 from .common import *
 
@@ -210,6 +211,18 @@ STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME', 'Studio')
 TENDER_DOMAIN = ENV_TOKENS.get('TENDER_DOMAIN', TENDER_DOMAIN)
 TENDER_SUBDOMAIN = ENV_TOKENS.get('TENDER_SUBDOMAIN', TENDER_SUBDOMAIN)
 
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+PROGRESS_DETACHED_APPS = ['group_project_v2']
+for app in PROGRESS_DETACHED_APPS:
+    try:
+        app_config = importlib.import_module('.app_config', app)
+    except ImportError:
+        continue
+
+    detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
+    PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
+
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
@@ -226,7 +239,6 @@ if FEATURES.get('AUTH_USE_CAS'):
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
-        import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
             importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
             CAS_ATTRIBUTE_CALLBACK['function']
