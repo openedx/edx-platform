@@ -103,12 +103,13 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
+        <p>${_("You are not enrolled in any courses yet.")}</p>
 
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <a href="${marketing_link('COURSES')}">
-            ${_("Find courses now!")}
+            ${_("Explore courses")}
           </a>
+
         %endif
       </section>
     % endif
