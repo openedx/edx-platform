@@ -496,6 +496,11 @@ def render_html_view(request, user_id, course_id):
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        raise Http404
+
     preview_mode = request.GET.get('preview', None)
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
