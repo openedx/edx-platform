@@ -3151,6 +3151,7 @@ class FormulaResponse(LoncapaResponse):
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
+    multi_device_support = True
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
