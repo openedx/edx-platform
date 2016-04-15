@@ -45,6 +45,7 @@ class BaseComponentEditorView(PageObject):
         Clicks save button.
         """
         click_css(self, 'a.action-save')
+        self.wait_for_ajax()
 
     def cancel(self):
         """

@@ -351,6 +351,9 @@ class XBlockWrapper(PageObject):
         """
         Returns the text content of the xblock as displayed on the container page.
         """
+        self.wait_for_ajax()
+        self.wait_for_element_visibility(self._bounded_selector('.xblock-student_view' + ' p'), 'message')
+        #from nose.tools import set_trace; set_trace()
         return self.q(css=self._bounded_selector('.xblock-student_view'))[0].text
 
     @property

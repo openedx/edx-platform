@@ -57,8 +57,14 @@ class HtmlComponentEditorView(ComponentEditorView):
         self.q(css='[aria-label="Edit HTML"]').click()
         self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
 
+        self.wait_for_ajax()
+        self.wait_for_element_visibility('#mce_28-body iframe', 'element is visible')
+
+        button = self.q(css='#mce_28-body iframe')[0]
+        ActionChains(self.browser).move_to_element(button).send_keys_to_element(button, content).perform()
+
         #Focus goes to the editor by default
-        ActionChains(self.browser).send_keys([Keys.CONTROL, 'a']).\
-            key_up(Keys.CONTROL).send_keys(content).perform()
+        #ActionChains(self.browser).send_keys([Keys.CONTROL, 'a']).\
+        #    key_up(Keys.CONTROL).send_keys(content).perform()
 
         self.q(css='.mce-foot .mce-primary').click()
