@@ -24,17 +24,6 @@ from status.status import get_site_status_msg
     </%block>
 % endif
 
-<%
-if uses_pattern_library:
-    main_nav_menu_classlist = "list-inline"
-    register_btn_classlist = "btn-neutral"
-    login_btn_classlist = "btn-brand"
-else:
-    main_nav_menu_classlist = "nav-global"
-    register_btn_classlist = "cta cta-register nav-courseware-button"
-    login_btn_classlist = "cta cta-login"
-%>
-
 <%block>
 <%
 try:
@@ -54,12 +43,8 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-% if uses_pattern_library:
 <header class="header-global ${"slim" if course and not disable_courseware_header else ""}" aria-label="Main" role="banner">
-% else:
-<header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
-% endif
-  <div class="${"rwd" if responsive else ""} ${"wrapper-header" if uses_pattern_library else "nav-wrapper"} nav-container">
+  <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
@@ -81,7 +66,7 @@ site_status_msg = get_site_status_msg(course_id)
       % if not course or disable_courseware_header:
         % if not nav_hidden or show_program_listing:
           <nav aria-label="Main" class="nav-main">
-            <ul class="left ${main_nav_menu_classlist} authenticated">
+            <ul class="left list-inline nav-global authenticated">
               % if not nav_hidden:
                 <%block name="navigation_global_links_authenticated">
                   <li class="nav-global-01">
@@ -130,20 +115,20 @@ site_status_msg = get_site_status_msg(course_id)
           <div class="nav-courseware-01">
             % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-                <a class="${login_btn_classlist}" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+                <a class="btn-brand btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
               % else:
-                <a class="${login_btn_classlist}" href="/login${login_query()}">${_("Sign in")}</a>
+                <a class="btn-brand btn-login" href="/login${login_query()}">${_("Sign in")}</a>
               % endif
             % endif
           </div>
           % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
               <div class="nav-courseware-02">
-                <a class="${register_btn_classlist}" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+                <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </div>
             % else:
               <div class="nav-courseware-02">
-                <a class="${register_btn_classlist}" href="/register">${_("Register")}</a>
+                <a class="btn-neutral btn-register" href="/register">${_("Register")}</a>
               </div>
             % endif
           % endif

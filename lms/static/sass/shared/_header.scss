@@ -1,7 +1,7 @@
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
-header.global {
+.header-global {
   @extend %ui-depth1;
   border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
@@ -327,7 +327,7 @@ header.global {
     li, div {
       display: inline-block;
 
-      .cta {
+      .btn {
         @extend %m-btn-primary;
       }
     }
@@ -337,7 +337,7 @@ header.global {
 // marketing site design syncing
 .view-register, .view-login, .view-passwordreset {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }
@@ -357,7 +357,7 @@ header.global {
 // ====================
 
 // CASE: marketing/course discovery
-header.global-new {
+.header-global {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
@@ -846,13 +846,13 @@ header.global-new {
   }
 }
 
-.view-register header.global-new .cta-register {
+.view-register .header-global .btn-register {
   text-decoration: none;
   color: $courseware-hover-color;
   border-bottom-color: $courseware-border-bottom-color;
 }
 
-.view-login header.global-new .cta-login {
+.view-login .header-global .btn-login {
   text-decoration: none;
   color: $courseware-hover-color;
 }
@@ -860,7 +860,7 @@ header.global-new {
 // marketing site design syncing
 .view-register, .view-login {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }
