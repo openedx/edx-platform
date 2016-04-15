@@ -207,7 +207,9 @@ var getConfig = function (config, useRequireJs) {
 
         // Concurrency level
         // how many browser should be started simultaneous
-        concurrency: Infinity
+        concurrency: Infinity,
+
+        browserNoActivityTimeout: 50000
     };
 };
 
