@@ -112,11 +112,11 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onShowCaptions: function () {
-            this.log('show_closed_captions', {current_time: this.getCurrentTime()});
+            this.log("edx.video.closed_captions.shown");
         },
 
         onHideCaptions: function () {
-            this.log('hide_closed_captions', {current_time: this.getCurrentTime()});
+            this.log("edx.video.closed_captions.hidden");
         },
 
         onShowTranscript: function () {

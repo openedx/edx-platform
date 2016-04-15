@@ -83,10 +83,13 @@ NAME_TO_EVENT_TYPE_MAP = {
     'edx.video.seeked': 'seek_video',
     'edx.video.transcript.shown': 'show_transcript',
     'edx.video.transcript.hidden': 'hide_transcript',
-    'edx.video.closed_captions.shown': 'show_closed_captions',
-    'edx.video.closed_captions.hidden': 'hide_closed_captions',
-    'edx.video.language_menu.shown': 'video_show_cc_menu',
-    'edx.video.language_menu.hidden': 'video_hide_cc_menu'
+
+    # Needs to add the following, but 'event' is seen as a str with them
+    # Mobile team?
+    # 'edx.video.closed_captions.shown': 'edx.video.closed_captions.shown',
+    # 'edx.video.closed_captions.hidden': 'edx.video.closed_captions.hidden',
+    # 'edx.video.language_menu.shown': 'video_show_cc_menu',
+    # 'edx.video.language_menu.hidden': 'video_hide_cc_menu',
 }
 
 
@@ -114,6 +117,14 @@ class VideoEventProcessor(object):
         # ever be emitted.
         if name == "edx.video.seeked":
             event['name'] = "edx.video.position.changed"
+
+        # Convert to the new namespace
+        # Mobile team?
+        if name == "video_show_cc_menu":
+            event['name'] = "edx.video.language_menu.shown"
+
+        if name == "video_hide_cc_menu":
+            event['name'] = "edx.video.language_menu.hidden"
 
         event['event_type'] = NAME_TO_EVENT_TYPE_MAP[name]
 
