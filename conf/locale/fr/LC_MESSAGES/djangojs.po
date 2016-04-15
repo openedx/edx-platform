@@ -98,7 +98,7 @@
 # Marie-Andrée Coulombe <coulombe.ma@gmail.com>, 2014
 # moocit-france <contact@moocit.fr>, 2015-2016
 # Olivier Lebon <oliv.lebon@wanadoo.fr>, 2015
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # Sébastien Viallemonteil <sebastien.viallemonteil@educagri.fr>, 2015
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#

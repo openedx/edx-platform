@@ -5413,7 +5413,7 @@ msgid ""
 msgstr ""
 "{platform_name} теперь предлагает финансовую помощь тем слушателям, которые хотят получит Подтвержденный сертификат, но не имеют возможности оплатить его стоимость. Отвечающие требованиям слушатели могут получить скидку до 90{percent_sign} от цены Подтвержденного сертификата.\n"
 "Для получения финансовой помощи, зарегистрируйтесь на курс как обычный слушатель, после чего заполните заявление. Следует заметить, что вы должны заполнять отдельные заявления для каждого курса, на который вы зарегистрированны.\n"
-"Мы в свою очередь используем предоставленную вами информацию для рассмотрения вашей просьбы о финансовой помощи, а также для дальнейшего развития нашей программы финансовой помощи."
+"Мы, в свою очередь, используем предоставленную вами информацию для рассмотрения вашей просьбы о финансовой помощи, а также для дальнейшего развития нашей программы финансовой помощи."
 
 #: lms/djangoapps/courseware/views.py
 msgid "Annual Household Income"
@@ -6283,8 +6283,8 @@ msgid ""
 "in username/email and then press \"Add to Exception List\" button."
 msgstr ""
 "Поле «Имя пользователя/электронная почта» является обязательным и не может "
-"быть пустым. Пожалуйста, заполните поле «Имя пользователя/электронная почта»"
-" после чего нажмите кнопку «Добавить в список исключений»."
+"быть пустым. Пожалуйста, заполните поле «Имя пользователя/электронная "
+"почта», после чего нажмите кнопку «Добавить в список исключений»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6298,15 +6298,15 @@ msgstr ""
 msgid ""
 "{user} does not exist in the LMS. Please check your spelling and retry."
 msgstr ""
-"{user} не существует в системе. Пожалуйста, проверьте правильность ввода и "
-"повторите."
+"{user} не зарегистрирован в системе. Пожалуйста, проверьте правильность "
+"ввода и повторите попытку."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "{user} is not enrolled in this course. Please check your spelling and retry."
 msgstr ""
-"{user} не зарегистрирован на этот курс. Пожалуйста, проверьте правильность "
-"ввода и повторите."
+"{user} не записан на этот курс. Пожалуйста, проверьте правильность ввода и "
+"повторите попытку."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid Json data, Please refresh the page and then try again."
@@ -8545,7 +8545,7 @@ msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "New Password"
-msgstr ""
+msgstr "Новый пароль"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Confirm Password"
@@ -9075,7 +9075,7 @@ msgstr "Эта версия была удалена."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Если восстановить эту версию, статья будет помечена как удалённая."
 
-#: cms/templates/index.html
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Denied"
 msgstr "Отказано"
 
@@ -9366,8 +9366,6 @@ msgstr "Путь к JS-коду приложения авторизации"
 msgid ""
 "This value is required in order to enable the Studio authoring interface."
 msgstr ""
-"Требуется заполнить это значение для включения интерфейса авторизации "
-"Studio."
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's CSS"
@@ -9379,7 +9377,7 @@ msgstr "Разрешить панель управления обучающег�
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Studio Authoring Interface"
-msgstr "Разрешить интерфейс авторизации Studio"
+msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
@@ -9513,7 +9511,7 @@ msgstr "Мария Иванова"
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Your legal name, used for any certificates you earn."
-msgstr "Ваша Фамилия, Имя, Отчество для официальных сертификатов."
+msgstr "Ваше полное имя для официальных сертификатов."
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's public username.
@@ -10152,11 +10150,11 @@ msgstr ""
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
+msgstr "Нет учетной записи {studio_name}? Зарегистрируйтесь!"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
+msgstr "Информация, необходимая для входа в {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
@@ -12388,10 +12386,10 @@ msgid ""
 "qualify for academic credit, advance your career, or strengthen your school "
 "applications."
 msgstr ""
-"Получите право на зачётные единицы и подтвердите ваши знания и навыки с "
-"помощью верифицированного сертификата. Используйте его в вашем учебном "
-"заведении, при устройстве на новую работу или улучшении вашей карьеры на "
-"текущем месте."
+"Получите право на получение зачётных единиц и продемонстрируйте свои новые "
+"знания и навыки с помощью подтверждённого сертификата. Используйте его в "
+"вашем учебном заведении, при устройстве на новую работу или для карьерного "
+"роста на текущем месте."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -13753,7 +13751,7 @@ msgstr "Советуем вам поменять пароль."
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
 msgid "Sincerely yours,The {course_name} Team"
-msgstr "С уважением, Команда {course_name}"
+msgstr "С уважением, команда курса {course_name}"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for signing up for {platform_name}."
@@ -13782,14 +13780,14 @@ msgstr ""
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Activate Your {platform_name} Account"
-msgstr "Активируйте свою учётную запись на {platform_name} "
+msgstr "Активация учётной записи {platform_name} "
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "Dear {full_name}"
-msgstr "Уважаемый/уважаемая {full_name}"
+msgstr "Здравствуйте, {full_name}!"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid ""
@@ -13803,20 +13801,19 @@ msgstr ""
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
-"Чтобы начать просматривать материалы курса, пожалуйста, посетите сайт "
+"Чтобы приступить к просмотру материалов курса, пожалуйста, посетите сайт "
 "{course_url}"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
 msgstr ""
-"Посетите сайт {course_about_url}, чтобы присоединиться к курсу и начать "
+"Перейдите по ссылке {course_about_url}, чтобы записаться на курс и начать "
 "бета-тестирование."
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {site_name} to enroll in the course and begin the beta test."
 msgstr ""
-"Посетите {site_name}, чтобы зарегистрироваться и начать бета тестирование "
-"курса."
+"Посетите {site_name}, чтобы записаться на курс и начать бета-тестирование."
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_allowedmessage.txt
@@ -13829,7 +13826,7 @@ msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
-msgstr "Вас приглашают на бета-тестирование курса {course_name}"
+msgstr "Приглашение на бета-тестирование курса {course_name}"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -13874,7 +13871,7 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The items in your order are:"
-msgstr "Предметы в вашем заказе:"
+msgstr "Состав заказа:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -14013,10 +14010,9 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us immediately. Contact information is listed at:"
 msgstr ""
-"Это подтверждение смены электронного адреса, связанного с вашей учётной "
-"записью на {platform_name}, с {old_email} на {new_email}. Если вы не делали "
-"такого запроса, пожалуйста, свяжитесь с нами незамедлительно.  Контактную "
-"информацию вы найдёте здесь:"
+"Подтверждаем смену электронного адреса, связанного с вашей учётной записью "
+"на {platform_name}, с {old_email} на {new_email}. Если вы не делали такого "
+"запроса, пожалуйста, свяжитесь с нами по адресу:"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -14054,7 +14050,7 @@ msgstr "Запрос на смену электронного адреса в у
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "Dear student,"
-msgstr "Уважаемый слушатель,"
+msgstr "Уважаемый слушатель!"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -14093,7 +14089,7 @@ msgid ""
 "{course_name} listed on your dashboard."
 msgstr ""
 "Как только вы зарегистрируетесь и активируете свою учётную запись, "
-"{course_name} отобразится на вашей панели управления."
+"{course_name} появится в вашей панели управления."
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -14109,15 +14105,15 @@ msgstr "Затем вы сможете записаться на курс {cours
 
 #: lms/templates/emails/enroll_email_allowedsubject.txt
 msgid "You have been invited to register for {course_name}"
-msgstr "Вы получили приглашение зарегистрироваться на курс {course_name}"
+msgstr "Приглашение записаться на курс {course_name}"
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid ""
 "You have been enrolled in {course_name} at {site_name} by a member of the "
 "course staff. The course should now appear on your {site_name} dashboard."
 msgstr ""
-"Вы были зарегистрированы в {course_name} на {site_name} в качестве "
-"сотрудника курса. Курс должен сейчас появиться на вашей {site_name} панели."
+"Вы записаны на курс «{course_name}» на {site_name} сотрудником курса. Курс "
+"теперь должен появиться на вашей {site_name} панели управления."
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -14127,7 +14123,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
-msgstr "Вы зарегистрированы на курсе {course_name}"
+msgstr "Вы записаны на курс {course_name}"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
@@ -14334,7 +14330,7 @@ msgstr "Это не повлияет на ваши остальные курсы
 
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
-msgstr "Вы были удалены из бета-тестеров курса {course_name}"
+msgstr "Исключение из бета-тестерования курса {course_name}"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -14395,15 +14391,15 @@ msgstr "С благодарностью,"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
-msgstr "Уважаемый Cтудент,"
+msgstr "Уважаемый слушатель!"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid ""
 "You have been un-enrolled from course {course_name} by a member of the "
 "course staff. Please disregard the invitation previously sent."
 msgstr ""
-"Вы были отчислены с курса {course_name} решением сотрудника курса. Просим "
-"считать ранее высланное приглашение аннулированным."
+"Вы были отчислены с курса {course_name} сотрудником курса. Просим считать "
+"ранее высланное приглашение аннулированным."
 
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid ""
@@ -14417,7 +14413,7 @@ msgstr ""
 
 #: lms/templates/emails/unenroll_email_subject.txt
 msgid "You have been un-enrolled from {course_name}"
-msgstr "Ваша регистрация на курсе {course_name} была отменена"
+msgstr "Отмена записи на курс {course_name}"
 
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html
@@ -14473,7 +14469,7 @@ msgstr "Заявление на финансовую помощь"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "A Note to Learners"
-msgstr "Заметки для слушателей"
+msgstr "Примечание для слушателей"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Dear edX Learner,"
@@ -14485,7 +14481,7 @@ msgid ""
 "financial circumstances a chance to earn a Verified Certificate upon "
 "successful completion of an edX course."
 msgstr ""
-"Финансовая помощь - это программа, созданная нами для того, чтобы дать "
+"Финансовая помощь — это программа, созданная нами для того, чтобы дать "
 "возможность получения Подтверждённого сертификата об успешном прохождении "
 "курсов edX любому слушателю, независимо от его финансового положения."
 
@@ -14519,9 +14515,9 @@ msgid ""
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
 msgstr ""
-"Если ваше заявление будет подтверждено, мы объясним вам как удостоверить "
-"вашу личность на сайте edx.org для того, чтобы вы смогли начать обучаться на"
-" курсе edX."
+"Если ваше заявление будет принято, мы объясним вам, как удостоверить вашу "
+"личность на сайте edx.org для того, чтобы вы смогли начать обучаться на "
+"курсе edX."
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
@@ -14634,8 +14630,8 @@ msgid ""
 " mode to on-demand generation."
 msgstr ""
 "Когда вы будете готовы к созданию сертификатов для вашего курса, нажмите "
-"«Создать Сертификаты». Вам не обязательно это делать,<br/> если вы вы "
-"поставили режим сертификата на «По требованию»."
+"«Создать Сертификаты». Вам не обязательно это делать,<br/> если вы выставили"
+" режим выдачи сертификатов «По требованию»."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -14664,18 +14660,19 @@ msgid ""
 "To regenerate certificates for your course, choose the learners who will "
 "receive regenerated certificates and click <br/> Regenerate Certificates."
 msgstr ""
-"Для повторного создания сертификатов выберите учащихся, для которых эти "
+"Для повторного создания сертификатов выберите слушателей, для которых эти "
 "сертификаты будут заново созданы, и нажмите кнопку <br/> «Повторно создать "
 "сертификаты»."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid ""
 "Regenerate for learners who have already received certificates. ({count})"
-msgstr "Создать повторно для слушателей уже получивших сертификаты. ({count})"
+msgstr ""
+"Создать повторно для слушателей, уже получивших сертификаты. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners who have not received certificates. ({count})"
-msgstr "Создать повторно для слушателей не получивших сертификаты. ({count})"
+msgstr "Создать повторно для слушателей, не получивших сертификаты. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
@@ -19653,7 +19650,7 @@ msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
 "signed up for {studio_name} and have an active account."
 msgstr ""
-"лагодаря возможности добавлять новых участников в команду создание курсов "
+"Благодаря возможности добавлять новых участников в команду создание курсов "
 "становится коллективным процессом. Пользователи должны быть зарегистрированы"
 " в {studio_name} и иметь действительную учётную запись."
 
@@ -20737,8 +20734,8 @@ msgstr ""
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid "To grant or deny this request, use the course creator admin table."
 msgstr ""
-"Чтобы одобрить или отклонить этот запрос, используйте администраторскую "
-"таблицу создателя курса."
+"Чтобы принять или отклонить данную заявку, воспользуйтесь таблицей "
+"создателей курсов в разделе администрирования:"
 
 #: cms/templates/emails/course_creator_denied.txt
 msgid ""

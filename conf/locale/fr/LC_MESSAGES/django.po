@@ -82,7 +82,7 @@
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Pierre-Emmanuel Colas <pecolas44@gmail.com>, 2015
 # qcappart <quentin.c@swing.be>, 2014
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # SLOG90 <slog90@gmail.com>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
@@ -119,7 +119,7 @@
 # madmarsu <madmarsu@gmail.com>, 2014
 # Maghjina <Maghjina@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
-# Minusc <olegine@gmail.com>, 2015
+# Emmanuel Olégine <olegine@gmail.com>, 2015
 # moocit-france <contact@moocit.fr>, 2015-2016
 # Manjari <mringuet@gmail.com>, 2014
 # Ramarohetra Malalatiana <mtiana8@gmail.com>, 2014
@@ -129,7 +129,7 @@
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
 # qcappart <quentin.c@swing.be>, 2014
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
@@ -159,7 +159,7 @@
 # moocit-france <contact@moocit.fr>, 2015
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014

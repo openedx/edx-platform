@@ -261,7 +261,12 @@ msgstr "ID del video"
 msgid "Status"
 msgstr "Estado"
 
-#: cms/templates/index.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Pending"
 msgstr "Pendiente"
@@ -3113,13 +3118,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Bypass Course Home"
-msgstr ""
+msgstr "Circunvalar Inicio de Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Bypass the course home tab when students arrive from the dashboard, sending "
 "them directly to course content."
 msgstr ""
+"Circunvalar la pestaña de inicio del curso cuando los estudiantes llegan "
+"desde el panel principal, guiándolos directamente a los contenidos del "
+"curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
@@ -4627,6 +4635,8 @@ msgid ""
 "A CCX can only be created on this course through an external service. "
 "Contact a course admin to give you access."
 msgstr ""
+"Un CCX sólo puede ser creado con este curso por medio de un servicio "
+"externo. Comuníquese con un administrador del curso para pedir acceso."
 
 #: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
@@ -5771,7 +5781,7 @@ msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Invalid JSON response received from notes api."
-msgstr ""
+msgstr "Respuesta JSON inválida recibida de los apuntes api."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Incorrect data received from notes api."
@@ -6088,6 +6098,8 @@ msgid ""
 "The detailed enrollment report is being created. To view the status of the "
 "report, see Pending Tasks below."
 msgstr ""
+"El reporte detallado de inscripciones está siendo creado. Para ver el estado"
+" del reporte, vea Tareas Pendientes abajo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6217,6 +6229,8 @@ msgid ""
 "The problem grade report is being created. To view the status of the report,"
 " see Pending Tasks below."
 msgstr ""
+"El reporte de calificaciones de problemas está siendo creado. Puede ver el "
+"estado del reporte en la sección de Tareas Pendientes abajo."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -8562,7 +8576,7 @@ msgstr "Tu reseteo de contraseña está completado"
 
 #: lms/templates/registration/password_reset_complete.html
 msgid "Password Reset Complete"
-msgstr ""
+msgstr "Restablecimiento de Contraseña Completado "
 
 #: lms/templates/registration/password_reset_complete.html
 #, python-format
@@ -8571,6 +8585,9 @@ msgid ""
 "                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
 "                "
 msgstr ""
+"\n"
+"                    Su contraseña ha sido restablecida. %(link_start)sInicie sesión.%(link_end)s\n"
+"                "
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -8578,42 +8595,45 @@ msgid ""
 "\n"
 "    Reset Your %(platform_name)s Password\n"
 msgstr ""
+"\n"
+"    Restablecer su %(platform_name)s Contraseña\n"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Error Resetting Password"
-msgstr ""
+msgstr "Error al Restablecer Contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "You must enter and confirm your new password."
-msgstr ""
+msgstr "Debe ingresar y confirmar su nueva contraseña."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "The text in both password fields must match."
-msgstr ""
+msgstr "El texto en los dos campos de contraseña deben coincidir. "
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your Password"
-msgstr ""
+msgstr "Restablecer su Contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Enter and confirm your new password."
-msgstr ""
+msgstr "Ingrese y confirme su nueva contraseña."
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "New Password"
-msgstr ""
+msgstr "Nueva Contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Confirm Password"
-msgstr ""
+msgstr "Confirmar Contraseña"
 
+#: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
 msgstr "Restablecer mi contraseña"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
-msgstr ""
+msgstr "Enlace de restablecimiento de contraseña inválido"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
@@ -9135,25 +9155,25 @@ msgstr "Esta revisión se ha eliminado."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "La restauración de esta revisión marcará el artículo como eliminado."
 
-#: cms/templates/index.html
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Denied"
-msgstr "Denegada"
+msgstr "Denegado"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Approved"
-msgstr ""
+msgstr "Aprobado"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Status of this API access request"
-msgstr ""
+msgstr "Estado de esta solicitud de acceso a la API"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "The URL of the website associated with this API user."
-msgstr ""
+msgstr "El URL del sitio web asociado con este usuario de la API."
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "The reason this user wants to access the API."
-msgstr ""
+msgstr "La razón por la cual este usuario quiere acceder a la API."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
@@ -9259,7 +9279,7 @@ msgstr "Elegibilidad para créditos del curso"
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "You are eligible for credit from {providers_string}"
-msgstr ""
+msgstr "Usted es elegible para recibir créditos de {providers_string}"
 
 #. Translators: The join of two university names (e.g., Harvard and MIT).
 #: openedx/core/djangoapps/credit/email_utils.py
@@ -9421,7 +9441,7 @@ msgstr "No se suministró una foto de perfil"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "API Version"
-msgstr "Versión IPA"
+msgstr "Versión API"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
@@ -12640,7 +12660,7 @@ msgstr "Añadir {course_name} al carrito <span>({price} USD)</span>"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
-msgstr "Inscrito en {course_name}"
+msgstr "Inscribirse en {course_name}"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"

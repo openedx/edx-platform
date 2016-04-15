@@ -116,7 +116,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-03-30 19:38+0000\n"
-"PO-Revision-Date: 2016-04-06 16:22+0000\n"
+"PO-Revision-Date: 2016-04-07 16:58+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -2234,7 +2234,7 @@ msgstr "%(field)s вмещает до %(count)d символов."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr "Пожалуйста, введите %(field)s."
+msgstr "Пожалуйста, заполните поле %(field)s."
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2947,8 +2947,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
-"При создании отчета по заданию с ответами в свободной форме возникла ошибка."
-" Пожалуйста, попробуйте еще раз."
+"При создании отчёта по заданиям с ответами в свободной форме возникла "
+"ошибка. Пожалуйста, попробуйте ещё раз."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3763,7 +3763,7 @@ msgstr "Имя пользователя/адрес электронной поч
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr "Задания с загруженными файлами. Нажмите «+» для просмотра."
+msgstr "В загруженном файле обнаружены ошибки. Нажмите «+» для просмотра."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
@@ -6738,7 +6738,7 @@ msgstr "Заявление на финансовую помощь"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Unable to submit application"
-msgstr "Отправка не удалась"
+msgstr "Не удалось отправить заявление"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
@@ -6769,14 +6769,14 @@ msgstr "Назад к {platform} FAQ"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
-msgstr "Подать заявку"
+msgstr "Подать заявление"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr ""
-"Благодарим вас за подачу заявления на грант по программе {course_name}! Вы "
+"Благодарим вас за подачу заявления на грант по курсу {course_name}! Вы "
 "получите ответ через 2-4 рабочих дня."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -6791,11 +6791,11 @@ msgid ""
 "include an optional note describing the reason for the exception in the "
 "second comma separated field."
 msgstr ""
-"Загрузите файл исключений формата .csv (текст, разделённый запятыми) который"
-" содержит имена пользователей или адреса их электронной почты. Включите имя "
-"пользователя или адрес электронной почты в первое поле. Вы можете добавить "
-"необязательное пояснение с описанием причины для исключения во второе поле "
-"после запятой."
+"Загрузите файл исключений формата .csv (текст, разделённый запятыми), "
+"который содержит имена пользователей или адреса их электронной почты. "
+"Включите имя пользователя или адрес электронной почты в первое поле. Вы "
+"можете добавить необязательное пояснение с описанием причины для исключения "
+"во второе поле после запятой."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
@@ -6857,8 +6857,8 @@ msgid ""
 "Enter the username or email address of each learner that you want to add as "
 "an exception."
 msgstr ""
-"Введите имя пользователя или адрес электронной почты, для которого вы хотите"
-" создать исключение."
+"Введите имя пользователя или адрес электронной почты, которого вы хотите "
+"добавить в список исключений."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
@@ -6886,11 +6886,11 @@ msgstr "Адрес электронной почты пользователя"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Exception Granted"
-msgstr "Исключения созданы"
+msgstr "Исключение добавлено"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Certificate Generated"
-msgstr "Cоздано сертификатов"
+msgstr "Сертификат создан"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
@@ -7740,7 +7740,7 @@ msgstr "Учётная запись не активирована"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
 msgid "You are enrolling in %(courseName)s"
-msgstr "Вы зачислены на курс %(courseName)s"
+msgstr "Вы записываетесь на курс: %(courseName)s"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -7756,7 +7756,7 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
-msgstr "Пожалуйста, проверьте почту - вам отправлена ссылка активации."
+msgstr "Пожалуйста, проверьте почту - вам отправлена ссылка для активации."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -7791,15 +7791,17 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "Your ID must be a government-issued photo ID that clearly shows your face."
-msgstr "Вы должны предъявить паспорт."
+msgstr ""
+"Вы должны предъявить государственное удостоверение личности с хорошо "
+"различимой фотографией."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "You will use your webcam to take a picture of your face and of your "
 "government-issued photo ID."
 msgstr ""
-"Используя веб-камеру сделайте снимок вашего лица и развернутого "
-"удостоверения личности: паспорта или иного документа с фотографией."
+"Используя веб-камеру, сделайте снимок вашего лица и разворота удостоверения "
+"личности: паспорта или иного документа с фотографией."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8203,7 +8205,7 @@ msgstr ""
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
 msgid "Course Outline"
-msgstr ""
+msgstr "Структура курса"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
