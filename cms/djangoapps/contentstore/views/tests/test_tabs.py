@@ -199,7 +199,6 @@ class TabsPageTests(CourseTestCase):
             self.client.get(invalid_tab_url)
 
 
-
 class PrimitiveTabEdit(ModuleStoreTestCase):
     """Tests for the primitive tab edit data manipulations"""
 

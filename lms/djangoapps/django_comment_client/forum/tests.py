@@ -1318,8 +1318,9 @@ class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
         request.user = self.student
         with self.assertRaises(Http404):
             views.inline_discussion(
-                request, self.course.id.to_deprecated_string(), self.course.discussion_topics['General']['id']
-        )
+                request, unicode(self.course.id), self.course.discussion_topics['General']['id']
+            )
+
 
 class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
     @classmethod
