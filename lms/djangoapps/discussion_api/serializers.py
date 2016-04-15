@@ -290,6 +290,7 @@ class CommentSerializer(_ContentSerializer):
     endorsed_by = serializers.SerializerMethodField()
     endorsed_by_label = serializers.SerializerMethodField()
     endorsed_at = serializers.SerializerMethodField()
+    child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS

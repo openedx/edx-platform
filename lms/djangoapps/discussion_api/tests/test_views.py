@@ -884,6 +884,34 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         overrides.setdefault("course_id", unicode(self.course.id))
         return make_minimal_cs_thread(overrides)
 
+    def expected_response_comment(self, overrides=None):
+        """
+        create expected response data
+        """
+        response_data = {
+            "id": "test_comment",
+            "thread_id": self.thread_id,
+            "parent_id": None,
+            "author": self.author.username,
+            "author_label": None,
+            "created_at": "1970-01-01T00:00:00Z",
+            "updated_at": "1970-01-01T00:00:00Z",
+            "raw_body": "dummy",
+            "rendered_body": "<p>dummy</p>",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "children": [],
+            "editable_fields": ["abuse_flagged", "voted"],
+            "child_count": 0,
+        }
+        response_data.update(overrides or {})
+        return response_data
+
     def test_thread_id_missing(self):
         response = self.client.get(self.url)
         self.assert_response_correct(
@@ -918,27 +946,17 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "endorsed": False,
             "abuse_flaggers": [],
             "votes": {"up_count": 4},
-        }]
-        expected_comments = [{
-            "id": "test_comment",
-            "thread_id": self.thread_id,
-            "parent_id": None,
-            "author": self.author.username,
-            "author_label": None,
-            "created_at": "2015-05-11T00:00:00Z",
-            "updated_at": "2015-05-11T11:11:11Z",
-            "raw_body": "Test body",
-            "rendered_body": "<p>Test body</p>",
-            "endorsed": False,
-            "endorsed_by": None,
-            "endorsed_by_label": None,
-            "endorsed_at": None,
-            "abuse_flagged": False,
-            "voted": True,
-            "vote_count": 4,
-            "editable_fields": ["abuse_flagged", "voted"],
+            "child_count": 0,
             "children": [],
         }]
+        expected_comments = [self.expected_response_comment(overrides={
+            "voted": True,
+            "vote_count": 4,
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "created_at": "2015-05-11T00:00:00Z",
+            "updated_at": "2015-05-11T11:11:11Z",
+        })]
         self.register_get_thread_response({
             "id": self.thread_id,
             "course_id": unicode(self.course.id),
@@ -979,7 +997,6 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "id": self.thread_id,
             "course_id": unicode(self.course.id),
             "thread_type": "discussion",
-            "children": [],
             "resp_total": 10,
         }))
         response = self.client.get(
@@ -1058,6 +1075,52 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             {"field_errors": {
                 "endorsed": {"developer_message": "This field is required for question threads."}
             }}
+        )
+
+    def test_child_comments_count(self):
+        self.register_get_user_response(self.user)
+        response_1 = make_minimal_cs_comment({
+            "id": "test_response_1",
+            "thread_id": self.thread_id,
+            "user_id": str(self.author.id),
+            "username": self.author.username,
+            "child_count": 2,
+        })
+        response_2 = make_minimal_cs_comment({
+            "id": "test_response_2",
+            "thread_id": self.thread_id,
+            "user_id": str(self.author.id),
+            "username": self.author.username,
+            "child_count": 3,
+        })
+        thread = self.make_minimal_cs_thread({
+            "id": self.thread_id,
+            "course_id": unicode(self.course.id),
+            "thread_type": "discussion",
+            "children": [response_1, response_2],
+            "resp_total": 2,
+            "comments_count": 8,
+            "unread_comments_count": 0,
+
+        })
+        self.register_get_thread_response(thread)
+        response = self.client.get(self.url, {"thread_id": self.thread_id})
+        expected_comments = [
+            self.expected_response_comment(overrides={"id": "test_response_1", "child_count": 2}),
+            self.expected_response_comment(overrides={"id": "test_response_2", "child_count": 3}),
+        ]
+        self.assert_response_correct(
+            response,
+            200,
+            {
+                "results": expected_comments,
+                "pagination": {
+                    "count": 2,
+                    "next": None,
+                    "num_pages": 1,
+                    "previous": None,
+                }
+            }
         )
 
 
@@ -1139,6 +1202,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "vote_count": 0,
             "children": [],
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "child_count": 0,
         }
         response = self.client.post(
             self.url,
@@ -1227,6 +1291,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "vote_count": 0,
             "children": [],
             "editable_fields": [],
+            "child_count": 0,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1429,7 +1494,8 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "voted": False,
             "vote_count": 0,
             "abuse_flagged": False,
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "child_count": 0,
         }
 
         response = self.client.get(self.url)
