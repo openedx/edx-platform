@@ -47,3 +47,37 @@ def decode(token):
         exc_type = u'{}.{}'.format(exc.__class__.__module__, exc.__class__.__name__)
         log.exception("raised_invalid_token: exc_type=%r, exc_detail=%r", exc_type, exc.message)
         raise
+
+
+def asymmetric_decode(token):
+    """
+    Ensure InvalidTokenErrors are logged for diagnostic purposes, before
+    failing authentication using asymmetric keys for decoding.
+    """
+    if not settings.FEATURES.get('ENABLE_JWT_AUTH', False):
+        msg = 'JWT auth not supported.'
+        log.error(msg)
+        raise exceptions.AuthenticationFailed(msg)
+
+    options = {
+        'verify_exp': api_settings.JWT_VERIFY_EXPIRATION,
+        'require_exp': True,
+        'require_iat': True,
+    }
+
+    try:
+        return jwt.decode(
+            token,
+            settings.PUBLIC_RSA_KEY,
+            api_settings.JWT_VERIFY,
+            options=options,
+            leeway=api_settings.JWT_LEEWAY,
+            audience=api_settings.JWT_AUDIENCE,
+            issuer=api_settings.JWT_ISSUER,
+            algorithms=['RS512']
+        )
+    except jwt.InvalidTokenError as exc:
+        exc_type = u'{}.{}'.format(exc.__class__.__module__, exc.__class__.__name__)
+        log.exception("raised_invalid_token: exc_type=%r, exc_detail=%r", exc_type, exc.message)
+        raise
+
