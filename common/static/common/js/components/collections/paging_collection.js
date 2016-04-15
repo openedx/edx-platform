@@ -20,7 +20,12 @@
     'use strict';
     define(['backbone.paginator'], function (BackbonePaginator) {
         var PagingCollection = BackbonePaginator.requestPager.extend({
-            initialize: function () {
+            initialize: function (models, options) {
+                options || (options = {});
+                if (options.url) {
+                    this.url = options.url;
+                }
+
                 var self = this;
                 // These must be initialized in the constructor because otherwise all PagingCollections would point
                 // to the same object references for sortableFields and filterableFields.
