@@ -118,14 +118,13 @@ if Backbone?
     pinnedThreadsSortComparatorWithDate: (thread, ascending)->
       # if threads are pinned they should be displayed on top.
       # Unpinned will be sorted by their last activity date
-      threadCreatedTime = new Date(thread.get("created_at")).getTime()
-      threadCreatedTime = new Date(thread.get("last_activity_at")).getTime()
+      threadLastActivityAtTime = new Date(thread.get("last_activity_at")).getTime()
       if thread.get('pinned')
         #use tomorrow's date
         today = new Date();
-        preferredDate = new Date(today.getTime() + (24 * 60 * 60 * 1000) + threadCreatedTime);
+        preferredDate = new Date(today.getTime() + (24 * 60 * 60 * 1000) + threadLastActivityAtTime);
       else
-        preferredDate = threadCreatedTime
+        preferredDate = threadLastActivityAtTime
       if ascending
         preferredDate
       else
