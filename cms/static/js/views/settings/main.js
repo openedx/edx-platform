@@ -20,7 +20,8 @@ var DetailsView = ValidatingView.extend({
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
-        'click .action-upload-image': "uploadImage"
+        'click .action-upload-image': "uploadImage",
+        'click .action-upload-hero-image': "uploadHeroImage"
     },
 
     initialize : function(options) {
@@ -38,6 +39,13 @@ var DetailsView = ValidatingView.extend({
             $(this).hide();
         });
         this.$el.find('img.course-image').load(function() {
+            $(this).show();
+        });
+
+        this.$el.find('img.hero-image').error(function() {
+            $(this).hide();
+        });
+        this.$el.find('img.hero-image').load(function() {
             $(this).show();
         });
 
@@ -92,9 +100,14 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 
+        debugger;
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
+
+        var heroImageURL = this.model.get('hero_image_asset_path');
+        this.$el.find('#hero-image-url').val(heroImageURL);
+        this.$el.find('#hero-image').attr('src', heroImageURL);
 
         var pre_requisite_courses = this.model.get('pre_requisite_courses');
         pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
@@ -144,6 +157,7 @@ var DetailsView = ValidatingView.extend({
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
+        'hero_image_asset_path': 'hero-image-url',
         'pre_requisite_courses': 'pre-requisite-course',
         'entrance_exam_enabled': 'entrance-exam-enabled',
         'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
@@ -217,6 +231,17 @@ var DetailsView = ValidatingView.extend({
             clearTimeout(this.imageTimer);
             this.imageTimer = setTimeout(function() {
                 $('#course-image').attr('src', $(event.currentTarget).val());
+            }, 1000);
+            break;
+        case 'hero-image-url':
+            this.setField(event);
+            var url = $(event.currentTarget).val();
+            var image_name = _.last(url.split('/'));
+            this.model.set('hero_image_name', image_name);
+            // Wait to set the hero image src until the user stops typing
+            clearTimeout(this.imageTimer);
+            this.imageTimer = setTimeout(function() {
+                $('#hero-image').attr('src', $(event.currentTarget).val());
             }, 1000);
             break;
         case 'entrance-exam-enabled':
@@ -359,6 +384,7 @@ var DetailsView = ValidatingView.extend({
 
     uploadImage: function(event) {
         event.preventDefault();
+        debugger;
         var upload = new FileUploadModel({
             title: gettext("Upload your course image."),
             message: gettext("Files must be in JPEG or PNG format."),
@@ -375,6 +401,30 @@ var DetailsView = ValidatingView.extend({
                 self.model.set(options);
                 self.render();
                 $('#course-image').attr('src', self.model.get('course_image_asset_path'));
+            }
+        });
+        modal.show();
+    },
+
+    uploadHeroImage: function(event) {
+        event.preventDefault();
+        debugger;
+        var upload = new FileUploadModel({
+            title: gettext("Upload your Hero image."),
+            message: gettext("Files must be in JPEG or PNG format."),
+            mimeTypes: ['image/jpeg', 'image/png']
+        });
+        var self = this;
+        var modal = new FileUploadDialog({
+            model: upload,
+            onSuccess: function(response) {
+                var options = {
+                    'hero_image_name': response.asset.display_name,
+                    'hero_image_asset_path': response.asset.url
+                };
+                self.model.set(options);
+                self.render();
+                $('#hero-image').attr('src', self.model.get('hero_image_asset_path'));
             }
         });
         modal.show();

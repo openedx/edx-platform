@@ -58,6 +58,8 @@ class CourseDetails(object):
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.hero_image_name = ""
+        self.hero_image_asset_path = ""
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -215,6 +217,10 @@ class CourseDetails(object):
 
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']
+            dirty = True
+
+        if 'hero_image_name' in jsondict:
+            descriptor.hero_image = jsondict['hero_image_name']
             dirty = True
 
         if 'pre_requisite_courses' in jsondict \
