@@ -595,6 +595,18 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             else:
                 duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
+        asides_to_create = []
+        for aside in source_item.runtime.get_asides(source_item):
+            for field in aside.fields.values():
+                if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
+                    asides_to_create.append(aside)
+                    break
+
+        for aside in asides_to_create:
+            for field in aside.fields.values():
+                if field.scope not in (Scope.settings, Scope.content,):
+                    field.delete_from(aside)
+
         dest_module = store.create_item(
             user.id,
             dest_usage_key.course_key,
@@ -603,6 +615,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
             metadata=duplicate_metadata,
             runtime=source_item.runtime,
+            asides=asides_to_create
         )
 
         children_handled = False
