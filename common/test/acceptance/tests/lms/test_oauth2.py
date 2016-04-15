@@ -44,13 +44,27 @@ class OAuth2PermissionDelegationTests(WebAppTest):
         assert self.oauth_page.visit()
         self.oauth_page.cancel()
 
+        def check_redirect():
+            """
+            Checks that the page correctly redirects to a url with a
+            denied query param.
+            """
+            query = self._qs(self.browser.current_url)
+            return 'access_denied' in query['error']
+
+        def check_redirect_chrome():
+            """
+            Similar to `check_redirect`, but, due to a bug in ChromeDriver,
+            we use `self.browser.title` here instead of `self.browser.current_url`
+            """
+            query = self._qs(self.browser.title)
+            return 'access_denied' in query['error']
+
         # This redirects to an invalid URI. For chrome verify title, current_url otherwise
         if self.browser.name == 'chrome':
-            query = self._qs(self.browser.title)
-            self.assertIn('access_denied', query['error'])
+            self.oauth_page.wait_for(check_redirect_chrome, 'redirected to invalid URL (chrome)')
         else:
-            query = self._qs(self.browser.current_url)
-            self.assertIn('access_denied', query['error'])
+            self.oauth_page.wait_for(check_redirect, 'redirected to invalid URL')
 
     @flaky      # TODO, fix this: TNL-4190
     def test_accepting_redirects(self):
