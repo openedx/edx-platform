@@ -95,6 +95,7 @@ define([
                 view = new CollectionListView({
                     el: '.program-cards-container',
                     childView: ProgramCardView,
+                    context: {'xseriesUrl': '/programs'},
                     collection: programCollection
                 });
                 view.render();

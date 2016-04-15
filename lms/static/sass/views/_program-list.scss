@@ -86,3 +86,67 @@ $pl-button-color: #0079bc;
     @include span-columns(3);
   }
 }
+
+// CASE: empty list of programs
+  .empty-programs-message {
+    border: 3px solid $gray-l4;
+    background: $gray-l6;
+    padding: ($baseline*2) 0;
+    text-align: center;
+
+    p {
+      @include font-size(24);
+      color: $lighter-base-font-color;
+      margin-bottom: $baseline;
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
+    }
+
+    a {
+      @include box-sizing(border-box);
+      background-color: $blue;
+      border: 1px solid $blue;
+      box-shadow: 0 1px 8px 0 $shadow-l1;
+      color: $white;
+      font-family: $sans-serif;
+      display: inline-block;
+      letter-spacing: 1px;
+      margin-top: ($baseline/4);
+      margin-left: ($baseline/4);
+      padding: 15px 20px;
+
+      &:hover, &:focus {
+        background: $blue-l2;
+        text-decoration: none;
+      }
+    }
+
+    .find-xseries-programs {
+      @extend %btn-pl-black-base;
+      .action-xseries-icon {
+        @include float(left);
+        @include margin-right($baseline*0.4);
+
+        display: inline;
+        background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
+        background-color: transparent;
+
+        width: ($baseline*1.1);
+        height: ($baseline*1.1);
+      }
+      &:hover,
+      &:focus {
+
+        .action-xseries-icon {
+          @include float(left);
+          @include margin-right($baseline*0.4);
+
+          display: inline;
+          background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
+          background-color: transparent;
+
+          width: ($baseline*1.1);
+          height: ($baseline*1.1);
+        }
+      }
+    }
+  }
