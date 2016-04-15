@@ -21,7 +21,9 @@
                     this.render();
                 },
                 render: function() {
-                    if (this.context.certificatesData.length > 0) {
+                    var certificatesData = this.context.certificatesData || [];
+
+                    if (certificatesData.length) {
                         this.$el.html(this.tpl(this.context));
                     }
                 }
