@@ -25,13 +25,13 @@ from django.core.urlresolvers import reverse
             </div>
             <ul class="list-inline">
               <li>
-                <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
-              </li>
-              <li>
-                <a href="/courses">${_("Courses")}</a>
+                <a class="btn-brand btn-client" href="/register${login_query()}">${_("Register")}</a>
               </li>
               <li>
                 <a href="/login${login_query()}">${_("Sign in")}</a>
+              </li>
+              <li>
+                <a href="/courses">${_("Courses")}</a>
               </li>
             </ul>
           </div>

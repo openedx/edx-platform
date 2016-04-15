@@ -28,13 +28,26 @@ a{
 
 .btn-client{
   background-color: $brand-color !important;
-  box-shadow: inset 0 -3px 0 0 darken($brand-color, 15%) !important;
   border-color: $brand-color !important;
   font-weight: normal !important;
   color: $white !important;
   &:hover{
-    background-color: lighten($brand-color, 15%) !important;
+    background-color: lighten($brand-color, 10%) !important;
   }
+  &.btn-elevated{
+    box-shadow: inset 0 -3px 0 0 darken($brand-color, 15%) !important;
+  }
+}
+.btn-success{
+  background-color: $success-base !important;
+  color: $white !important;
+  border-color: $success-base;
+  &:hover{
+    background-color: lighten($success-base, 10%) !important;
+  }
+}
+.btn-block{
+  width: 100% !important;
 }
 
 section{
@@ -105,15 +118,7 @@ header.header-main {
       text-align: center;
       a{
         line-height: normal;
-        color: $x-dark;
-        &.btn-neutral{
-          border-color: $x-dark;
-          padding: 0.4rem .6rem;
-            &:hover{
-              color: $white;
-              background-color: $x-dark;
-          }
-        }
+        color: $brand-color;
       }
     }
   }
@@ -157,16 +162,16 @@ header.header-main {
     }
   }
   &.hero-video{
-    background: rgba(0,0,0,0.6);
+    background: $white;
     .grid-container{
       .row{
-        height: 22rem;
+        height: auto;
         .description{
           .data{
-            padding: 11.5% 2% 0 0;
+            padding: 7% 0 0 0;
             h1{
-            font-size: 2.5rem;
-            color: $white;
+            font-size: 1.5rem;
+            color: $black;
             line-height: normal;
             padding-left: 1rem;
             text-align: left;
@@ -175,11 +180,12 @@ header.header-main {
               }
             }
             p{
-                font-size: 1.3rem;
+                font-size: 1rem;
                 padding-left: 1rem;
-                color:$white;
+                color: $x-dark;
                 line-height: normal;
                 margin-top: 1.2rem;
+                padding-bottom: 2rem;
             }
           }
         }
@@ -188,10 +194,11 @@ header.header-main {
           .video-data{
             position: relative;
             text-align: center;
-            line-height: 352px;
-            max-width: 95%;
+            line-height: normal;
+            max-width: none;
             img{
-              border: 3px solid $white;
+              border: 0;
+              width: 100%;
             }
             &:before{
               content: "";
@@ -201,6 +208,7 @@ header.header-main {
               position: absolute;
               left: calc(50% - 40px);
               top: calc(50% - 40px);
+              z-index: 1;
             }
           }
         }
@@ -238,6 +246,13 @@ header.header-main {
       }
     }
   }
+  .footer-logo{
+    text-align: center;
+    img{
+      margin-bottom: 1.5rem;
+      max-width: 90%;
+    }
+  }
 }
 
 //Courses
@@ -255,6 +270,8 @@ header.header-main {
           font-size: 1.25rem;
           padding: 0 1.25rem;
           margin: 5px 0;
+          max-height: 72px;
+          overflow: hidden;
         }
         .course-list{
           padding: 1.5rem 0;
@@ -270,7 +287,7 @@ header.header-main {
               }
             }
             .course-info{
-              height: 192px;
+              height: 165px;
               .course-organization{
                 padding: 5px 20px;
                 font-size: 1rem;
@@ -279,6 +296,7 @@ header.header-main {
               .course-date{
                 color: $base;
                 font-size: 1rem;
+                padding: 0 1.25rem;
                 span{
                   display: block;
                   color: $x-dark;
@@ -289,6 +307,7 @@ header.header-main {
               border: 0;
               box-shadow: none;
               background-color: $white;
+              border-bottom: 6px solid $brand-color;
             }
           }
         }
@@ -382,6 +401,27 @@ header.header-main {
   }
 }
 
+//Course Details
+
+.course-info{
+  .course-detail{
+    padding: 1.8rem 1.25rem;
+     background-color: $course-section-background-color;
+    [class*="col"]{
+      padding-top: 1%;
+      span{
+        display: block;
+        color: $black;
+        font-size: 1.25rem;
+        margin-top: .4rem;
+      }
+      &:last-child{
+        padding-top: 0;
+      }
+    }
+  }
+}
+
 //Media Queries
 
 @media screen and (min-width: 30em){
@@ -419,15 +459,6 @@ header.header-main {
         margin-left: 2.5em;
       }
     }
-    &.hero-video{
-      .grid-container{
-        .row{
-          .video{
-            float: right;
-          }
-        }
-      }
-    }
   }
   .courses-section {
     .courses-container {
@@ -448,8 +479,8 @@ header.header-main {
   }
 
   .footer-main{
-    .normalize-margin{
-      margin-left: 0;
+    .footer-logo{
+      text-align: center;
     }
   }
   .visible-mobile{
@@ -470,8 +501,8 @@ header.header-main {
 
 @media screen and (min-width: 48em){
   .footer-main{
-    .normalize-margin{
-      margin-left: 16%;
+    .footer-logo{
+      text-align: center;
     }
   }
   .hero-main {
@@ -480,21 +511,49 @@ header.header-main {
         font-size: 40px;
       }
     }
+    &.hero-video{
+       background: rgba(0,0,0,0.6);
+      .grid-container{
+        .row{
+          height: 22rem;
+          .description{
+            .data{
+              padding: 11.5% 2% 0 0;
+              h1{
+                color: $white;
+                font-size: 2.5rem;
+              }
+              p{
+                color: $white;
+                font-size: 1.3rem;
+              }
+            }
+          }
+          .video{
+            float: right;
+            .video-data{
+              line-height: 352px;
+              max-width: 95%;
+              img{
+                border: 3px solid $white;
+                width: auto;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
 @media screen and (min-width: 64em){
-  .footer-main{
-    .normalize-margin{
-      margin-left: 33%;
-    }
+  .footer-logo{
+    text-align: left;
   }
 }
 
 @media screen and (min-width: 80em){
-  .footer-main{
-    .normalize-margin{
-      margin-left: 33%;
-    }
+  .footer-logo{
+    text-align: left;
   }
 }
