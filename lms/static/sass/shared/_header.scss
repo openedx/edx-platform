@@ -30,10 +30,11 @@
   }
 
   nav {
+    @include float(left);
     @include clearfix();
     height: 40px;
     margin: 0 auto;
-    padding: 18px ($baseline/2) 0;
+    padding: 7px ($baseline/2) 0;
     max-width: grid-width(12);
   }
 
@@ -259,26 +260,10 @@
   }
 
   .nav-global {
-    margin-top: ($baseline/2);
+    margin-top: 12px;
     list-style: none;
     @include float(left);
-    .tab-nav-item{
-      display: inline;
-      margin: 0px;
-      .tab-nav-link{
-        font-size: em(16);
-        color: $gray;
-        padding: 26px 15px;
-        display: inline;
-        &:hover,
-        &:focus{
-          border-bottom: 4px solid $courseware-border-bottom-color;
-        }
-      }
-      .active{
-        border-bottom: 4px solid $black-t3 !important;
-      }
-    }
+
     li,
     div {
       display: inline-block;
@@ -399,7 +384,6 @@
         font-size: em(16);
         color: $gray;
         display: inline;
-        padding: 25px 15px;
         &:hover,
         &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
@@ -407,6 +391,12 @@
       }
       .active{
         border-bottom: 4px solid $black-t3 !important;
+      }
+      .edx-functional-link{
+        padding: 23px 15px;
+      }
+      .default-functional-link{
+        padding: 29px 15px;
       }
     }
   }
