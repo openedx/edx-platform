@@ -3,8 +3,10 @@ define([
         'jquery',
         'js/learner_dashboard/views/program_card_view',
         'js/learner_dashboard/collections/program_collection',
-        'js/learner_dashboard/views/collection_list_view'
-    ], function (Backbone, $, ProgramCardView, ProgramCollection, CollectionListView) {
+        'js/learner_dashboard/views/collection_list_view',
+        'js/learner_dashboard/collections/program_progress_collection'
+    ], function (Backbone, $, ProgramCardView, ProgramCollection, CollectionListView,
+        ProgressCollection) {
         
         'use strict';
         /*jslint maxlen: 500 */
@@ -12,6 +14,7 @@ define([
         describe('Collection List View', function () {
             var view = null,
                 programCollection,
+                progressCollection,
                 context = {
                     programsData:[
                         {
@@ -58,16 +61,35 @@ define([
                                 w726h242: 'http://www.edx.org/images/org2/test3'
                             }
                         }
+                    ],
+                    userProgress: [
+                        {
+                            programId: 146,
+                            completed: ['courses', 'the', 'user', 'completed'],
+                            in_progress: ['in', 'progress'],
+                            not_started : ['courses', 'not', 'yet', 'started']
+                        },
+                        {
+                            programId: 147,
+                            completed: ['Course 1'],
+                            in_progress: [],
+                            not_started: ['Course 2', 'Course 3', 'Course 4']
+                        }
                     ]
                 };
 
             beforeEach(function() {
                 setFixtures('<div class="program-cards-container"></div>');
                 programCollection = new ProgramCollection(context.programsData);
+                progressCollection = new ProgressCollection();
+                progressCollection.set(context.userProgress);
+                context.progressCollection = progressCollection; 
+                
                 view = new CollectionListView({
                     el: '.program-cards-container',
                     childView: ProgramCardView,
-                    collection: programCollection
+                    collection: programCollection,
+                    context: context
                 });
                 view.render();
             });
