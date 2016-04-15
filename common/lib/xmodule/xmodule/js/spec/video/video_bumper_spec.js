@@ -1,6 +1,6 @@
 (function (WAIT_TIMEOUT) {
     'use strict';
-    describe('VideoBumper', function () {
+    xdescribe('VideoBumper', function () {
         var state, oldOTBD, waitForPlaying;
 
         waitForPlaying = function (state, done) {
