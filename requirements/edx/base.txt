@@ -38,7 +38,7 @@ djangorestframework-jwt==1.7.2
 djangorestframework-oauth==1.1.0
 edx-ccx-keys==0.1.2
 edx-lint==0.4.3
-edx-management-commands==0.0.1
+edx-management-commands==0.1.1
 edx-django-oauth2-provider==1.0.3
 edx-oauth2-provider==1.0.1
 edx-opaque-keys==0.2.1
