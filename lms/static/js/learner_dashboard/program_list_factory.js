@@ -12,7 +12,6 @@
             new CollectionListView({
                 el: '.program-cards-container',
                 childView: ProgramCardView,
-                context: options,
                 collection: new ProgramCollection(options.programsData)
             }).render();
 
