@@ -357,7 +357,7 @@
 // ====================
 
 // CASE: marketing/course discovery
-.header-global {
+.header-global-new {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
@@ -846,13 +846,13 @@
   }
 }
 
-.view-register .header-global .btn-register {
+.view-register .header-global-new .btn-register {
   text-decoration: none;
   color: $courseware-hover-color;
   border-bottom-color: $courseware-border-bottom-color;
 }
 
-.view-login .header-global .btn-login {
+.view-login .header-global-new .btn-login {
   text-decoration: none;
   color: $courseware-hover-color;
 }

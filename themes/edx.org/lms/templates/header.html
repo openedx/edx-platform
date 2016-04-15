@@ -43,7 +43,11 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
+% if uses_pattern_library:
 <header class="header-global ${"slim" if course and not disable_courseware_header else ""}" aria-label="Main" role="banner">
+% else:
+<header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
+% endif
   <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
