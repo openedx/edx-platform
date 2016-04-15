@@ -51,6 +51,29 @@
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="content-primary" role="main">
+            % if settings.FEATURES.get('CONTENT_VISIBILITY_NOTICE',''):
+            <div id="content-visibility-notice">
+                <div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+                    <div class="alert warning ">
+                        <i class="feedback-symbol fa fa-warning"></i>
+                        <div class="copy">
+                            <h2 class="title" id="notice-title">Content Visibility Notice</h2>
+                            <p class="message">
+                              ${_("Materials uploaded here are viewable by the general public in addition "
+                              "to your registered Stanford students. Such publicly-viewable content is subject "
+                              "to copyright exemptions more restrictive than material viewable only by registered "
+                              "Stanford students. Therefore, before uploading any content that has not been "
+                              "created by you or content to which neither you nor Stanford owns all of the "
+                              "rights, you must obtain the permissions (releases, waivers, licenses, etc.) "
+                              "necessary to distribute such materials to the public through the Internet. "
+                              "If you have any questions, please send an email to "
+                              "{copyright_email}").format(copyright_email=settings.COPYRIGHT_EMAIL)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            % endif
             <div class="wrapper-assets" />
             <div class="ui-loading">
                 <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>

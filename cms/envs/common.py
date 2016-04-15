@@ -76,6 +76,9 @@ FEATURES = {
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
+    # warning to instructors about publicly-viewable content
+    'CONTENT_VISIBILITY_NOTICE': True,
+
     # Segment - must explicitly turn it on for production
     'CMS_SEGMENT_KEY': None,
 
@@ -412,6 +415,7 @@ EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 SERVER_EMAIL = 'devops@example.com'
+COPYRIGHT_EMAIL = 'copyright@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
