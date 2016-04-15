@@ -1,6 +1,8 @@
 """Utilities for working with ID tokens."""
 import datetime
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import jwt
@@ -63,3 +65,50 @@ def get_id_token(user, client_name):
     }
 
     return jwt.encode(payload, client.client_secret)
+
+
+def get_asymmetric_token(user):
+    """Construct a JWT signed with this app's private key.
+
+    The JWT includes the following claims:
+
+        preferred_username (str): The user's username. The claim name is borrowed from edx-oauth2-provider.
+        name (str): The user's full name.
+        email (str): The user's email address.
+        administrator (Boolean): Whether the user has staff permissions.
+        iss (str): Registered claim. Identifies the principal that issued the JWT.
+        exp (int): Registered claim. Identifies the expiration time on or after which
+            the JWT must NOT be accepted for processing.
+        iat (int): Registered claim. Identifies the time at which the JWT was issued.
+        sub (int): Registered claim.  Identifies the user.  This implementation uses the raw user id.
+
+    Arguments:
+        user (User): User for which to generate the JWT.
+
+    Returns:
+        str: the JWT
+
+    """
+    private_key = load_pem_private_key(settings.PRIVATE_RSA_KEY, None, default_backend())
+
+    try:
+        # Service users may not have user profiles.
+        full_name = UserProfile.objects.get(user=user).name
+    except UserProfile.DoesNotExist:
+        full_name = None
+
+    now = datetime.datetime.utcnow()
+    expires_in = getattr(settings, 'OAUTH_ID_TOKEN_EXPIRATION', 30)
+
+    payload = {
+        'preferred_username': user.username,
+        'name': full_name,
+        'email': user.email,
+        'administrator': user.is_staff,
+        'iss': settings.OAUTH_OIDC_ISSUER,
+        'exp': now + datetime.timedelta(seconds=expires_in),
+        'iat': now,
+        'sub': anonymous_id_for_user(user, None),
+    }
+
+    return jwt.encode(payload, private_key, algorithm='RS512')
