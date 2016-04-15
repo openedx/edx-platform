@@ -21,7 +21,7 @@
     define(['backbone.paginator'], function (BackbonePaginator) {
         var PagingCollection = BackbonePaginator.requestPager.extend({
             initialize: function (models, options) {
-                options || (options = {});
+                options = options || {};
                 if (options.url) {
                     this.url = options.url;
                 }
