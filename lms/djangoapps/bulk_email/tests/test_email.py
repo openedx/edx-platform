@@ -10,11 +10,13 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
 from bulk_email.models import Optout
+from bulk_email.tasks import _get_source_address
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
@@ -322,12 +324,23 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for self'
         }
 
-        # make very long display_name for course
-        long_name = u"x" * 321
+        # make display_name that's longer than 320 characters when encoded
+        # to ascii, but shorter than 320 unicode characters
+        long_name = u"é" * 200
+
         course = CourseFactory.create(
             display_name=long_name, number="bulk_email_course_name"
         )
         instructor = InstructorFactory(course_key=course.id)
+
+        unexpected_from_addr = _get_source_address(
+            course.id, course.display_name, truncate=False
+        )
+        __, encoded_unexpected_from_addr = forbid_multi_line_headers(
+            "from", unexpected_from_addr, 'utf-8'
+        )
+        self.assertGreater(len(encoded_unexpected_from_addr), 320)
+        self.assertGreater(320, len(unexpected_from_addr))
 
         self.login_as_user(instructor)
         send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
@@ -337,11 +350,13 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(mail.outbox), 1)
         from_email = mail.outbox[0].from_email
 
+        expected_from_addr = (
+            u'"{course_name}" Course Staff <{course_name}-no-reply@example.com>'
+        ).format(course_name=course.id.course)
+
         self.assertEqual(
             from_email,
-            u'"{course_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
-                course_name=course.id.course
-            )
+            expected_from_addr
         )
         self.assertEqual(len(from_email), 83)
 
