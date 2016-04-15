@@ -153,18 +153,18 @@
             });
         });
 
-        it('can emit "show_closed_captions" event', function () {
+        it('can emit "edx.video.closed_captions.shown" event', function () {
             state.el.trigger('captions:show');
-            expect(Logger.log).toHaveBeenCalledWith('show_closed_captions', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
                 id: 'id',
                 code: 'html5',
                 current_time: 10
             });
         });
 
-        it('can emit "hide_closed_captions" event', function () {
+        it('can emit "edx.video.closed_captions.hidden" event', function () {
             state.el.trigger('captions:hide');
-            expect(Logger.log).toHaveBeenCalledWith('hide_closed_captions', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
                 code: 'html5',
                 current_time: 10
