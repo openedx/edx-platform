@@ -9,8 +9,20 @@ import textwrap
 from unittest import TestCase
 
 from ..safe_template_linter import (
-    _process_os_walk, FileResults, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
+    _process_os_walk, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
 )
+
+
+class TestLinter(TestCase):
+    """
+    Test Linter base class
+    """
+    def _validate_data_rule(self, data, results):
+        if data['rule'] is None:
+            self.assertEqual(len(results.violations), 0)
+        else:
+            self.assertEqual(len(results.violations), 1)
+            self.assertEqual(results.violations[0].rule, data['rule'])
 
 
 class TestSafeTemplateLinter(TestCase):
@@ -39,7 +51,7 @@ class TestSafeTemplateLinter(TestCase):
 
 
 @ddt
-class TestMakoTemplateLinter(TestCase):
+class TestMakoTemplateLinter(TestLinter):
     """
     Test MakoTemplateLinter
     """
@@ -278,6 +290,8 @@ class TestMakoTemplateLinter(TestCase):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
+        for violation in results.violations:
+            print violation.rule
         self._validate_data_rule(data, results)
 
     def test_check_mako_expression_default_disabled(self):
@@ -577,16 +591,9 @@ class TestMakoTemplateLinter(TestCase):
         end_index = parse_string.end_index - parse_string.quote_length
         self.assertEqual(data['template'][start_index:end_index], parse_string.string_inner)
 
-    def _validate_data_rule(self, data, results):
-        if data['rule'] is None:
-            self.assertEqual(len(results.violations), 0)
-        else:
-            self.assertEqual(len(results.violations), 1)
-            self.assertEqual(results.violations[0].rule, data['rule'])
-
 
 @ddt
-class TestUnderscoreTemplateLinter(TestCase):
+class TestUnderscoreTemplateLinter(TestLinter):
     """
     Test UnderscoreTemplateLinter
     """
@@ -730,3 +737,53 @@ class TestUnderscoreTemplateLinter(TestCase):
         linter._check_underscore_file_is_safe(data['template'], results)
 
         self.assertEqual(len(results.violations), 0)
+
+
+@ddt
+class TestJavaScriptLinter(TestLinter):
+    """
+    Test JavaScriptLinter
+    """
+
+    @data(
+        {'template': 'var m = "Text " + message + " text."', 'rule': None},
+        {'template': 'var m = "<p>" + message + "</p>"', 'rule': Rules.javascript_concat_html},
+        {'template': 'var m = " <p> " + message + " </p> "', 'rule': Rules.javascript_concat_html},
+    )
+    def test_concat_with_html(self, data):
+        """
+        Test _check_javascript_file_is_safe with concatenating strings and HTML
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'test.append( test.render().el )', 'rule': None},
+        {'template': 'test.append( test.render().$el )', 'rule': None},
+        {'template': 'test.append( testEl )', 'rule': None},
+        {'template': 'test.append( testEl )', 'rule': None},
+        {'template': 'test.append( $test )', 'rule': None},
+        {'template': 'test.append( "text" )', 'rule': None},
+        {'template': 'test.append( $( "<div>" ) )', 'rule': None},
+        {'template': 'test.append( $( "<div/>" ) )', 'rule': None},
+        {'template': 'test.append( [] )', 'rule': None},
+        {'template': 'test.append( {x: 1, y: 2 + 3} )', 'rule': None},
+        {'template': 'HtmlUtils.append(anything)', 'rule': None},
+        {'template': 'test.append("fail on concat" + test.render().el)', 'rule': Rules.javascript_jquery_append},
+        {'template': 'test.append("fail on concat" + testEl)', 'rule': Rules.javascript_jquery_append},
+        {'template': 'test.append( message )', 'rule': Rules.javascript_jquery_append},
+    )
+    def test_jquery_append(self, data):
+        """
+        Test _check_javascript_file_is_safe with concatenating strings and HTML
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
