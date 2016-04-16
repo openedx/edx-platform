@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for safe_template_linter.py
 """
@@ -9,8 +10,20 @@ import textwrap
 from unittest import TestCase
 
 from ..safe_template_linter import (
-    _process_os_walk, FileResults, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
+    _process_os_walk, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
 )
+
+
+class TestLinter(TestCase):
+    """
+    Test Linter base class
+    """
+    def _validate_data_rule(self, data, results):
+        if data['rule'] is None:
+            self.assertEqual(len(results.violations), 0)
+        else:
+            self.assertEqual(len(results.violations), 1)
+            self.assertEqual(results.violations[0].rule, data['rule'])
 
 
 class TestSafeTemplateLinter(TestCase):
@@ -29,17 +42,24 @@ class TestSafeTemplateLinter(TestCase):
             'is_quiet': False,
         }
 
-        template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter()]
+        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter()]
 
-        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True) as mock_is_valid_directory:
-            _process_os_walk('scripts/tests/templates', template_linters, options, out)
+        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True):
+            with mock.patch.object(JavaScriptLinter, '_is_valid_directory', return_value=True):
+                with mock.patch.object(UnderscoreTemplateLinter, '_is_valid_directory', return_value=True):
+                    _process_os_walk('scripts/tests/templates', template_linters, options, out)
 
         output = out.getvalue()
-        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', out.getvalue()))
+        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
+        self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
+        self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.js.*javascript-concat-html', output))
+        self.assertIsNotNone(re.search('test\.js.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.underscore.*underscore-not-escaped', output))
 
 
 @ddt
-class TestMakoTemplateLinter(TestCase):
+class TestMakoTemplateLinter(TestLinter):
     """
     Test MakoTemplateLinter
     """
@@ -577,23 +597,16 @@ class TestMakoTemplateLinter(TestCase):
         end_index = parse_string.end_index - parse_string.quote_length
         self.assertEqual(data['template'][start_index:end_index], parse_string.string_inner)
 
-    def _validate_data_rule(self, data, results):
-        if data['rule'] is None:
-            self.assertEqual(len(results.violations), 0)
-        else:
-            self.assertEqual(len(results.violations), 1)
-            self.assertEqual(results.violations[0].rule, data['rule'])
-
 
 @ddt
-class TestUnderscoreTemplateLinter(TestCase):
+class TestUnderscoreTemplateLinter(TestLinter):
     """
     Test UnderscoreTemplateLinter
     """
 
     def test_check_underscore_file_is_safe(self):
         """
-        Test _check_underscore_file_is_safe with safe template
+        Test check_underscore_file_is_safe with safe template
         """
         linter = UnderscoreTemplateLinter()
         results = FileResults('')
@@ -606,13 +619,13 @@ class TestUnderscoreTemplateLinter(TestCase):
             %>
         """)
 
-        linter._check_underscore_file_is_safe(template, results)
+        linter.check_underscore_file_is_safe(template, results)
 
         self.assertEqual(len(results.violations), 0)
 
     def test_check_underscore_file_is_not_safe(self):
         """
-        Test _check_underscore_file_is_safe with unsafe template
+        Test check_underscore_file_is_safe with unsafe template
         """
         linter = UnderscoreTemplateLinter()
         results = FileResults('')
@@ -625,7 +638,7 @@ class TestUnderscoreTemplateLinter(TestCase):
             %>
         """)
 
-        linter._check_underscore_file_is_safe(template, results)
+        linter.check_underscore_file_is_safe(template, results)
 
         self.assertEqual(len(results.violations), 2)
         self.assertEqual(results.violations[0].rule, Rules.underscore_not_escaped)
@@ -683,12 +696,12 @@ class TestUnderscoreTemplateLinter(TestCase):
     )
     def test_check_underscore_file_disable_rule(self, data):
         """
-        Test _check_underscore_file_is_safe with various disabled pragmas
+        Test check_underscore_file_is_safe with various disabled pragmas
         """
         linter = UnderscoreTemplateLinter()
         results = FileResults('')
 
-        linter._check_underscore_file_is_safe(data['template'], results)
+        linter.check_underscore_file_is_safe(data['template'], results)
 
         violation_count = len(data['is_disabled'])
         self.assertEqual(len(results.violations), violation_count)
@@ -697,7 +710,7 @@ class TestUnderscoreTemplateLinter(TestCase):
 
     def test_check_underscore_file_disables_one_violation(self):
         """
-        Test _check_underscore_file_is_safe with disabled before a line only
+        Test check_underscore_file_is_safe with disabled before a line only
         disables for the violation following
         """
         linter = UnderscoreTemplateLinter()
@@ -709,7 +722,7 @@ class TestUnderscoreTemplateLinter(TestCase):
             <%= message %>
         """)
 
-        linter._check_underscore_file_is_safe(template, results)
+        linter.check_underscore_file_is_safe(template, results)
 
         self.assertEqual(len(results.violations), 2)
         self.assertEqual(results.violations[0].is_disabled, True)
@@ -721,12 +734,210 @@ class TestUnderscoreTemplateLinter(TestCase):
     )
     def test_check_underscore_no_escape_allowed(self, data):
         """
-        Test _check_underscore_file_is_safe with expressions that are allowed
+        Test check_underscore_file_is_safe with expressions that are allowed
         without escaping because the internal calls properly escape.
         """
         linter = UnderscoreTemplateLinter()
         results = FileResults('')
 
-        linter._check_underscore_file_is_safe(data['template'], results)
+        linter.check_underscore_file_is_safe(data['template'], results)
 
         self.assertEqual(len(results.violations), 0)
+
+
+@ddt
+class TestJavaScriptLinter(TestLinter):
+    """
+    Test JavaScriptLinter
+    """
+
+    @data(
+        {'template': 'var m = "Plain text " + message + "plain text"', 'rule': None},
+        {'template': 'var m = "檌檒濦 " + message + "plain text"', 'rule': None},
+        {'template': 'var m = "<p>" + message + "</p>"', 'rule': Rules.javascript_concat_html},
+        {'template': 'var m = " <p> " + message + " </p> "', 'rule': Rules.javascript_concat_html},
+    )
+    def test_concat_with_html(self, data):
+        """
+        Test _check_javascript_file_is_safe with concatenating strings and HTML
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'test.append( test.render().el )', 'rule': None},
+        {'template': 'test.append(test.render().el)', 'rule': None},
+        {'template': 'test.append(test.render().$el)', 'rule': None},
+        {'template': 'test.append(testEl)', 'rule': None},
+        {'template': 'test.append($test)', 'rule': None},
+        # plain text is ok because any & will be escaped, and it stops false
+        # negatives on some other objects with an append() method
+        {'template': 'test.append("plain text")', 'rule': None},
+        {'template': 'test.append("<div/>")', 'rule': Rules.javascript_jquery_append},
+        {'template': 'graph.svg.append("g")', 'rule': None},
+        {'template': 'test.append( $( "<div>" ) )', 'rule': None},
+        {'template': 'test.append($("<div>"))', 'rule': None},
+        {'template': 'test.append($("<div/>"))', 'rule': None},
+        {'template': 'test.append(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'HtmlUtils.append($el, someHtml)', 'rule': None},
+        {'template': 'test.append("fail on concat" + test.render().el)', 'rule': Rules.javascript_jquery_append},
+        {'template': 'test.append("fail on concat" + testEl)', 'rule': Rules.javascript_jquery_append},
+        {'template': 'test.append(message)', 'rule': Rules.javascript_jquery_append},
+    )
+    def test_jquery_append(self, data):
+        """
+        Test _check_javascript_file_is_safe with JQuery append()
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'test.prepend( test.render().el )', 'rule': None},
+        {'template': 'test.prepend(test.render().el)', 'rule': None},
+        {'template': 'test.prepend(test.render().$el)', 'rule': None},
+        {'template': 'test.prepend(testEl)', 'rule': None},
+        {'template': 'test.prepend($test)', 'rule': None},
+        {'template': 'test.prepend("text")', 'rule': None},
+        {'template': 'test.prepend( $( "<div>" ) )', 'rule': None},
+        {'template': 'test.prepend($("<div>"))', 'rule': None},
+        {'template': 'test.prepend($("<div/>"))', 'rule': None},
+        {'template': 'test.prepend(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'HtmlUtils.prepend($el, someHtml)', 'rule': None},
+        {'template': 'test.prepend("fail on concat" + test.render().el)', 'rule': Rules.javascript_jquery_prepend},
+        {'template': 'test.prepend("fail on concat" + testEl)', 'rule': Rules.javascript_jquery_prepend},
+        {'template': 'test.prepend(message)', 'rule': Rules.javascript_jquery_prepend},
+    )
+    def test_jquery_prepend(self, data):
+        """
+        Test _check_javascript_file_is_safe with JQuery prepend()
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'test.unwrap(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.wrap(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.wrapAll(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.wrapInner(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.after(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.before(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.replaceAll(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.replaceWith(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'test.replaceWith(edx.HtmlUtils.HTML(htmlString).toString())', 'rule': None},
+        {'template': 'test.unwrap(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.wrap(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.wrapAll(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.wrapInner(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.after(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.before(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.replaceAll(anything)', 'rule': Rules.javascript_jquery_insertion},
+        {'template': 'test.replaceWith(anything)', 'rule': Rules.javascript_jquery_insertion},
+    )
+    def test_jquery_insertion(self, data):
+        """
+        Test _check_javascript_file_is_safe with JQuery insertion functions
+        other than append(), prepend() and html() that take content as an
+        argument (e.g. before(), after()).
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': '  element.parentNode.appendTo(target);', 'rule': None},
+        {'template': '  test.render().el.appendTo(target);', 'rule': None},
+        {'template': '  test.render().$el.appendTo(target);', 'rule': None},
+        {'template': '  test.$element.appendTo(target);', 'rule': None},
+        {'template': '  test.testEl.appendTo(target);', 'rule': None},
+        {'template': '$element.appendTo(target);', 'rule': None},
+        {'template': 'el.appendTo(target);', 'rule': None},
+        {'template': 'testEl.appendTo(target);', 'rule': None},
+        {'template': 'testEl.prependTo(target);', 'rule': None},
+        {'template': 'testEl.insertAfter(target);', 'rule': None},
+        {'template': 'testEl.insertBefore(target);', 'rule': None},
+        {'template': 'anycall().appendTo(target)', 'rule': Rules.javascript_jquery_insert_into_target},
+        {'template': 'anything.appendTo(target)', 'rule': Rules.javascript_jquery_insert_into_target},
+        {'template': 'anything.prependTo(target)', 'rule': Rules.javascript_jquery_insert_into_target},
+        {'template': 'anything.insertAfter(target)', 'rule': Rules.javascript_jquery_insert_into_target},
+        {'template': 'anything.insertBefore(target)', 'rule': Rules.javascript_jquery_insert_into_target},
+    )
+    def test_jquery_insert_to_target(self, data):
+        """
+        Test _check_javascript_file_is_safe with JQuery insert to target
+        functions that take a target as an argument, like appendTo() and
+        prependTo().
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'test.html()', 'rule': None},
+        {'template': 'test.html( )', 'rule': None},
+        {'template': "test.html( '' )", 'rule': None},
+        {'template': "test.html('')", 'rule': None},
+        {'template': 'test.html("")', 'rule': None},
+        {'template': 'test.html(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
+        {'template': 'HtmlUtils.setHtml($el, someHtml)', 'rule': None},
+        {'template': 'test.html("any string")', 'rule': Rules.javascript_jquery_html},
+        {'template': 'test.html("檌檒濦")', 'rule': Rules.javascript_jquery_html},
+        {'template': 'test.html(anything)', 'rule': Rules.javascript_jquery_html},
+    )
+    def test_jquery_html(self, data):
+        """
+        Test _check_javascript_file_is_safe with JQuery html()
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': 'StringUtils.interpolate()', 'rule': None},
+        {'template': 'HtmlUtils.interpolateHtml()', 'rule': None},
+        {'template': 'interpolate(anything)', 'rule': Rules.javascript_interpolate},
+    )
+    def test_javascript_interpolate(self, data):
+        """
+        Test _check_javascript_file_is_safe with interpolate()
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
+
+    @data(
+        {'template': '_.escape()', 'rule': None},
+        {'template': 'anything.escape()', 'rule': Rules.javascript_escape},
+    )
+    def test_javascript_interpolate(self, data):
+        """
+        Test _check_javascript_file_is_safe with interpolate()
+        """
+        linter = JavaScriptLinter()
+        results = FileResults('')
+
+        linter._check_javascript_file_is_safe(data['template'], results)
+
+        self._validate_data_rule(data, results)
