@@ -255,6 +255,14 @@ class TestMakoTemplateLinter(TestCase):
             'expression': "${ HTML('<span></span>') + 'some other text' }",
             'rule': Rules.mako_html_alone
         },
+        {
+            'expression': "${'Rock &amp; Roll'}",
+            'rule': Rules.mako_html_entities
+        },
+        {
+            'expression': "${'Rock &#38; Roll'}",
+            'rule': Rules.mako_html_entities
+        },
     )
     def test_check_mako_with_text_and_html(self, data):
         """
