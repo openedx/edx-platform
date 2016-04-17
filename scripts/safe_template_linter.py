@@ -329,11 +329,37 @@ class Rules(Enum):
     )
     javascript_jquery_append = (
         'javascript-jquery-append',
-        'Refactor to use HtmlUtils.append() rather than JQuery append().'
+        'Refactor to use HtmlUtils.append(), or use HtmlUtils.forJQuery().'
+    )
+    javascript_jquery_prepend = (
+        'javascript-jquery-prepend',
+        'Refactor to use HtmlUtils.prepend(), or use HtmlUtils.forJQuery().'
+    )
+    javascript_jquery_insertion = (
+        'javascript-jquery-insertion',
+        'Refactor JQuery DOM insertion calls that take content as the argument to use HtmlUtils JQuery wrapper calls '
+        'or HtmlUtils.forJQuery().'
+    )
+    javascript_jquery_insert_into_target = (
+        'javascript-jquery-insert-into-target',
+        'Refactor JQuery DOM insertion calls that take a target as the argument to use HtmlUtils JQuery wrapper calls '
+        'or HtmlUtils.forJQuery().'
+    )
+    javascript_jquery_html = (
+        'javascript-jquery-html',
+        "Refactor to use HtmlUtils.setHtml(), HtmlUtils.forJQuery(), or JQuery's text() function."
     )
     javascript_concat_html = (
         'javascript-concat-html',
         'Use HtmlUtils functions rather than concatenating strings with HTML.'
+    )
+    javascript_escape = (
+        'javascript-escape',
+        "Avoid calls to escape(), especially in Backbone. Use templates, HtmlUtils, or JQuery's text() function."
+    )
+    javascript_interpolate = (
+        'javascript-interpolate',
+        'Use StringUtils.interpolate() or HtmlUtils.interpolateHtml() as appropriate.'
     )
 
     def __init__(self, rule_id, rule_summary):
@@ -585,7 +611,8 @@ class FileResults(object):
 
         """
         if options['is_quiet']:
-            print(self.full_path, file=out)
+            if self.violations is not None and 0 < len(self.violations):
+                print(self.full_path, file=out)
         else:
             self.violations.sort(key=lambda violation: violation.sort_key())
             for violation in self.violations:
@@ -1183,10 +1210,10 @@ class UnderscoreTemplateLinter(object):
 
         """
         underscore_template = _load_file(self, file_full_path)
-        self._check_underscore_file_is_safe(underscore_template, results)
+        self.check_underscore_file_is_safe(underscore_template, results)
         return results
 
-    def _check_underscore_file_is_safe(self, underscore_template, results):
+    def check_underscore_file_is_safe(self, underscore_template, results):
         """
         Checks for violations in an Underscore.js template.
 
@@ -1274,11 +1301,12 @@ class UnderscoreTemplateLinter(object):
 
 class JavaScriptLinter(object):
     """
-    The linter for JavaScript files.
+    The linter for JavaScript and CoffeeScript files.
     """
 
-    #TODO: skip test directories for JavaScript?
-    _skip_javascript_dirs = _skip_dirs
+    _skip_javascript_dirs = _skip_dirs + ('i18n', 'static/coffee')
+    _skip_coffeescript_dirs = _skip_dirs
+    underScoreLinter = UnderscoreTemplateLinter()
 
     def process_file(self, directory, file_name):
         """
@@ -1299,27 +1327,32 @@ class JavaScriptLinter(object):
         if not results.is_file:
             return results
 
-        if not self._is_valid_directory(directory):
+        if file_name.lower().endswith('.js') and not file_name.lower().endswith('.min.js'):
+            skip_dirs = self._skip_javascript_dirs
+        elif file_name.lower().endswith('.coffee'):
+            skip_dirs = self._skip_coffeescript_dirs
+        else:
             return results
 
-        if not file_name.lower().endswith('.js') or file_name.lower().endswith('.min.js'):
+        if not self._is_valid_directory(skip_dirs, directory):
             return results
 
         return self._load_and_check_javascript_file_is_safe(file_full_path, results)
 
-    def _is_valid_directory(self, directory):
+    def _is_valid_directory(self, skip_dirs, directory):
         """
         Determines if the provided directory is a directory that could contain
         a JavaScript file that needs to be linted.
 
         Arguments:
+            skip_dirs: The directories to be skipped.
             directory: The directory to be linted.
 
         Returns:
             True if this directory should be linted for JavaScript violations
             and False otherwise.
         """
-        if _is_skip_dir(self._skip_javascript_dirs, directory):
+        if _is_skip_dir(skip_dirs, directory):
             return False
 
         return True
@@ -1348,84 +1381,250 @@ class JavaScriptLinter(object):
             results: A file results objects to which violations will be added.
 
         """
-        self._check_jquery_append(file_contents, results)
+        no_caller_check = None
+        no_argument_check = None
+        self._check_jquery_function(
+            file_contents, "append", Rules.javascript_jquery_append, no_caller_check,
+            self._is_jquery_argument_safe, results
+        )
+        self._check_jquery_function(
+            file_contents, "prepend", Rules.javascript_jquery_prepend, no_caller_check,
+            self._is_jquery_argument_safe, results
+        )
+        self._check_jquery_function(
+            file_contents, "unwrap|wrap|wrapAll|wrapInner|after|before|replaceAll|replaceWith",
+            Rules.javascript_jquery_insertion, no_caller_check, self._is_jquery_argument_safe, results
+        )
+        self._check_jquery_function(
+            file_contents, "appendTo|prependTo|insertAfter|insertBefore",
+            Rules.javascript_jquery_insert_into_target, self._is_jquery_insert_caller_safe, no_argument_check, results
+        )
+        self._check_jquery_function(
+            file_contents, "html", Rules.javascript_jquery_html, no_caller_check,
+            self._is_jquery_html_argument_safe, results
+        )
+        self._check_javascript_interpolate(file_contents, results)
+        self._check_javascript_escape(file_contents, results)
         self._check_concat_with_html(file_contents, results)
+        self.underScoreLinter.check_underscore_file_is_safe(file_contents, results)
         results.prepare_results(file_contents)
 
-    def _check_jquery_append(self, file_contents, results):
+    def _get_expression_for_function(self, file_contents, function_match):
         """
-        Checks that append() calls are acceptable.
+        Returns an expression that best matches the function call.
 
-        Acceptable calls to append():
-        - HtmlUtils.append()
-        - the argument can end with ".el", ".$el" (with no concatenation)
-        - the argument can be a single variable ending in "El" or staring with
-            "$". For example, "testEl" or "$test".
-        - the argument can be a single string literal with no HTML tags
-        - the argument can start with "[" or "{". If so, we assume this is an
-            array or object append() call.
-        - the argument can be a call to $() with the first argument a string
-            literal with a single HTML tag.  For example, ".append($('<br/>'))"
-            or ".append($('<br/>'))".
+        Arguments:
+            file_contents: The contents of the JavaScript file.
+            function_match: A regex match representing the start of the function
+                call.
+
+        """
+        start_index = function_match.start()
+        inner_start_index = function_match.end()
+        close_paren_index = _find_closing_char_index(
+            None, "(", ")", file_contents, start_index=inner_start_index
+        )['close_char_index']
+        if 0 <= close_paren_index:
+            end_index = close_paren_index + 1
+            expression_text = file_contents[function_match.start():close_paren_index + 1]
+            expression = {
+                'start_index': start_index,
+                'end_index': end_index,
+                'expression': expression_text,
+                'expression_inner': expression_text,
+            }
+        else:
+            expression = {
+                'start_index': start_index,
+                'end_index': -1,
+                'expression': None,
+                'expression_inner': None,
+            }
+        return expression
+
+    def _check_javascript_interpolate(self, file_contents, results):
+        """
+        Checks that interpolate() calls are safe.
+
+        Only use of StringUtils.interpolate() or HtmlUtils.interpolateText()
+        are safe.
 
         Arguments:
             file_contents: The contents of the JavaScript file.
             results: A file results objects to which violations will be added.
 
         """
-        for append_match in re.finditer(r"(?<!HtmlUtils).append\(", file_contents):
+        # Ignores calls starting with "StringUtils.", because those are safe
+        regex = re.compile(r"(?<!StringUtils).interpolate\(")
+        for function_match in regex.finditer(file_contents):
+            expression = self._get_expression_for_function(file_contents, function_match)
+            results.violations.append(ExpressionRuleViolation(Rules.javascript_interpolate, expression))
+
+    def _check_javascript_escape(self, file_contents, results):
+        """
+        Checks that only necessary escape() are used.
+
+        Allows for _.escape(), although this shouldn't be the recommendation.
+
+        Arguments:
+            file_contents: The contents of the JavaScript file.
+            results: A file results objects to which violations will be added.
+
+        """
+        # Ignores calls starting with "_.", because those are safe
+        regex = regex = re.compile(r"(?<!_).escape\(")
+        for function_match in regex.finditer(file_contents):
+            expression = self._get_expression_for_function(file_contents, function_match)
+            results.violations.append(ExpressionRuleViolation(Rules.javascript_escape, expression))
+
+    def _check_jquery_function(self, file_contents, function_names, rule, is_caller_safe, is_argument_safe, results):
+        """
+        Checks that the JQuery function_names (e.g. append(), prepend()) calls
+        are safe.
+
+        Arguments:
+            file_contents: The contents of the JavaScript file.
+            function_names: A pipe delimited list of names of the functions
+                (e.g. "wrap|after|before").
+            rule: The name of the rule to use for validation errors (e.g.
+                Rules.javascript_jquery_append).
+            is_caller_safe: A function to test if caller of the JQuery function
+                is safe.
+            is_argument_safe: A function to test if the argument passed to the
+                JQuery function is safe.
+            results: A file results objects to which violations will be added.
+
+        """
+        # Ignores calls starting with "HtmlUtils.", because those are safe
+        regex = re.compile(r"(?<!HtmlUtils).(?:{})\(".format(function_names))
+        for function_match in regex.finditer(file_contents):
             is_violation = True
-            start_index = append_match.start()
-            inner_start_index = append_match.end()
-            close_paren_index = _find_closing_char_index(
-                None, "(", ")", file_contents, start_index=inner_start_index
-            )['close_char_index']
-            if 0 <= close_paren_index:
-                expression_inner = file_contents[inner_start_index:close_paren_index].strip()
-                match_variable_name = re.search("[_$a-zA-Z]+[_$a-zA-Z0-9]*", expression_inner)
-                if match_variable_name is not None and match_variable_name.group() == expression_inner:
-                    if expression_inner.endswith('El') or expression_inner.startswith('$'):
-                        is_violation = False
-                elif expression_inner.startswith('[') and expression_inner.endswith(']'):
-                    is_violation = False
-                elif expression_inner.startswith('{') and expression_inner.endswith('}'):
-                    is_violation = False
-                elif "+" not in expression_inner:
-                    if expression_inner.endswith('.el') or expression_inner.endswith('.$el'):
-                        is_violation = False
-                    elif expression_inner.startswith('"') or expression_inner.startswith("'"):
-                        string = ParseString(expression_inner, 0, len(expression_inner))
-                        if string.string == expression_inner and "<" not in expression_inner:
-                            is_violation = False
-                    elif expression_inner.startswith('$('):
-                        # match on JQuery calls with single string and single HTML tag
-                        # Examples:
-                        #    $("<span>")
-                        #    $("<div/>")
-                        #    $("<div/>", {...})
-                        match = re.search(r"""\$\(\s*['"]<[a-zA-Z0-9]+[/]?>['"]\s*[,)]""", expression_inner)
-                        if match is not None:
-                            is_violation = False
-                if is_violation:
-                    end_index = close_paren_index + 1
-                    expression_text = file_contents[append_match.start():close_paren_index + 1]
-                    expression = {
-                        'start_index': start_index,
-                        'end_index': end_index,
-                        'expression': expression_text,
-                        'expression_inner': expression_text,
-                    }
-            else:
-                expression = {
-                    'start_index': start_index,
-                    'end_index': -1,
-                    'expression': None,
-                    'expression_inner': None,
-                }
+            expression = self._get_expression_for_function(file_contents, function_match)
+            if 0 < expression['end_index']:
+                start_index = expression['start_index']
+                inner_start_index = function_match.end()
+                close_paren_index = expression['end_index'] - 1
+                function_argument = file_contents[inner_start_index:close_paren_index].strip()
+                if is_argument_safe is not None and is_caller_safe is None:
+                    is_violation = is_argument_safe(function_argument) is False
+                elif is_caller_safe is not None and is_argument_safe is None:
+                    line_start_index = StringLines(file_contents).index_to_line_start_index(start_index)
+                    caller_line_start = file_contents[line_start_index:start_index]
+                    is_violation = is_caller_safe(caller_line_start) is False
+                else:
+                    raise ValueError("Must supply either is_argument_safe, or is_caller_safe, but not both.")
             if is_violation:
-                results.violations.append(ExpressionRuleViolation(
-                    Rules.javascript_jquery_append, expression
-                ))
+                results.violations.append(ExpressionRuleViolation(rule, expression))
+
+    def _is_jquery_argument_safe(self, argument):
+        """
+        Check the argument sent to a jQuery DOM insertion function (e.g.
+        append()) to check if it is safe.
+
+        Safe arguments include:
+        - the argument can end with ".el", ".$el" (with no concatenation)
+        - the argument can be a single variable ending in "El" or starting with
+            "$". For example, "testEl" or "$test".
+        - the argument can be a single string literal with no HTML tags
+        - the argument can be a call to $() with the first argument a string
+            literal with a single HTML tag.  For example, ".append($('<br/>'))"
+            or ".append($('<br/>'))".
+        - the argument can be a call to HtmlUtils.forJQuery(html)
+
+        Arguments:
+            argument: The argument sent to the jQuery function (e.g.
+            append(argument)).
+
+        Returns:
+            True if the argument is safe, and False otherwise.
+
+        """
+        match_variable_name = re.search("[_$a-zA-Z]+[_$a-zA-Z0-9]*", argument)
+        if match_variable_name is not None and match_variable_name.group() == argument:
+            if argument.endswith('El') or argument.startswith('$'):
+                return True
+        elif argument.startswith('"') or argument.startswith("'"):
+            # a single literal string with no HTML is ok
+            string = ParseString(argument, 0, len(argument))
+            if string.string == argument and "<" not in argument:
+                return True
+        elif argument.startswith('$('):
+            # match on JQuery calls with single string and single HTML tag
+            # Examples:
+            #    $("<span>")
+            #    $("<div/>")
+            #    $("<div/>", {...})
+            match = re.search(r"""\$\(\s*['"]<[a-zA-Z0-9]+\s*[/]?>['"]\s*[,)]""", argument)
+            if match is not None:
+                return True
+        elif argument.startswith('HtmlUtils.forJQuery(') and argument.endswith(')'):
+            return True
+        # check rules that shouldn't use concatenation
+        elif "+" not in argument:
+            if argument.endswith('.el') or argument.endswith('.$el'):
+                return True
+        return False
+
+    def _is_jquery_html_argument_safe(self, argument):
+        """
+        Check the argument sent to the jQuery html() function to check if it is
+        safe.
+
+        Safe arguments to html():
+        - no argument (i.e. getter rather than setter)
+        - the argument can be a call to HtmlUtils.forJQuery(html)
+
+        Arguments:
+            argument: The argument sent to html() in code (i.e. html(argument)).
+
+        Returns:
+            True if the argument is safe, and False otherwise.
+
+        """
+        if argument == "":
+            return True
+        elif "+" not in argument:
+            if argument.startswith('HtmlUtils.forJQuery(') and argument.endswith(')'):
+                return True
+        return False
+
+    def _is_jquery_insert_caller_safe(self, caller_line_start):
+        """
+        Check that the caller of a jQuery DOM insertion function that takes a
+        target is safe (e.g. thisEl.appendTo(target)).
+
+        If original line was::
+
+            draggableObj.iconEl.appendTo(draggableObj.containerEl);
+
+        Parameter caller_line_start would be:
+
+            draggableObj.iconEl
+
+        Safe callers include:
+        - the caller can be ".el", ".$el"
+        - the caller can be a single variable ending in "El" or starting with
+            "$". For example, "testEl" or "$test".
+
+        Arguments:
+            caller_line_start: The line leading up to the jQuery function call.
+
+        Returns:
+            True if the caller is safe, and False otherwise.
+
+        """
+        # matches end of line for caller, which can't itself be a function
+        caller_match = re.search(r"(?:\s*|[.])([_$a-zA-Z]+[_$a-zA-Z0-9])*$", caller_line_start)
+        if caller_match is None:
+            return False
+        caller = caller_match.group(1)
+        if caller is None:
+            return False
+        elif caller.endswith('El') or caller.startswith('$'):
+            return True
+        elif caller == 'el' or caller == 'parentNode':
+            return True
+        return False
 
     def _check_concat_with_html(self, file_contents, results):
         """
