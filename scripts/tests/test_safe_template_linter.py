@@ -41,13 +41,20 @@ class TestSafeTemplateLinter(TestCase):
             'is_quiet': False,
         }
 
-        template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter()]
+        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter()]
 
-        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True) as mock_is_valid_directory:
-            _process_os_walk('scripts/tests/templates', template_linters, options, out)
+        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True):
+            with mock.patch.object(JavaScriptLinter, '_is_valid_directory', return_value=True):
+                with mock.patch.object(UnderscoreTemplateLinter, '_is_valid_directory', return_value=True):
+                    _process_os_walk('scripts/tests/templates', template_linters, options, out)
 
         output = out.getvalue()
-        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', out.getvalue()))
+        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
+        self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
+        self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.js.*javascript-concat-html', output))
+        self.assertIsNotNone(re.search('test\.js.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.underscore.*underscore-not-escaped', output))
 
 
 @ddt
