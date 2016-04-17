@@ -111,14 +111,12 @@ def set_logged_in_cookies(request, response, user):
     # whether it needs to set the cookie or continue to the next pipeline stage.
     user_info_cookie_is_secure = request.is_secure()
 
-    # This cookie is not being used by us and contains invalid characters that don't play
-    # well with out load balancers, so we are taking it out
-    # response.set_cookie(
-    #     settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
-    #     json.dumps(user_info),
-    #     secure=user_info_cookie_is_secure,
-    #     **cookie_settings
-    # )
+    response.set_cookie(
+        settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
+        json.dumps(user_info),
+        secure=user_info_cookie_is_secure,
+        **cookie_settings
+    )
 
     return response
 
