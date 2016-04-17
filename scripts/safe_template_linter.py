@@ -1572,6 +1572,7 @@ class JavaScriptLinter(object):
 
         Safe arguments to html():
         - no argument (i.e. getter rather than setter)
+        - empty string is safe
         - the argument can be a call to HtmlUtils.forJQuery(html)
 
         Arguments:
@@ -1581,7 +1582,7 @@ class JavaScriptLinter(object):
             True if the argument is safe, and False otherwise.
 
         """
-        if argument == "":
+        if argument == "" or argument == "''" or argument == '""':
             return True
         elif "+" not in argument:
             if argument.startswith('HtmlUtils.forJQuery(') and argument.endswith(')'):

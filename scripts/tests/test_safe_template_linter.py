@@ -879,6 +879,8 @@ class TestJavaScriptLinter(TestLinter):
 
     @data(
         {'template': 'test.html( )', 'rule': None},
+        {'template': "test.html( '' )", 'rule': None},
+        {'template': 'test.html("")', 'rule': None},
         {'template': 'test.html(HtmlUtils.forJQuery(someHtml))', 'rule': None},
         {'template': 'HtmlUtils.setHtml($el, someHtml)', 'rule': None},
         {'template': 'test.html("any string")', 'rule': Rules.javascript_jquery_html},
