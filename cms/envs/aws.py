@@ -212,7 +212,6 @@ TENDER_DOMAIN = ENV_TOKENS.get('TENDER_DOMAIN', TENDER_DOMAIN)
 TENDER_SUBDOMAIN = ENV_TOKENS.get('TENDER_SUBDOMAIN', TENDER_SUBDOMAIN)
 
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:

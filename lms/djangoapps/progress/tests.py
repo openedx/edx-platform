@@ -104,6 +104,12 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'Lab'},
             display_name=u"test vertical 2",
         )
+        vertical3 = ItemFactory.create(
+            parent_location=sub_section2.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Lab'},
+            display_name=u"Discussion Course",
+        )
         ItemFactory.create(
             parent_location=vertical2.location,
             category='problem',
@@ -146,6 +152,17 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name="final problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+        self.problem6 = ItemFactory.create(
+            parent_location=vertical3.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name="Problem 6",
+        )
+        ItemFactory.create(
+            parent_location=vertical3.location,
+            category='discussion-course',
+            display_name="Course Discussion Item",
         )
 
     def test_save_completion(self):
@@ -352,6 +369,22 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
             category='group-project',
         )
         module = self.get_module_for_user(self.user, self.course, module)
+        module.system.publish(module, 'progress', {})
+
+        progress = StudentProgress.objects.all()
+        # assert there is no progress entry for a module whose category is in detached categories
+        self.assertEqual(len(progress), 0)
+
+    @override_settings(
+        PROGRESS_DETACHED_CATEGORIES=["group-project"],
+        PROGRESS_DETACHED_VERTICAL_CATEGORIES=["discussion-course"],
+    )
+    def test_progress_calc_on_vertical_with_detached_module(self):
+        """
+        Tests progress calculations for modules inside a vertical with detached categories
+        """
+        self._create_course()
+        module = self.get_module_for_user(self.user, self.course, self.problem6)
         module.system.publish(module, 'progress', {})
 
         progress = StudentProgress.objects.all()
