@@ -320,7 +320,7 @@ class UsersTestCase(CourseTestCase):
     def test_invalid_course_id(self):
         """ Asserts that Http404 is raised when the course id is not valid. """
         wrong_url = reverse_course_url(
-            'course_team_handler', "/some.invalid.key/TTT/CS01/2015_T0",
+            'course_team_handler', "/some.invalid.key/course-v1:TTT+CS01+2015_T0",
             kwargs={'email': self.ext_user.email}
         )
         with self.assertRaises(Http404):

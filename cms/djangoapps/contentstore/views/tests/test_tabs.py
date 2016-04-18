@@ -194,7 +194,7 @@ class TabsPageTests(CourseTestCase):
 
     def test_invalid_course_id(self):
         """ Asserts that Http404 is raised when the course id is not valid. """
-        invalid_tab_url = reverse_course_url('tabs_handler', "/some.invalid.key/TTT/CS01/2015_T0")
+        invalid_tab_url = reverse_course_url('tabs_handler', "/some.invalid.key/course-v1:TTT+CS01+2015_T0")
         with self.assertRaises(Http404):
             self.client.get(invalid_tab_url)
 

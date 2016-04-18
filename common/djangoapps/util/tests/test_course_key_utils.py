@@ -1,11 +1,11 @@
 """
 Tests for util.course_key_utils
 """
+import ddt
+import unittest
 from util.course_key_utils import course_key_from_string_or_404
 from opaque_keys.edx.keys import CourseKey
 from django.http import Http404
-import ddt
-import unittest
 
 
 @ddt.ddt
@@ -21,7 +21,6 @@ class TestFromStringOr404(unittest.TestCase):
         """
         Tests course_key_from_string_or_404 for valid split style course keys and mongo style course keys.
         """
-        from nose.tools import set_trace ; set_trace()
         self.assertEquals(
             CourseKey.from_string(valid_course_key),
             course_key_from_string_or_404(valid_course_key)
