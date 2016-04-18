@@ -1,0 +1,50 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("About")}</%block>
+
+<div class="main-heading">
+    <h1>${_("About")}</h1>
+</div>
+<section class="grid-manual grid-container">
+    <div class="row">
+        <div class="col col-7">
+            <h2 class="hd-2">Curabitur ligula sapien tincidunt non</h2>
+            <div class="copy-base">
+                <p>Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Fusce ac felis sit amet ligula pharetra condimentum. Fusce a quam. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.</p>
+                <p>Duis leo. Maecenas egestas arcu quis ligula mattis placerat. Praesent vestibulum dapibus nibh. Ut non enim eleifend felis pretium feugiat.</p>
+                <p>Nunc interdum lacus sit amet orci. Etiam imperdiet imperdiet orci. Cras ultricies mi eu turpis hendrerit fringilla. Fusce egestas elit eget lorem.</p>
+                <p>Nam at tortor in tellus interdum sagittis. Curabitur ullamcorper ultricies nisi. Praesent nonummy mi in odio. Nullam sagittis.</p>
+            </div>
+        </div>
+        <div class="col col-5">
+            <div class="copy-base">
+                <img class="message-image" src="http://placehold.it/120x120">
+                <p>Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. In consectetuer turpis ut velit.</p>
+                <p>Nam eget dui. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Etiam rhoncus.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-7">
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-7">
+            <img src="http://placehold.it/220x120">
+            <div class="copy-base">
+                <p>Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Fusce ac felis sit amet ligula pharetra condimentum. Fusce a quam. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. Duis leo. Maecenas egestas arcu quis ligula mattis placerat. Praesent vestibulum dapibus nibh. Ut non enim eleifend felis pretium feugiat.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-7">
+            <a href="#">Praesent egestas neque eu enim</a>
+        </div>
+    </div>
+</section>
