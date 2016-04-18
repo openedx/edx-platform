@@ -298,6 +298,51 @@ def run_jshint(options):
         )
 
 
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+@cmdopts([
+    ("limit=", "l", "limit for number of acceptable violations"),
+])
+def run_safelint(options):
+    """
+    Runs safe_template_linter.py on the codebase
+    """
+
+    violations_limit = int(getattr(options, 'limit', -1))
+
+    safelint_report_dir = (Env.REPORT_DIR / "safelint")
+    safelint_report = safelint_report_dir / "safelint.report"
+    _prepare_report_dir(safelint_report_dir)
+
+    sh(
+        "{repo_root}/scripts/safe_template_linter.py >> {safelint_report}".format(
+            repo_root=Env.REPO_ROOT,
+            safelint_report=safelint_report,
+        ),
+        ignore_error=True
+    )
+
+    try:
+        num_violations = int(_get_count_from_last_line(safelint_report, "safelint"))
+    except TypeError:
+        raise BuildFailure(
+            "Error. Number of safelint violations could not be found in {safelint_report}".format(
+                safelint_report=safelint_report
+            )
+        )
+
+    # Record the metric
+    _write_metric(num_violations, (Env.METRICS_DIR / "safelint"))
+
+    # Fail if number of violations is greater than the limit
+    if num_violations > violations_limit > -1:
+        raise Exception(
+            "SafeTemplateLinter Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
+                count=num_violations, violations_limit=violations_limit
+            )
+        )
+
+
 def _write_metric(metric, filename):
     """
     Write a given metric to a given file
