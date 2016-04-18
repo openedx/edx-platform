@@ -1,5 +1,10 @@
 body{
     background-color: $body-background-color !important;
+  *{
+    &:focus{
+      outline: 0;
+    }
+  }
 
 }
 //Helper Classes
@@ -17,6 +22,10 @@ a{
   &:hover{
     text-decoration: none;
     opacity: 0.8;
+  }
+  &:focus{
+    text-decoration: none;
+    outline: none;
   }
 }
 .hidden-mobile{
@@ -49,16 +58,18 @@ a{
 .btn-block{
   width: 100% !important;
 }
-
-section{
-  h2{
-    font-size: 1.5rem;
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-    margin: 1.25rem 0;
-    text-transform: none;
-  }
+.inner-container{
+  padding: 0 1.25rem;
 }
-
+h2{
+  font-size: 1.5rem;
+  font-family: $brand-font;
+  margin: 1.25rem 0;
+  text-transform: none;
+}
+h1, h2, h3, h4, h5, h6{
+  font-family: $brand-font;
+}
 
 //Header
 header.header-main {
@@ -405,10 +416,13 @@ header.header-main {
 
 .course-info{
   .course-detail{
-    padding: 1.8rem 1.25rem;
      background-color: $course-section-background-color;
+    .inner-container{
+      padding: 1.8rem 1.25rem;
+    }
     [class*="col"]{
-      padding-top: 1%;
+      padding-top: 0.5rem;
+      margin-bottom: 1rem;
       span{
         display: block;
         color: $black;
@@ -417,6 +431,111 @@ header.header-main {
       }
       &:last-child{
         padding-top: 0;
+      }
+    }
+    .btn-enroll{
+      border-radius: 3px;
+      text-align: center;
+      margin-top: 1rem;
+      padding: 1rem 1.875rem !important;
+    }
+  }
+  .description-container{
+    padding: 2.25rem 0;
+    .expandable{
+      max-height: 120px;
+      overflow: hidden;
+    }
+    h2{
+      color: $black;
+      font-size: 1.25rem;
+    }
+    p{
+      line-height: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    ul{
+      margin-left: 2rem;
+      li{
+        margin-bottom: 0.8rem;
+        padding-left: 0.5rem;
+      }
+    }
+    .extras{
+      margin-top: 1.5rem;
+      h3{
+        font-size: 0.9rem;
+      }
+      .sponsored-logo{
+        margin-bottom: 3rem;
+      }
+      .social-icons{
+        margin-bottom: 3rem;
+        margin-left: 0;
+        overflow: hidden;
+        li{
+          list-style-type: none;
+          padding-left: 0.5rem !important;
+          float: left;
+          .icon{
+            background-color: $brand-color;
+            border-radius: 50%;
+            text-align: center;
+            width: 50px;
+            height: 50px;
+            line-height: 60px;
+            .fa{
+              color: $white;
+              font-size: 1.9rem;
+              &.fa-google-plus{
+                line-height: 54px;
+              }
+            }
+          }
+        }
+      }
+      .course-features{
+        margin-top: 1rem 2rem;
+        background-color: #fafafa;
+        padding: 2rem;
+        border-radius: 10px;
+        font-size: 0.9;
+        .row{
+          padding: .8rem 0;
+          border-bottom: 1px solid $light;
+          &:last-child{
+            border-bottom: 0;
+          }
+        }
+      }
+    }
+    .instructors{
+      padding: 1.5rem 0 0 0;
+      display: table;
+      width: 100%;
+      [class*="col"]{
+        display: table-row;
+        .thumbnail{
+          display: table-cell;
+          vertical-align: middle;
+          margin-right: 1.3rem;
+          padding-bottom: 1.5rem;
+        }
+        p{
+          display: table-cell;
+          vertical-align: middle;
+          margin-bottom: 0;
+          margin-top: 0;
+          color: $brand-color;
+          line-height: 1rem;
+          padding-left: 1.3rem;
+          padding-bottom: 1.5rem;
+          span{
+            display: block;
+            color: $dark;
+            margin-top: 0.6rem;
+          }
+        }
       }
     }
   }
@@ -541,6 +660,21 @@ header.header-main {
             }
           }
         }
+      }
+    }
+  }
+  .course-info {
+    .course-detail {
+      [class*="col"] {
+        margin-bottom: 0;
+      }
+      .btn-enroll{
+        margin-top: 0;
+      }
+    }
+    .description-container{
+      .expandable{
+        max-height: 224px;
       }
     }
   }
