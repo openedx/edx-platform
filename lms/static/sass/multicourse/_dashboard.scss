@@ -212,9 +212,44 @@
   }
 }
 
+// CASE: empty dashboard
+    .empty-dashboard-message {
+      border: 3px solid $gray-l4;
+      background: $gray-l6;
+      padding: ($baseline*2) 0;
+      text-align: center;
+
+      p {
+        @include font-size(24);
+        color: $lighter-base-font-color;
+        margin-bottom: $baseline;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+      }
+
+      a {
+        background-color: $blue;
+        border: 1px solid $blue;
+        box-shadow: 0 1px 8px 0 $shadow-l1;
+        @include box-sizing(border-box);
+        color: $white;
+        font-family: $sans-serif;
+        display: inline-block;
+        letter-spacing: 1px;
+        margin-top: ($baseline/4);
+        margin-left: ($baseline/4);
+        padding: 15px 20px;
+
+        &:hover, &:focus {
+          background: $blue-l2;
+          text-decoration: none;
+        }
+      }
+    }
+
 // +Dashboard - Course Listing
 // ====================
 .dashboard {
+
   .my-courses {
     @include float(left);
     margin: 0;
@@ -230,43 +265,6 @@
         @include padding-right($baseline/2);
       }
     }
-
-    // CASE: empty dashboard
-    .empty-dashboard-message {
-      padding: ($baseline*2) 0;
-      text-align: center;
-
-      p {
-        color: $lighter-base-font-color;
-        font-style: italic;
-        margin-bottom: $baseline;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
-      }
-
-      a {
-        background: rgb(240,240,240);
-        @include background-image($button-bg-image);
-        background-color: $button-bg-color;
-        border: 1px solid $border-color-2;
-        border-radius: 4px;
-        box-shadow: 0 1px 8px 0 $shadow-l1;
-        @include box-sizing(border-box);
-        color: $base-font-color;
-        font-family: $sans-serif;
-        display: inline-block;
-        letter-spacing: 1px;
-        @include margin-left($baseline/4);
-        padding: 5px 10px;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-        &:hover, &:focus {
-          color: $link-color;
-          text-decoration: none;
-        }
-      }
-    }
-
-    // ====================
 
     // UI: course list
     .listing-courses {
