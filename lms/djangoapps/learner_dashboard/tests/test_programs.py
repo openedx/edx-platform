@@ -14,6 +14,8 @@ from edx_oauth2_provider.tests.factories import ClientFactory
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests.mixins import CredentialsDataMixin, CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tests.mixins import (
     ProgramsApiConfigMixin,
     ProgramsDataMixin)
@@ -29,7 +31,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class TestProgramListing(
         ModuleStoreTestCase,
         ProgramsApiConfigMixin,
-        ProgramsDataMixin):
+        ProgramsDataMixin,
+        CredentialsDataMixin,
+        CredentialsApiConfigMixin):
 
     """
     Unit tests for getting the list of programs enrolled by a logged in user
@@ -41,6 +45,7 @@ class TestProgramListing(
             Add a student
         """
         super(TestProgramListing, self).setUp()
+        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
         self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
@@ -139,3 +144,57 @@ class TestProgramListing(
         self.assertEqual(response.status_code, 302)
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertIn('login', response.url)  # pylint: disable=no-member
+
+    def _expected_credetials_data(self):
+        """ Dry method for getting expected credentials."""
+
+        return [
+            {
+                "display_name": "Test Program A",
+                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
+            },
+            {
+                "display_name": "Test Program B",
+                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
+            }
+        ]
+
+    @httpretty.activate
+    def test_get_xseries_certificates_with_data(self):
+
+        self.create_programs_config(program_listing_enabled=True)
+        self.create_credentials_config(is_learner_issuance_enabled=True)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # mock programs and credentials apis
+        self.mock_programs_api()
+        self.mock_credentials_api(self.student, data=self.CREDENTIALS_API_RESPONSE, reset_url=False)
+
+        response = self.client.get(reverse("program_listing_view"))
+        self.assertEqual(response.status_code, 200)
+
+        for certificate in self._expected_credetials_data():
+            self.assertIn(certificate['display_name'], response.content)
+            self.assertIn(certificate['credential_url'], response.content)
+
+        self.assertIn('images/xseries-certificate-visual.png', response.content)
+
+    @httpretty.activate
+    def test_get_xseries_certificates_without_data(self):
+
+        self.create_programs_config(program_listing_enabled=True)
+        self.create_credentials_config(is_learner_issuance_enabled=True)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # mock programs and credentials apis
+        self.mock_programs_api()
+        self.mock_credentials_api(self.student, data={"results": []}, reset_url=False)
+
+        response = self.client.get(reverse("program_listing_view"))
+        self.assertEqual(response.status_code, 200)
+
+        for certificate in self._expected_credetials_data():
+            self.assertNotIn(certificate['display_name'], response.content)
+            self.assertNotIn(certificate['credential_url'], response.content)

@@ -19,6 +19,11 @@ $pl-button-color: #0079bc;
 .sidebar{
   @include outer-container;
   @include span-columns(12);
+  float: right !important;
+  margin-bottom: $baseline;
+  .certificate-container{
+    @include xseries-certificate-container();
+  }
   .program-advertise{
     padding: $baseline;
     background-color: $body-bg;

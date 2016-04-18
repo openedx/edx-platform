@@ -754,7 +754,8 @@
         'lms/include/js/spec/markdown_editor_spec.js',
         'lms/include/js/spec/learner_dashboard/collection_list_view_spec.js',
         'lms/include/js/spec/learner_dashboard/sidebar_view_spec.js',
-        'lms/include/js/spec/learner_dashboard/program_card_view_spec.js'
+        'lms/include/js/spec/learner_dashboard/program_card_view_spec.js',
+        'lms/include/js/spec/learner_dashboard/certificate_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);
