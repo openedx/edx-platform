@@ -82,36 +82,40 @@ class TestMakoTemplateLinter(TestLinter):
     @data(
         {
             'template': '\n <%page expression_filter="h"/>',
-            'violations': 0,
             'rule': None
         },
         {
             'template':
                 '\n <%page args="section_data" expression_filter="h" /> ',
-            'violations': 0,
             'rule': None
+        },
+        {
+            'template': '\n ## <%page expression_filter="h"/>',
+            'rule': Rules.mako_missing_default
         },
         {
             'template':
                 '\n <%page expression_filter="h" /> '
                 '\n <%page args="section_data"/>',
-            'violations': 1,
             'rule': Rules.mako_multiple_page_tags
         },
         {
+            'template':
+                '\n <%page expression_filter="h" /> '
+                '\n ## <%page args="section_data"/>',
+            'rule': None
+        },
+        {
             'template': '\n <%page args="section_data" /> ',
-            'violations': 1,
             'rule': Rules.mako_missing_default
         },
         {
             'template':
                 '\n <%page args="section_data"/> <some-other-tag expression_filter="h" /> ',
-            'violations': 1,
             'rule': Rules.mako_missing_default
         },
         {
             'template': '\n',
-            'violations': 1,
             'rule': Rules.mako_missing_default
         },
     )
@@ -124,16 +128,18 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(data['template'], results)
 
-        self.assertEqual(len(results.violations), data['violations'])
-        if data['violations'] > 0:
+        num_violations = 0 if data['rule'] is None else 1
+        self.assertEqual(len(results.violations), num_violations)
+        if num_violations > 0:
             self.assertEqual(results.violations[0].rule, data['rule'])
 
     @data(
         {'expression': '${x}', 'rule': None},
         {'expression': '${{unbalanced}', 'rule': Rules.mako_unparseable_expression},
         {'expression': '${x | n}', 'rule': Rules.mako_invalid_html_filter},
-        {'expression': '${x | n, unicode}', 'rule': None},
+        {'expression': '${x | n, decode.utf8}', 'rule': None},
         {'expression': '${x | h}', 'rule': Rules.mako_unwanted_html_filter},
+        {'expression': '  ## ${commented_out | h}', 'rule': None},
         {'expression': '${x | n, dump_js_escaped_json}', 'rule': Rules.mako_invalid_html_filter},
     )
     def test_check_mako_expressions_in_html(self, data):
@@ -377,7 +383,7 @@ class TestMakoTemplateLinter(TestLinter):
         {'expression': '${x | n}', 'rule': Rules.mako_invalid_js_filter},
         {'expression': '${x | h}', 'rule': Rules.mako_invalid_js_filter},
         {'expression': '${x | n, dump_js_escaped_json}', 'rule': None},
-        {'expression': '${x | n, unicode}', 'rule': None},
+        {'expression': '${x | n, decode.utf8}', 'rule': None},
     )
     def test_check_mako_expressions_in_javascript(self, data):
         """
@@ -400,7 +406,7 @@ class TestMakoTemplateLinter(TestLinter):
 
     @data(
         {'expression': '${x}', 'rule': Rules.mako_invalid_js_filter},
-        {'expression': '${x | n, js_escaped_string}', 'rule': None},
+        {'expression': '"${x | n, js_escaped_string}"', 'rule': None},
     )
     def test_check_mako_expressions_in_require_js(self, data):
         """
@@ -476,6 +482,63 @@ class TestMakoTemplateLinter(TestLinter):
         self.assertEqual(results.violations[2].rule, Rules.mako_unwanted_html_filter)
         self.assertEqual(results.violations[3].rule, Rules.mako_invalid_js_filter)
         self.assertEqual(results.violations[4].rule, Rules.mako_unwanted_html_filter)
+
+    def test_check_mako_expressions_javascript_strings(self):
+        """
+        Test _check_mako_file_is_safe javascript string specific rules.
+        - mako_js_missing_quotes
+        - mako_js_html_string
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            <script type="text/javascript">
+                var valid1 = '${x | n, js_escaped_string} ${y | n, js_escaped_string}'
+                var valid2 = '${x | n, js_escaped_string} ${y | n, js_escaped_string}'
+                var valid3 = 'string' + ' ${x | n, js_escaped_string} '
+                var valid4 = "${Text(_('Some mixed text{begin_span}with html{end_span}')).format(
+                    begin_span=HTML('<span>'),
+                    end_span=HTML('</span>'),
+                ) | n, js_escaped_string}"
+                var valid5 = " " + "${Text(_('Please {link_start}send us e-mail{link_end}.')).format(
+                    link_start=HTML('<a href="#" id="feedback_email">'),
+                    link_end=HTML('</a>'),
+                ) | n, js_escaped_string}";
+                var invalid1 = ${x | n, js_escaped_string};
+                var invalid2 = '<strong>${x | n, js_escaped_string}</strong>'
+                var invalid3 = '<strong>${x | n, dump_js_escaped_json}</strong>'
+            </script>
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 3)
+        self.assertEqual(results.violations[0].rule, Rules.mako_js_missing_quotes)
+        self.assertEqual(results.violations[1].rule, Rules.mako_js_html_string)
+        self.assertEqual(results.violations[2].rule, Rules.mako_js_html_string)
+
+    def test_check_javascript_in_mako_javascript_context(self):
+        """
+        Test _check_mako_file_is_safe with JavaScript error in JavaScript
+        context.
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            <script type="text/javascript">
+                var message = '<p>' + msg + '</p>';
+            </script>
+        """)
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertEqual(results.violations[0].rule, Rules.javascript_concat_html)
+        self.assertEqual(results.violations[0].start_line, 4)
 
     @data(
         {'template': "\n${x | n}", 'parseable': True},
@@ -749,20 +812,20 @@ class TestJavaScriptLinter(TestLinter):
     """
     Test JavaScriptLinter
     """
-
     @data(
         {'template': 'var m = "Text " + message + " text."', 'rule': None},
         {'template': 'var m = "<p>" + message + "</p>"', 'rule': Rules.javascript_concat_html},
+        {'template': '  // var m = "<p>" + commentedOutMessage + "</p>"', 'rule': None},
         {'template': 'var m = " <p> " + message + " </p> "', 'rule': Rules.javascript_concat_html},
     )
     def test_concat_with_html(self, data):
         """
-        Test _check_javascript_file_is_safe with concatenating strings and HTML
+        Test check_javascript_file_is_safe with concatenating strings and HTML
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
         self._validate_data_rule(data, results)
 
     @data(
@@ -781,12 +844,12 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_jquery_append(self, data):
         """
-        Test _check_javascript_file_is_safe with JQuery append()
+        Test check_javascript_file_is_safe with JQuery append()
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
@@ -806,12 +869,12 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_jquery_prepend(self, data):
         """
-        Test _check_javascript_file_is_safe with JQuery prepend()
+        Test check_javascript_file_is_safe with JQuery prepend()
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
@@ -835,14 +898,14 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_jquery_insertion(self, data):
         """
-        Test _check_javascript_file_is_safe with JQuery insertion functions
+        Test check_javascript_file_is_safe with JQuery insertion functions
         other than append(), prepend() and html() that take content as an
         argument (e.g. before(), after()).
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
@@ -866,14 +929,14 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_jquery_insert_to_target(self, data):
         """
-        Test _check_javascript_file_is_safe with JQuery insert to target
+        Test check_javascript_file_is_safe with JQuery insert to target
         functions that take a target as an argument, like appendTo() and
         prependTo().
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
@@ -888,12 +951,12 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_jquery_html(self, data):
         """
-        Test _check_javascript_file_is_safe with JQuery html()
+        Test check_javascript_file_is_safe with JQuery html()
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
@@ -904,26 +967,26 @@ class TestJavaScriptLinter(TestLinter):
     )
     def test_javascript_interpolate(self, data):
         """
-        Test _check_javascript_file_is_safe with interpolate()
+        Test check_javascript_file_is_safe with interpolate()
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
 
     @data(
-        {'template': '_.escape()', 'rule': None},
-        {'template': 'anything.escape()', 'rule': Rules.javascript_escape},
+        {'template': '_.escape(message)', 'rule': None},
+        {'template': 'anything.escape(message)', 'rule': Rules.javascript_escape},
     )
     def test_javascript_interpolate(self, data):
         """
-        Test _check_javascript_file_is_safe with interpolate()
+        Test check_javascript_file_is_safe with interpolate()
         """
         linter = JavaScriptLinter()
         results = FileResults('')
 
-        linter._check_javascript_file_is_safe(data['template'], results)
+        linter.check_javascript_file_is_safe(data['template'], results)
 
         self._validate_data_rule(data, results)
