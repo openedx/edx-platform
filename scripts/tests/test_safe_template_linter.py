@@ -46,9 +46,10 @@ class TestSafeTemplateLinter(TestCase):
         with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True):
             with mock.patch.object(JavaScriptLinter, '_is_valid_directory', return_value=True):
                 with mock.patch.object(UnderscoreTemplateLinter, '_is_valid_directory', return_value=True):
-                    _process_os_walk('scripts/tests/templates', template_linters, options, out)
+                    num_violations = _process_os_walk('scripts/tests/templates', template_linters, options, out)
 
         output = out.getvalue()
+        self.assertEqual(num_violations, 6)
         self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
         self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
         self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))

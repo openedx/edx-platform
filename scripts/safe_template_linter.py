@@ -660,16 +660,23 @@ class FileResults(object):
                     all violations.
             out: output file
 
+        Returns:
+            The number of violations. When using --quiet, returns number of
+            files with violations.
 
         """
+        num_violations = 0
         if options['is_quiet']:
             if self.violations is not None and 0 < len(self.violations):
+                num_violations += 1
                 print(self.full_path, file=out)
         else:
             self.violations.sort(key=lambda violation: violation.sort_key())
             for violation in self.violations:
                 if not violation.is_disabled:
+                    num_violations += 1
                     violation.print_results(out)
+        return num_violations
 
 
 class ParseString(object):
@@ -1895,12 +1902,17 @@ def _process_file(full_path, template_linters, options, out):
         options: A list of the options.
         out: output file
 
+    Returns:
+        The number of violations.
+
     """
+    num_violations = 0
     directory = os.path.dirname(full_path)
     file = os.path.basename(full_path)
     for template_linter in template_linters:
         results = template_linter.process_file(directory, file)
-        results.print_results(options, out)
+        num_violations += results.print_results(options, out)
+    return num_violations
 
 
 def _process_current_walk(current_walk, template_linters, options, out):
@@ -1914,12 +1926,17 @@ def _process_current_walk(current_walk, template_linters, options, out):
         options: A list of the options.
         out: output file
 
+    Returns:
+        The number of violations.
+
     """
+    num_violations = 0
     walk_directory = os.path.normpath(current_walk[0])
     walk_files = current_walk[2]
     for walk_file in walk_files:
         full_path = os.path.join(walk_directory, walk_file)
-        _process_file(full_path, template_linters, options, out)
+        num_violations += _process_file(full_path, template_linters, options, out)
+    return num_violations
 
 
 def _process_os_walk(starting_dir, template_linters, options, out):
@@ -1932,29 +1949,14 @@ def _process_os_walk(starting_dir, template_linters, options, out):
         options: A list of the options.
         out: output file
 
-    """
-    for current_walk in os.walk(starting_dir):
-        _process_current_walk(current_walk, template_linters, options, out)
-
-
-def _parse_arg(arg, option):
-    """
-    Parses an argument searching for --[option]=[OPTION_VALUE]
-
-    Arguments:
-        arg: The system argument
-        option: The specific option to be searched for (e.g. "file")
-
     Returns:
-        The option value for a match, or None if arg is not for this option
+        The number of violations.
+
     """
-    if arg.startswith('--{}='.format(option)):
-        option_value = arg.split('=')[1]
-        if option_value.startswith("'") or option_value.startswith('"'):
-            option_value = option_value[1:-1]
-        return option_value
-    else:
-        return None
+    num_violations = 0
+    for current_walk in os.walk(starting_dir):
+        num_violations += _process_current_walk(current_walk, template_linters, options, out)
+    return num_violations
 
 
 def main():
@@ -1986,11 +1988,16 @@ def main():
     if args.file is not None:
         if os.path.isfile(args.file[0]) is False:
             raise ValueError("File [{}] is not a valid file.".format(args.file[0]))
-        _process_file(args.file[0], template_linters, options, out=sys.stdout)
+        num_violations = _process_file(args.file[0], template_linters, options, out=sys.stdout)
     else:
         if os.path.exists(args.directory[0]) is False or os.path.isfile(args.directory[0]) is True:
             raise ValueError("Directory [{}] is not a valid directory.".format(args.directory[0]))
-        _process_os_walk(args.directory[0], template_linters, options, out=sys.stdout)
+        num_violations = _process_os_walk(args.directory[0], template_linters, options, out=sys.stdout)
+
+    if options['is_quiet'] is False:
+        # matches output of jshint for simplicity
+        print("")
+        print("{} violations found".format(num_violations))
 
 
 if __name__ == "__main__":
