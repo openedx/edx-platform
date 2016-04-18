@@ -31,7 +31,7 @@ class StudentProgress(models.Model):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
-    def get_total_completions(cls, course_key, exclude_users=None, org_ids=None):
+    def get_total_completions(cls, course_key, exclude_users=None, org_ids=None, group_ids=None):
         """
         Returns count of completions for a given course.
         """
@@ -41,8 +41,9 @@ class StudentProgress(models.Model):
             .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
-        completions = queryset.aggregate(total=Sum('completions'))
-        completions = completions['total'] or 0
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids).distinct()
+        completions = sum([student_progress.completions for student_progress in queryset])
         return completions
 
     @classmethod
@@ -86,7 +87,7 @@ class StudentProgress(models.Model):
         return data
 
     @classmethod
-    def generate_leaderboard(cls, course_key, count=3, exclude_users=None, org_ids=None):
+    def generate_leaderboard(cls, course_key, count=None, exclude_users=None, org_ids=None, group_ids=None):
         """
         Assembles a data set representing the Top N users, by progress, for a given course.
 
@@ -104,6 +105,8 @@ class StudentProgress(models.Model):
             .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids).distinct()
         queryset = queryset.values(
             'user__id',
             'user__username',
@@ -111,6 +114,7 @@ class StudentProgress(models.Model):
             'user__profile__avatar_url',
             'completions')\
             .order_by('-completions', 'modified')[:count]
+
         return queryset
 
 
