@@ -51,7 +51,7 @@ from api_manager.models import (
 from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
-from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
+from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime, get_ids_from_list_param
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 from progress.serializers import CourseModuleCompletionSerializer
@@ -1081,8 +1081,6 @@ class CoursesUsersList(SecureAPIView):
         """
         GET /api/courses/{course_id}/users
         """
-        orgs = request.QUERY_PARAMS.get('organizations')
-        groups = request.QUERY_PARAMS.get('groups', None)
         exclude_groups = request.QUERY_PARAMS.get('exclude_groups', None)
         response_data = OrderedDict()
         base_uri = generate_base_uri(request)
@@ -1092,15 +1090,17 @@ class CoursesUsersList(SecureAPIView):
         course_key = get_course_key(course_id)
         # Get a list of all enrolled students
         users = CourseEnrollment.objects.users_enrolled_in(course_key)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+
+        orgs = get_ids_from_list_param(self.request, 'organizations')
         if orgs:
-            orgs = orgs.split(",")[:upper_bound]
             users = users.filter(organizations__in=orgs)
+
+        groups = get_ids_from_list_param(self.request, 'groups')
         if groups:
-            groups = groups.split(",")[:upper_bound]
             users = users.filter(groups__in=groups)
+
+        exclude_groups = get_ids_from_list_param(self.request, 'exclude_groups')
         if exclude_groups:
-            exclude_groups = exclude_groups.split(",")[:upper_bound]
             users = users.exclude(groups__in=exclude_groups)
 
         response_data['enrollments'] = []
@@ -1400,7 +1400,6 @@ class CourseModuleCompletionList(SecureListAPIView):
         """
         GET /api/courses/{course_id}/completions/
         """
-        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
         stage = self.request.QUERY_PARAMS.get('stage', None)
         course_id = self.kwargs['course_id']
@@ -1408,9 +1407,8 @@ class CourseModuleCompletionList(SecureListAPIView):
             raise Http404
         course_key = get_course_key(course_id)
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        user_ids = get_ids_from_list_param(self.request, 'user_id')
         if user_ids:
-            user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
         if content_id:
@@ -1475,19 +1473,12 @@ class CoursesMetricsGradesList(SecureListAPIView):
                                                    user__courseenrollment__is_active=True,
                                                    user__courseenrollment__course_id__exact=course_key)\
             .exclude(user__in=exclude_users)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
-        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
+        user_ids = get_ids_from_list_param(self.request, 'user_id')
         if user_ids:
-            user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
-        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         if group_ids:
-            try:
-                group_ids = map(int, group_ids.split(','))
-            except ValueError:
-                return Response({}, status.HTTP_400_BAD_REQUEST)
-
             queryset = queryset.filter(user__groups__in=group_ids).distinct()
 
         sum_of_grades = sum([gradebook.grade for gradebook in queryset])
@@ -1562,13 +1553,8 @@ class CoursesMetrics(SecureAPIView):
             users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
             org_ids = [organization]
 
-        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         if group_ids:
-            try:
-                group_ids = map(int, group_ids.split(','))
-            except ValueError:
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
             users_enrolled_qs = users_enrolled_qs.filter(groups__in=group_ids)
 
         users_started = StudentProgress.get_num_users_started(course_key,
@@ -1666,13 +1652,8 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
             modules_completed_qs = modules_completed_qs.filter(user__organizations=organization)
             active_users_qs = active_users_qs.filter(student__organizations=organization)
 
-        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         if group_ids:
-            try:
-                group_ids = map(int, group_ids.split(','))
-            except ValueError:
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
             enrolled_qs = enrolled_qs.filter(user__groups__in=group_ids).distinct()
             grades_complete_qs = grades_complete_qs.filter(user__groups__in=group_ids).distinct()
             users_started_qs = users_started_qs.filter(user__groups__in=group_ids).distinct()
@@ -1749,13 +1730,7 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         GET /api/courses/{course_id}/grades/leaders/
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
-        group_ids = self.request.QUERY_PARAMS.get('groups', None)
-        if group_ids:
-            try:
-                group_ids = map(int, group_ids.split(','))
-            except ValueError:
-                return Response({}, status.HTTP_400_BAD_REQUEST)
-
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         count = self.request.QUERY_PARAMS.get('count', 3)
         data = {}
         course_avg = 0
@@ -1818,13 +1793,11 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         course_metadata = CourseAggregatedMetaData.get_from_id(course_key)
         total_possible_completions = float(course_metadata.total_assessments)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
-        if orgs_filter:
-            upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
-            orgs_filter = orgs_filter.split(",")[:upper_bound]
+        orgs_filter = get_ids_from_list_param(self.request, 'organizations')
+        group_ids = get_ids_from_list_param(self.request, 'groups')
 
         total_actual_completions = StudentProgress.get_total_completions(course_key, exclude_users=exclude_users,
-                                                                         org_ids=orgs_filter)
+                                                                         org_ids=orgs_filter, group_ids=group_ids)
         if user_id:
             user_data = StudentProgress.get_user_position(course_key, user_id, exclude_users=exclude_users)
             data['position'] = user_data['position']
@@ -1837,6 +1810,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         total_users_qs = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if orgs_filter:
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
+        if group_ids:
+            total_users_qs = total_users_qs.filter(groups__in=group_ids).distinct()
         total_users = total_users_qs.count()
         if total_users and total_actual_completions and total_possible_completions:
             course_avg = total_actual_completions / float(total_users)
@@ -1845,7 +1820,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
 
         if not skipleaders:
             queryset = StudentProgress.generate_leaderboard(course_key, count=count, exclude_users=exclude_users,
-                                                            org_ids=orgs_filter)
+                                                            org_ids=orgs_filter, group_ids=group_ids)
             serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
                                                             context={'total_completions': total_possible_completions})
             data['leaders'] = serializer.data  # pylint: disable=E1101
