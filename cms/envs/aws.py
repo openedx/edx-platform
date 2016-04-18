@@ -253,7 +253,6 @@ STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
 STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME', 'Studio')
 
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:

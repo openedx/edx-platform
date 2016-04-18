@@ -18,6 +18,7 @@ from edx_notifications.lib.publisher import (
     get_notification_type
 )
 from edx_notifications.data import NotificationMessage
+from openedx.core.djangoapps.content.course_metadata.utils import is_progress_detached_vertical
 
 from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
 
@@ -38,7 +39,7 @@ def is_valid_progress_module(content_id):
         usage_id = BlockUsageLocator.from_string(content_id)
         module = modulestore().get_item(usage_id)
         if module and module.parent and module.parent.category == "vertical" and \
-                module.category not in detached_categories:
+                module.category not in detached_categories and not is_progress_detached_vertical(module.parent):
             return True
         else:
             return False
