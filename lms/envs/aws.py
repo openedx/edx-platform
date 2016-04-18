@@ -625,7 +625,6 @@ BLOCK_STRUCTURES_SETTINGS = ENV_TOKENS.get('BLOCK_STRUCTURES_SETTINGS', BLOCK_ST
 STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUDENT_FILEUPLOAD_MAX_SIZE)
 
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:
