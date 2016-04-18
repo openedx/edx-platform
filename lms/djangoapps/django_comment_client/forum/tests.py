@@ -1318,7 +1318,7 @@ class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
         request.user = self.student
         with self.assertRaises(Http404):
             views.inline_discussion(
-                request, unicode(self.course.id), self.course.discussion_topics['General']['id']
+                request, "/some.invalid.key/course-v1:TTT+CS01+2015_T0", self.course.discussion_topics['General']['id']
             )
 
 
