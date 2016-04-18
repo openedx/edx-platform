@@ -54,6 +54,12 @@ class UtilsTests(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'FinalExam'},
             display_name=u"test vertical 2",
         )
+        self.vertical3 = ItemFactory.create(
+            parent_location=self.sub_section2.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Lab'},
+            display_name=u"Course Discussion",
+        )
         self.content_child1 = ItemFactory.create(
             category="html",
             parent_location=self.vertical.location,
@@ -78,9 +84,24 @@ class UtilsTests(ModuleStoreTestCase):
             data=self.test_data,
             display_name="Html component 2"
         )
+        self.content_child5 = ItemFactory.create(
+            category="discussion-course",
+            parent_location=self.vertical3.location,
+            data=self.test_data,
+            display_name="Course discussion"
+        )
+        self.content_child6 = ItemFactory.create(
+            category="html",
+            parent_location=self.vertical3.location,
+            data=self.test_data,
+            display_name="Html component 3"
+        )
         self.user = UserFactory()
 
-    @override_settings(PROGRESS_DETACHED_CATEGORIES=[])
+    @override_settings(
+        PROGRESS_DETACHED_CATEGORIES=[],
+        PROGRESS_DETACHED_VERTICAL_CATEGORIES=[],
+    )
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_course_leaf_nodes(self, module_store_type):
         """
@@ -88,9 +109,12 @@ class UtilsTests(ModuleStoreTestCase):
         """
         with modulestore().default_store(module_store_type):
             nodes = get_course_leaf_nodes(self.course.id)
-            self.assertEqual(len(nodes), 4)
+            self.assertEqual(len(nodes), 6)
 
-    @override_settings(PROGRESS_DETACHED_CATEGORIES=["group-project"])
+    @override_settings(
+        PROGRESS_DETACHED_CATEGORIES=["group-project"],
+        PROGRESS_DETACHED_VERTICAL_CATEGORIES=[],
+    )
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_course_leaf_nodes_with_detached_categories(self, module_store_type):
         """
@@ -99,16 +123,33 @@ class UtilsTests(ModuleStoreTestCase):
         with modulestore().default_store(module_store_type):
             nodes = get_course_leaf_nodes(self.course.id)
             # group-project project node should not be counted
-            self.assertEqual(len(nodes), 3)
+            self.assertEqual(len(nodes), 5)
 
-    @override_settings(PROGRESS_DETACHED_CATEGORIES=[])
+    @override_settings(
+        PROGRESS_DETACHED_CATEGORIES=["group-project"],
+        PROGRESS_DETACHED_VERTICAL_CATEGORIES=["discussion-course", "group-project"],
+    )
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_get_course_leaf_nodes_with_detached_vertical_categories(self, module_store_type):
+        """
+        Tests get_course_leaf_nodes with detached component and vertical categories
+        """
+        with modulestore().default_store(module_store_type):
+            nodes = get_course_leaf_nodes(self.course.id)
+            # group-project project node and all children of discussion-course vertical should not be counted
+            self.assertEqual(len(nodes), 1)
+
+    @override_settings(
+        PROGRESS_DETACHED_CATEGORIES=[],
+        PROGRESS_DETACHED_VERTICAL_CATEGORIES=[],
+    )
     def test_get_course_leaf_nodes_with_orphan_nodes(self):
         """
         Tests get_course_leaf_nodes if some nodes are orphan
         """
         with modulestore().default_store(ModuleStoreEnum.Type.mongo):
             with modulestore().branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-                # delete sub_section2 to make vertical2 orphan
+                # delete sub_section2 to make vertical2 and vertical3 orphan
                 store = modulestore()
                 store.delete_item(self.sub_section2.location, self.user.id)
                 nodes = get_course_leaf_nodes(self.course.id)

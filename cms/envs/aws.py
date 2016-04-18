@@ -263,7 +263,6 @@ for app in PROGRESS_DETACHED_APPS:
     PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
 
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 PROGRESS_DETACHED_APPS = ['group_project_v2']
 for app in PROGRESS_DETACHED_APPS:
     try:
