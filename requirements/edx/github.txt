@@ -63,6 +63,8 @@ git+https://github.com/edx/edx-organizations.git@release-2015-09-22#egg=edx-orga
 
 git+https://github.com/edx/edx-proctoring.git@0.10.20#egg=edx-proctoring==0.10.20
 
+# Oppia XBlock
+-e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
 
 # Third Party XBlocks
 -e git+https://github.com/Stanford-Online/edx-sga@0fb3a0e8887c6856f13c1c388661dcc255710b1d#egg=edx-sga
