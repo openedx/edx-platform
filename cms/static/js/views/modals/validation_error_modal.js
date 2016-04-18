@@ -57,7 +57,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
 
                 // hide the modal
                 BaseModal.prototype.hide.call(this); 
-            },
+            }
         });
 
         return ValidationErrorModal;

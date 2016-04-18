@@ -17,9 +17,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         VerificationAccessEditor, TimedExaminationPreferenceEditor, AccessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
-        events : {
+        events : _.extend({}, BaseModal.prototype.events, {
             'click .action-save': 'save'
-        },
+        }),
 
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'course-outline',
@@ -32,7 +32,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
-            this.events = $.extend({}, BaseModal.prototype.events, this.events);
             this.template = this.loadTemplate('course-outline-modal');
             this.options.title = this.getTitle();
         },
