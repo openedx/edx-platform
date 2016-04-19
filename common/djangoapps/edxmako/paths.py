@@ -9,9 +9,14 @@ import pkg_resources
 
 from django.conf import settings
 from mako.lookup import TemplateLookup
+from mako.exceptions import TopLevelLookupException
 
-from microsite_configuration import microsite
 from . import LOOKUP
+from openedx.core.djangoapps.theming.helpers import (
+    get_template as themed_template,
+    get_template_path_with_theme,
+    strip_site_theme_templates_path,
+)
 
 
 class DynamicTemplateLookup(TemplateLookup):
@@ -49,15 +54,29 @@ class DynamicTemplateLookup(TemplateLookup):
 
     def get_template(self, uri):
         """
-        Overridden method which will hand-off the template lookup to the microsite subsystem
-        """
-        microsite_template = microsite.get_template(uri)
+        Overridden method for locating a template in either the database or the site theme.
 
-        return (
-            microsite_template
-            if microsite_template
-            else super(DynamicTemplateLookup, self).get_template(uri)
-        )
+        If not found, template lookup will be done in comprehensive theme for current site
+        by prefixing path to theme.
+        e.g if uri is `main.html` then new uri would be something like this `/red-theme/lms/static/main.html`
+
+        If still unable to find a template, it will fallback to the default template directories after stripping off
+        the prefix path to theme.
+        """
+        # try to get template for the given file from microsite
+        template = themed_template(uri)
+
+        # if microsite template is not present or request is not in microsite then
+        # let mako find and serve a template
+        if not template:
+            try:
+                # Try to find themed template, i.e. see if current theme overrides the template
+                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
+            except TopLevelLookupException:
+                # strip off the prefix path to theme and look in default template dirs
+                template = super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
+
+        return template
 
 
 def clear_lookups(namespace):
