@@ -265,7 +265,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         url = reverse('info', args=[unicode(course.id)])
         with self.assertNumQueries(sql_queries):
             with check_mongo_calls(mongo_queries):
-                resp = self.client.get(url)
+                with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
+                    resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
