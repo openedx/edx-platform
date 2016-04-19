@@ -12,8 +12,9 @@ function (gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView
             'tabindex': -1
         },
 
-        initialize: function () {
+        initialize: function (options) {
             this.children = [];
+            this.options = _.extend({}, options);
             if (this.options.createHeaderFooter) {
                 this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
                 this.pagingFooterView = new PagingFooterView({collection: this.collection, hideWhenOnePage: true});

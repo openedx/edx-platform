@@ -19,8 +19,8 @@
                     notes: ''
                 },
 
-                url: function() {
-                    return this.get('url');
+                initialize: function (attributes, options) {
+                    this.url = options.url;
                 },
 
                 validate: function(attrs) {

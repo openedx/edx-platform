@@ -46,6 +46,11 @@
                 'success': gettext('Your changes have been saved.')
             },
 
+            constructor: function(options) {
+                this.options = _.extend({}, options);
+                Backbone.View.apply(this, arguments);
+            },
+
             initialize: function () {
 
                 this.template = _.template(this.fieldTemplate || '');
