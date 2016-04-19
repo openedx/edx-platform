@@ -17,7 +17,8 @@ from monkey_patch import (
 import xmodule.x_module
 import cms.lib.xblock.runtime
 
-from openedx.core.djangoapps.theming.core import enable_comprehensive_theme
+from openedx.core.djangoapps.theming.core import enable_comprehensive_theming
+from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
 
 def run():
@@ -29,8 +30,8 @@ def run():
 
     # Comprehensive theming needs to be set up before django startup,
     # because modifying django template paths after startup has no effect.
-    if settings.COMPREHENSIVE_THEME_DIR:
-        enable_comprehensive_theme(settings.COMPREHENSIVE_THEME_DIR)
+    if is_comprehensive_theming_enabled():
+        enable_comprehensive_theming(settings.COMPREHENSIVE_THEME_DIR)
 
     django.setup()
 
