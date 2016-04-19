@@ -8,17 +8,27 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components/utils/view_utils", "js/views/utils/xblock_utils",
-        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+define([
+    "jquery",
+    "underscore",
+    "js/views/xblock_outline",
+    "common/js/components/utils/view_utils",
+    "js/views/utils/xblock_utils",
+    "js/models/xblock_outline_info",
+    "js/views/modals/course_outline_modals",
+    "js/utils/drag_and_drop",
+    "text!templates/course-outline.underscore"
+    ],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
-        XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+        XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger,
+        CourseOutlineTemplate
     ) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
 
-            templateName: 'course-outline',
+            templateString: CourseOutlineTemplate,
 
             render: function() {
                 var renderResult = XBlockOutlineView.prototype.render.call(this);

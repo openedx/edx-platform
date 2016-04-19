@@ -73,7 +73,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
             beforeEach(function () {
                 ViewHelpers.installMockAnalytics();
                 ViewHelpers.installViewTemplates();
-                TemplateHelpers.installTemplate('unit-outline');
                 appendSetFixtures('<div class="wrapper-unit-overview"></div>');
             });
 

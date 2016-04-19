@@ -14,11 +14,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
             beforeEach(function () {
-                TemplateHelpers.installTemplate('xblock-string-field-editor');
                 TemplateHelpers.installTemplate('publish-xblock');
-                TemplateHelpers.installTemplate('publish-history');
-                TemplateHelpers.installTemplate('unit-outline');
-                TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
             });
 

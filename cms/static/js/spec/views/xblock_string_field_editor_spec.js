@@ -27,7 +27,6 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers
                beforeEach(function () {
                    initialDisplayName = "Default Display Name";
                    updatedDisplayName = "Updated Display Name";
-                   TemplateHelpers.installTemplate('xblock-string-field-editor');
                    appendSetFixtures(
                            '<div class="wrapper-xblock-field incontext-editor is-editable"' +
                            'data-field="display_name" data-field-display-name="Display Name">' +

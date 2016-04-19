@@ -1,9 +1,27 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-    "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+define([
+    "jquery",
+    "underscore",
+    "gettext",
+    "js/views/baseview",
+    "common/js/components/utils/view_utils",
+    "js/views/utils/xblock_utils",
+    "text!templates/container-message.underscore",
+    "text!templates/publish-history.underscore",
+    "edx-ui-toolkit/js/utils/html-utils"
+    ], function (
+        $,
+        _,
+        gettext,
+        BaseView,
+        ViewUtils,
+        XBlockViewUtils,
+        ContainerMessageTemplate,
+        PublishHistoryTemplate,
+        HtmlUtils
+    ) {
         var VisibilityState = XBlockViewUtils.VisibilityState,
             disabledCss = "is-disabled";
 
@@ -34,7 +52,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
         var MessageView = ContainerStateListenerView.extend({
             initialize: function () {
                 ContainerStateListenerView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('container-message');
+                this.template = HtmlUtils.template(ContainerMessageTemplate);
             },
 
             shouldRefresh: function(model) {
@@ -42,9 +60,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
+                    })
+                );
                 return this;
             }
         });
@@ -227,7 +248,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
 
             initialize: function () {
                 BaseView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('publish-history');
+                this.template = HtmlUtils.template(PublishHistoryTemplate);
                 this.model.on('sync', this.onSync, this);
             },
 
@@ -238,12 +259,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
             },
 
             render: function () {
-                this.$el.html(this.template({
-                    published: this.model.get('published'),
-                    published_on: this.model.get('published_on'),
-                    published_by: this.model.get('published_by')
-                }));
-
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template({
+                        published: this.model.get('published'),
+                        published_on: this.model.get('published_on'),
+                        published_by: this.model.get('published_by')
+                    })
+                );
                 return this;
             }
         });

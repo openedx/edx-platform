@@ -3,13 +3,11 @@
  */
 define(["jquery", "common/js/spec_helpers/template_helpers", "common/js/spec_helpers/view_helpers"],
     function($, TemplateHelpers, ViewHelpers) {
-        var installModalTemplates, getModalElement, getModalWindow, getModalTitle, isShowingModal, 
+        var installModalTemplates, getModalElement, getModalWindow, getModalTitle, isShowingModal,
             hideModalIfShowing, pressModalButton, cancelModal, cancelModalIfShowing;
 
         installModalTemplates = function(append) {
             ViewHelpers.installViewTemplates(append);
-            TemplateHelpers.installTemplate('basic-modal');
-            TemplateHelpers.installTemplate('modal-button');
         };
 
         getModalElement = function(modal) {
