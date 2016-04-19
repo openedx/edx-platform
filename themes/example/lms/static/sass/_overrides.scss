@@ -134,7 +134,7 @@ header.header-main {
       text-align: center;
       a{
         line-height: normal;
-        color: $brand-color;
+        color: $x-dark;
       }
     }
   }
@@ -542,6 +542,16 @@ header.header-main {
     text-align: left;
     letter-spacing: 0;
   }
+  h2{
+    font-size: 1.25rem;
+    color: $black;
+    line-height: 1.6rem;
+    text-transform: uppercase;
+  }
+  .brand-link{
+    display: block;
+    margin: 2rem 0;
+  }
   p{
     margin-top: 1rem;
     margin-bottom: 2rem;
@@ -569,6 +579,22 @@ header.header-main {
   .edx-intro{
     p{
       margin-top: 2.5rem;
+    }
+  }
+  .bordered-list{
+    margin: 0.5rem 0 2rem;
+    li{
+      list-style-type: none;
+      margin-bottom: 0;
+      border-bottom: 2px solid $course-section-background-color;
+      a{
+        padding: 0.8rem 0.5rem 0.8rem 0;
+        line-height: 1.5rem;
+        color: $brand-color;
+        font-size: 1rem;
+        display: inline-block;
+        word-break: break-word;
+      }
     }
   }
 }
@@ -683,7 +709,7 @@ header.header-main {
           width: auto;
           text-align: left;
           line-height: 100px;
-          padding: 0 1rem;
+          padding: 0 0.9rem;
           a{
             &.btn-neutral{
               padding: 0.625rem 1.25rem;
