@@ -122,7 +122,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
 
         for suite in suites:
             # Karma test command
-            karma_config_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
+            karma_config_file = Env.JS_TEST_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
             expected_test_tool_command = u'karma start {options}'.format(
                 options=self.EXPECTED_KARMA_OPTIONS.format(
                     config_file=karma_config_file,
