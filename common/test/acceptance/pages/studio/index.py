@@ -20,7 +20,6 @@ class DashboardPage(PageObject):
         super(DashboardPage, self).__init__(browser)
     url = BASE_URL + "/course/"
 
-
     def is_browser_on_page(self):
         return self.q(css='.content-primary').visible
 
@@ -61,7 +60,6 @@ class DashboardPage(PageObject):
         self.q(css='.course-run .value').filter(lambda el: el.text == run)[0].click()
         # Clicking on course with run will trigger an ajax event
         self.wait_for_ajax()
-
 
     def view_live(self, element):
         """

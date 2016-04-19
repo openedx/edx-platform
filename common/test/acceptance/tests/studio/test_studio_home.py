@@ -179,6 +179,7 @@ class StudioLanguageTest(WebAppTest):
             u'Dummy Language (Esperanto)'
         )
 
+
 class CourseNotEnrollTest(WebAppTest):
     """
     Test that we can create a new content library on the studio home page.
@@ -204,11 +205,11 @@ class CourseNotEnrollTest(WebAppTest):
         # TODO - is there a better way to make this agnostic to the underlying default module store?
         default_store = os.environ.get('DEFAULT_STORE', 'draft')
         course_key = CourseLocator(
-                self.course_org,
-                self.course_number,
-                self.course_run,
-                deprecated=(default_store == 'draft')
-            )
+            self.course_org,
+            self.course_number,
+            self.course_run,
+            deprecated=(default_store == 'draft')
+        )
         return unicode(course_key)
 
     def test_unenroll_course(self):
@@ -235,17 +236,20 @@ class CourseNotEnrollTest(WebAppTest):
         self.assertTrue(self.dashboard_page.is_new_course_form_valid())
         self.dashboard_page.submit_new_course_form()
 
+        self.dashboard_page.visit()
         LogoutPage(self.browser).visit()
         AutoAuthPage(self.browser, course_id=None, staff=True).visit()
 
         self.dashboard_page.visit()
         self.dashboard_page.view_live('.submit>input:last-child')
+
         about_page = AboutPage(self.browser, self.course_id)
         about_page.wait_for_page()
+        self.assertTrue(about_page.is_browser_on_page())
         self.assertTrue(about_page.is_register_button_present)
 
         self.dashboard_page.visit()
         self.dashboard_page.view_live('.submit>input:first-child')
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        self.assertTrue(courseware.is_browser_on_page())
+        course_ware = CoursewarePage(self.browser, self.course_id)
+        course_ware.wait_for_page()
+        self.assertTrue(course_ware.is_browser_on_page())

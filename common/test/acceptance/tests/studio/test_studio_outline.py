@@ -1450,7 +1450,6 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
     def test_unenroll_course(self):
-        from nose.tools import set_trace; set_trace()
         self.course_outline_page.visit()
         self.course_outline_page.view_live()
         courseware = CoursewarePage(self.browser, self.course_id)

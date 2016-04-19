@@ -354,11 +354,11 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
-        if bool(staff_access) == False:
+        if not bool(staff_access):
             return redirect("{url}?{redirect}".format(
                 url=reverse(enroll_staff, args=[course_key.to_deprecated_string()]),
                 redirect=request.GET.urlencode()
-                )
+            )
             )
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
@@ -837,6 +837,7 @@ def get_cosmetic_display_price(course, registration_price):
     else:
         # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
         return _('Free')
+
 
 @require_global_staff
 @require_http_methods(['POST', 'GET'])
