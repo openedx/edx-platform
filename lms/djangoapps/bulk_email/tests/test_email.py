@@ -339,8 +339,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         __, encoded_unexpected_from_addr = forbid_multi_line_headers(
             "from", unexpected_from_addr, 'utf-8'
         )
-        self.assertGreater(len(encoded_unexpected_from_addr), 320)
-        self.assertGreater(320, len(unexpected_from_addr))
+        self.assertEqual(len(encoded_unexpected_from_addr), 748)
+        self.assertEqual(len(unexpected_from_addr), 261)
 
         self.login_as_user(instructor)
         send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
