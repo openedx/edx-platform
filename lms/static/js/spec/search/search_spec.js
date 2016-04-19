@@ -655,6 +655,7 @@ define([
 
             function navigatesToSearch () {
                 var requests = AjaxHelpers.requests(this);
+                Backbone.history.start();
                 Backbone.history.loadUrl('search/query');
                 expect(requests[0].requestBody).toContain('search_string=query');
             }
@@ -688,6 +689,10 @@ define([
                     this.$searchResults = $('.courseware-results');
                 });
 
+                afterEach(function (){
+                    Backbone.history.stop();
+                });
+
                 it('shows loading message on search', showsLoadingMessage);
                 it('performs search', performsSearch);
                 it('shows an error message', showsErrorMessage);
@@ -714,6 +719,10 @@ define([
                     this.$contentElement = $('#my-courses');
                     this.contentElementDisplayValue = 'block';
                     this.$searchResults = $('#dashboard-search-results');
+                });
+
+                afterEach(function (){
+                    Backbone.history.stop();
                 });
 
                 it('shows loading message on search', showsLoadingMessage);

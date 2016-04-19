@@ -11,7 +11,8 @@ define([
             return 'note-section-' + _.uniqueId();
         },
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.extend({}, options);
             this.template = _.template(this.options.template);
             this.className = this.options.className;
         },
@@ -37,8 +38,9 @@ define([
         },
         template: _.template('<h3 class="course-title"><%- chapterName %></h3>'),
 
-        initialize: function () {
+        initialize: function (options) {
             this.children = [];
+            this.options = _.extend({}, options);
         },
 
         render: function () {

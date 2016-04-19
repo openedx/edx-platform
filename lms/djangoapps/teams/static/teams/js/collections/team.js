@@ -6,6 +6,7 @@
                 sortField: 'last_activity_at',
 
                 initialize: function(teams, options) {
+                    this.url = options.url;
                     var self = this;
                     BaseCollection.prototype.initialize.call(this, options);
 
