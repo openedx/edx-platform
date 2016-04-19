@@ -6,7 +6,8 @@
 
         var AccountSettingsView = Backbone.View.extend({
 
-            initialize: function () {
+            initialize: function (options) {
+                this.options = _.extend({}, options);
                 _.bindAll(this, 'render', 'renderFields', 'showLoadingError');
             },
 

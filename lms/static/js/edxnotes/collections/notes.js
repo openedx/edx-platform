@@ -9,6 +9,7 @@ define([
         initialize: function(models, options) {
             PagingCollection.prototype.initialize.call(this);
 
+            this.url = options.url;
             this.perPage = options.perPage;
             this.server_api = _.pick(this.server_api, "page", "page_size");
             if (options.text) {

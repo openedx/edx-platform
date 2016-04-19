@@ -22,6 +22,7 @@
                 },
 
                 initialize: function(options) {
+                    this.options = _.extend({}, options);
                     // The URL ends with team_id,request_username. We want to replace
                     // the last occurrence of team_id with the actual team_id, and remove request_username
                     // as the actual user to be removed from the team will be added on before calling DELETE.
