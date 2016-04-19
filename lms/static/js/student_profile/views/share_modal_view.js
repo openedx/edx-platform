@@ -17,6 +17,9 @@
                     'focus .focusguard-start': 'focusGuardStart',
                     'focus .focusguard-end': 'focusGuardEnd'
                 },
+                initialize: function (options) {
+                    this.options = _.extend({}, options);
+                },
                 focusGuardStart: function () {
                     // Should only be selected directly if shift-tabbing from the start, so grab last item.
                     this.$el.find("a").last().focus();

@@ -4,6 +4,9 @@
         function(BaseCollection, TeamMembershipModel) {
             var TeamMembershipCollection = BaseCollection.extend({
                 initialize: function(team_memberships, options) {
+                    if (options.url) {
+                        this.url = options.url;
+                    }
                     var self = this;
                     BaseCollection.prototype.initialize.call(this, options);
 
