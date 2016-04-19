@@ -12,9 +12,10 @@ import httpretty
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 
+from .constants import DUMMY_REDIRECT_URL
 from .. import adapters
 from .. import views
-from .constants import DUMMY_REDIRECT_URL
+from . import mixins
 
 
 class _DispatchingViewTestCase(TestCase):
@@ -43,14 +44,14 @@ class _DispatchingViewTestCase(TestCase):
             client_id='dop-app-client-id',
         )
 
-    def _post_request(self, user, client):
+    def _post_request(self, user, client, token_type=None):
         """
         Call the view with a POST request objectwith the appropriate format,
         returning the response object.
         """
-        return self.client.post(self.url, self._post_body(user, client))
+        return self.client.post(self.url, self._post_body(user, client, token_type))
 
-    def _post_body(self, user, client):
+    def _post_body(self, user, client, token_type=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -58,7 +59,7 @@ class _DispatchingViewTestCase(TestCase):
 
 
 @ddt.ddt
-class TestAccessTokenView(_DispatchingViewTestCase):
+class TestAccessTokenView(mixins.AccessTokenMixin, _DispatchingViewTestCase):
     """
     Test class for AccessTokenView
     """
@@ -66,16 +67,21 @@ class TestAccessTokenView(_DispatchingViewTestCase):
     view_class = views.AccessTokenView
     url = reverse('access_token')
 
-    def _post_body(self, user, client):
+    def _post_body(self, user, client, token_type=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
-        return {
+        body = {
             'client_id': client.client_id,
             'grant_type': 'password',
             'username': user.username,
             'password': 'test',
         }
+
+        if token_type:
+            body['token_type'] = token_type
+
+        return body
 
     @ddt.data('dop_client', 'dot_app')
     def test_access_token_fields(self, client_attr):
@@ -87,6 +93,16 @@ class TestAccessTokenView(_DispatchingViewTestCase):
         self.assertIn('expires_in', data)
         self.assertIn('scope', data)
         self.assertIn('token_type', data)
+
+    @ddt.data('dop_client', 'dot_app')
+    def test_jwt_access_token(self, client_attr):
+        client = getattr(self, client_attr)
+        response = self._post_request(self.user, client, token_type='jwt')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertIn('expires_in', data)
+        self.assertEqual(data['token_type'], 'JWT')
+        self.assert_valid_jwt_access_token(data['access_token'], self.user, data['scope'].split(' '))
 
     def test_dot_access_token_provides_refresh_token(self):
         response = self._post_request(self.user, self.dot_app)
@@ -111,7 +127,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     view_class = views.AccessTokenExchangeView
     url = reverse('exchange_access_token', kwargs={'backend': 'google-oauth2'})
 
-    def _post_body(self, user, client):
+    def _post_body(self, user, client, token_type=None):
         return {
             'client_id': client.client_id,
             'access_token': self.access_token,
