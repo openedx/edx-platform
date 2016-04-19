@@ -324,7 +324,7 @@ class S3ReportStore(ReportStore):
         course_dir = self.key_for(course_id, '')
         return [
             (key.key.split("/")[-1], key.generate_url(expires_in=300))
-            for key in sorted(self.bucket.list(prefix=course_dir.key), reverse=True, key=lambda k: k.last_modified)
+            for key in sorted(self.bucket.list(prefix=course_dir.key.strip('/')), reverse=True, key=lambda k: k.last_modified)
         ]
 
 
