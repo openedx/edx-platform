@@ -458,7 +458,13 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
 OAUTH2_PROVIDER = {
-    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator'
+    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'email': 'Email scope',
+        'profile': 'Profile scope',
+    }
 }
 
 ################################## TEMPLATE CONFIGURATION #####################################

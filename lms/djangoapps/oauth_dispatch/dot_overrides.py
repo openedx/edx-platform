@@ -1,6 +1,7 @@
 """
 Classes that override default django-oauth-toolkit behavior
 """
+from __future__ import unicode_literals
 
 from django.contrib.auth import authenticate, get_user_model
 from oauth2_provider.oauth2_validators import OAuth2Validator
@@ -41,3 +42,25 @@ class EdxOAuth2Validator(OAuth2Validator):
             else:
                 authenticated_user = authenticate(username=email_user.username, password=password)
         return authenticated_user
+
+    def save_bearer_token(self, token, request, *args, **kwargs):
+        """
+        Ensure that access tokens issued via client credentials grant are associated with the owner of the
+        ``Application``.
+        """
+        grant_type = request.grant_type
+        user = request.user
+
+        if grant_type == 'client_credentials':
+            # Temporarily remove the grant type to avoid triggering the super method's code that removes request.user.
+            request.grant_type = None
+
+            # Ensure the tokens get associated with the correct user since DOT does not normally
+            # associate access tokens issued with the client_credentials grant to users.
+            request.user = request.client.user
+
+        super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
+
+        # Restore the original request attributes
+        request.grant_type = grant_type
+        request.user = user
