@@ -137,7 +137,7 @@
         var view;
         view = new PromptView.Confirmation(this.options).show();
         expect(this.inFocusSpy).toHaveBeenCalled();
-        return ViewHelpers.verifyElementInFocus(view, ".wrapper-prompt")
+        expect(view.$(".wrapper-prompt")).toBeFocused();
       });
       it("is not focused on hide", function() {
         var view;
@@ -153,7 +153,7 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-primary")
+        expect(view.$(".action-primary")).toBeFocused();
       });
       it("traps keyboard focus when moving backward", function() {
         var view;
@@ -163,7 +163,7 @@
           "keydown",
           { keyCode: $.simulate.keyCode.TAB, shiftKey: true }
         );
-        return ViewHelpers.verifyElementInFocus(view, ".action-secondary")
+        expect(view.$(".action-secondary")).toBeFocused();
       });
       return it("changes class on body", function() {
         var view;
