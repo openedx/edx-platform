@@ -32,3 +32,13 @@ class ApiAccessRequestForm(forms.ModelForm):
         # Get rid of the colons at the end of the field labels.
         kwargs.setdefault('label_suffix', '')
         super(ApiAccessRequestForm, self).__init__(*args, **kwargs)
+
+
+class CatalogForm(forms.Form):
+    id = forms.IntegerField(required=False, widget=forms.HiddenInput)
+    name = forms.CharField(required=True, help_text="The name of this catalog")
+    query = forms.CharField(
+        required=True,
+        help_text="The query for courses to be returned by catalog",
+        widget=forms.Textarea
+    )

@@ -67,7 +67,7 @@ def get_id_token(user, client_name):
     return jwt.encode(payload, client.client_secret)
 
 
-def get_asymmetric_token(user):
+def get_asymmetric_token(user, client_id):
     """Construct a JWT signed with this app's private key.
 
     The JWT includes the following claims:
@@ -108,6 +108,7 @@ def get_asymmetric_token(user):
         'iss': settings.OAUTH_OIDC_ISSUER,
         'exp': now + datetime.timedelta(seconds=expires_in),
         'iat': now,
+        'aud': client_id,
         'sub': anonymous_id_for_user(user, None),
     }
 
