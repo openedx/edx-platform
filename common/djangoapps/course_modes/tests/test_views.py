@@ -22,7 +22,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
 import lms.djangoapps.commerce.tests.test_utils as ecomm_test_utils
 from course_modes.models import CourseMode, Mode
-from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
+from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 
 
 @ddt.ddt
@@ -352,7 +352,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @with_is_edx_domain(True)
+    @with_comprehensive_theme("edx.org")
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
