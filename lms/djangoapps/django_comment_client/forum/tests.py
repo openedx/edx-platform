@@ -1312,6 +1312,15 @@ class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
+    def _test_invalid_course_id(self):
+        """ Asserts that Http404 is raised when the course id is not valid. """
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        with self.assertRaises(Http404):
+            views.inline_discussion(
+                request, "/some.invalid.key/course-v1:TTT+CS01+2015_T0", self.course.discussion_topics['General']['id']
+            )
+
 
 class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
     @classmethod
