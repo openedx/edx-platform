@@ -179,3 +179,24 @@ def _send_decision_email(instance):
         instance.contacted = True
     except SMTPException:
         log.exception('Error sending API user notification email for request [%s].', instance.id)
+
+
+class CatalogManager(object):
+    def get(self, key):
+        log.info("GET api call: %s", key)
+        return None
+
+    def all(self):
+        log.info("ALL api call")
+        return []
+
+    def filter(self, **kwargs):
+        log.info("FILTER api call: %s", kwargs)
+        return []
+
+
+class Catalog(models.Model):
+    objects = CatalogManager()
+
+    class Meta:
+        managed = False

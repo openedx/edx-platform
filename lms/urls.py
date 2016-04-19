@@ -113,6 +113,9 @@ urlpatterns = (
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+    url(r'^admin/api_admin/catalog/add/$', 'openedx.core.djangoapps.api_admin.views.catalog_changeform'),
+    url(r'^admin/api_admin/catalog/(?P<id>\d+)/$', 'openedx.core.djangoapps.api_admin.views.catalog_changeform'),
+    url(r'^admin/api_admin/catalog/$', 'openedx.core.djangoapps.api_admin.views.catalog_changelist'),
 )
 
 urlpatterns += (
