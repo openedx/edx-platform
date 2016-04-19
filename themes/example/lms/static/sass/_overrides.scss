@@ -28,7 +28,7 @@ a{
     outline: none;
   }
   &.brand-link{
-    color: $brand-color;
+    color: $brand-color !important;
   }
 }
 .hidden-mobile{
@@ -121,14 +121,16 @@ header.header-main {
     left: 0;
     background-color: $white;
     z-index: 1;
+    box-shadow: 0px 2px 3px $light;
+    padding: 1rem 0;
     li{
       float: right;
       display: inline-block;
       vertical-align: middle;
-      line-height: 75px;
-      padding: 0 10px;
+      line-height: normal;
+      padding: 0.5rem;
       font-size: 1rem;
-      width: 33%;
+      width: 100%;
       text-align: center;
       a{
         line-height: normal;
@@ -613,33 +615,6 @@ header.header-main {
 //Media Queries
 
 @media screen and (min-width: 30em){
-  header.header-main{
-    .collapsed-button{
-      display: none;
-    }
-    .navbar-collapse{
-      ul{
-        display: block;
-        transition: all .2s;
-        position: relative;
-        top: inherit;
-        right: inherit;
-        left: inherit;
-        border-top: 0;
-        background-color: transparent;
-        li{
-          width: auto;
-          text-align: left;
-          line-height: 100px;
-          a{
-            &.btn-neutral{
-              padding: 0.625rem 1.25rem;
-            }
-          }
-        }
-      }
-    }
-  }
   .hero-main{
     .text-tint{
       .btn-neutral{
@@ -688,6 +663,36 @@ header.header-main {
 }
 
 @media screen and (min-width: 48em){
+  header.header-main{
+    .collapsed-button{
+      display: none;
+    }
+    .navbar-collapse{
+      ul{
+        display: block;
+        transition: all .2s;
+        position: relative;
+        top: inherit;
+        right: inherit;
+        left: inherit;
+        border-top: 0;
+        background-color: transparent;
+        box-shadow: none;
+        padding: 0;
+        li{
+          width: auto;
+          text-align: left;
+          line-height: 100px;
+          padding: 0 1rem;
+          a{
+            &.btn-neutral{
+              padding: 0.625rem 1.25rem;
+            }
+          }
+        }
+      }
+    }
+  }
   .footer-main{
     .footer-logo{
       text-align: center;
