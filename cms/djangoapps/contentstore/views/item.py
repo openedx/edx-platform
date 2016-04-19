@@ -106,6 +106,9 @@ def xblock_handler(request, usage_key_string):
                 :children: the unicode representation of the UsageKeys of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
+                :fields: any other xblock fields to be set. Only supported by update.
+                    This is represented as a dictionary:
+                        {'field_name': 'field_value'}
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
                 :isPrereq: Set this xblock as a prerequisite which can be used to limit access to other xblocks
@@ -169,6 +172,7 @@ def xblock_handler(request, usage_key_string):
                 prereq_usage_key=request.json.get('prereqUsageKey'),
                 prereq_min_score=request.json.get('prereqMinScore'),
                 publish=request.json.get('publish'),
+                fields=request.json.get('fields'),
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
@@ -431,11 +435,13 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
-                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None, publish=None):
+                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
+                 publish=None, fields=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
+
     """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
@@ -456,6 +462,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             xblock.data = data
         else:
             data = old_content['data'] if 'data' in old_content else None
+
+        if fields:
+            for field_name in fields:
+                setattr(xblock, field_name, fields[field_name])
 
         if children_strings is not None:
             children = []
@@ -610,7 +620,7 @@ def _create_item(request):
         user=request.user,
         category=category,
         display_name=request.json.get('display_name'),
-        boilerplate=request.json.get('boilerplate')
+        boilerplate=request.json.get('boilerplate'),
     )
 
     return JsonResponse(
