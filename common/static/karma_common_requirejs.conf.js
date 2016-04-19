@@ -37,7 +37,7 @@ var libraryFiles = [
     {pattern: 'js/vendor/jquery.truncate.js', included: false},
     {pattern: 'common/js/vendor/underscore.js', included: false},
     {pattern: 'js/vendor/underscore.string.min.js', included: false},
-    {pattern: 'js/vendor/backbone-min.js', included: false},
+    {pattern: 'common/js/vendor/backbone-min.js', included: false},
     {pattern: 'js/vendor/backbone.paginator.min.js', included: false},
     {pattern: 'js/vendor/jquery.timeago.js', included: false},
     {pattern: 'js/vendor/URI.min.js', included: false},

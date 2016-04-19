@@ -61,7 +61,7 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/src/**/*.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/backbone-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},

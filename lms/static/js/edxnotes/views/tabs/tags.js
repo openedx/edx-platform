@@ -24,6 +24,7 @@ define([
         },
 
         initialize: function (options) {
+            this.options = _.extend({}, options);
             TabView.prototype.initialize.call(this, options);
             _.bindAll(this, 'scrollToTag');
             this.options.scrollToTag = this.scrollToTag;

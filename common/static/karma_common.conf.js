@@ -39,7 +39,7 @@ var libraryFiles = [
     {pattern: 'js/vendor/mustache.js', included: true},
     {pattern: 'common/js/vendor/underscore.js', included: true},
     {pattern: 'js/vendor/underscore.string.min.js', included: true},
-    {pattern: 'js/vendor/backbone-min.js', included: true},
+    {pattern: 'common/js/vendor/backbone-min.js', included: true},
     {pattern: 'js/vendor/jquery.timeago.js', included: true},
     {pattern: 'js/vendor/URI.min.js', included: true},
     {pattern: 'coffee/src/ajax_prefix.js', included: true},

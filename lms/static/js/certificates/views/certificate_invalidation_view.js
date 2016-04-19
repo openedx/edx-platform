@@ -35,11 +35,15 @@
                     var notes = this.$("#certificate-invalidation-notes").val();
                     var message = "";
 
-                    var certificate_invalidation = new CertificateInvalidationModel({
-                        url: this.collection.url,
-                        user: user,
-                        notes: notes
-                    });
+                    var certificate_invalidation = new CertificateInvalidationModel(
+                        {
+                            user: user,
+                            notes: notes
+                        },
+                        {
+                            url: this.collection.url
+                        }
+                    );
 
                     if (this.collection.findWhere({user: user})) {
                         message = gettext("Certificate of <%= user %> has already been invalidated. Please check your spelling and retry."); // jshint ignore:line
