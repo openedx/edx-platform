@@ -17,7 +17,6 @@ import ddt
 from freezegun import freeze_time
 from mock import Mock, patch
 import tempfile
-import json
 from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
@@ -34,11 +33,7 @@ from django.conf import settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from pytz import UTC
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
-from xmodule.partitions.partitions import Group, UserPartition
-
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -733,6 +728,71 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 ]
             ))
         ])
+
+    def test_problem_grade_report_valid_columns_order(self):
+        """
+        Test that in the CSV grade report columns are placed in the proper order
+        """
+        grader_num = 7
+
+        self.course = CourseFactory.create(
+            grading_policy={
+                "GRADER": [{
+                    "type": "Homework %d" % i,
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW %d" % i,
+                    "weight": 1.0
+                } for i in xrange(1, grader_num)]
+            }
+        )
+
+        # Create users
+        self.student_a = UserFactory.create(username='student_a', email='student_a@example.com')
+        CourseEnrollmentFactory.create(user=self.student_a, course_id=self.course.id)
+        self.student_b = UserFactory.create(username='student_b', email='student_b@example.com')
+        CourseEnrollmentFactory.create(user=self.student_b, course_id=self.course.id)
+
+        problem_vertical_list = []
+
+        for i in xrange(1, grader_num):
+            chapter_name = 'Chapter %d' % i
+            problem_section_name = 'Problem section %d' % i
+            problem_section_format = 'Homework %d' % i
+            problem_vertical_name = 'Problem Unit %d' % i
+
+            chapter = ItemFactory.create(parent_location=self.course.location,
+                                         display_name=chapter_name)
+
+            # Add a sequence to the course to which the problems can be added
+            problem_section = ItemFactory.create(parent_location=chapter.location,
+                                                 category='sequential',
+                                                 metadata={'graded': True,
+                                                           'format': problem_section_format},
+                                                 display_name=problem_section_name)
+
+            # Create a vertical
+            problem_vertical = ItemFactory.create(
+                parent_location=problem_section.location,
+                category='vertical',
+                display_name=problem_vertical_name
+            )
+            problem_vertical_list.append(problem_vertical)
+
+        problem_names = []
+        for i in xrange(1, grader_num):
+            problem_url = 'test_problem_%d' % i
+            self.define_option_problem(problem_url, parent=problem_vertical_list[i - 1])
+            title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
+            problem_names.append(title)
+
+        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        for problem in problem_names:
+            header_row += [problem + ' (Earned)', problem + ' (Possible)']
+
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            upload_problem_grade_report(None, None, self.course.id, None, 'graded')
+        self.assertEquals(self.get_csv_row_with_headers(), header_row)
 
 
 class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, InstructorTaskModuleTestCase):
