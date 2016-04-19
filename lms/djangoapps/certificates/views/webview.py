@@ -14,6 +14,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
@@ -476,6 +477,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
+@login_required
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified user and course
