@@ -27,6 +27,9 @@ a{
     text-decoration: none;
     outline: none;
   }
+  &.brand-link{
+    color: $brand-color;
+  }
 }
 .hidden-mobile{
   display: none;
@@ -224,44 +227,6 @@ header.header-main {
           }
         }
       }
-    }
-  }
-}
-
-//Footer
-
-.footer-main{
-  padding: 2em 0;
-  .logo{
-    margin-bottom: 1em;
-  }
-  ul{
-    list-style: none;
-    margin-left: 1.5em;
-    li{
-      color: $dark;
-      padding: .3em 0;
-      a{
-        font-size: 1em;
-        color: $dark;
-        &:hover{
-          color: $dark;
-          text-decoration: none;
-        }
-      }
-      &:first-child{
-        font-weight:bold;
-      }
-      &:last-child{
-        margin-bottom: 2em;
-      }
-    }
-  }
-  .footer-logo{
-    text-align: center;
-    img{
-      margin-bottom: 1.5rem;
-      max-width: 90%;
     }
   }
 }
@@ -548,6 +513,99 @@ header.header-main {
           }
         }
       }
+    }
+  }
+}
+
+// Static pages
+
+.page-heading{
+  height: 110px;
+  background: url("../images/page-heading.jpg") center center no-repeat;
+  h1{
+    background-color: rgba($brand-color , 0.7);
+    text-align: center;
+    line-height: 110px;
+    color: $white;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+}
+.static-content{
+  padding: 3rem 0;
+  h1{
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    color: $black;
+    text-align: left;
+    letter-spacing: 0;
+  }
+  p{
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    color: $dark;
+    line-height: 1.5rem;
+  }
+  .mission-statement{
+    margin-top: 1rem;
+    p{
+      font-size: 1.05rem;
+    }
+    h3{
+      font-size: 1rem;
+      color: $black;
+      span{
+        color: $dark;
+        display: block;
+      }
+    }
+  }
+  hr{
+    border-top: 3px solid $course-section-background-color;
+    margin-bottom: 4rem;
+  }
+  .edx-intro{
+    p{
+      margin-top: 2.5rem;
+    }
+  }
+}
+
+//Footer
+
+.footer-main{
+  padding: 2em 0;
+  border-top: 3px solid $course-section-background-color;
+  .logo{
+    margin-bottom: 1em;
+  }
+  ul{
+    list-style: none;
+    margin-left: 1.5em;
+    li{
+      color: $dark;
+      padding: .3em 0;
+      a{
+        font-size: 1em;
+        color: $dark;
+        &:hover{
+          color: $dark;
+          text-decoration: none;
+        }
+      }
+      &:first-child{
+        font-weight:bold;
+      }
+      &:last-child{
+        margin-bottom: 2em;
+      }
+    }
+  }
+  .footer-logo{
+    text-align: center;
+    img{
+      margin-bottom: 1.5rem;
+      max-width: 90%;
     }
   }
 }
