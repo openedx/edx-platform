@@ -219,4 +219,6 @@ class AdvancedSettingsPage(CoursePage):
             'enable_proctored_exams',
             'enable_timed_exams',
             'enable_subsection_gating',
+            'learning_info',
+            'instructor_info'
         ]

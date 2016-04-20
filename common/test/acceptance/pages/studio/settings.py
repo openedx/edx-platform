@@ -261,12 +261,15 @@ class SettingsPage(CoursePage):
         # Return the joined path of the required asset.
         return os.sep.join(folders_list_in_path)
 
-    def upload_image(self, image_selector, file_to_upload):
+    def upload_image(self, upload_btn_selector, file_to_upload):
         """
         Upload image specified by image_selector and file_to_upload
         """
 
-        self.q(css=image_selector).results[0].click()
+        # wait for upload button
+        self.wait_for_element_presence(upload_btn_selector, 'upload button is present')
+
+        self.q(css=upload_btn_selector).results[0].click()
 
         # wait for popup
         self.wait_for_element_presence(self.upload_image_popup_window_selector, 'upload dialog is present')

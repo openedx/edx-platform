@@ -29,7 +29,9 @@ var CourseDetails = Backbone.Model.extend({
         video_thumbnail_image_asset_path: '',
         pre_requisite_courses: [],
         entrance_exam_enabled : '',
-        entrance_exam_minimum_score_pct: '50'
+        entrance_exam_minimum_score_pct: '50',
+        learning_info: [],
+        instructor_info: {}
     },
 
     validate: function(newattrs) {
