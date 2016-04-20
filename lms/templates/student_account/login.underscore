@@ -29,7 +29,7 @@
 
 <form id="login" class="login-form" tabindex="-1">
 
-    <div class="section-title">
+    <div class="section-title lines">
         <h2>
             <span class="text"><%- gettext("Login with") %></span>
         </h2>
@@ -77,5 +77,5 @@
 </form>
 
 <div class="toggle-form">
-    <button class="sign-up-button" data-type="register"><%- gettext("SIGN UP INSTEAD") %></button>
+    <a class="sign-up-button form-toggle" data-type="register"><%- gettext("SIGN UP INSTEAD") %></a>
 </div>

@@ -91,7 +91,7 @@ class LoginSessionView(APIView):
 
         # Translators: This label appears above a field on the login form
         # meant to hold the user's password.
-        password_label = _(u"")
+        password_label = _(u"Password")
 
         form_desc.add_field(
             "password",
@@ -325,11 +325,11 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _(u"")
+        email_label = _(u"Email")
 
         # Translators: This example email address is used as a placeholder in
         # a field on the registration form meant to hold the user's email address.
-        email_placeholder = _(u"Email Address")
+        email_placeholder = _(u"username@domain.com")
 
         form_desc.add_field(
             "email",
@@ -355,11 +355,11 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"")
+        name_label = _(u"Full name")
 
         # Translators: This example name is used as a placeholder in
         # a field on the registration form meant to hold the user's name.
-        name_placeholder = _(u"Your Full Name")
+        name_placeholder = _(u"Jane Doe")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
@@ -388,7 +388,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"")
+        username_label = _(u"Public username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
@@ -399,7 +399,7 @@ class RegistrationView(APIView):
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
-        username_placeholder = _(u"Public username e.g. JaneDoe")
+        username_placeholder = _(u"JaneDoe")
 
         form_desc.add_field(
             "username",
@@ -425,12 +425,11 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's password.
-        password_label = _(u"")
+        password_label = _(u"Password")
 
         form_desc.add_field(
             "password",
             label=password_label,
-            placeholder="Password",
             field_type="password",
             restrictions={
                 "min_length": PASSWORD_MIN_LENGTH,

@@ -21,7 +21,7 @@
         </div>
     <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
         <div class="login-providers">
-            <div class="section-title">
+            <div class="section-title lines">
                 <h2>
                     <span class="text"><%- gettext("Create an account using") %></span>
                 </h2>
@@ -54,12 +54,12 @@
             </h2>
         </div>
     <% } %>
-    <p class="note">* <%- gettext("Required field") %></p>
-    <%= context.fields %>
 
+    <%= context.fields %>
+    <p class="note">* <%- gettext("Required field") %></p>
     <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
 </form>
 
 <div class="toggle-form">
-    <button class="sign-up-button" data-type="login"><%- gettext("LOG IN INSTEAD") %></button>
+    <a class="sign-up-button form-toggle" data-type="login"><%- gettext("LOG IN INSTEAD") %></a>
 </div>
