@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 <div class="authorization-confirmation">
   % if not error:
   <p>
-  ${_("<strong>{application_name}</strong> would like to access your data with the following permissions:".format(
+  ${_("\n    <strong>{application_name}</strong> would like to access your data with the following permissions:\n  ".format(
     application_name=client.name
   ))}
   </p>
