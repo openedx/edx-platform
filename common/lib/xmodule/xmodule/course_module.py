@@ -408,6 +408,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    allow_private_to_peers = Boolean(
+        display_name=_("Allow Private Discussion Posts with Staff"),
+        help=_(
+            "Enter true or false. If true, students can create discussion posts that are not viewable by other "
+            "students. This settings allows staff to communicate privately with a student."
+        ),
+        scope=Scope.settings, default=False
+    )
     advanced_modules = List(
         display_name=_("Advanced Module List"),
         help=_("Enter the names of the advanced components to use in your course."),

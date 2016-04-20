@@ -76,6 +76,7 @@ if Backbone?
 
           anonymous          = false || @$(".js-anon").is(":checked")
           anonymous_to_peers = false || @$(".js-anon-peers").is(":checked")
+          private_to_peers   = false || @$(".js-private-peers").is(":checked")
           follow             = false || @$(".js-follow").is(":checked")
 
           topicId = if @isTabMode() then @topicView.getCurrentTopicId() else @topicId
@@ -93,6 +94,7 @@ if Backbone?
                   body: body
                   anonymous: anonymous
                   anonymous_to_peers: anonymous_to_peers
+                  private_to_peers: private_to_peers
                   auto_subscribe: follow
                   group_id: group
               error: DiscussionUtil.formErrorHandler(@$(".post-errors"))
