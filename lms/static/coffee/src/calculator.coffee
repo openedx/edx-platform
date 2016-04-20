@@ -62,7 +62,7 @@ class @Calculator
       isExpanded = true
 
       $calcWrapper
-        .find('input, a,')
+        .find('input, a')
         .attr 'tabindex', 0
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the

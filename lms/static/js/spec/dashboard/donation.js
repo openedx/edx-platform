@@ -29,7 +29,7 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // This function gets passed the dynamically constructed
                 // form with signed payment parameters from the LMS server,
                 // so we can verify that the form is constructed correctly.
-                spyOn(view, 'submitPaymentForm').andCallFake(function() {});
+                spyOn(view, 'submitPaymentForm').and.callFake(function() {});
 
                 // Stub the analytics event tracker
                 window.analytics = jasmine.createSpyObj('analytics', ['track']);
@@ -64,7 +64,7 @@ define(['common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_
                 // We stub out the actual submission of the form to avoid
                 // leaving the current page during the test.
                 expect(view.submitPaymentForm).toHaveBeenCalled();
-                var form = view.submitPaymentForm.mostRecentCall.args[0];
+                var form = view.submitPaymentForm.calls.mostRecent().args[0];
                 expect(form.serialize()).toEqual($.param(PAYMENT_PARAMS));
                 expect(form.attr('method')).toEqual("post");
                 expect(form.attr('action')).toEqual(PAYMENT_URL);

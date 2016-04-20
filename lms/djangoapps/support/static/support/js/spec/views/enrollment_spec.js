@@ -46,7 +46,7 @@ define([
         it('re-renders itself when its collection changes', function () {
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
-            spyOn(enrollmentView, 'render').andCallThrough();
+            spyOn(enrollmentView, 'render').and.callThrough();
             AjaxHelpers.respondWithJson(requests, [EnrollmentHelpers.mockEnrollmentData]);
             expect(enrollmentView.render).toHaveBeenCalled();
         });

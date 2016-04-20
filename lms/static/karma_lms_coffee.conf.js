@@ -38,7 +38,9 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
+    {pattern: 'js/spec/main_requirejs_coffee.js', included: true},
     {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: true},
@@ -54,6 +56,12 @@ var files = [
     {pattern: 'xmodule_js/src/capa/*.js', included: true},
     {pattern: 'xmodule_js/src/video/*.js', included: true},
     {pattern: 'xmodule_js/src/xmodule.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/vendor/draggabilly.js', included: false},
+
+    {pattern: 'xmodule_js/common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
+    {pattern: 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom.js', included: false},
+    {pattern: 'xmodule_js/common_static/edx-pattern-library/js/afontgarde.js', included: false},
+    {pattern: 'xmodule_js/common_static/edx-pattern-library/js/edx-icons.js', included: false},
 
     // source files
     {pattern: 'coffee/src/**/*.js', included: true, nocache: true},
