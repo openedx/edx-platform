@@ -28,7 +28,4 @@ window.ABTestSelector = function (runtime, elem) {
         var group_id = $(this).val();
         select_child(group_id);
     });
-}
-
-
-
+};
