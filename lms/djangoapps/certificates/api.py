@@ -32,6 +32,7 @@ from certificates.queue import XQueueCertInterface
 
 
 log = logging.getLogger("edx.certificate")
+MODES = GeneratedCertificate.MODES
 
 
 def is_passing_status(cert_status):
