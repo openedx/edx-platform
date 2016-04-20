@@ -459,8 +459,7 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = block.__class__.unmixed_class
-    # TODO: how can we cache XBlocks that are local to edx-platform?
-    if is_installed_xblock(xblock_class) and (settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG):
+    if (settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG):
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
             package_name=xblock_class.__module__,
             path=uri
@@ -470,12 +469,3 @@ def xblock_local_resource_url(block, uri):
             'block_type': block.scope_ids.block_type,
             'uri': uri,
         })
-
-
-def is_installed_xblock(xblock_class):
-    """
-    Returns true if the specified XBlock class belongs to an installed package,
-    i.e. it is not defined in edx-platform.
-    """
-    local_file = sys.modules[xblock_class.__module__].__file__
-    return "edx-platform" not in local_file

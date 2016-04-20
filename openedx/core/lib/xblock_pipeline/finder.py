@@ -12,8 +12,6 @@ from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
 
-from openedx.core.lib.xblock_utils import is_installed_xblock
-
 
 class XBlockPackageStorage(Storage):
     """
@@ -22,12 +20,13 @@ class XBlockPackageStorage(Storage):
 
     RESOURCE_PREFIX = 'xblock/resources/'
 
-    def __init__(self, module, *args, **kwargs):
+    def __init__(self, module, base_dir, *args, **kwargs):
         """
         Returns a static file storage if available in the given app.
         """
         super(XBlockPackageStorage, self).__init__(*args, **kwargs)
         self.module = module
+        self.base_dir = base_dir
 
         # Register a prefix that collectstatic will add to each path
         self.prefix = os.path.join(self.RESOURCE_PREFIX, module)
@@ -36,13 +35,13 @@ class XBlockPackageStorage(Storage):
         """
         Returns a file system filename for the specified file name.
         """
-        return resource_filename(self.module, name)
+        return resource_filename(self.module, os.path.join(self.base_dir, name))
 
     def exists(self, path):
         """
         Returns True if the specified path exists.
         """
-        return resource_exists(self.module, path)
+        return resource_exists(self.module, os.path.join(self.base_dir, path))
 
     def listdir(self, path):
         """
@@ -50,10 +49,10 @@ class XBlockPackageStorage(Storage):
         """
         directories = []
         files = []
-        for item in resource_listdir(self.module, path):
+        for item in resource_listdir(self.module, os.path.join(self.base_dir, path)):
             __, file_extension = os.path.splitext(item)
             if file_extension not in [".py", ".pyc", ".scss"]:
-                if resource_isdir(self.module, os.path.join(path, item)):
+                if resource_isdir(self.module, os.path.join(self.base_dir, path, item)):
                     directories.append(item)
                 else:
                     files.append(item)
@@ -109,11 +108,13 @@ class XBlockPipelineFinder(BaseFinder):
     """
     def __init__(self, *args, **kwargs):
         super(XBlockPipelineFinder, self).__init__(*args, **kwargs)
-        installed_xblock_packages = set()
+        xblock_classes = set()
         for __, xblock_class in XBlock.load_classes():
-            if is_installed_xblock(xblock_class):
-                installed_xblock_packages.add(xblock_class.__module__)
-        self.package_storages = [XBlockPackageStorage(package) for package in installed_xblock_packages]
+            xblock_classes.add(xblock_class)
+        self.package_storages = [
+            XBlockPackageStorage(xblock_class.__module__, xblock_class.get_resources_dir())
+            for xblock_class in xblock_classes
+        ]
 
     def list(self, ignore_patterns):
         """
