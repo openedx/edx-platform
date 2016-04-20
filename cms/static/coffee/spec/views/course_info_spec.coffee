@@ -94,6 +94,20 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     previewContents = @courseInfoEdit.$el.find('.update-contents').html()
                     expect(previewContents).toEqual('existing update')
 
+                @testInvalidDateValue = (value) ->
+                    @courseInfoEdit.onNew(@event)
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
+                    @courseInfoEdit.$el.find('input.date').val(value).trigger("change")
+                    courseInfoEdit = @courseInfoEdit
+                    jasmine.waitUntil(->
+                        courseInfoEdit.$el.find('.save-button').hasClass('is-disabled') == true
+                    ).then ->
+                        courseInfoEdit.$el.find('input.date').val('01/01/16').trigger 'change'
+                        jasmine.waitUntil(->
+                            courseInfoEdit.$el.find('.save-button').hasClass('is-disabled') == false
+                        ).always done
+                    return
+
                 cancelEditingUpdate = (update, modalCover, useCancelButton) ->
                     if useCancelButton
                         update.$el.find('.cancel-button').click()
@@ -152,14 +166,6 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
             it "does not remove existing course info on click outside modal", ->
                 @cancelExistingCourseInfo(false)
-
-            @testInvalidDateValue: (value) ->
-                @courseInfoEdit.onNew(@event)
-                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
-                @courseInfoEdit.$el.find('input.date').val(value).trigger("change")
-                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
-                @courseInfoEdit.$el.find('input.date').val("01/01/16").trigger("change")
-                expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
 
             it "does not allow updates to be saved with an invalid date", ->
                 @testInvalidDateValue("Marchtober 40, 2048")
