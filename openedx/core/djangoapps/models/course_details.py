@@ -9,7 +9,7 @@ from django.conf import settings
 from xmodule.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import course_image_url, additional_image_url
 from xmodule.modulestore.django import modulestore
 
 
@@ -100,6 +100,8 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.hero_image_name = descriptor.hero_image
+        course_details.hero_image_asset_path = additional_image_url(descriptor, 'hero_image')
         course_details.language = descriptor.language
         course_details.self_paced = descriptor.self_paced
 
@@ -219,7 +221,7 @@ class CourseDetails(object):
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
 
-        if 'hero_image_name' in jsondict:
+        if 'hero_image_name' in jsondict and jsondict['hero_image_name'] != descriptor.hero_image:
             descriptor.hero_image = jsondict['hero_image_name']
             dirty = True
 
