@@ -59,6 +59,12 @@ var files = [
     {pattern: 'common_static/js/vendor/moment.min.js', included: true},
     {pattern: 'spec/main_requirejs.js', included: true},
     {pattern: 'src/word_cloud/d3.min.js', included: true},
+    {pattern: 'common_static/js/vendor/draggabilly.js', included: false},
+
+    {pattern: 'common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
+    {pattern: 'common_static/edx-pattern-library/js/modernizr-custom.js', included: false},
+    {pattern: 'common_static/edx-pattern-library/js/afontgarde.js', included: false},
+    {pattern: 'common_static/edx-pattern-library/js/edx-icons.js', included: false},
 
     // Paths to source JavaScript files
     {pattern: 'src/xmodule.js', included: true, nocache: true},
