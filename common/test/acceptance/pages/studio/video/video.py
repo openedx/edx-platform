@@ -10,6 +10,7 @@ from ....tests.helpers import YouTubeStubConfig
 from ...lms.video.video import VideoPage
 from ...common.utils import wait_for_notification
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 CLASS_SELECTORS = {
@@ -134,6 +135,13 @@ class VideoComponentPage(VideoPage):
 
         """
         return self.q(css=CLASS_SELECTORS['video_controls']).visible
+
+    def click_button_subtitles(self):
+        """
+        Click .setting-replace button after first hovering to it.
+        """
+        element = self.q(css='.setting-replace')[0]
+        ActionChains(self.browser).move_to_element(element).click(element).perform()
 
     def click_button(self, button_name, index=0, require_notification=False):
         """
