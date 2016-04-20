@@ -54,6 +54,7 @@ class TestCreateAccount(TestCase):
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "testpass",
         }
 
     @ddt.data("en", "eo")
@@ -294,6 +295,7 @@ class TestCreateAccountValidation(TestCase):
             "name": "Test Name",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "test_password",
         }
 
     def assert_success(self, params):
@@ -555,6 +557,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "testpass",
         }
 
     def test_cs_user_created(self, request):
