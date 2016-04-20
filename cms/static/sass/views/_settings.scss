@@ -838,6 +838,184 @@
       }
     }
 
+    .add-new-data {
+      background-color: $green;
+      border-color: $green;
+      color: $white;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      &:hover{
+        background-color: $green-l1;
+        border-color: $green-l1;
+        box-shadow: 0 2px 1px rgba(0,0,0,0.2);
+      }
+      &.add-course-learning-info {
+        margin-top: 10px;
+      }
+    }
+
+    &.course-learning-info {
+      .list-input {
+        .course-settings-learning-fields {
+          .field {
+            .input-learning-info {
+              width: 88%;
+              display: inline-block;
+            }
+            .input-learning-info-stretch {
+              width: 100%;
+              display: inline-block;
+            }
+            input[type="button"] {
+              width: 10%;
+              margin-left: 1%;
+              font-size: 14px;
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+    &.instructor-types {
+      .list-input {
+        .course-instructor-details-fields {
+          .field {
+            width: 30%;
+            &.field-course-instructor-bio {
+              width: 95%;
+            }
+            &.current-instructor-image {
+              width: 100%;
+              text-align: left;
+              padding: 0;
+              .action-upload-instructor-image {
+                float: right;
+                width: 20%;
+                border-radius: 5px;
+                background-color: $white;
+                border: 1px solid lighten($blue, 24%);
+                padding: 10px 20px;
+                color: lighten($blue, 24%);
+                font-weight: 600;
+                font-size: 12px;
+                margin-top: 5px;
+                &:hover {
+                  background-color: lighten($blue, 24%);
+                  color: $white;
+                }
+              }
+              .wrapper-instructor-image {
+                margin: 15px auto;
+              }
+              .new-instructor-image-url {
+                width: 65%;
+                display: inline-block;
+              }
+            }
+          }
+        }
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .field-group {
+        @include clearfix();
+        width: flex-grid(9, 9);
+        margin-bottom: ($baseline*1.5);
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+
+        .field {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(3, 6);
+          margin-bottom: ($baseline/2);
+          margin-right: flex-gutter();
+        }
+
+         // specific fields - course image
+         .field-course-instructor-image {
+             margin-bottom: ($baseline/2);
+             padding: ($baseline/2) $baseline;
+             background: $gray-l5;
+             text-align: center;
+
+             .wrapper-instructor-image {
+               display: block;
+               width: 375px;
+               height: 200px;
+               overflow: hidden;
+               margin: 0 auto;
+               border: 1px solid $gray-l4;
+               box-shadow: 0 1px 1px $shadow-l1;
+               padding: ($baseline/2);
+               background: $white;
+             }
+
+             .instructor-image {
+               display: block;
+               width: 100%;
+               min-height: 100%;
+             }
+
+             .msg {
+               @extend %t-copy-sub2;
+               display: block;
+               margin-top: ($baseline/2);
+               color: $gray-l3;
+             }
+         }
+
+        .field-course-instructor-name,
+        .field-course-instructor-title,
+        .field-course-instructor-bio,
+        .field-course-instructor-organization {
+          width: flex-grid(2, 4);
+        }
+
+      .wrapper-input {
+        @include clearfix();
+        width: flex-grid(9,9);
+
+        .input {
+          float: left;
+          width: flex-grid(6,9);
+          margin-right: flex-gutter();
+        }
+
+        .action-upload-image {
+          @extend %ui-btn-flat-outline;
+          float: right;
+          width: flex-grid(2,9);
+          margin-top: ($baseline/4);
+          padding: ($baseline/2) $baseline;
+        }
+      }
+      }
+
+
+      .actions {
+        float: left;
+        width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+    }
+
     // specific fields - advanced settings
     &.advanced-policies {
 

@@ -14,7 +14,7 @@
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector", "course-settings-learning-fields", "course-instructor-details"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -386,10 +386,38 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                     <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
-                % endif
+                  % endif
+              </ol>
+            </section>
+         <hr class="divide" />
+          <section class="group-settings course-learning-info">
+              <header>
+                <h2 class="title-2">${_("Course Learning Information")}</h2>
+                <span class="tip">${_("Provide the course learning details")}</span>
+              </header>
+              <ol class="list-input enum">
+                  <li class="course-settings-learning-fields"></li>
+                  <li>
+                      <a href="javascript:void(0)" class="action action-primary button new-button add-new-data add-course-learning-info">
+                          <i class="icon fa fa-plus icon-inline"></i>${_("Add Learning Details")}</a>
+                  </li>
               </ol>
             </section>
 
+        <hr class="divide" />
+          <section class="group-settings instructor-types">
+              <header>
+                <h2 class="title-2">${_("Course Instructors Information")}</h2>
+                <span class="tip">${_("Information for course instructors")}</span>
+              </header>
+              <ol class="list-input enum">
+                  <span class="course-instructor-details-fields"></span>
+                  <li>
+                     <a href="javascript:void(0)" class="action action-primary button new-button add-course-instructor-info add-new-data">
+                         <i class="icon fa fa-plus icon-inline"></i>${_("Add Instructor Details")}</a>
+                 </li>
+              </ol>
+            </section>
           % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
