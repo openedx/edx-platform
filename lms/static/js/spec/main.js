@@ -31,8 +31,8 @@
             'moment': 'xmodule_js/common_static/js/vendor/moment.min',
             'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
-            'underscore': 'xmodule_js/common_static/common/js/vendor/underscore',
-            'underscore.string': 'xmodule_js/common_static/common/js/vendor/underscore.string',
+            'underscore': 'common/js/vendor/underscore',
+            'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
@@ -49,7 +49,6 @@
             'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
             'jasmine-waituntil': 'xmodule_js/common_static/js/libs/jasmine-waituntil',
             'jasmine-extensions': 'xmodule_js/common_static/js/libs/jasmine-extensions',
-            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
@@ -651,7 +650,6 @@
 
     var testFiles = [
         'js/spec/components/header/header_spec.js',
-        'js/spec/components/tabbed/tabbed_view_spec.js',
         'js/spec/components/card/card_spec.js',
         'js/spec/staff_debug_actions_spec.js',
         'js/spec/views/notification_spec.js',
