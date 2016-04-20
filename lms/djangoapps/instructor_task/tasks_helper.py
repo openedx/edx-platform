@@ -1420,20 +1420,13 @@ def generate_students_certificates(
         )
 
     elif student_set == 'whitelisted_not_generated':
-        # All Whitelisted students
+        # Whitelist students who did not get certificates already.
         students_to_generate_certs_for = students_to_generate_certs_for.filter(
             certificatewhitelist__course_id=course_id,
             certificatewhitelist__whitelist=True
-        )
-
-        # Whitelisted students which got certificates already.
-        certificate_generated_students = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
-            course_id=course_id,
-        )
-        certificate_generated_students_ids = set(certificate_generated_students.values_list('user_id', flat=True))
-
-        students_to_generate_certs_for = students_to_generate_certs_for.exclude(
-            id__in=certificate_generated_students_ids
+        ).exclude(
+            generatedcertificate__course_id=course_id,
+            generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
         )
 
     elif student_set == "specific_student":
