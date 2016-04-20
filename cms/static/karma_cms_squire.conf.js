@@ -34,7 +34,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.string.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone-associations-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
@@ -70,6 +70,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
 
     // Paths to source JavaScript files
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true, nocache: true},
     {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
     {pattern: 'js/collections/**/*.js', included: false, nocache: true},
     {pattern: 'js/models/**/*.js', included: false, nocache: true},
