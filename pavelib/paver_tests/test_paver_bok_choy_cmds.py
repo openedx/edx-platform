@@ -8,7 +8,7 @@ import unittest
 from mock import patch, call
 from test.test_support import EnvironmentVarGuard
 from paver.easy import BuildFailure
-from pavelib.utils.test.suites import BokChoyTestSuite, A11yCrawler
+from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
 
 REPO_DIR = os.getcwd()
 
@@ -171,7 +171,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             BokChoyTestSuite.verbosity_processes_string(suite)
 
 
-class TestPaverPa11ycrawlerCmd(unittest.TestCase):
+class TestPaverPa11yCrawlerCmd(unittest.TestCase):
 
     """
     Paver pa11ycrawler command test cases.  Most of the functionality is
@@ -179,7 +179,7 @@ class TestPaverPa11ycrawlerCmd(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestPaverPa11ycrawlerCmd, self).setUp()
+        super(TestPaverPa11yCrawlerCmd, self).setUp()
 
         # Mock shell commands
         mock_sh = patch('pavelib.utils.test.suites.bokchoy_suite.sh')
@@ -188,41 +188,32 @@ class TestPaverPa11ycrawlerCmd(unittest.TestCase):
         # Cleanup mocks
         self.addCleanup(mock_sh.stop)
 
-    def _expected_command(self, report_dir):
+    def _expected_command(self, report_dir, start_urls):
         """
         Returns the expected command to run pa11ycrawler.
         """
-        cms_start_url = (
-            "http://localhost:8031/auto_auth?redirect=true&course_id=course-v1"
-            "%3AedX%2BTest101%2Bcourse&staff=true"
-        )
-
-        lms_start_url = (
-            "http://localhost:8003/auto_auth?redirect=true&course_id=course-v1"
-            "%3AedX%2BTest101%2Bcourse&staff=true"
-        )
-
         expected_statement = (
-            'pa11ycrawler run "{cms_start_url}" "{lms_start_url}" '
+            'pa11ycrawler run {start_urls} '
             '--pa11ycrawler-allowed-domains=localhost '
             '--pa11ycrawler-reports-dir={report_dir} '
             '--pa11ycrawler-deny-url-matcher=logout '
             '--pa11y-reporter="1.0-json" '
             '--depth-limit=6 '
         ).format(
-            cms_start_url=cms_start_url,
-            lms_start_url=lms_start_url,
+            start_urls=start_urls,
             report_dir=report_dir,
         )
         return expected_statement
 
     def test_default(self):
-        suite = A11yCrawler('')
+        suite = Pa11yCrawler('')
         self.assertEqual(
-            suite.cmd, self._expected_command(suite.pa11y_report_dir))
+            suite.cmd,
+            self._expected_command(suite.pa11y_report_dir, suite.start_urls)
+        )
 
     def test_get_test_course(self):
-        suite = A11yCrawler('')
+        suite = Pa11yCrawler('')
         suite.get_test_course()
         self._mock_sh.assert_has_calls([
             call(
@@ -232,7 +223,7 @@ class TestPaverPa11ycrawlerCmd(unittest.TestCase):
         ])
 
     def test_generate_html_reports(self):
-        suite = A11yCrawler('')
+        suite = Pa11yCrawler('')
         suite.generate_html_reports()
         self._mock_sh.assert_has_calls([
             call(

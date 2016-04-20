@@ -1906,8 +1906,9 @@ def auto_auth(request):
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
     * `no_login`: Define this to create the user but not login
-    * `redirect`: Set to "true" will redirect to course if course_id is defined, otherwise it will redirect to dashboard
-
+    * `redirect`: Set to "true" will redirect to the `redirect_to` value if set, or
+        course home page if course_id is defined, otherwise it will redirect to dashboard
+    * `redirect_to`: will redirect to to this url
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -1923,6 +1924,7 @@ def auto_auth(request):
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
+    redirect_to = request.GET.get('redirect_to', None)
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
@@ -1931,7 +1933,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
-    redirect_when_done = request.GET.get('redirect', '').lower() == 'true'
+    redirect_when_done = request.GET.get('redirect', '').lower() == 'true' or redirect_to
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -1996,8 +1998,11 @@ def auto_auth(request):
     # Provide the user with a valid CSRF token
     # then return a 200 response unless redirect is true
     if redirect_when_done:
+        # Redirect to specific page if specified
+        if redirect_to:
+            redirect_url = redirect_to
         # Redirect to course info page if course_id is known
-        if course_id:
+        elif course_id:
             try:
                 # redirect to course info page in LMS
                 redirect_url = reverse(

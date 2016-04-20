@@ -260,22 +260,55 @@ class BokChoyTestSuite(TestSuite):
         return cmd
 
 
-class A11yCrawler(BokChoyTestSuite):
+class Pa11yCrawler(BokChoyTestSuite):
     """
     Sets up test environment with mega-course loaded, and runs pa11ycralwer
     against it.
     """
 
     def __init__(self, *args, **kwargs):
-        super(A11yCrawler, self).__init__(*args, **kwargs)
+        super(Pa11yCrawler, self).__init__(*args, **kwargs)
+        self.course_key = kwargs.get('course_key', "course-v1:edX+Test101+course")
+        if self.imports_dir:
+            # If imports_dir has been specified, assume the files are
+            # already there -- no need to fetch them from github. This
+            # allows someome to crawl a different course. They are responsible
+            # for putting it, un-archived, in the directory.
+            self.should_fetch_course = False
+        else:
+            # Otherwise, obey `--skip-fetch` command and use the default
+            # test course.  Note that the fetch will also be skipped when
+            # using `--fast`.
+            self.should_fetch_course = kwargs.get('should_fetch_course', not self.fasttest)
+            self.imports_dir = path('test_root/courses/')
 
         self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
-        self.imports_dir = path('test_root/courses/')
         self.tar_gz_file = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
 
+        self.start_urls = []
+        auto_auth_params = {
+            "redirect": 'true',
+            "staff": 'true',
+            "course_id": self.course_key,
+        }
+        cms_params = urlencode(auto_auth_params)
+        self.start_urls.append("\"http://localhost:8031/auto_auth?{}\"".format(cms_params))
+
+        sequence_url = "/api/courses/v1/blocks/?{}".format(
+            urlencode({
+                "course_id": self.course_key,
+                "depth": "all",
+                "all_blocks": "true",
+            })
+        )
+        auto_auth_params.update({'redirect_to': sequence_url})
+        lms_params = urlencode(auto_auth_params)
+        self.start_urls.append("\"http://localhost:8003/auto_auth?{}\"".format(lms_params))
+
     def __enter__(self):
-        self.get_test_course()
-        super(A11yCrawler, self).__enter__()
+        if self.should_fetch_course:
+            self.get_test_course()
+        super(Pa11yCrawler, self).__enter__()
 
     def get_test_course(self):
         """
@@ -319,23 +352,15 @@ class A11yCrawler(BokChoyTestSuite):
         """
         Runs pa11ycrawler as staff user against the test course.
         """
-        params = urlencode({
-            "redirect": 'true',
-            "staff": 'true',
-            "course_id": "course-v1:edX+Test101+course",
-        })
-        cms_start_url = 'http://localhost:8031/auto_auth?{}'.format(params)
-        lms_start_url = 'http://localhost:8003/auto_auth?{}'.format(params)
         cmd_str = (
-            'pa11ycrawler run "{cms_start_url}" "{lms_start_url}" '
+            'pa11ycrawler run {start_urls} '
             '--pa11ycrawler-allowed-domains={allowed_domains} '
             '--pa11ycrawler-reports-dir={report_dir} '
             '--pa11ycrawler-deny-url-matcher={dont_go_here} '
             '--pa11y-reporter="{reporter}" '
             '--depth-limit={depth} '
         ).format(
-            cms_start_url=cms_start_url,
-            lms_start_url=lms_start_url,
+            start_urls=self.start_urls,
             allowed_domains='localhost',
             report_dir=self.pa11y_report_dir,
             reporter="1.0-json",

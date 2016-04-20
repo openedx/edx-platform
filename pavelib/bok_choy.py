@@ -3,7 +3,7 @@ Run acceptance tests that use the bok-choy framework
 http://bok-choy.readthedocs.org/en/latest/
 """
 from paver.easy import task, needs, cmdopts, sh
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, A11yCrawler
+from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from optparse import make_option
@@ -24,6 +24,7 @@ BOKCHOY_OPTS = [
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('default_store=', 's', 'Default modulestore'),
     ('test_dir=', 'd', 'Directory for finding tests (relative to common/test/acceptance)'),
+    ('imports_dir=', 'i', 'Directory containing (un-archived) courses to be imported'),
     ('num_processes=', 'n', 'Number of test threads (for multiprocessing)'),
     ('verify_xss', 'x', 'Run XSS vulnerability tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
@@ -53,6 +54,7 @@ def parse_bokchoy_opts(options):
         'extra_args': getattr(options, 'extra_args', ''),
         'pdb': getattr(options, 'pdb', False),
         'test_dir': getattr(options, 'test_dir', 'tests'),
+        'imports_dir': getattr(options, 'imports_dir', None),
         'save_screenshots': getattr(options, 'save_screenshots', False),
     }
 
@@ -115,15 +117,12 @@ def test_a11y(options):
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
-@cmdopts(BOKCHOY_OPTS + [
-    ('imports_dir=', 'd', 'Directory containing (un-archived) courses to be imported'),
-])
+@cmdopts(BOKCHOY_OPTS)
 def perf_report_bokchoy(options):
     """
     Generates a har file for with page performance info.
     """
     opts = parse_bokchoy_opts(options)
-    opts['imports_dir'] = getattr(options, 'imports_dir', None)
     opts['test_dir'] = 'performance'
 
     run_bokchoy(**opts)
@@ -133,6 +132,13 @@ def perf_report_bokchoy(options):
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts(BOKCHOY_OPTS + [
     ('with-html', 'w', 'Include html reports'),
+    make_option('--course-key', help='Course key for test course'),
+    make_option(
+        "--skip-fetch",
+        action="store_false",
+        dest="should_fetch_course",
+        help='Course key for test course',
+    ),
 ])
 def pa11ycrawler(options):
     """
@@ -146,7 +152,9 @@ def pa11ycrawler(options):
     opts = parse_bokchoy_opts(options)
     opts['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
     opts['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
-    test_suite = A11yCrawler('a11y_crawler', **opts)
+    opts['should_fetch_course'] = getattr(options, 'should_fetch_course', None)
+    opts['course_key'] = getattr(options, 'course-key', None)
+    test_suite = Pa11yCrawler('a11y_crawler', **opts)
     test_suite.run()
 
     if getattr(options, 'with_html', False):
