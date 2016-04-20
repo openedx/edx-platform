@@ -37,8 +37,7 @@
             'draggabilly': 'js/vendor/draggabilly',
             'jasmine-stealth': 'js/libs/jasmine-stealth',
             'jasmine-waituntil': 'js/libs/jasmine-waituntil',
-            'jasmine-extensions': 'js/libs/jasmine-extensions',
-            'URI': 'js/vendor/URI.min'
+            'jasmine-extensions': 'js/libs/jasmine-extensions'
         },
         shim: {
             'gettext': {
