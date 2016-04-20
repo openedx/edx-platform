@@ -33,6 +33,25 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 log = logging.getLogger("edx.certificate")
 
 def get_certificates_for_user_basic(username):
+    """
+    Retrieve basic certificate information for a particular user.
+
+    Arguments:
+        username (unicode): The identifier of the user.
+
+    Returns: list
+
+    Example Usage:
+    >>> get_certificates_for_user_basic("bob")
+    [
+        {
+            "course_title": "some course",
+            "download_url": "/certificates/user/3/course/course-v1:APC101:2016_S1",
+        }
+    ]
+
+    """
+
     return [
         {
             "course_title": CourseOverview.objects.get(id=cert.course_id).display_name,
