@@ -17,7 +17,8 @@ define('video/09_events_plugin.js', [], function() {
 
         _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onEnded', 'onSeek',
             'onSpeedChange', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowCaptions', 'onHideCaptions', 'destroy');
+            'onShowCaptions', 'onHideCaptions', 'onShowTranscript', 'onHideTranscript',
+            'destroy');
         this.state = state;
         this.options = _.extend({}, options);
         this.state.videoEventsPlugin = this;
@@ -45,6 +46,8 @@ define('video/09_events_plugin.js', [], function() {
                 'speedchange': this.onSpeedChange,
                 'language_menu:show': this.onShowLanguageMenu,
                 'language_menu:hide': this.onHideLanguageMenu,
+                'transcript:show': this.onShowTranscript,
+                'transcript:hide': this.onHideTranscript,
                 'captions:show': this.onShowCaptions,
                 'captions:hide': this.onHideCaptions,
                 'destroy': this.destroy
@@ -105,20 +108,33 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onHideLanguageMenu: function () {
-            this.log('video_hide_cc_menu');
+            this.log('video_hide_cc_menu', { language: this.getCurrentLanguage() });
         },
 
         onShowCaptions: function () {
-            this.log('show_transcript', {current_time: this.getCurrentTime()});
+            this.log("edx.video.closed_captions.shown");
         },
 
         onHideCaptions: function () {
+            this.log("edx.video.closed_captions.hidden");
+        },
+
+        onShowTranscript: function () {
+            this.log('show_transcript', {current_time: this.getCurrentTime()});
+        },
+
+        onHideTranscript: function () {
             this.log('hide_transcript', {current_time: this.getCurrentTime()});
         },
 
         getCurrentTime: function () {
             var player = this.state.videoPlayer;
             return player ? player.currentTime : 0;
+        },
+
+        getCurrentLanguage: function() {
+            var language = this.state.lang;
+            return language;
         },
 
         log: function (eventName, data) {

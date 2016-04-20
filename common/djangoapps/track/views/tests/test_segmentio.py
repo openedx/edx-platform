@@ -320,6 +320,13 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         ('edx.video.position.changed', 'seek_video'),
         ('edx.video.transcript.shown', 'show_transcript'),
         ('edx.video.transcript.hidden', 'hide_transcript'),
+
+        # Need to add the following
+        # Mobile team?
+        # ('edx.video.closed_captions.shown', 'edx.video.closed_captions.shown'),
+        # ('edx.video.closed_captions.hidden', 'edx.video.closed_captions.hidden'),
+        # ('edx.video.language_menu.shown', 'video_show_cc_menu'),
+        # ('edx.video.language_menu.hidden', 'video_hide_cc_menu'),
     )
     @unpack
     def test_video_event(self, name, event_type):
