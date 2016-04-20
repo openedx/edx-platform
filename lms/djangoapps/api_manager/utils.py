@@ -4,10 +4,14 @@ import socket
 import struct
 import json
 import datetime
+
 from django.utils.timezone import now
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta, MO
 from django.conf import settings
+
+from rest_framework.exceptions import ParseError
+
 from student.roles import CourseRole, CourseObserverRole
 
 
@@ -194,3 +198,18 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
         dt_key += relativedelta(**{interval: 1})
 
     return series
+
+
+def get_ids_from_list_param(request, param_name):
+    """
+    Returns list of ids extracted from query param
+    """
+    ids = request.QUERY_PARAMS.get(param_name, None)
+    if ids:
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        try:
+            ids = map(int, ids.split(','))[:upper_bound]
+        except Exception:
+            raise ParseError("Invalid {} parameter value".format(param_name))
+
+    return ids
