@@ -33,7 +33,10 @@ class ProgramsApiConfigMixin(object):
 
 
 class ProgramsDataMixin(object):
-    """Mixin mocking Programs API URLs and providing fake data for testing."""
+    """Mixin mocking Programs API URLs and providing fake data for testing.
+
+    NOTE: This mixin is DEPRECATED. Tests should create and manage their own data.
+    """
     PROGRAM_NAMES = [
         'Test Program A',
         'Test Program B',

@@ -53,6 +53,8 @@ class TestProgramListing(
     def _create_course_and_enroll(self, student, org, course, run):
         """
         Creates a course and associated enrollment.
+
+        TODO: Use CourseEnrollmentFactory to avoid course creation.
         """
         course_location = locator.CourseLocator(org, course, run)
         course = CourseFactory.create(
@@ -96,6 +98,10 @@ class TestProgramListing(
             self.PROGRAMS_API_RESPONSE['results'][program_id]['organizations'][0]['display_name'],
         ]
 
+    def _assert_progress_data_present(self, response):
+        """Verify that progress data is present."""
+        self.assertContains(response, 'userProgress')
+
     @httpretty.activate
     def test_get_program_with_no_enrollment(self):
         response = self._setup_and_get_program()
@@ -113,6 +119,8 @@ class TestProgramListing(
         for program_element in self._get_program_checklist(1):
             self.assertNotContains(response, program_element)
 
+        self._assert_progress_data_present(response)
+
     @httpretty.activate
     def test_get_both_program(self):
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
@@ -122,6 +130,8 @@ class TestProgramListing(
             self.assertContains(response, program_element)
         for program_element in self._get_program_checklist(1):
             self.assertContains(response, program_element)
+
+        self._assert_progress_data_present(response)
 
     def test_get_programs_dashboard_not_enabled(self):
         self.create_programs_config(program_listing_enabled=False)
