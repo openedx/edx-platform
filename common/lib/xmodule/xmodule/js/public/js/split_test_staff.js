@@ -5,6 +5,7 @@
  */
 
 function ABTestSelector(runtime, elem) {
+    "use strict";
     var _this = this;
     _this.elem = $(elem);
     _this.children = _this.elem.find('.split-test-child');
