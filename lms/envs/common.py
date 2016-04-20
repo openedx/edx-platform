@@ -455,6 +455,12 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
+################################## DJANGO OAUTH TOOLKIT #######################################
+
+OAUTH2_PROVIDER = {
+    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator'
+}
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
