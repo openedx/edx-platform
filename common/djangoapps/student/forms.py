@@ -113,6 +113,7 @@ class TrueField(forms.BooleanField):
 _USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
 _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
 _PASSWORD_INVALID_MSG = _("A valid password is required")
+_PASSWORD_COPY_INVALID_MSG = _("A copy of password is required")
 _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
 
 
@@ -150,6 +151,8 @@ class AccountCreationForm(forms.Form):
     password_copy = forms.CharField(
         min_length=2,
         error_messages={
+            "required": _PASSWORD_COPY_INVALID_MSG,
+            "min_length": _PASSWORD_COPY_INVALID_MSG,
         }
     )
     name = forms.CharField(
@@ -250,12 +253,18 @@ class AccountCreationForm(forms.Form):
         return password_copy
 
     def _verify_email_really_exists(self, email):
+        """Check if a email really exists"""
+        mx_record = None
         try:
             domain = email.rsplit('@', 1)[-1]
             records = dns.resolver.query(domain, 'MX')
-            mxRecord = records[0].exchange
-            mxRecord = str(mxRecord)
-
+            mx_record = records[0].exchange
+            mx_record = str(mx_record)
+        except BaseException:
+            raise ValidationError(
+                u"Email domain '{domain}' doesn't exist".format(domain=domain)
+            )
+        try:
             # Get local server hostname
             host = socket.gethostname()
 
@@ -264,20 +273,18 @@ class AccountCreationForm(forms.Form):
             server.set_debuglevel(0)
 
             # SMTP Conversation
-            server.connect(mxRecord)
+            server.connect(mx_record)
             server.helo(host)
             server.mail(email)
-            code, message = server.rcpt(str(email))
+            code = server.rcpt(str(email))
             server.quit()
 
             if code != 250:
-                raise
-        except dns.resolver.NoNameservers:
+                raise ValidationError(
+                    u"Email '{email}' doesn't exist".format(email=email)
+                )
+        except BaseException:
             pass
-        except:
-            raise ValidationError(
-                u"Email '{email}' doesn't exist".format(email=email)
-            )
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
@@ -299,7 +306,8 @@ class AccountCreationForm(forms.Form):
                     "It looks like {email} belongs to an existing account. Try again with a different email address."
                 ).format(email=email)
             )
-        self._verify_email_really_exists(email)
+        if settings.REGISTRATION_EMAIL_FULL_VERIFICATION is not None:
+            self._verify_email_really_exists(email)
         return email
 
     def clean_year_of_birth(self):

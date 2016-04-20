@@ -54,6 +54,7 @@ class TestCreateAccount(TestCase):
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "testpass",
         }
 
     @ddt.data("en", "eo")
@@ -294,6 +295,7 @@ class TestCreateAccountValidation(TestCase):
             "name": "Test Name",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "test_password",
         }
 
     def assert_success(self, params):
@@ -376,6 +378,17 @@ class TestCreateAccountValidation(TestCase):
         assert_email_error("A properly formatted e-mail is required")
 
     @override_settings(
+        REGISTRATION_EMAIL_FULL_VERIFICATION = True,
+        REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
+    )
+    def test_email_really_exists(self):
+        params = dict(self.minimal_params)
+
+        field = "email"
+        params[field] = "abracadabra@abracadabra.com"
+        self.assert_error(params, field, "Email domain 'abracadabra.com' doesn't exist")
+
+    @override_settings(
         REGISTRATION_EMAIL_PATTERNS_ALLOWED=[
             r'.*@edx.org',  # Naive regex omitting '^', '$' and '\.' should still work.
             r'^.*@(.*\.)?example\.com$',
@@ -429,6 +442,26 @@ class TestCreateAccountValidation(TestCase):
         # Matching username
         params["username"] = params["password"] = "test_username_and_password"
         assert_password_error("Username and password fields cannot match")
+
+    def test_password_copy(self):
+        params = dict(self.minimal_params)
+
+        field = "password_copy"
+        error = "A copy of password is required"
+        # missing
+        del params[field]
+        self.assert_error(params, field, error)
+
+        #empty
+        params[field] = ""
+        self.assert_error(params, field, error)
+
+        # too short
+        params[field] = "a"
+        self.assert_error(params, field, error)
+
+        params[field] = "abracadabra"
+        self.assert_error(params, field, "Passwords don't match")
 
     def test_name(self):
         params = dict(self.minimal_params)
@@ -555,6 +588,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
+            "password_copy": "testpass",
         }
 
     def test_cs_user_created(self, request):
