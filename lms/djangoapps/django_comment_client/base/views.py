@@ -214,7 +214,7 @@ def create_thread(request, course_id, commentable_id):
     else:
         anonymous_to_peers = False
 
-    if course.allow_private_peers:
+    if course.allow_private_to_peers:
         private_to_peers = post.get('private_to_peers', 'false').lower() == 'true'
     else:
         private_to_peers = False
