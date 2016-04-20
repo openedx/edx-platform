@@ -128,7 +128,6 @@ LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
 ALLOWED_HOSTS = [
-    # TODO: bbeggs remove this before prod, temp fix to get load testing running
     "*",
     ENV_TOKENS.get('CMS_BASE')
 ]
