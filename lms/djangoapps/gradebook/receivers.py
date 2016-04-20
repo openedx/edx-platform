@@ -3,25 +3,24 @@ Signal handlers supporting various gradebook use cases
 """
 import logging
 import sys
-import json
+
 from django.dispatch import receiver
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 
-from courseware import grades
 from courseware.signals import score_changed
-from xmodule.modulestore import EdxJSONEncoder
-from util.request import RequestMockWithoutMiddleware
 from util.signals import course_deleted
 from student.roles import get_aggregate_exclusion_user_ids
-
-from gradebook.models import StudentGradebook, StudentGradebookHistory
-
 from edx_notifications.lib.publisher import (
     publish_notification_to_user,
     get_notification_type
 )
 from edx_notifications.data import NotificationMessage
+
+
+from gradebook.models import StudentGradebook, StudentGradebookHistory
+from gradebook.tasks import update_user_gradebook
+
 
 log = logging.getLogger(__name__)
 
@@ -29,40 +28,11 @@ log = logging.getLogger(__name__)
 @receiver(score_changed, dispatch_uid="lms.courseware.score_changed")
 def on_score_changed(sender, **kwargs):
     """
-    Listens for a 'score_changed' signal and when observed
-    recalculates the specified user's gradebook entry
+    Listens for a 'score_changed' signal invoke grade book update task
     """
-    from courseware.views import get_course
     user = kwargs['user']
     course_key = kwargs['course_key']
-    course_descriptor = get_course(course_key, depth=None)
-    request = RequestMockWithoutMiddleware().get('/')
-    request.user = user
-    progress_summary = grades.progress_summary(user, request, course_descriptor, locators_as_strings=True)
-    grade_summary = grades.grade(user, request, course_descriptor)
-    grading_policy = course_descriptor.grading_policy
-    grade = grade_summary['percent']
-    proforma_grade = grades.calculate_proforma_grade(grade_summary, grading_policy)
-
-    try:
-        gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course_key)
-        if gradebook_entry.grade != grade:
-            gradebook_entry.grade = grade
-            gradebook_entry.proforma_grade = proforma_grade
-            gradebook_entry.progress_summary = json.dumps(progress_summary, cls=EdxJSONEncoder)
-            gradebook_entry.grade_summary = json.dumps(grade_summary, cls=EdxJSONEncoder)
-            gradebook_entry.grading_policy = json.dumps(grading_policy, cls=EdxJSONEncoder)
-            gradebook_entry.save()
-    except StudentGradebook.DoesNotExist:
-        StudentGradebook.objects.create(
-            user=user,
-            course_id=course_key,
-            grade=grade,
-            proforma_grade=proforma_grade,
-            progress_summary=json.dumps(progress_summary, cls=EdxJSONEncoder),
-            grade_summary=json.dumps(grade_summary, cls=EdxJSONEncoder),
-            grading_policy=json.dumps(grading_policy, cls=EdxJSONEncoder)
-        )
+    update_user_gradebook.delay(course_key, user)
 
 
 @receiver(course_deleted)
