@@ -9,8 +9,48 @@ import textwrap
 from unittest import TestCase
 
 from ..safe_template_linter import (
-    _process_os_walk, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString, UnderscoreTemplateLinter, Rules
+    _process_os_walk, FileResults, JavaScriptLinter, MakoTemplateLinter, ParseString, StringLines,
+    UnderscoreTemplateLinter, Rules
 )
+
+
+@ddt
+class TestStringLines(TestCase):
+    """
+    Test StringLines class.
+    """
+    @data(
+        {'string': 'test', 'index': 0, 'line_start_index': 0, 'line_end_index': 4},
+        {'string': 'test', 'index': 2, 'line_start_index': 0, 'line_end_index': 4},
+        {'string': 'test', 'index': 3, 'line_start_index': 0, 'line_end_index': 4},
+        {'string': '\ntest', 'index': 0, 'line_start_index': 0, 'line_end_index': 1},
+        {'string': '\ntest', 'index': 2, 'line_start_index': 1, 'line_end_index': 5},
+        {'string': '\ntest\n', 'index': 0, 'line_start_index': 0, 'line_end_index': 1},
+        {'string': '\ntest\n', 'index': 2, 'line_start_index': 1, 'line_end_index': 6},
+        {'string': '\ntest\n', 'index': 6, 'line_start_index': 6, 'line_end_index': 6},
+    )
+    def test_string_lines_start_end_index(self, data):
+        """
+        Test StringLines index_to_line_start_index and index_to_line_end_index.
+        """
+        lines = StringLines(data['string'])
+        self.assertEqual(lines.index_to_line_start_index(data['index']), data['line_start_index'])
+        self.assertEqual(lines.index_to_line_end_index(data['index']), data['line_end_index'])
+
+    @data(
+        {'string': 'test', 'line_number': 1, 'line': 'test'},
+        {'string': '\ntest', 'line_number': 1, 'line': ''},
+        {'string': '\ntest', 'line_number': 2, 'line': 'test'},
+        {'string': '\ntest\n', 'line_number': 1, 'line': ''},
+        {'string': '\ntest\n', 'line_number': 2, 'line': 'test'},
+        {'string': '\ntest\n', 'line_number': 3, 'line': ''},
+    )
+    def test_string_lines_start_end_index(self, data):
+        """
+        Test line_number_to_line.
+        """
+        lines = StringLines(data['string'])
+        self.assertEqual(lines.line_number_to_line(data['line_number']), data['line'])
 
 
 class TestLinter(TestCase):
@@ -30,7 +70,7 @@ class TestSafeTemplateLinter(TestCase):
     Test some top-level linter functions
     """
 
-    def test_process_os_walk_with_includes(self):
+    def test_process_os_walk(self):
         """
         Tests the top-level processing of template files, including Mako
         includes.
@@ -599,10 +639,10 @@ class TestMakoTemplateLinter(TestLinter):
         expressions = linter._find_mako_expressions(data['template'])
 
         self.assertEqual(len(expressions), 1)
-        start_index = expressions[0]['start_index']
-        end_index = expressions[0]['end_index']
+        start_index = expressions[0].start_index
+        end_index = expressions[0].end_index
         self.assertEqual(data['template'][start_index:end_index], data['template'].strip())
-        self.assertEqual(expressions[0]['expression'], data['template'].strip())
+        self.assertEqual(expressions[0].expression, data['template'].strip())
 
     @data(
         {'template': " ${{unparseable} ${}", 'start_index': 1},
@@ -616,8 +656,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         expressions = linter._find_mako_expressions(data['template'])
         self.assertTrue(2 <= len(expressions))
-        self.assertEqual(expressions[0]['start_index'], data['start_index'])
-        self.assertIsNone(expressions[0]['expression'])
+        self.assertEqual(expressions[0].start_index, data['start_index'])
+        self.assertIsNone(expressions[0].expression)
 
     @data(
         {

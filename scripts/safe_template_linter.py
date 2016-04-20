@@ -74,18 +74,16 @@ def _find_closing_char_index(start_delim, open_char, close_char, template, start
         strings: A list of ParseStrings already parsed
 
     Returns:
-        A dict containing the following:
-            close_char_index: The index of the closing character, or -1 if
-            unparseable.
+        A dict containing the following, or None if unparseable:
+            close_char_index: The index of the closing character
             strings: a list of ParseStrings
 
     """
     strings = [] if strings is None else strings
-    unparseable_result = {'close_char_index': -1, 'strings': []}
     close_char_index = template.find(close_char, start_index)
     if close_char_index < 0:
         # if we can't find an end_char, let's just quit
-        return unparseable_result
+        return None
     open_char_index = template.find(open_char, start_index, close_char_index)
     parse_string = ParseString(template, start_index, close_char_index)
 
@@ -99,7 +97,7 @@ def _find_closing_char_index(start_delim, open_char, close_char, template, start
     if parse_string.start_index == min_valid_index:
         strings.append(parse_string)
         if parse_string.end_index < 0:
-            return unparseable_result
+            return None
         else:
             return _find_closing_char_index(
                 start_delim, open_char, close_char, template, start_index=parse_string.end_index,
@@ -111,7 +109,7 @@ def _find_closing_char_index(start_delim, open_char, close_char, template, start
             # if we find another starting delim, consider this unparseable
             start_delim_index = template.find(start_delim, start_index, close_char_index)
             if 0 <= start_delim_index < open_char_index:
-                return unparseable_result
+                return None
         return _find_closing_char_index(
             start_delim, open_char, close_char, template, start_index=open_char_index + 1,
             num_open_chars=num_open_chars + 1, strings=strings
@@ -145,7 +143,9 @@ class StringLines(object):
 
         """
         self._string = string
-        self._line_breaks = self._process_line_breaks(string)
+        self._line_start_indexes = self._process_line_breaks(string)
+        # this is an exclusive index used in the case that the template doesn't
+        # end with a new line
         self.eof_index = len(string)
 
     def _process_line_breaks(self, string):
@@ -157,19 +157,18 @@ class StringLines(object):
             string: The string in which to find line breaks.
 
         Returns:
-             A list of indices into the string at which each line break can be
-             found.
+             A list of indices into the string at which each line begins.
 
         """
-        line_breaks = [0]
+        line_start_indexes = [0]
         index = 0
         while True:
             index = string.find('\n', index)
             if index < 0:
                 break
             index += 1
-            line_breaks.append(index)
-        return line_breaks
+            line_start_indexes.append(index)
+        return line_start_indexes
 
     def get_string(self):
         """
@@ -190,7 +189,7 @@ class StringLines(object):
 
         """
         current_line_number = 0
-        for line_break_index in self._line_breaks:
+        for line_break_index in self._line_start_indexes:
             if line_break_index <= index:
                 current_line_number += 1
             else:
@@ -254,7 +253,7 @@ class StringLines(object):
             The starting index for the provided line number.
 
         """
-        return self._line_breaks[line_number - 1]
+        return self._line_start_indexes[line_number - 1]
 
     def line_number_to_end_index(self, line_number):
         """
@@ -268,9 +267,11 @@ class StringLines(object):
             The ending index for the provided line number.
 
         """
-        if len(self._line_breaks) < line_number:
-            return self._line_breaks[line_number]
+        if line_number < len(self._line_start_indexes):
+            return self._line_start_indexes[line_number]
         else:
+            # an exclusive index in the case that the file didn't end with a
+            # newline.
             return self.eof_index
 
     def line_number_to_line(self, line_number):
@@ -284,11 +285,11 @@ class StringLines(object):
             The line of text designated by the provided line number.
 
         """
-        start_index = self._line_breaks[line_number - 1]
-        if len(self._line_breaks) == line_number:
+        start_index = self._line_start_indexes[line_number - 1]
+        if len(self._line_start_indexes) == line_number:
             line = self._string[start_index:]
         else:
-            end_index = self._line_breaks[line_number]
+            end_index = self._line_start_indexes[line_number]
             line = self._string[start_index:end_index - 1]
         return line
 
@@ -296,7 +297,7 @@ class StringLines(object):
         """
         Gets the number of lines in the string.
         """
-        return len(self._line_breaks)
+        return len(self._line_start_indexes)
 
 
 class Rules(Enum):
@@ -407,6 +408,57 @@ class Rules(Enum):
         self.rule_summary = rule_summary
 
 
+class Expression(object):
+    """
+    Represents an arbitrary expression.
+
+    An expression can be any type of code snippet. It will sometimes have a
+    starting and ending delimiter, but not always.
+
+    Here are some example expressions::
+
+        ${x | n, decode.utf8}
+        <%= x %>
+        function(x)
+        "<p>" + message + "</p>"
+
+    Other details of note:
+    - Only a start_index is required for a valid expression.
+    - If end_index is None, it means we couldn't parse the rest of the
+    expression.
+    - All other details of the expression are optional, and are only added if
+    and when supplied and needed for additional checks.  They are not necessary
+    for the final results output.
+
+    """
+
+    def __init__(self, start_index, end_index=None, template=None, start_delim="", end_delim="", strings=None):
+        """
+        Init method.
+
+        Arguments:
+            start_index: the starting index of the expression
+            end_index: the index immediately following the expression, or None
+                if the expression was unparseable
+            template: optional template code in which the expression was found
+            start_delim: optional starting delimiter of the expression
+            end_delim: optional ending delimeter of the expression
+            strings: optional list of ParseStrings
+
+        """
+        self.start_index = start_index
+        self.end_index = end_index
+        self.start_delim = start_delim
+        self.end_delim = end_delim
+        self.strings = strings
+        if template is not None and self.end_index is not None:
+            self.expression = template[start_index:end_index]
+            self.expression_inner = self.expression[len(start_delim):-len(end_delim)].strip()
+        else:
+            self.expression = None
+            self.expression_inner = None
+
+
 class RuleViolation(object):
     """
     Base class representing a rule violation which can be used for reporting.
@@ -508,7 +560,7 @@ class ExpressionRuleViolation(RuleViolation):
 
         Arguments:
             rule: The Rule which was violated.
-            expression: The expression that was in violation.
+            expression: The Expression that was in violation.
 
         """
         super(ExpressionRuleViolation, self).__init__(rule)
@@ -582,11 +634,11 @@ class ExpressionRuleViolation(RuleViolation):
 
         """
         self.full_path = full_path
-        start_index = self.expression['start_index']
+        start_index = self.expression.start_index
         self.start_line = string_lines.index_to_line_number(start_index)
         self.start_column = string_lines.index_to_column_number(start_index)
-        end_index = self.expression['end_index']
-        if end_index > 0:
+        end_index = self.expression.end_index
+        if end_index is not None:
             self.end_line = string_lines.index_to_line_number(end_index)
             self.end_column = string_lines.index_to_column_number(end_index)
         else:
@@ -638,17 +690,21 @@ class FileResults(object):
         self.is_file = os.path.isfile(full_path)
         self.violations = []
 
-    def prepare_results(self, file_string):
+    def prepare_results(self, file_string, line_comment_delim=None):
         """
         Prepares the results for output for this file.
 
         Arguments:
             file_string: The string of content for this file.
+            line_comment_delim: A string representing the start of a line
+                comment. For example "##" for Mako and "//" for JavaScript.
 
         """
         string_lines = StringLines(file_string)
         for violation in self.violations:
             violation.prepare_results(self.full_path, string_lines)
+        if line_comment_delim is not None:
+            self._filter_commented_code(line_comment_delim)
 
     def print_results(self, options, out):
         """
@@ -678,14 +734,39 @@ class FileResults(object):
                     violation.print_results(out)
         return num_violations
 
+    def _filter_commented_code(self, line_comment_delim):
+        """
+        Remove any violations that were found in commented out code.
+
+        Arguments:
+            line_comment_delim: A string representing the start of a line
+                comment. For example "##" for Mako and "//" for JavaScript.
+
+        """
+        self.violations = [v for v in self.violations if not self._is_commented(v, line_comment_delim)]
+
+    def _is_commented(self, violation, line_comment_delim):
+        """
+        Checks if violation line is commented out.
+
+        Arguments:
+            violation: The violation to check
+            line_comment_delim: A string representing the start of a line
+                comment. For example "##" for Mako and "//" for JavaScript.
+
+        Returns:
+            True if the first line of the violation is actually commented out,
+            False otherwise.
+        """
+        return violation.first_line().lstrip().startswith(line_comment_delim)
 
 class ParseString(object):
     """
     ParseString is the result of parsing a string out of a template.
 
     A ParseString has the following attributes:
-        start_index: The index of the first quote, or -1 if none found
-        end_index: The index following the closing quote, or -1 if
+        start_index: The index of the first quote, or None if none found
+        end_index: The index following the closing quote, or None if
             unparseable
         quote_length: The length of the quote.  Could be 3 for a Python
             triple quote.  Or None if none found.
@@ -705,12 +786,12 @@ class ParseString(object):
             end_index: The end index to search before.
 
         """
-        self.end_index = -1
+        self.end_index = None
         self.quote_length = None
         self.string = None
         self.string_inner = None
         self.start_index = self._find_string_start(template, start_index, end_index)
-        if 0 <= self.start_index:
+        if self.start_index is not None:
             result = self._parse_string(template, self.start_index)
             if result is not None:
                 self.end_index = result['end_index']
@@ -729,13 +810,13 @@ class ParseString(object):
             end_index: The end index to search before.
 
         Returns:
-            The start index of the first single or double quote, or -1 if
-            no quote was found.
+            The start index of the first single or double quote, or None if no
+            quote was found.
         """
         quote_regex = re.compile(r"""['"]""")
         start_match = quote_regex.search(template, start_index, end_index)
         if start_match is None:
-            return -1
+            return None
         else:
             return start_match.start()
 
@@ -888,15 +969,15 @@ class UnderscoreTemplateLinter(object):
             <%= _.escape(message) %>
 
         Arguments:
-            expression: The expression being checked.
+            expression: The Expression being checked.
 
         Returns:
-            True if the expression has been safely escaped, and False otherwise.
+            True if the Expression has been safely escaped, and False otherwise.
 
         """
-        if expression['expression_inner'].startswith('HtmlUtils.'):
+        if expression.expression_inner.startswith('HtmlUtils.'):
             return True
-        if expression['expression_inner'].startswith('_.escape('):
+        if expression.expression_inner.startswith('_.escape('):
             return True
         return False
 
@@ -910,25 +991,16 @@ class UnderscoreTemplateLinter(object):
             underscore_template: The contents of the Underscore.js template.
 
         Returns:
-            A list of dicts for each expression, where the dict contains the
-            following:
-
-                start_index: The index of the start of the expression.
-                end_index: The index of the end of the expression.
-                expression: The text of the expression.
+            A list of Expressions.
         """
-        unescaped_expression_regex = re.compile("<%=(.*?)%>", re.DOTALL)
+        unescaped_expression_regex = re.compile("<%=.*?%>", re.DOTALL)
 
         expressions = []
         for match in unescaped_expression_regex.finditer(underscore_template):
-            expression = {
-                'start_index': match.start(),
-                'end_index': match.end(),
-                'expression': match.group(),
-                'expression_inner': match.group(1).strip()
-            }
+            expression = Expression(
+                match.start(), match.end(), template=underscore_template, start_delim="<%=", end_delim="%>"
+            )
             expressions.append(expression)
-
         return expressions
 
 
@@ -1040,48 +1112,34 @@ class JavaScriptLinter(object):
         self._check_javascript_escape(file_contents, results)
         self._check_concat_with_html(file_contents, results)
         self.underScoreLinter.check_underscore_file_is_safe(file_contents, results)
-        results.prepare_results(file_contents)
-        self._filter_commented_code(results)
+        results.prepare_results(file_contents, line_comment_delim='//')
 
-    def _filter_commented_code(self, results):
+    def _get_expression_for_function(self, file_contents, function_start_match):
         """
-        Remove any results that were found in code that was commented out.
-        """
-        for violation in list(results.violations):
-            if violation.first_line().lstrip().startswith('//'):
-                results.violations.remove(violation)
-
-    def _get_expression_for_function(self, file_contents, function_match):
-        """
-        Returns an expression that best matches the function call.
+        Returns an expression that matches the function call opened with
+        function_start_match.
 
         Arguments:
             file_contents: The contents of the JavaScript file.
-            function_match: A regex match representing the start of the function
-                call.
+            function_start_match: A regex match representing the start of the function
+                call (e.g. ".escape(").
+
+        Returns:
+            An Expression that best matches the function.
 
         """
-        start_index = function_match.start()
-        inner_start_index = function_match.end()
-        close_paren_index = _find_closing_char_index(
+        start_index = function_start_match.start()
+        inner_start_index = function_start_match.end()
+        result = _find_closing_char_index(
             None, "(", ")", file_contents, start_index=inner_start_index
-        )['close_char_index']
-        if 0 <= close_paren_index:
-            end_index = close_paren_index + 1
-            expression_text = file_contents[function_match.start():close_paren_index + 1]
-            expression = {
-                'start_index': start_index,
-                'end_index': end_index,
-                'expression': expression_text,
-                'expression_inner': expression_text,
-            }
+        )
+        if result is not None:
+            end_index = result['close_char_index'] + 1
+            expression = Expression(
+                start_index, end_index, template=file_contents, start_delim=function_start_match.group(), end_delim=")"
+            )
         else:
-            expression = {
-                'start_index': start_index,
-                'end_index': -1,
-                'expression': None,
-                'expression_inner': None,
-            }
+            expression = Expression(start_index)
         return expression
 
     def _check_javascript_interpolate(self, file_contents, results):
@@ -1142,10 +1200,10 @@ class JavaScriptLinter(object):
         for function_match in regex.finditer(file_contents):
             is_violation = True
             expression = self._get_expression_for_function(file_contents, function_match)
-            if 0 < expression['end_index']:
-                start_index = expression['start_index']
+            if expression.end_index is not None:
+                start_index = expression.start_index
                 inner_start_index = function_match.end()
-                close_paren_index = expression['end_index'] - 1
+                close_paren_index = expression.end_index - 1
                 function_argument = file_contents[inner_start_index:close_paren_index].strip()
                 if is_argument_safe is not None and is_caller_safe is None:
                     is_violation = is_argument_safe(function_argument) is False
@@ -1286,10 +1344,12 @@ class JavaScriptLinter(object):
         for match in re.finditer(regex_concat_with_html, file_contents):
             found_new_violation = False
             if last_expression is not None:
-                last_line = lines.index_to_line_number(last_expression['start_index'])
+                last_line = lines.index_to_line_number(last_expression.start_index)
                 # check if violation should be expanded to more of the same line
                 if last_line == lines.index_to_line_number(match.start()):
-                    last_expression['end_index'] = match.end()
+                    last_expression = Expression(
+                        last_expression.start_index, match.end(), template=file_contents
+                    )
                 else:
                     results.violations.append(ExpressionRuleViolation(
                         Rules.javascript_concat_html, last_expression
@@ -1298,10 +1358,9 @@ class JavaScriptLinter(object):
             else:
                 found_new_violation = True
             if found_new_violation:
-                last_expression = {
-                    'start_index': match.start(),
-                    'end_index': match.end(),
-                }
+                last_expression = Expression(
+                    match.start(), match.end(), template=file_contents
+                )
 
         # add final expression
         if last_expression is not None:
@@ -1402,16 +1461,7 @@ class MakoTemplateLinter(object):
             return
         has_page_default = self._has_page_default(mako_template, results)
         self._check_mako_expressions(mako_template, has_page_default, results)
-        results.prepare_results(mako_template)
-        self._filter_commented_code(results)
-
-    def _filter_commented_code(self, results):
-        """
-        Remove any results that were found in code that was commented out.
-        """
-        for violation in list(results.violations):
-            if violation.first_line().lstrip().startswith('##'):
-                results.violations.remove(violation)
+        results.prepare_results(mako_template, line_comment_delim='##')
 
     def _is_django_template(self, mako_template):
         """
@@ -1493,13 +1543,13 @@ class MakoTemplateLinter(object):
         contexts = self._get_contexts(mako_template)
         self._check_javascript_contexts(mako_template, contexts, results)
         for expression in expressions:
-            if expression['expression'] is None:
+            if expression.end_index is None:
                 results.violations.append(ExpressionRuleViolation(
                     Rules.mako_unparseable_expression, expression
                 ))
                 continue
 
-            context = self._get_context(contexts, expression['start_index'])
+            context = self._get_context(contexts, expression.start_index)
             self._check_filters(mako_template, expression, context, has_page_default, results)
             self._check_deprecated_display_name(expression, results)
             self._check_html_and_text(expression, has_page_default, results)
@@ -1517,18 +1567,18 @@ class MakoTemplateLinter(object):
         Side effect:
             Adds JavaScript violations to results.
         """
-        javascript_start_index = -1
+        javascript_start_index = None
         for context in contexts:
             if context['type'] == 'javascript':
                 if javascript_start_index < 0:
                     javascript_start_index = context['index']
             else:
-                if 0 <= javascript_start_index:
+                if javascript_start_index is not None:
                     javascript_end_index = context['index']
                     javascript_code = mako_template[javascript_start_index:javascript_end_index]
                     self._check_javascript_context(javascript_code, javascript_start_index, results)
-                    javascript_start_index = -1
-        if 0 <= javascript_start_index:
+                    javascript_start_index = None
+        if javascript_start_index is not None:
             javascript_code = mako_template[javascript_start_index:]
             self._check_javascript_context(javascript_code, javascript_start_index, results)
 
@@ -1553,9 +1603,9 @@ class MakoTemplateLinter(object):
         # Mako template
         for violation in javascript_results.violations:
             expression = violation.expression
-            expression['start_index'] += start_offset
-            if 0 < expression['end_index']:
-                expression['end_index'] += start_offset
+            expression.start_index += start_offset
+            if expression.end_index is not None:
+                expression.end_index += start_offset
             results.violations.append(ExpressionRuleViolation(violation.rule, expression))
 
     def _check_deprecated_display_name(self, expression, results):
@@ -1564,12 +1614,11 @@ class MakoTemplateLinter(object):
         used. Adds violation to results if there is a problem.
 
         Arguments:
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: An Expression
             results: A list of results into which violations will be added.
 
         """
-        if '.display_name_with_default_escaped' in expression['expression']:
+        if '.display_name_with_default_escaped' in expression.expression:
             results.violations.append(ExpressionRuleViolation(
                 Rules.mako_deprecated_display_name, expression
             ))
@@ -1579,18 +1628,17 @@ class MakoTemplateLinter(object):
         Checks rules related to proper use of HTML() and Text().
 
         Arguments:
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: A Mako Expression.
             has_page_default: True if the page is marked as default, False
                 otherwise.
             results: A list of results into which violations will be added.
 
         """
-        # strip '${' and '}' and whitespace from ends
-        expression_inner = expression['expression'][2:-1].strip()
-        # find the template relative inner expression start index
-        # - find used to take into account above strip()
-        template_inner_start_index = expression['start_index'] + expression['expression'].find(expression_inner)
+        expression_inner = expression.expression_inner
+        # use find to get the template relative inner expression start index
+        # due to possible skipped white space
+        template_inner_start_index = expression.start_index
+        template_inner_start_index += expression.expression.find(expression_inner)
         if 'HTML(' in expression_inner:
             if expression_inner.startswith('HTML('):
                 close_paren_index = _find_closing_char_index(
@@ -1612,11 +1660,11 @@ class MakoTemplateLinter(object):
                 ))
 
         # strings to be checked for HTML
-        unwrapped_html_strings = expression['strings']
+        unwrapped_html_strings = expression.strings
         for match in re.finditer(r"(HTML\(|Text\()", expression_inner):
             result = _find_closing_char_index(None, "(", ")", expression_inner, start_index=match.end())
-            close_paren_index = result['close_char_index']
-            if 0 <= close_paren_index:
+            if result is not None:
+                close_paren_index = result['close_char_index']
                 # the argument sent to HTML() or Text()
                 argument = expression_inner[match.end():close_paren_index]
                 if ".format(" in argument:
@@ -1654,8 +1702,7 @@ class MakoTemplateLinter(object):
 
         Arguments:
             mako_template: The contents of the Mako template.
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: A Mako Expression.
             context: The context of the page in which the expression was found
                 (e.g. javascript, html).
             has_page_default: True if the page is marked as default, False
@@ -1663,9 +1710,9 @@ class MakoTemplateLinter(object):
             results: A list of results into which violations will be added.
 
         """
-        # finds "| n, h}" when given "${x | n, h}"
-        filters_regex = re.compile(r'\|[a-zA-Z0-9_.,\s]*\}')
-        filters_match = filters_regex.search(expression['expression'])
+        # Example: finds "| n, h}" when given "${x | n, h}"
+        filters_regex = re.compile(r'\|([.,\w\s]*)\}')
+        filters_match = filters_regex.search(expression.expression)
         if filters_match is None:
             if context == 'javascript':
                 results.violations.append(ExpressionRuleViolation(
@@ -1673,12 +1720,12 @@ class MakoTemplateLinter(object):
                 ))
             return
 
-        filters = filters_match.group()[1:-1].replace(" ", "").split(",")
-        if (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'decode.utf8'):
+        filters = filters_match.group(1).replace(" ", "").split(",")
+        if filters == ['n', 'decode.utf8']:
             # {x | n, decode.utf8} is valid in any context
             pass
         elif context == 'html':
-            if (len(filters) == 1) and (filters[0] == 'h'):
+            if filters == ['h']:
                 if has_page_default:
                     # suppress this violation if the page default hasn't been set,
                     # otherwise the template might get less safe
@@ -1691,10 +1738,10 @@ class MakoTemplateLinter(object):
                 ))
         elif context == 'javascript':
             self._check_js_expression_not_with_html(mako_template, expression, results)
-            if (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'dump_js_escaped_json'):
+            if filters == ['n', 'dump_js_escaped_json']:
                 # {x | n, dump_js_escaped_json} is valid
                 pass
-            elif (len(filters) == 2) and (filters[0] == 'n') and (filters[1] == 'js_escaped_string'):
+            elif filters == ['n', 'js_escaped_string']:
                 # {x | n, js_escaped_string} is valid, if surrounded by quotes
                 self._check_js_string_expression_in_quotes(mako_template, expression, results)
             else:
@@ -1709,8 +1756,7 @@ class MakoTemplateLinter(object):
 
         Arguments:
             mako_template: The contents of the Mako template.
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: A Mako Expression.
             results: A list of results into which violations will be added.
         """
         parse_string = self._find_string_wrapping_expression(mako_template, expression)
@@ -1726,8 +1772,7 @@ class MakoTemplateLinter(object):
 
         Arguments:
             mako_template: The contents of the Mako template.
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: A Mako Expression.
             results: A list of results into which violations will be added.
         """
         parse_string = self._find_string_wrapping_expression(mako_template, expression)
@@ -1742,26 +1787,28 @@ class MakoTemplateLinter(object):
 
         Arguments:
             mako_template: The contents of the Mako template.
-            expression: A dict containing the start_index, end_index, and
-                expression (text) of the expression.
+            expression: A Mako Expression.
 
         Returns:
             ParseString representing a scrubbed version of the wrapped string,
             where the Mako expression was replaced with "${...}", if a wrapped
-            string was found.  Otherwise, returns None.
+            string was found.  Otherwise, returns None if none found.
         """
         lines = StringLines(mako_template)
-        start_index = lines.index_to_line_start_index(expression['start_index'])
-        if 0 < expression['end_index']:
-            end_index = lines.index_to_line_end_index(expression['end_index'])
+        start_index = lines.index_to_line_start_index(expression.start_index)
+        if expression.end_index is not None:
+            end_index = lines.index_to_line_end_index(expression.end_index)
         else:
             return None
+        # scrub out the actual expression so any code inside the expression
+        # doesn't interfere with rules applied to the surrounding code (i.e.
+        # checking JavaScript).
         scrubbed_lines = "".join((
-            mako_template[start_index:expression['start_index']],
+            mako_template[start_index:expression.start_index],
             "${...}",
-            mako_template[expression['end_index']:end_index]
+            mako_template[expression.end_index:end_index]
         ))
-        adjusted_start_index = expression['start_index'] - start_index
+        adjusted_start_index = expression.start_index - start_index
         start_index = 0
         while True:
             parse_string = ParseString(scrubbed_lines, start_index, len(scrubbed_lines))
@@ -1783,8 +1830,9 @@ class MakoTemplateLinter(object):
         template changes from HTML context to JavaScript and back.
 
         Return:
-            A list of dicts where each dict contains the 'index' of the context
-            and the context 'type' (e.g. 'html' or 'javascript').
+            A list of dicts where each dict contains:
+                - index: the index of the context.
+                - type: the context type (e.g. 'html' or 'javascript').
         """
         contexts_re = re.compile(r"""
             <script.*?>|  # script tag start
@@ -1849,14 +1897,7 @@ class MakoTemplateLinter(object):
             mako_template: The content of the Mako template.
 
         Returns:
-            A list of dicts for each expression, where the dict contains the
-            following:
-
-                start_index: The index of the start of the expression.
-                end_index: The index immediately following the expression, or -1
-                    if unparseable.
-                expression: The text of the expression.
-                strings: a list of ParseStrings
+            A list of Expressions.
 
         """
         start_delim = '${'
@@ -1871,23 +1912,25 @@ class MakoTemplateLinter(object):
             result = _find_closing_char_index(
                 start_delim, '{', '}', mako_template, start_index=start_index + len(start_delim)
             )
-            close_char_index = result['close_char_index']
-            if close_char_index < 0:
-                expression = None
+            if result is None:
+                expression = Expression(start_index)
+                # for parsing error, restart search right after the start of the
+                # current expression
+                start_index = start_index + len(start_delim)
             else:
+                close_char_index = result['close_char_index']
                 expression = mako_template[start_index:close_char_index + 1]
-
-            expression = {
-                'start_index': start_index,
-                'end_index': close_char_index + 1,
-                'expression': expression,
-                'strings': result['strings'],
-            }
+                expression = Expression(
+                    start_index,
+                    end_index=close_char_index + 1,
+                    template=mako_template,
+                    start_delim=start_delim,
+                    end_delim='}',
+                    strings=result['strings'],
+                )
+                # restart search after the current expression
+                start_index = expression.end_index
             expressions.append(expression)
-
-            # end_index of -1 represents a parsing error and we may find others
-            start_index = max(start_index + len(start_delim), close_char_index)
-
         return expressions
 
 
@@ -1908,9 +1951,9 @@ def _process_file(full_path, template_linters, options, out):
     """
     num_violations = 0
     directory = os.path.dirname(full_path)
-    file = os.path.basename(full_path)
+    file_name = os.path.basename(full_path)
     for template_linter in template_linters:
-        results = template_linter.process_file(directory, file)
+        results = template_linter.process_file(directory, file_name)
         num_violations += results.print_results(options, out)
     return num_violations
 
