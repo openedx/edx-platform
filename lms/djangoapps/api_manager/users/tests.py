@@ -1471,6 +1471,7 @@ class UsersApiTests(ModuleStoreTestCase):
         user_id = self.user.id
 
         course = CourseFactory.create(org='TUCGLG', run='TUCGLG1', display_name="Robot Super Course")
+        CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -1642,32 +1643,36 @@ class UsersApiTests(ModuleStoreTestCase):
         grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
         module.system.publish(module, 'grade', grade_dict)
 
-        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
+        with mock.patch('api_manager.users.views._recalculate_grade') as recalculate_grade:
+            test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            # grades should be calculate in score_changed signal handler of gradebook app
+            # make sure grades are not recalculated when calling user grades API
+            self.assertFalse(recalculate_grade.called)
 
-        courseware_summary = response.data['courseware_summary']
-        self.assertEqual(len(courseware_summary), 2)
-        self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
-        self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
+            courseware_summary = response.data['courseware_summary']
+            self.assertEqual(len(courseware_summary), 2)
+            self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
+            self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
 
-        sections = courseware_summary[0]['sections']
-        self.assertEqual(len(sections), 1)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 1')
-        self.assertEqual(sections[0]['graded'], False)
+            sections = courseware_summary[0]['sections']
+            self.assertEqual(len(sections), 1)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 1')
+            self.assertEqual(sections[0]['graded'], False)
 
-        sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 12)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 2')
-        self.assertEqual(sections[0]['graded'], False)
+            sections = courseware_summary[1]['sections']
+            self.assertEqual(len(sections), 12)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 2')
+            self.assertEqual(sections[0]['graded'], False)
 
-        grade_summary = response.data['grade_summary']
-        self.assertGreater(len(grade_summary['section_breakdown']), 0)
-        grading_policy = response.data['grading_policy']
-        self.assertGreater(len(grading_policy['GRADER']), 0)
-        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
-        self.assertAlmostEqual(response.data['current_grade'], 0.74, 1)
-        self.assertAlmostEqual(response.data['proforma_grade'], 0.9375, 1)
+            grade_summary = response.data['grade_summary']
+            self.assertGreater(len(grade_summary['section_breakdown']), 0)
+            grading_policy = response.data['grading_policy']
+            self.assertGreater(len(grading_policy['GRADER']), 0)
+            self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+            self.assertAlmostEqual(response.data['current_grade'], 0.74, 1)
+            self.assertAlmostEqual(response.data['proforma_grade'], 0.9375, 1)
 
         test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
 
