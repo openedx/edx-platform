@@ -2272,6 +2272,8 @@ REGISTRATION_EXTRA_FIELDS = {
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
+# Optionally verify if a registration email really exists
+REGISTRATION_EMAIL_FULL_VERIFICATION = None
 
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
