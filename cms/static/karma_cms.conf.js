@@ -34,7 +34,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.string.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone-associations-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
@@ -53,7 +53,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/**/*.js', included: false},
     {pattern: 'xmodule_js/src/xmodule.js', included: false},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/draggabilly.pkgd.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/vendor/draggabilly.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/date.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/domReady.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: false},
@@ -76,6 +76,11 @@ var files = [
     },
     {pattern: 'xmodule_js/common_static/js/vendor/mock-ajax.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
+
+    {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: false},
+    {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: false},
+    {pattern: 'edx-pattern-library/js/afontgarde.js', included: false},
+    {pattern: 'edx-pattern-library/js/edx-icons.js', included: false},
 
     // Paths to source JavaScript files
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true, nocache: true},
