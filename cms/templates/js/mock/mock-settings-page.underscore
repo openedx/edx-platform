@@ -197,4 +197,33 @@
   </ol>
 </section>
 
+<section class="group-settings course-learning-info">
+    <header>
+        <h2 class="title-2">Learning Outcomes</h2>
+        <span class="tip">Add the learning outcomes for this course</span>
+    </header>
+    <ol class="list-input enum">
+      <li class="course-settings-learning-fields"></li>
+    </ol>
+    <div class="actions">
+      <button type="button" class="action action-primary button new-button add-course-learning-info">
+        <i class="icon fa fa-plus icon-inline"></i>Add Learning Outcome
+      </button>
+    </div>
+</section>
+
+<section class="group-settings instructor-types">
+  <header>
+    <h2 class="title-2">Instructors</h2>
+    <span class="tip">Add details about the instructors for this course</span>
+  </header>
+  <ol class="list-input enum">
+    <li class="course-instructor-details-fields"></li>
+  </ol>
+  <div class="actions">
+    <button type="button" class="action action-primary button new-button add-course-instructor-info">
+      <i class="icon fa fa-plus icon-inline"></i>Add Instructor
+    </button>
+  </div>
+</section>
 </form>
