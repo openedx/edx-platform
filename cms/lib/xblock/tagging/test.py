@@ -7,7 +7,11 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xblock_config.models import StudioConfig
+from xblock.fields import ScopeIds
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
 from cms.lib.xblock.tagging import StructuredTagsAside
+from cms.lib.xblock.tagging.models import TagCategories, TagAvailableValues
 from contentstore.views.preview import get_preview_fragment
 from contentstore.utils import reverse_usage_url
 from contentstore.tests.utils import AjaxEnabledTestClient
@@ -30,8 +34,9 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         self.user_password = super(StructuredTagsAsideTestCase, self).setUp()
         self.aside_name = 'tagging_aside'
-        self.aside_tag = 'difficulty_tag'
-        self.aside_tag_value = 'hard'
+        self.aside_tag_dif = 'difficulty'
+        self.aside_tag_dif_value = 'Hard'
+        self.aside_tag_lo = 'learning_outcome'
 
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         self.course = ItemFactory.create(
@@ -75,16 +80,47 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
             user_id=self.user.id
         )
 
+        _init_data = [
+            {
+                'name': 'difficulty',
+                'title': 'Difficulty',
+                'values': ['Easy', 'Medium', 'Hard'],
+            },
+            {
+                'name': 'learning_outcome',
+                'title': 'Learning outcome',
+                'values': ['Learned nothing', 'Learned a few things', 'Learned everything']
+            }
+        ]
+
+        for tag in _init_data:
+            category = TagCategories.objects.create(name=tag['name'], title=tag['title'])
+            for val in tag['values']:
+                TagAvailableValues.objects.create(category=category, value=val)
+
         config = StudioConfig.current()
         config.enabled = True
         config.save()
+
+    def tearDown(self):
+        TagAvailableValues.objects.all().delete()
+        TagCategories.objects.all().delete()
+        super(StructuredTagsAsideTestCase, self).tearDown()
 
     def test_aside_contains_tags(self):
         """
         Checks that available_tags list is not empty
         """
-        self.assertGreater(len(StructuredTagsAside.available_tags), 0,
-                           "StructuredTagsAside should contains at least one available tag")
+        sids = ScopeIds(user_id="bob",
+                        block_type="bobs-type",
+                        def_id="definition-id",
+                        usage_id="usage-id")
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+        runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+        xblock_aside = StructuredTagsAside(scope_ids=sids, runtime=runtime)
+        available_tags = xblock_aside.get_available_tags()
+        self.assertEquals(len(available_tags), 2, "StructuredTagsAside should contains two tag categories")
 
     def test_preview_html(self):
         """
@@ -115,10 +151,26 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.assertIn('xblock_asides-v1', div_node.get('class'))
 
         select_nodes = div_node.xpath('div/select')
-        self.assertEquals(len(select_nodes), 1)
+        self.assertEquals(len(select_nodes), 2)
 
-        select_node = select_nodes[0]
-        self.assertEquals(select_node.get('name'), self.aside_tag)
+        select_node1 = select_nodes[0]
+        self.assertEquals(select_node1.get('name'), self.aside_tag_dif)
+
+        option_nodes1 = select_node1.xpath('option')
+        self.assertEquals(len(option_nodes1), 4)
+
+        option_values1 = [opt_elem.text for opt_elem in option_nodes1]
+        self.assertEquals(option_values1, ['Not selected', 'Easy', 'Medium', 'Hard'])
+
+        select_node2 = select_nodes[1]
+        self.assertEquals(select_node2.get('name'), self.aside_tag_lo)
+
+        option_nodes2 = select_node2.xpath('option')
+        self.assertEquals(len(option_nodes2), 4)
+
+        option_values2 = [opt_elem.text for opt_elem in option_nodes2 if opt_elem.text]
+        self.assertEquals(option_values2, ['Not selected', 'Learned nothing',
+                                           'Learned a few things', 'Learned everything'])
 
         # Now ensure the acid_aside is not in the result
         self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")
@@ -146,11 +198,11 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         response = client.post(path=handler_url, data={'tag': 'undefined_tag:undefined'})
         self.assertEqual(response.status_code, 400)
 
-        val = '%s:undefined' % self.aside_tag
+        val = '%s:undefined' % self.aside_tag_dif
         response = client.post(path=handler_url, data={'tag': val})
         self.assertEqual(response.status_code, 400)
 
-        val = '%s:%s' % (self.aside_tag, self.aside_tag_value)
+        val = '%s:%s' % (self.aside_tag_dif, self.aside_tag_dif_value)
         response = client.post(path=handler_url, data={'tag': val})
         self.assertEqual(response.status_code, 200)
 
@@ -163,4 +215,4 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
                 break
 
         self.assertIsNotNone(tag_aside, "Necessary StructuredTagsAside object isn't found")
-        self.assertEqual(tag_aside.saved_tags[self.aside_tag], self.aside_tag_value)
+        self.assertEqual(tag_aside.saved_tags[self.aside_tag_dif], self.aside_tag_dif_value)

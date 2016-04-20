@@ -903,6 +903,9 @@ INSTALLED_APPS = (
 
     # Management commands used for configuration automation
     'edx_management_commands.management_commands',
+
+    # Tagging
+    'cms.lib.xblock.tagging',
 )
 
 
