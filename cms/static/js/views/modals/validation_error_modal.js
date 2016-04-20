@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
 
                 return this.template({
                     response: this.response,
-                    num_errors: this.response.length,
+                    num_errors: this.response.length
                 });
             },
 

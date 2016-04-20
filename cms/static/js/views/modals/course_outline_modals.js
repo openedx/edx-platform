@@ -153,10 +153,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
 
-        events: {
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
             'click .action-save': 'save',
-            'click .settings-tab-button': 'handleShowTab',
-        },
+            'click .settings-tab-button': 'handleShowTab'
+        }),
 
         /**
          * Return request data.
@@ -184,9 +184,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
 
     PublishXBlockModal = CourseOutlineXBlockModal.extend({
-        events : {
+        events : _.extend({}, CourseOutlineXBlockModal.prototype.events, {
             'click .action-publish': 'save'
-        },
+        }),
 
         initialize: function() {
             CourseOutlineXBlockModal.prototype.initialize.call(this);
