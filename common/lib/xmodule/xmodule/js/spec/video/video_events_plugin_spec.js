@@ -130,7 +130,8 @@
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('video_hide_cc_menu', {
                 id: 'id',
-                code: 'html5'
+                code: 'html5',
+                language: 'en'
             });
         });
 
