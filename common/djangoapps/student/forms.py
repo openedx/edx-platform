@@ -3,6 +3,9 @@ Utility functions for validating forms
 """
 from importlib import import_module
 import re
+import socket
+import smtplib
+import dns.resolver
 
 from django import forms
 from django.forms import widgets
@@ -144,6 +147,11 @@ class AccountCreationForm(forms.Form):
             "min_length": _PASSWORD_INVALID_MSG,
         }
     )
+    password_copy = forms.CharField(
+        min_length=2,
+        error_messages={
+        }
+    )
     name = forms.CharField(
         min_length=2,
         error_messages={
@@ -229,6 +237,48 @@ class AccountCreationForm(forms.Form):
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
 
+    def clean_password_copy(self):
+        """Enforce password policies (if applicable)"""
+        password_copy = self.cleaned_data["password_copy"]
+
+        if (
+                "password" in self.cleaned_data and
+                self.cleaned_data["password"] != password_copy
+        ):
+            raise ValidationError(_("Passwords don't match"))
+
+        return password_copy
+
+    def _verify_email_really_exists(self, email):
+        try:
+            domain = email.rsplit('@', 1)[-1]
+            records = dns.resolver.query(domain, 'MX')
+            mxRecord = records[0].exchange
+            mxRecord = str(mxRecord)
+
+            # Get local server hostname
+            host = socket.gethostname()
+
+            # SMTP lib setup (use debug level for full output)
+            server = smtplib.SMTP()
+            server.set_debuglevel(0)
+
+            # SMTP Conversation
+            server.connect(mxRecord)
+            server.helo(host)
+            server.mail(email)
+            code, message = server.rcpt(str(email))
+            server.quit()
+
+            if code != 250:
+                raise
+        except dns.resolver.NoNameservers:
+            pass
+        except:
+            raise ValidationError(
+                u"Email '{email}' doesn't exist".format(email=email)
+            )
+
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
         email = self.cleaned_data["email"]
@@ -249,6 +299,7 @@ class AccountCreationForm(forms.Form):
                     "It looks like {email} belongs to an existing account. Try again with a different email address."
                 ).format(email=email)
             )
+        self._verify_email_really_exists(email)
         return email
 
     def clean_year_of_birth(self):
