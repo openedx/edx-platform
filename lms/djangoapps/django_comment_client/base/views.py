@@ -104,6 +104,7 @@ def track_thread_created_event(request, course, thread, followed):
         'title': thread.title,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
+        'private_to_peers': thread.private_to_peers,
         'options': {'followed': followed},
         # There is a stated desire for an 'origin' property that will state
         # whether this thread was created via courseware or the forum.
