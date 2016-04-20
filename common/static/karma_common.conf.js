@@ -47,6 +47,12 @@ var files = [
     {pattern: 'js/test/i18n.js', included: true},
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
     {pattern: 'js/vendor/jquery.leanModal.js', included: true},
+    {pattern: 'js/vendor/draggabilly.js', included: true},
+
+    {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: true},
+    {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: true},
+    {pattern: 'edx-pattern-library/js/afontgarde.js', included: true},
+    {pattern: 'edx-pattern-library/js/edx-icons.js', included: true},
 
     // Paths to source JavaScript files
     {pattern: 'js/xblock/**/*.js', included: true, nocache: true},
