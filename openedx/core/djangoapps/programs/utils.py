@@ -46,6 +46,7 @@ def flatten_programs(programs, course_ids):
                 for run in course_code['run_modes']:
                     run_id = run['course_key']
                     if run_id in course_ids:
+                        program['display_category'] = get_display_category(program)
                         flattened.setdefault(run_id, []).append(program)
         except KeyError:
             log.exception('Unable to parse Programs API response: %r', program)
@@ -111,6 +112,24 @@ def get_programs_for_credentials(user, programs_credentials):
                 certificate_programs.append(program)
 
     return certificate_programs
+
+
+def get_display_category(program):
+    """ Given the program, return the category of the program for display
+    Arguments:
+        program (Program): The program to get the display category string from
+
+    Returns:
+        string, the category for display to the user.
+        Empty string if the program has no category or is null.
+    """
+    display_candidate = ''
+    if program and program.get('category'):
+        if program.get('category') == 'xseries':
+            display_candidate = 'XSeries'
+        else:
+            display_candidate = program.get('category', '').capitalize()
+    return display_candidate
 
 
 def get_engaged_programs(user, enrollments):

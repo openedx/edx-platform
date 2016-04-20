@@ -1121,14 +1121,14 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test to check the default sorting preference of user. (Default = date )
         """
         selected_sort = self.sort_page.get_selected_sort_preference()
-        self.assertEqual(selected_sort, "date")
+        self.assertEqual(selected_sort, "activity")
 
     def test_change_sort_preference(self):
         """
         Test that if user sorting preference is changing properly.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()
@@ -1139,7 +1139,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test that user last preference is saved.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()

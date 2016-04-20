@@ -5,7 +5,6 @@ import datetime
 import logging
 
 from django.conf import settings
-from opaque_keys import InvalidKeyError
 import pytz
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied

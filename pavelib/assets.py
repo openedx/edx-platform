@@ -35,13 +35,19 @@ CMS_SASS_DIRECTORIES = [
     path("cms/static/sass"),
 ]
 THEME_SASS_DIRECTORIES = []
-SASS_LOAD_PATHS = ['common/static', 'common/static/sass']
+SASS_LOAD_PATHS = [
+    'common/static',
+    'common/static/sass',
+    'node_modules',
+    'node_modules/edx-pattern-library/node_modules',
+]
 
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
     'underscore/underscore.js',
-    'underscore.string/dist/underscore.string.js'
+    'underscore.string/dist/underscore.string.js',
+    'picturefill/dist/picturefill.min.js'
 ]
 
 # Directory to install static vendor files

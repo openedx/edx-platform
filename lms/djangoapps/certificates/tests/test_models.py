@@ -1,10 +1,13 @@
 """Tests for certificate Django models. """
+import ddt
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+import json
+from mock import Mock
 from path import Path as path
 
 from certificates.models import (
@@ -12,13 +15,14 @@ from certificates.models import (
     ExampleCertificateSet,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    EligibleCertificateManager,
     GeneratedCertificate,
     CertificateStatuses,
+    CertificateGenerationHistory,
 )
 from certificates.tests.factories import GeneratedCertificateFactory
+from instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locator import CourseLocator
-from student.tests.factories import UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -229,4 +233,70 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         self.assertEqual(
             list(GeneratedCertificate.objects.filter(user=self.user)),  # pylint: disable=no-member
             [self.eligible_cert, self.ineligible_cert]
+        )
+
+
+@attr('shard_1')
+@ddt.ddt
+class TestCertificateGenerationHistory(TestCase):
+    """
+    Test the CertificateGenerationHistory model's methods
+    """
+    @ddt.data(
+        ({"student_set": "whitelisted_not_generated"}, "For exceptions", True),
+        ({"student_set": "whitelisted_not_generated"}, "For exceptions", False),
+        # check "students" key for backwards compatibility
+        ({"students": [1, 2, 3]}, "For exceptions", True),
+        ({"students": [1, 2, 3]}, "For exceptions", False),
+        ({}, "All learners", True),
+        ({}, "All learners", False),
+        # test single status to regenerate returns correctly
+        ({"statuses_to_regenerate": ['downloadable']}, 'already received', True),
+        ({"statuses_to_regenerate": ['downloadable']}, 'already received', False),
+        # test that list of > 1 statuses render correctly
+        ({"statuses_to_regenerate": ['downloadable', 'error']}, 'already received, error states', True),
+        ({"statuses_to_regenerate": ['downloadable', 'error']}, 'already received, error states', False),
+        # test that only "readable" statuses are returned
+        ({"statuses_to_regenerate": ['downloadable', 'not_readable']}, 'already received', True),
+        ({"statuses_to_regenerate": ['downloadable', 'not_readable']}, 'already received', False),
+    )
+    @ddt.unpack
+    def test_get_certificate_generation_candidates(self, task_input, expected, is_regeneration):
+        staff = AdminFactory.create()
+        instructor_task = InstructorTaskFactory.create(
+            task_input=json.dumps(task_input),
+            requester=staff,
+            task_key=Mock(),
+            task_id=Mock(),
+        )
+        certificate_generation_history = CertificateGenerationHistory(
+            course_id=instructor_task.course_id,
+            generated_by=staff,
+            instructor_task=instructor_task,
+            is_regeneration=is_regeneration,
+        )
+        self.assertEqual(
+            certificate_generation_history.get_certificate_generation_candidates(),
+            expected
+        )
+
+    @ddt.data((True, "regenerated"), (False, "generated"))
+    @ddt.unpack
+    def test_get_task_name(self, is_regeneration, expected):
+        staff = AdminFactory.create()
+        instructor_task = InstructorTaskFactory.create(
+            task_input=json.dumps({}),
+            requester=staff,
+            task_key=Mock(),
+            task_id=Mock(),
+        )
+        certificate_generation_history = CertificateGenerationHistory(
+            course_id=instructor_task.course_id,
+            generated_by=staff,
+            instructor_task=instructor_task,
+            is_regeneration=is_regeneration,
+        )
+        self.assertEqual(
+            certificate_generation_history.get_task_name(),
+            expected
         )

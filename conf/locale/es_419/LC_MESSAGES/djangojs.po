@@ -108,8 +108,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-03-30 19:38+0000\n"
-"PO-Revision-Date: 2016-04-01 08:33+0000\n"
-"Last-Translator: Tala Aoun <talaaoun@gmail.com>\n"
+"PO-Revision-Date: 2016-04-08 21:01+0000\n"
+"Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -8154,11 +8154,13 @@ msgid ""
 "This content group is not in use. Add a content group to any unit from the "
 "{linkStart}Course Outline{linkEnd}."
 msgstr ""
+"Este grupo de contenidos no está en uso. Añada un grupo de contenidos a "
+"cualquier unidad de la {linkStart}Estructura del curso{linkEnd}."
 
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
 msgid "Course Outline"
-msgstr ""
+msgstr "Estructura del curso"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -8274,6 +8276,8 @@ msgid ""
 "The general category for this type of assignment, for example, Homework or "
 "Midterm Exam. This name is visible to learners."
 msgstr ""
+"La categoría general para este tipo de asignación, por ejemplo, Tareas o "
+"Examen trimestral. Este nombre es visible a los estudiantes."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Abbreviation"
@@ -8284,6 +8288,9 @@ msgid ""
 "This short name for the assignment type (for example, HW or Midterm) appears"
 " next to assignments on a learner's Progress page."
 msgstr ""
+"Estos nombres para los tipos de asignaciones (por ejemplo, Tareas o Examen "
+"trimestral) aparecen al lado de las asignaciones en la página de Progreso "
+"del estudiante."
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Weight of Total Grade"
@@ -8314,6 +8321,9 @@ msgid ""
 "The number of assignments of this type that will be dropped. The lowest "
 "scoring assignments are dropped first."
 msgstr ""
+"El número de asignaciones de este tipo que serán descartados. Las "
+"asignaciones con calificaciones más bajas serán las primeras en ser "
+"descartadas."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -8438,6 +8448,9 @@ msgid ""
 "This Group Configuration is not in use. Start by adding a content experiment"
 " to any Unit via the {linkStart}Course Outline{linkEnd}."
 msgstr ""
+"Esta Configuración de grupo no está en uso. Comience añadiendo contenido "
+"experimental a cualquier Unidad a través de la {linkStart}Estructura del "
+"curso{linkEnd}."
 
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Group Configuration information"

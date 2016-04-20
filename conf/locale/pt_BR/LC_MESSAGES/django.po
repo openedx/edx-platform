@@ -67,7 +67,7 @@
 # Victor Hochgreb de Freitas <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
-# William Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
@@ -171,7 +171,8 @@
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
-# William Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -222,7 +223,8 @@
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
-# William Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX

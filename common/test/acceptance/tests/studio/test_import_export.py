@@ -182,7 +182,6 @@ class ImportTestMixin(object):
         """
         return []
 
-    @flaky      # TODO, fix this: TNL-4191
     def test_upload(self):
         """
         Scenario: I want to upload a course or library for import.

@@ -47,7 +47,6 @@
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
             'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
-            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
@@ -66,6 +65,11 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
+            'picturefill': 'common/js/vendor/picturefill.min',
+            'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
+            'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
+            'edxicons': 'xmodule_js/common_static/edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -624,8 +628,13 @@
                     'xmodule_js/common_static/coffee/src/discussion/utils'
                 ],
                 exports: 'DiscussionSpecHelper'
+            },
+            'modernizr': {
+                exports: 'Modernizr'
+            },
+            'afontgarde': {
+                exports: 'AFontGarde'
             }
-
         }
     });
 

@@ -1,6 +1,5 @@
 
 import json
-import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory

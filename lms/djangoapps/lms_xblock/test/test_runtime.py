@@ -2,7 +2,6 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
-from django.contrib.auth.models import User
 from django.conf import settings
 from ddt import ddt, data
 from django.test import TestCase

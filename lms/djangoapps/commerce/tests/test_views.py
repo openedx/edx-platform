@@ -1,6 +1,5 @@
 """ Tests for commerce views. """
-import json
-from uuid import uuid4
+
 from nose.plugins.attrib import attr
 
 import ddt

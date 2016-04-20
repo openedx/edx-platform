@@ -18,6 +18,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_programs_for_dashboard,
     get_programs_for_credentials,
     get_engaged_programs,
+    get_display_category
 )
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
@@ -109,6 +110,7 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         actual = get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         expected = {}
         for program in self.PROGRAMS_API_RESPONSE['results']:
+            program['display_category'] = get_display_category(program)
             for course_code in program['course_codes']:
                 for run in course_code['run_modes']:
                     course_key = run['course_key']
@@ -206,6 +208,8 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         actual = get_engaged_programs(self.user, enrollments)
 
         programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
         # get_engaged_programs iterates across a list returned by the programs
         # API to create flattened lists keyed by course ID. These lists are
         # joined in order of enrollment creation time when constructing the
@@ -234,6 +238,8 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         actual = get_engaged_programs(self.user, enrollments)
 
         programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
         expected = [programs[0]]
 
         self.assertEqual(expected, actual)
@@ -251,6 +257,8 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         actual = get_engaged_programs(self.user, enrollments)
 
         programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
         expected = programs[-2:]
 
         self.assertEqual(expected, actual)
@@ -277,3 +285,16 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         expected = []
 
         self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_display_category_success(self):
+        self.create_programs_config()
+        self.mock_programs_api()
+        actual_programs = get_programs(self.user)
+        for program in actual_programs:
+            expected = 'XSeries'
+            self.assertEqual(expected, get_display_category(program))
+
+    def test_get_display_category_none(self):
+        self.assertEqual('', get_display_category(None))
+        self.assertEqual('', get_display_category({"id": "test"}))

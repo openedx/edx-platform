@@ -7,7 +7,6 @@ import collections
 import json
 import logging
 from pkg_resources import resource_string
-import warnings
 
 from lxml import etree
 from xblock.core import XBlock

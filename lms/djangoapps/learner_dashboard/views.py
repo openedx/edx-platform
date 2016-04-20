@@ -16,7 +16,8 @@ from student.views import get_course_enrollments
 @require_GET
 def view_programs(request):
     """View programs in which the user is engaged."""
-    if not ProgramsApiConfig.current().is_student_dashboard_enabled:
+    show_program_listing = ProgramsApiConfig.current().show_program_listing
+    if not show_program_listing:
         raise Http404
 
     enrollments = list(get_course_enrollments(request.user, None, []))
@@ -32,5 +33,7 @@ def view_programs(request):
 
     return render_to_response('learner_dashboard/programs.html', {
         'programs': programs,
-        'xseries_url': marketing_root if ProgramsApiConfig.current().show_xseries_ad else None
+        'xseries_url': marketing_root if ProgramsApiConfig.current().show_xseries_ad else None,
+        'nav_hidden': True,
+        'show_program_listing': show_program_listing
     })

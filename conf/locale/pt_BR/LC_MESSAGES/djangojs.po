@@ -57,7 +57,7 @@
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
-# William Roca <williambr_1331@hotmail.com>, 2016
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
@@ -105,6 +105,7 @@
 # Siderlan Santos <siderlan.santos@gmail.com>, 2015
 # Thiago Perrotta <inactive+thiagowfx@transifex.com>, 2014
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
+# William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -112,7 +113,7 @@
 # 
 # Translators:
 # Alan Mól <alan3df@gmail.com>, 2015
-# Ana Paula D'Almeida Oliveira <paulladalmeida@gmail.com>, 2015
+# Ana Paula D'Almeida <paulladalmeida@gmail.com>, 2015
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
 # Angela Amaro <angelasimei@gmail.com>, 2016
 # Bruno Sette <brunosette@gmail.com>, 2015

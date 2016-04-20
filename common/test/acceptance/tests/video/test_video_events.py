@@ -4,7 +4,6 @@ import datetime
 import json
 from nose.plugins.attrib import attr
 import ddt
-import unittest
 
 from ..helpers import EventsTestMixin
 from .test_video_module import VideoBaseTest

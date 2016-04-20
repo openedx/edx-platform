@@ -1,7 +1,6 @@
 """
 Course Group Configurations page.
 """
-from bok_choy.promise import EmptyPromise
 from ..common.utils import confirm_prompt
 from .course_page import CoursePage
 
