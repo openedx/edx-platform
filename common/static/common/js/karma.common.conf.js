@@ -32,7 +32,7 @@ function junitClassNameFormatter(browser) {
  * @return {Array}
  */
 function reporters(config) {
-    var defaultReporters = ['dots', 'junit', 'kjhtml'];
+    var defaultReporters = ['spec', 'junit', 'kjhtml'];
     if (config.coverage) {
         defaultReporters.push('coverage');
     }
@@ -160,6 +160,7 @@ var getConfig = function (config, useRequireJs) {
             'karma-coverage',
             'karma-chrome-launcher',
             'karma-firefox-launcher',
+            'karma-spec-reporter',
             customPlugin
         ],
 
