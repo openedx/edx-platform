@@ -9,7 +9,7 @@ from django.http import Http404
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.utils import get_engaged_programs
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from student.views import get_course_enrollments
+from student.views import get_course_enrollments, _get_xseries_credentials
 
 
 @login_required
@@ -35,5 +35,6 @@ def view_programs(request):
         'programs': programs,
         'xseries_url': marketing_root if ProgramsApiConfig.current().show_xseries_ad else None,
         'nav_hidden': True,
-        'show_program_listing': show_program_listing
+        'show_program_listing': show_program_listing,
+        'credentials': _get_xseries_credentials(request.user)
     })

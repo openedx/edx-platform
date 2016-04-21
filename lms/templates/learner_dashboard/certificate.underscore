@@ -1,0 +1,7 @@
+<div class="certificate-container">
+    <p class="title"><%- gettext('XSeries Program Certificates') %>:</p>
+    <img src="<%- xseriesImage %>" alt="">
+    <% _.each(certificatesData, function(certificate){ %>
+        <a class="certificate-box" href="<%- gettext(certificate.credential_url) %>"><%- gettext(certificate.display_name) %></a>
+    <% }); %>
+</div>
