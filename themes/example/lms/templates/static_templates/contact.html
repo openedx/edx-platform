@@ -2,9 +2,61 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
-<%block name="pagetitle">${_("Contact")}</%block>
+<%block name="pagetitle">${_("Contact Us")}</%block>
 
-<section class="container about">
-<h1>${_("Contact")}</h1>
-<p>${_("This page left intentionally blank. It is not used by edx.org but is left here for possible use by installations of Open edX.")}</p>
+<div class="page-heading">
+  <h1>${_("Contact Us")}</h1>
+</div>
+
+<section class="static-content">
+  <div class="grid-manual grid-container">
+    <div class="inner-container">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id suscipit dolor rutrum id. Morbi facilisis porta volutpat. Fusce adipiscing, mauris quis congue tincidunt, sapien purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci mattis fringilla. Praesent eu ipsum in sapien tincidunt molestie sed ut magna.</p>
+      <div class="row">
+        <div class="col col-12 sm-col-10 md-col-8 lg-col-6 xl-col-6 col-centered">
+          <form action="" class="form-block">
+            <div class="input-group">
+              <label for="">Email*</label>
+              <input type="email" class="input-lg" placeholder="">
+            </div>
+            <div class="input-group">
+              <label for="">Full Name*</label>
+              <input type="text" class="input-lg has-error" placeholder="">
+              <div class="has-error field-message">
+                <span class="field-message-content">Lorem Ipsum</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="">I am a</label>
+              <div class="custom-select">
+                <select name="" id="" placeholder="" class="input-lg">
+                  <option value="">None</option>
+                  <option value="">None</option>
+                  <option value="">None</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="">Inquiry Type*</label>
+              <div class="custom-select">
+                <select name="" id="" placeholder="Select" class="input-lg">
+                  <option value="">None</option>
+                  <option value="">None</option>
+                  <option value="">None</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group">
+              <label for="">Message</label>
+              <textarea name="" id="" rows="10"></textarea>
+            </div>
+            <button class="btn-brand btn-client btn-lg">Submit</button>
+            <div class="input-group">
+              <label for="" class="text-light">* Required Fields</label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
