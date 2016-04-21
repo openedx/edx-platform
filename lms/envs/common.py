@@ -642,8 +642,10 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
+# Verticals having children with any of these categories would be excluded from progress calculations
+PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project']
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
@@ -1961,6 +1963,7 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.course_metadata',
     'course_structure_api',
 
     # Mailchimp Syncing

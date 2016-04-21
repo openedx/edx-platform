@@ -42,6 +42,7 @@ from lms.envs.common import (
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
+    PROGRESS_DETACHED_VERTICAL_CATEGORIES, PROGRESS_DETACHED_CATEGORIES,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
@@ -769,6 +770,7 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.course_metadata',
 
     # Credit courses
     'openedx.core.djangoapps.credit',

@@ -25,12 +25,10 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
 from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
@@ -39,6 +37,7 @@ from api_manager.courseware_access import get_course_key
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
+
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 TEST_API_KEY = str(uuid.uuid4())
@@ -145,13 +144,6 @@ class CoursesApiTests(ModuleStoreTestCase):
             display_name="Group Project2"
         )
 
-        self.course_content = ItemFactory.create(
-            category="videosequence",
-            parent_location=self.chapter.location,
-            data=self.test_data,
-            display_name="Video_Sequence",
-        )
-
         self.course_content2 = ItemFactory.create(
             category="sequential",
             parent_location=self.chapter.location,
@@ -159,18 +151,25 @@ class CoursesApiTests(ModuleStoreTestCase):
             display_name="Sequential",
         )
 
-        self.content_child = ItemFactory.create(
-            category="video",
-            parent_location=self.course_content.location,
-            data=self.test_data,
-            display_name="Video"
-        )
-
         self.content_child2 = ItemFactory.create(
             category="vertical",
             parent_location=self.course_content2.location,
             data=self.test_data,
             display_name="Vertical Sequence"
+        )
+
+        self.course_content = ItemFactory.create(
+            category="videosequence",
+            parent_location=self.content_child2.location,
+            data=self.test_data,
+            display_name="Video_Sequence",
+        )
+
+        self.content_child = ItemFactory.create(
+            category="video",
+            parent_location=self.course_content.location,
+            data=self.test_data,
+            display_name="Video"
         )
 
         self.content_subchild = ItemFactory.create(
@@ -198,7 +197,8 @@ class CoursesApiTests(ModuleStoreTestCase):
             category="static_tab",
             parent_location=self.course.location,
             data=TEST_STATIC_TAB1_CONTENT,
-            display_name="syllabus"
+            display_name="syllabus",
+            name="Static+Tab"
         )
 
         self.static_tab2 = ItemFactory.create(
@@ -418,12 +418,13 @@ class CoursesApiTests(ModuleStoreTestCase):
         chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['children']), 6)
+        # we should have 5 children of Overview chapter
+        # 1 sequential, 1 vertical, 1 videosequence and 2 videos
+        self.assertEqual(len(chapter['children']), 5)
 
-        sequence = chapter['children'][0]
-        self.assertEqual(sequence['category'], 'videosequence')
-        self.assertEqual(sequence['name'], 'Video_Sequence')
-        self.assertNotIn('children', sequence)
+        # Make sure one of the children should be a sequential
+        sequential = [child for child in chapter['children'] if child['category'] == 'sequential']
+        self.assertGreater(len(sequential), 0)
 
     def test_courses_tree_get_root(self):
         # query the course tree to quickly get naviation information
@@ -859,13 +860,71 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(tabs[1]['id'], u'readings')
         self.assertEqual(tabs[1]['content'], self.static_tab2.data)
 
+        # get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tabs[0]['id']
+        )
+        tab1_content = cache.get(cache_key)
+        self.assertTrue(tab1_content is not None)
+        self.assertEqual(tab1_content, self.static_tab1.data)
+
+        # get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tabs[1]['id']
+        )
+        tab2_content = cache.get(cache_key)
+        self.assertTrue(tab2_content is not None)
+        self.assertEqual(tab2_content, self.static_tab2.data)
+
     def test_static_tab_list_get_invalid_course(self):
         #try a bogus course_id to test failure case
         test_uri = self.base_courses_uri + '/' + self.test_bogus_course_id + '/static_tabs'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_static_tab_detail_get(self):
+    def test_static_tab_detail_get_by_name(self):
+        # get course static tab by tab name
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/Static+Tab'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['name'], u'Static+Tab')
+        self.assertEqual(tab['content'], self.static_tab1.data)
+
+        # now try to get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
+    def test_static_tab_detail_get_by_url_slug(self):
+        # get course static tab by url_slug
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'readings')
+        self.assertEqual(tab['content'], self.static_tab2.data)
+
+        # now try to get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab2.data)
+
+    @override_settings(STATIC_TAB_CONTENTS_CACHE_MAX_SIZE_LIMIT=200)
+    def test_static_tab_content_cache_max_size_limit(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -874,6 +933,16 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(tab['id'], u'syllabus')
         self.assertEqual(tab['content'], self.static_tab1.data)
 
+        # try to get syllabus tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
+        # now test static tab with content size greater than 200 bytes
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/readings'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -881,6 +950,41 @@ class CoursesApiTests(ModuleStoreTestCase):
         tab = response.data
         self.assertEqual(tab['id'], u'readings')
         self.assertEqual(tab['content'], self.static_tab2.data)
+
+        # try to get readings tab contents from cache
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is None)
+
+    @override_settings(STATIC_TAB_CONTENTS_CACHE_TTL=60)
+    def test_static_tab_content_cache_time_to_live(self):
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/static_tabs/syllabus'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        tab = response.data
+        self.assertEqual(tab['id'], u'syllabus')
+        self.assertEqual(tab['content'], self.static_tab1.data)
+
+        cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(
+            course_id=self.test_course_id,
+            url_slug=tab['id']
+        )
+
+        # try to get syllabus tab contents from cache
+        tab_contents = cache.get(cache_key)
+        self.assertTrue(tab_contents is not None)
+        self.assertEqual(tab_contents, self.static_tab1.data)
+
+        # now reset the time to 1 minute and 5 seconds from now in future to expire cache
+        reset_time = datetime.now(pytz.UTC) + timedelta(seconds=65)
+        with freeze_time(reset_time):
+            # try to get syllabus tab contents from cache again
+            tab_contents = cache.get(cache_key)
+            self.assertTrue(tab_contents is None)
 
     def test_static_tab_detail_get_invalid_course(self):
         # try a bogus courseId
@@ -2012,7 +2116,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
                 category="videosequence",
-                parent_location=self.chapter.location,
+                parent_location=self.content_child2.location,
                 data=self.test_data,
                 display_name=local_content_name
             )
@@ -2049,6 +2153,80 @@ class CoursesApiTests(ModuleStoreTestCase):
         )
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_data_metrics_user_group_filter_for_empty_group(self):
+        group = GroupFactory.create()
+
+        # get course metrics for users in group
+        course_metrics_uri = '{}/{}/metrics/?groups={}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            group.id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 0)
+        self.assertGreaterEqual(response.data['users_started'], 0)
+
+    def test_course_data_metrics_user_group_filter_for_group_having_members(self):
+        group = GroupFactory.create()
+        users = UserFactory.create_batch(3, groups=(group,))
+
+        # enroll all users in course
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        # create course completions
+        for user in users:
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
+            completions_data = {
+                'content_id': unicode(self.course_content.scope_ids.usage_id),
+                'user_id': user.id,
+                'stage': 'First'
+            }
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        course_metrics_uri = '{}/{}/metrics/?groups={}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            group.id
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 3)
+        self.assertGreaterEqual(response.data['users_started'], 3)
+
+    def test_course_data_metrics_user_group_filter_for_multiple_groups_having_members(self):
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(4, groups=(groups[0],))
+        users.append(UserFactory.create(groups=groups))
+
+        # enroll all users in course
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        # create course completions
+        for user in users:
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
+            completions_data = {
+                'content_id': unicode(self.course_content.scope_ids.usage_id),
+                'user_id': user.id,
+                'stage': 'First'
+            }
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        course_metrics_uri = '{}/{}/metrics/?groups={},{}'.format(
+            self.base_courses_uri,
+            self.test_course_id,
+            groups[0].id,
+            groups[1].id,
+        )
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 5)
+        self.assertGreaterEqual(response.data['users_started'], 5)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'MARK_PROGRESS_ON_GRADING_EVENT': True,
                                                        'SIGNAL_ON_SCORE_CHANGED': True,

@@ -13,9 +13,11 @@ from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.courses import course_image_url
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_mongo_calls_range
-
+from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+from openedx.core.djangoapps.content.course_overviews.signals import listen_for_course_publish
 from .models import CourseOverview
 
 
@@ -30,6 +32,11 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
     LAST_WEEK = TODAY - datetime.timedelta(days=7)
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
     NEXT_MONTH = TODAY + datetime.timedelta(days=30)
+
+    def setUp(self):
+        super(CourseOverviewTestCase, self).setUp()
+        SignalHandler.course_published.connect(listen_for_course_publish)
+        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
 
     def check_course_overview_against_course(self, course):
         """

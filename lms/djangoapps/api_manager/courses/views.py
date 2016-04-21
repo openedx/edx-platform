@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from django.db.models import Avg, Count, Max, Min
 from django.http import Http404
 from django.utils import timezone
@@ -37,16 +38,22 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole, get_aggregate_exclusion_user_ids
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
+from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
 
-from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
+from api_manager.courseware_access import get_course, get_course_child, get_course_key, \
     course_exists, get_modulestore, get_course_descriptor
-from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from api_manager.models import (
+    CourseGroupRelationship,
+    CourseContentGroupRelationship,
+    GroupProfile,
+)
 from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
+from .tasks import cache_static_tab_contents
 from progress.serializers import CourseModuleCompletionSerializer
 
 
@@ -365,6 +372,20 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
     resource_uri = '{}/users/'.format(base_uri_without_qs)
     data['resources'].append({'uri': resource_uri})
     return data
+
+
+def _get_static_tab_contents(request, course, tab):
+    """
+    Wrapper around get_static_tab_contents to cache contents for the given static tab
+    """
+
+    cache_key = u'course.{course_id}.static.tab.{url_slug}.contents'.format(course_id=course.id, url_slug=tab.url_slug)
+    contents = cache.get(cache_key)
+    if contents is None:
+        contents = get_static_tab_contents(request, course, tab, wrap_xmodule_display=False)
+        cache_static_tab_contents.delay(cache_key, contents)
+
+    return contents
 
 
 class CourseContentList(SecureAPIView):
@@ -912,11 +933,10 @@ class CoursesStaticTabsList(SecureAPIView):
                 tab_data['id'] = tab.url_slug
                 tab_data['name'] = tab.name
                 if request.GET.get('detail') and request.GET.get('detail') in ['True', 'true']:
-                    tab_data['content'] = get_static_tab_contents(
+                    tab_data['content'] = _get_static_tab_contents(
                         request,
                         course_descriptor,
-                        tab,
-                        wrap_xmodule_display=False
+                        tab
                     )
                 tabs.append(tab_data)
         response_data['tabs'] = tabs
@@ -927,19 +947,19 @@ class CoursesStaticTabsDetail(SecureAPIView):
     """
     **Use Case**
 
-        CoursesStaticTabsDetail returns a collection of custom pages in the
-        course, including the page content.
+        CoursesStaticTabsDetail returns a custom page in the course,
+        including the page content.
 
     **Example Requests**
 
-          GET /api/courses/{course_id}/static_tabs/{tab_id}
+          GET /api/courses/{course_id}/static_tabs/{tab_url_slug}
+          GET /api/courses/{course_id}/static_tabs/{tab_name}
 
     **Response Values**
 
-        * tabs: The collection of custom pages in the course. Each object in the
-          collection conains the following keys:
+        * tab: A custom page in the course. containing following keys:
 
-          * id: The ID of the custom page.
+          * id: The url_slug of the custom page.
 
           * name: The Display Name of the custom page.
 
@@ -955,18 +975,17 @@ class CoursesStaticTabsDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = OrderedDict()
         for tab in course_descriptor.tabs:
-            if tab.type == 'static_tab' and tab.url_slug == tab_id:
+            if tab.type == 'static_tab' and (tab.url_slug == tab_id or tab.name == tab_id):
                 response_data['id'] = tab.url_slug
                 response_data['name'] = tab.name
-                response_data['content'] = get_static_tab_contents(
+                response_data['content'] = _get_static_tab_contents(
                     request,
                     course_descriptor,
-                    tab,
-                    wrap_xmodule_display=False
+                    tab
                 )
-        if not response_data:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-        return Response(response_data, status=status.HTTP_200_OK)
+                return Response(response_data, status=status.HTTP_200_OK)
+
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CoursesUsersList(SecureAPIView):
@@ -1520,9 +1539,21 @@ class CoursesMetrics(SecureAPIView):
             users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
             org_ids = [organization]
 
-        users_started = StudentProgress.get_num_users_started(course_key, exclude_users=exclude_users, org_ids=org_ids)
+        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        if group_ids:
+            try:
+                group_ids = map(int, group_ids.split(','))
+            except ValueError:
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+            users_enrolled_qs = users_enrolled_qs.filter(groups__in=group_ids)
+
+        users_started = StudentProgress.get_num_users_started(course_key,
+                                                              exclude_users=exclude_users,
+                                                              org_ids=org_ids,
+                                                              group_ids=group_ids)
         data = {
-            'users_enrolled': users_enrolled_qs.count(),
+            'users_enrolled': users_enrolled_qs.distinct().count(),
             'users_started': users_started,
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
@@ -1736,7 +1767,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        total_possible_completions = float(len(get_course_leaf_nodes(course_key)))
+        course_metadata = CourseAggregatedMetaData.get_from_id(course_key)
+        total_possible_completions = float(course_metadata.total_assessments)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
         orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
         if orgs_filter:
@@ -1758,7 +1790,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         if orgs_filter:
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
         total_users = total_users_qs.count()
-        if total_users and total_actual_completions:
+        if total_users and total_actual_completions and total_possible_completions:
             course_avg = total_actual_completions / float(total_users)
             course_avg = min(100 * (course_avg / total_possible_completions), 100)  # avg in percentage
         data['course_avg'] = course_avg

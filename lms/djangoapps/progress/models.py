@@ -46,7 +46,7 @@ class StudentProgress(models.Model):
         return completions
 
     @classmethod
-    def get_num_users_started(cls, course_key, exclude_users=None, org_ids=None):
+    def get_num_users_started(cls, course_key, exclude_users=None, org_ids=None, group_ids=None):
         """
         Returns count of users who completed at least one module.
         """
@@ -56,7 +56,9 @@ class StudentProgress(models.Model):
             .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
-        return queryset.count()
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids)
+        return queryset.distinct().count()
 
     @classmethod
     def get_user_position(cls, course_key, user_id, exclude_users=None):

@@ -554,6 +554,12 @@ FEATURES['ORGANIZATIONS_APP'] = True
 if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
     INSTALLED_APPS += ('organizations',)
 
+# Disable course_published signals
+# If we don't disconnect then tests take too much time to run since
+# this signal is sent every time course or a course block is created
+# via CourseFactory or ItemFactory
+FEATURES['DISABLE_COURSE_PUBLISHED_SIGNAL'] = True
+
 # Test mode. Used to let code that might otherwise affect global state know that it shouldn't
 # (such as management commands.)
 TEST_MODE = True
