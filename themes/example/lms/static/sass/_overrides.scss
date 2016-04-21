@@ -42,9 +42,12 @@ a{
   background-color: $brand-color !important;
   border-color: $brand-color !important;
   font-weight: normal !important;
+  box-shadow: none !important;
   color: $white !important;
+  text-shadow: none !important;
   &:hover{
     background-color: lighten($brand-color, 10%) !important;
+    background-image: none !important;
   }
   &.btn-elevated{
     box-shadow: inset 0 -3px 0 0 darken($brand-color, 15%) !important;
@@ -73,7 +76,86 @@ h2{
 h1, h2, h3, h4, h5, h6{
   font-family: $brand-font;
 }
-
+.col-centered{
+  float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.input-group{
+  margin-bottom: 1.25rem;
+}
+.text-light{
+  color: $base !important;
+}
+.input-lg{
+  line-height: 55px !important;
+  height: 55px !important;
+  padding: 0 1.25rem !important;
+}
+.form-block{
+  label, input, select, button, textarea{
+    display: block;
+    width: 100%;
+    font-family: $brand-font;
+    font-style: normal;
+    margin-bottom: 0.5rem !important;
+    &.has-error{
+      border-color: $error-base;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: 0 !important;
+      + .field-message{
+        border-radius: 0 0 4px 4px;
+        width: 100%;
+      }
+    }
+  }
+  input{
+    box-shadow: none;
+    border: 1px solid $light;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 100%;
+    &:focus, &:active{
+      box-shadow: none;
+      border-color: $dark;
+    }
+  }
+  select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-color: $light;
+    appearance: none;
+    &::-ms-expand{
+      display: none;
+    }
+  }
+  .custom-select{
+    position: relative;
+    select{
+      padding-right: 3rem !important;
+    }
+    &:after{
+      content: "\f0da";
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-family: 'FontAwesome';
+    font-size: 1.3rem;
+    color: $base;
+    }
+  }
+  textarea{
+    height: 280px;
+    border-color: $light;
+    box-shadow: none;
+    resize: none;
+    padding: 1rem;
+  }
+  button{
+    margin-top: 2.5rem;
+    padding: 1.25rem;
+  }
+}
 //Header
 header.header-main {
   min-height: 100px;

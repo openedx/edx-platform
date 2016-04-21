@@ -18,3 +18,4 @@ $pattern-library-path: '../../edx-pattern-library' !default;
 
 // Load overrides
 @import "overrides";
+@import "has";
