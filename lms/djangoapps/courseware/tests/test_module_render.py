@@ -23,7 +23,7 @@ from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockAside
 from xblock.fragment import Fragment
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -51,6 +51,7 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
 from openedx.core.djangoapps.credit.models import CreditCourse
@@ -1703,9 +1704,36 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
         self.assertEquals(problem_display_name, module_info['display_name'])
 
-    def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    @patch('xmodule.modulestore.mongo.base.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    @patch('lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_context_contains_aside_info(self, mock_tracker):
         """
-        Creates a fake module, invokes the callback and extracts the 'module'
+        Check that related xblock asides populate information in the 'problem_check' event in case
+        the 'get_event_context' method is exist
+        """
+        problem_display_name = u'Test Problem'
+
+        def get_event_context(self, event_type, event):  # pylint: disable=unused-argument
+            """
+            This method return data that should be associated with the "check_problem" event
+            """
+            return {'content': 'test1', 'data_field': 'test2'}
+
+        AsideTestType.get_event_context = get_event_context
+        context_info = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+        self.assertIn('asides', context_info)
+        self.assertIn('test_aside', context_info['asides'])
+        self.assertIn('content', context_info['asides']['test_aside'])
+        self.assertEquals(context_info['asides']['test_aside']['content'], 'test1')
+        self.assertIn('data_field', context_info['asides']['test_aside'])
+        self.assertEquals(context_info['asides']['test_aside']['data_field'], 'test2')
+
+    def handle_callback_and_get_context_info(self, mock_tracker, problem_display_name=None):
+        """
+        Creates a fake module, invokes the callback and extracts the 'context'
         metadata from the emitted problem_check event.
         """
         descriptor_kwargs = {
@@ -1730,7 +1758,15 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         event = mock_call[1][0]
 
         self.assertEquals(event['event_type'], 'problem_check')
-        return event['context']['module']
+        return event['context']
+
+    def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
+        """
+        Creates a fake module, invokes the callback and extracts the 'module'
+        metadata from the emitted problem_check event.
+        """
+        event = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+        return event['module']
 
     def test_missing_display_name(self, mock_tracker):
         actual_display_name = self.handle_callback_and_get_module_info(mock_tracker)['display_name']

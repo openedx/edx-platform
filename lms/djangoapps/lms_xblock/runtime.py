@@ -281,4 +281,10 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         if block.scope_ids.block_type in config.disabled_blocks.split():
             return []
 
-        return super(LmsModuleSystem, self).applicable_aside_types()
+        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+        # (see https://openedx.atlassian.net/browse/TE-811)
+        return [
+            aside_type
+            for aside_type in super(LmsModuleSystem, self).applicable_aside_types(block)
+            if aside_type != 'acid_aside'
+        ]

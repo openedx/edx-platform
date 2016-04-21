@@ -620,7 +620,7 @@ class CapaMixin(CapaFields):
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
         event_info['hint_text'] = hint_text
-        self.runtime.track_function('edx.problem.hint.demandhint_displayed', event_info)
+        self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
@@ -1145,7 +1145,7 @@ class CapaMixin(CapaFields):
         # avoiding problems where an event_info is unmasked twice.
         event_unmasked = copy.deepcopy(event_info)
         self.unmask_event(event_unmasked)
-        self.runtime.track_function(title, event_unmasked)
+        self.runtime.publish(self, title, event_unmasked)
 
     def unmask_event(self, event_info):
         """
