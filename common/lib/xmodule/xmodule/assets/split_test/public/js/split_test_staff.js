@@ -1,7 +1,7 @@
 /* Creates a new selector for managing toggling which child to show. */
 window.ABTestSelector = function (runtime, elem) {
     "use strict";
-    var _this = this;
+    var _this = {};
     _this.elem = $(elem);
     _this.children = _this.elem.find('.split-test-child');
     _this.content_container = _this.elem.find('.split-test-child-container');

@@ -1,6 +1,1 @@
-/* Javascript for the Split Test XBlock. */
-window.SplitTestStudentView = function (runtime, element) {
-    "use strict";
-    $.post(runtime.handlerUrl(element, 'log_child_render'));
-    return {};
-};
+../../../assets/split_test/public/js/split_test_student.js
