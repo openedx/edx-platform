@@ -200,7 +200,14 @@ class CoursewarePage(CoursePage):
         self.q(css='button.start-timed-exam[data-start-immediately="false"]').first.click()
 
         # Wait for the unique exam code to appear.
-        # elf.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+        # self.wait_for_element_presence(".proctored-exam-code", "unique exam code")
+
+    def has_submitted_exam_message(self):
+        """
+        Returns whether the "you have submitted your exam" message is present.
+        This being true implies "the exam contents and results are hidden".
+        """
+        return self.q(css="div.proctored-exam.completed").visible
 
     @property
     def entrance_exam_message_selector(self):
