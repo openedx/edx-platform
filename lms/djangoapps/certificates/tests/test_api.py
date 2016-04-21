@@ -8,16 +8,20 @@ from django.test.utils import override_settings
 from django.conf import settings
 from mock import patch
 from nose.plugins.attrib import attr
-
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+
+from config_models.models import cache
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from config_models.models import cache
+from microsite_configuration import microsite
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+)
 
 from certificates import api as certs_api
 from certificates.models import (
@@ -30,7 +34,6 @@ from certificates.models import (
 from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
 from certificates.tests.factories import GeneratedCertificateFactory
 
-from microsite_configuration import microsite
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -197,6 +200,93 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
                 ),
                 'uuid': cert_status['uuid']
             }
+        )
+
+
+@attr('shard_1')
+class CertificateGetTests(SharedModuleStoreTestCase):
+    """Tests for the `test_get_certificate_for_user` helper function. """
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateGetTests, cls).setUpClass()
+        cls.student = UserFactory()
+        cls.student_no_cert = UserFactory()
+        cls.course_1 = CourseFactory.create(
+            org='edx',
+            number='verified_1',
+            display_name='Verified Course 1'
+        )
+        cls.course_2 = CourseFactory.create(
+            org='edx',
+            number='verified_2',
+            display_name='Verified Course 2'
+        )
+        # certificate for the first course
+        GeneratedCertificateFactory.create(
+            user=cls.student,
+            course_id=cls.course_1.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url='www.google.com',
+            grade="0.88",
+        )
+        # certificate for the second course
+        GeneratedCertificateFactory.create(
+            user=cls.student,
+            course_id=cls.course_2.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor',
+            download_url='www.gmail.com',
+            grade="0.99",
+        )
+
+    def test_get_certificate_for_user(self):
+        """
+        Test to get a certificate for a user for a specific course.
+        """
+        cert = certs_api.get_certificate_for_user(self.student.username, self.course_1.id)
+
+        self.assertEqual(cert['username'], self.student.username)
+        self.assertEqual(cert['course_key'], self.course_1.id)
+        self.assertEqual(cert['type'], CourseMode.VERIFIED)
+        self.assertEqual(cert['status'], CertificateStatuses.downloadable)
+        self.assertEqual(cert['grade'], "0.88")
+        self.assertEqual(cert['download_url'], 'www.google.com')
+
+    def test_get_certificates_for_user(self):
+        """
+        Test to get all the certificates for a user
+        """
+        certs = certs_api.get_certificates_for_user(self.student.username)
+        self.assertEqual(len(certs), 2)
+        self.assertEqual(certs[0]['username'], self.student.username)
+        self.assertEqual(certs[1]['username'], self.student.username)
+        self.assertEqual(certs[0]['course_key'], self.course_1.id)
+        self.assertEqual(certs[1]['course_key'], self.course_2.id)
+        self.assertEqual(certs[0]['type'], CourseMode.VERIFIED)
+        self.assertEqual(certs[1]['type'], CourseMode.HONOR)
+        self.assertEqual(certs[0]['status'], CertificateStatuses.downloadable)
+        self.assertEqual(certs[1]['status'], CertificateStatuses.downloadable)
+        self.assertEqual(certs[0]['grade'], '0.88')
+        self.assertEqual(certs[1]['grade'], '0.99')
+        self.assertEqual(certs[0]['download_url'], 'www.google.com')
+        self.assertEqual(certs[1]['download_url'], 'www.gmail.com')
+
+    def test_no_certificate_for_user(self):
+        """
+        Test the case when there is no certificate for a user for a specific course.
+        """
+        self.assertIsNone(
+            certs_api.get_certificate_for_user(self.student_no_cert.username, self.course_1.id)
+        )
+
+    def test_no_certificates_for_user(self):
+        """
+        Test the case when there are no certificates for a user.
+        """
+        self.assertEqual(
+            certs_api.get_certificates_for_user(self.student_no_cert.username),
+            []
         )
 
 
