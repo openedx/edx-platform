@@ -145,13 +145,6 @@ class CoursesApiTests(ModuleStoreTestCase):
             display_name="Group Project2"
         )
 
-        self.course_content = ItemFactory.create(
-            category="videosequence",
-            parent_location=self.chapter.location,
-            data=self.test_data,
-            display_name="Video_Sequence",
-        )
-
         self.course_content2 = ItemFactory.create(
             category="sequential",
             parent_location=self.chapter.location,
@@ -159,18 +152,25 @@ class CoursesApiTests(ModuleStoreTestCase):
             display_name="Sequential",
         )
 
-        self.content_child = ItemFactory.create(
-            category="video",
-            parent_location=self.course_content.location,
-            data=self.test_data,
-            display_name="Video"
-        )
-
         self.content_child2 = ItemFactory.create(
             category="vertical",
             parent_location=self.course_content2.location,
             data=self.test_data,
             display_name="Vertical Sequence"
+        )
+
+        self.course_content = ItemFactory.create(
+            category="videosequence",
+            parent_location=self.content_child2.location,
+            data=self.test_data,
+            display_name="Video_Sequence",
+        )
+
+        self.content_child = ItemFactory.create(
+            category="video",
+            parent_location=self.course_content.location,
+            data=self.test_data,
+            display_name="Video"
         )
 
         self.content_subchild = ItemFactory.create(
@@ -584,12 +584,13 @@ class CoursesApiTests(ModuleStoreTestCase):
         chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['children']), 6)
+        # we should have 5 children of Overview chapter
+        # 1 sequential, 1 vertical, 1 videosequence and 2 videos
+        self.assertEqual(len(chapter['children']), 5)
 
-        sequence = chapter['children'][0]
-        self.assertEqual(sequence['category'], 'videosequence')
-        self.assertEqual(sequence['name'], 'Video_Sequence')
-        self.assertNotIn('children', sequence)
+        # Make sure one of the children should be a sequential
+        sequential = [child for child in chapter['children'] if child['category'] == 'sequential']
+        self.assertGreater(len(sequential), 0)
 
     def test_courses_tree_get_root(self):
         # query the course tree to quickly get naviation information
@@ -2341,7 +2342,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
                 category="videosequence",
-                parent_location=self.chapter.location,
+                parent_location=self.content_child2.location,
                 data=self.test_data,
                 display_name=local_content_name
             )
