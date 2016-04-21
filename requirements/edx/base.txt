@@ -40,7 +40,6 @@ edx-ccx-keys==0.1.2
 edx-django-oauth2-provider==1.0.3
 edx-lint==0.4.3
 edx-management-commands==0.0.1
-edx-django-oauth2-provider==1.0.1
 edx-oauth2-provider==1.0.0
 edx-opaque-keys==0.2.1
 edx-organizations==0.4.0
