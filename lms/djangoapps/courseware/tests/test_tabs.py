@@ -241,7 +241,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         )
         cls.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='New Tab', url_slug='new_tab'))
         cls.course.save()
-        cls.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_logged_in(self):
         self.setup_user()
@@ -262,16 +261,15 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
-    @skip("Broken! Never finds the 'resources' static tab when created by the ToyCourseFactory.")
     def test_get_static_tab_contents(self):
         self.setup_user()
-        course = get_course_by_id(self.toy_course_key)
+        course = get_course_by_id(self.course.id)
         request = get_request_for_user(self.user)
-        tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
+        tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'new_tab')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)
-        self.assertIn(self.toy_course_key.to_deprecated_string(), tab_content)
+        self.assertIn(self.course.id.to_deprecated_string(), tab_content)
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
