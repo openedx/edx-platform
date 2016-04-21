@@ -1097,19 +1097,22 @@ class CoursesUsersList(SecureAPIView):
 
         groups = get_ids_from_list_param(self.request, 'groups')
         if groups:
-            users = users.filter(groups__in=groups)
+            users = users.filter(groups__in=groups).distinct()
+
+        workgroups = get_ids_from_list_param(self.request, 'workgroups')
+        if workgroups:
+            users = users.filter(workgroups__in=workgroups).distinct()
 
         exclude_groups = get_ids_from_list_param(self.request, 'exclude_groups')
         if exclude_groups:
             users = users.exclude(groups__in=exclude_groups)
 
-        response_data['enrollments'] = []
-        for user in users:
-            user_data = OrderedDict()
-            user_data['id'] = user.id
-            user_data['email'] = user.email
-            user_data['username'] = user.username
-            response_data['enrollments'].append(user_data)
+        users = users.prefetch_related('organizations')\
+            .select_related('courseenrollment_set', 'profile')\
+            .annotate(courses_enrolled=Count('courseenrollment'))
+
+        serializer = UserSerializer(users, many=True)
+        response_data['enrollments'] = serializer.data
 
         # Then list all enrollments which are pending. These are enrollments for students that have not yet
         # created an account
