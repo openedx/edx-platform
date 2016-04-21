@@ -240,10 +240,11 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         return self.store.has_changes(self.store.get_item(location))
 
     # pylint: disable=dangerous-default-value
-    def _initialize_mixed(self, mappings={}, contentstore=None):
+    def _initialize_mixed(self, mappings=None, contentstore=None):
         """
         initializes the mixed modulestore.
         """
+        mappings = mappings or {}
         self.store = MixedModuleStore(
             contentstore, create_modulestore_instance=create_modulestore_instance,
             mappings=mappings,
