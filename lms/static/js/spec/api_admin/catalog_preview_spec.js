@@ -1,6 +1,6 @@
 define([
     'js/api_admin/views/catalog_preview',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function (
     CatalogPreviewView, AjaxHelpers
 ) {

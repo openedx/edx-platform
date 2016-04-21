@@ -2,7 +2,7 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'teams/js/views/edit_team',
     'teams/js/models/team',

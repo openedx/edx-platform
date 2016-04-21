@@ -1,4 +1,5 @@
-define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
         'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
         'js/groups/views/course_cohort_settings_notification', 'js/groups/models/cohort_discussions',

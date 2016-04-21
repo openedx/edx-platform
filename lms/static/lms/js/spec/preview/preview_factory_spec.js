@@ -1,6 +1,6 @@
 define(
     [
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/components/utils/view_utils',
         'lms/js/preview/preview_factory'
     ],

@@ -1,13 +1,13 @@
 define(
     [
         'jquery', 'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
-        'common/js/spec_helpers/ajax_helpers',
         'xmodule'
     ],
-function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {
+function ($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
     'use strict';
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(

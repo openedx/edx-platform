@@ -4,7 +4,7 @@
             'jquery',
             'jquery.url',
             'utility',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/views/FinishAuthView',
             'js/student_account/enrollment',
             'js/student_account/shoppingcart',

@@ -1,6 +1,6 @@
-define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils", "js/views/pages/course_outline",
-        "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
-        "common/js/spec_helpers/template_helpers", 'js/models/course',],
+define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/components/utils/view_utils",
+        "js/views/pages/course_outline", "js/models/xblock_outline_info", "js/utils/date_utils",
+        "js/spec_helpers/edit_helpers", "common/js/spec_helpers/template_helpers", 'js/models/course'],
     function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils,
              EditHelpers, TemplateHelpers, Course) {
 

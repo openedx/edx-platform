@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
+define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "common/js/components/views/feedback_prompt", "js/views/pages/container",
         "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils",

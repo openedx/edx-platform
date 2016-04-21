@@ -4,7 +4,7 @@
 ;(function (define) {
     'use strict';
 define(["jquery", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_prompt",
-        'common/js/spec_helpers/ajax_helpers'],
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, NotificationView, Prompt, AjaxHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,

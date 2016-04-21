@@ -3,7 +3,7 @@ define([
     'teams/js/collections/my_teams',
     'teams/js/views/my_teams',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function (Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('My Teams View', function () {

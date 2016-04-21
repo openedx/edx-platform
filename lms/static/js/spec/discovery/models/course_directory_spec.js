@@ -1,5 +1,5 @@
 define([
-    'common/js/spec_helpers/ajax_helpers', 'js/discovery/models/course_discovery'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/course_discovery'
 ], function(AjaxHelpers, CourseDiscovery) {
     'use strict';
 

@@ -1,16 +1,15 @@
 define([
-    'underscore', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
-    'js/collections/group_configuration', 'js/collections/group',
-    'js/views/group_configuration_details', 'js/views/group_configurations_list', 'js/views/group_configuration_editor',
-    'js/views/group_configuration_item', 'js/views/experiment_group_edit', 'js/views/content_group_list',
-    'js/views/content_group_details', 'js/views/content_group_editor', 'js/views/content_group_item',
-    'common/js/components/views/feedback_notification', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/view_helpers'
+    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
+    'common/js/spec_helpers/view_helpers', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
+    'js/collections/group_configuration', 'js/collections/group', 'js/views/group_configuration_details',
+    'js/views/group_configurations_list', 'js/views/group_configuration_editor', 'js/views/group_configuration_item',
+    'js/views/experiment_group_edit', 'js/views/content_group_list', 'js/views/content_group_details',
+    'js/views/content_group_editor', 'js/views/content_group_item'
 ], function(
-    _, Course, GroupConfigurationModel, GroupModel, GroupConfigurationCollection, GroupCollection,
-    GroupConfigurationDetailsView, GroupConfigurationsListView, GroupConfigurationEditorView,
-    GroupConfigurationItemView, ExperimentGroupEditView, GroupList, ContentGroupDetailsView,
-    ContentGroupEditorView, ContentGroupItemView, Notification, AjaxHelpers, TemplateHelpers, ViewHelpers
+    _, AjaxHelpers, TemplateHelpers, ViewHelpers, Course, GroupConfigurationModel, GroupModel,
+    GroupConfigurationCollection, GroupCollection, GroupConfigurationDetailsView, GroupConfigurationsListView,
+    GroupConfigurationEditorView, GroupConfigurationItemView, ExperimentGroupEditView, GroupList,
+    ContentGroupDetailsView, ContentGroupEditorView, ContentGroupItemView
 ) {
     'use strict';
     var SELECTORS = {
@@ -286,7 +285,7 @@ define([
         it('should hide empty usage appropriately', function() {
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
-            assertHideEmptyUsages(this.view)
+            assertHideEmptyUsages(this.view);
         });
 
         it('should show non-empty usage appropriately', function() {
@@ -298,7 +297,7 @@ define([
                 this.view,
                 'This Group Configuration is used in:',
                 'Cannot delete when in use by an experiment'
-            )
+            );
         });
 
         it('should hide non-empty usage appropriately', function() {
@@ -922,7 +921,7 @@ define([
                 this.view,
                 'This content group is used in:',
                 'Cannot delete when in use by a unit'
-            )
+            );
         });
 
         it('should hide non-empty usage appropriately', function() {
@@ -988,7 +987,7 @@ define([
                 notificationSpy = ViewHelpers.createNotificationSpy();
             this.view.$(SELECTORS.inputName).val('New Content Group');
 
-            ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy)
+            ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy);
         });
 
         it('does not save on cancel', function() {
