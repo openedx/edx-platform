@@ -825,6 +825,16 @@ class RegistrationView(APIView):
                         restrictions={}
                     )
 
+                    form_desc.override_field_properties(
+                        "password_copy",
+                        default="",
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
+
 
 class PasswordResetView(APIView):
     """HTTP end-point for GETting a description of the password reset form. """
