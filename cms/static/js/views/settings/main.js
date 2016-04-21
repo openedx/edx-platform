@@ -217,11 +217,12 @@ var DetailsView = ValidatingView.extend({
     },
 
     updateModel: function(event) {
+        var url, image_name;
         switch (event.currentTarget.id) {
         case 'course-image-url':
             this.setField(event);
-            var url = $(event.currentTarget).val();
-            var image_name = _.last(url.split('/'));
+            url = $(event.currentTarget).val();
+            image_name = _.last(url.split('/'));
             this.model.set('course_image_name', image_name);
             // Wait to set the image src until the user stops typing
             clearTimeout(this.imageTimer);
@@ -231,8 +232,8 @@ var DetailsView = ValidatingView.extend({
             break;
         case 'hero-image-url':
             this.setField(event);
-            var url = $(event.currentTarget).val();
-            var image_name = _.last(url.split('/'));
+            url = $(event.currentTarget).val();
+            image_name = _.last(url.split('/'));
             this.model.set('hero_image_name', image_name);
             // Wait to set the hero image src until the user stops typing
             clearTimeout(this.imageTimer);
@@ -242,8 +243,8 @@ var DetailsView = ValidatingView.extend({
             break;
          case 'thumbnail-image-url':
             this.setField(event);
-            var url = $(event.currentTarget).val();
-            var image_name = _.last(url.split('/'));
+            url = $(event.currentTarget).val();
+            image_name = _.last(url.split('/'));
             this.model.set('thumbnail_image_name', image_name);
             // Wait to set the thumbnail image src until the user stops typing
             clearTimeout(this.imageTimer);

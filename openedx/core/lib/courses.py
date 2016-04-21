@@ -55,7 +55,7 @@ def additional_image_url(course, image_key):
         # courses can use custom course image paths, otherwise just
         # return the default static path.
         url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
-        if hasattr(course, image_key) and getattr(course, image_key) !=  course.fields[image_key].default:
+        if hasattr(course, image_key) and getattr(course, image_key) != course.fields[image_key].default:
             url += '/' + getattr(course, image_key)
         else:
             url += '/images/course_image.jpg'
