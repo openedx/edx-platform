@@ -79,7 +79,6 @@
     "About me": "\uc790\uae30\uc18c\uac1c", 
     "Account Settings": "\uacc4\uc815 \uc124\uc815", 
     "Account Settings page.": "\uacc4\uc815 \uc124\uc815 \ud398\uc774\uc9c0", 
-    "Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.": "\uc774 \uadf8\ub8f9\uc758 \ud56d\ubaa9 \ud65c\uc131\ud654\uac00 \uc77c\uce58\ud558\ub294 \uc2dc\uac04 \uc9c0\uc810\uc5d0 \ub3d9\uc601\uc0c1\uc744 \uc2a4\ud480\ud560 \uac83\uc785\ub2c8\ub2e4. \uc790\ub9c9\uc744 \ub118\uae30\ub824\uba74, \uc774\uc804 \ud56d\ubaa9\uc73c\ub85c \uac00\uc138\uc694. ", 
     "Add Cohort": "\ud559\uc2b5\uc9d1\ub2e8 \ucd94\uac00\ud558\uae30", 
     "Add Country": "\uad6d\uac00 \ucd94\uac00", 
     "Add Students": "\ud559\uc2b5\uc790 \ucd94\uac00", 
