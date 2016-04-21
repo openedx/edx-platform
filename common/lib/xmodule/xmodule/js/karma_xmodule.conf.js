@@ -27,7 +27,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, 'common_static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
@@ -60,38 +60,66 @@ var files = [
     {pattern: 'spec/main_requirejs.js', included: true},
     {pattern: 'src/word_cloud/d3.min.js', included: true},
     {pattern: 'common_static/js/vendor/draggabilly.js', included: false},
-
     {pattern: 'common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
     {pattern: 'common_static/edx-pattern-library/js/modernizr-custom.js', included: false},
     {pattern: 'common_static/edx-pattern-library/js/afontgarde.js', included: false},
-    {pattern: 'common_static/edx-pattern-library/js/edx-icons.js', included: false},
+    {pattern: 'common_static/edx-pattern-library/js/edx-icons.js', included: false}
+];
 
-    // Paths to source JavaScript files
-    {pattern: 'src/xmodule.js', included: true, nocache: true},
-    {pattern: 'src/**/*.js', included: true, nocache: true},
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'src/xmodule.js', included: true, skipInstrument: true},
+    {pattern: 'src/**/*.js', included: true}
+];
 
-    // Paths to spec (test) JavaScript files
-    {pattern: 'spec/helper.js', included: true, nocache: true},
-    {pattern: 'spec/**/*.js', included: true, nocache: true},
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'spec/helper.js', included: true, skipInstrument: true},
+    {pattern: 'spec/**/*.js', included: true}
+];
 
-    // Paths to fixture files
-    {pattern: 'fixtures/*.*', included: false, served: true, nocache: true},
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'fixtures/*.*', included: false, served: true}
+];
 
+var runAndConfigFiles = [
     {pattern: 'karma_runner.js', included: true}
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'src/**/*.js': ['coverage']
-};
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+
+        if (!file.skipInstrument) {
+            preprocessFiles[pattern] = ['coverage'];
+        }
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };

@@ -185,7 +185,7 @@
         return view.hide();
       });
     });
-    describe("NotificationView.Mini", function() {
+    xdescribe("NotificationView.Mini", function() {
       var view;
       beforeEach(function() {
         view = new NotificationView.Mini();

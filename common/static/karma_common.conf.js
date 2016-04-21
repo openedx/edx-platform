@@ -27,7 +27,7 @@ var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 // Files to load by Karma
-var files = [
+var libraryFiles = [
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
@@ -48,44 +48,64 @@ var files = [
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
     {pattern: 'js/vendor/jquery.leanModal.js', included: true},
     {pattern: 'js/vendor/draggabilly.js', included: true},
-
     {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: true},
     {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: true},
     {pattern: 'edx-pattern-library/js/afontgarde.js', included: true},
-    {pattern: 'edx-pattern-library/js/edx-icons.js', included: true},
-
-    // Paths to source JavaScript files
-    {pattern: 'js/xblock/**/*.js', included: true, nocache: true},
-    {pattern: 'coffee/src/**/*.js', included: true, nocache: true},
-    {pattern: 'js/src/**/*.js', included: true, nocache: true},
-    {pattern: 'js/capa/src/**/*.js', included: true, nocache: true},
-
-    // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/**/*.js', included: true, nocache: true},
-    {pattern: 'js/spec/**/*.js', included: true, nocache: true},
-    {pattern: 'js/capa/spec/**/*.js', included: true, nocache: true},
-
-    // Paths to fixture files
-    {pattern: 'js/fixtures/**/*.html', included: false, nocache: true},
-    {pattern: 'js/capa/fixtures/**/*.html', included: false, nocache: true},
-    {pattern: 'common/templates/**/*.underscore', included: false, nocache: true}
+    {pattern: 'edx-pattern-library/js/edx-icons.js', included: true}
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'js/xblock/**/*.js': ['coverage'],
-    'coffee/src/**/*.js': ['coverage'],
-    'js/src/**/*.js': ['coverage'],
-    'js/capa/src/**/*.js': ['coverage']
-};
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'js/xblock/**/*.js', included: true},
+    {pattern: 'coffee/src/**/*.js', included: true},
+    {pattern: 'js/src/**/*.js', included: true},
+    {pattern: 'js/capa/src/**/*.js', included: true}
+];
+
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'coffee/spec/**/*.js', included: true},
+    {pattern: 'js/spec/**/*.js', included: true},
+    {pattern: 'js/capa/spec/**/*.js', included: true}
+];
+
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'js/fixtures/**/*.html', included: false},
+    {pattern: 'js/capa/fixtures/**/*.html', included: false},
+    {pattern: 'common/templates/**/*.underscore', included: false}
+];
+
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };
