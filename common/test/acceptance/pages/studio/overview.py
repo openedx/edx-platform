@@ -549,7 +549,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".subsection-header-actions .configure-button").nth(index).click()
         self.wait_for_element_presence('.course-outline-modal', 'Subsection settings modal is present.')
 
-    def change_problem_release_date_in_studio(self):
+    def change_problem_release_date(self):
         """
         Sets a new start date
         """
@@ -558,26 +558,39 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
+    def change_problem_due_date(self, date):
+        """
+        Sets a new due date.
+
+        Expects date to be a string that will be accepted by the input (for example, '01/01/1970')
+        """
+        self.q(css=".subsection-header-actions .configure-button").first.click()
+        self.q(css="#due_date").fill(date)
+        self.q(css=".action-save").first.click()
+        self.wait_for_ajax()
+
     def select_advanced_tab(self):
         """
         Select the advanced settings tab
         """
         self.q(css=".settings-tab-button[data-tab='advanced']").first.click()
-        self.wait_for_element_presence('#id_not_timed', 'Special exam settings fields not present.')
+        self.wait_for_element_presence('input.no_special_exam', 'Special exam settings fields not present.')
 
     def make_exam_proctored(self):
         """
         Makes a Proctored exam.
         """
-        self.q(css="#id_proctored_exam").first.click()
+        self.q(css="input.proctored_exam").first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def make_exam_timed(self):
+    def make_exam_timed(self, hide_after_due=False):
         """
         Makes a timed exam.
         """
-        self.q(css="#id_timed_exam").first.click()
+        self.q(css="input.timed_exam").first.click()
+        if hide_after_due:
+            self.q(css='.field-hide-after-due input').first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
@@ -585,37 +598,43 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Choose "none" exam but do not press enter
         """
-        self.q(css="#id_not_timed").first.click()
+        self.q(css="input.no_special_exam").first.click()
 
     def select_timed_exam(self):
         """
         Choose a timed exam but do not press enter
         """
-        self.q(css="#id_timed_exam").first.click()
+        self.q(css="input.timed_exam").first.click()
 
     def select_proctored_exam(self):
         """
         Choose a proctored exam but do not press enter
         """
-        self.q(css="#id_proctored_exam").first.click()
+        self.q(css="input.proctored_exam").first.click()
 
     def select_practice_exam(self):
         """
         Choose a practice exam but do not press enter
         """
-        self.q(css="#id_practice_exam").first.click()
+        self.q(css="input.practice_exam").first.click()
 
     def time_allotted_field_visible(self):
         """
         returns whether the time allotted field is visible
         """
-        return self.q(css="#id_time_limit_div").visible
+        return self.q(css=".field-time-limit").visible
 
     def exam_review_rules_field_visible(self):
         """
         Returns whether the review rules field is visible
         """
-        return self.q(css=".exam-review-rules-list-fields").visible
+        return self.q(css=".field-exam-review-rules").visible
+
+    def hide_after_due_field_visible(self):
+        """
+        Returns whether the hide after due field is visible
+        """
+        return self.q(css=".field-hide-after-due").visible
 
     def proctoring_items_are_displayed(self):
         """
@@ -623,19 +642,19 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
 
         # The None radio button
-        if not self.q(css="#id_not_timed").present:
+        if not self.q(css="input.no_special_exam").present:
             return False
 
         # The Timed exam radio button
-        if not self.q(css="#id_timed_exam").present:
+        if not self.q(css="input.timed_exam").present:
             return False
 
         # The Proctored exam radio button
-        if not self.q(css="#id_proctored_exam").present:
+        if not self.q(css="input.proctored_exam").present:
             return False
 
         # The Practice exam radio button
-        if not self.q(css="#id_practice_exam").present:
+        if not self.q(css="input.practice_exam").present:
             return False
 
         return True
