@@ -265,21 +265,14 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
                 break
         self._initialize_mixed()
 
-        # convert to CourseKeys
-        self.course_locations = {
-            course_id: CourseLocator.from_string(course_id)
-            for course_id in [self.MONGO_COURSEID]
-        }
-        # and then to the root UsageKey
-        self.course_locations = {
-            course_id: course_key.make_usage_key('course', course_key.run)
-            for course_id, course_key in self.course_locations.iteritems()
-        }
-
-        mongo_course_key = self.course_locations[self.MONGO_COURSEID].course_key
-        self.fake_location = self.store.make_course_key(mongo_course_key.org, mongo_course_key.course, mongo_course_key.run).make_usage_key('vertical', 'fake')
-
-        self._create_course(self.course_locations[self.MONGO_COURSEID].course_key)
+        test_course_key = CourseLocator.from_string(self.MONGO_COURSEID)
+        test_course_key = test_course_key.make_usage_key('course', test_course_key.run).course_key
+        self.fake_location = self.store.make_course_key(
+            test_course_key.org,
+            test_course_key.course,
+            test_course_key.run
+        ).make_usage_key('vertical', 'fake')
+        self._create_course(test_course_key)
 
         self.assertEquals(default, self.store.get_modulestore_type(self.course.id))
 
