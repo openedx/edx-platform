@@ -15,8 +15,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
 
         afterEach ->
             delete CMS.URL.UPLOAD_ASSET
-            if (@lastView && modal_helpers.isShowingModal(@lastView))
-                @lastView.hide()
+            modal_helpers.cancelModalIfShowing()
 
         createTestView = (test) ->
             view = new UploadDialog(
@@ -99,6 +98,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "common/js
                 @clock = sinon.useFakeTimers()
 
             afterEach ->
+                modal_helpers.cancelModalIfShowing()
                 @clock.restore()
 
             it "can upload correctly", ->
