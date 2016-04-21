@@ -27,7 +27,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
@@ -57,34 +57,57 @@ var files = [
     {pattern: 'xmodule_js/src/video/*.js', included: true},
     {pattern: 'xmodule_js/src/xmodule.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/draggabilly.js', included: false},
-
     {pattern: 'xmodule_js/common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
     {pattern: 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom.js', included: false},
     {pattern: 'xmodule_js/common_static/edx-pattern-library/js/afontgarde.js', included: false},
-    {pattern: 'xmodule_js/common_static/edx-pattern-library/js/edx-icons.js', included: false},
-
-    // source files
-    {pattern: 'coffee/src/**/*.js', included: true, nocache: true},
-
-    // spec files
-    {pattern: 'coffee/spec/**/*.js', included: true, nocache: true},
-
-    // Fixtures
-    {pattern: 'coffee/fixtures/**/*.*', included: true, nocache: true}
+    {pattern: 'xmodule_js/common_static/edx-pattern-library/js/edx-icons.js', included: false}
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'coffee/src/**/*.js': ['coverage']
-};
+// source files
+var sourceFiles = [
+    {pattern: 'coffee/src/**/*.js', included: true}
+];
+
+// spec files
+var specFiles = [
+    {pattern: 'coffee/spec/**/*.js', included: true}
+];
+
+// Fixtures
+var fixtureFiles = [
+    {pattern: 'coffee/fixtures/**/*.*', included: true}
+];
+
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };

@@ -26,7 +26,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
@@ -48,6 +48,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/Squire.js', included: false},
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-stealth.js', included: false},
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/**/*.js', included: false},
@@ -76,52 +77,71 @@ var files = [
     },
     {pattern: 'xmodule_js/common_static/js/vendor/mock-ajax.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
-
     {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: false},
     {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: false},
     {pattern: 'edx-pattern-library/js/afontgarde.js', included: false},
     {pattern: 'edx-pattern-library/js/edx-icons.js', included: false},
+    {pattern: 'edx-pattern-library/js/**/*.js', included: false},
+    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false}
+];
 
-    // Paths to source JavaScript files
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true, nocache: true},
-    {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
-    {pattern: 'js/**/*.js', included: false, nocache: true},
-    {pattern: 'js/certificates/**/*.js', included: false, nocache: true},
-    {pattern: 'js/factories/**/*.js', included: false, nocache: true},
-    {pattern: 'common/js/**/*.js', included: false, nocache: true},
-    {pattern: 'edx-pattern-library/js/**/*.js', included: false, nocache: true},
-    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false, nocache: true},
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'coffee/src/**/!(*spec).js', included: false},
+    {pattern: 'js/**/!(*spec).js', included: false},
+    {pattern: 'common/js/**/!(*spec).js', included: false}
+];
 
-    // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/main.js', included: false, nocache: true},
-    {pattern: 'coffee/spec/**/*.js', included: false, nocache: true},
-    {pattern: 'js/spec/**/*.js', included: false, nocache: true},
-    {pattern: 'js/certificates/spec/**/*.js', included: false, nocache: true},
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'coffee/spec/**/*spec.js', included: false},
+    {pattern: 'js/spec/**/*spec.js', included: false},
+    {pattern: 'js/certificates/spec/**/*spec.js', included: false}
+];
 
-    // Paths to fixture files
-    {pattern: 'coffee/fixtures/**/*.underscore', included: false, nocache: true},
-    {pattern: 'templates/**/*.underscore', included: false, nocache: true},
-    {pattern: 'common/templates/**/*.underscore', included: false, nocache: true},
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'coffee/fixtures/**/*.underscore', included: false},
+    {pattern: 'templates/**/*.underscore', included: false},
+    {pattern: 'common/templates/**/*.underscore', included: false}
+];
 
-    // override fixture path and other config.
+// override fixture path and other config.
+var runAndConfigFiles = [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'coffee/spec/main.js'
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'coffee/src/**/*.js': ['coverage'],
-    'js/**/!(*spec).js': ['coverage'],
-    'common/js/**/*.js': ['coverage']
-};
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };

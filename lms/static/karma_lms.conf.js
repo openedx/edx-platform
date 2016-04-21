@@ -26,7 +26,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/logger.js', included: false},
@@ -72,71 +72,90 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
-
-    // Paths to source JavaScript files
-    {pattern: 'js/**/*.js', included: false, nocache: true},
-    {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
-    {pattern: 'common/js/**/*.js', included: false, nocache: true},
-    {pattern: 'edx-pattern-library/js/**/*.js', included: false, nocache: true},
-    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false, nocache: true},
-    {pattern: 'support/js/**/*.js', included: false, nocache: true},
-    {pattern: 'teams/js/**/*.js', included: false, nocache: true},
-    {pattern: 'xmodule_js/common_static/coffee/**/*.js', included: false, nocache: true},
-
-    // Paths to Jasmine plugins
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true}
+];
 
-    // Paths to spec (test) JavaScript files
-    {pattern: 'js/spec/**/*.js', included: false, nocache: true},
-    {pattern: 'teams/js/spec/**/*.js', included: false, nocache: true},
-    {pattern: 'support/js/spec/**/*.js', included: false, nocache: true},
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'js/**/!(*spec).js', included: false},
+    {pattern: 'coffee/src/**/*.js', included: false},
+    {pattern: 'common/js/**/*.js', included: false},
+    {pattern: 'edx-pattern-library/js/**/*.js', included: false},
+    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
+    {pattern: 'support/js/**/!(*spec).js', included: false},
+    {pattern: 'teams/js/**/!(*spec).js', included: false},
+    {pattern: 'xmodule_js/common_static/coffee/**/*.js', included: false}
+];
 
-    // Paths to fixture files
-    {pattern: 'js/fixtures/**/*.html', included: false, nocache: true},
-    {pattern: 'templates/instructor/instructor_dashboard_2/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/dashboard/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/edxnotes/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/fields/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/student_account/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/student_profile/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/verify_student/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/file-upload.underscore', included: false, nocache: true},
-    {pattern: 'templates/components/header/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/components/tabbed/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/components/card/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/financial-assistance/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/search/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/discovery/**/*.*', included: false, nocache: true},
-    {pattern: 'common/templates/**/*.*', included: false, nocache: true},
-    {pattern: 'teams/templates/**/*.*', included: false, nocache: true},
-    {pattern: 'support/templates/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/bookmarks/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/learner_dashboard/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/ccx/**/*.*', included: false, nocache: true},
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'js/spec/**/*spec.js', included: false},
+    {pattern: 'teams/js/spec/**/*spec.js', included: false},
+    {pattern: 'support/js/spec/**/*spec.js', included: false}
+];
 
-    // override fixture path and other config.
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'js/fixtures/**/*.html', included: false},
+    {pattern: 'templates/instructor/instructor_dashboard_2/**/*.*', included: false},
+    {pattern: 'templates/dashboard/**/*.*', included: false},
+    {pattern: 'templates/edxnotes/**/*.*', included: false},
+    {pattern: 'templates/fields/**/*.*', included: false},
+    {pattern: 'templates/student_account/**/*.*', included: false},
+    {pattern: 'templates/student_profile/**/*.*', included: false},
+    {pattern: 'templates/verify_student/**/*.*', included: false},
+    {pattern: 'templates/file-upload.underscore', included: false},
+    {pattern: 'templates/components/header/**/*.*', included: false},
+    {pattern: 'templates/components/tabbed/**/*.*', included: false},
+    {pattern: 'templates/components/card/**/*.*', included: false},
+    {pattern: 'templates/financial-assistance/**/*.*', included: false},
+    {pattern: 'templates/search/**/*.*', included: false},
+    {pattern: 'templates/discovery/**/*.*', included: false},
+    {pattern: 'common/templates/**/*.*', included: false},
+    {pattern: 'teams/templates/**/*.*', included: false},
+    {pattern: 'support/templates/**/*.*', included: false},
+    {pattern: 'templates/bookmarks/**/*.*', included: false},
+    {pattern: 'templates/learner_dashboard/**/*.*', included: false},
+    {pattern: 'templates/ccx/**/*.*', included: false}
+];
+
+// override fixture path and other config.
+var runAndConfigFiles = [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     {pattern: 'js/spec/main.js', included: true}
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'js/**/*.js': ['coverage'],
-    'coffee/src/**/*.js': ['coverage'],
-    'common/js/**/*.js': ['coverage'],
-    'support/js/**/*.js': ['coverage'],
-    'teams/js/**/*.js': ['coverage'],
-    'xmodule_js/common_static/coffee/**/*.js': ['coverage']
-};
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };

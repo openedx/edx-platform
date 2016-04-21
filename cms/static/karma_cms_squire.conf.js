@@ -26,7 +26,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
@@ -48,6 +48,7 @@ var files = [
     {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/domReady.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
     {pattern: 'xmodule_js/src/xmodule.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js', included: false},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
@@ -67,48 +68,68 @@ var files = [
         pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js',
         included: false
     },
-    {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
+    {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false}
+];
 
-    // Paths to source JavaScript files
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true, nocache: true},
-    {pattern: 'coffee/src/**/*.js', included: false, nocache: true},
-    {pattern: 'js/collections/**/*.js', included: false, nocache: true},
-    {pattern: 'js/models/**/*.js', included: false, nocache: true},
-    {pattern: 'js/utils/**/*.js', included: false, nocache: true},
-    {pattern: 'js/views/**/*.js', included: false, nocache: true},
-    {pattern: 'common/js/**/*.js', included: false, nocache: true},
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'coffee/src/**/*.js', included: false},
+    {pattern: 'js/collections/**/*.js', included: false},
+    {pattern: 'js/models/**/*.js', included: false},
+    {pattern: 'js/utils/**/*.js', included: false},
+    {pattern: 'js/views/**/*.js', included: false},
+    {pattern: 'common/js/**/*.js', included: false}
+];
 
-    // Paths to spec (test) JavaScript files
-    {pattern: 'coffee/spec/**/*.js', included: false, nocache: true},
-    {pattern: 'js/spec/**/*.js', included: false, nocache: true},
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'coffee/spec/**/*.js', included: false},
+    {pattern: 'js/spec/**/*.js', included: false}
+];
 
-    // Paths to fixture files
-    {pattern: 'coffee/fixtures/**/*.*', included: false, nocache: true},
-    {pattern: 'templates/**/*.*', included: false, nocache: true},
-    {pattern: 'common/templates/**/*.*', included: false, nocache: true},
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'coffee/fixtures/**/*.*', included: false},
+    {pattern: 'templates/**/*.*', included: false},
+    {pattern: 'common/templates/**/*.*', included: false}
+];
 
-    // override fixture path and other config.
+// override fixture path and other config.
+var runAndConfigFiles = [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'coffee/spec/main_squire.js'
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'coffee/src/**/*.js': ['coverage'],
-    'js/collections/**/*.js': ['coverage'],
-    'js/models/**/*.js': ['coverage'],
-    'js/utils/**/*.js': ['coverage'],
-    'js/views/**/*.js': ['coverage'],
-    'common/js/**/*.js': ['coverage']
-};
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };

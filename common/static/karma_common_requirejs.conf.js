@@ -27,7 +27,7 @@ var path = require('path');
 var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = [
+var libraryFiles = [
     {pattern: 'js/vendor/jquery.min.js', included: false},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: false},
     {pattern: 'js/libs/jasmine-stealth.js', included: false},
@@ -46,34 +46,60 @@ var files = [
     {pattern: 'js/test/i18n.js', included: false},
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: false},
     {pattern: 'js/vendor/requirejs/text.js', included: false},
-    {pattern: 'js/vendor/sinon-1.17.0.js', included: false},
+    {pattern: 'js/vendor/sinon-1.17.0.js', included: false}
+];
 
-    // Paths to source JavaScript files
-    {pattern: 'common/js/**/*.js', included: false, nocache: true},
+// Paths to source JavaScript files
+var sourceFiles = [
+    {pattern: 'common/js/**/!(*spec).js', included: false}
+];
 
-    // Paths to spec (test) JavaScript files
-    {pattern: 'common/js/spec/**/*.js', included: false, nocache: true},
+// Paths to spec (test) JavaScript files
+var specFiles = [
+    {pattern: 'common/js/spec/**/*spec.js', included: false}
+];
 
-    // Paths to fixture files
-    {pattern: 'common/templates/**/*.*', included: false, nocache: true},
+// Paths to fixture files
+var fixtureFiles = [
+    {pattern: 'common/templates/**/*.*', included: false}
+];
 
-    // override fixture path and other config.
+// override fixture path and other config.
+var runAndConfigFiles = [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'common/js/spec/main_requirejs.js'
 ];
 
-var preprocessors = {
-    // do not include tests or libraries
-    // (these files will be instrumented by Istanbul)
-    'common/js/**/*.js': ['coverage']
-};
+// do not include tests or libraries
+// (these files will be instrumented by Istanbul)
+var preprocessors = (function () {
+    var preprocessFiles = {};
+    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+}());
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config),
-        localConfig = {
-            files: files,
-            preprocessors: preprocessors
-        };
+        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
+        localConfig;
+
+    // add nocache in files if coverage is not set
+    if (!config.coverage) {
+        files.forEach(function (f) {
+            if (_.isObject(f)) {
+                f.nocache = true;
+            }
+        });
+    }
+
+    localConfig = {
+        files: files,
+        preprocessors: preprocessors
+    };
 
     config.set(_.extend(commonConfig, localConfig));
 };
