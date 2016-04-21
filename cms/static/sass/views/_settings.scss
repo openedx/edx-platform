@@ -516,7 +516,7 @@
     }
 
     // specific fields - course image
-    #field-course-image, #field-hero-image {
+    #field-course-image, #field-hero-image, #field-thumbnail-image {
 
       .current-course-image {
         margin-bottom: ($baseline/2);
@@ -560,7 +560,7 @@
           margin-right: flex-gutter();
         }
 
-        .action-upload-image, .action-upload-hero-image {
+        .action-upload-image {
           @extend %ui-btn-flat-outline;
           float: right;
           width: flex-grid(2,9);

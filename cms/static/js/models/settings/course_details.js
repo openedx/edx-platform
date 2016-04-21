@@ -25,6 +25,8 @@ var CourseDetails = Backbone.Model.extend({
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
         hero_image_name: '',
         hero_image_asset_path: '',
+        thumbnail_image_name: '',
+        thumbnail_image_asset_path: '',
         pre_requisite_courses: [],
         entrance_exam_enabled : '',
         entrance_exam_minimum_score_pct: '50'

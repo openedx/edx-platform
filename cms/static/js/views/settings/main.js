@@ -20,8 +20,7 @@ var DetailsView = ValidatingView.extend({
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
-        'click .action-upload-image': "uploadImage",
-        'click .action-upload-hero-image': "uploadHeroImage"
+        'click .action-upload-image': "uploadImage"
     },
 
     initialize : function(options) {
@@ -35,17 +34,10 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
 
         // Avoid showing broken image on mistyped/nonexistent image
-        this.$el.find('img.course-image').error(function() {
+        this.$el.find('img').error(function() {
             $(this).hide();
         });
-        this.$el.find('img.course-image').load(function() {
-            $(this).show();
-        });
-
-        this.$el.find('img.hero-image').error(function() {
-            $(this).hide();
-        });
-        this.$el.find('img.hero-image').load(function() {
+        this.$el.find('img').load(function() {
             $(this).show();
         });
 
@@ -100,7 +92,6 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 
-        debugger;
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
@@ -108,6 +99,10 @@ var DetailsView = ValidatingView.extend({
         var heroImageURL = this.model.get('hero_image_asset_path');
         this.$el.find('#hero-image-url').val(heroImageURL);
         this.$el.find('#hero-image').attr('src', heroImageURL);
+
+        var thumbnailImageURL = this.model.get('thumbnail_image_asset_path');
+        this.$el.find('#thumbnail-image-url').val(thumbnailImageURL);
+        this.$el.find('#thumbnail-image').attr('src', thumbnailImageURL);
 
         var pre_requisite_courses = this.model.get('pre_requisite_courses');
         pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
@@ -158,6 +153,7 @@ var DetailsView = ValidatingView.extend({
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
         'hero_image_asset_path': 'hero-image-url',
+        'thumbnail_image_asset_path': 'thumbnail-image-url',
         'pre_requisite_courses': 'pre-requisite-course',
         'entrance_exam_enabled': 'entrance-exam-enabled',
         'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
@@ -242,6 +238,17 @@ var DetailsView = ValidatingView.extend({
             clearTimeout(this.imageTimer);
             this.imageTimer = setTimeout(function() {
                 $('#hero-image').attr('src', $(event.currentTarget).val());
+            }, 1000);
+            break;
+         case 'thumbnail-image-url':
+            this.setField(event);
+            var url = $(event.currentTarget).val();
+            var image_name = _.last(url.split('/'));
+            this.model.set('thumbnail_image_name', image_name);
+            // Wait to set the thumbnail image src until the user stops typing
+            clearTimeout(this.imageTimer);
+            this.imageTimer = setTimeout(function() {
+                $('#thumbnail-image').attr('src', $(event.currentTarget).val());
             }, 1000);
             break;
         case 'entrance-exam-enabled':
@@ -384,33 +391,30 @@ var DetailsView = ValidatingView.extend({
 
     uploadImage: function(event) {
         event.preventDefault();
-        debugger;
-        var upload = new FileUploadModel({
-            title: gettext("Upload your course image."),
-            message: gettext("Files must be in JPEG or PNG format."),
-            mimeTypes: ['image/jpeg', 'image/png']
-        });
-        var self = this;
-        var modal = new FileUploadDialog({
-            model: upload,
-            onSuccess: function(response) {
-                var options = {
-                    'course_image_name': response.asset.display_name,
-                    'course_image_asset_path': response.asset.url
-                };
-                self.model.set(options);
-                self.render();
-                $('#course-image').attr('src', self.model.get('course_image_asset_path'));
-            }
-        });
-        modal.show();
-    },
+        var title = "", selector = "", image_key = "", image_path_key = "";
+        switch (event.currentTarget.id) {
+            case 'upload-course-image':
+                title = "Upload your course image.";
+                selector = "#course-image";
+                image_key = 'course_image_name';
+                image_path_key = 'course_image_asset_path';
+                break;
+            case 'upload-hero-image':
+                title = "Upload your hero image.";
+                selector = "#hero-image";
+                image_key = 'hero_image_name';
+                image_path_key = 'hero_image_asset_path';
+                break;
+            case 'upload-thumbnail-image':
+                title = "Upload your video thumbnail image.";
+                selector = "#thumbnail-image";
+                image_key = 'thumbnail_image_name';
+                image_path_key = 'thumbnail_image_asset_path';
+                break;
+        }
 
-    uploadHeroImage: function(event) {
-        event.preventDefault();
-        debugger;
         var upload = new FileUploadModel({
-            title: gettext("Upload your Hero image."),
+            title: gettext(title),
             message: gettext("Files must be in JPEG or PNG format."),
             mimeTypes: ['image/jpeg', 'image/png']
         });
@@ -418,13 +422,12 @@ var DetailsView = ValidatingView.extend({
         var modal = new FileUploadDialog({
             model: upload,
             onSuccess: function(response) {
-                var options = {
-                    'hero_image_name': response.asset.display_name,
-                    'hero_image_asset_path': response.asset.url
-                };
+                var options = {};
+                options[image_key] = response.asset.display_name;
+                options[image_path_key] = response.asset.url;
                 self.model.set(options);
                 self.render();
-                $('#hero-image').attr('src', self.model.get('hero_image_asset_path'));
+                $(selector).attr('src', self.model.get(image_path_key));
             }
         });
         modal.show();
