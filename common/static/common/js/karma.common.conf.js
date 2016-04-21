@@ -74,6 +74,7 @@ function coverageSettings(config) {
     return {
         dir: path.dir,
         subdir: '.',
+        includeAllSources: true,
         reporters: [
             {type: 'cobertura', file: path.file},
             {type: 'text-summary'}
