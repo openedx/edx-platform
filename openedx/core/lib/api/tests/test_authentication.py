@@ -4,40 +4,33 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 """
 
 from __future__ import unicode_literals
-from collections import namedtuple
-from datetime import datetime, timedelta
+
 import itertools
 import json
+from collections import namedtuple
 
 import ddt
-from django.conf import settings
+from datetime import datetime, timedelta
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import unittest
 from django.utils.http import urlencode
-from mock import patch
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
-from rest_framework import exceptions
+from provider import constants, scope
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_oauth import permissions
-from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.views import APIView
-from rest_framework_jwt.settings import api_settings
+from rest_framework_oauth import permissions
+from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 
 from lms.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
-from openedx.core.lib.api.tests.mixins import JwtMixin
-from provider import constants, scope
-from student.tests.factories import UserFactory
-
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
-jwt_decode_handler = api_settings.JWT_DECODE_HANDLER    # pylint: disable=invalid-name
 
 
 class MockView(APIView):  # pylint: disable=missing-docstring
@@ -311,32 +304,3 @@ class OAuth2Tests(TestCase):
         self.assertEqual(response.status_code, scope_statuses.read_status)
         response = self.post_with_bearer_token('/oauth2-with-scope-test/', token=self.access_token.token)
         self.assertEqual(response.status_code, scope_statuses.write_status)
-
-
-@attr('shard_2')
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestJWTAuthToggle(JwtMixin, TestCase):
-    """ Test JWT authentication toggling with feature flag 'ENABLE_JWT_AUTH'."""
-
-    USERNAME = 'test-username'
-
-    def setUp(self):
-        self.user = UserFactory.create(username=self.USERNAME)
-        self.jwt_token = self.generate_id_token(user=self.user)
-        super(TestJWTAuthToggle, self).setUp()
-
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_JWT_AUTH': True})
-    def test_enabled_jwt_auth(self):
-        """ Ensure that the JWT auth works fine when its feature flag
-        'ENABLE_JWT_AUTH' is set.
-        """
-        jwt_decode_handler(self.jwt_token)
-
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_JWT_AUTH': False})
-    def test_disabled_jwt_auth(self):
-        """ Ensure that the JWT auth raises exception when its feature flag
-        'ENABLE_JWT_AUTH' is not set.
-        """
-        with self.assertRaises(exceptions.AuthenticationFailed):
-            jwt_decode_handler(self.jwt_token)
