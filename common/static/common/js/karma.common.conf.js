@@ -1,8 +1,10 @@
 // Common configuration for Karma
 /* jshint node: true */
+/*jshint -W079 */
 'use strict';
 
 var path = require('path');
+var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
 
 /**
@@ -99,6 +101,25 @@ function junitSettings(config) {
         classNameFormatter: junitClassNameFormatter
     };
 }
+
+var getPreprocessorObject = function (files) {
+    var preprocessFiles = {};
+
+    files.forEach(function (file) {
+        var pattern = _.isObject(file) ? file.pattern : file;
+
+        if (pattern.match(/^common\/js/)) {
+            pattern = path.join(appRoot, '/common/static/' + pattern)
+        } else if (pattern.match(/^xmodule_js\/common_static/)) {
+            pattern = path.join(appRoot, '/common/static/' +
+                pattern.replace(/^xmodule_js\/common_static\//, ''));
+        }
+
+        preprocessFiles[pattern] = ['coverage'];
+    });
+
+    return preprocessFiles;
+};
 
 var getConfig = function (config, useRequireJs) {
     useRequireJs = useRequireJs === undefined ? true : useRequireJs;
@@ -216,5 +237,6 @@ var getConfig = function (config, useRequireJs) {
 
 module.exports = {
     getConfig: getConfig,
+    getPreprocessorObject: getPreprocessorObject,
     appRoot: appRoot
 };

@@ -80,15 +80,7 @@ var fixtureFiles = [
 
 // do not include tests or libraries
 // (these files will be instrumented by Istanbul)
-var preprocessors = (function () {
-    var preprocessFiles = {};
-    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
-        var pattern = _.isObject(file) ? file.pattern : file;
-        preprocessFiles[pattern] = ['coverage'];
-    });
-
-    return preprocessFiles;
-}());
+var preprocessors = configModule.getPreprocessorObject(_.flatten([sourceFiles, specFiles]));
 
 module.exports = function (config) {
     var commonConfig = configModule.getConfig(config, false),

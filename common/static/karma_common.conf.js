@@ -80,8 +80,10 @@ var fixtureFiles = [
 // (these files will be instrumented by Istanbul)
 var preprocessors = (function () {
     var preprocessFiles = {};
+
     _.flatten([sourceFiles, specFiles]).forEach(function (file) {
         var pattern = _.isObject(file) ? file.pattern : file;
+        pattern = path.join(configModule.appRoot, '/common/static/' + pattern);
         preprocessFiles[pattern] = ['coverage'];
     });
 
