@@ -29,12 +29,14 @@ from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
 from organizations.models import Organization
+from projects.models import Workgroup, Project
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore import ModuleStoreEnum
 from api_manager.courseware_access import get_course_key
+from api_manager.models import GroupProfile
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
@@ -1277,6 +1279,49 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
+    def test_courses_users_list_get_attributes(self):
+        """ Test presence of newly added attributes to courses users list api """
+        course = CourseFactory.create(
+            number='3035',
+            name='metrics_grades_leaders',
+            start=self.course_start_date,
+            end=self.course_end_date
+        )
+        test_uri = self.base_courses_uri + '/' + unicode(course.id) + '/users'
+        user = UserFactory.create(username="testuserattributes", profile='test')
+        CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+        data = {
+            'name': 'Test Organization Attributes',
+            'display_name': 'Test Org Display Name Attributes',
+            'users': [user.id]
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        group = GroupFactory.create()
+        GroupProfile.objects.create(group=group, name='role1', group_type='permission')
+        user.groups.add(group)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('id', response.data['enrollments'][0])
+        self.assertIn('email', response.data['enrollments'][0])
+        self.assertIn('username', response.data['enrollments'][0])
+        self.assertIn('last_login', response.data['enrollments'][0])
+        self.assertIn('full_name', response.data['enrollments'][0])
+        self.assertIn('is_active', response.data['enrollments'][0])
+        self.assertIsNotNone(response.data['enrollments'][0]['organizations'])
+        self.assertIn('url', response.data['enrollments'][0]['organizations'][0])
+        self.assertIn('id', response.data['enrollments'][0]['organizations'][0])
+        self.assertIn('name', response.data['enrollments'][0]['organizations'][0])
+        self.assertIn('created', response.data['enrollments'][0]['organizations'][0])
+        self.assertIn('display_name', response.data['enrollments'][0]['organizations'][0])
+        self.assertIn('logo_url', response.data['enrollments'][0]['organizations'][0])
+        self.assertIsNotNone(response.data['enrollments'][0]['roles'])
+        self.assertIn('id', response.data['enrollments'][0]['roles'][0])
+        self.assertIn('name', response.data['enrollments'][0]['roles'][0])
+
     def test_courses_users_list_get_filter_by_orgs(self):
         # create 5 users
         users = []
@@ -1375,6 +1420,42 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get('{}?exclude_groups={}'.format(test_uri, group_ids[0]))
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data['enrollments']), 4)
+
+    def test_courses_users_list_get_filter_by_workgroups(self):
+        """ Test courses users list workgroup filter """
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        organization = Organization.objects.create(
+            name="Test Organization",
+            display_name='Test Org Display Name',
+        )
+        project = Project.objects.create(course_id=self.test_course_id,
+                                         content_id=self.test_course_content_id,
+                                         organization=organization)
+        # create 2 work groups
+        workgroups = []
+        workgroups.append(Workgroup.objects.create(name="Group1", project_id=project.id))
+        workgroups.append(Workgroup.objects.create(name="Group2", project_id=project.id))
+        workgroup_ids = ','.join([str(workgroup.id) for workgroup in workgroups])
+
+        # create 5 users
+        users = UserFactory.create_batch(5)
+
+        for i, user in enumerate(users):
+            workgroups[i % 2].add_user(user)
+
+        # enroll all users in course
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.test_course_id)
+
+        # retrieve all users enrolled in the course and member of workgroup 1
+        response = self.do_get('{}?workgroups={}'.format(test_uri, workgroups[0].id))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 3)
+
+        # retrieve all users enrolled in the course and member of workgroup 1 and workgroup 2
+        response = self.do_get('{}?workgroups={}'.format(test_uri, workgroup_ids))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 5)
 
     def test_courses_users_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
