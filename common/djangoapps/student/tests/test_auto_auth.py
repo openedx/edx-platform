@@ -219,6 +219,17 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 
+    def test_redirect_to_specified(self):
+        # Create user and redirect to specified url
+        url_pattern = '/u/test#about_me'
+        response = self._auto_auth({
+            'username': 'test',
+            'redirect_to': url_pattern,
+            'staff': 'true',
+        }, status_code=302)
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+
     def _auto_auth(self, params=None, status_code=None, **kwargs):
         """
         Make a request to the auto-auth end-point and check

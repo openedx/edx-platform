@@ -37,6 +37,9 @@ class Env(object):
         "lib" / "custom_a11y_rules.js"
     )
 
+    PA11YCRAWLER_REPORT_DIR = REPORT_DIR / "pa11ycrawler"
+    PA11YCRAWLER_COVERAGERC = BOK_CHOY_DIR / ".pa11ycrawlercoveragerc"
+
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
     # in the main jenkins flow job without overwriting the reports from other
