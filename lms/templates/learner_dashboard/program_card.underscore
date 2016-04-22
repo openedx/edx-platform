@@ -14,7 +14,7 @@
     <div class="meta-info">
         <div class="organization">
             <% _.each(organizations, function(org){ %>
-                <%- gettext(org.display_name) %>
+                <%- gettext(org.key) %>
             <% }); %>
         </div>
         <div class="category">
