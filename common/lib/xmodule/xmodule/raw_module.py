@@ -13,6 +13,8 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     Module that provides a raw editing view of its data and children.  It
     requires that the definition xml is valid.
     """
+    resources_dir = None
+
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
@@ -42,6 +44,8 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     Version of RawDescriptor for modules which may have no XML data,
     but use XMLEditingDescriptor for import/export handling.
     """
+    resources_dir = None
+
     data = String(default='', scope=Scope.content)
 
     @classmethod

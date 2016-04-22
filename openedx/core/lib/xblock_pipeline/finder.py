@@ -41,6 +41,9 @@ class XBlockPackageStorage(Storage):
         """
         Returns True if the specified path exists.
         """
+        if self.base_dir is None:
+            return False
+
         return resource_exists(self.module, os.path.join(self.base_dir, path))
 
     def listdir(self, path):
