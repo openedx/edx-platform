@@ -840,27 +840,29 @@ def get_cosmetic_display_price(course, registration_price):
 
 
 @require_global_staff
-@require_http_methods(['POST', 'GET'])
+@ensure_valid_course_key
 def enroll_staff(request, course_id):
-    '''
+    """
     1. Should be staff
     2. should be a valid course_id
     3. shouldn't be enrolled before
     4. The requested view url to redirect
 
-    URL-ABC-GOTO-HERE-
+    GET
+        html: return enroll staff page
 
-    1. You want to register for this course?
-        Confirm:
-            1. User is valid staff user who wants to enroll.
-            2. Course is valid course
-    2. Yes
-    3. Post request, enroll the user and redirect him to the requested view
+    POST
+        1. You want to register for this course?
+            Confirm:
+                1. User is valid staff user who wants to enroll.
+                2. Course is valid course
+        2. Yes
+        3. Post request, enroll the user and redirect him to the requested view
 
     :param request:
     :param course_id:
     :return:
-    '''
+    """
     user = request.user
     course_key = CourseKey.from_string(course_id)
     _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
@@ -876,8 +878,8 @@ def enroll_staff(request, course_id):
                 'csrftoken': csrf(request)["csrf_token"]
             })
 
-    elif request.method == 'POST' and 'enroll' in request.POST.dict():
-        enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_key)
+    elif request.method == 'POST' and 'enroll' in request.POST:
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True)
         log.info(
             u"User %s enrolled in %s via `enroll_staff` view",
