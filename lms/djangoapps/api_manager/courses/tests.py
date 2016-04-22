@@ -2419,7 +2419,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
         org_id = response.data['id']
 
-        for i in xrange(1, 5):
+        for i in xrange(1, users_to_add):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
                 category="videosequence",
@@ -2438,6 +2438,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
         self.assertGreaterEqual(response.data['users_started'], 1)
+        self.assertEqual(response.data['users_not_started'], users_to_add + USER_COUNT - 1)
+        self.assertEqual(response.data['modules_completed'], users_to_add - 1)
+        self.assertEqual(response.data['users_completed'], 0)
         self.assertIsNotNone(response.data['grade_cutoffs'])
         self.assertEqual(response.data['num_threads'], 5)
         self.assertEqual(response.data['num_active_threads'], 3)
@@ -2484,7 +2487,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         # create course completions
-        for user in users:
+        for i, user in enumerate(users):
             completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
             completions_data = {
                 'content_id': unicode(self.course_content.scope_ids.usage_id),
@@ -2493,6 +2496,15 @@ class CoursesApiTests(ModuleStoreTestCase):
             }
             response = self.do_post(completions_uri, completions_data)
             self.assertEqual(response.status_code, 201)
+
+            # mark two users a complete
+            if i % 2 == 0:
+                StudentGradebook.objects.get_or_create(
+                    user=user,
+                    course_id=self.course.id,
+                    grade=0.9,
+                    proforma_grade=0.91,
+                )
 
         course_metrics_uri = '{}/{}/metrics/?groups={}'.format(
             self.base_courses_uri,
@@ -2503,6 +2515,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], 3)
         self.assertGreaterEqual(response.data['users_started'], 3)
+        self.assertEqual(response.data['users_not_started'], 0)
+        self.assertEqual(response.data['modules_completed'], 3)
+        self.assertEqual(response.data['users_completed'], 2)
 
     def test_course_data_metrics_user_group_filter_for_multiple_groups_having_members(self):
         groups = GroupFactory.create_batch(2)
@@ -2534,6 +2549,9 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], 5)
         self.assertGreaterEqual(response.data['users_started'], 5)
+        self.assertEqual(response.data['users_not_started'], 0)
+        self.assertEqual(response.data['modules_completed'], 5)
+        self.assertEqual(response.data['users_completed'], 0)
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
