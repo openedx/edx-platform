@@ -593,7 +593,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.select_language('en')
         self._verify_caption_text('Welcome to edX.')
 
-    @flaky  # TODO: Fix TNL-4304
     def test_video_language_menu_working_closed_captions(self):
         """
         Scenario: Language menu works correctly in Video component, checks closed captions
@@ -619,7 +618,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         # we start the video, then pause it to activate the transcript
         self.video.click_player_button('play')
-        self.video.wait_for_position('0:01')
+        self.video.wait_for_position('0:03')
         self.video.click_player_button('pause')
 
         self.video.select_language('en')
@@ -774,19 +773,19 @@ class YouTubeVideoTest(VideoBaseTest):
         Given the course has a Video component in "Youtube" mode
         Then the video has rendered in "Youtube" mode
         And I click video button "play""
-        Then I wait until video reaches at position "0.05"
+        Then I wait until video reaches at position "0.03"
         And I click video button "pause"
         And I reload the page with video
         And I click video button "play""
         And I click video button "pause"
-        Then video slider should be Equal or Greater than "0:05"
+        Then video slider should be Equal or Greater than "0:03"
 
         """
         self.navigate_to_video()
 
         self.video.click_player_button('play')
 
-        self.video.wait_for_position('0:05')
+        self.video.wait_for_position('0:03')
 
         self.video.click_player_button('pause')
 
@@ -795,7 +794,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('play')
         self.video.click_player_button('pause')
 
-        self.assertGreaterEqual(self.video.seconds, 5)
+        self.assertGreaterEqual(self.video.seconds, 3)
 
     @skip("Intermittently fails 03 June 2014")
     def test_video_position_stored_correctly_with_seek(self):
