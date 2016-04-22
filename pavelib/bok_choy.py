@@ -152,8 +152,8 @@ def pa11ycrawler(options):
     opts = parse_bokchoy_opts(options)
     opts['report_dir'] = Env.PA11YCRAWLER_REPORT_DIR
     opts['coveragerc'] = Env.PA11YCRAWLER_COVERAGERC
-    opts['should_fetch_course'] = getattr(options, 'should_fetch_course', None)
-    opts['course_key'] = getattr(options, 'course-key', None)
+    opts['should_fetch_course'] = getattr(options, 'should_fetch_course', not opts['fasttest'])
+    opts['course_key'] = getattr(options, 'course-key', "course-v1:edX+Test101+course")
     test_suite = Pa11yCrawler('a11y_crawler', **opts)
     test_suite.run()
 

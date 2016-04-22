@@ -268,7 +268,7 @@ class Pa11yCrawler(BokChoyTestSuite):
 
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
-        self.course_key = kwargs.get('course_key', "course-v1:edX+Test101+course")
+        self.course_key = kwargs.get('course_key')
         if self.imports_dir:
             # If imports_dir has been specified, assume the files are
             # already there -- no need to fetch them from github. This
@@ -279,7 +279,7 @@ class Pa11yCrawler(BokChoyTestSuite):
             # Otherwise, obey `--skip-fetch` command and use the default
             # test course.  Note that the fetch will also be skipped when
             # using `--fast`.
-            self.should_fetch_course = kwargs.get('should_fetch_course', not self.fasttest)
+            self.should_fetch_course = kwargs.get('should_fetch_course')
             self.imports_dir = path('test_root/courses/')
 
         self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
