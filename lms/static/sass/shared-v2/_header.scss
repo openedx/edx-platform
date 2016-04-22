@@ -47,14 +47,17 @@
         }
 
         .list-inline {
-            margin-top: 12px;
+            &.nav-global {
+                margin-top: 12px;
+            }
+
+            &.nav-courseware {
+                margin-top: 5px;
+            }
 
             .item {
-                display: inline-block;
-                font-size: font-size(small);
                 font-weight: font-weight(semi-bold);
                 text-transform: uppercase;
-                letter-spacing: 0 !important;
 
                 &.active {
                     a {
@@ -62,22 +65,7 @@
                         color: $link-color;
                     }
                 }
-
-                a {
-                    color: $courseware-navigation-color;
-                    padding: 3px 10px;
-
-                    &:hover,
-                    &:focus {
-                        background: inherit;
-                        color: $courseware-hover-color;
-                    }
-                }
             }
-        }
-
-        .nav-courseware.list-inline {
-            margin-top: 5px;
         }
     }
 }
