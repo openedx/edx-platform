@@ -86,6 +86,19 @@ define('video/09_play_pause_control.js', [], function() {
                     .text(gettext('Pause'));
         },
 
+        playAgain: function () {
+            this.el
+                .addClass('pause')
+                .removeClass('play')
+                .find('.icon')
+                    .removeClass('fa-play')
+                    .addClass('fa-pause');
+
+            this.el
+                .find('.control-text')
+                    .text(gettext('Pause'));
+        },
+
         pause: function () {
             this.el
                 .removeClass('pause')
