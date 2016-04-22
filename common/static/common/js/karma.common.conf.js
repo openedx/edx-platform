@@ -109,7 +109,7 @@ var getPreprocessorObject = function (files) {
         var pattern = _.isObject(file) ? file.pattern : file;
 
         if (pattern.match(/^common\/js/)) {
-            pattern = path.join(appRoot, '/common/static/' + pattern)
+            pattern = path.join(appRoot, '/common/static/' + pattern);
         } else if (pattern.match(/^xmodule_js\/common_static/)) {
             pattern = path.join(appRoot, '/common/static/' +
                 pattern.replace(/^xmodule_js\/common_static\//, ''));
