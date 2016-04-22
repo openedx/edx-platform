@@ -124,7 +124,12 @@ function FakeXMLHttpRequest() {
       // jasmine.Clock.tick(20);
 
       this.onload();
-      this.onreadystatechange();
+
+      // With newer versions of JQuery, the onload function sets onreadystatechange to null.
+      // Once we upgrade Jasmine to 2.x, we can also upgrade mock-ajax.
+      // Note that mock-ajax is only used by active_video_upload_list_spec.js, so it is also
+      // possible that the test could be rewritten to not require it.
+      // this.onreadystatechange();
     },
     responseTimeout: function() {
       this.readyState = 4;

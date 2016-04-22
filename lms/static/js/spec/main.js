@@ -4,7 +4,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'xmodule_js/common_static/js/vendor/jquery.min',
+            'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
+            'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -13,7 +14,7 @@
             'jquery.leanModal': 'xmodule_js/common_static/js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'xmodule_js/common_static/js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'xmodule_js/common_static/js/vendor/jquery.scrollTo.min',
             'jquery.timepicker': 'xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
@@ -116,6 +117,7 @@
             'date': {
                 exports: 'Date'
             },
+            "jquery-migrate": ['jquery'],
             'jquery.ui': {
                 deps: ['jquery'],
                 exports: 'jQuery.ui'
@@ -288,6 +290,10 @@
             'coffee/src/instructor_dashboard/student_admin': {
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            },
+            'coffee/src/instructor_dashboard/util': {
+                exports: 'coffee/src/instructor_dashboard/util',
+                deps: ['jquery', 'underscore', 'slick.core', 'slick.grid']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -480,6 +486,14 @@
             'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            'slick.core': {
+                deps: ['jquery'],
+                exports: 'Slick'
+            },
+            'slick.grid': {
+                deps: ['jquery', 'jquery.eventDrag', 'slick.core'],
+                exports: 'Slick'
             },
             // Discussions
             'xmodule_js/common_static/coffee/src/discussion/utils': {

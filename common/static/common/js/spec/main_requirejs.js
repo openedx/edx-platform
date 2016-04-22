@@ -1,8 +1,11 @@
 (function(requirejs, define) {
+    'use strict';
+
     requirejs.config({
         paths: {
             'gettext': 'js/test/i18n',
-            'jquery': 'js/vendor/jquery.min',
+            'jquery': 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'js/vendor/jquery-ui.min',
             'jquery.flot': 'js/vendor/flot/jquery.flot.min',
             'jquery.form': 'js/vendor/jquery.form',
@@ -10,7 +13,7 @@
             'jquery.leanModal': 'js/vendor/jquery.leanModal',
             'jquery.ajaxQueue': 'js/vendor/jquery.ajaxQueue',
             'jquery.smoothScroll': 'js/vendor/jquery.smooth-scroll.min',
-            'jquery.scrollTo': 'js/vendor/jquery.scrollTo-1.4.2-min',
+            'jquery.scrollTo': 'js/vendor/jquery.scrollTo.min',
             'jquery.timepicker': 'js/vendor/timepicker/jquery.timepicker',
             'jquery.cookie': 'js/vendor/jquery.cookie',
             'jquery.qtip': 'js/vendor/jquery.qtip.min',

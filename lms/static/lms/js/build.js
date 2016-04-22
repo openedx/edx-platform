@@ -63,6 +63,7 @@
             'gettext': 'empty:',
             'coffee/src/ajax_prefix': 'empty:',
             'jquery': 'empty:',
+            'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
             'backbone': 'empty:',

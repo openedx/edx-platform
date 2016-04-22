@@ -229,10 +229,9 @@ Feature: LMS.Answer problems
         Given I am viewing a "<ProblemType>" problem
         When I answer a "<ProblemType>" problem "<InitialCorrectness>ly"
         Then my "<ProblemType>" answer is marked "<InitialCorrectness>"
-        And I input an answer on a "<ProblemType>" problem "<OtherCorrectness>ly"
+        And I reset the problem
         Then my "<ProblemType>" answer is NOT marked "<InitialCorrectness>"
         And my "<ProblemType>" answer is NOT marked "<OtherCorrectness>"
-        And I reset the problem
 
         Examples:
         | ProblemType     | InitialCorrectness | OtherCorrectness |
