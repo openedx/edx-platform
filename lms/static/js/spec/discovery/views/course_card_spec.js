@@ -43,8 +43,8 @@ define([
         it('renders', function () {
             var data = this.view.model.attributes;
             expect(this.view.$el).toContainHtml(data.content.display_name);
-            expect(this.view.$el).toContain('a[href="/courses/' + data.course + '/about"]');
-            expect(this.view.$el).toContain('img[src="' + data.image_url + '"]');
+            expect(this.view.$el).toContainElement('a[href="/courses/' + data.course + '/about"]');
+            expect(this.view.$el).toContainElement('img[src="' + data.image_url + '"]');
             expect(this.view.$el.find('.course-name')).toContainHtml(data.org);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.number);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.display_name);

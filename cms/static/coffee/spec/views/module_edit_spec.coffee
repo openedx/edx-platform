@@ -29,7 +29,7 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
         </ul>
         """
         edit_helpers.installEditTemplates(true);
-        spyOn($, 'ajax').andReturn(@moduleData)
+        spyOn($, 'ajax').and.returnValue(@moduleData)
 
         @moduleEdit = new ModuleEdit(
           el: $(".component")
@@ -62,7 +62,7 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
             spyOn(@moduleEdit, 'loadDisplay')
             spyOn(@moduleEdit, 'delegateEvents')
             spyOn($.fn, 'append')
-            spyOn(ViewUtils, 'loadJavaScript').andReturn($.Deferred().resolve().promise());
+            spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().resolve().promise());
 
             window.MockXBlock = (runtime, element) ->
               return { }
@@ -70,7 +70,7 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
             window.loadedXBlockResources = undefined
 
             @moduleEdit.render()
-            $.ajax.mostRecentCall.args[0].success(
+            $.ajax.calls.mostRecent().args[0].success(
               html: '<div>Response html</div>'
               resources: [
                 ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
@@ -120,7 +120,7 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
 
             mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore')
 
-            $.ajax.mostRecentCall.args[0].success(
+            $.ajax.calls.mostRecent().args[0].success(
               html: mockXBlockEditorHtml
               resources: [
                 ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
@@ -161,14 +161,14 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
             expect($.fn.append).not.toHaveBeenCalledWith('not-head-html')
 
           it "doesn't reload resources", ->
-            count = $('head').append.callCount
-            $.ajax.mostRecentCall.args[0].success(
+            count = $('head').append.calls.count()
+            $.ajax.calls.mostRecent().args[0].success(
               html: '<div>Response html 2</div>'
               resources: [
                 ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
               ]
             )
-            expect($('head').append.callCount).toBe(count)
+            expect($('head').append.calls.count()).toBe(count)
 
         describe "loadDisplay", ->
           beforeEach ->
@@ -177,4 +177,4 @@ define ["jquery", "common/js/components/utils/view_utils", "js/spec_helpers/edit
 
           it "loads the .xmodule-display inside the module editor", ->
             expect(XBlock.initializeBlock).toHaveBeenCalled()
-            expect(XBlock.initializeBlock.mostRecentCall.args[0]).toBe($('.xblock-student_view'))
+            expect(XBlock.initializeBlock.calls.mostRecent().args[0].get(0)).toBe($('.xblock-student_view').get(0))

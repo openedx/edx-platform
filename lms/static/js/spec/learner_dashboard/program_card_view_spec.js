@@ -67,7 +67,7 @@ define([
             });
 
             it('should handle exceptions from reEvaluatePicture', function(){
-                spyOn(view, 'reEvaluatePicture').andCallFake(function(){
+                spyOn(view, 'reEvaluatePicture').and.callFake(function(){
                     throw {name:'Picturefill had exceptions'};
                 });
                 view.reLoadBannerImage();

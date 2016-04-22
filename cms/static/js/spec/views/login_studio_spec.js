@@ -12,7 +12,7 @@ function($, LoginFactory, AjaxHelpers, ViewUtils) {
         });
 
         it('disable the submit button once it is clicked', function() {
-            spyOn(ViewUtils, 'redirect').andCallFake(function(){});
+            spyOn(ViewUtils, 'redirect').and.callFake(function(){});
             var requests = AjaxHelpers.requests(this);
             expect(submitButton).not.toHaveClass('is-disabled');
             submitButton.click();

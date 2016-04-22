@@ -86,7 +86,9 @@ define('video/09_bumper.js',[], function () {
             if (this.doNotShowAgain) {
                 _.extend(info, {bumper_do_not_show_again: true});
             }
-            this.state.videoSaveStatePlugin.saveState(true, info);
+            if (this.state.videoSaveStatePlugin) {
+                this.state.videoSaveStatePlugin.saveState(true, info);
+            }
         },
 
         destroy: function () {
