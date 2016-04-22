@@ -360,7 +360,7 @@ class Pa11yCrawler(BokChoyTestSuite):
             '--pa11y-reporter="{reporter}" '
             '--depth-limit={depth} '
         ).format(
-            start_urls=self.start_urls,
+            start_urls=' '.join(self.start_urls),
             allowed_domains='localhost',
             report_dir=self.pa11y_report_dir,
             reporter="1.0-json",
