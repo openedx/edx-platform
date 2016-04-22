@@ -263,13 +263,16 @@ header.global {
     list-style: none;
     @include float(left);
     .tab-nav-item{
-      display: inline;
+      display: flex;
       margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
       .tab-nav-link{
         font-size: em(16);
         color: $gray;
-        padding: 26px 15px;
-        display: inline;
+        padding: 5px 25px 23px;
+        display: inline-block;
         &:hover,
         &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
@@ -393,13 +396,16 @@ header.global-new {
   .nav-global {
     @include float(left);
     .tab-nav-item{
-      display: inline;
+      display: flex;
       margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
       .tab-nav-link{
         font-size: em(16);
         color: $gray;
-        display: inline;
-        padding: 25px 15px;
+        display: inline-block;
+        padding: 5px 25px 19px;
         &:hover,
         &:focus{
           border-bottom: 4px solid $courseware-border-bottom-color;
