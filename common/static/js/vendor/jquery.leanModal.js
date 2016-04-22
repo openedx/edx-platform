@@ -41,8 +41,7 @@
                         "position": "fixed",
                         "opacity": 0,
                         "z-index": 11000,
-                        "left": 50 + "%",
-                        "margin-left": -(modal_width / 2) + "px",
+                        "left": 10 + "%",
                         "top": o.top + "px"
                     });
                     $(modal_id).fadeTo(200, 1);
