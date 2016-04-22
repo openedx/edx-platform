@@ -105,7 +105,7 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onHideLanguageMenu: function () {
-            this.log('video_hide_cc_menu');
+            this.log('video_hide_cc_menu', { language: this.getCurrentLanguage() });
         },
 
         onShowCaptions: function () {
@@ -119,6 +119,11 @@ define('video/09_events_plugin.js', [], function() {
         getCurrentTime: function () {
             var player = this.state.videoPlayer;
             return player ? player.currentTime : 0;
+        },
+
+        getCurrentLanguage: function() {
+            var language = this.state.lang;
+            return language;
         },
 
         log: function (eventName, data) {
