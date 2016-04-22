@@ -2,10 +2,10 @@
 Django database models supporting the gradebook app
 """
 from django.utils import timezone
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Avg, Max, Min, Count
+from django.db.models import Avg, Max, Min, Count, F
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
@@ -160,6 +160,27 @@ class StudentGradebook(models.Model):
         data['user_grade'] = user_grade
 
         return data
+
+    @classmethod
+    def get_num_users_completed(cls, course_key, exclude_users=None, org_ids=None, group_ids=None):
+        """
+        Returns count of users those who completed given course.
+        """
+        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+        queryset = cls.objects.filter(
+            course_id__exact=course_key,
+            user__is_active=True,
+            user__courseenrollment__is_active=True,
+            user__courseenrollment__course_id__exact=course_key,
+            proforma_grade__lte=F('grade') + grade_complete_match_range,
+            proforma_grade__gt=0
+        ).exclude(user__id__in=exclude_users)
+        if org_ids:
+            queryset = queryset.filter(user__organizations__in=org_ids)
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids)
+
+        return queryset.distinct().count()
 
 
 class StudentGradebookHistory(TimeStampedModel):
