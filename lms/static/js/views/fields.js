@@ -76,6 +76,8 @@
                     return this[message_status + 'Message'].call(this);
                 } else if (this.showMessages) {
                     return this.indicators[message_status] + this.messages[message_status];
+                } else {
+                    console.log('No point beaing here.')
                 }
                 return this.indicators[message_status];
             },
@@ -86,6 +88,15 @@
                 }
                 this.$('.u-field-message-notification').html('');
                 this.$('.u-field-message-help').html(message);
+            },
+
+            getAnotherMessage: function(message_status) {
+                if ((message_status + 'Message') in this) {
+                    return this[message_status + 'Message'].call(this);
+                } else if (this.showMessages) {
+                    return this.indicators[message_status] + this.messages[message_status];
+                }
+                return this.indicators[message_status];
             },
 
             getNotificationMessage: function() {

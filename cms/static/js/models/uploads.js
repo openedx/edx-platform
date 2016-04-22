@@ -39,6 +39,22 @@ var FileUpload = Backbone.Model.extend({
 
         return mimeTypes.concat(fileFormats);
     },
+    mimeTypes: function() {
+        var mimeTypes = _.map(
+                this.attributes.mimeTypes,
+                function(type) {
+                    return type.split('/')[1].toUpperCase();
+                }
+            ),
+            fileFormats = _.map(
+                this.attributes.fileFormats,
+                function(type) {
+                    return type.toUpperCase();
+                }
+            );
+
+        return mimeTypes.concat(fileFormats);
+    },
     checkTypeValidity: function (file) {
         var attrs = this.attributes,
             getRegExp = function (formats) {
