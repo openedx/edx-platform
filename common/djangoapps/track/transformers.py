@@ -374,6 +374,8 @@ class VideoEventTransformer(EventTransformer):
         u'edx.video.seeked': u'seek_video',
         u'edx.video.transcript.shown': u'show_transcript',
         u'edx.video.transcript.hidden': u'hide_transcript',
+        u'edx.video.language_menu.shown': u'video_show_cc_menu',
+        u'edx.video.language_menu.hidden': u'video_hide_cc_menu',
     }
 
     is_legacy_event = True

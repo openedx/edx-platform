@@ -398,7 +398,7 @@
                 // present instead of on the container hover, since it wraps
                 // the "CC" and "Transcript" buttons as well.
                 if ($(event.currentTarget).find('.lang').length) {
-                    this.state.el.trigger('language_menu:show');
+                    this.state.el.trigger('language_menu:hide');
                 }
             },
 
