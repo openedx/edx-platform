@@ -130,6 +130,27 @@ def split_mongo_store_config(data_dir):
     return store
 
 
+def contentstore_config():
+    """
+    Return a new configuration for the contentstore that is isolated
+    from other such configurations.
+    """
+    return {
+        'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+        'DOC_STORE_CONFIG': {
+            'host': MONGO_HOST,
+            'db': 'test_xcontent_{}'.format(uuid4().hex),
+            'port': MONGO_PORT_NUM,
+        },
+        # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+        'ADDITIONAL_OPTIONS': {
+            'trashcan': {
+                'bucket': 'trash_fs'
+            }
+        }
+    }
+
+
 @patch('xmodule.modulestore.django.create_modulestore_instance', autospec=True)
 def drop_mongo_collections(mock_create):
     """
@@ -195,9 +216,11 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
     """
 
     MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
+    CONTENTSTORE = functools.partial(contentstore_config)
     ENABLED_CACHES = ['mongo_metadata_inheritance', 'loc_cache']
     __settings_overrides = []
     __old_modulestores = []
+    __old_contentstores = []
 
     @classmethod
     def start_modulestore_isolation(cls):
@@ -209,9 +232,11 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         cls.start_cache_isolation()
         override = override_settings(
             MODULESTORE=cls.MODULESTORE(),
+            CONTENTSTORE=cls.CONTENTSTORE(),
         )
 
         cls.__old_modulestores.append(copy.deepcopy(settings.MODULESTORE))
+        cls.__old_contentstores.append(copy.deepcopy(settings.CONTENTSTORE))
         override.__enter__()
         cls.__settings_overrides.append(override)
         XMODULE_FACTORY_LOCK.enable()
@@ -230,6 +255,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         cls.__settings_overrides.pop().__exit__(None, None, None)
 
         assert settings.MODULESTORE == cls.__old_modulestores.pop()
+        assert settings.CONTENTSTORE == cls.__old_contentstores.pop()
         cls.end_cache_isolation()
 
 
