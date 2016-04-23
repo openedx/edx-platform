@@ -176,6 +176,7 @@ COURSE_DISCOVERY_MEANINGS = {
     },
     'language': LANGUAGE_MAP,
 }
+COURSE_DISCOVERY_MEANINGS = ENV_TOKENS.get('COURSE_DISCOVERY_MEANINGS', COURSE_DISCOVERY_MEANINGS)
 
 FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 # Setting for overriding default filtering facets for Course discovery
