@@ -279,9 +279,17 @@
                 },
 
                 scrollTop: function( $el ) {
+                    var $header = $('header');
+                    var headerOffset = 0;
+
+                    // if the header is fixed, we must offset it as well
+                    if ($header && $header.css('position') === 'fixed') {
+                      headerOffset = $header.innerHeight();
+                    }
+
                     // Scroll to top of selected element
                     $('html,body').animate({
-                        scrollTop: $el.offset().top
+                        scrollTop: $el.offset().top - headerOffset
                     },'slow');
                 },
 
