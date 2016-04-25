@@ -1,9 +1,8 @@
 @import 'lms/static/sass/partials/base/variables';
 
-$action-primary-fg: $extraDarkGrey;
-$action-primary-bg: $white;
-$action-primary-focused-bg: $lightGrey;
-$link-color: $extraDarkGrey ;
+
+
+
 
 $white: #ffffff;
 $body-background-color: $white;
@@ -16,3 +15,16 @@ $base: #9b9b9b;
 $success-base: #25b85a;
 $error-base: #b20610;
 $brand-font: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+
+
+
+
+
+
+
+$action-primary-fg: $brand-color;
+$action-primary-bg: lighten($brand-color, 10%);
+$action-primary-shadow: $brand-color !default;
+$link-color: $brand-color !default;
+
+
