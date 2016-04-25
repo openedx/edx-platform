@@ -67,7 +67,7 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'picturefill': 'common/js/vendor/picturefill.min',
+            'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
             'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
