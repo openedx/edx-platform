@@ -200,7 +200,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             '--pa11y-reporter="1.0-json" '
             '--depth-limit=6 '
         ).format(
-            start_urls=start_urls,
+            start_urls=' '.join(start_urls),
             report_dir=report_dir,
         )
         return expected_statement

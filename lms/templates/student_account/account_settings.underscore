@@ -1,3 +1,4 @@
+<main id="main" aria-label="Content" tabindex="-1">
 <div class="account-settings-container">
     <div class="wrapper-header">
         <h2 class="header-title"><%- gettext("Account Settings") %></h2>
@@ -22,3 +23,4 @@
         <% }); %>
     </div>
 </div>
+</main>
