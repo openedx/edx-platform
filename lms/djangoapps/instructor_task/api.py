@@ -446,7 +446,6 @@ def submit_export_ora2_data(request, course_key):
 
 def generate_certificates_for_students(request, course_key, student_set=None, specific_student_id=None):  # pylint: disable=invalid-name
     """
-<<<<<<< HEAD
     Submits a task to generate certificates for given students enrolled in the course.
 
      Arguments:

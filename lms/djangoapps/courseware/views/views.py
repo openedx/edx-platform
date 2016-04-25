@@ -354,12 +354,12 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
-        if not bool(staff_access):
+        if bool(staff_access):
+            usage_key = UsageKey.from_string(course.location.to_deprecated_string()).replace(course_key=course_key)
+            redirect_url = get_redirect_url(course_key, usage_key)
             return redirect("{url}?{redirect}".format(
                 url=reverse(enroll_staff, args=[course_key.to_deprecated_string()]),
-                redirect=request.GET.urlencode()
-            )
-            )
+                redirect=redirect_url))
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
     # see if all pre-requisites (as per the milestones app feature) have been fulfilled
@@ -878,16 +878,18 @@ def enroll_staff(request, course_id):
                 'csrftoken': csrf(request)["csrf_token"]
             })
 
-    elif request.method == 'POST' and 'enroll' in request.POST:
-        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
-        enrollment.update_enrollment(is_active=True)
-        log.info(
-            u"User %s enrolled in %s via `enroll_staff` view",
-            user.username,
-            course_id
-        )
-
-    return redirect(_next)
+    elif request.method == 'POST':
+        if 'enroll' in request.POST:
+            enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
+            enrollment.update_enrollment(is_active=True)
+            log.info(
+                u"User %s enrolled in %s via `enroll_staff` view",
+                user.username,
+                course_id
+            )
+            return redirect(_next)
+        else:
+            return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
 
 @ensure_csrf_cookie

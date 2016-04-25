@@ -323,47 +323,54 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertNotIn('Problem 1', response.content)
         self.assertNotIn('Problem 2', response.content)
 
-    def test_enroll_staff(self):
+    def _create_url_for_enroll_staff(self):
         """
-        Here we check two methods GET and POST and should be a staff user
+        User will have satff access and creates the url for enroll_staff view
         """
         self.user.is_staff = True
-        self.user.save()
+        self.user.save()  # pylint: disable=no-member
         self.client.login(username=self.user.username, password=self.password)
 
         # create the course
         course = CourseFactory.create()
-        chapter = ItemFactory.create(parent=course, category='chapter')
-        section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
 
         # create the _next parameter
-        courseware_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': unicode(course.id),
-                'chapter': chapter.url_name,
-                'section': section.url_name,
-            }
-        ) + '?activate_block_id=test_block_id'
+        courseware_url = reverse('courseware', kwargs={
+            'course_id': course.id.to_deprecated_string()}) + '?activate_block_id=test_block_id'
 
         # create the url for enroll_staff view
-        url = "{enroll_staff_url}?next={courseware_url}".format(
-            enroll_staff_url= reverse('enroll_staff', kwargs={'course_id': unicode(course.id)}),
-            courseware_url= courseware_url
+        enroll_staff_url = "{enroll_staff_url}?next={courseware_url}".format(
+            enroll_staff_url=reverse('enroll_staff', kwargs={'course_id': unicode(course.id)}),
+            courseware_url=courseware_url
         )
+        return enroll_staff_url
+
+    def test_redirection_unenrolled_staff(self):
+        """
+        Verify unenrolled staff is not redirected to the 'about' section of the chapter
+        """
+        enroll_staff_url = self._create_url_for_enroll_staff()
 
         # Check the GET method
-        response = self.client.get(url)
+        response = self.client.get(enroll_staff_url)
         self.assertEqual(response.status_code, 200)
         response_content = response.content
-        self.assertIn('Enroll' , response_content)
-        self.assertIn('Continue', response_content)
+        self.assertIn('Enroll', response_content)
+        self.assertIn("Don't enroll", response_content)
 
-        # Check the POST Method
-        data = {'enroll' : 'Enroll'}
-        response_post = self.client.post(url, data=data)
-        # here we check the status code 302 because of the redirect
-        self.assertEqual(response_post.status_code, 302)
+    @ddt.data(
+        {'enroll': "Enroll"},
+        {'dont_enroll': "Don't enroll"},
+    )
+    def test_redirection_unenrolled_staff_post_data(self, data):
+        """
+        Verify unenrolled staff is redirected to the page according to data passed.
+        """
+        enroll_staff_url = self._create_url_for_enroll_staff()
+        response = self.client.post(enroll_staff_url, data=data)
+
+        # Here we check the status code 302 because of the redirect
+        self.assertEqual(response.status_code, 302)
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
