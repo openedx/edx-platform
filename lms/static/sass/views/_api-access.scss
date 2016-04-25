@@ -26,21 +26,13 @@
     &.request-pending {
       border-top: 2px solid $orange;
     }
-
-    &.request-denied {
-      border-top: 2px solid $red;
-    }
-
-    &.request-approved {
-      border-top: 2px solid $green;
-    }
   }
 
   #api-access-status {
     @extend %t-copy-base;
   }
 
-  .api-management-form {
+  #api-access-request {
 
     padding: 0 $baseline $baseline $baseline;
 
@@ -97,19 +89,6 @@
       background-image: none;
       text-shadow: none;
       text-transform: none;
-    }
-  }
-
-  .application-info {
-    margin: $baseline 0;
-
-    p {
-      @extend %t-copy-base;
-      margin: $baseline/2 0;
-
-      .application-label {
-        @extend %t-weight4;
-      }
     }
   }
 }
