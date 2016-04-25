@@ -26,7 +26,7 @@ from course_modes.tests.factories import CourseModeFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
-from util.testing import EventTestMixin
+from util.testing import EventTestMixin, UrlResetMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -197,7 +197,8 @@ class CertificatesBaseTestCase(object):
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesListHandlerTestCase(
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin):
     """
     Test cases for certificates_list_handler.
     """
@@ -206,6 +207,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         Set up CertificatesListHandlerTestCase.
         """
         super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        self.reset_urls()
 
     def _url(self):
         """
@@ -420,7 +422,8 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
 
 @ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
+class CertificatesDetailHandlerTestCase(
+        EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods, UrlResetMixin):
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
@@ -432,6 +435,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         Set up CertificatesDetailHandlerTestCase.
         """
         super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        self.reset_urls()
 
     def _url(self, cid=-1):
         """
