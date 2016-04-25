@@ -31,6 +31,11 @@ a{
     color: $brand-color !important;
   }
 }
+
+.show{
+  display: block !important;
+}
+
 .hidden-mobile{
   display: none;
 }
@@ -220,6 +225,62 @@ header.header-main {
       a{
         line-height: normal;
         color: $x-dark;
+      }
+      &.user-account{
+        margin-right: 1rem;
+        position: relative;
+        .user-img{
+          display: inline-block;
+          width: 50px;
+          height: 50px;
+          line-height: 100px;
+          vertical-align: middle;
+          margin-right: 0.6rem;
+          img {
+            vertical-align: top;
+            width: 100%;
+          }
+        }
+        .user-name{
+          cursor: pointer;
+          position: relative;
+          display: inline-block;
+          &:after{
+            content: "\f0d7";
+            position: absolute;
+            right: -1rem;
+            font-family: 'FontAwesome';
+            top: 0.2rem;
+          }
+        }
+        ul{
+          display: none;
+          position: relative;
+          background-color: $white;
+          box-shadow: 0px 2px 24px rgba(0,0,0,0.3);
+          width: 50%;
+          margin: auto;
+          margin-top: 0.5rem;
+          border: 1px solid $light;
+          li{
+            border-bottom: 1px solid lighten($light, 10%);
+            background: $white;
+            float: none;
+            a{
+              display: block;
+            }
+          }
+          &:before{
+            content: "\f0d8";
+            position: absolute;
+            font-family: 'FontAwesome';
+            right: 1rem;
+            top: -20px;
+            color: $white;
+            font-size: 2rem;
+            line-height: normal;
+          }
+        }
       }
     }
   }
@@ -797,6 +858,24 @@ header.header-main {
           a{
             &.btn-neutral{
               padding: 0.625rem 1.25rem;
+            }
+          }
+          &.user-account{
+            ul{
+              position: absolute;
+              right: 1rem;
+              top: 100%;
+              width: 100%;
+              margin-top: -1rem;
+              li{
+                display: block;
+                float: none;
+                line-height: normal;
+                a{
+                  padding: 0.5rem;
+                  display: inline-block;
+                }
+              }
             }
           }
         }

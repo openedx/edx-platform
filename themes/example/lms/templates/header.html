@@ -4,6 +4,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
 
 
@@ -24,12 +25,29 @@ from django.core.urlresolvers import reverse
               <span></span><span></span><span></span>
             </div>
             <ul class="list-inline">
+              % if user.is_authenticated():
+                <%
+                  username = user.username
+                  profile_image_url = get_profile_image_urls_for_user(user)['medium']
+                %>
+                <li class="user-account">
+                  <span class="user-img"><img src="/static/images/profiles/default_50.png" alt=""></span>
+                  <span class="user-name">${username}</span>
+                  <ul>
+                    <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
+                    <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
+                    <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
+                    <li><a href="${reverse('logout')}">${_("Sign Out")}</a></li>
+                  </ul>
+                </li>
+              % else:
               <li>
                 <a class="btn-brand btn-client" href="/register${login_query()}">${_("Register")}</a>
               </li>
               <li>
                 <a href="/login${login_query()}" class="brand-link">${_("Sign in")}</a>
               </li>
+            % endif
               <li>
                 <a href="/courses">${_("Courses")}</a>
               </li>
@@ -41,7 +59,13 @@ from django.core.urlresolvers import reverse
 </header>
 
 <script>
-$( ".collapsed-button" ).click(function() {
-  $(".navbar-collapse .list-inline").toggleClass("show-menu");
-});
+  $( ".collapsed-button" ).click(function() {
+    $(".navbar-collapse .list-inline").toggleClass("show-menu");
+  });
+
+  $(".user-account .user-name").click(function(){
+    $(".user-account ul").toggleClass("show");
+  });
+
+
 </script>
