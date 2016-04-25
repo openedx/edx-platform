@@ -66,7 +66,9 @@ from openedx.core.djangolib.js_utils import (
     <!-- view -->
     <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
         <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+        <%block name="headerblock">
         <%include file="widgets/header.html" args="online_help_token=online_help_token" />
+        </%block>
 
       <div id="page-alert">
       <%block name="page_alert"></%block>
