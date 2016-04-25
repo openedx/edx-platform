@@ -1564,9 +1564,20 @@ class CoursesMetrics(SecureAPIView):
                                                               exclude_users=exclude_users,
                                                               org_ids=org_ids,
                                                               group_ids=group_ids)
+        users_enrolled = users_enrolled_qs.distinct().count()
+        modules_completed = StudentProgress.get_total_completions(
+            course_key, exclude_users=exclude_users, org_ids=org_ids, group_ids=group_ids
+        )
+        users_completed = StudentGradebook.get_num_users_completed(
+            course_key, exclude_users=exclude_users, org_ids=org_ids, group_ids=group_ids
+        )
+
         data = {
-            'users_enrolled': users_enrolled_qs.distinct().count(),
+            'users_enrolled': users_enrolled,
             'users_started': users_started,
+            'users_not_started': users_enrolled - users_started,
+            'modules_completed': modules_completed,
+            'users_completed': users_completed,
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
 
