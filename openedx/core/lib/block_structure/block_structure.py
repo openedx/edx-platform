@@ -72,6 +72,9 @@ class BlockStructure(object):
         """
         return self.get_block_keys()
 
+    def __len__(self):
+        return len(self._block_relations)
+
     #--- Block structure relation methods ---#
 
     def get_parents(self, usage_key):
@@ -149,6 +152,7 @@ class BlockStructure(object):
             self,
             filter_func=None,
             yield_descendants_of_unyielded=False,
+            start_node=None,
     ):
         """
         Performs a topological sort of the block structure and yields
@@ -163,7 +167,7 @@ class BlockStructure(object):
                 traverse_topologically method.
         """
         return traverse_topologically(
-            start_node=self.root_block_usage_key,
+            start_node=start_node or self.root_block_usage_key,
             get_parents=self.get_parents,
             get_children=self.get_children,
             filter_func=filter_func,
@@ -173,6 +177,7 @@ class BlockStructure(object):
     def post_order_traversal(
             self,
             filter_func=None,
+            start_node=None,
     ):
         """
         Performs a post-order sort of the block structure and yields
@@ -187,7 +192,7 @@ class BlockStructure(object):
                 traverse_post_order method.
         """
         return traverse_post_order(
-            start_node=self.root_block_usage_key,
+            start_node=start_node or self.root_block_usage_key,
             get_children=self.get_children,
             filter_func=filter_func,
         )
@@ -267,19 +272,114 @@ class BlockStructure(object):
         block_relations[usage_key] = _BlockRelations()
 
 
-class _BlockData(object):
+class FieldData(object):
+    """
+    Data structure to encapsulate collected fields.
+    """
+    def own_class_field_names(self):
+        """
+        Returns list of names of fields that are defined directly
+        on the class.
+        """
+        return ['fields']
+
+    def __init__(self):
+        # Map of field name to the field's value for this block.
+        # dict {string: any picklable type}
+        self.fields = {}
+
+    def __getattr__(self, field_name):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__getattr__(field_name)
+        try:
+            return self.fields[field_name]
+        except KeyError:
+            raise AttributeError("Field {0} does not exist".format(field_name))
+
+    def __setattr__(self, field_name, field_value):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__setattr__(field_name, field_value)
+        else:
+            self.fields[field_name] = field_value
+
+    def __delattr__(self, field_name):
+        if self._is_own_field(field_name):
+            return super(FieldData, self).__delattr__(field_name)
+        else:
+            delattr(self.fields, field_name)
+
+    def _is_own_field(self, field_name):
+        """
+        Returns whether the given field_name is the name of an
+        actual field of this class.
+        """
+        return field_name in self.own_class_field_names()
+
+
+class TransformerData(FieldData):
+    """
+    Data structure to encapsulate collected data for a transformer.
+    """
+    pass
+
+
+class TransformerDataMap(dict):
+    """
+    A map of Transformer name to its corresponding TransformerData.
+    The map can be accessed by the Transformer's name or the
+    Transformer's class type.
+    """
+    def __getitem__(self, key):
+        key = self._translate_key(key)
+        return dict.__getitem__(self, key)
+
+    def __setitem__(self, key, value):
+        key = self._translate_key(key)
+        dict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        key = self._translate_key(key)
+        dict.__delitem__(self, key)
+
+    def get_or_create(self, key):
+        """
+        Returns the TransformerData associated with the given
+        key.  If not found, creates and returns a new TransformerData
+        and maps it to the given key.
+        """
+        try:
+            return self[key]
+        except KeyError:
+            new_transformer_data = TransformerData()
+            self[key] = new_transformer_data
+            return new_transformer_data
+
+    def _translate_key(self, key):
+        """
+        Allows the given key to be either the transformer's class or name,
+        always returning the transformer's name.
+        """
+        try:
+            return key.name()
+        except AttributeError:
+            return key
+
+
+class BlockData(FieldData):
     """
     Data structure to encapsulate collected data for a single block.
     """
-    def __init__(self):
-        # Map of xblock field name to the field's value for this block.
-        # dict {string: any picklable type}
-        self.xblock_fields = {}
+    def own_class_field_names(self):
+        return super(BlockData, self).own_class_field_names() + ['location', 'transformer_data']
 
-        # Map of transformer name to the transformer's data for this
-        # block.
-        # defaultdict {string: dict}
-        self.transformer_data = defaultdict(dict)
+    def __init__(self, usage_key):
+        super(BlockData, self).__init__()
+
+        # Location (or usage key) of the block.
+        self.location = usage_key
+
+        # Map of transformer name to its block-specific data.
+        self.transformer_data = TransformerDataMap()
 
 
 class BlockStructureBlockData(BlockStructure):
@@ -292,12 +392,31 @@ class BlockStructureBlockData(BlockStructure):
 
         # Map of a block's usage key to its collected data, including
         # its xBlock fields and block-specific transformer data.
-        # defaultdict {UsageKey: _BlockData}
-        self._block_data_map = defaultdict(_BlockData)
+        # dict {UsageKey: BlockData}
+        self._block_data_map = {}
 
         # Map of a transformer's name to its non-block-specific data.
-        # defaultdict {string: dict}
-        self._transformer_data = defaultdict(dict)
+        self.transformer_data = TransformerDataMap()
+
+    def iteritems(self):
+        """
+        Returns iterator of (UsageKey, BlockData) pairs for all
+        blocks in the BlockStructure.
+        """
+        return self._block_data_map.iteritems()
+
+    def itervalues(self):
+        """
+        Returns iterator of BlockData for all blocks in the
+        BlockStructure.
+        """
+        return self._block_data_map.itervalues()
+
+    def __getitem__(self, usage_key):
+        """
+        Returns the BlockData associated with the given key.
+        """
+        return self._block_data_map.get(usage_key)
 
     def get_xblock_field(self, usage_key, field_name, default=None):
         """
@@ -316,7 +435,7 @@ class BlockStructureBlockData(BlockStructure):
                 not found.
         """
         block_data = self._block_data_map.get(usage_key)
-        return block_data.xblock_fields.get(field_name, default) if block_data else default
+        return getattr(block_data, field_name, default) if block_data else default
 
     def get_transformer_data(self, transformer, key, default=None):
         """
@@ -330,7 +449,10 @@ class BlockStructureBlockData(BlockStructure):
             key (string) - A dictionary key to the transformer's data
                 that is requested.
         """
-        return self._transformer_data.get(transformer.name(), {}).get(key, default)
+        try:
+            return getattr(self.transformer_data[transformer], key, default)
+        except KeyError:
+            return default
 
     def set_transformer_data(self, transformer, key, value):
         """
@@ -346,7 +468,26 @@ class BlockStructureBlockData(BlockStructure):
             value (any picklable type) - The value to associate with the
                 given key for the given transformer's data.
         """
-        self._transformer_data[transformer.name()][key] = value
+        setattr(self.transformer_data.get_or_create(transformer), key, value)
+
+    def get_transformer_block_data(self, usage_key, transformer):
+        """
+        Returns the TransformerData for the given
+        transformer for the block identified by the given usage_key.
+
+        Raises KeyError if not found.
+
+        Arguments:
+            usage_key (UsageKey) - Usage key of the block whose
+                transformer data is requested.
+
+            transformer (BlockStructureTransformer) - The transformer
+                whose dictionary data is requested.
+
+            key (string) - A dictionary key to the transformer's data
+                that is requested.
+        """
+        return self._block_data_map[usage_key].transformer_data[transformer]
 
     def get_transformer_block_field(self, usage_key, transformer, key, default=None):
         """
@@ -367,8 +508,11 @@ class BlockStructureBlockData(BlockStructure):
             default (any type) - The value to return if a dictionary
                 entry is not found.
         """
-        transformer_data = self.get_transformer_block_data(usage_key, transformer)
-        return transformer_data.get(key, default)
+        try:
+            transformer_data = self.get_transformer_block_data(usage_key, transformer)
+        except KeyError:
+            return default
+        return getattr(transformer_data, key, default)
 
     def set_transformer_block_field(self, usage_key, transformer, key, value):
         """
@@ -388,30 +532,11 @@ class BlockStructureBlockData(BlockStructure):
                 given key for the given transformer's data for the
                 requested block.
         """
-        self._block_data_map[usage_key].transformer_data[transformer.name()][key] = value
-
-    def get_transformer_block_data(self, usage_key, transformer):
-        """
-        Returns the entire transformer data dict for the given
-        transformer for the block identified by the given usage_key;
-        returns an empty dict {} if not found.
-
-        Arguments:
-            usage_key (UsageKey) - Usage key of the block whose
-                transformer data is requested.
-
-            transformer (BlockStructureTransformer) - The transformer
-                whose dictionary data is requested.
-
-            key (string) - A dictionary key to the transformer's data
-                that is requested.
-        """
-        default = {}
-        block_data = self._block_data_map.get(usage_key)
-        if not block_data:
-            return default
-        else:
-            return block_data.transformer_data.get(transformer.name(), default)
+        setattr(
+            self._get_or_create_block(usage_key).transformer_data.get_or_create(transformer),
+            key,
+            value,
+        )
 
     def remove_transformer_block_field(self, usage_key, transformer, key):
         """
@@ -425,8 +550,11 @@ class BlockStructureBlockData(BlockStructure):
             transformer (BlockStructureTransformer) - The transformer
                 whose data entry is to be deleted.
         """
-        transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
-        transformer_block_data.pop(key, None)
+        try:
+            transformer_block_data = self.get_transformer_block_data(usage_key, transformer)
+            delattr(transformer_block_data, key)
+        except (AttributeError, KeyError):
+            pass
 
     def remove_block(self, usage_key, keep_descendants):
         """
@@ -527,6 +655,19 @@ class BlockStructureBlockData(BlockStructure):
             raise TransformerException('VERSION attribute is not set on transformer {0}.', transformer.name())
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.VERSION)
 
+    def _get_or_create_block(self, usage_key):
+        """
+        Returns the BlockData associated with the given usage_key.
+        If not found, creates and returns a new BlockData and
+        maps it to the given key.
+        """
+        try:
+            return self._block_data_map[usage_key]
+        except KeyError:
+            block_data = BlockData(usage_key)
+            self._block_data_map[usage_key] = block_data
+            return block_data
+
 
 class BlockStructureModulestoreData(BlockStructureBlockData):
     """
@@ -599,23 +740,19 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
         Iterates through all instantiated xBlocks that were added and
         collects all xBlock fields that were requested.
         """
-        if not self._requested_xblock_fields:
-            return
-
         for xblock_usage_key, xblock in self._xblock_map.iteritems():
+            block_data = self._get_or_create_block(xblock_usage_key)
             for field_name in self._requested_xblock_fields:
-                self._set_xblock_field(xblock_usage_key, xblock, field_name)
+                self._set_xblock_field(block_data, xblock, field_name)
 
-    def _set_xblock_field(self, usage_key, xblock, field_name):
+    def _set_xblock_field(self, block_data, xblock, field_name):
         """
         Updates the given block's xBlock fields data with the xBlock
         value for the given field name.
 
         Arguments:
-            usage_key (UsageKey) - Usage key of the given xBlock.  This
-                value is passed in separately as opposed to retrieving
-                it from the given xBlock since this interface is
-                agnostic to and decoupled from the xBlock interface.
+            block_data (BlockData) - A BlockStructure BlockData
+                object.
 
             xblock (XBlock) - An instantiated XBlock object whose
                 field is being accessed and collected for later
@@ -625,4 +762,4 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
                 being collected and stored.
         """
         if hasattr(xblock, field_name):
-            self._block_data_map[usage_key].xblock_fields[field_name] = getattr(xblock, field_name)
+            setattr(block_data, field_name, getattr(xblock, field_name))

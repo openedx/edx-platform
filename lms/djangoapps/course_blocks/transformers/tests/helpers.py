@@ -36,8 +36,6 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     """
     Helper for test cases that need to build course structures.
     """
-    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
-
     def setUp(self):
         """
         Create users.

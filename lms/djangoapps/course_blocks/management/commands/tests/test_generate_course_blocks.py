@@ -15,8 +15,6 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     """
     Tests generate course blocks management command.
     """
-    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
-
     def setUp(self):
         """
         Create courses in modulestore.

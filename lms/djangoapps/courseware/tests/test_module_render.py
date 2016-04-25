@@ -339,16 +339,16 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     ))
-    def test_rebind_different_users_ccx(self):
+    def test_rebind_different_users(self):
         """
         This tests the rebinding a descriptor to a student does not result
-        in overly nested _field_data when CCX is enabled.
+        in overly nested _field_data.
         """
         request = self.request_factory.get('')
         request.user = self.mock_user
-        course = CourseFactory.create(enable_ccx=True)
+        course = CourseFactory.create()
 
         descriptor = ItemFactory(category='html', parent=course)
         field_data_cache = FieldDataCache(
