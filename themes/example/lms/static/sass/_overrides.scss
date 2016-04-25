@@ -37,7 +37,9 @@ a{
 .visible-mobile{
   display: block;
 }
-
+.light-bg{
+  background-color: $course-section-background-color;
+}
 .btn-client{
   background-color: $brand-color !important;
   border-color: $brand-color !important;
@@ -156,6 +158,7 @@ h1, h2, h3, h4, h5, h6{
     padding: 1.25rem;
   }
 }
+
 //Header
 header.header-main {
   min-height: 100px;
@@ -476,7 +479,6 @@ header.header-main {
 
 .course-info{
   .course-detail{
-     background-color: $course-section-background-color;
     .inner-container{
       padding: 1.8rem 1.25rem;
     }
