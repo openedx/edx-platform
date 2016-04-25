@@ -201,7 +201,7 @@
                     category: 'user-engagement'
                 });
 
-                this.element.hide( $(this.el).find('#login-anchor') );
+                this.element.hide( $(this.el).find('#login-form') );
                 this.loadForm('reset');
                 this.element.scrollTop( $('#password-reset-anchor') );
             },
