@@ -6,51 +6,63 @@
 
   % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
     <div class="about-container">
-
-      <div class="grid-manual">
-        <div class="row">
-          <div class="col col-12 text-center">
-            <h2> An Online Gateway to Knowledge </h2>
-          </div>
-        </div>
-
-        <div class="row about-list text-center">
-          <div class="col col-4 about-list-item">
-            <div class="about-icon">
-              <img src="${static.url('images/about-img.png')}" alt="" />
-              <p><span>Students</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
-            </div>
-          </div>
-          <div class="col col-4 about-list-item">
-            <div class="about-icon">
-              <img src="${static.url('images/about-img.png')}" alt="" />
-              <p><span>Faculty</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
-            </div>
-          </div>
-          <div class="col col-4 about-list-item">
-            <div class="about-icon">
-              <img src="${static.url('images/about-img.png')}" alt="" />
-              <p><span>Courses</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col col-12 text-center">
-            <a href="/about" class="btn-neutral">More about this site</a>
-          </div>
-        </div>
-
-      </div>
     </div>
   % endif
 
 </section>
 
+
+<script type="text/template" id="about-content">
+
+  <div class="grid-manual">
+      <div class="row">
+        <div class="col col-12 text-center">
+          <h2> An Online Gateway to Knowledge </h2>
+        </div>
+      </div>
+
+      <div class="row about-list text-center">
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Students</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Faculty</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Courses</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col col-12 text-center">
+          <a href="/about" class="btn-neutral">More about this site</a>
+        </div>
+      </div>
+
+    </div>
+  </script>
+
 <script>
 
-  $('document').ready(function() {
+  $(document).ready(function() {
+    $(".about-container").html( $("#about-content").html());
+    addSlider();
+  });
 
+  $(window).resize(function(){
+      addSlider();
+  });
+
+  function addSlider(){
     var addSlider = $(window).width() < 768;
     $(".about-list").toggleClass("slidable", addSlider);
 
@@ -61,9 +73,9 @@
         prevArrow: '<i class="fa fa-angle-left"></i>',
       });
     } else {
-      $(".about-list").find(".about-list-item").addClass('col col-4');
+      $(".about-container").html( $("#about-content").html());
     }
-  });
+  }
 
 
 </script>
