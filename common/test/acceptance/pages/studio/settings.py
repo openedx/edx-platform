@@ -26,7 +26,7 @@ class SettingsPage(CoursePage):
     # Helpers
     ################
     def is_browser_on_page(self):
-        return self.q(css='body.view-settings').present
+        return self.q(css='body.view-settings').visible
 
     def wait_for_require_js(self):
         """
