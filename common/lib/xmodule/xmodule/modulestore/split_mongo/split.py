@@ -2946,7 +2946,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         output_fields = dict(jsonfields)
         for field_name, value in output_fields.iteritems():
             if value:
-                field = xblock_class.fields.get(field_name)
+                field = None
+                try:
+                    field = xblock_class.fields.get(field_name)
+                except AttributeError:
+                    pass
                 if field is None:
                     continue
                 elif isinstance(field, Reference):

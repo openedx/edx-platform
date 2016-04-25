@@ -940,7 +940,6 @@ class ScoresClient(object):
     Score = namedtuple('Score', 'correct total')
 
     def __init__(self, course_key, user_id):
-        """Basic constructor. from_field_data_cache() is more appopriate for most uses."""
         self.course_key = course_key
         self.user_id = user_id
         self._locations_to_scores = {}
@@ -983,10 +982,10 @@ class ScoresClient(object):
         return self._locations_to_scores.get(location.replace(version=None, branch=None))
 
     @classmethod
-    def from_field_data_cache(cls, fd_cache):
-        """Create a ScoresClient from a populated FieldDataCache."""
-        client = cls(fd_cache.course_id, fd_cache.user.id)
-        client.fetch_scores(fd_cache.scorable_locations)
+    def create_for_locations(cls, course_id, user_id, scorable_locations):
+        """Create a ScoresClient with pre-fetched data for the given locations."""
+        client = cls(course_id, user_id)
+        client.fetch_scores(scorable_locations)
         return client
 
 

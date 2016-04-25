@@ -138,17 +138,19 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
 
         # verify fields have not been collected yet
         for block in blocks:
+            bs_block = block_structure[block.location]
             for field in fields:
-                self.assertIsNone(block_structure.get_xblock_field(block.location, field))
+                self.assertIsNone(getattr(bs_block, field, None))
 
         # collect fields
         block_structure._collect_requested_xblock_fields()
 
         # verify values of collected fields
         for block in blocks:
+            bs_block = block_structure[block.location]
             for field in fields:
                 self.assertEquals(
-                    block_structure.get_xblock_field(block.location, field),
+                    getattr(bs_block, field, None),
                     block.field_map.get(field),
                 )
 

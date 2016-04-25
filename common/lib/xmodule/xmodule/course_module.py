@@ -11,12 +11,10 @@ from django.utils.timezone import UTC
 from lazy import lazy
 from lxml import etree
 from path import Path as path
-from xblock.core import XBlock
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
-from xmodule.exceptions import UndefinedContext
 from xmodule.graders import grader_from_conf
 from xmodule.mixin import LicenseMixin
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
@@ -1173,83 +1171,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         The lower the number the "newer" the course.
         """
         return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
-
-    @lazy
-    def grading_context(self):
-        """
-        This returns a dictionary with keys necessary for quickly grading
-        a student. They are used by grades.grade()
-
-        The grading context has two keys:
-        graded_sections - This contains the sections that are graded, as
-            well as all possible children modules that can affect the
-            grading. This allows some sections to be skipped if the student
-            hasn't seen any part of it.
-
-            The format is a dictionary keyed by section-type. The values are
-            arrays of dictionaries containing
-                "section_descriptor" : The section descriptor
-                "xmoduledescriptors" : An array of xmoduledescriptors that
-                    could possibly be in the section, for any student
-
-        all_descriptors - This contains a list of all xmodules that can
-            effect grading a student. This is used to efficiently fetch
-            all the xmodule state for a FieldDataCache without walking
-            the descriptor tree again.
-
-
-        """
-        # If this descriptor has been bound to a student, return the corresponding
-        # XModule. If not, just use the descriptor itself
-        try:
-            module = getattr(self, '_xmodule', None)
-            if not module:
-                module = self
-        except UndefinedContext:
-            module = self
-
-        def possibly_scored(usage_key):
-            """Can this XBlock type can have a score or children?"""
-            return usage_key.block_type in self.block_types_affecting_grading
-
-        all_descriptors = []
-        graded_sections = {}
-
-        def yield_descriptor_descendents(module_descriptor):
-            for child in module_descriptor.get_children(usage_key_filter=possibly_scored):
-                yield child
-                for module_descriptor in yield_descriptor_descendents(child):
-                    yield module_descriptor
-
-        for chapter in self.get_children():
-            for section in chapter.get_children():
-                if section.graded:
-                    xmoduledescriptors = list(yield_descriptor_descendents(section))
-                    xmoduledescriptors.append(section)
-
-                    # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {
-                        'section_descriptor': section,
-                        'xmoduledescriptors': [child for child in xmoduledescriptors if child.has_score]
-                    }
-
-                    section_format = section.format if section.format is not None else ''
-                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
-
-                    all_descriptors.extend(xmoduledescriptors)
-                    all_descriptors.append(section)
-
-        return {'graded_sections': graded_sections,
-                'all_descriptors': all_descriptors, }
-
-    @lazy
-    def block_types_affecting_grading(self):
-        """Return all block types that could impact grading (i.e. scored, or having children)."""
-        return frozenset(
-            cat for (cat, xblock_class) in XBlock.load_classes() if (
-                getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
-            )
-        )
 
     @staticmethod
     def make_id(org, course, url_name):

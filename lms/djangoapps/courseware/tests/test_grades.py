@@ -11,7 +11,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from courseware.grades import (
-    field_data_cache_for_grading,
     grade,
     iterate_grades_for,
     MaxScoresCache,
@@ -216,15 +215,6 @@ class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
         self.student = UserFactory.create()
 
         CourseEnrollment.enroll(self.student, self.course.id)
-
-    def test_field_data_cache_scorable_locations(self):
-        """Only scorable locations should be in FieldDataCache.scorable_locations."""
-        fd_cache = field_data_cache_for_grading(self.course, self.student)
-        block_types = set(loc.block_type for loc in fd_cache.scorable_locations)
-        self.assertNotIn('video', block_types)
-        self.assertNotIn('html', block_types)
-        self.assertNotIn('discussion', block_types)
-        self.assertIn('problem', block_types)
 
 
 class TestProgressSummary(TestCase):
