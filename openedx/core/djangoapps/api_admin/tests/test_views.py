@@ -1,14 +1,20 @@
 #pylint: disable=missing-docstring
 import unittest
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.utils import override_settings
+from oauth2_provider.models import get_application_model
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
-from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory
+from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory, ApplicationFactory
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 from student.tests.factories import UserFactory
+
+
+Application = get_application_model()  # pylint: disable=invalid-name
 
 
 class ApiAdminTest(TestCase):
@@ -86,6 +92,8 @@ class ApiRequestViewTest(ApiAdminTest):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@override_settings(PLATFORM_NAME='edX')
+@ddt.ddt
 class ApiRequestStatusViewTest(ApiAdminTest):
 
     def setUp(self):
@@ -103,14 +111,35 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         response = self.client.get(self.url)
         self.assertRedirects(response, reverse('api_admin:api-request'))
 
-    def test_get_with_request(self):
+    @ddt.data(
+        (ApiAccessRequest.APPROVED, 'Your request to access the edX Course Catalog API has been approved.'),
+        (ApiAccessRequest.PENDING, 'Your request to access the edX Course Catalog API is being processed.'),
+        (ApiAccessRequest.DENIED, 'Your request to access the edX Course Catalog API has been denied.'),
+    )
+    @ddt.unpack
+    def test_get_with_request(self, status, expected):
         """
         Verify that users who have requested access can see a message
         regarding their request status.
         """
-        ApiAccessRequestFactory(user=self.user)
+        ApiAccessRequestFactory(user=self.user, status=status)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertIn(expected, response.content)
+
+    def test_get_with_existing_application(self):
+        """
+        Verify that if the user has created their client credentials, they
+        are shown on the status page.
+        """
+        ApiAccessRequestFactory(user=self.user, status=ApiAccessRequest.APPROVED)
+        application = ApplicationFactory(user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        unicode_content = response.content.decode('utf-8')
+        self.assertIn(application.client_secret, unicode_content)  # pylint: disable=no-member
+        self.assertIn(application.client_id, unicode_content)  # pylint: disable=no-member
+        self.assertIn(application.redirect_uris, unicode_content)  # pylint: disable=no-member
 
     def test_get_anonymous(self):
         """Verify that users must be logged in to see the page."""
@@ -123,6 +152,49 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         ApiAccessConfig(enabled=False).save()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+    @ddt.data(
+        (ApiAccessRequest.APPROVED, True, True),
+        (ApiAccessRequest.DENIED, True, False),
+        (ApiAccessRequest.PENDING, True, False),
+        (ApiAccessRequest.APPROVED, False, True),
+        (ApiAccessRequest.DENIED, False, False),
+        (ApiAccessRequest.PENDING, False, False),
+    )
+    @ddt.unpack
+    def test_post(self, status, application_exists, new_application_created):
+        """
+        Verify that posting the form creates an application if the user is
+        approved, and does not otherwise. Also ensure that if the user
+        already has an application, it is deleted before a new
+        application is created.
+        """
+        if application_exists:
+            old_application = ApplicationFactory(user=self.user)
+        ApiAccessRequestFactory(user=self.user, status=status)
+        self.client.post(self.url, {
+            'name': 'test.com',
+            'redirect_uris': 'http://example.com'
+        })
+        applications = Application.objects.filter(user=self.user)
+        if application_exists and new_application_created:
+            self.assertEqual(applications.count(), 1)
+            self.assertNotEqual(old_application, applications[0])
+        elif application_exists:
+            self.assertEqual(applications.count(), 1)
+            self.assertEqual(old_application, applications[0])
+        elif new_application_created:
+            self.assertEqual(applications.count(), 1)
+        else:
+            self.assertEqual(applications.count(), 0)
+
+    def test_post_with_errors(self):
+        ApiAccessRequestFactory(user=self.user, status=ApiAccessRequest.APPROVED)
+        response = self.client.post(self.url, {
+            'name': 'test.com',
+            'redirect_uris': 'not a url'
+        })
+        self.assertIn('Enter a valid URL.', response.content)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
