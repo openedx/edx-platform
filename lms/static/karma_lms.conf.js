@@ -60,7 +60,7 @@ var libraryFiles = [
     {pattern: 'xmodule_js/src/xmodule.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/**/*.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/underscore.string.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.string.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone-min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js', included: false},
@@ -151,4 +151,3 @@ module.exports = function (config) {
 
     config.set(_.extend(commonConfig, localConfig));
 };
-
