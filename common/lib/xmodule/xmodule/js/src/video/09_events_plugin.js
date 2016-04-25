@@ -105,11 +105,11 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onShowLanguageMenu: function () {
-            this.log('video_show_cc_menu');
+            this.log('edx.video.language_menu.shown');
         },
 
         onHideLanguageMenu: function () {
-            this.log('video_hide_cc_menu', { language: this.getCurrentLanguage() });
+            this.log('edx.video.language_menu.hidden', { language: this.getCurrentLanguage() });
         },
 
         onShowTranscript: function () {

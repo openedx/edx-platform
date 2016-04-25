@@ -117,17 +117,17 @@
             });
         });
 
-        it('can emit "video_show_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.shown" event', function () {
             state.el.trigger('language_menu:show');
-            expect(Logger.log).toHaveBeenCalledWith('video_show_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
                 code: 'html5'
             });
         });
 
-        it('can emit "video_hide_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.hidden" event', function () {
             state.el.trigger('language_menu:hide');
-            expect(Logger.log).toHaveBeenCalledWith('video_hide_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
                 code: 'html5',
                 language: 'en'
