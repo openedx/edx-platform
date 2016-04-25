@@ -50,7 +50,7 @@ def offline_grade_calculation(course_key):
         request.user = student
         request.session = {}
 
-        gradeset = grades.grade(student, request, course, keep_raw_scores=True)
+        gradeset = grades.grade(student, course, keep_raw_scores=True)
         # Convert Score namedtuples to dicts:
         totaled_scores = gradeset['totaled_scores']
         for section in totaled_scores:
@@ -89,7 +89,7 @@ def student_grades(student, request, course, keep_raw_scores=False, use_offline=
     as use_offline.  If use_offline is True then this will look for an offline computed gradeset in the DB.
     '''
     if not use_offline:
-        return grades.grade(student, request, course, keep_raw_scores=keep_raw_scores)
+        return grades.grade(student, course, keep_raw_scores=keep_raw_scores)
 
     try:
         ocg = models.OfflineComputedGrade.objects.get(user=student, course_id=course.id)

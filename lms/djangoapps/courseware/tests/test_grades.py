@@ -11,7 +11,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from courseware.grades import (
-    field_data_cache_for_grading,
     grade,
     iterate_grades_for,
     MaxScoresCache,
@@ -31,7 +30,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-def _grade_with_errors(student, request, course, keep_raw_scores=False):
+def _grade_with_errors(student, course, keep_raw_scores=False):
     """This fake grade method will throw exceptions for student3 and
     student4, but allow any other students to go through normal grading.
 
@@ -42,7 +41,7 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     if student.username in ['student3', 'student4']:
         raise Exception("I don't like {}".format(student.username))
 
-    return grade(student, request, course, keep_raw_scores=keep_raw_scores)
+    return grade(student, course, keep_raw_scores=keep_raw_scores)
 
 
 @attr('shard_1')
@@ -216,15 +215,6 @@ class TestFieldDataCacheScorableLocations(SharedModuleStoreTestCase):
         self.student = UserFactory.create()
 
         CourseEnrollment.enroll(self.student, self.course.id)
-
-    def test_field_data_cache_scorable_locations(self):
-        """Only scorable locations should be in FieldDataCache.scorable_locations."""
-        fd_cache = field_data_cache_for_grading(self.course, self.student)
-        block_types = set(loc.block_type for loc in fd_cache.scorable_locations)
-        self.assertNotIn('video', block_types)
-        self.assertNotIn('html', block_types)
-        self.assertNotIn('discussion', block_types)
-        self.assertIn('problem', block_types)
 
 
 class TestProgressSummary(TestCase):

@@ -22,7 +22,7 @@ class EnableTransformerRegistryMixin(object):
 
     def tearDown(self):
         super(EnableTransformerRegistryMixin, self).tearDown()
-        TransformerRegistry.USE_PLUGIN_MANAGER = False
+        TransformerRegistry.USE_PLUGIN_MANAGER = True
 
 
 def is_course_in_block_structure_cache(course_key, store):

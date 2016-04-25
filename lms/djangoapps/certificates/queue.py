@@ -257,7 +257,7 @@ class XQueueCertInterface(object):
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        grade = grades.grade(student, self.request, course)
+        grade = grades.grade(student, course)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
