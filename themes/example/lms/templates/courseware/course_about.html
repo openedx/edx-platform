@@ -1,16 +1,20 @@
 <%namespace name='static' file='../static_content.html'/>
- <%!
- from django.utils.translation import ugettext as _
- from django.core.urlresolvers import reverse
- from courseware.courses import get_course_about_section
- from django.conf import settings
- from edxmako.shortcuts import marketing_link
- from openedx.core.lib.courses import course_image_url
- %>
- 
- <%inherit file="../main.html" />
- 
- <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import get_course_about_section
+from django.conf import settings
+from edxmako.shortcuts import marketing_link
+from openedx.core.lib.courses import course_image_url
+%>
+
+<%inherit file="../main.html" />
+<%block name="headextra">
+<link rel="stylesheet" type="text/css" href="${static.url('css/slick.css')}"/>
+</%block>
+
+
+<%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info" xmlns="http://www.w3.org/1999/html">
   <header class="hero-main grid-manual hero-video">
@@ -30,7 +34,7 @@
       </div>
     </div>
   </header>
-  <div class="course-detail">
+  <div class="course-detail light-bg">
     <div class="grid-manual grid-container">
       <div class="inner-container">
         <div class="row">
@@ -59,7 +63,7 @@
         <div class="row">
           <div class="col col-12 sm-col-12 md-col-4 pull-right extras">
             <h3>Sponsored by:</h3>
-            <div class="sponsored-logo"><img src="http://placehold.it/190x60" alt="Home Page" /></div>
+            <div class="sponsored-logo"><img src="http://placehold.it/190x60" alt="Home Page"/></div>
             <h3>Share this course:</h3>
             <ul class="social-icons">
               <li>
@@ -90,26 +94,26 @@
             </ul>
             <div class="course-features">
 
-                <div class="row">
-                  <div class="col col-6">Course Number:</div>
-                  <div class="col col-6">IOTx</div>
-                </div>
-                <div class="row">
-                  <div class="col col-6">Language:</div>
-                  <div class="col col-6">English</div>
-                </div>
-                <div class="row">
-                  <div class="col col-6">Level:</div>
-                  <div class="col col-6">Introductory</div>
-                </div>
-                <div class="row">
-                  <div class="col col-6">Effort Level:</div>
-                  <div class="col col-6">Self-Paced</div>
-                </div>
-                <div class="row">
-                  <div class="col col-6">Price:</div>
-                  <div class="col col-6">$495 USD</div>
-                </div>
+              <div class="row">
+                <div class="col col-6">Course Number:</div>
+                <div class="col col-6">IOTx</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Language:</div>
+                <div class="col col-6">English</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Level:</div>
+                <div class="col col-6">Introductory</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Effort Level:</div>
+                <div class="col col-6">Self-Paced</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Price:</div>
+                <div class="col col-6">$495 USD</div>
+              </div>
             </div>
           </div>
           <div class="col col-12 sm-col-12 md-col-8">
@@ -117,16 +121,16 @@
             <h2> Course Description</h2>
             <div class="expandable">
               <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
 
               <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
 
               <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-              Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
             </div>
 
             <h2> What you'll learn</h2>
@@ -141,39 +145,7 @@
               </ul>
             </div>
           </div>
-          </div>
-
-<h2>Responsive Accordion to Tabs</h2>
-
-
-<ul id="nav">
-  <li><a href="">Item 1</a>
-    <section>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id suscipit dolor rutrum id. Morbi facilisis porta volutpat. Fusce adipiscing, mauris quis congue tincidunt, sapien purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci mattis fringilla. Praesent eu ipsum in sapien tincidunt molestie sed ut magna. Nam accumsan dui at orci rhoncus pharetra tincidunt elit ullamcorper. Sed ac mauris ipsum. Nullam imperdiet sapien id purus pretium id aliquam mi ullamcorper.</p>
-    </section>
-  </li>
-  <li><a href="">Item 2</a>
-    <section>
-      <p>Ut laoreet augue et neque pretium non sagittis nibh pulvinar. Etiam ornare tincidunt orci quis ultrices. Pellentesque ac sapien ac purus gravida ullamcorper. Duis rhoncus sodales lacus, vitae adipiscing tellus pharetra sed. Praesent bibendum lacus quis metus condimentum ac accumsan orci vulputate. Aenean fringilla massa vitae metus facilisis congue. Morbi placerat eros ac sapien semper pulvinar. Vestibulum facilisis, ligula a molestie venenatis, metus justo ullamcorper ipsum, congue aliquet dolor tortor eu neque. Sed imperdiet, nibh ut vestibulum tempor, nibh dui volutpat lacus, vel gravida magna justo sit amet quam. Quisque tincidunt ligula at nisl imperdiet sagittis. Morbi rutrum tempor arcu, non ultrices sem semper a. Aliquam quis sem mi.</p>
-     </section>
-  </li>
-  <li><a href="">Item 3</a>
-    <section>
-      <p>Donec mattis mauris gravida metus laoreet non rutrum sem viverra. Aenean nibh libero, viverra vel vestibulum in, porttitor ut sapien. Phasellus tempor lorem id justo ornare tincidunt. Nulla faucibus, purus eu placerat fermentum, velit mi iaculis nunc, bibendum tincidunt ipsum justo eu mauris. Nulla facilisi. Vestibulum vel lectus ac purus tempus suscipit nec sit amet eros. Nullam fringilla, enim eu lobortis dapibus, quam magna tincidunt nibh, sit amet imperdiet dolor justo congue turpis.</p>
-    </section>
-  </li>
-  <li><a href="">Item 4</a>
-    <section>
-         <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus dui urna, mollis vel suscipit in, pharetra at ligula. Pellentesque a est vel est fermentum pellentesque sed sit amet dolor. Nunc in dapibus nibh. Aliquam erat volutpat. Phasellus vel dui sed nibh iaculis convallis id sit amet urna. Proin nec tellus quis justo consequat accumsan. Vivamus turpis enim, auctor eget placerat eget, aliquam ut sapien.</p>
-    </section>
-  </li>
-</ul>
-
-
-
-
-
-
+        </div>
         <div class="row instructors">
           <div class="col col-12"><h2>Instructors</h2></div>
           <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
@@ -181,7 +153,7 @@
             <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
           </div>
           <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
-           <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
+            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
             <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
           </div>
           <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
@@ -192,39 +164,163 @@
       </div>
     </div>
   </div>
- </section>
+  <div class="light-bg tabcordion course-about">
+    <div class="grid-manual grid-container">
+      <div class="inner-container">
+        <div class="row">
+          <div class="col col-12">
+            <h2>Still want to know more?</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-12">
+            <ul>
+              <li><a href="">Item 1</a>
+                <section>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id
+                    suscipit
+                    dolor rutrum id. Morbi facilisis porta volutpat. Fusce adipiscing, mauris quis congue tincidunt,
+                    sapien
+                    purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci mattis fringilla.
+                    Praesent eu ipsum in sapien tincidunt molestie sed ut magna. Nam accumsan dui at orci rhoncus
+                    pharetra
+                    tincidunt elit ullamcorper. Sed ac mauris ipsum. Nullam imperdiet sapien id purus pretium id aliquam
+                    mi
+                    ullamcorper.</p>
+                </section>
+              </li>
+              <li><a href="">Item 2</a>
+                <section>
+                  <p>Ut laoreet augue et neque pretium non sagittis nibh pulvinar. Etiam ornare tincidunt orci quis
+                    ultrices. Pellentesque ac sapien ac purus gravida ullamcorper. Duis rhoncus sodales lacus, vitae
+                    adipiscing tellus pharetra sed. Praesent bibendum lacus quis metus condimentum ac accumsan orci
+                    vulputate. Aenean fringilla massa vitae metus facilisis congue. Morbi placerat eros ac sapien semper
+                    pulvinar. Vestibulum facilisis, ligula a molestie venenatis, metus justo ullamcorper ipsum, congue
+                    aliquet dolor tortor eu neque. Sed imperdiet, nibh ut vestibulum tempor, nibh dui volutpat lacus,
+                    vel
+                    gravida magna justo sit amet quam. Quisque tincidunt ligula at nisl imperdiet sagittis. Morbi rutrum
+                    tempor arcu, non ultrices sem semper a. Aliquam quis sem mi.</p>
+                </section>
+              </li>
+              <li><a href="">Item 3</a>
+                <section>
+                  <p>Donec mattis mauris gravida metus laoreet non rutrum sem viverra. Aenean nibh libero, viverra vel
+                    vestibulum in, porttitor ut sapien. Phasellus tempor lorem id justo ornare tincidunt. Nulla
+                    faucibus,
+                    purus eu placerat fermentum, velit mi iaculis nunc, bibendum tincidunt ipsum justo eu mauris. Nulla
+                    facilisi. Vestibulum vel lectus ac purus tempus suscipit nec sit amet eros. Nullam fringilla, enim
+                    eu
+                    lobortis dapibus, quam magna tincidunt nibh, sit amet imperdiet dolor justo congue turpis.</p>
+                </section>
+              </li>
+              <li><a href="">Item 4</a>
+                <section>
+                  <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus dui
+                    urna, mollis vel suscipit in, pharetra at ligula. Pellentesque a est vel est fermentum pellentesque
+                    sed
+                    sit amet dolor. Nunc in dapibus nibh. Aliquam erat volutpat. Phasellus vel dui sed nibh iaculis
+                    convallis id sit amet urna. Proin nec tellus quis justo consequat accumsan. Vivamus turpis enim,
+                    auctor
+                    eget placerat eget, aliquam ut sapien.</p>
+                </section>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="about-section">
+
+    <div class="about-container">
+
+      <div class="grid-manual">
+        <div class="row about-list">
+          <div class="col col-12 text-center">
+            <h2> An Online Gateway to Knowledge </h2>
+          </div>
+        </div>
+
+        <div class="row about-list text-center">
+          <div class="col col-4 about-list-item">
+            <div class="about-icon">
+              <img src="/static/example/images/about-img.png" alt="">
+              <p><span>Students</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+            </div>
+          </div>
+          <div class="col col-4 about-list-item">
+            <div class="about-icon">
+              <img src="/static/example/images/about-img.png" alt="">
+              <p><span>Faculty</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+            </div>
+          </div>
+          <div class="col col-4 about-list-item">
+            <div class="about-icon">
+              <img src="/static/example/images/about-img.png" alt="">
+              <p><span>Courses</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-12 text-center">
+            <a href="#" class="btn-neutral">More about this site</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+</section>
 
 
+
+<%block name="js_extra">
 
 <script>
 
   $(document).ready(function () {
 
-    $('#nav').children('li').first().children('a').addClass('active')
-        .next().addClass('is-open').show();
-
-    $('#nav').on('click', 'li > a', function() {
-
+    // Third party code for conversion of tabs
+    $('.tabcordion ul').children('li').first().children('a').addClass('active').next().addClass('is-open').show();
+    $('.tabcordion ul').on('click', 'li > a', function () {
       if (!$(this).hasClass('active')) {
-
-        $('#nav .is-open').removeClass('is-open').hide();
+        $('.tabcordion ul .is-open').removeClass('is-open').hide();
         $(this).next().toggleClass('is-open').toggle();
-
-        $('#nav').find('.active').removeClass('active');
+        $('.tabcordion ul').find('.active').removeClass('active');
         $(this).addClass('active');
       } else {
-        $('#nav .is-open').removeClass('is-open').hide();
+        $('.tabcordion ul .is-open').removeClass('is-open').hide();
         $(this).removeClass('active');
       }
-   });
+    });
+
+
+    // conversion of about site links into swipe on mobile resolution
+    var addSlider = $(window).width() < 768;
+    $(".about-list").toggleClass("slidable", addSlider);
+    if (addSlider) {
+      $(".about-list").find(".about-list-item").removeClass('col col-4');
+      $(".slidable").slick({
+        nextArrow: '<i class="fa fa-angle-right"></i>',
+        prevArrow: '<i class="fa fa-angle-left"></i>',
+      });
+    } else {
+      $(".about-list").find(".about-list-item").addClass('col col-4');
+    }
 
 
     $('a[href=""]').click(function (event) { // where href are blank
-   event.preventDefault();
-});
-});
+      event.preventDefault();
+    });
+  });
+
+</script>
+
+<script type="text/javascript" src="${static.url('js/slick.min.js')}"></script>
 
 
+</%block>
 
 
-  </script>
