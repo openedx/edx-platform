@@ -32,7 +32,7 @@ class ApiAccessRequest(TimeStampedModel):
         (DENIED, _('Denied')),
         (APPROVED, _('Approved')),
     )
-    user = models.OneToOneField(User, related_name='api_access_request')
+    user = models.OneToOneField(User)
     status = models.CharField(
         max_length=255,
         choices=STATUS_CHOICES,
