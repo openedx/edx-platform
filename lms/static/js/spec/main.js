@@ -770,7 +770,9 @@
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    require(testFiles, function () {
+    // Jasmine has a global stack for creating a tree of specs. We need to load
+    // spec files one by one, otherwise some end up getting nested under others.
+    window.requireSerial(testFiles, function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });

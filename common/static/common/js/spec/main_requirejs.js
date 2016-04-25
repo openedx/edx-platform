@@ -178,7 +178,7 @@
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    require(testFiles, function () {
+    window.requireSerial(testFiles, function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });

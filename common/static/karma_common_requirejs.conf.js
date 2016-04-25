@@ -46,7 +46,8 @@ var libraryFiles = [
     {pattern: 'js/test/i18n.js', included: false},
     {pattern: 'coffee/src/jquery.immediateDescendents.js', included: false},
     {pattern: 'js/vendor/requirejs/text.js', included: false},
-    {pattern: 'js/vendor/sinon-1.17.0.js', included: false}
+    {pattern: 'js/vendor/sinon-1.17.0.js', included: false},
+    {pattern: 'common/js/utils/require-serial.js', included: true}
 ];
 
 // Paths to source JavaScript files

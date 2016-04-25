@@ -82,7 +82,9 @@ var libraryFiles = [
     {pattern: 'edx-pattern-library/js/afontgarde.js', included: false},
     {pattern: 'edx-pattern-library/js/edx-icons.js', included: false},
     {pattern: 'edx-pattern-library/js/**/*.js', included: false},
-    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false}
+    {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
+
+    {pattern: 'common/js/utils/require-serial.js', included: true}
 ];
 
 // Paths to source JavaScript files
