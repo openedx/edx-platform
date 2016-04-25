@@ -161,13 +161,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if domain is False:
         domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses_by_university(user, domain=domain)
-    # if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-    #                        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
-    #     courses = sort_by_start_date(courses)
-    # else:
-    #     courses = sort_by_announcement(courses)
-
+    if microsite.get_value("ENABLE_COURSE_SORTING_BY_UNIVERSITY", False):
+        courses = get_courses_by_university(user, domain=domain)
+    else:
+        courses = get_courses(user, domain=domain)
+    
     context = {'courses': courses}
 
     context.update(extra_context)
