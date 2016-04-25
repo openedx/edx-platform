@@ -73,7 +73,8 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true}
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
+    {pattern: 'common/js/utils/require-serial.js', included: true}
 ];
 
 // Paths to source JavaScript files

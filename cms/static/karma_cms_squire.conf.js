@@ -68,7 +68,8 @@ var libraryFiles = [
         pattern: 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js',
         included: false
     },
-    {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false}
+    {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
+    {pattern: 'common/js/utils/require-serial.js', included: true}
 ];
 
 // Paths to source JavaScript files

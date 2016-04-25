@@ -202,6 +202,9 @@ i = 0
 while i < testFiles.length
     testFiles[i] = '/base/' + testFiles[i] + '.js'
     i++
-require testFiles, ->
+
+# Jasmine has a global stack for creating a tree of specs. We need to load
+# spec files one by one, otherwise some end up getting nested under others.
+requireSerial testFiles, ->
 # start test run, once Require.js is done
     window.__karma__.start()
