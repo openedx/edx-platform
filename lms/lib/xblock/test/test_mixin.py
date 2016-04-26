@@ -2,6 +2,7 @@
 Tests of the LMS XBlock Mixin
 """
 import ddt
+from nose.plugins.attrib import attr
 
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
@@ -151,6 +152,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         self.assertTrue(self.open_assessment.has_score)
 
 
+@attr('shard_3')
 @ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
@@ -243,6 +245,7 @@ def ddt_named(parent, child):
     return args
 
 
+@attr('shard_3')
 @ddt.ddt
 class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     """

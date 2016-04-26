@@ -16,6 +16,7 @@ import urllib
 import ddt
 from freezegun import freeze_time
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 import tempfile
 from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
@@ -666,6 +667,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
+@attr('shard_3')
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
@@ -1674,6 +1676,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
+@attr('shard_3')
 @ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):

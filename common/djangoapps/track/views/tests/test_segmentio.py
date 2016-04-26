@@ -5,6 +5,7 @@ import json
 
 from ddt import ddt, data, unpack
 from mock import sentinel
+from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -36,6 +37,7 @@ def expect_failure_with_message(message):
     return test_decorator
 
 
+@attr('shard_3')
 @ddt
 @override_settings(
     TRACKING_SEGMENTIO_WEBHOOK_SECRET=SECRET,
