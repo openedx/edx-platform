@@ -432,11 +432,19 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
                 XBlockFixtureDesc('sequential', 'Test Subsection 1,2').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 3', data='<problem>problem 3 dummy body</problem>'),
                 ),
+                XBlockFixtureDesc(
+                    'sequential', 'Test HIDDEN Subsection', metadata={'visible_to_staff_only': True}
+                ).add_children(
+                    XBlockFixtureDesc('problem', 'Test HIDDEN Problem', data='<problem>hidden problem</problem>'),
+                ),
             ),
             XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 2,1').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 4', data='<problem>problem 4 dummy body</problem>'),
                 ),
+            ),
+            XBlockFixtureDesc('chapter', 'Test HIDDEN Section', metadata={'visible_to_staff_only': True}).add_children(
+                XBlockFixtureDesc('sequential', 'Test HIDDEN Subsection'),
             ),
         ).install()
 

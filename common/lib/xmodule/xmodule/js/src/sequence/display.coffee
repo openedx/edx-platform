@@ -251,7 +251,7 @@ class @Sequence
       tab_count: @num_contents
       widget_placement: widget_placement
 
-    if (direction == 'next') and (@position == @contents.length)
+    if (direction == 'next') and (@position >= @contents.length)
       window.location.href = @nextUrl
     else if (direction == 'previous') and (@position == 1)
       window.location.href = @prevUrl
