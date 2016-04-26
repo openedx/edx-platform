@@ -134,8 +134,8 @@ def perf_report_bokchoy(options):
     ('with-html', 'w', 'Include html reports'),
     make_option('--course-key', help='Course key for test course'),
     make_option(
-        "--skip-fetch",
-        action="store_false",
+        "--fetch-course",
+        action="store_true",
         dest="should_fetch_course",
         help='Course key for test course',
     ),
