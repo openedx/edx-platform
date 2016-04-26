@@ -16,6 +16,7 @@ from openedx.core.lib.courses import course_image_url
   <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 
+
 <%block name="js_extra">
   ## CourseTalk widget js script
   % if show_coursetalk_widget:
@@ -112,6 +113,35 @@ from openedx.core.lib.courses import course_image_url
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">
+
+          <strong> Title:</strong> ${course_details.title} <br>
+          <strong> Subtitle:</strong> ${course_details.subtitle} <br>
+          <strong> Duration:</strong> ${course_details.duration} <br>
+          <strong> Description:</strong> ${course_details.description} <br>
+          <strong> Short Description:</strong> ${course_details.short_description} <br> <br>
+
+          <strong> Course Image:</strong> ${course_details.course_image_name} <br>
+          <strong> Course Image Path:</strong> ${course_details.course_image_asset_path} <br> <br>
+
+          <strong> Hero Image:</strong> ${course_details.hero_image_name} <br>
+          <strong> Hero Image Path:</strong> ${course_details.hero_image_asset_path} <br> <br>
+
+          <strong> Video Thumbnail Image:</strong> ${course_details.thumbnail_image_name} <br>
+          <strong> Video Thumbnail Image Path:</strong> ${course_details.thumbnail_image_asset_path} <br> <br>
+
+{#          <strong>What will you learn:</strong> <br>#}
+{#          loop through course_details.learning_info (list)#}
+{##}
+{#          <strong>Instructor</strong> <br>#}
+{#          loop through course_details.instructor_info (list of instructors)#}
+{#          #}
+{#          Instructor: #}
+{#            name#}
+{#            title#}
+{#            organization#}
+{#            bio#}
+{#            image#}
+
         <div class="heading-group">
           <h1>
             ${course.display_name_with_default_escaped}
