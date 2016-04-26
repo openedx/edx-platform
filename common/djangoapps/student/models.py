@@ -145,9 +145,9 @@ def anonymous_id_for_user(user, course_id, save=True):
             log.error(
                 u"Stored anonymous user id %r for user %r "
                 u"in course %r doesn't match computed id %r",
+                anonymous_user_id.anonymous_user_id,
                 user,
                 course_id,
-                anonymous_user_id.anonymous_user_id,
                 digest
             )
     except IntegrityError:
