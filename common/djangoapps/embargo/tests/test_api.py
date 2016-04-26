@@ -4,6 +4,7 @@ Tests for EmbargoMiddleware
 
 from contextlib import contextmanager
 import mock
+from nose.plugins.attrib import attr
 import unittest
 import pygeoip
 import ddt
@@ -37,6 +38,7 @@ from mock import patch
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 
+@attr('shard_3')
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

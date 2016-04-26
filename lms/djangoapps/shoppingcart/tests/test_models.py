@@ -11,6 +11,7 @@ import smtplib
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 import pytz
 import ddt
 from django.core import mail
@@ -46,6 +47,7 @@ from shoppingcart.exceptions import (
 from opaque_keys.edx.locator import CourseLocator
 
 
+@attr('shard_3')
 @ddt.ddt
 class OrderTest(ModuleStoreTestCase):
     def setUp(self):
@@ -477,6 +479,7 @@ class OrderItemTest(TestCase):
         self.assertEqual(item.get_list_price(), item.list_price)
 
 
+@attr('shard_3')
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     """

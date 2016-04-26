@@ -4,6 +4,7 @@ Tests for course_info
 
 import ddt
 from django.conf import settings
+from nose.plugins.attrib import attr
 
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
@@ -16,6 +17,7 @@ from ..testutils import (
 )
 
 
+@attr('shard_3')
 @ddt.ddt
 class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -83,6 +85,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
+@attr('shard_3')
 @ddt.ddt
 class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """

@@ -8,6 +8,7 @@ import decimal
 import ddt
 import freezegun
 from mock import patch
+from nose.plugins.attrib import attr
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -25,9 +26,13 @@ from course_modes.models import CourseMode, Mode
 from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
+@attr('shard_3')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
+    """
+    Course Mode View tests
+    """
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
         super(CourseModeViewTest, self).setUp('course_modes.urls')

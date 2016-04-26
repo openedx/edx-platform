@@ -11,6 +11,7 @@ from urlparse import urljoin
 import pytz
 from markupsafe import escape
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery as pq
 
@@ -888,6 +889,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 
 
 # TODO: Clean up these tests so that they use the ProgramsDataMixin.
+@attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):

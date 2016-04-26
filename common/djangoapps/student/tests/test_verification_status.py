@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import unittest
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -24,6 +25,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareS
 from util.testing import UrlResetMixin
 
 
+@attr('shard_3')
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
