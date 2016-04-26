@@ -20,6 +20,7 @@ import cms.lib.xblock.runtime
 
 from openedx.core.djangoapps.theming.core import enable_comprehensive_theme
 
+
 def run():
     """
     Executed during django startup
