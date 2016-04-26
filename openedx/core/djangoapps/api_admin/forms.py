@@ -1,8 +1,9 @@
 """Forms for API management."""
 from django import forms
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
 from openedx.core.djangoapps.api_admin.widgets import TermsOfServiceCheckboxInput
 
 
@@ -34,11 +35,20 @@ class ApiAccessRequestForm(forms.ModelForm):
         super(ApiAccessRequestForm, self).__init__(*args, **kwargs)
 
 
-class CatalogForm(forms.Form):
-    id = forms.IntegerField(required=False, widget=forms.HiddenInput)
-    name = forms.CharField(required=True, help_text="The name of this catalog")
-    query = forms.CharField(
-        required=True,
-        help_text="The query for courses to be returned by catalog",
-        widget=forms.Textarea
-    )
+class CatalogForm(forms.ModelForm):
+    """Form to create a catalog."""
+
+    username = forms.CharField(max_length=30)
+
+    class Meta(object):
+        model = Catalog
+        fields = ('name', 'query', 'username')
+
+    def clean(self):
+        cleaned_data = super(CatalogForm, self).clean()
+        username = cleaned_data.get('username')
+        try:
+            user = User.objects.get(username=username)
+            self.instance.user = user
+        except User.DoesNotExist:
+            self.add_error('username', _('The specified user does not exist.'))

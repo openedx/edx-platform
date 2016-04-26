@@ -1,5 +1,6 @@
 """Views for API management."""
 import logging
+from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -15,9 +16,15 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from edx_rest_api_client.client import EdxRestApiClient
 from edxmako.shortcuts import render_to_response
+from rest_framework import permissions
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
 from openedx.core.lib.token_utils import get_asymmetric_token
 
 log = logging.getLogger(__name__)
@@ -68,72 +75,82 @@ class ApiTosView(TemplateView):
     template_name = 'api_admin/terms_of_service.html'
 
 
-@never_cache
-@staff_member_required
-def catalog_changelist(request):
-    # TODO: get catalogs
-    catalogs = [
-        {
-            'id': '1',
-            'name': 'test1',
-            'query': '*'
-        }
-    ]
-    return render(
-        RequestContext(request),
-        'api_admin/catalog_changelist.html',
-        {
-            'catalogs': catalogs,
-        }
-    )
+class CatalogSearchView(View):
+    """View to search for catalogs belong to a user."""
+
+    def get(self, request):
+        return render_to_response('api_admin/catalogs/search.html')
+
+    def post(self, request):
+        username = request.POST.get('username')
+        # If no username is provided, bounce back to this page.
+        if not username:
+            return redirect(reverse('api_admin:catalog-search'))
+        return redirect(reverse('api_admin:catalog-list', kwargs={'username': username}))
 
 
-@never_cache
-@staff_member_required
-def catalog_changeform(request, id=None):
-    # import pdb; pdb.set_trace()
-    if request.method == 'POST':
+class CatalogListView(View):
+    """View to list existing catalogs and create new ones."""
+
+    template = 'api_admin/catalogs/list.html'
+
+    def get(self, request, username):
+        # TODO actually get these catalogs, and filter by user
+        return render_to_response(self.template, {
+            'username': username,
+            'catalogs': Catalog.all(),
+            'form': CatalogForm(initial={'username': username}),
+        })
+
+    def post(self, request, username):
         form = CatalogForm(request.POST)
-        change = False
-        if form.is_valid():
-            if id is None:
-                log.info("CREATE NEW CATALOGUE")  # create new catalog
-            else:
-                change = True
-                log.info("UPDATE CATALOGUE")  # update catalog
-            return HttpResponseRedirect('..')
-    else:
-        if id is None:  # Create new catalog
-            change = False
-            form = CatalogForm()
-        else:  # Update existing catalog
-            change = True
-            catalog = {
-                'id': '2',
-                'name': 'test2',
-                'query': 'test*'
-            }  # Get catalogs
+        if not form.is_valid():
+            return render_to_response(self.template, {
+                'form': form,
+                'catalogs': Catalog.all(),
+                'username': username,
+            })
+        form.save()
+        # return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': form.instance.id}))
+        # TODO: redirect to the correct catalog. right now we don't have an ID.
+        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': '1'}))
 
-            form = CatalogForm(catalog)
-            # del form.fields['hidden_field']
-    return render(
-        request,
-        'api_admin/catalog_changeform.html',
-        {
-            'change': change,
+
+class CatalogDetailView(View):
+    """View to show an individual catalog."""
+
+    def get(self, request, catalog_id):
+        catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+        return render_to_response('api_admin/catalogs/detail.html', {
+            'catalog': catalog,
+            'edit_link': reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}),
+            'preview_link': urljoin(  # TODO: link to a preview in CD
+                settings.COURSE_DISCOVERY_API_URL, 'catalogs/{id}/courses'.format(id=catalog_id)
+            ),
+        })
+
+
+class CatalogEditView(View):
+    """View to edit an individual catalog."""
+
+    def get(self, request, catalog_id):
+        catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+        form = CatalogForm(instance=catalog)
+        return render_to_response('api_admin/catalogs/edit.html', {
+            'catalog': catalog,
             'form': form,
-        }
-    )
+        })
 
-
-def catalog_client(user):
-    token = get_asymmetric_token(user, 'course-discovery')
-    return EdxRestApiClient(
-        "http://18.111.106.34:8008/api/v1/",
-        jwt=token
-    )
-
-# from openedx.core.djangoapps.api_admin.views import catalog_client
-# from django.contrib.auth.models import User
-# user = User.objects.all()[1]
-# c = catalog_client(user)
+    def post(self, request, catalog_id):
+        if request.POST.get('delete-catalog') == 'on':
+            # TODO delete catalog
+            return redirect(reverse('api_admin:catalog-list', kwargs={'username': 'TODO'}))  # TODO redirect correctly
+        form = CatalogForm(request.POST)
+        if not form.is_valid():
+            catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+            return render_to_response('api_admin/catalogs/edit.html', {
+                'catalog': catalog,
+                'form': form,
+            })
+        form.save()
+        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': catalog_id}))

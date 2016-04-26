@@ -181,22 +181,30 @@ def _send_decision_email(instance):
         log.exception('Error sending API user notification email for request [%s].', instance.id)
 
 
-class CatalogManager(object):
-    def get(self, key):
-        log.info("GET api call: %s", key)
+class Catalog(models.Model):
+    """A (non-Django-managed) model for Catalogs in the course discovery service."""
+
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255, null=False, blank=False)
+    query = models.TextField(null=False, blank=False)
+    user = models.ForeignKey(User)
+
+    class Meta(object):
+        # Catalogs live in course discovery, so we do not create any
+        # tables in LMS. Instead we override the save method to post
+        # this catalog to discovery.
+        managed = False
+
+    def save(self, **kwargs):
+        # TODO: save this catalog to discovery
         return None
 
-    def all(self):
-        log.info("ALL api call")
-        return []
-
-    def filter(self, **kwargs):
-        log.info("FILTER api call: %s", kwargs)
-        return []
-
-
-class Catalog(models.Model):
-    objects = CatalogManager()
-
-    class Meta:
-        managed = False
+    @classmethod
+    def all(cls):
+        """
+        TODO: get these from the course discovery service. This method is
+        just for testing right now.
+        """
+        return [
+            Catalog(id=i, name='test_' + str(i), query='*') for i in xrange(5)
+        ]

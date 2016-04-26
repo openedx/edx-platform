@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig, Catalog
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
 
 
 @admin.register(ApiAccessRequest)
@@ -14,9 +14,5 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     readonly_fields = ('user', 'website', 'reason', 'company_name', 'company_address', 'contacted', )
     exclude = ('site',)
-
-@admin.register(Catalog)
-class CatalogAdmin (admin.ModelAdmin):
-    name="Catalog"
 
 admin.site.register(ApiAccessConfig, ConfigurationModelAdmin)

@@ -804,3 +804,5 @@ if FEATURES.get('ENABLE_CSMH_EXTENDED'):
     INSTALLED_APPS += ('coursewarehistoryextended',)
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
+
+COURSE_DISCOVERY_API_URL = ENV_TOKENS.get('COURSE_DISCOVERY_API_URL', 'https://discovery.example.com/api/v1/')

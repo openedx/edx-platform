@@ -1,0 +1,31 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../../main.html"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="nav_skip">#content</%block>
+
+<%block name="pagetitle">${_("Catalogs for {username}").format(username=username)}</%block>
+
+<%block name="content">
+<div id="api-access-wrapper">
+  <h1 id="api-header">${_("Catalogs for {username}").format(username=username)}</h1>
+  <ul>
+    % for catalog in catalogs:
+    <li>
+      <a href="${reverse('api_admin:catalog-detail', args=(catalog.id,))}">${catalog.name}</a>
+    </li>
+    % endfor
+  </ul>
+
+  <h2 class="api-subheading">${_("Create new catalog:")}</h2>
+  <form class="api-form" id="catalog-create" action="${reverse('api_admin:catalog-list', args={'username': username})}" method="post">
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+    ${form.as_p() | n}
+    <input id="catalog-create-submit" type="submit" value="${_('Create Catalog')}"/>
+  </form>
+</div>
+</%block>

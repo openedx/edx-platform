@@ -134,3 +134,120 @@ class ApiTosViewTest(ApiAdminTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn('Terms of Service', response.content)
+
+
+class CatalogTest(ApiAdminTest):
+
+    def setUp(self):
+        super(CatalogTest, self).setUp()
+        password = 'abc123'
+        self.user = UserFactory(password=password, is_staff=True)
+        self.client.login(username=self.user.username, password=password)
+
+    def assert_staff_member_access(self, url):
+        self.client.logout()
+        password = 'testpass'
+        user = UserFactory(password=password)
+        self.client.login(username=user.username, password=password)
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse('dashboard'))
+
+
+class CatalogSearchTest(CatalogTest):
+
+    url = reverse('api_admin:catalog-search')
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Catalog Search', response.content)
+
+    def test_post(self):
+        username = 'test-user'
+        response = self.client.post(self.url, {'username': username})
+        self.assertRedirects(response, reverse('api_admin:catalog-list', kwargs={'username': username}))
+
+    def test_empty_post(self):
+        response = self.client.post(self.url, {'username': ''})
+        self.assertRedirects(response, reverse('api_admin:catalog-search'))
+
+    def test_staff_access(self):
+        self.assert_staff_member_access(self.url)
+
+
+class CatalogListTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogListTest, self).setUp()
+        self.catalog_user = UserFactory()
+        self.url = reverse('api_admin:catalog-list', kwargs={'username': self.catalog_user.username})
+
+    def test_staff_access(self):
+        self.assert_staff_member_access(self.url)
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # TODO: assert that the response contains the correct catalogs
+
+    def test_post(self):
+        response = self.client.post(self.url, {
+            'username': self.catalog_user.username,
+            'query': '*',
+            'name': 'test catalog'
+        })
+        self.assertEqual(response.status_code, 302)
+        # TODO: assert that the redirect is to the correct place.
+        # self.assertRedirects(response, reverse('api_admin:catalog_detail'))
+
+    def test_post_invalid(self):
+        response = self.client.post(self.url, {
+            'username': self.catalog_user.username,
+            'name': 'test catalog'
+        })
+        self.assertIn('This field is required.', response.content)
+
+
+class CatalogDetailTest(CatalogTest):
+
+    def test_get(self):
+        # TODO actually create a catalog
+        url = reverse('api_admin:catalog-detail', kwargs={'catalog_id': 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # TODO assert that catalog's contents are shown
+
+
+class CatalogEditTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogEditTest, self).setUp()
+        self.catalog_user = UserFactory()
+        # TODO actually create a catalog
+        self.catalog_id = 1
+        self.url = reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog_id})
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # TODO assert that the right content is shown
+
+    def test_post(self):
+        response = self.client.post(self.url, {
+            'query': '*',
+            'username': self.catalog_user.username,
+            'name': 'test catalog',
+            'delete-catalog': 'off'
+        })
+        self.assertRedirects(response, reverse('api_admin:catalog-detail', kwargs={'catalog_id': self.catalog_id}))
+
+    def test_post_invalid(self):
+        response = self.client.post(self.url, {
+            'query': '*',
+            'username': '',
+            'name': 'test catalog',
+            'delete-catalog': 'off'
+        })
+        self.assertIn('This field is required.', response.content)
+
+    # TODO also test that deletion works

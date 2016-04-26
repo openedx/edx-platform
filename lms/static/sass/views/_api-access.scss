@@ -1,19 +1,20 @@
 #api-access-wrapper {
 
-  #api-access-request-header {
+  #api-header {
     @extend %t-title4;
     margin-bottom: 0;
     padding: $baseline;
     @include text-align(left);
   }
 
-  .api-access-request-subheading {
+  .api-subheading {
     @extend %t-title5;
-    margin: $baseline;
     @include text-align(left);
+    margin: $baseline;
+    text-transform: none;
   }
 
-  .api-tos-body {
+  .api-copy-body {
     @extend %t-copy-sub1;
     margin: $baseline;
   }
@@ -32,7 +33,7 @@
     @extend %t-copy-base;
   }
 
-  #api-access-request {
+  .api-form {
 
     padding: 0 $baseline $baseline $baseline;
 
@@ -49,10 +50,10 @@
       @extend %t-copy-base;
       display: block;
       font-style: normal;
+    }
 
-      &.tos-checkbox-label {
-        display: inline-block;
-      }
+    input[type=checkbox] + label {
+      display: inline-block;
     }
 
     input, textarea {
@@ -65,6 +66,17 @@
         display: inline-block;
         width: initial;
         @include margin-right(0.5*$baseline);
+      }
+
+      &[type=submit] {
+        @extend %t-copy-base;
+        border-radius: 3px;
+        border: none;
+        background-color: $blue;
+        box-shadow: none;
+        background-image: none;
+        text-shadow: none;
+        text-transform: none;
       }
     }
 
@@ -90,5 +102,10 @@
       text-shadow: none;
       text-transform: none;
     }
+  }
+
+  .catalog-query {
+    padding: 0 $baseline;
+    font-family: monospace;
   }
 }

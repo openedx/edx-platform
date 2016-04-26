@@ -9,7 +9,7 @@ from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <div id="api-access-wrapper">
-  <h1 id="api-access-request-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>
+  <h1 id="api-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>
   <div class="request-status request-${status}">
     % if status == ApiAccessRequest.PENDING:
     ## Translators: "platform_name" is the name of this Open edX installation. "link_start" and "link_end" are the HTML for a link to the API documentation. "api_support_email_link" is HTML for a link to email the API support staff.

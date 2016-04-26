@@ -1,0 +1,26 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../../main.html"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="nav_skip">#content</%block>
+
+<%block name="pagetitle">${_("Edit {catalog_name}").format(catalog_name=catalog.name)}</%block>
+
+<%block name="content">
+<div id="api-access-wrapper">
+  <h1 id="api-header">${catalog.name}</h1>
+  <form class="api-form" id="catalog-update" action="${reverse('api_admin:catalog-edit', args=(catalog.id,))}" method="post">
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+    <p>
+      <input type="checkbox" id="delete-catalog" name="delete-catalog" />
+      <label class="api-checkbox-label" for="delete-catalog">${_("Delete this catalog")}</label>
+    </p>
+    ${form.as_p() | n}
+    <input id="catalog-create-submit" type="submit" value="${_('Update Catalog')}"/>
+  </form>
+</div>
+</%block>
