@@ -27,7 +27,7 @@
 
 <% } else {%>
 
-    <div class="bookmarks-empty" tabindex="0">
+    <div class="bookmarks-empty">
         <div class="bookmarks-empty-header">
             <i class="icon fa fa-bookmark-o bookmarks-empty-header-icon" aria-hidden="true"></i>
             <%= gettext("You have not bookmarked any courseware pages yet.") %>
