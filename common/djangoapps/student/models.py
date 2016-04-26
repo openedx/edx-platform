@@ -2074,7 +2074,8 @@ class MdlToEdx(models.Model):
         db_table = 'edx_mdl'
 
     user = models.OneToOneField(User)
-    link = models.CharField(max_length=255)
-    status = models.BooleanField(default=False)
+    link = models.CharField(blank=True, max_length=255)
+    sent = models.BooleanField(default=False)
     visited = models.BooleanField(default=False)
     timesent = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    mdl_user_id = models.IntegerField(blank=True, unique=True)
