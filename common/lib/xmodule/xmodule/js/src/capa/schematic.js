@@ -3879,24 +3879,34 @@ schematic = (function() {
 	////////////////////////////////////////////////////////////////////////////////
 
 	Schematic.prototype.add_tool = function(icon,tip,callback) {
-	    var tool;
+	    var tool, child, label, hidden;
+
+        tool = document.createElement('button');
+        child = document.createElement('img');
+        label = document.createElement('span');
+        hidden = document.createElement('span');
+        
+        tool.style.backgroundImage = 'none';
+        tool.setAttribute('title', tip);
+        label.innerHTML = tip;
+        label.classList.add('sr');
+        hidden.setAttribute('aria-hidden', 'true');
+
 	    if (icon.search('data:image') != -1) {
-		tool = document.createElement('img');
-		tool.src = icon;
+            child.setAttribute('src', icon);
+            child.setAttribute('alt', '');
+            tool.appendChild(child);
 	    } else {
-		tool = document.createElement('span');
-		tool.style.font = 'small-caps small sans-serif';
-		var label = document.createTextNode(icon);
-		tool.appendChild(label);
+            tool.style.font = 'small-caps small sans-serif';
+            hidden.innerHTML = icon;
+            tool.appendChild(hidden);
+            tool.appendChild(label);
 	    }
 
 	    // decorate tool
-	    tool.style.borderWidth = '1px';
-	    tool.style.borderStyle = 'solid';
-	    tool.style.borderColor = background_style;
-	    tool.style.padding = '2px';
-	    tool.style.verticalAlign = 'middle';
-	    tool.style.cursor = 'default';
+        tool.style.height = '32px';
+        tool.style.width = 'auto';
+        tool.style.verticalAlign = 'top';
 
 	    // set up event processing
 	    tool.addEventListener('mouseover',tool_enter,false);
@@ -3910,7 +3920,6 @@ schematic = (function() {
 	    this.toolbar.push(tool);
 
 	    tool.enabled = false;
-	    tool.style.opacity = 0.2;
 
 	    return tool;
 	}
@@ -3919,13 +3928,13 @@ schematic = (function() {
 	    var tool = this.tools[tname];
 
 	    if (tool != undefined) {
-		tool.style.opacity = which ? 1.0 : 0.2;
+        tool.removeAttribute('disabled');
 		tool.enabled = which;
 
 		// if disabling tool, remove border and tip
 		if (!which) {
-		    tool.style.borderColor = background_style;
 		    tool.sch.message('');
+            tool.setAttribute('disabled', 'true');
 		}
 	    }
 	}
@@ -3933,35 +3942,41 @@ schematic = (function() {
 	// highlight tool button by turning on border, changing background
 	function tool_enter(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
-	    if (tool.enabled) {
-		tool.style.borderColor = normal_style;
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
+        if (tool.enabled) {
 		tool.sch.message(tool.tip);
-		tool.opacity = 1.0;
 	    }
+        event.stopPropagation();
 	}
 
 	// unhighlight tool button by turning off border, reverting to normal background
 	function tool_leave(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
 	    if (tool.enabled) {
-		tool.style.borderColor = background_style;
 		tool.sch.message('');
 	    }
+        event.stopPropagation();
 	}
 
 	// handle click on a tool
 	function tool_click(event) {
 	    if (!event) event = window.event;
-	    var tool = (window.event) ? event.srcElement : event.target;
-
+        var tool = event.target;
+        if (event.target.tagName.toLowerCase() == 'img' || event.target.tagName.toLowerCase() == 'span') {
+            tool = event.target.parentNode;
+        }
 	    if (tool.enabled) {
 		tool.sch.canvas.relMouseCoords(event);  // so we can position pop-up window correctly
 		tool.callback.call(tool.sch);
 	    }
+        event.stopPropagation();
 	}
 
 	var help_icon = 'data:image/gif;base64,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';
