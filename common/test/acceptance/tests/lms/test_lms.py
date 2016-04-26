@@ -159,7 +159,6 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
             self.login_page.wait_for_errors()
         )
 
-    @skip_if_browser('chrome')  # TODO Need to fix this for chrome browser.
     def test_third_party_login(self):
         """
         Test that we can login using third party credentials, and that the
@@ -170,7 +169,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         # Navigate to the login page
         self.login_page.visit()
-        self.assertScreenshot('#login .login-providers', 'login-providers')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name))
 
         # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
@@ -197,7 +197,6 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         self._unlink_dummy_account()
 
-    @skip_if_browser('chrome')  # TODO Need to fix this for chrome browser.
     def test_hinted_login(self):
         """ Test the login page when coming from course URL that specified which third party provider to use """
         # Create a user account and link it to third party auth with the dummy provider:
@@ -212,7 +211,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # We should now be redirected to the login page
         self.login_page.wait_for_page()
         self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
-        self.assertScreenshot('#hinted-login-form', 'hinted-login')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
         self.login_page.click_third_party_dummy_provider()
 
         # We should now be redirected to the course page
@@ -331,7 +331,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.register_page.visit().toggle_form()
         self.assertEqual(self.register_page.current_form, "login")
 
-    @skip_if_browser('chrome')  # TODO Need to fix this for chrome browser.
     def test_third_party_register(self):
         """
         Test that we can register using third party credentials, and that the
@@ -339,7 +338,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         """
         # Navigate to the register page
         self.register_page.visit()
-        self.assertScreenshot('#register .login-providers', 'register-providers')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name))
 
         # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()
