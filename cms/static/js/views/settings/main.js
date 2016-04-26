@@ -1,9 +1,10 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/views/license", "js/models/license",
-    "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext"],
+    "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext",
+    'edx-ui-toolkit/js/utils/string-utils'],
        function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 FileUploadDialog, LicenseView, LicenseModel, NotificationView,
-                timepicker, date, gettext) {
+                timepicker, date, gettext, StringUtils) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -25,7 +26,6 @@ var DetailsView = ValidatingView.extend({
 
     initialize : function(options) {
         options = options || {};
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-language").val(this.model.get('language'));
         this.$el.find("#course-organization").val(this.model.get('org'));
@@ -71,6 +71,16 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
+        if (this.model.get('title') !== '') {
+            this.$el.find('#' + this.fieldToSelectorMap.title).val(this.model.get('title'));
+        } else {
+            var displayName = this.$el.find('#' + this.fieldToSelectorMap.title).attr('data-display-name');
+            this.$el.find('#' + this.fieldToSelectorMap.title).val(displayName);
+        }
+        this.$el.find('#' + this.fieldToSelectorMap.subtitle).val(this.model.get('subtitle'));
+        this.$el.find('#' + this.fieldToSelectorMap.duration).val(this.model.get('duration'));
+        this.$el.find('#' + this.fieldToSelectorMap.description).val(this.model.get('description'));
+
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
@@ -115,7 +125,7 @@ var DetailsView = ValidatingView.extend({
             paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
         }
 
-        this.licenseView.render()
+        this.licenseView.render();
 
         return this;
     },
@@ -126,6 +136,10 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'title': 'course-title',
+        'subtitle': 'course-subtitle',
+        'duration': 'course-duration',
+        'description': 'course-description',
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
@@ -139,19 +153,18 @@ var DetailsView = ValidatingView.extend({
         var now = new Date(),
             hours = now.getUTCHours(),
             minutes = now.getUTCMinutes(),
-            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
+            currentTimeText = StringUtils.interpolate(
+                gettext('{hours}:{minutes} (current UTC time)'),
+                {
+                    'hours': hours,
+                    'minutes': minutes
+                }
+            );
 
-        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
-            'hours': hours,
-            'minutes': minutes
-        }, true));
+        $(e.currentTarget).attr('title', currentTimeText);
     },
-
     updateModel: function(event) {
         switch (event.currentTarget.id) {
-        case 'course-language':
-            this.setField(event);
-            break;
         case 'course-image-url':
             this.setField(event);
             var url = $(event.currentTarget).val();
@@ -162,9 +175,6 @@ var DetailsView = ValidatingView.extend({
             this.imageTimer = setTimeout(function() {
                 $('#course-image').attr('src', $(event.currentTarget).val());
             }, 1000);
-            break;
-        case 'course-effort':
-            this.setField(event);
             break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
@@ -182,9 +192,6 @@ var DetailsView = ValidatingView.extend({
             else {
                 this.setField(event);
             }
-            break;
-        case 'course-short-description':
-            this.setField(event);
             break;
         case 'pre-requisite-course':
             var value = $(event.currentTarget).val();
@@ -211,6 +218,15 @@ var DetailsView = ValidatingView.extend({
             // Fallthrough to handle both radio buttons
         case 'course-pace-instructor-paced':
             this.model.set('self_paced', JSON.parse(event.currentTarget.value));
+            break;
+        case 'course-language':
+        case 'course-effort':
+        case 'course-title':
+        case 'course-subtitle':
+        case 'course-duration':
+        case 'course-description':
+        case 'course-short-description':
+            this.setField(event);
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
@@ -322,8 +338,8 @@ var DetailsView = ValidatingView.extend({
     },
 
     handleLicenseChange: function() {
-        this.showNotificationBar()
-        this.model.set("license", this.licenseModel.toString())
+        this.showNotificationBar();
+        this.model.set("license", this.licenseModel.toString());
     }
 });
 

@@ -40,7 +40,7 @@ from django_comment_client.utils import (
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
-from opaque_keys.edx.keys import CourseKey
+from util.course_key_utils import course_key_from_string_or_404
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -94,7 +94,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     default_query_params = {
         'page': 1,
         'per_page': per_page,
-        'sort_key': 'date',
+        'sort_key': 'activity',
         'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
@@ -178,7 +178,7 @@ def use_bulk_ops(view_func):
     """
     @wraps(view_func)
     def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
-        course_key = CourseKey.from_string(course_id)
+        course_key = course_key_from_string_or_404(course_id)
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)
     return wrapped_view

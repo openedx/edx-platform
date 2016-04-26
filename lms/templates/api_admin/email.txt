@@ -1,8 +1,0 @@
-## mako
-We have received the following request to use the Course Discovery API. Please go to ${approval_url} to approve the user.
-
-Company name: ${company_name}
-Company contact: ${username}
-Company URL: ${url}
-Address:  ${company_address}
-Reason for API usage: ${reason}

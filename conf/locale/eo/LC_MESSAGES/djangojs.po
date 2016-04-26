@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-04-06 19:27+0000\n"
-"PO-Revision-Date: 2016-04-06 19:28:37.640637\n"
+"POT-Creation-Date: 2016-04-14 20:36+0000\n"
+"PO-Revision-Date: 2016-04-14 20:37:17.183722\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1767,45 +1767,53 @@ msgid "Do not show again"
 msgstr "Dö nöt shöw ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn on closed captioning"
-msgstr "Türn ön çlöséd çäptïönïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off transcript"
-msgstr "Türn öff tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Transcript will be displayed when you start playing the video."
+msgstr ""
+"Tränsçrïpt wïll ßé dïspläýéd whén ýöü stärt pläýïng thé vïdéö. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Language: Press the UP arrow key to enter the language menu, then use UP and"
-" DOWN arrow keys to navigate language options. Press ENTER to change to the "
+"Activating a link in this group will skip to the corresponding point in the "
+"video."
+msgstr ""
+"Àçtïvätïng ä lïnk ïn thïs gröüp wïll skïp tö thé çörréspöndïng pöïnt ïn thé "
+"vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Video transcript"
+msgstr "Vïdéö tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Start of transcript. Skip to the end."
+msgstr ""
+"Stärt öf tränsçrïpt. Skïp tö thé énd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "End of transcript. Skip to the start."
+msgstr ""
+"Énd öf tränsçrïpt. Skïp tö thé stärt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Language: Press the UP arrow key to enter the language menu then use UP and "
+"DOWN arrow keys to navigate language options. Press ENTER to change to the "
 "selected language."
 msgstr ""
-"Längüägé: Préss thé ÛP ärröw kéý tö éntér thé längüägé ménü, thén üsé ÛP änd"
-" DÖWN ärröw kéýs tö nävïgäté längüägé öptïöns. Préss ÉNTÉR tö çhängé tö thé "
+"Längüägé: Préss thé ÛP ärröw kéý tö éntér thé längüägé ménü thén üsé ÛP änd "
+"DÖWN ärröw kéýs tö nävïgäté längüägé öptïöns. Préss ÉNTÉR tö çhängé tö thé "
 "séléçtéd längüägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
 "єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
 "єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σ#"
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Open language menu"
-msgstr "Öpén längüägé ménü Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid ""
-"Activating an item in this group will spool the video to the corresponding "
-"time point. To skip transcript, go to previous item."
-msgstr ""
-"Àçtïvätïng än ïtém ïn thïs gröüp wïll spööl thé vïdéö tö thé çörréspöndïng "
-"tïmé pöïnt. Tö skïp tränsçrïpt, gö tö prévïöüs ïtém. Ⱡ'σяє#"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "<li>Transcript will be displayed when "
-msgstr ""
-"<li>Tränsçrïpt wïll ßé dïspläýéd whén  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+msgid "Open language menu."
+msgstr "Öpén längüägé ménü. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -1816,6 +1824,10 @@ msgid "(Caption will be displayed when you start playing the video.)"
 msgstr ""
 "(Çäptïön wïll ßé dïspläýéd whén ýöü stärt pläýïng thé vïdéö.) Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr "Türn ön çlöséd çäptïönïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -5326,6 +5338,12 @@ msgstr "ässét_päth ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 msgid "You must specify a name"
 msgstr "Ýöü müst spéçïfý ä nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: cms/static/js/models/course_update.js
+msgid "Action required: Enter a valid date."
+msgstr ""
+"Àçtïön réqüïréd: Éntér ä välïd däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
 #: cms/static/js/models/group.js
 msgid "Group name is required"
 msgstr "Gröüp nämé ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -7371,16 +7389,12 @@ msgid "Generate Exception Certificates"
 msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all "
-msgstr "Généräté ä Çértïfïçäté för äll  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "New"
-msgstr "Néw Ⱡ'σяєм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "additions to the Exception list"
-msgstr "äddïtïöns tö thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid ""
+"Generate certificates for all users on the Exception list for whom "
+"certificates have not yet been run"
+msgstr ""
+"Généräté çértïfïçätés för äll üsérs ön thé Éxçéptïön lïst för whöm "
+"çértïfïçätés hävé nöt ýét ßéén rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all users on the Exception list"
@@ -7657,25 +7671,25 @@ msgstr "Ûséd Ⱡ'σяєм ι#"
 msgid "Valid"
 msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid ""
+"Browse recently launched courses and see what\\'s new in your favorite "
+"subjects"
+msgstr ""
+"Bröwsé réçéntlý läünçhéd çöürsés änd séé whät\\'s néw ïn ýöür fävörïté "
+"süßjéçts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid "Explore New XSeries"
+msgstr "Éxplöré Néw XSérïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "org.display_name"
 msgstr "örg.dïspläý_nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "category"
-msgstr "çätégörý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/learner_dashboard/sidebar.underscore
-msgid ""
-"Browse recently launched courses and see what\\'s new in our favorite "
-"subjects"
-msgstr ""
-"Bröwsé réçéntlý läünçhéd çöürsés änd séé whät\\'s néw ïn öür fävörïté "
-"süßjéçts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/learner_dashboard/sidebar.underscore
-msgid "Explore New XSeries"
-msgstr "Éxplöré Néw XSérïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "type"
+msgstr "týpé Ⱡ'σяєм ι#"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore

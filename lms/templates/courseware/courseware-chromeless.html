@@ -37,8 +37,6 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
-<%block name="nav_skip">${"#content" if section_title else "#content"}</%block>
-
 <%include file="../discussion/_js_head_dependencies.html" />
   ${fragment.head_html()}
 </%block>

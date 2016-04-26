@@ -7,12 +7,11 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .andReturn(null);
+                .and.returnValue(null);
 
-            jasmine.stubRequests();
             state = jasmine.initializePlayer();
             spyOn(Logger, 'log');
-            spyOn(state.videoEventsPlugin, 'getCurrentTime').andReturn(10);
+            spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
         });
 
         afterEach(function () {
@@ -90,7 +89,7 @@
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
-            Logger.log.reset();
+            Logger.log.calls.reset();
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
@@ -118,24 +117,25 @@
             });
         });
 
-        it('can emit "video_show_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.shown" event', function () {
             state.el.trigger('language_menu:show');
-            expect(Logger.log).toHaveBeenCalledWith('video_show_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
                 code: 'html5'
             });
         });
 
-        it('can emit "video_hide_cc_menu" event', function () {
+        it('can emit "edx.video.language_menu.hidden" event', function () {
             state.el.trigger('language_menu:hide');
-            expect(Logger.log).toHaveBeenCalledWith('video_hide_cc_menu', {
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
-                code: 'html5'
+                code: 'html5',
+                language: 'en'
             });
         });
 
         it('can emit "show_transcript" event', function () {
-            state.el.trigger('captions:show');
+            state.el.trigger('transcript:show');
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
                 code: 'html5',
@@ -144,8 +144,26 @@
         });
 
         it('can emit "hide_transcript" event', function () {
-            state.el.trigger('captions:hide');
+            state.el.trigger('transcript:hide');
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can emit "edx.video.closed_captions.shown" event', function () {
+            state.el.trigger('captions:show');
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
+                id: 'id',
+                code: 'html5',
+                current_time: 10
+            });
+        });
+
+        it('can emit "edx.video.closed_captions.hidden" event', function () {
+            state.el.trigger('captions:hide');
+            expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
                 code: 'html5',
                 current_time: 10
@@ -154,7 +172,7 @@
 
         it('can destroy itself', function () {
             var plugin = state.videoEventsPlugin;
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
@@ -167,6 +185,8 @@
                 'speedchange': plugin.onSpeedChange,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
+                'transcript:show': plugin.onShowTranscript,
+                'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
                 'destroy': plugin.destroy

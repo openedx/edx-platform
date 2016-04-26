@@ -24,7 +24,6 @@ class SplitTestBase(SharedModuleStoreTestCase):
     COURSE_NUMBER = 'split-test-base'
     ICON_CLASSES = None
     TOOLTIPS = None
-    HIDDEN_CONTENT = None
     VISIBLE_CONTENT = None
 
     @classmethod
@@ -62,6 +61,9 @@ class SplitTestBase(SharedModuleStoreTestCase):
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
         self.client.login(username=self.student.username, password='test')
+
+        self.included_usage_keys = None
+        self.excluded_usage_keys = None
 
     def _video(self, parent, group):
         """
@@ -128,33 +130,101 @@ class SplitTestBase(SharedModuleStoreTestCase):
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)
 
-        for hidden in self.HIDDEN_CONTENT[user_tag]:
-            self.assertNotIn(hidden, content)
+        unicode_content = content.decode("utf-8")
+        for key in self.included_usage_keys[user_tag]:
+            self.assertIn(unicode(key), unicode_content)
+
+        for key in self.excluded_usage_keys[user_tag]:
+            self.assertNotIn(unicode(key), unicode_content)
 
         # Assert that we can see the data from the appropriate test condition
         for visible in self.VISIBLE_CONTENT[user_tag]:
             self.assertIn(visible, content)
 
 
-class TestVertSplitTestVert(SplitTestBase):
+class TestSplitTestVert(SplitTestBase):
     """
-    Tests related to xmodule/split_test_module
+    Tests a sequential whose top-level vertical is determined by a split test.
     """
     __test__ = True
 
-    COURSE_NUMBER = 'vert-split-vert'
+    COURSE_NUMBER = 'test-split-test-vert-vert'
 
     ICON_CLASSES = [
         'seq_problem',
         'seq_video',
     ]
     TOOLTIPS = [
-        ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
-        ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
-    ]
-    HIDDEN_CONTENT = [
         ['Condition 0 vertical'],
         ['Condition 1 vertical'],
+    ]
+    # Data is html encoded, because it's inactive inside the
+    # sequence until javascript is executed
+    VISIBLE_CONTENT = [
+        ['class=&#34;problems-wrapper'],
+        ['Some HTML for group 1']
+    ]
+
+    def setUp(self):
+        # We define problem compenents that we need but don't explicitly call elsewhere.
+        # pylint: disable=unused-variable
+        super(TestSplitTestVert, self).setUp()
+
+        c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
+        c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
+
+        split_test = ItemFactory.create(
+            parent_location=self.sequential.location,
+            category="split_test",
+            display_name="Split test",
+            user_partition_id='0',
+            group_id_to_child={"0": c0_url, "1": c1_url},
+        )
+
+        cond0vert = ItemFactory.create(
+            parent_location=split_test.location,
+            category="vertical",
+            display_name="Condition 0 vertical",
+            location=c0_url,
+        )
+        video0 = self._video(cond0vert, 0)
+        problem0 = self._problem(cond0vert, 0)
+
+        cond1vert = ItemFactory.create(
+            parent_location=split_test.location,
+            category="vertical",
+            display_name="Condition 1 vertical",
+            location=c1_url,
+        )
+        video1 = self._video(cond1vert, 1)
+        html1 = self._html(cond1vert, 1)
+
+        self.included_usage_keys = [
+            [video0.location, problem0.location],
+            [video1.location, html1.location],
+        ]
+
+        self.excluded_usage_keys = [
+            [video1.location, html1.location],
+            [video0.location, problem0.location],
+        ]
+
+
+class TestVertSplitTestVert(SplitTestBase):
+    """
+    Tests a sequential whose top-level vertical contains a split test determining content within that vertical.
+    """
+    __test__ = True
+
+    COURSE_NUMBER = 'test-vert-split-test-vert'
+
+    ICON_CLASSES = [
+        'seq_problem',
+        'seq_video',
+    ]
+    TOOLTIPS = [
+        ['Split test vertical'],
+        ['Split test vertical'],
     ]
 
     # Data is html encoded, because it's inactive inside the
@@ -169,9 +239,6 @@ class TestVertSplitTestVert(SplitTestBase):
         # pylint: disable=unused-variable
         super(TestVertSplitTestVert, self).setUp()
 
-        # vert <- split_test
-        # split_test cond 0 = vert <- {video, problem}
-        # split_test cond 1 = vert <- {video, html}
         vert1 = ItemFactory.create(
             parent_location=self.sequential.location,
             category="vertical",
@@ -191,8 +258,8 @@ class TestVertSplitTestVert(SplitTestBase):
         cond0vert = ItemFactory.create(
             parent_location=split_test.location,
             category="vertical",
-            display_name="Condition 0 vertical",
-            location=c0_url,
+            display_name="Condition 0 Vertical",
+            location=c0_url
         )
         video0 = self._video(cond0vert, 0)
         problem0 = self._problem(cond0vert, 0)
@@ -200,76 +267,21 @@ class TestVertSplitTestVert(SplitTestBase):
         cond1vert = ItemFactory.create(
             parent_location=split_test.location,
             category="vertical",
-            display_name="Condition 1 vertical",
-            location=c1_url,
+            display_name="Condition 1 Vertical",
+            location=c1_url
         )
         video1 = self._video(cond1vert, 1)
         html1 = self._html(cond1vert, 1)
 
+        self.included_usage_keys = [
+            [video0.location, problem0.location],
+            [video1.location, html1.location],
+        ]
 
-class TestSplitTestVert(SplitTestBase):
-    """
-    Tests related to xmodule/split_test_module
-    """
-    __test__ = True
-
-    COURSE_NUMBER = 'split-vert'
-
-    ICON_CLASSES = [
-        'seq_problem',
-        'seq_video',
-    ]
-    TOOLTIPS = [
-        ['Group 0 Sees This Video', "Group 0 Sees This Problem"],
-        ['Group 1 Sees This Video', 'Group 1 Sees This HTML'],
-    ]
-    HIDDEN_CONTENT = [
-        ['Condition 0 vertical'],
-        ['Condition 1 vertical'],
-    ]
-
-    # Data is html encoded, because it's inactive inside the
-    # sequence until javascript is executed
-    VISIBLE_CONTENT = [
-        ['class=&#34;problems-wrapper'],
-        ['Some HTML for group 1']
-    ]
-
-    def setUp(self):
-        # We define problem compenents that we need but don't explicitly call elsewhere.
-        # pylint: disable=unused-variable
-        super(TestSplitTestVert, self).setUp()
-
-        # split_test cond 0 = vert <- {video, problem}
-        # split_test cond 1 = vert <- {video, html}
-        c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
-        c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
-
-        split_test = ItemFactory.create(
-            parent_location=self.sequential.location,
-            category="split_test",
-            display_name="Split test",
-            user_partition_id='0',
-            group_id_to_child={"0": c0_url, "1": c1_url},
-        )
-
-        cond0vert = ItemFactory.create(
-            parent_location=split_test.location,
-            category="vertical",
-            display_name="Condition 0 vertical",
-            location=c0_url,
-        )
-        video0 = self._video(cond0vert, 0)
-        problem0 = self._problem(cond0vert, 0)
-
-        cond1vert = ItemFactory.create(
-            parent_location=split_test.location,
-            category="vertical",
-            display_name="Condition 1 vertical",
-            location=c1_url,
-        )
-        video1 = self._video(cond1vert, 1)
-        html1 = self._html(cond1vert, 1)
+        self.excluded_usage_keys = [
+            [video1.location, html1.location],
+            [video0.location, problem0.location],
+        ]
 
 
 @attr('shard_1')

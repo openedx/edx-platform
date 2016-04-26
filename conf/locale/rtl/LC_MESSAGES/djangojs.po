@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-04-06 19:27+0000\n"
-"PO-Revision-Date: 2016-04-06 19:28:37.640637\n"
+"POT-Creation-Date: 2016-04-14 20:36+0000\n"
+"PO-Revision-Date: 2016-04-14 20:37:17.183722\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1751,38 +1751,42 @@ msgid "Do not show again"
 msgstr "يخ رخف ساخص شلشهر"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn on closed captioning"
-msgstr "فعقر خر ذمخسثي ذشحفهخرهرل"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off transcript"
-msgstr "فعقر خبب فقشرسذقهحف"
+msgid "Transcript will be displayed when you start playing the video."
+msgstr "فقشرسذقهحف صهمم زث يهسحمشغثي صاثر غخع سفشقف حمشغهرل فاث دهيثخ."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Language: Press the UP arrow key to enter the language menu, then use UP and"
-" DOWN arrow keys to navigate language options. Press ENTER to change to the "
+"Activating a link in this group will skip to the corresponding point in the "
+"video."
+msgstr ""
+"شذفهدشفهرل ش مهرن هر فاهس لقخعح صهمم سنهح فخ فاث ذخققثسحخريهرل حخهرف هر فاث "
+"دهيثخ."
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Video transcript"
+msgstr "دهيثخ فقشرسذقهحف"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Start of transcript. Skip to the end."
+msgstr "سفشقف خب فقشرسذقهحف. سنهح فخ فاث ثري."
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "End of transcript. Skip to the start."
+msgstr "ثري خب فقشرسذقهحف. سنهح فخ فاث سفشقف."
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Language: Press the UP arrow key to enter the language menu then use UP and "
+"DOWN arrow keys to navigate language options. Press ENTER to change to the "
 "selected language."
 msgstr ""
-"مشرلعشلث: حقثسس فاث عح شققخص نثغ فخ ثرفثق فاث مشرلعشلث وثرع, فاثر عسث عح شري"
-" يخصر شققخص نثغس فخ رشدهلشفث مشرلعشلث خحفهخرس. حقثسس ثرفثق فخ ذاشرلث فخ فاث "
+"مشرلعشلث: حقثسس فاث عح شققخص نثغ فخ ثرفثق فاث مشرلعشلث وثرع فاثر عسث عح شري "
+"يخصر شققخص نثغس فخ رشدهلشفث مشرلعشلث خحفهخرس. حقثسس ثرفثق فخ ذاشرلث فخ فاث "
 "سثمثذفثي مشرلعشلث."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Open language menu"
-msgstr "خحثر مشرلعشلث وثرع"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid ""
-"Activating an item in this group will spool the video to the corresponding "
-"time point. To skip transcript, go to previous item."
-msgstr ""
-"شذفهدشفهرل شر هفثو هر فاهس لقخعح صهمم سحخخم فاث دهيثخ فخ فاث ذخققثسحخريهرل "
-"فهوث حخهرف. فخ سنهح فقشرسذقهحف, لخ فخ حقثدهخعس هفثو."
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "<li>Transcript will be displayed when "
-msgstr "<li>فقشرسذقهحف صهمم زث يهسحمشغثي صاثر "
+msgid "Open language menu."
+msgstr "خحثر مشرلعشلث وثرع."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
@@ -1791,6 +1795,10 @@ msgstr "اهيث ذمخسثي ذشحفهخرس"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
 msgstr "(ذشحفهخر صهمم زث يهسحمشغثي صاثر غخع سفشقف حمشغهرل فاث دهيثخ.)"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr "فعقر خر ذمخسثي ذشحفهخرهرل"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -4785,6 +4793,10 @@ msgstr "شسسثف_حشفا هس قثضعهقثي"
 msgid "You must specify a name"
 msgstr "غخع وعسف سحثذهبغ ش رشوث"
 
+#: cms/static/js/models/course_update.js
+msgid "Action required: Enter a valid date."
+msgstr "شذفهخر قثضعهقثي: ثرفثق ش دشمهي يشفث."
+
 #: cms/static/js/models/group.js
 msgid "Group name is required"
 msgstr "لقخعح رشوث هس قثضعهقثي"
@@ -6655,16 +6667,12 @@ msgid "Generate Exception Certificates"
 msgstr "لثرثقشفث ثطذثحفهخر ذثقفهبهذشفثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all "
-msgstr "لثرثقشفث ش ذثقفهبهذشفث بخق شمم "
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "New"
-msgstr "رثص"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "additions to the Exception list"
-msgstr "شييهفهخرس فخ فاث ثطذثحفهخر مهسف"
+msgid ""
+"Generate certificates for all users on the Exception list for whom "
+"certificates have not yet been run"
+msgstr ""
+"لثرثقشفث ذثقفهبهذشفثس بخق شمم عسثقس خر فاث ثطذثحفهخر مهسف بخق صاخو "
+"ذثقفهبهذشفثس اشدث رخف غثف زثثر قعر"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all users on the Exception list"
@@ -6910,25 +6918,25 @@ msgstr "عسثي"
 msgid "Valid"
 msgstr "دشمهي"
 
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid ""
+"Browse recently launched courses and see what\\'s new in your favorite "
+"subjects"
+msgstr ""
+"زقخصسث قثذثرفمغ مشعرذاثي ذخعقسثس شري سثث صاشف\\'س رثص هر غخعق بشدخقهفث "
+"سعزتثذفس"
+
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid "Explore New XSeries"
+msgstr "ثطحمخقث رثص طسثقهثس"
+
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "org.display_name"
 msgstr "خقل.يهسحمشغ_رشوث"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "category"
-msgstr "ذشفثلخقغ"
-
-#: lms/templates/learner_dashboard/sidebar.underscore
-msgid ""
-"Browse recently launched courses and see what\\'s new in our favorite "
-"subjects"
-msgstr ""
-"زقخصسث قثذثرفمغ مشعرذاثي ذخعقسثس شري سثث صاشف\\'س رثص هر خعق بشدخقهفث "
-"سعزتثذفس"
-
-#: lms/templates/learner_dashboard/sidebar.underscore
-msgid "Explore New XSeries"
-msgstr "ثطحمخقث رثص طسثقهثس"
+msgid "type"
+msgstr "فغحث"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore

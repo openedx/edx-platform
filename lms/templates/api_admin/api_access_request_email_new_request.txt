@@ -1,0 +1,8 @@
+## mako
+We have received the following request to use the Course Catalog API. Go to ${approval_url} to approve the user.
+
+Company name: ${api_request.company_name}
+Company contact: ${api_request.user.username}
+Company URL: ${api_request.website}
+Address:  ${api_request.company_address}
+Reason for API usage: ${api_request.reason}

@@ -10,7 +10,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/shoppingcart'
 
             beforeEach(function() {
                 // Mock the redirect call
-                spyOn(ShoppingCartInterface, 'redirect').andCallFake(function() {});
+                spyOn(ShoppingCartInterface, 'redirect').and.callFake(function() {});
             });
 
             it('adds a course to the cart', function() {

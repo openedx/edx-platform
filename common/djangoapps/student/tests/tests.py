@@ -45,6 +45,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -111,22 +112,6 @@ class CourseEndingTest(TestCase):
                 'survey_url': survey_url,
                 'grade': '67',
                 'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': False,
-            }
-        )
-
-        cert_status = {'status': 'regenerating', 'grade': '67', 'mode': 'verified'}
-        self.assertEqual(
-            _cert_info(user, course, cert_status, course_mode),
-            {
-                'status': 'generating',
-                'show_disabled_download_button': True,
-                'show_download_url': False,
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '67',
-                'mode': 'verified',
                 'linked_in_url': None,
                 'can_unenroll': False,
             }
@@ -226,7 +211,7 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the css class and the status message are in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
@@ -263,7 +248,7 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
@@ -495,12 +480,13 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @with_is_edx_domain(True)
     def test_dashboard_header_nav_has_find_courses(self):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))
 
-        # "Find courses" is shown in the side panel
-        self.assertContains(response, "Find courses")
+        # "Explore courses" is shown in the side panel
+        self.assertContains(response, "Explore courses")
 
         # But other links are hidden in the navigation
         self.assertNotContains(response, "How it Works")

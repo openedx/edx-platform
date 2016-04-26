@@ -35,10 +35,11 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
+from commerce.models import CommerceConfiguration
+from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
@@ -133,6 +134,34 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.WEBCAM_REQ,
         ])
         self._assert_upgrade_session_flag(False)
+
+    @httpretty.activate
+    @override_settings(
+        ECOMMERCE_API_URL=TEST_API_URL,
+        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+        ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
+    )
+    def test_start_flow_with_ecommerce(self):
+        """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
+        checkout_page = '/test_basket/'
+        sku = 'TESTSKU'
+        # When passing a SKU ecommerce api gets called.
+        httpretty.register_uri(
+            httpretty.GET,
+            "{}/payment/processors/".format(TEST_API_URL),
+            body=json.dumps(['foo', 'bar']),
+            content_type="application/json",
+        )
+        httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
+        CommerceConfiguration.objects.create(
+            checkout_on_ecommerce_service=True,
+            single_course_checkout_page=checkout_page
+        )
+        course = self._create_course('verified', sku=sku)
+        self._enroll(course.id)
+        response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+        expected_page = '{}{}?sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+        self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
         ("no-id-professional", "verify_student_start_flow"),
@@ -290,7 +319,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
         self._assert_redirects_to_dashboard(response)
 
-    @with_comprehensive_theme("edx.org")
+    @with_is_edx_domain(True)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_pay_and_verify_hides_header_nav(self, payment_flow):
         course = self._create_course("verified")
@@ -822,7 +851,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         for course_mode in course_modes:
             min_price = (0 if course_mode in ["honor", "audit"] else self.MIN_PRICE)
-            CourseModeFactory(
+            CourseModeFactory.create(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
@@ -1012,7 +1041,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         course = CourseFactory.create(display_name=mode_display_name)
         for course_mode in [CourseMode.DEFAULT_MODE_SLUG, "verified"]:
             min_price = (self.MIN_PRICE if course_mode != CourseMode.DEFAULT_MODE_SLUG else 0)
-            CourseModeFactory(
+            CourseModeFactory.create(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=mode_display_name,
@@ -1074,7 +1103,7 @@ class CheckoutTestMixin(object):
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
         for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price, sku=self.make_sku())
         self.client.login(username="test", password="test")
 
     def _assert_checked_out(
@@ -1119,7 +1148,7 @@ class CheckoutTestMixin(object):
     def test_create_order_prof_ed(self, patched_create_order):
         # Create a prof ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'professional')
@@ -1127,7 +1156,7 @@ class CheckoutTestMixin(object):
     def test_create_order_no_id_professional(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
@@ -1135,8 +1164,8 @@ class CheckoutTestMixin(object):
     def test_create_order_for_multiple_paid_modes(self, patched_create_order):
         # Create a no-id-professional ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
-        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
+        CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
         params = {'course_id': unicode(course.id)}
         # TODO jsa - is this the intended behavior?
@@ -1227,7 +1256,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         ecommerce api, we correctly call to that api to create a basket.
         """
         user = UserFactory.create(username="test-username")
-        course_mode = CourseModeFactory(sku="test-sku").to_tuple()  # pylint: disable=no-member
+        course_mode = CourseModeFactory.create(sku="test-sku").to_tuple()  # pylint: disable=no-member
         expected_payment_data = {'foo': 'bar'}
         # mock out the payment processors endpoint
         httpretty.register_uri(
@@ -2079,7 +2108,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -2280,7 +2309,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
@@ -2483,7 +2512,7 @@ class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory(mode_slug=mode, course_id=self.course_key, min_price=min_price)
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
 
         # Create the 'edx-reverification-block' in course tree
         section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')

@@ -332,6 +332,7 @@ def make_minimal_cs_thread(overrides=None):
         "anonymous_to_peers": False,
         "created_at": "1970-01-01T00:00:00Z",
         "updated_at": "1970-01-01T00:00:00Z",
+        "last_activity_at": "1970-01-01T00:00:00Z",
         "thread_type": "discussion",
         "title": "dummy",
         "body": "dummy",
@@ -371,6 +372,7 @@ def make_minimal_cs_comment(overrides=None):
         "abuse_flaggers": [],
         "votes": {"up_count": 0},
         "endorsed": False,
+        "child_count": 0,
         "children": [],
     }
     ret.update(overrides or {})

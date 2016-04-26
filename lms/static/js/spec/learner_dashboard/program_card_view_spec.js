@@ -56,7 +56,7 @@ define([
                 expect($cards).toBeDefined();
                 expect($cards.find('.title').html().trim()).toEqual(program.name);
                 expect($cards.find('.category span').html().trim()).toEqual('XSeries Program');
-                expect($cards.find('.organization').html().trim()).toEqual(program.organizations[0].display_name);
+                expect($cards.find('.organization').html().trim()).toEqual(program.organizations[0].key);
                 expect($cards.find('.card-link').attr('href')).toEqual(program.marketing_url);
             });
 
@@ -67,7 +67,7 @@ define([
             });
 
             it('should handle exceptions from reEvaluatePicture', function(){
-                spyOn(view, 'reEvaluatePicture').andCallFake(function(){
+                spyOn(view, 'reEvaluatePicture').and.callFake(function(){
                     throw {name:'Picturefill had exceptions'};
                 });
                 view.reLoadBannerImage();

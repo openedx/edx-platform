@@ -2,9 +2,12 @@
 """
 End-to-end tests for the LMS.
 """
+
+import json
 from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from ..helpers import UniqueCourseTest, EventsTestMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -65,7 +68,7 @@ class CoursewareTest(UniqueCourseTest):
         Open problem page with assertion.
         """
         self.courseware_page.visit()
-        self.problem_page = ProblemPage(self.browser)
+        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
     def _create_breadcrumb(self, index):
@@ -393,7 +396,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.course_outline.time_allotted_field_visible())
 
 
-class CoursewareMultipleVerticalsTest(UniqueCourseTest):
+class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
     """
     Test courseware with multiple verticals
     """
@@ -475,6 +478,87 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         self.courseware_page.click_previous_button_on_bottom()
         self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 2, next_enabled=True, prev_enabled=True)
 
+        # test UI events emitted by navigation
+        filter_sequence_ui_event = lambda event: event.get('name', '').startswith('edx.ui.lms.sequence.')
+
+        sequence_ui_events = self.wait_for_events(event_filter=filter_sequence_ui_event, timeout=2)
+        legacy_events = [ev for ev in sequence_ui_events if ev['event_type'] in {'seq_next', 'seq_prev', 'seq_goto'}]
+        nonlegacy_events = [ev for ev in sequence_ui_events if ev not in legacy_events]
+
+        self.assertTrue(all('old' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertTrue(all('new' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertFalse(any('old' in json.loads(ev['event']) for ev in nonlegacy_events))
+        self.assertFalse(any('new' in json.loads(ev['event']) for ev in nonlegacy_events))
+
+        self.assert_events_match(
+            [
+                {
+                    'event_type': 'seq_next',
+                    'event': {
+                        'old': 1,
+                        'new': 2,
+                        'current_tab': 1,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'seq_goto',
+                    'event': {
+                        'old': 2,
+                        'new': 4,
+                        'current_tab': 2,
+                        'target_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'seq_prev',
+                    'event': {
+                        'old': 4,
+                        'new': 3,
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+            ],
+            sequence_ui_events
+        )
+
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
@@ -542,3 +626,167 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         self.courseware_page.a11y_audit.config.set_scope(
             include=['div.sequence-nav'])
         self.courseware_page.a11y_audit.check_for_accessibility_errors()
+
+
+class ProblemStateOnNavigationTest(UniqueCourseTest):
+    """
+    Test courseware with problems in multiple verticals
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    problem1_name = 'MULTIPLE CHOICE TEST PROBLEM 1'
+    problem2_name = 'MULTIPLE CHOICE TEST PROBLEM 2'
+
+    def setUp(self):
+        super(ProblemStateOnNavigationTest, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        # Install a course with section, tabs and multiple choice problems.
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                    self.create_multiple_choice_problem(self.problem1_name),
+                    self.create_multiple_choice_problem(self.problem2_name),
+                ),
+            ),
+        ).install()
+
+        # Auto-auth register for the course.
+        AutoAuthPage(
+            self.browser, username=self.USERNAME, email=self.EMAIL,
+            course_id=self.course_id, staff=False
+        ).visit()
+
+        self.courseware_page.visit()
+        self.problem_page = ProblemPage(self.browser)
+
+    def create_multiple_choice_problem(self, problem_name):
+        """
+        Return the Multiple Choice Problem Descriptor, given the name of the problem.
+        """
+        factory = MultipleChoiceResponseXMLFactory()
+        xml_data = factory.build_xml(
+            question_text='The correct answer is Choice 2',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
+
+        return XBlockFixtureDesc(
+            'problem',
+            problem_name,
+            data=xml_data,
+            metadata={'rerandomize': 'always'}
+        )
+
+    def go_to_tab_and_assert_problem(self, position, problem_name):
+        """
+        Go to sequential tab and assert that we are on problem whose name is given as a parameter.
+        Args:
+            position: Position of the sequential tab
+            problem_name: Name of the problem
+        """
+        self.courseware_page.go_to_sequential_position(position)
+        self.problem_page.wait_for_element_presence(
+            self.problem_page.CSS_PROBLEM_HEADER,
+            'wait for problem header'
+        )
+        self.assertEqual(self.problem_page.problem_name, problem_name)
+
+    def test_perform_problem_check_and_navigate(self):
+        """
+        Scenario:
+        I go to sequential position 1
+        Facing problem1, I select 'choice_1'
+        Then I click check button
+        Then I go to sequential position 2
+        Then I came back to sequential position 1 again
+        Facing problem1, I observe the problem1 content is not
+        outdated before and after sequence navigation
+        """
+        # Go to sequential position 1 and assert that we are on problem 1.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+
+        # Update problem 1's content state by clicking check button.
+        self.problem_page.click_choice('choice_choice_1')
+        self.problem_page.click_check()
+        self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
+
+        # Save problem 1's content state as we're about to switch units in the sequence.
+        problem1_content_before_switch = self.problem_page.problem_content
+
+        # Go to sequential position 2 and assert that we are on problem 2.
+        self.go_to_tab_and_assert_problem(2, self.problem2_name)
+
+        # Come back to our original unit in the sequence and assert that the content hasn't changed.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+        problem1_content_after_coming_back = self.problem_page.problem_content
+        self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+
+    def test_perform_problem_save_and_navigate(self):
+        """
+        Scenario:
+        I go to sequential position 1
+        Facing problem1, I select 'choice_1'
+        Then I click save button
+        Then I go to sequential position 2
+        Then I came back to sequential position 1 again
+        Facing problem1, I observe the problem1 content is not
+        outdated before and after sequence navigation
+        """
+        # Go to sequential position 1 and assert that we are on problem 1.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+
+        # Update problem 1's content state by clicking save button.
+        self.problem_page.click_choice('choice_choice_1')
+        self.problem_page.click_save()
+        self.problem_page.wait_for_expected_status('div.capa_alert', 'saved')
+
+        # Save problem 1's content state as we're about to switch units in the sequence.
+        problem1_content_before_switch = self.problem_page.problem_content
+
+        # Go to sequential position 2 and assert that we are on problem 2.
+        self.go_to_tab_and_assert_problem(2, self.problem2_name)
+
+        # Come back to our original unit in the sequence and assert that the content hasn't changed.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+        problem1_content_after_coming_back = self.problem_page.problem_content
+        self.assertIn(problem1_content_after_coming_back, problem1_content_before_switch)
+
+    def test_perform_problem_reset_and_navigate(self):
+        """
+        Scenario:
+        I go to sequential position 1
+        Facing problem1, I select 'choice_1'
+        Then perform the action – check and reset
+        Then I go to sequential position 2
+        Then I came back to sequential position 1 again
+        Facing problem1, I observe the problem1 content is not
+        outdated before and after sequence navigation
+        """
+        # Go to sequential position 1 and assert that we are on problem 1.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+
+        # Update problem 1's content state – by performing reset operation.
+        self.problem_page.click_choice('choice_choice_1')
+        self.problem_page.click_check()
+        self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
+        self.problem_page.click_reset()
+        self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')
+
+        # Save problem 1's content state as we're about to switch units in the sequence.
+        problem1_content_before_switch = self.problem_page.problem_content
+
+        # Go to sequential position 2 and assert that we are on problem 2.
+        self.go_to_tab_and_assert_problem(2, self.problem2_name)
+
+        # Come back to our original unit in the sequence and assert that the content hasn't changed.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+        problem1_content_after_coming_back = self.problem_page.problem_content
+        self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)

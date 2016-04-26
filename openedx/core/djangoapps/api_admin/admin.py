@@ -12,6 +12,8 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('user__email',)
     raw_id_fields = ('user',)
+    readonly_fields = ('user', 'website', 'reason', 'company_name', 'company_address', 'contacted', )
+    exclude = ('site',)
 
 
 admin.site.register(ApiAccessConfig, ConfigurationModelAdmin)

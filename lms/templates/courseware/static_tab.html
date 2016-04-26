@@ -16,8 +16,10 @@
 
 <%include file="/courseware/course_navigation.html" args="active_page='static_tab_{0}'.format(tab['url_slug'])" />
 
-<section class="container">
-  <div class="static_tab_wrapper">
-    ${tab_contents}
-  </div>
-</section>
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="container">
+      <div class="static_tab_wrapper">
+        ${tab_contents}
+      </div>
+    </section>
+</main>

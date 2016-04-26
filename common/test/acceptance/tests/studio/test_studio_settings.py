@@ -475,3 +475,36 @@ class ContentLicenseTest(StudioCourseTest):
         # The course_license text will include a bunch of screen reader text to explain
         # the selected options
         self.assertIn("Some Rights Reserved", self.lms_courseware.course_license)
+
+
+@attr('a11y')
+class StudioSettingsA11yTest(StudioCourseTest):
+
+    """
+    Class to test Studio pages accessibility.
+    """
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioSettingsA11yTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+
+    def test_studio_settings_page_a11y(self):
+        """
+        Check accessibility of SettingsPage.
+        """
+        self.settings_page.visit()
+        self.settings_page.wait_for_page()
+
+        # There are several existing color contrast errors on this page,
+        # we will ignore this error in the test until we fix them.
+        self.settings_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'color-contrast',  # TODO: AC-225
+                'link-href',  # TODO: AC-226
+                'nav-aria-label',  # TODO: AC-227
+                'icon-aria-hidden',  # TODO: AC-229
+            ],
+        })
+
+        self.settings_page.a11y_audit.check_for_accessibility_errors()

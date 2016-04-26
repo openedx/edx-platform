@@ -5,6 +5,7 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
+    @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
     # ensure that we wait a minimum of ~ 1s before transitioning the check
@@ -12,7 +13,7 @@ class @Problem
     @has_timed_out = false
     @has_response = false
 
-    @render()
+    @render(@content)
 
   $: (selector) ->
     $(selector, @el)
@@ -316,6 +317,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -331,6 +333,7 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+        @el.trigger('contentChanged', [@id, response.html])
         @render(response.html)
         @updateProgress response
 
@@ -419,6 +422,8 @@ class @Problem
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
+      if response.success
+        @el.trigger('contentChanged', [@id, response.html])
       @gentle_alert saveMessage
       @updateProgress response
 
@@ -465,8 +470,8 @@ class @Problem
     at_least_one_text_input_found = false
     one_text_input_filled = false
     @el.find("input:text").each (i, text_field) =>
-      at_least_one_text_input_found = true
       if $(text_field).is(':visible')
+        at_least_one_text_input_found = true
         if $(text_field).val() isnt ''
           one_text_input_filled = true
         if bind
