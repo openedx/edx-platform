@@ -87,5 +87,5 @@
 </form>
 
 <div class="toggle-form">
-    <a class="sign-up-button form-toggle" data-type="register"><%- gettext("Don't have an account? Sign up!") %></a>
+    <a class="sign-up-button form-toggle" data-type="register"><%- gettext("DON'T HAVE AN ACCOUNT? SIGN UP!") %></a>
 </div>
