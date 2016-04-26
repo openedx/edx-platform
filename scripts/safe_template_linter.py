@@ -235,6 +235,10 @@ class Rules(Enum):
         'mako-html-entities',
         "HTML entities should be plain text or wrapped with HTML()."
     )
+    mako_unknown_context = (
+        'mako-unknown-context',
+        "The context could not be determined."
+    )
     underscore_not_escaped = (
         'underscore-not-escaped',
         'Expressions should be escaped using <%- expression %>.'
@@ -1727,6 +1731,12 @@ class MakoTemplateLinter(BaseLinter):
             results: A list of results into which violations will be added.
 
         """
+        if context == 'unknown':
+            results.violations.append(ExpressionRuleViolation(
+                Rules.mako_unknown_context, expression
+            ))
+            return
+
         # Example: finds "| n, h}" when given "${x | n, h}"
         filters_regex = re.compile(r'\|([.,\w\s]*)\}')
         filters_match = filters_regex.search(expression.expression)
@@ -1851,15 +1861,25 @@ class MakoTemplateLinter(BaseLinter):
                 - index: the index of the context.
                 - type: the context type (e.g. 'html' or 'javascript').
         """
-        contexts_re = re.compile(r"""
-            <script.*?>|  # script tag start
-            </script>|  # script tag end
-            <%static:require_module.*?>|  # require js script tag start
-            </%static:require_module>  # require js script tag end""", re.VERBOSE | re.IGNORECASE)
+        contexts_re = re.compile(
+            r"""
+                <script.*?> |  # script tag start
+                </script> |  # script tag end
+                <%static:require_module.*?> |  # require js script tag start
+                </%static:require_module> | # require js script tag end
+                <%block[ ]*name=['"]requirejs['"]\w*> |  # require js tag start
+                </%block>  # require js tag end
+            """,
+            re.VERBOSE | re.IGNORECASE
+        )
         media_type_re = re.compile(r"""type=['"].*?['"]""", re.IGNORECASE)
 
         contexts = [{'index': 0, 'type': 'html'}]
-        javascript_types = ['text/javascript', 'text/ecmascript', 'application/ecmascript', 'application/javascript']
+        javascript_types = [
+            'text/javascript', 'text/ecmascript', 'application/ecmascript', 'application/javascript',
+            'text/x-mathjax-config', 'json/xblock-args'
+        ]
+        html_types = ['text/template']
         for context in contexts_re.finditer(mako_template):
             match_string = context.group().lower()
             if match_string.startswith("<script"):
@@ -1869,18 +1889,15 @@ class MakoTemplateLinter(BaseLinter):
                     # get media type (e.g. get text/javascript from
                     # type="text/javascript")
                     match_type = match_type.group()[6:-1].lower()
-                    if match_type not in javascript_types:
-                        # TODO: What are other types found, and are these really
-                        # html?  Or do we need to properly handle unknown
-                        # contexts? Only "text/template" is a known alternative.
+                    if match_type in html_types:
                         context_type = 'html'
+                    elif match_type not in javascript_types:
+                        context_type = 'unknown'
                 contexts.append({'index': context.end(), 'type': context_type})
-            elif match_string.startswith("</script"):
+            elif match_string.startswith("</"):
                 contexts.append({'index': context.start(), 'type': 'html'})
-            elif match_string.startswith("<%static:require_module"):
-                contexts.append({'index': context.end(), 'type': 'javascript'})
             else:
-                contexts.append({'index': context.start(), 'type': 'html'})
+                contexts.append({'index': context.end(), 'type': 'javascript'})
 
         return contexts
 
