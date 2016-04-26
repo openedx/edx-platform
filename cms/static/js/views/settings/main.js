@@ -1,9 +1,10 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/views/license", "js/models/license",
-    "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext"],
+    "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext",
+    'edx-ui-toolkit/js/utils/string-utils'],
        function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 FileUploadDialog, LicenseView, LicenseModel, NotificationView,
-                timepicker, date, gettext) {
+                timepicker, date, gettext, StringUtils) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -25,7 +26,6 @@ var DetailsView = ValidatingView.extend({
 
     initialize : function(options) {
         options = options || {};
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-language").val(this.model.get('language'));
         this.$el.find("#course-organization").val(this.model.get('org'));
@@ -115,7 +115,7 @@ var DetailsView = ValidatingView.extend({
             paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
         }
 
-        this.licenseView.render()
+        this.licenseView.render();
 
         return this;
     },
@@ -139,14 +139,16 @@ var DetailsView = ValidatingView.extend({
         var now = new Date(),
             hours = now.getUTCHours(),
             minutes = now.getUTCMinutes(),
-            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
+            currentTimeText = StringUtils.interpolate(
+                gettext('{hours}:{minutes} (current UTC time)'),
+                {
+                    'hours': hours,
+                    'minutes': minutes
+                }
+            );
 
-        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
-            'hours': hours,
-            'minutes': minutes
-        }, true));
+        $(e.currentTarget).attr('title', currentTimeText);
     },
-
     updateModel: function(event) {
         switch (event.currentTarget.id) {
         case 'course-language':
@@ -322,8 +324,8 @@ var DetailsView = ValidatingView.extend({
     },
 
     handleLicenseChange: function() {
-        this.showNotificationBar()
-        this.model.set("license", this.licenseModel.toString())
+        this.showNotificationBar();
+        this.model.set("license", this.licenseModel.toString());
     }
 });
 
