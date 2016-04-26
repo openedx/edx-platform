@@ -7,7 +7,6 @@ from django.conf import settings
 # Force settings to run so that the python path is modified
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-from openedx.core.djangoapps.theming.core import enable_comprehensive_theming
 from openedx.core.lib.django_startup import autostartup
 import django
 from monkey_patch import (
