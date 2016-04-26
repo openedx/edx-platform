@@ -44,3 +44,26 @@ def create_course_image_thumbnail(course, dimensions):
     _content, thumb_loc = contentstore().generate_thumbnail(course_image, dimensions=dimensions)
 
     return StaticContent.serialize_asset_key_with_slash(thumb_loc)
+
+
+def additional_image_url(course, image_key):
+    """Try to look up additional image (such as hero) url for the course.  If it's not found,
+    log an error and return the dead link"""
+    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
+        # If we are a static course with the course_image attribute
+        # set different than the default, return that path so that
+        # courses can use custom course image paths, otherwise just
+        # return the default static path.
+        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
+        if hasattr(course, image_key) and getattr(course, image_key) != course.fields[image_key].default:
+            url += '/' + getattr(course, image_key)
+        else:
+            url += '/images/course_image.jpg'
+    elif not getattr(course, image_key):
+        # if course_image is empty, use the default image url from settings
+        url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+    else:
+        loc = StaticContent.compute_location(course.id, getattr(course, image_key))
+        url = StaticContent.serialize_asset_key_with_slash(loc)
+
+    return url

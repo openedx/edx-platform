@@ -70,7 +70,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import course_image_url, additional_image_url
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
@@ -992,6 +992,8 @@ def settings_handler(request, course_key_string):
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
                 'course_image_url': course_image_url(course_module),
+                'hero_image_url': additional_image_url(course_module, 'hero_image'),
+                'thumbnail_image_url': additional_image_url(course_module, 'thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,

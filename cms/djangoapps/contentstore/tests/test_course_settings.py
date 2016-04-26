@@ -264,6 +264,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
+            self.assertNotContains(response, "Hero Image")
+            self.assertNotContains(response, "Course Video Thumbnail Image")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
@@ -394,6 +396,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
+            self.assertContains(response, "Hero Image")
+            self.assertContains(response, "Course Video Thumbnail Image")
 
 
 @ddt.ddt
