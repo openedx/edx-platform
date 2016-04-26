@@ -62,8 +62,8 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                         mockCssUrl = "mock.css",
                         headHtml;
                     postXBlockRequest(requests, [
-                        ["hash1", { mimetype: "text/css", kind: "text", data: mockCssText }],
-                        ["hash2", { mimetype: "text/css", kind: "url", data: mockCssUrl }]
+                        ["xblock_spec_hash1", { mimetype: "text/css", kind: "text", data: mockCssText }],
+                        ["xblock_spec_hash2", { mimetype: "text/css", kind: "url", data: mockCssUrl }]
                     ]);
                     headHtml = $('head').html();
                     expect(headHtml).toContain(mockCssText);
@@ -73,7 +73,9 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                 it('can render an xblock with required JavaScript', function() {
                     var requests = AjaxHelpers.requests(this);
                     postXBlockRequest(requests, [
-                        ["hash3", { mimetype: "application/javascript", kind: "text", data: "window.test = 100;" }]
+                        ["xblock_spec_hash3", {
+                            mimetype: "application/javascript", kind: "text", data: "window.test = 100;"
+                        }]
                     ]);
                     expect(window.test).toBe(100);
                 });
@@ -82,7 +84,7 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                     var requests = AjaxHelpers.requests(this),
                         mockHeadTag = "<title>Test Title</title>";
                     postXBlockRequest(requests, [
-                        ["hash4", { mimetype: "text/html", placement: "head", data: mockHeadTag }]
+                        ["xblock_spec_hash4", { mimetype: "text/html", placement: "head", data: mockHeadTag }]
                     ]);
                     expect($('head').html()).toContain(mockHeadTag);
                 });
@@ -93,7 +95,9 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                         promise;
                     spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().reject().promise());
                     promise = postXBlockRequest(requests, [
-                        ["hash5", { mimetype: "application/javascript", kind: "url", data: missingJavaScriptUrl }]
+                        ["xblock_spec_hash5", {
+                            mimetype: "application/javascript", kind: "url", data: missingJavaScriptUrl
+                        }]
                     ]);
                     expect(promise.isRejected()).toBe(true);
                 });
