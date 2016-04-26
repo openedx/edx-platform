@@ -464,9 +464,38 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
+            ## switch to JavaScript context
             <script>
                 {expression}
             </script>
+            ## switch back to HTML context
+            ${{x}}
+        """.format(expression=data['expression']))
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self._validate_data_rules(data, results)
+
+    @data(
+        {'expression': '${x}', 'rule': Rules.mako_invalid_js_filter},
+        {'expression': '"${x | n, js_escaped_string}"', 'rule': None},
+    )
+    def test_check_mako_expressions_in_require_module(self, data):
+        """
+        Test _check_mako_file_is_safe in JavaScript require context provides
+        appropriate violations
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            ## switch to JavaScript context (after next line)
+            <%static:require_module module_name="${{x}}" class_name="TestFactory">
+                {expression}
+            </%static:require_module>
+            ## switch back to HTML context
+            ${{x}}
         """.format(expression=data['expression']))
 
         linter._check_mako_file_is_safe(mako_template, results)
@@ -479,7 +508,7 @@ class TestMakoTemplateLinter(TestLinter):
     )
     def test_check_mako_expressions_in_require_js(self, data):
         """
-        Test _check_mako_file_is_safe in JavaScript require context provides
+        Test _check_mako_file_is_safe in JavaScript require js context provides
         appropriate violations
         """
         linter = MakoTemplateLinter()
@@ -487,9 +516,12 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
-            <%static:require_module module_name="${{x}}" class_name="TestFactory">
+            # switch to JavaScript context
+            <%block name="requirejs">
                 {expression}
-            </%static:require_module>
+            </%block>
+            ## switch back to HTML context
+            ${{x}}
         """.format(expression=data['expression']))
 
         linter._check_mako_file_is_safe(mako_template, results)
@@ -497,12 +529,14 @@ class TestMakoTemplateLinter(TestLinter):
         self._validate_data_rules(data, results)
 
     @data(
-        {'media_type': 'text/javascript', 'expected_violations': 0},
-        {'media_type': 'text/ecmascript', 'expected_violations': 0},
-        {'media_type': 'application/ecmascript', 'expected_violations': 0},
-        {'media_type': 'application/javascript', 'expected_violations': 0},
-        {'media_type': 'text/template', 'expected_violations': 1},
-        {'media_type': 'unknown/type', 'expected_violations': 1},
+        {'media_type': 'text/javascript', 'rule': None},
+        {'media_type': 'text/ecmascript', 'rule': None},
+        {'media_type': 'application/ecmascript', 'rule': None},
+        {'media_type': 'application/javascript', 'rule': None},
+        {'media_type': 'text/x-mathjax-config', 'rule': None},
+        {'media_type': 'json/xblock-args', 'rule': None},
+        {'media_type': 'text/template', 'rule': Rules.mako_invalid_html_filter},
+        {'media_type': 'unknown/type', 'rule': Rules.mako_unknown_context},
     )
     def test_check_mako_expressions_in_script_type(self, data):
         """
@@ -513,14 +547,17 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
+            # switch to JavaScript context
             <script type="{}">
                 ${{x | n, dump_js_escaped_json}}
             </script>
+            ## switch back to HTML context
+            ${{x}}
         """).format(data['media_type'])
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), data['expected_violations'])
+        self._validate_data_rules(data, results)
 
     def test_check_mako_expressions_in_mixed_contexts(self):
         """
