@@ -1,0 +1,126 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,700);
+
+$border-width: 2rem;
+
+// ------------------------------
+// #RENDERING
+// ------------------------------
+.accomplishment-rendering {
+    border: $border-width solid #172D32;
+    background: palette(grayscale, white-t) url('/static/images/bdu_book.png') center/80% no-repeat;
+    padding: $border-width;
+
+    .accomplishment-recipient {
+        font-size: 60px;
+        font-weight: 100;
+        color: #0a222b;
+    }
+}
+
+// ------------------------------
+// #CERTIFICATE
+// ------------------------------
+.certificate {
+    .accomplishment-rendering {
+        .accomplishment-organizations {
+            margin-bottom: 3rem;
+
+            &:after {
+                content: '';
+                display: block;
+                clear: both;
+            }
+
+            .logo {
+                max-height: 60px;
+
+                &-center {
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+
+                &-left { float: left; }
+                &-right { float: right; }
+            }
+        }
+
+        .accomplishment-statement {
+            border-bottom: 0;
+
+            .accomplishment-statement-lead {
+                .accomplishment-summary {
+                    margin-top: 2rem;
+                }
+
+                .copy {
+                    color: #0A222B;
+                }
+            }
+        }
+
+        .accomplishment-footer {
+            text-transform: uppercase;
+            font-size: 1rem;
+            position: absolute;
+            bottom: $border-width;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+
+            &-sep {
+                font-size: 1.5rem;
+            }
+        }
+    }
+}
+
+// ------------------------------
+// #LAYOUT
+// ------------------------------
+.layout-accomplishment {
+    .wrapper-accomplishment-rendering {
+        position: relative;
+
+        &:after {
+            padding-top: 56.25%; // 16:9 aspect ratio
+            display: block;
+            content: '';
+        }
+    }
+
+    .accomplishment-rendering {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+// ------------------------------
+// #PRINT
+// ------------------------------
+@media print {
+    .wrapper-accomplishment-rendering {
+        &:after {
+            padding-top: 65% !important;
+        }
+    }
+
+    .wrapper-statement-and-signatories {
+        border-bottom: 0 !important;
+    }
+
+    .accomplishment-rendering {
+        .accomplishment-statement {
+            width: span(12);
+        }
+
+        .accomplishment-summary {
+            width: span(8) !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+}
