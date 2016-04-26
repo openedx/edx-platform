@@ -475,6 +475,26 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
+    banner_image = String(
+        display_name=_("Course Banner Image"),
+        help=_(
+            "Edit the name of the banner image file. "
+            "You can set the banner image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
+    video_thumbnail_image = String(
+        display_name=_("Course Video Thumbnail Image"),
+        help=_(
+            "Edit the name of the video thumbnail image file. "
+            "You can set the video thumbnail image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
     issue_badges = Boolean(
         display_name=_("Issue Open Badges"),
         help=_(

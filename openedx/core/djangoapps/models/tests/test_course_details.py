@@ -95,6 +95,16 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
                 jsondetails.course_image_name
             )
+            jsondetails.banner_image_name = "an_image.jpg"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).banner_image_name,
+                jsondetails.banner_image_name
+            )
+            jsondetails.video_thumbnail_image_name = "an_image.jpg"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).video_thumbnail_image_name,
+                jsondetails.video_thumbnail_image_name
+            )
             jsondetails.language = "hr"
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,

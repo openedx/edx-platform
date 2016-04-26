@@ -34,10 +34,10 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
 
         // Avoid showing broken image on mistyped/nonexistent image
-        this.$el.find('img.course-image').error(function() {
+        this.$el.find('img').error(function() {
             $(this).hide();
         });
-        this.$el.find('img.course-image').load(function() {
+        this.$el.find('img').load(function() {
             $(this).show();
         });
 
@@ -92,9 +92,17 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 
-        var imageURL = this.model.get('course_image_asset_path');
-        this.$el.find('#course-image-url').val(imageURL);
-        this.$el.find('#course-image').attr('src', imageURL);
+        var courseImageURL = this.model.get('course_image_asset_path');
+        this.$el.find('#course-image-url').val(courseImageURL);
+        this.$el.find('#course-image').attr('src', courseImageURL);
+
+        var bannerImageURL = this.model.get('banner_image_asset_path');
+        this.$el.find('#banner-image-url').val(bannerImageURL);
+        this.$el.find('#banner-image').attr('src', bannerImageURL);
+
+        var videoThumbnailImageURL = this.model.get('video_thumbnail_image_asset_path');
+        this.$el.find('#video-thumbnail-image-url').val(videoThumbnailImageURL);
+        this.$el.find('#video-thumbnail-image').attr('src', videoThumbnailImageURL);
 
         var pre_requisite_courses = this.model.get('pre_requisite_courses');
         pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
@@ -144,6 +152,8 @@ var DetailsView = ValidatingView.extend({
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
+        'banner_image_asset_path': 'banner-image-url',
+        'video_thumbnail_image_asset_path': 'video-thumbnail-image-url',
         'pre_requisite_courses': 'pre-requisite-course',
         'entrance_exam_enabled': 'entrance-exam-enabled',
         'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
@@ -164,15 +174,13 @@ var DetailsView = ValidatingView.extend({
     updateModel: function(event) {
         switch (event.currentTarget.id) {
         case 'course-image-url':
-            this.setField(event);
-            var url = $(event.currentTarget).val();
-            var image_name = _.last(url.split('/'));
-            this.model.set('course_image_name', image_name);
-            // Wait to set the image src until the user stops typing
-            clearTimeout(this.imageTimer);
-            this.imageTimer = setTimeout(function() {
-                $('#course-image').attr('src', $(event.currentTarget).val());
-            }, 1000);
+            this.updateImageField(event, 'course_image_name', '#course-image');
+            break;
+        case 'banner-image-url':
+            this.updateImageField(event, 'banner_image_name', '#banner-image');
+            break;
+         case 'video-thumbnail-image-url':
+            this.updateImageField(event, 'video_thumbnail_image_name', '#video-thumbnail-image');
             break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
@@ -230,7 +238,17 @@ var DetailsView = ValidatingView.extend({
             break;
         }
     },
-
+    updateImageField: function(event, image_field, selector) {
+        this.setField(event);
+        var url = $(event.currentTarget).val();
+        var image_name = _.last(url.split('/'));
+        this.model.set(image_field, image_name);
+        // Wait to set the image src until the user stops typing
+        clearTimeout(this.imageTimer);
+        this.imageTimer = setTimeout(function() {
+            $(selector).attr('src', $(event.currentTarget).val());
+        }, 1000);
+    },
     removeVideo: function(event) {
         event.preventDefault();
         if (this.model.has('intro_video')) {
@@ -314,8 +332,30 @@ var DetailsView = ValidatingView.extend({
 
     uploadImage: function(event) {
         event.preventDefault();
+        var title = "", selector = "", image_key = "", image_path_key = "";
+        switch (event.currentTarget.id) {
+            case 'upload-course-image':
+                title = gettext("Upload your course image.");
+                selector = "#course-image";
+                image_key = 'course_image_name';
+                image_path_key = 'course_image_asset_path';
+                break;
+            case 'upload-banner-image':
+                title = gettext("Upload your banner image.");
+                selector = "#banner-image";
+                image_key = 'banner_image_name';
+                image_path_key = 'banner_image_asset_path';
+                break;
+            case 'upload-video-thumbnail-image':
+                title = gettext("Upload your video thumbnail image.");
+                selector = "#video-thumbnail-image";
+                image_key = 'video_thumbnail_image_name';
+                image_path_key = 'video_thumbnail_image_asset_path';
+                break;
+        }
+
         var upload = new FileUploadModel({
-            title: gettext("Upload your course image."),
+            title: title,
             message: gettext("Files must be in JPEG or PNG format."),
             mimeTypes: ['image/jpeg', 'image/png']
         });
@@ -323,13 +363,12 @@ var DetailsView = ValidatingView.extend({
         var modal = new FileUploadDialog({
             model: upload,
             onSuccess: function(response) {
-                var options = {
-                    'course_image_name': response.asset.display_name,
-                    'course_image_asset_path': response.asset.url
-                };
+                var options = {};
+                options[image_key] = response.asset.display_name;
+                options[image_path_key] = response.asset.url;
                 self.model.set(options);
                 self.render();
-                $('#course-image').attr('src', self.model.get('course_image_asset_path'));
+                $(selector).attr('src', self.model.get(image_path_key));
             }
         });
         modal.show();
