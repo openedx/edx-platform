@@ -159,14 +159,7 @@
                 start: function() {
                     Backbone.history.start();
 
-                    $(document).ajaxError(function (event, xhr) {
-                        if (xhr.status === 401) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed. Reload the page and try again."));
-                        }
-                        else if (xhr.status === 500) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem."));
-                        }
-                    });
+                    $(document).ajaxError(this.errorHandler);
 
                     // Navigate to the default page if there is no history:
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page
@@ -177,6 +170,20 @@
                         } else {
                             this.router.navigate('browse', {trigger: true});
                         }
+                    }
+                },
+
+                errorHandler: function(event, xhr) {
+                    if (xhr.status === 401) {
+                        TeamUtils.showMessage(gettext(
+                            "Your request could not be completed. Reload the page and try again."
+                        ));
+                    }
+                    else if (xhr.status === 500) {
+                        TeamUtils.showMessage(gettext(
+                            "Your request could not be completed due to a server problem. Reload the page" +
+                            " and try again. If the issue persists, click the Help tab to report the problem."
+                        ));
                     }
                 },
 
