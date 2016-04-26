@@ -1,20 +1,29 @@
+"""
+ORA1. Deprecated.
+"""
+from datetime import datetime
 import json
 import logging
 import re
+
 import bleach
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 from html5lib.tokenizer import HTMLTokenizer
+from pytz import UTC
+
 from xmodule.progress import Progress
 import capa.xqueue_interface as xqueue_interface
 from capa.util import *
 from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
-from datetime import datetime
-from pytz import UTC
-from boto.s3.connection import S3Connection
-from boto.s3.key import Key
 
 log = logging.getLogger("edx.courseware")
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
@@ -88,7 +97,6 @@ class OpenEndedChild(object):
     DONE = 'done'
 
     # This is used to tell students where they are at in the module
-    _ = lambda text: text
     HUMAN_NAMES = {
         # Translators: "Not started" communicates to a student that their response
         # has not yet been graded

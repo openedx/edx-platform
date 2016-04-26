@@ -1,28 +1,16 @@
-define(["jquery", "backbone", "teams/js/teams_tab_factory"],
-    function($, Backbone, TeamsTabFactory) {
+define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
+        'common/js/spec_helpers/page_helpers', 'teams/js/spec_helpers/team_spec_helpers'],
+    function($, Backbone, TeamsTabFactory, PageHelpers, TeamSpecHelpers) {
         'use strict';
-       
-        describe("Teams Tab Factory", function() {
-            var teamsTab;
 
+        describe("Teams Tab Factory", function() {
             var initializeTeamsTabFactory = function() {
-                TeamsTabFactory({
-                    topics: {results: []},
-                    topicsUrl: '',
-                    teamsUrl: '',
-                    maxTeamSize: 9999,
-                    courseID: 'edX/DemoX/Demo_Course',
-                    userInfo: {
-                        username: 'test-user',
-                        privileged: false,
-                        staff: false,
-                        team_memberships_data: null
-                    }
-                });
+                TeamsTabFactory(TeamSpecHelpers.createMockContext());
             };
 
             beforeEach(function() {
                 setFixtures('<section class="teams-content"></section>');
+                PageHelpers.preventBackboneChangingUrl();
             });
 
             afterEach(function() {

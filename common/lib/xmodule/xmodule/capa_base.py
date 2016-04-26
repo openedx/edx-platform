@@ -21,7 +21,7 @@ except ImportError:
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
-from capa.util import convert_files_to_filenames
+from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from .progress import Progress
 from xmodule.exceptions import NotFoundError
 from xmodule.exceptions import TimeExpiredError
@@ -36,9 +36,9 @@ from types import MethodType
 
 log = logging.getLogger("edx.courseware")
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
 
 # Generate this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
@@ -221,12 +221,12 @@ class CapaFields(object):
         scope=Scope.settings
     )
     matlab_api_key = String(
-        display_name="Matlab API key",
-        help="Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
-             "This key is granted for exclusive use by this course for the specified duration. "
-             "Please do not share the API key with other courses and notify MathWorks immediately "
-             "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report an issue, please contact moocsupport@mathworks.com",
+        display_name=_("Matlab API key"),
+        help=_("Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+               "This key is granted for exclusive use by this course for the specified duration. "
+               "Please do not share the API key with other courses and notify MathWorks immediately "
+               "if you believe the key is exposed or compromised. To obtain a key for your course, "
+               "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
 
@@ -653,7 +653,7 @@ class CapaMixin(CapaFields):
 
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         hint_element = demand_hints[hint_index]
-        hint_text = hint_element.text.strip()
+        hint_text = get_inner_html_from_xpath(hint_element)
         if len(demand_hints) == 1:
             prefix = _('Hint: ')
         else:
@@ -1534,7 +1534,9 @@ class CapaMixin(CapaFields):
         self.track_function_unmask('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
-            msg = _("Your answers have been saved but not graded. Click 'Submit' to grade them.")
+            msg = _(
+                "Your answers have been saved but not graded. Click '{button_name}' to grade them."
+            ).format(button_name=self.check_button_name())
         return {
             'success': True,
             'msg': msg,

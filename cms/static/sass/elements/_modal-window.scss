@@ -469,6 +469,15 @@
       }
     }
 
+    .field-visibility-verification {
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 24px;
+        display: block;
+      }
+    }
+
     // CASE: content group has been removed
     .field-visibility-content-group.was-removed {
 
@@ -524,7 +533,7 @@
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
     .exam-time-list-fields {
-      margin-bottom: ($baseline/2);
+      margin: 0 0 ($baseline/2) ($baseline/2);
     }
     .list-fields {
       .field-message {
@@ -633,8 +642,12 @@
       }
     }
 
+    .edit-staff-lock {
+      margin-bottom: $baseline;
+    }
+
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
@@ -657,6 +670,20 @@
       .checkbox-cosmetic .label {
         margin-bottom: 0;
       }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 21px;
+        display: block;
+      }
+    }
+
+    .verification-access {
+      .checkbox-cosmetic .label {
+        @include float(left);
+        margin: 2px 6px 0 0;
+      }
     }
 
     // UI: timed and proctored exam section
@@ -664,12 +691,6 @@
 
       // give a little space between the sections
       padding-bottom: 10px;
-
-      // indent this group a bit to make it seem like
-      // it is one group, under a header
-      .modal-section-content {
-        margin-left: 25px;
-      }
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;

@@ -36,8 +36,8 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
-    MODULESTORE, ACCOUNT_NAME,
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT, COMP_THEME_DIR,
+    ACCOUNT_NAME,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -47,8 +47,11 @@ from lms.envs.common import (
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
     DEFAULT_COURSE_ABOUT_IMAGE_URL,
+
+    # Django REST framework configuration
+    REST_FRAMEWORK,
 )
-from path import path
+from path import Path as path
 from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
@@ -61,8 +64,6 @@ from xmodule.mixin import LicenseMixin
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'GITHUB_PUSH': False,
 
     # for consistency in user-experience, keep the value of the following 3 settings
@@ -76,8 +77,8 @@ FEATURES = {
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
-    # Segment.io - must explicitly turn it on for production
-    'SEGMENT_IO': False,
+    # Segment - must explicitly turn it on for production
+    'CMS_SEGMENT_KEY': None,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
@@ -166,20 +167,11 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
-    # Social Media Sharing on Student Dashboard
-    'SOCIAL_SHARING_SETTINGS': {
-        # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
-        'CUSTOM_COURSE_URLS': False
-    },
-
     # Teams feature
     'ENABLE_TEAMS': True,
 
     # Show video bumper in Studio
     'ENABLE_VIDEO_BUMPER': False,
-
-    # Timed Proctored Exams
-    'ENABLE_PROCTORED_EXAMS': False,
 
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
@@ -190,12 +182,17 @@ FEATURES = {
     # Can the visibility of the discussion tab be configured on a per-course basis?
     'ALLOW_HIDING_DISCUSSION_TAB': True,
 
-    # Timed or Proctored Exams
-    'ENABLE_PROCTORED_EXAMS': False,
+    # Special Exams, aka Timed and Proctored Exams
+    'ENABLE_SPECIAL_EXAMS': False,
 }
 
 ENABLE_JASMINE = False
 
+############################# SOCIAL MEDIA SHARING #############################
+SOCIAL_SHARING_SETTINGS = {
+    # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
+    'CUSTOM_COURSE_URLS': False
+}
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
@@ -282,13 +279,6 @@ XQUEUE_INTERFACE = {
 simplefilter('ignore')
 
 ################################# Middleware ###################################
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
-)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -405,6 +395,7 @@ MODULESTORE = {
 DEBUG = False
 TEMPLATE_DEBUG = False
 SESSION_COOKIE_SECURE = False
+SESSION_SAVE_EVERY_REQUEST = False
 
 # Site info
 SITE_ID = 1
@@ -468,8 +459,24 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
 
-############################### Pipeline #######################################
+############################### PIPELINE #######################################
+
+PIPELINE_ENABLED = True
+
+# Process static files using RequireJS Optimizer
 STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+
+# List of finder classes that know how to find static files in various locations.
+# Note: the pipeline finder is included to be able to discover optimized files
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
+]
+
+# Don't use compression by default
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = None
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -558,7 +565,8 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
     "*.pyc",
-    # it would be nice if we could do, for example, "**/*.scss",
+
+    # It would be nice if we could do, for example, "**/*.scss",
     # but these strings get passed down to the `fnmatch` module,
     # which doesn't support that. :(
     # http://docs.python.org/2/library/fnmatch.html
@@ -570,6 +578,10 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*/*.coffee",
     "coffee/*/*/*.coffee",
     "coffee/*/*/*/*.coffee",
+
+    # Ignore tests
+    "spec",
+    "spec_helpers",
 
     # Symlinks used by js-test-tool
     "xmodule_js",
@@ -614,18 +626,6 @@ REQUIRE_ENVIRONMENT = "node"
 # problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
-################################# TENDER ######################################
-
-# If you want to enable Tender integration (http://tenderapp.com/),
-# put in the subdomain where Tender hosts tender_widget.js. For example,
-# if you want to use the URL https://example.tenderapp.com/tender_widget.js,
-# you should use "example".
-TENDER_SUBDOMAIN = None
-# If you want to have a vanity domain that points to Tender, put that here.
-# For example, "help.myapp.com". Otherwise, should should be your full
-# tenderapp domain name: for example, "example.tenderapp.com".
-TENDER_DOMAIN = None
 
 ################################# CELERY ######################################
 
@@ -746,6 +746,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # Common views
+    'openedx.core.djangoapps.common_views',
+
     # History tables
     'simple_history',
 
@@ -775,9 +778,12 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
+    'django.contrib.staticfiles',
     'static_replace',
     'require',
+
+    # Theming
+    'openedx.core.djangoapps.theming',
 
     # comment common
     'django_comment_common',
@@ -819,6 +825,12 @@ INSTALLED_APPS = (
 
     # edX Proctoring
     'edx_proctoring',
+
+    # programs support
+    'openedx.core.djangoapps.programs',
+
+    # Self-paced course configuration
+    'openedx.core.djangoapps.self_paced',
 )
 
 
@@ -978,6 +990,25 @@ DEFAULT_COURSE_LANGUAGE = "en"
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 
+# These strings are entry-point names from the setup.py of the XBlock.
+# For example:
+#
+#   setup(
+#       name='xblock-foobar',
+#       version='0.1',
+#       packages=[
+#           'foobar_xblock',
+#       ],
+#       entry_points={
+#           'xblock.v1': [
+#               'foobar-block = foobar_xblock:FoobarBlock',
+#           #    ^^^^^^^^^^^^ This is the one you want.
+#           ]
+#       },
+#   )
+#
+# To use this block, add 'foobar-block' to the ADVANCED_COMPONENT_TYPES list.
+
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'textannotation',  # module for annotating text (with annotation table)
@@ -992,15 +1023,14 @@ ADVANCED_COMPONENT_TYPES = [
     'pb-dashboard',
     'poll',
     'survey',
-    # XBlocks from pmitros repos are prototypes. They should not be used
-    # except for edX Learning Sciences experiments on edge.edx.org without
-    # further work to make them robust, maintainable, finalize data formats,
-    # etc.
+    # Some of the XBlocks from pmitros repos are sometimes prototypes.
+    # Use with caution.
     'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
     'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
+    'rate',  # Allows up-down voting of course content. See https://github.com/pmitros/RateXBlock
 
     'split_test',
     'combinedopenended',
@@ -1014,24 +1044,37 @@ ADVANCED_COMPONENT_TYPES = [
     'google-document',
     'google-calendar',
 
+    # Oppia block
+    'oppia',
+
     # In-course reverification checkpoint
     'edx-reverification-block',
+
+    # Peer instruction tool
+    'ubcpi',
 ]
 
 # XBlock types listed here will _always_ be selectable as Studio components
 XBLOCKS_ALWAYS_IN_STUDIO = [
 ]
-# Adding components in this list will disable the creation of new problem for those
-# compoenents in studio. Existing problems will work fine and one can edit them in studio
+# Adding components in this list will disable the creation of new problem for
+# those components in Studio. Existing problems will work fine and one can edit
+# them in Studio.
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
-# Specify xblocks that should be treated as advanced problems. Each entry is a tuple
-# specifying the xblock name and an optional YAML template to be used.
+# Specify XBlocks that should be treated as advanced problems. Each entry is a
+# dict:
+#       'component': the entry-point name of the XBlock. See the comment for
+#               ADVANCED_COMPONENT_TYPES for details of where to find this
+#               name.
+#       'boilerplate_name': an optional YAML template to be used.  Specify as
+#               None to omit.
+#
 ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'openassessment',
         'boilerplate_name': None,
-    }
+    },
 ]
 
 

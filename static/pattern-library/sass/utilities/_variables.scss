@@ -17,6 +17,8 @@
 // ----------------------------
 $em-base: 16; // deliberately sets bourbon-based em-base (http://bourbon.io/docs/#em-base)
 
+$static-path: '..' !default;
+
 
 // ----------------------------
 // #GRID
@@ -133,52 +135,52 @@ $palettes: (
 // typography: config
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Light-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-Light-webfont',
     300,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-LightItalic-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-LightItalic-webfont',
     300,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Regular-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-Regular-webfont',
     400,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Italic-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-Italic-webfont',
     400,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Semibold-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-Semibold-webfont',
     600,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-SemiboldItalic-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-SemiboldItalic-webfont',
     600,
     italic,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-Bold-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-Bold-webfont',
     700,
     $file-formats: woff woff2 ttf
 );
 @include font-face(
     'Open Sans',
-    '../../fonts/OpenSans/OpenSans-BoldItalic-webfont',
+    '#{$static-path}/../fonts/OpenSans/OpenSans-BoldItalic-webfont',
     700,
     italic,
     $file-formats: woff woff2 ttf

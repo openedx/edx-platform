@@ -1,8 +1,15 @@
+# encoding: utf-8
+"""
+Admin site configurations for verify_student.
+"""
+
+from config_models.admin import ConfigurationModelAdmin
 from ratelimitbackend import admin
 from verify_student.models import (
+    IcrvStatusEmailsConfiguration,
+    SkippedReverification,
     SoftwareSecurePhotoVerification,
     VerificationStatus,
-    SkippedReverification,
 )
 
 
@@ -54,3 +61,4 @@ class SkippedReverificationAdmin(admin.ModelAdmin):
 admin.site.register(SoftwareSecurePhotoVerification, SoftwareSecurePhotoVerificationAdmin)
 admin.site.register(SkippedReverification, SkippedReverificationAdmin)
 admin.site.register(VerificationStatus, VerificationStatusAdmin)
+admin.site.register(IcrvStatusEmailsConfiguration, ConfigurationModelAdmin)

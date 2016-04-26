@@ -52,17 +52,6 @@ urlpatterns = patterns(
         }
     ),
 
-    # The user has paid and still needs to verify,
-    # but the user is NOT arriving directly from the payment flow.
-    # This is equivalent to starting a new flow
-    # with the payment steps and requirements hidden
-    # (since the user already paid).
-    url(
-        r'^verify-later/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.VerifyLaterView.as_view(),
-        name="verify_student_verify_later"
-    ),
-
     # The user is returning to the flow after paying.
     # This usually occurs after a redirect from the shopping cart
     # once the order has been fulfilled.

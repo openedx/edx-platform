@@ -291,9 +291,6 @@ class CreditRequirement(TimeStampedModel):
     active = models.BooleanField(default=True)
 
     class Meta(object):
-        """
-        Model metadata.
-        """
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
@@ -411,6 +408,7 @@ class CreditRequirementStatus(TimeStampedModel):
     REQUIREMENT_STATUS_CHOICES = (
         ("satisfied", "satisfied"),
         ("failed", "failed"),
+        ("declined", "declined"),
     )
 
     username = models.CharField(max_length=255, db_index=True)
@@ -427,7 +425,7 @@ class CreditRequirementStatus(TimeStampedModel):
     # Maintain a history of requirement status updates for auditing purposes
     history = HistoricalRecords()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('username', 'requirement')
 
     @classmethod
@@ -467,6 +465,30 @@ class CreditRequirementStatus(TimeStampedModel):
             requirement_status.reason = reason if reason else {}
             requirement_status.save()
 
+    @classmethod
+    @transaction.commit_on_success
+    def remove_requirement_status(cls, username, requirement):
+        """
+        Remove credit requirement status for given username.
+
+        Args:
+            username(str): Username of the user
+            requirement(CreditRequirement): 'CreditRequirement' object
+        """
+
+        try:
+            requirement_status = cls.objects.get(username=username, requirement=requirement)
+            requirement_status.delete()
+        except cls.DoesNotExist:
+            log_msg = (
+                u'The requirement status {requirement} does not exist for username {username}.'.format(
+                    requirement=requirement,
+                    username=username
+                )
+            )
+            log.error(log_msg)
+            return
+
 
 class CreditEligibility(TimeStampedModel):
     """
@@ -490,7 +512,7 @@ class CreditEligibility(TimeStampedModel):
         help_text=ugettext_lazy("Deadline for purchasing and requesting credit.")
     )
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('username', 'course')
         verbose_name_plural = "Credit eligibilities"
 
@@ -612,7 +634,7 @@ class CreditRequest(TimeStampedModel):
 
     history = HistoricalRecords()
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         # Enforce the constraint that each user can have exactly one outstanding
         # request to a given provider.  Multiple requests use the same UUID.
         unique_together = ('username', 'course', 'provider')

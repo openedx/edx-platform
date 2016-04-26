@@ -8,7 +8,7 @@ import unittest
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.test.utils import override_settings
 from mock import patch
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
@@ -118,7 +118,7 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         self.assertEqual(content["parameters"]["course_org"], "edX")
         self.assertEqual(content["parameters"]["course_num"], "DemoX")
         self.assertEqual(content["parameters"]["course_run"], "Demo_Course")
-        self.assertEqual(content["parameters"]["final_grade"], self.FINAL_GRADE)
+        self.assertEqual(content["parameters"]["final_grade"], unicode(self.FINAL_GRADE))
         self.assertEqual(content["parameters"]["user_username"], self.USERNAME)
         self.assertEqual(content["parameters"]["user_full_name"], self.USER_FULL_NAME)
         self.assertEqual(content["parameters"]["user_mailing_address"], "")
@@ -336,6 +336,51 @@ class CreditProviderViewTests(UrlResetMixin, TestCase):
         request = CreditRequest.objects.get(uuid=uuid)
         self.assertEqual(request.status, expected_status)
 
+    def test_get_providers_detail(self):
+        """Verify that the method 'get_provider_detail' returns provider with
+        the given provide in 'provider_ids'.
+        """
+        url = reverse("credit:providers_detail") + "?provider_ids=hogwarts"
+        response = self.client.get(url)
+        expected = [
+            {
+                'enable_integration': True,
+                'description': '',
+                'url': 'https://credit.example.com/request',
+                'status_url': '',
+                'thumbnail_url': '',
+                'fulfillment_instructions': None,
+                'display_name': '',
+                'id': 'hogwarts'
+            }
+        ]
+
+        self.assertListEqual(json.loads(response.content), expected)
+
+    def test_get_providers_with_multiple_provider_ids(self):
+        """Test that the method 'get_provider_detail' returns multiple
+         providers with given 'provider_ids' or when no provider in
+         'provider_ids' is given.
+         """
+        # Add another credit provider for the course
+        CreditProvider.objects.create(
+            provider_id='dummy_id',
+            enable_integration=True,
+            provider_url='https://example.com',
+        )
+
+        # verify that all the matching providers are returned when provider ids
+        # are given in parameter 'provider_ids'
+        url = reverse("credit:providers_detail") + "?provider_ids=hogwarts,dummy_id"
+        response = self.client.get(url)
+        self.assertEquals(len(json.loads(response.content)), 2)
+
+        # verify that all providers are returned when no provider id in
+        # parameter 'provider_ids' is provided
+        url = reverse("credit:providers_detail")
+        response = self.client.get(url)
+        self.assertEquals(len(json.loads(response.content)), 2)
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CreditCourseViewSetTests(TestCase):
@@ -380,6 +425,31 @@ class CreditCourseViewSetTests(TestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
 
+    def test_session_auth_post_requires_csrf_token(self):
+        """ Verify non-GET requests require a CSRF token be attached to the request. """
+        user = UserFactory(password=self.password, is_staff=True)
+        client = Client(enforce_csrf_checks=True)
+        self.assertTrue(client.login(username=user.username, password=self.password))
+
+        data = {
+            'course_key': 'a/b/c',
+            'enabled': True
+        }
+
+        # POSTs without a CSRF token should fail.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn('CSRF', response.content)
+
+        # Retrieve a CSRF token
+        response = client.get('/dashboard')
+        csrf_token = response.cookies[settings.CSRF_COOKIE_NAME].value  # pylint: disable=no-member
+        self.assertGreater(len(csrf_token), 0)
+
+        # Ensure POSTs made with the token succeed.
+        response = client.post(self.path, data=json.dumps(data), content_type=JSON, HTTP_X_CSRFTOKEN=csrf_token)
+        self.assertEqual(response.status_code, 201)
+
     def test_oauth(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
         user = UserFactory(is_staff=False)
@@ -399,23 +469,47 @@ class CreditCourseViewSetTests(TestCase):
         response = self.client.get(self.path, **headers)
         self.assertEqual(response.status_code, 200)
 
-    def test_create(self):
-        """ Verify the endpoint supports creating new CreditCourse objects. """
-        course_key = CourseKey.from_string('a/b/c')
+    def assert_course_created(self, course_id, response):
+        """ Verify an API request created a new CreditCourse object. """
         enabled = True
         data = {
-            'course_key': unicode(course_key),
+            'course_key': unicode(course_id),
             'enabled': enabled
         }
 
-        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
         self.assertEqual(response.status_code, 201)
 
         # Verify the API returns the serialized CreditCourse
         self.assertDictEqual(json.loads(response.content), data)
 
         # Verify the CreditCourse was actually created
+        course_key = CourseKey.from_string(course_id)
         self.assertTrue(CreditCourse.objects.filter(course_key=course_key, enabled=enabled).exists())
+
+    def test_create(self):
+        """ Verify the endpoint supports creating new CreditCourse objects. """
+        course_id = 'a/b/c'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        response = self.client.post(self.path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
+
+    def test_put_as_create(self):
+        """ Verify the update endpoint supports creating a new CreditCourse object. """
+        course_id = 'd/e/f'
+        enabled = True
+        data = {
+            'course_key': unicode(course_id),
+            'enabled': enabled
+        }
+
+        path = reverse('credit:creditcourse-detail', args=[course_id])
+        response = self.client.put(path, data=json.dumps(data), content_type=JSON)
+        self.assert_course_created(course_id, response)
 
     def test_get(self):
         """ Verify the endpoint supports retrieving CreditCourse objects. """

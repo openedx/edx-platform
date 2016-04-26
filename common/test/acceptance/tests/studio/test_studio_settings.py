@@ -304,7 +304,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         # Let modal popup
         self.advanced_settings.wait_for_modal_load()
 
-        # Press Undo Changes button
+        # Click Undo Changes button
         self.advanced_settings.undo_changes_via_modal()
 
         # Check that changes are undone
@@ -335,8 +335,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Iterate through the wrong values and make sure they're still displayed
         for key, val in inputs.iteritems():
-            print self.advanced_settings.get(key)
-            print val
             self.assertEquals(
                 str(self.advanced_settings.get(key)),
                 str(val),

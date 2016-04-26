@@ -11,7 +11,7 @@ define([
             DEFAULT_MEMBERSHIP = [
                 {
                     'user': {
-                        'username': 'bilbo',
+                        'username': TeamSpecHelpers.testUser,
                         'profile_image': {
                             'has_image': true,
                             'image_url_medium': '/image-url'
@@ -21,7 +21,9 @@ define([
             ];
 
         beforeEach(function () {
-            setFixtures('<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>');
+            setFixtures('<div id="page-prompt"></div>' +
+                '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>' +
+                '<div class="profile-view"></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
@@ -40,22 +42,14 @@ define([
         createTeamProfileView = function(requests, options) {
             teamModel = new TeamModel(createTeamModelData(options), { parse: true });
             profileView = new TeamProfileView({
+                el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
+                context: TeamSpecHelpers.testContext,
                 model: teamModel,
-                maxTeamSize: options.maxTeamSize || 3,
-                requestUsername: 'bilbo',
-                countries : [
-                    ['', ''],
-                    ['US', 'United States'],
-                    ['CA', 'Canada']
-                ],
-                languages : [
-                    ['', ''],
-                    ['en', 'English'],
-                    ['fr', 'French']
-                ],
-                teamMembershipDetailUrl: 'api/team/v0/team_membership/team_id,bilbo'
+                setFocusToHeaderFunc: function() {
+                    $('.teams-content').focus();
+                }
             });
             profileView.render();
             AjaxHelpers.expectRequest(
@@ -74,19 +68,30 @@ define([
             return profileView;
         };
 
-        clickLeaveTeam = function(requests, view) {
+        clickLeaveTeam = function(requests, view, options) {
             expect(view.$(leaveTeamLinkSelector).length).toBe(1);
 
             // click on Leave Team link under Team Details
             view.$(leaveTeamLinkSelector).click();
 
-            // expect a request to DELETE the team membership
-            AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'api/team/v0/team_membership/test-team,bilbo');
-            AjaxHelpers.respondWithNoContent(requests);
+            if (!options.cancel) {
+                // click on Confirm button on dialog
+                $('.prompt.warning .action-primary').click();
 
-            // expect a request to refetch the user's team memberships
-            AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
-            AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
+                // expect a request to DELETE the team membership
+                AjaxHelpers.expectJsonRequest(
+                    requests, 'DELETE', '/api/team/v0/team_membership/test-team,' + TeamSpecHelpers.testUser
+                );
+                AjaxHelpers.respondWithNoContent(requests);
+
+                // expect a request to refetch the user's team memberships
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/api/team/v0/teams/test-team');
+                AjaxHelpers.respondWithJson(requests, createTeamModelData({country: 'US', language: 'en'}));
+            } else {
+                // click on Cancel button on dialog
+                $('.prompt.warning .action-secondary').click();
+                AjaxHelpers.expectNoRequests(requests);
+            }
         };
 
         describe('DiscussionsView', function() {
@@ -111,7 +116,7 @@ define([
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
                 expect(view.$('.new-post-btn').length).toEqual(1);
-                clickLeaveTeam(requests, view);
+                clickLeaveTeam(requests, view, {cancel: false});
                 expect(view.$('.new-post-btn').length).toEqual(0);
             });
         });
@@ -122,7 +127,7 @@ define([
                 expect(view.$('.team-detail-header').text()).toBe('Team Details');
                 expect(view.$('.team-country').text()).toContain('United States');
                 expect(view.$('.team-language').text()).toContain('English');
-                expect(view.$('.team-capacity').text()).toContain(members + ' / 3 Members');
+                expect(view.$('.team-capacity').text()).toContain(members + ' / 6 Members');
                 expect(view.$('.team-member').length).toBe(members);
                 expect(Boolean(view.$('.leave-team-link').length)).toBe(memberOfTeam);
             };
@@ -163,9 +168,9 @@ define([
                     expect(view.$('.team-user-membership-status').text().trim()).toBe('You are a member of this team.');
 
                     // assert tooltip text.
-                    expect(view.$('.member-profile p').text()).toBe('bilbo');
+                    expect(view.$('.member-profile p').text()).toBe(TeamSpecHelpers.testUser);
                     // assert user profile page url.
-                    expect(view.$('.member-profile').attr('href')).toBe('/u/bilbo');
+                    expect(view.$('.member-profile').attr('href')).toBe('/u/' + TeamSpecHelpers.testUser);
 
                     //Verify that the leave team link is present
                     expect(view.$(leaveTeamLinkSelector).text()).toContain('Leave Team');
@@ -178,8 +183,19 @@ define([
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
                     assertTeamDetails(view, 1, true);
-                    clickLeaveTeam(requests, view);
+                    clickLeaveTeam(requests, view, {cancel: false});
                     assertTeamDetails(view, 0, false);
+                });
+
+                it("wouldn't do anything if user click on Cancel button on dialog", function() {
+                    var requests = AjaxHelpers.requests(this);
+
+                    var view = createTeamProfileView(
+                        requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
+                    );
+                    assertTeamDetails(view, 1, true);
+                    clickLeaveTeam(requests, view, {cancel: true});
+                    assertTeamDetails(view, 1, true);
                 });
 
                 it('shows correct error messages', function () {
@@ -189,7 +205,10 @@ define([
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );
+                        // click leave team link
                         view.$('.leave-team-link').click();
+                        // click Confirm button on dialog
+                        $('.prompt.warning .action-primary').click();
                         AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
                         expect($('.msg-content .copy').text().trim()).toBe(expectedMessage);
                     };

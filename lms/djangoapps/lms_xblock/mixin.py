@@ -1,15 +1,13 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
+from django.utils.translation import ugettext_noop as _
 from lazy import lazy
 
 from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-
-# Make '_' a no-op so we can scrape strings
-_ = lambda text: text
 
 
 class GroupAccessDict(Dict):
@@ -151,11 +149,13 @@ class LmsBlockMixin(XBlockMixin):
             except NoSuchUserPartitionError:
                 has_invalid_user_partitions = True
             else:
-                for group_id in group_ids:
-                    try:
-                        user_partition.get_group(group_id)
-                    except NoSuchUserPartitionGroupError:
-                        has_invalid_groups = True
+                # Skip the validation check if the partition has been disabled
+                if user_partition.active:
+                    for group_id in group_ids:
+                        try:
+                            user_partition.get_group(group_id)
+                        except NoSuchUserPartitionGroupError:
+                            has_invalid_groups = True
 
         if has_invalid_user_partitions:
             validation.add(

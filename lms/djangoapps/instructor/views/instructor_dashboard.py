@@ -39,7 +39,7 @@ from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeIte
 from course_modes.models import CourseMode, CourseModesArchive
 from instructor_email_widget.models import GroupedQuery
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import CertificateGenerationConfiguration
+from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist
 from certificates import api as certs_api
 from util.date_utils import get_default_time_display
 
@@ -146,15 +146,18 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
 
-    # Gate access to Proctoring tab
-    # only global staff (user.is_staff) is allowed to see this tab
-    can_see_proctoring = (
-        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and
-        course.enable_proctored_exams and
-        request.user.is_staff
+    # Gate access to Special Exam tab depending if either timed exams or proctored exams
+    # are enabled in the course
+
+    # NOTE: For now, if we only have procotred exams enabled, then only platform Staff
+    # (user.is_staff) will be able to view the special exams tab. This may
+    # change in the future
+    can_see_special_exams = (
+        ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
     )
-    if can_see_proctoring:
-        sections.append(_section_proctoring(course, access))
+    if can_see_special_exams:
+        sections.append(_section_special_exams(course, access))
 
     # Certificates panel
     # This is used to generate example certificates
@@ -165,15 +168,22 @@ def instructor_dashboard_2(request, course_id):
 
     disable_buttons = not _is_small_course(course_key)
 
+    certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
+    certificate_exception_url = reverse(
+        'create_certificate_exception',
+        kwargs={'course_id': unicode(course_key), 'white_list_student': ''}
+    )
+
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
-        'analytics_dashboard_message': analytics_dashboard_message
+        'analytics_dashboard_message': analytics_dashboard_message,
+        'certificate_white_list': certificate_white_list,
+        'certificate_exception_url': certificate_exception_url
     }
-
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
@@ -237,13 +247,13 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
     return section_data
 
 
-def _section_proctoring(course, access):
+def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
 
     section_data = {
-        'section_key': 'proctoring',
-        'section_display_name': _('Proctoring'),
+        'section_key': 'special_exams',
+        'section_display_name': _('Special Exams'),
         'access': access,
         'course_id': unicode(course_key)
     }
@@ -363,7 +373,7 @@ def _section_course_info(course, access):
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': get_default_time_display(course.start),
-        'end_date': get_default_time_display(course.end),
+        'end_date': get_default_time_display(course.end) or _('No end date set'),
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
@@ -518,6 +528,12 @@ def _section_extensions(course):
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
+
+    show_proctored_report_button = (
+        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+        course.enable_proctored_exams
+    )
+
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
@@ -530,9 +546,13 @@ def _section_data_download(course, access):
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
         'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
                                                  kwargs={'course_id': unicode(course_key)}),
-        'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
+        'show_generate_proctored_exam_report_button': show_proctored_report_button,
+        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
+        'get_issued_certificates_url': reverse(
+            'get_issued_certificates', kwargs={'course_id': unicode(course_key)}
+        ),
         'get_students_who_may_enroll_url': reverse(
             'get_students_who_may_enroll', kwargs={'course_id': unicode(course_key)}
         ),
@@ -542,6 +562,8 @@ def _section_data_download(course, access):
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
+        'course_has_survey': True if course.course_survey_name else False,
+        'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -619,7 +641,7 @@ def _section_analytics(course, access):
     insights_message = _("For analytics about your course, go to {analytics_dashboard_name}.")
 
     insights_message = insights_message.format(
-        analytics_dashboard_name='{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_name=u'{0}{1}</a>'.format(link_start, settings.ANALYTICS_DASHBOARD_NAME)
     )
     section_data = {
         'section_key': 'instructor_analytics',

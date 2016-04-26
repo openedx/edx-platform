@@ -1,13 +1,17 @@
+"""
+Definition of the Discussion module.
+"""
+import json
 from pkg_resources import resource_string
 
-import json
 from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.fields import String, Scope, UNIQUE_ID
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -97,13 +101,10 @@ class DiscussionModule(DiscussionFields, XModule):
 
     def get_course(self):
         """
-        Return the CourseDescriptor at the root of the tree we're in.
+        Return CourseDescriptor by course id.
         """
-        block = self
-        while block.parent:
-            block = block.get_parent()
-
-        return block
+        course = self.runtime.modulestore.get_course(self.course_id)
+        return course
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

@@ -4,7 +4,7 @@ define([
     'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
 ], function (_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper) {
     'use strict';
-    describe('TeamDiscussionView', function() {
+    xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
 
         beforeEach(function() {

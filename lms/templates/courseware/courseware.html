@@ -9,7 +9,7 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from student.models import UserProfile
 %>
 <%
-  include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams
+  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
@@ -39,7 +39,7 @@ ${page_title_breadcrumbs(course_name())}
     % endfor
 % endif
 
-% if include_proctoring:
+% if include_special_exams:
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
@@ -60,14 +60,6 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
-
-  % if show_chat:
-    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
-    ## It'd be better to have this in a place like lms/css/vendor/candy,
-    ## but the candy_res/ folder contains images and other junk, and it
-    ## all needs to stay together for the Candy.js plugin to work.
-    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
-  % endif
   ${fragment.head_html()}
 
 </%block>
@@ -121,83 +113,6 @@ ${page_title_breadcrumbs(course_name())}
       });
   </script>
 
-% if timer_expiration_duration:
-  <script type="text/javascript">
-    var timer = {
-      timer_inst : null,
-      end_time : null,
-      get_remaining_secs : function(endTime) {
-        var currentTime = new Date();
-        var remaining_secs = Math.floor((endTime - currentTime)/1000);
-        return remaining_secs;
-      },
-      get_time_string : function() {
-        function pretty_time_string(num) {
-          return ( num < 10 ? "0" : "" ) + num;
-        }
-        // count down in terms of hours, minutes, and seconds:
-        var hours = pretty_time_string(Math.floor(remaining_secs / 3600));
-        remaining_secs = remaining_secs % 3600;
-        var minutes = pretty_time_string(Math.floor(remaining_secs / 60));
-        remaining_secs = remaining_secs % 60;
-        var seconds = pretty_time_string(Math.floor(remaining_secs));
-
-        var remainingTimeString = hours + ":" + minutes + ":" + seconds;
-        return remainingTimeString;
-      },
-      update_time : function(self) {
-        remaining_secs = self.get_remaining_secs(self.end_time);
-        if (remaining_secs <= 0) {
-          self.end(self);
-        }
-        $('#exam_timer').text(self.get_time_string(remaining_secs));
-      },
-      start : function() { var that = this;
-        // set the end time when the template is rendered.
-        // This value should be UTC time as number of milliseconds since epoch.
-        this.end_time = new Date((new Date()).getTime() + ${timer_expiration_duration});
-        this.timer_inst = setInterval(function(){ that.update_time(that); }, 1000);
-      },
-      end : function(self) {
-        clearInterval(self.timer_inst);
-        // redirect to specified URL:
-        window.location = "${time_expired_redirect_url}";
-      }
-    }
-    // start timer right away:
-    timer.start();
-  </script>
-% endif
-
-% if show_chat:
-  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
-
-  <script type="text/javascript">
-    $(function() {
-      // show/hide the chat widget
-      $('#chat-toggle').click(function() {
-        var toggle = $(this);
-        if (toggle.hasClass('closed')) {
-          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
-            $('#chat-open').hide();
-            $('#chat-close').show();
-          });
-        } else {
-          $('#chat-block').animate({height: '0px'}, 'slow', function() {
-            $('#chat-open').show();
-            $('#chat-close').hide();
-            $(this).hide(); // do this at the very end
-          });
-        }
-        toggle.toggleClass('closed');
-      });
-
-      // TODO: add pop-in/pop-out functionality here
-    });
-  </script>
-% endif
-
 ${fragment.foot_html()}
 
 </%block>
@@ -209,14 +124,10 @@ ${fragment.foot_html()}
 % endif
 
 <div class="container">
-  <div class="course-wrapper">
+  <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index" role="navigation">
-      <header id="open_close_accordion">
-        <a href="#">${_("close")}</a>
-      </header>
-
+    <div class="course-index">
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
         <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
           <form>
@@ -234,8 +145,8 @@ ${fragment.foot_html()}
         </div>
       % endif
 
-      <div id="accordion" style="display: none">
-        <nav aria-label="${_('Course Navigation')}">
+      <div class="accordion">
+        <nav class="course-navigation" aria-label="${_('Course')}">
           % if accordion.strip():
             ${accordion}
           % else:
@@ -246,7 +157,7 @@ ${fragment.foot_html()}
 
     </div>
 % endif
-    <section class="course-content" id="course-content" role="main" aria-label=“Content”>
+    <section class="course-content" id="course-content" role="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -254,14 +165,24 @@ ${fragment.foot_html()}
             <p class="sequential-status-message">
                 ${_('To access course materials, you must score {required_score}% or higher on this \
                 exam. Your current score is {current_score}%.').format(
-                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
-                    current_score=int(entrance_exam_current_score * 100)
+                    required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
+                    current_score=int(round(entrance_exam_current_score * 100))
                 )}
             </p>
+            <script type="text/javascript">
+            $(document).ajaxSuccess(function(event, xhr, settings) {
+                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.entrance_exam_passed){
+                        location.reload();
+                    }
+                }
+            });
+            </script>
             % else:
               <p class="sequential-status-message">
                 ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
-                    current_score=int(entrance_exam_current_score * 100)
+                    current_score=int(round(entrance_exam_current_score * 100))
                 )}
             </p>
             % endif
@@ -298,11 +219,6 @@ ${fragment.foot_html()}
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Chat
-  % if show_chat:
-    <%include file="/chat/toggle_chat.html" />
-  % endif
-
   ## Utility: Notes
   % if is_edxnotes_enabled(course):
     <%include file="/edxnotes/toggle_notes.html" args="course=course"/>

@@ -1,3 +1,6 @@
+"""
+Test cases covering behaviors and workflows of the Peer Grading XBlock
+"""
 import unittest
 import json
 import logging
@@ -219,11 +222,15 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(score_dict["score"], 0.0)
 
     def get_score(self, success, count_graded, count_required):
+        """
+        Returns the peer-graded score based on the provided graded/required values
+        """
         self.peer_grading.use_for_single_location_local = True
         self.peer_grading.graded = True
 
         # Patch for external grading service.
-        with patch('xmodule.peer_grading_module.PeerGradingModule.query_data_for_location') as mock_query_data_for_location:
+        module_name = 'xmodule.peer_grading_module.PeerGradingModule.query_data_for_location'
+        with patch(module_name) as mock_query_data_for_location:
             mock_query_data_for_location.return_value = (
                 success,
                 {"count_graded": count_graded, "count_required": count_required}
@@ -249,6 +256,9 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
 
 
 class MockPeerGradingServiceProblemList(MockPeerGradingService):
+    """
+    Mock object representing a set of peer-grading problems
+    """
     def get_problem_list(self, course_id, grader_id):
         return {'success': True,
                 'problem_list': [
@@ -348,6 +358,9 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         return ScopeIds(None, None, self.problem_location, self.problem_location)
 
     def _create_peer_grading_descriptor_with_linked_problem(self):
+        """
+        Internal helper method to construct a peer grading XBlock
+        """
         # Initialize the peer grading module.
         system = get_test_descriptor_system()
 

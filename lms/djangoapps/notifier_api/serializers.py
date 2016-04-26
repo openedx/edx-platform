@@ -23,9 +23,9 @@ class NotifierUserSerializer(serializers.ModelSerializer):
      * course_groups
      * roles__permissions
     """
-    name = serializers.SerializerMethodField("get_name")
-    preferences = serializers.SerializerMethodField("get_preferences")
-    course_info = serializers.SerializerMethodField("get_course_info")
+    name = serializers.SerializerMethodField()
+    preferences = serializers.SerializerMethodField()
+    course_info = serializers.SerializerMethodField()
 
     def get_name(self, user):
         return user.profile.name
@@ -63,7 +63,7 @@ class NotifierUserSerializer(serializers.ModelSerializer):
                     pass
         return ret
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = User
         fields = ("id", "email", "name", "preferences", "course_info")
         read_only_fields = ("id", "email")

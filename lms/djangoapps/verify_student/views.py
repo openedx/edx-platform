@@ -29,14 +29,14 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce import ecommerce_api_client
 from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
-from ecommerce_api_client.exceptions import SlumberBaseException
+from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from embargo import api as embargo_api
 from microsite_configuration import microsite
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
@@ -52,12 +52,13 @@ from verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationCheckpoint,
     VerificationStatus,
+    IcrvStatusEmailsConfiguration,
 )
 from verify_student.image import decode_image_data, InvalidImageData
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
-from staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 log = logging.getLogger(__name__)
@@ -273,7 +274,7 @@ class PayAndVerifyView(View):
         # separate out the payment flow and use the product SKU to figure out what
         # the user is trying to purchase.
         #
-        # Nonethless, for the time being we continue to make the really ugly assumption
+        # Nonetheless, for the time being we continue to make the really ugly assumption
         # that at some point there was a paid course mode we can query for the price.
         relevant_course_mode = self._get_paid_mode(course_key)
 
@@ -509,9 +510,12 @@ class PayAndVerifyView(View):
         # Retrieve all the modes at once to reduce the number of database queries
         all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
 
-        # Retrieve the first unexpired, paid mode, if there is one
+        # Retrieve the first mode that matches the following criteria:
+        #  * Unexpired
+        #  * Price > 0
+        #  * Not credit
         for mode in unexpired_modes[course_key]:
-            if mode.min_price > 0:
+            if mode.min_price > 0 and not CourseMode.is_credit_mode(mode):
                 return mode
 
         # Otherwise, find the first expired mode
@@ -763,13 +767,22 @@ def create_order(request):
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     current_mode = None
-    paid_modes = CourseMode.paid_modes_for_course(course_id)
-    # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
-    # for course exist then choose the first one
-    if paid_modes:
-        if len(paid_modes) > 1:
-            log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
-        current_mode = paid_modes[0]
+    sku = request.POST.get('sku', None)
+
+    if sku:
+        try:
+            current_mode = CourseMode.objects.get(sku=sku)
+        except CourseMode.DoesNotExist:
+            log.exception(u'Failed to find CourseMode with SKU [%s].', sku)
+
+    if not current_mode:
+        # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
+        # for course exist then choose the first one
+        paid_modes = CourseMode.paid_modes_for_course(course_id)
+        if paid_modes:
+            if len(paid_modes) > 1:
+                log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+            current_mode = paid_modes[0]
 
     # Make sure this course has a paid mode
     if not current_mode:
@@ -1090,9 +1103,10 @@ class SubmitPhotosView(View):
         Returns: None
 
         """
-        if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        if settings.LMS_SEGMENT_KEY:
             tracking_context = tracker.get_tracker().resolve_context()
             context = {
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1299,8 +1313,9 @@ def results_callback(request):
     checkpoints = VerificationCheckpoint.objects.filter(photo_verification=attempt).all()
     VerificationStatus.add_status_from_checkpoints(checkpoints=checkpoints, user=attempt.user, status=status)
 
-    # If this is re-verification then send the update email
-    if checkpoints:
+    # Trigger ICRV email only if ICRV status emails config is enabled
+    icrv_status_emails = IcrvStatusEmailsConfiguration.current()
+    if icrv_status_emails.enabled and checkpoints:
         user_id = attempt.user.id
         course_key = checkpoints[0].course_id
         related_assessment_location = checkpoints[0].checkpoint_location
@@ -1427,7 +1442,7 @@ class InCourseReverifyView(View):
             event_name, user_id, course_id, checkpoint
         )
 
-        if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        if settings.LMS_SEGMENT_KEY:
             tracking_context = tracker.get_tracker().resolve_context()
             analytics.track(
                 user_id,
@@ -1438,6 +1453,7 @@ class InCourseReverifyView(View):
                     'checkpoint': checkpoint
                 },
                 context={
+                    'ip': tracking_context.get('ip'),
                     'Google Analytics': {
                         'clientId': tracking_context.get('client_id')
                     }
@@ -1473,11 +1489,3 @@ class InCourseReverifyView(View):
         params = urllib.urlencode({"checkpoint": checkpoint})
         full_url = u"{base}?{params}".format(base=base_url, params=params)
         return redirect(full_url)
-
-
-class VerifyLaterView(RedirectView):
-    """ This view has been deprecated and should redirect to the unified verification flow. """
-    permanent = True
-
-    def get_redirect_url(self, course_id, **kwargs):    # pylint: disable=unused-argument
-        return reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_id)})

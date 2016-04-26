@@ -555,8 +555,8 @@ class MatlabTest(unittest.TestCase):
         response = self.the_input.handle_ajax("plot", data)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
-        self.assertTrue('queuekey' not in self.the_input.input_state)
-        self.assertTrue('queuestate' not in self.the_input.input_state)
+        self.assertNotIn('queuekey', self.the_input.input_state)
+        self.assertNotIn('queuestate', self.the_input.input_state)
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_success(self, time):
@@ -594,7 +594,7 @@ class MatlabTest(unittest.TestCase):
         the_input.ungraded_response(queue_msg, 'abc')
         self.assertEqual(input_state['queuekey'], queuekey)
         self.assertEqual(input_state['queuestate'], 'queued')
-        self.assertFalse('queue_msg' in input_state)
+        self.assertNotIn('queue_msg', input_state)
 
     @patch('capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_timeout_not_exceeded(self, time):
@@ -1076,7 +1076,7 @@ class ChemicalEquationTest(unittest.TestCase):
             )
 
         self.assertIn('error', response)
-        self.assertTrue("Couldn't parse formula" in response['error'])
+        self.assertIn("Couldn't parse formula", response['error'])
 
     @patch('capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
@@ -1126,8 +1126,52 @@ class FormulaEquationTest(unittest.TestCase):
             'size': self.size,
             'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
             'inline': False,
+            'trailing_text': '',
         }
         self.assertEqual(context, expected)
+
+    def test_trailing_text_rendering(self):
+        """
+        Verify that the render context matches the expected render context with trailing_text
+        """
+        size = "42"
+        # store (xml_text, expected)
+        trailing_text = []
+        # standard trailing text
+        trailing_text.append(('m/s', 'm/s'))
+        # unicode trailing text
+        trailing_text.append((u'\xc3', u'\xc3'))
+        # html escaped trailing text
+        # this is the only one we expect to change
+        trailing_text.append(('a &lt; b', 'a < b'))
+
+        for xml_text, expected_text in trailing_text:
+            xml_str = u"""<formulaequationinput id="prob_1_2"
+                            size="{size}"
+                            trailing_text="{tt}"
+                            />""".format(size=size, tt=xml_text)
+
+            element = etree.fromstring(xml_str)
+
+            state = {'value': 'x^2+1/2', }
+            the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
+
+            context = the_input._get_render_context()  # pylint: disable=protected-access
+
+            expected = {
+                'STATIC_URL': '/dummy-static/',
+                'id': 'prob_1_2',
+                'value': 'x^2+1/2',
+                'status': inputtypes.Status('unanswered'),
+                'label': '',
+                'msg': '',
+                'size': size,
+                'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
+                'inline': False,
+                'trailing_text': expected_text,
+            }
+
+            self.assertEqual(context, expected)
 
     def test_formcalc_ajax_sucess(self):
         """

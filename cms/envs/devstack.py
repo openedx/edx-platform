@@ -2,6 +2,8 @@
 Specific overrides to the base prod settings to make development easier.
 """
 
+from os.path import abspath, dirname, join
+
 from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 FEATURES['USE_DJANGO_PIPELINE'] = False
@@ -35,8 +37,15 @@ FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ########################### PIPELINE #################################
 
-# Skip RequireJS optimizer in development
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+# Skip packaging and optimization in development
+PIPELINE_ENABLED = False
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+
+# Revert to the default set of finders as we don't want the production pipeline
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 ############################# ADVANCED COMPONENTS #############################
 
@@ -110,10 +119,8 @@ REQUIRE_DEBUG = DEBUG
 
 ###############################################################################
 # See if the developer has any local overrides.
-try:
-    from .private import *  # pylint: disable=import-error
-except ImportError:
-    pass
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import
 
 #####################################################################
 # Lastly, run any migrations, if needed.

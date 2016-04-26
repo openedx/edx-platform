@@ -4,28 +4,20 @@ This file contains all entrance exam related utils/logic.
 from django.conf import settings
 
 from courseware.access import has_access
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
+from courseware.model_data import FieldDataCache, ScoresClient
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import EntranceExamConfiguration
-from util.milestones_helpers import get_required_content
+from util.milestones_helpers import get_required_content, is_entrance_exams_enabled
 from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import modulestore
-
-
-def feature_is_enabled():
-    """
-    Checks to see if the Entrance Exams feature is enabled
-    Use this operation instead of checking the feature flag all over the place
-    """
-    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
 
 
 def course_has_entrance_exam(course):
     """
     Checks to see if a course is properly configured for an entrance exam
     """
-    if not feature_is_enabled():
+    if not is_entrance_exams_enabled():
         return False
     if not course.entrance_exam_enabled:
         return False
@@ -88,29 +80,38 @@ def _calculate_entrance_exam_score(user, course_descriptor, exam_modules):
     """
     Calculates the score (percent) of the entrance exam using the provided modules
     """
-    # All of the exam module ids
-    exam_module_ids = [exam_module.location for exam_module in exam_modules]
-
-    # All of the corresponding student module records
-    student_modules = StudentModule.objects.filter(
-        student=user,
-        course_id=course_descriptor.id,
-        module_state_key__in=exam_module_ids,
-    )
     student_module_dict = {}
-    for student_module in student_modules:
-        student_module_dict[unicode(student_module.module_state_key)] = {
-            'grade': student_module.grade,
-            'max_grade': student_module.max_grade
-        }
+    scores_client = ScoresClient(course_descriptor.id, user.id)
+    # removing branch and version from exam modules locator
+    # otherwise student module would not return scores since module usage keys would not match
+    locations = [
+        BlockUsageLocator(
+            course_key=course_descriptor.id,
+            block_type=exam_module.location.block_type,
+            block_id=exam_module.location.block_id
+        )
+        if isinstance(exam_module.location, BlockUsageLocator) and exam_module.location.version
+        else exam_module.location
+        for exam_module in exam_modules
+    ]
+    scores_client.fetch_scores(locations)
+
+    # Iterate over all of the exam modules to get score of user for each of them
+    for index, exam_module in enumerate(exam_modules):
+        exam_module_score = scores_client.get(locations[index])
+        if exam_module_score:
+            student_module_dict[unicode(locations[index])] = {
+                'grade': exam_module_score.correct,
+                'max_grade': exam_module_score.total
+            }
     exam_percentage = 0
     module_percentages = []
     ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
 
-    for module in exam_modules:
+    for index, module in enumerate(exam_modules):
         if module.graded and module.category not in ignore_categories:
             module_percentage = 0
-            module_location = unicode(module.location)
+            module_location = unicode(locations[index])
             if module_location in student_module_dict and student_module_dict[module_location]['max_grade']:
                 student_module = student_module_dict[module_location]
                 module_percentage = student_module['grade'] / student_module['max_grade']

@@ -1,7 +1,9 @@
 import json
 import logging
 import traceback
+
 from lxml import etree
+
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
 from xmodule.progress import Progress
@@ -34,6 +36,8 @@ ACCEPT_FILE_UPLOAD = False
 # Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 HUMAN_TASK_TYPE = {

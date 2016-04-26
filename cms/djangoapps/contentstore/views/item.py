@@ -38,16 +38,19 @@ from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
+from util.milestones_helpers import is_entrance_exams_enabled
 
 from student.auth import has_studio_write_access, has_studio_read_access
-from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
-    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups
+from contentstore.utils import (
+    find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
+    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups,
+    get_user_partition_info,
+)
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
@@ -63,12 +66,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
-# In order to allow descriptors to use a handler url, we need to
-# monkey-patch the x_module library.
-# TODO: Remove this code when Runtimes are no longer created by modulestores
-xmodule.x_module.descriptor_global_handler_url = handler_url
-xmodule.x_module.descriptor_global_local_resource_url = local_resource_url
 
 
 def hash_resource(resource):
@@ -86,7 +83,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+    if is_entrance_exams_enabled():
         graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
     return graders
 
@@ -699,10 +696,14 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     """
     store = modulestore()
     items = store.get_orphans(course_usage_key)
+    branch = course_usage_key.branch
     if commit:
         for itemloc in items:
-            # need to delete all versions
-            store.delete_item(itemloc, user_id, revision=ModuleStoreEnum.RevisionOption.all)
+            revision = ModuleStoreEnum.RevisionOption.all
+            # specify branches when deleting orphans
+            if branch == ModuleStoreEnum.BranchName.published:
+                revision = ModuleStoreEnum.RevisionOption.published_only
+            store.delete_item(itemloc, user_id, revision=revision)
     return [unicode(item) for item in items]
 
 
@@ -756,7 +757,7 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
-                       user=None):
+                       user=None, course=None):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -788,6 +789,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Filter the graders data as needed
     graders = _filter_entrance_exam_grader(graders)
 
+    # We need to load the course in order to retrieve user partition information.
+    # For this reason, we load the course once and re-use it when recursively loading children.
+    if course is None:
+        course = modulestore().get_course(xblock.location.course_key)
+
     # Compute the child info first so it can be included in aggregate information for the parent
     should_visit_children = include_child_info and (course_outline and not is_xblock_unit or not course_outline)
     if should_visit_children and xblock.has_children:
@@ -796,7 +802,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             course_outline,
             graders,
             include_children_predicate=include_children_predicate,
-            user=user
+            user=user,
+            course=course
         )
     else:
         child_info = None
@@ -846,24 +853,27 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due_date": get_default_time_display(xblock.due),
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
-        "course_graders": json.dumps([grader.get('type') for grader in graders]),
+        "course_graders": [grader.get('type') for grader in graders],
         "has_changes": has_changes,
         "actions": xblock_actions,
         "explanatory_message": explanatory_message,
+        "group_access": xblock.group_access,
+        "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
-    # update xblock_info with proctored_exam information if the feature flag is enabled
-    if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
+    # update xblock_info with special exam information if the feature flag is enabled
+    if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         if xblock.category == 'course':
             xblock_info.update({
-                "enable_proctored_exams": xblock.enable_proctored_exams
+                "enable_proctored_exams": xblock.enable_proctored_exams,
+                "enable_timed_exams": xblock.enable_timed_exams
             })
         elif xblock.category == 'sequential':
             xblock_info.update({
-                "is_proctored_enabled": xblock.is_proctored_enabled,
+                "is_proctored_exam": xblock.is_proctored_exam,
+                "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes,
-                "is_practice_exam": xblock.is_practice_exam
+                "default_time_limit_minutes": xblock.default_time_limit_minutes
             })
 
     # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.
@@ -1023,7 +1033,7 @@ def _create_xblock_ancestor_info(xblock, course_outline):
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None):
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None):  # pylint: disable=line-too-long
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1042,7 +1052,8 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 include_children_predicate=include_children_predicate,
                 parent_xblock=xblock,
                 graders=graders,
-                user=user
+                user=user,
+                course=course,
             ) for child in xblock.get_children()
         ]
     return child_info

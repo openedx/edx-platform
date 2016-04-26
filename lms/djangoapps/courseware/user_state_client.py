@@ -18,6 +18,8 @@ from xblock.fields import Scope, ScopeBase
 from courseware.models import StudentModule, StudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
+from openedx.core.djangoapps.call_stack_manager import donottrack
+
 
 class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
@@ -40,7 +42,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
 
     # Use this sample rate for DataDog events.
-    API_DATADOG_SAMPLE_RATE = 0.01
+    API_DATADOG_SAMPLE_RATE = 0.1
 
     class ServiceUnavailable(XBlockUserStateClient.ServiceUnavailable):
         """
@@ -69,6 +71,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.user = user
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def _get_student_modules(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
@@ -116,6 +119,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             sample_rate=self.API_DATADOG_SAMPLE_RATE,
         )
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def get_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Retrieve the stored XBlock state for the specified XBlock usages.
@@ -136,13 +140,18 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         block_count = state_length = 0
         evt_time = time()
 
+        self._ddog_histogram(evt_time, 'get_many.blks_requested', len(block_keys))
+
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
+                self._ddog_increment(evt_time, 'get_many.empty_state')
                 continue
 
             state = json.loads(module.state)
             state_length += len(module.state)
+
+            self._ddog_histogram(evt_time, 'get_many.block_size', len(module.state))
 
             # If the state is the empty dict, then it has been deleted, and so
             # conformant UserStateClients should treat it as if it doesn't exist.
@@ -160,9 +169,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         # The rest of this method exists only to submit DataDog events.
         # Remove it once we're no longer interested in the data.
+        finish_time = time()
         self._ddog_histogram(evt_time, 'get_many.blks_out', block_count)
-        self._ddog_histogram(evt_time, 'get_many.blks_size', state_length)
+        self._ddog_histogram(evt_time, 'get_many.response_time', (finish_time - evt_time) * 1000)
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
         Set fields for a particular XBlock.
@@ -234,21 +245,32 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             num_fields_updated = max(0, len(state) - num_new_fields_set)
             self._ddog_histogram(evt_time, 'set_many.fields_updated', num_fields_updated)
 
-        # Event for the entire set_many call.
+        # Events for the entire set_many call.
+        finish_time = time()
         self._ddog_histogram(evt_time, 'set_many.blks_updated', len(block_keys_to_state))
+        self._ddog_histogram(evt_time, 'set_many.response_time', (finish_time - evt_time) * 1000)
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Delete the stored XBlock state for a many xblock usages.
 
         Arguments:
             username: The name of the user whose state should be deleted
-            block_key (UsageKey): The UsageKey identifying which xblock state to delete.
+            block_keys (list): The UsageKey identifying which xblock state to delete.
             scope (Scope): The scope to delete data from
             fields: A list of fields to delete. If None, delete all stored fields.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
+
+        evt_time = time()
+        if fields is None:
+            self._ddog_increment(evt_time, 'delete_many.empty_state')
+        else:
+            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
+
+        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
 
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
@@ -265,6 +287,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             # We just read this object, so we know that we can do an update
             student_module.save(force_update=True)
 
+        # Event for the entire delete_many call.
+        finish_time = time()
+        self._ddog_histogram(evt_time, 'delete_many.response_time', (finish_time - evt_time) * 1000)
+
+    @donottrack(StudentModule, StudentModuleHistory)
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
         Retrieve history of state changes for a given block for a given
@@ -319,6 +346,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size
@@ -329,6 +357,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
+    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size

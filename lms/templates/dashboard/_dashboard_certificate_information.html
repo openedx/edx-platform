@@ -59,7 +59,7 @@ else:
         <a class="btn" href="${cert_status['cert_web_view_url']}" target="_blank"
            title="${_('This link will open the certificate web view')}">
            ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}</a></li>
-      % elif cert_status['show_download_url'] and (enrollment.mode == 'honor' or enrollment.mode == 'audit'):
+      % elif cert_status['show_download_url'] and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
         <li class="action action-certificate">
         <a class="btn" href="${cert_status['download_url']}"
            title="${_('This link will open/download a PDF document')}">

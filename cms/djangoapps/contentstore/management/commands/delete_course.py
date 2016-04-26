@@ -18,18 +18,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 
-def print_out_all_courses():
-    """
-    Print out all the courses available in the course_key format so that
-    the user can correct any course_key mistakes
-    """
-    courses = modulestore().get_courses_keys()
-    print 'Available courses:'
-    for course in courses:
-        print str(course)
-    print ''
-
-
 class Command(BaseCommand):
     """
     Delete a MongoDB backed course
@@ -58,8 +46,6 @@ class Command(BaseCommand):
         elif len(args) > 2:
             raise CommandError("Too many arguments! Expected <course_key> <commit>")
 
-        print_out_all_courses()
-
         if not modulestore().get_course(course_key):
             raise CommandError("Course with '%s' key not found." % args[0])
 
@@ -67,4 +53,4 @@ class Command(BaseCommand):
         if query_yes_no("Deleting course {0}. Confirm?".format(course_key), default="no"):
             if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
                 delete_course_and_groups(course_key, ModuleStoreEnum.UserID.mgmt_command)
-                print_out_all_courses()
+                print "Deleted course {}".format(course_key)

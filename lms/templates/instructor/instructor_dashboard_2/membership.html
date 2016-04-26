@@ -25,7 +25,8 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       </table>
     </div>
     <div class="bottom-bar">
-      <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
+      <label for="add-field" class="sr">{{add_placeholder}}</label>
+      <input type="text" id="add-field" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
       <input type="button" name="add" class="add" value="{{add_btn_label}}">
     </div>
   </div>
@@ -154,7 +155,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
 <hr class="divider" />
 %endif
 
-<div class="member-lists-management membership-section">
+<div class="member-lists-management membership-section" aria-live="polite">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Course Team Management")} </h2>
 
@@ -192,6 +193,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-add-button-label="${_("Add Staff")}"
     ></div>
 
+    ## Note that "Admin" is identified as "Instructor" in the Django admin panel.
     <div class="auth-list-container"
       data-rolename="instructor"
       data-display-name="${_("Admin")}"
@@ -204,7 +206,8 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Admin")}"
-    ></div>
+    >
+    </div>
 
     <div class="auth-list-container"
       data-rolename="beta"

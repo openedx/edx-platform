@@ -2,7 +2,6 @@
 """
 Student dashboard page.
 """
-
 from bok_choy.page_object import PageObject
 from . import BASE_URL
 
@@ -156,6 +155,18 @@ class DashboardPage(PageObject):
     def get_course_social_sharing_widget(self, widget_name):
         """ Retrieves the specified social sharing widget by its classification """
         return self.q(css='a.action-{}'.format(widget_name))
+
+    def get_courses(self):
+        """
+        Get all courses shown in the dashboard
+        """
+        return self.q(css='ul.listing-courses .course-item')
+
+    def get_course_date(self):
+        """
+        Get course date of the first course from dashboard
+        """
+        return self.q(css='ul.listing-courses .course-item .info-date-block').first.text[0]
 
     def click_username_dropdown(self):
         """

@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container", "js/utils/module", "gettext",
-        "js/views/feedback_notification", "js/views/paging_header", "common/js/components/views/paging_footer"],
+define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/views/container", "js/utils/module", "gettext",
+        "common/js/components/views/feedback_notification", "js/views/paging_header", "common/js/components/views/paging_footer"],
     function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
         var PagedContainerView = ContainerView.extend({
             initialize: function(options){

@@ -80,7 +80,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
         # With default configuration settings, email is not shared with other (non-staff) users.
         account_settings = get_account_settings(self.default_request, self.different_user.username)
-        self.assertFalse("email" in account_settings)
+        self.assertNotIn("email", account_settings)
 
         account_settings = get_account_settings(
             self.default_request,
@@ -150,6 +150,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
                 {"language_proficiencies": [{}]}
             )
 
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(self.user, {"account_privacy": ""})
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
@@ -164,7 +167,10 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         field_errors = context_manager.exception.field_errors
         self.assertEqual(3, len(field_errors))
         self.assertEqual("This field is not editable via this API", field_errors["username"]["developer_message"])
-        self.assertIn("Select a valid choice", field_errors["gender"]["developer_message"])
+        self.assertIn(
+            "Value \'undecided\' is not valid for field \'gender\'",
+            field_errors["gender"]["developer_message"]
+        )
         self.assertIn("Valid e-mail address required.", field_errors["email"]["developer_message"])
 
     @patch('django.core.mail.send_mail')
@@ -209,6 +215,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         Test that eventing of language proficiencies, which happens update_account_settings method, behaves correctly.
         """
         def verify_event_emitted(new_value, old_value):
+            """
+            Confirm that the user setting event was properly emitted
+            """
             update_account_settings(self.user, {"language_proficiencies": new_value})
             self.assert_user_setting_event_emitted(setting='language_proficiencies', old=old_value, new=new_value)
             self.reset_tracker()
@@ -223,7 +232,9 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
 )
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class AccountSettingsOnCreationTest(TestCase):
@@ -267,12 +278,15 @@ class AccountSettingsOnCreationTest(TestCase):
             },
             'requires_parental_consent': True,
             'language_proficiencies': [],
+            'account_privacy': None
         })
 
 
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
-
+    """
+    Test cases to cover the account initialization workflow
+    """
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'frank+underwood@example.com'
@@ -412,6 +426,9 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     def _assert_is_datetime(self, timestamp):
+        """
+        Internal helper to validate the type of the provided timestamp
+        """
         if not timestamp:
             return False
         try:

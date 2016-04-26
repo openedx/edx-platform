@@ -1,38 +1,17 @@
 <%inherit file="accomplishment-base.html" />
 <%! from django.utils.translation import ugettext as _ %>
 
-<div class="wrapper-content">
+<div class="wrapper-content status status-invalid">
     <div class="wrapper-content-grid">
-
-        <section class="content content-main" role="main">
-            <div class="status status-invalid" id="validation-status">
-                <h2 class="title title-lvl2">${_("This is an invalid certificate number")}</h2>
-            </div>
-
-            <div class="feedback">
-                <div class="feedback-lead">
-                    <h3 class="title">${_("This Certificate Does Not Exist")}</h3>
-                    <div class="copy">
-                        <p>${_("We cannot find a certificate on file that matches this URL or ID number.")}</p>
-                    </div>
+        <main class="content content-main">
+            <section class="">
+                <h2 class="title">${_("Cannot Find Certificate")}</h2>
+                <div class="copy">
+                    <p>${_("We cannot find a certificate with this URL or ID number. If you are trying to validate a certificate, make sure that the URL or ID number is correct. If you are sure that the URL or ID number is correct, contact support.")}</p>
                 </div>
-
-                <div class="feedback-support">
-                    <h3 class="title">${_("Looking for a Particular Certificate?")}</h3>
-
-                    <div class="copy">
-                        <p>${_("Ensure that the ID number is an exact match of the ID number on the PDF or print certificate you are referencing.")}</p>
-                    </div>
-                </div>
-
-                <div class="feedback-warning">
-                    <h3 class="title">Please Note</h3>
-                    <div class="copy">
-                        <p>${_("If you are trying to validate a certificate with this ID number, it may be a forgery.")}</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+            </section>
+        </main>
+        <aside role="complementary" class="content-secondary about" aria-label="About ${platform_name} Certificates">
+        </aside>
     </div>
 </div>

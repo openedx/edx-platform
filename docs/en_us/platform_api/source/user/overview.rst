@@ -4,7 +4,9 @@ User API Overview
 
 Use the User API to view and update account and preference information.
 
-You can use the User API for web, desktop, and mobile applications.
+.. contents::
+   :local:
+   :depth: 1
 
 *************************************
 User API Version and Status

@@ -8,12 +8,9 @@ import urllib2
 import json
 from util.json_request import JsonResponse
 from pytz import timezone
-import cgi
 
 from datetime import datetime
-from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -34,8 +31,9 @@ from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
-from courseware.access import has_access, in_preview_mode, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
+from courseware.access_utils import in_preview_mode
 from courseware.courses import (
     get_courses, get_course, get_course_by_id,
     get_studio_url, get_course_with_access,
@@ -293,36 +291,6 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
         current_module = parent
 
 
-def chat_settings(course, user):
-    """
-    Returns a dict containing the settings required to connect to a
-    Jabber chat server and room.
-    """
-    domain = getattr(settings, "JABBER_DOMAIN", None)
-    if domain is None:
-        log.warning('You must set JABBER_DOMAIN in the settings to '
-                    'enable the chat widget')
-        return None
-
-    return {
-        'domain': domain,
-
-        # Jabber doesn't like slashes, so replace with dashes
-        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
-
-        'username': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-
-        # TODO: clearly this needs to be something other than the username
-        #       should also be something that's not necessarily tied to a
-        #       particular course
-        'password': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-    }
-
-
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -484,18 +452,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
             return redirect_to_course_position(course_module, CONTENT_DEPTH)
-
-        # Only show the chat if it's enabled by the course and in the
-        # settings.
-        show_chat = course.show_chat and settings.FEATURES['ENABLE_CHAT']
-        if show_chat:
-            context['chat'] = chat_settings(course, request.user)
-            # If we couldn't load the chat settings, then don't show
-            # the widget in the courseware.
-            if context['chat'] is None:
-                show_chat = False
-
-        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
         if chapter_descriptor is not None:
@@ -953,97 +909,6 @@ def course_about(request, course_id):
         })
 
 
-@ensure_csrf_cookie
-@cache_if_anonymous('org')
-@ensure_valid_course_key
-def mktg_course_about(request, course_id):
-    """This is the button that gets put into an iframe on the Drupal site."""
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-    try:
-        permission_name = microsite.get_value(
-            'COURSE_ABOUT_VISIBILITY_PERMISSION',
-            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-        )
-        course = get_course_with_access(request.user, permission_name, course_key)
-    except (ValueError, Http404):
-        # If a course does not exist yet, display a "Coming Soon" button
-        return render_to_response(
-            'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
-        )
-
-    registered = registered_for_course(course, request.user)
-
-    if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id.to_deprecated_string()])
-    else:
-        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
-
-    allow_registration = bool(has_access(request.user, 'enroll', course))
-
-    show_courseware_link = bool(has_access(request.user, 'load', course) or
-                                settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
-    course_modes = CourseMode.modes_for_course_dict(course.id)
-
-    context = {
-        'course': course,
-        'registered': registered,
-        'allow_registration': allow_registration,
-        'course_target': course_target,
-        'show_courseware_link': show_courseware_link,
-        'course_modes': course_modes,
-    }
-
-    # The edx.org marketing site currently displays only in English.
-    # To avoid displaying a different language in the register / access button,
-    # we force the language to English.
-    # However, OpenEdX installations with a different marketing front-end
-    # may want to respect the language specified by the user or the site settings.
-    force_english = settings.FEATURES.get('IS_EDX_DOMAIN', False)
-    if force_english:
-        translation.activate('en-us')
-
-    if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-        # Drupal will pass organization names using a GET parameter, as follows:
-        #     ?org=Harvard
-        #     ?org=Harvard,MIT
-        # If no full names are provided, the marketing iframe won't show the
-        # email opt-in checkbox.
-        org = request.GET.get('org')
-        if org:
-            org_list = org.split(',')
-            # HTML-escape the provided organization names
-            org_list = [cgi.escape(org) for org in org_list]
-            if len(org_list) > 1:
-                if len(org_list) > 2:
-                    # Translators: The join of three or more institution names (e.g., Harvard, MIT, and Dartmouth).
-                    org_name_string = _("{first_institutions}, and {last_institution}").format(
-                        first_institutions=u", ".join(org_list[:-1]),
-                        last_institution=org_list[-1]
-                    )
-                else:
-                    # Translators: The join of two institution names (e.g., Harvard and MIT).
-                    org_name_string = _("{first_institution} and {second_institution}").format(
-                        first_institution=org_list[0],
-                        second_institution=org_list[1]
-                    )
-            else:
-                org_name_string = org_list[0]
-
-            context['checkbox_label'] = ungettext(
-                "I would like to receive email from {institution_series} and learn about its other programs.",
-                "I would like to receive email from {institution_series} and learn about their other programs.",
-                len(org_list)
-            ).format(institution_series=org_name_string)
-
-    try:
-        return render_to_response('courseware/mktg_course_about.html', context)
-    finally:
-        # Just to be safe, reset the language if we forced it to be English.
-        if force_english:
-            translation.deactivate()
-
-
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually
@@ -1171,6 +1036,9 @@ def _credit_course_requirements(course_key, student):
     if not (settings.FEATURES.get("ENABLE_CREDIT_ELIGIBILITY", False) and is_credit_course(course_key)):
         return None
 
+    # Credit requirement statuses for which user does not remain eligible to get credit.
+    non_eligible_statuses = ['failed', 'declined']
+
     # Retrieve the status of the user for each eligibility requirement in the course.
     # For each requirement, the user's status is either "satisfied", "failed", or None.
     # In this context, `None` means that we don't know the user's status, either because
@@ -1194,7 +1062,7 @@ def _credit_course_requirements(course_key, student):
 
     # If the user has *failed* any requirements (for example, if a photo verification is denied),
     # then the user is NOT eligible for credit.
-    elif any(requirement['status'] == 'failed' for requirement in requirement_statuses):
+    elif any(requirement['status'] in non_eligible_statuses for requirement in requirement_statuses):
         eligibility_status = "not_eligible"
 
     # Otherwise, the user may be eligible for credit, but the user has not
@@ -1715,7 +1583,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
         None
 
     """
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if settings.LMS_SEGMENT_KEY:
         event_name = 'edx.bi.user.certificate.generate'
         tracking_context = tracker.get_tracker().resolve_context()
 
@@ -1727,6 +1595,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
                 'label': unicode(course_id)
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1743,6 +1612,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     usage_key = UsageKey.from_string(usage_key_string)
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
+
+    requested_view = request.GET.get('view', 'student_view')
+    if requested_view != 'student_view':
+        return HttpResponseBadRequest("Rendering of the xblock view '{}' is not supported.".format(requested_view))
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check

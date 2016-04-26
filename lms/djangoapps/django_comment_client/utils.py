@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 import json
 import logging
+from django.conf import settings
 
 import pytz
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
+from ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
@@ -32,15 +34,27 @@ log = logging.getLogger(__name__)
 
 
 def extract(dic, keys):
+    """
+    Returns a subset of keys from the provided dictionary
+    """
     return {k: dic.get(k) for k in keys}
 
 
 def strip_none(dic):
+    """
+    Returns a dictionary stripped of any keys having values of None
+    """
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
 
 
 def strip_blank(dic):
+    """
+    Returns a dictionary stripped of any 'blank' (empty) keys
+    """
     def _is_blank(v):
+        """
+        Determines if the provided value contains no information
+        """
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
@@ -48,16 +62,23 @@ def strip_blank(dic):
 
 
 def merge_dict(dic1, dic2):
+    """
+    Combines the keys from the two provided dictionaries
+    """
     return dict(dic1.items() + dic2.items())
 
 
 def get_role_ids(course_id):
+    """
+    Returns a dictionary having role names as keys and a list of users as values
+    """
     roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
     return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
 def has_discussion_privileges(user, course_id):
-    """Returns True if the user is privileged in teams discussions for
+    """
+    Returns True if the user is privileged in teams discussions for
     this course. The user must be one of Discussion Admin, Moderator,
     or Community TA.
 
@@ -77,6 +98,9 @@ def has_discussion_privileges(user, course_id):
 
 
 def has_forum_access(uname, course_id, rolename):
+    """
+    Boolean operation which tests a user's role-based permissions (not actually forums-specific)
+    """
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
@@ -85,10 +109,17 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def has_required_keys(module):
-    """Returns True iff module has the proper attributes for generating metadata with get_discussion_id_map_entry()"""
+    """
+    Returns True iff module has the proper attributes for generating metadata
+    with get_discussion_id_map_entry()
+    """
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
         if getattr(module, key, None) is None:
-            log.debug("Required key '%s' not in discussion %s, leaving out of category map", key, module.location)
+            log.debug(
+                "Required key '%s' not in discussion %s, leaving out of category map",
+                key,
+                module.location
+            )
             return False
     return True
 
@@ -168,7 +199,10 @@ def get_discussion_id_map(course, user):
 
 
 def _filter_unstarted_categories(category_map):
-
+    """
+    Returns a subset of categories from the provided map which have not yet met the start date
+    Includes information about category children, subcategories (different), and entries
+    """
     now = datetime.now(UTC())
 
     result_map = {}
@@ -206,6 +240,9 @@ def _filter_unstarted_categories(category_map):
 
 
 def _sort_map_entries(category_map, sort_alpha):
+    """
+    Internal helper method to list category entries according to the provided sort order
+    """
     things = []
     for title, entry in category_map["entries"].items():
         if entry["sort_key"] is None and sort_alpha:
@@ -385,14 +422,26 @@ def get_discussion_categories_ids(course, user, include_all=False):
 
 
 class JsonResponse(HttpResponse):
+    """
+    Django response object delivering JSON representations
+    """
     def __init__(self, data=None):
+        """
+        Object constructor, converts data (if provided) to JSON
+        """
         content = json.dumps(data, cls=i4xEncoder)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf-8')
 
 
 class JsonError(HttpResponse):
+    """
+    Django response object delivering JSON exceptions
+    """
     def __init__(self, error_messages=[], status=400):
+        """
+        Object constructor, returns an error response containing the provided exception messages
+        """
         if isinstance(error_messages, basestring):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
@@ -401,12 +450,24 @@ class JsonError(HttpResponse):
 
 
 class HtmlResponse(HttpResponse):
+    """
+    Django response object delivering HTML representations
+    """
     def __init__(self, html=''):
+        """
+        Object constructor, brokers provided HTML to caller
+        """
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
 class ViewNameMiddleware(object):
+    """
+    Django middleware object to inject view name into request context
+    """
     def process_view(self, request, view_func, view_args, view_kwargs):
+        """
+        Injects the view name value into the request context
+        """
         request.view_name = view_func.__name__
 
 
@@ -418,6 +479,9 @@ class QueryCountDebugMiddleware(object):
     multi-db setups.
     """
     def process_response(self, request, response):
+        """
+        Log information for 200 OK responses as part of the outbound pipeline
+        """
         if response.status_code == 200:
             total_time = 0
 
@@ -437,6 +501,9 @@ class QueryCountDebugMiddleware(object):
 
 
 def get_ability(course_id, content, user):
+    """
+    Return a dictionary of forums-oriented actions and the user's permission to perform them
+    """
     return {
         'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
@@ -485,6 +552,10 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
 
 
 def get_metadata_for_threads(course_id, threads, user, user_info):
+    """
+    Returns annotated content information for the specified course, threads, and user information
+    """
+
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
 
@@ -716,3 +787,13 @@ def is_commentable_cohorted(course_key, commentable_id):
 
     log.debug(u"is_commentable_cohorted(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
+
+
+def is_discussion_enabled(course_id):
+    """
+    Return True if Discussion is enabled for a course; else False
+    """
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        if get_current_ccx(course_id):
+            return False
+    return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')

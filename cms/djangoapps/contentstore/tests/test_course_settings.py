@@ -16,6 +16,9 @@ from models.settings.course_details import (CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.tests.factories import CourseFactory
+from student.roles import CourseInstructorRole
+from student.tests.factories import UserFactory
+
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.fields import Date
@@ -27,6 +30,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 import ddt
 from xmodule.modulestore import ModuleStoreEnum
 
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.milestones_helpers import seed_milestone_relationship_types
 
 
@@ -54,6 +58,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
         self.assertIsNone(details.has_cert_config)
+        self.assertFalse(details.self_paced)
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -84,6 +89,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         jsondetails = CourseDetails.fetch(self.course.id)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -116,10 +122,20 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,
             jsondetails.effort, "After set effort"
         )
+        jsondetails.self_paced = True
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
+            jsondetails.self_paced
+        )
         jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
             jsondetails.start_date
+        )
+        jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
+            jsondetails.end_date
         )
         jsondetails.course_image_name = "an_image.jpg"
         self.assertEqual(
@@ -136,7 +152,11 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {
+            'ENABLE_MKTG_SITE': True,
+            'ENTRANCE_EXAMS': False,
+            'ENABLE_PREREQUISITE_COURSES': False
+        }):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Summary Page")
             self.assertNotContains(response, "Send a note to students via email")
@@ -284,7 +304,21 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
 
+    def test_toggle_pacing_during_course_run(self):
+        SelfPacedConfiguration(enabled=True).save()
+        self.course.start = datetime.datetime.now()
+        modulestore().update_item(self.course, self.user.id)
 
+        details = CourseDetails.fetch(self.course.id)
+        updated_details = CourseDetails.update_from_json(
+            self.course.id,
+            dict(details.__dict__, self_paced=True),
+            self.user
+        )
+        self.assertFalse(updated_details.self_paced)
+
+
+@ddt.ddt
 class CourseDetailsViewTest(CourseTestCase):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
@@ -314,6 +348,7 @@ class CourseDetailsViewTest(CourseTestCase):
         return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
+        SelfPacedConfiguration(enabled=True).save()
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -335,6 +370,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
         self.alter_field(url, details, 'language', "en")
+        self.alter_field(url, details, 'self_paced', "true")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """
@@ -416,6 +452,28 @@ class CourseDetailsViewTest(CourseTestCase):
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
+
+    @ddt.data(
+        (False, False, False),
+        (True, False, True),
+        (False, True, False),
+        (True, True, True),
+    )
+    def test_visibility_of_entrance_exam_section(self, feature_flags):
+        """
+        Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
+        feature is enabled or disabled i.e ENABLE_MKTG_SITE.
+        """
+        with patch.dict("django.conf.settings.FEATURES", {
+            'ENTRANCE_EXAMS': feature_flags[0],
+            'ENABLE_MKTG_SITE': feature_flags[1]
+        }):
+            course_details_url = get_url(self.course.id)
+            resp = self.client.get_html(course_details_url)
+            self.assertEqual(
+                feature_flags[2],
+                '<h3 id="heading-entrance-exam">' in resp.content
+            )
 
 
 @ddt.ddt
@@ -1116,3 +1174,116 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(obj, grader)
         current_graders = CourseGradingModel.fetch(self.course.id).graders
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
+
+
+class CourseEnrollmentEndFieldTest(CourseTestCase):
+    """
+    Base class to test the enrollment end fields in the course settings details view in Studio
+    when using marketing site flag and global vs non-global staff to access the page.
+    """
+    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX Partner Manager to update these settings."
+    NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
+    NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
+    NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
+id=\"course-enrollment-end-date\" placeholder=\"MM/DD/YYYY\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
+    NOT_EDITABLE_TIME_FIELD = "<input type=\"text\" class=\"time end\" id=\"course-enrollment-end-time\" \
+value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\" readonly aria-readonly=\"true\" />"
+
+    EDITABLE_DATE_WRAPPER = "<div class=\"field date \" id=\"field-enrollment-end-date\">"
+    EDITABLE_TIME_WRAPPER = "<div class=\"field time \" id=\"field-enrollment-end-time\">"
+    EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
+id=\"course-enrollment-end-date\" placeholder=\"MM/DD/YYYY\" autocomplete=\"off\"  />"
+    EDITABLE_TIME_FIELD = "<input type=\"text\" class=\"time end\" \
+id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=\"off\"  />"
+
+    EDITABLE_ELEMENTS = [
+        EDITABLE_DATE_WRAPPER,
+        EDITABLE_TIME_WRAPPER,
+        EDITABLE_DATE_FIELD,
+        EDITABLE_TIME_FIELD,
+    ]
+
+    NOT_EDITABLE_ELEMENTS = [
+        NOT_EDITABLE_HELPER_MESSAGE,
+        NOT_EDITABLE_DATE_WRAPPER,
+        NOT_EDITABLE_TIME_WRAPPER,
+        NOT_EDITABLE_DATE_FIELD,
+        NOT_EDITABLE_TIME_FIELD,
+    ]
+
+    def setUp(self):
+        """ Initialize course used to test enrollment fields. """
+        super(CourseEnrollmentEndFieldTest, self).setUp()
+        self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
+        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+
+    def _get_course_details_response(self, global_staff):
+        """ Return the course details page as either global or non-global staff"""
+        user = UserFactory(is_staff=global_staff)
+        CourseInstructorRole(self.course.id).add_users(user)
+
+        self.client.login(username=user.username, password='test')
+
+        return self.client.get_html(self.course_details_url)
+
+    def _verify_editable(self, response):
+        """ Verify that the response has expected editable fields.
+
+        Assert that all editable field content exists and no
+        uneditable field content exists for enrollment end fields.
+        """
+        self.assertEqual(response.status_code, 200)
+        for element in self.NOT_EDITABLE_ELEMENTS:
+            self.assertNotContains(response, element)
+
+        for element in self.EDITABLE_ELEMENTS:
+            self.assertContains(response, element)
+
+    def _verify_not_editable(self, response):
+        """ Verify that the response has expected non-editable fields.
+
+        Assert that all uneditable field content exists and no
+        editable field content exists for enrollment end fields.
+        """
+        self.assertEqual(response.status_code, 200)
+        for element in self.NOT_EDITABLE_ELEMENTS:
+            self.assertContains(response, element)
+
+        for element in self.EDITABLE_ELEMENTS:
+            self.assertNotContains(response, element)
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
+    def test_course_details_with_disabled_setting_global_staff(self):
+        """ Test that user enrollment end date is editable in response.
+
+        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
+        User is global staff.
+        """
+        self._verify_editable(self._get_course_details_response(True))
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
+    def test_course_details_with_disabled_setting_non_global_staff(self):
+        """ Test that user enrollment end date is editable in response.
+
+        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
+        User is non-global staff.
+        """
+        self._verify_editable(self._get_course_details_response(False))
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    def test_course_details_with_enabled_setting_global_staff(self):
+        """ Test that user enrollment end date is editable in response.
+
+        Feature flag 'ENABLE_MKTG_SITE' is enabled.
+        User is global staff.
+        """
+        self._verify_editable(self._get_course_details_response(True))
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    def test_course_details_with_enabled_setting_non_global_staff(self):
+        """ Test that user enrollment end date is not editable in response.
+
+        Feature flag 'ENABLE_MKTG_SITE' is enabled.
+        User is non-global staff.
+        """
+        self._verify_not_editable(self._get_course_details_response(False))

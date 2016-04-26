@@ -29,6 +29,9 @@ while patched.
 #  All major functions are documented, the rest are self-evident shells.
 # pylint: disable=no-member
 #  Pylint doesn't see our decorator `translate_with` add the `_` method.
+# pylint: disable=test-inherits-tests
+#  This test file intentionally defines one base test class (UgettextTest) and
+#   patches the gettext function under test for all subsequent inheriting classes.
 from unittest import TestCase
 
 from ddt import data

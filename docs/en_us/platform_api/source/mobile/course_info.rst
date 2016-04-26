@@ -5,8 +5,9 @@ Mobile API Course Information Resource
 With the Mobile API **Course Information** resource, you can complete the
 following tasks.
 
-* :ref:`Get updates about a course<Get Course Updates>`.
-* :ref:`Get a list of course handouts<Get Course Handouts>`.
+.. contents::
+   :local:
+   :depth: 1
   
 .. _Get Course Updates:
 

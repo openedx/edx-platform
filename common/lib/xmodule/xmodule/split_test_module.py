@@ -23,7 +23,8 @@ from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')

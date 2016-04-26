@@ -41,5 +41,5 @@ class ProviderUserStateTestCase(testutil.TestCase):
 
     def test_get_unlink_form_name(self):
         google_provider = self.configure_google_provider(enabled=True)
-        state = pipeline.ProviderUserState(google_provider, object(), 1000)
+        state = pipeline.ProviderUserState(google_provider, object(), None)
         self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())

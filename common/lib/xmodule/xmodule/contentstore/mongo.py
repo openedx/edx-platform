@@ -393,36 +393,80 @@ class MongoContentStore(ContentStore):
         return dbkey
 
     def ensure_indexes(self):
-
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
         # which can be `uploadDate`, `display_name`,
-
         self.fs_files.create_index(
-            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('_id.name', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('_id.tag', pymongo.ASCENDING),
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('_id.category', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
-             ('content_son.name', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('content_son.org', pymongo.ASCENDING),
+                ('content_son.course', pymongo.ASCENDING),
+                ('uploadDate', pymongo.DESCENDING)
+            ],
+            sparse=True,
+            background=True
         )
         self.fs_files.create_index(
-            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('_id.name', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
         )
         self.fs_files.create_index(
-            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('content_son.org', pymongo.ASCENDING),
+                ('content_son.course', pymongo.ASCENDING),
+                ('content_son.name', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
-             ('uploadDate', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('uploadDate', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
         )
         self.fs_files.create_index(
-            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING),
-             ('display_name', pymongo.ASCENDING)],
-            sparse=True
+            [
+                ('_id.org', pymongo.ASCENDING),
+                ('_id.course', pymongo.ASCENDING),
+                ('display_name', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
+        )
+        self.fs_files.create_index(
+            [
+                ('content_son.org', pymongo.ASCENDING),
+                ('content_son.course', pymongo.ASCENDING),
+                ('uploadDate', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
+        )
+        self.fs_files.create_index(
+            [
+                ('content_son.org', pymongo.ASCENDING),
+                ('content_son.course', pymongo.ASCENDING),
+                ('display_name', pymongo.ASCENDING)
+            ],
+            sparse=True,
+            background=True
         )
 
 

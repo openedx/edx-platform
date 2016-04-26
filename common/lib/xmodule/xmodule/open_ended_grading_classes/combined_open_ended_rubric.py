@@ -1,4 +1,5 @@
 import logging
+
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -11,6 +12,8 @@ GRADER_TYPE_IMAGE_DICT = {
     'BC': '/static/images/ml_grading_icon.png',
 }
 
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 HUMAN_GRADER_TYPE = {

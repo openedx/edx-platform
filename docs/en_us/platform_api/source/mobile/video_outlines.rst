@@ -5,8 +5,9 @@ Mobile API Video Outlines Resource
 With the Mobile API **Video Outlines** resource, you can complete the
 following tasks.
 
-* :ref:`Get a list of all videos in the course <Get the Video List>`.
-* :ref:`Get a transcript for a specified video and language <Get a Video Transcript>`.
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Get the Video List:
 

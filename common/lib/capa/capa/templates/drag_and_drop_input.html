@@ -8,7 +8,7 @@
 
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/drag_and_drop.js"></div>
 
-    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
         <div class="${status.classname}" id="status_${id}">
     % endif
 
@@ -26,7 +26,7 @@
         <span class="message">${msg|n}</span>
     % endif
 
-    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
         </div>
     % endif
 </div>

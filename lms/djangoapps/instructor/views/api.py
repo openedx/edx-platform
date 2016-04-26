@@ -19,6 +19,7 @@ from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
@@ -37,7 +38,7 @@ from util.file import (
     store_uploaded_file, course_and_time_based_filename_generator,
     FileValidationException, UniversalNewlineIterator
 )
-from util.json_request import JsonResponse
+from util.json_request import JsonResponse, JsonResponseBadRequest
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from instructor_analytics.csvs import create_csv_response
 import gzip
@@ -96,8 +97,10 @@ from instructor.lti_grader import LTIGrader
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
+from certificates.models import CertificateWhitelist
 
 from bulk_email.models import CourseEmail
+from student.models import get_user_by_username_or_email
 
 from .tools import (
     dump_student_extensions,
@@ -113,7 +116,7 @@ from .tools import (
     add_block_ids,
     generate_course_forums_d3,
 )
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
@@ -1343,6 +1346,51 @@ def save_group_name(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_problem_responses(request, course_id):
+    """
+    Initiate generation of a CSV file containing all student answers
+    to a given problem.
+
+    Responds with JSON
+        {"status": "... status message ..."}
+
+    if initiation is successful (or generation task is already running).
+
+    Responds with BadRequest if problem location is faulty.
+    """
+    course_key = CourseKey.from_string(course_id)
+    problem_location = request.GET.get('problem_location', '')
+
+    try:
+        problem_key = UsageKey.from_string(problem_location)
+        # Are we dealing with an "old-style" problem location?
+        run = getattr(problem_key, 'run')
+        if not run:
+            problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
+        if problem_key.course_key != course_key:
+            raise InvalidKeyError(type(problem_key), problem_key)
+    except InvalidKeyError:
+        return JsonResponseBadRequest(_("Could not find problem with this location."))
+
+    try:
+        instructor_task.api.submit_calculate_problem_responses_csv(request, course_key, problem_location)
+        success_status = _(
+            "The problem responses report is being created."
+            " To view the status of the report, see Pending Tasks below."
+        )
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A problem responses report generation task is already in progress. "
+            "Check the 'Pending Tasks' table for the status of the task. "
+            "When completed, the report will be available for download in the table below."
+        )
+        return JsonResponse({"status": already_running_status})
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
@@ -1500,6 +1548,45 @@ def re_validate_invoice(obj_invoice):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
+    """
+    Responds with JSON if CSV is not required. contains a list of issued certificates.
+    Arguments:
+        course_id
+    Returns:
+        {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    csv_required = request.GET.get('csv', 'false')
+
+    query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
+    query_features_names = [
+        ('course_id', _('CourseID')),
+        ('mode', _('Certificate Type')),
+        ('total_issued_certificate', _('Total Certificates Issued')),
+        ('report_run_date', _('Date Report Run'))
+    ]
+    certificates_data = instructor_analytics.basic.issued_certificates(course_key, query_features)
+    if csv_required.lower() == 'true':
+        __, data_rows = instructor_analytics.csvs.format_dictlist(certificates_data, query_features)
+        return instructor_analytics.csvs.create_csv_response(
+            'issued_certificates.csv',
+            [col_header for __, col_header in query_features_names],
+            data_rows
+        )
+    else:
+        response_payload = {
+            'certificates': certificates_data,
+            'queried_features': query_features,
+            'feature_names': dict(query_features_names)
+        }
+        return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
@@ -1545,6 +1632,10 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         # Translators: 'Cohort' refers to a group of students within a course.
         query_features.append('cohort')
         query_features_names['cohort'] = _('Cohort')
+
+    if course.teams_enabled:
+        query_features.append('team')
+        query_features_names['team'] = _('Team')
 
     if not csv:
         student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
@@ -1726,22 +1817,41 @@ def get_exec_summary_report(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_course_survey_results(request, course_id):
+    """
+    get the survey results report for the particular course.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_course_survey_report(request, course_key)
+        status_response = _("The survey report is being created."
+                            " To view the status of the report, see Pending Instructor Tasks below.")
+    except AlreadyRunningError:
+        status_response = _(
+            "The survey report is currently being created."
+            " To view the status of the report, see Pending Instructor Tasks below."
+            " You will be able to download the report when it is complete."
+        )
+    return JsonResponse({
+        "status": status_response
+    })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_proctored_exam_results(request, course_id):
     """
     get the proctored exam resultsreport for the particular course.
     """
     query_features = [
-        'created',
-        'modified',
-        'started_at',
-        'exam_name',
         'user_email',
-        'completed_at',
-        'external_id',
+        'exam_name',
         'allowed_time_limit_mins',
-        'status',
-        'attempt_code',
         'is_sample_attempt',
+        'started_at',
+        'completed_at',
+        'status',
     ]
 
     course_key = CourseKey.from_string(course_id)
@@ -3243,3 +3353,100 @@ def start_certificate_generation(request, course_id):
         'task_id': task.task_id
     }
     return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def create_certificate_exception(request, course_id, white_list_student=None):
+    """
+    Add Students to certificate white list.
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    try:
+        certificate_white_list = json.loads(request.body)
+    except ValueError:
+        return JsonResponse({
+            'success': False,
+            'message': _('Invalid Json data')
+        }, status=400)
+    try:
+        certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
+    except ValueError as error:
+        return JsonResponse(
+            {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
+            status=400
+        )
+
+    if white_list_student == 'all':
+        # Generate Certificates for all white listed students
+        students = User.objects.filter(
+            certificatewhitelist__course_id=course_key,
+            certificatewhitelist__whitelist=True
+        )
+
+    if students:
+        # generate certificates for students if 'students' list is not empty
+        instructor_task.api.generate_certificates_for_students(request, course_key, students=students)
+
+    response_payload = {
+        'success': True,
+        'message': _('Students added to Certificate white list successfully'),
+        'data': json.dumps(certificate_white_list)
+    }
+
+    return JsonResponse(response_payload)
+
+
+def process_certificate_exceptions(data_list, course_key):
+    """
+    Validate user data for certificate exceptions, raise ValueError in case of invalid data and create
+    'CertificateWhitelist' record for students in data_list.
+
+    return updated data_list after creating 'CertificateWhitelist' records in db.
+    """
+    students = []
+    users = [data.get('user_name', False) or data.get('user_email', False) for data in data_list]
+
+    if not all(users):
+        # Username and email can not both be empty
+        raise ValueError(_('Student username/email is required.'))
+
+    if len(users) != len(set(users)):
+        # Duplicate Student username/email is not allowed
+        raise ValueError(_('Duplicate Student Username/password.'))
+
+    for data in data_list:
+        user = data.get('user_name', '') or data.get('user_email', '')
+        try:
+            db_user = get_user_by_username_or_email(user)
+        except ObjectDoesNotExist:
+            raise ValueError(_('Student (username/email={user}) does not exist').format(user=user))
+        except MultipleObjectsReturned:
+            raise ValueError(_('Multiple Students found with username/email={user}').format(user=user))
+
+        if CertificateWhitelist.objects.filter(user=db_user, course_id=course_key, whitelist=True).count() > 0:
+            raise ValueError(
+                _("Student (username/email={user_id} already in certificate exception  list)").format(user_id=user)
+            )
+
+        certificate_white_list = CertificateWhitelist.objects.create(
+            user=db_user,
+            course_id=course_key,
+            whitelist=True,
+            notes=data.get('notes', '')
+        )
+
+        data.update({
+            'id': certificate_white_list.id,
+            'user_email': db_user.email,
+            'user_name': db_user.username,
+            'user_id': db_user.id,
+            'created': certificate_white_list.created.strftime("%A, %B %d, %Y"),
+        })
+
+        students.append(db_user)
+
+    return data_list, students

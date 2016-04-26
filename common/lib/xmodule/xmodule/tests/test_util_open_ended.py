@@ -1,3 +1,6 @@
+"""
+Utility classes and data structures supporting the Open-Ended Grading feature of Open edX
+"""
 import json
 from StringIO import StringIO
 
@@ -29,15 +32,27 @@ class MockS3Key(object):
         pass
 
     def set_metadata(self, key, value):
+        """
+        Appends an attribute the current instance using the provided key/value pair
+        """
         setattr(self, key, value)
 
     def set_contents_from_file(self, fileobject):
+        """
+        Sets the 'data' parameter to the contents of the provided file object
+        """
         self.data = fileobject.read()
 
     def set_acl(self, acl):
+        """
+        Sets the 'acl' metadata parameter to the provided value
+        """
         self.set_metadata("acl", acl)
 
     def generate_url(self, timeout):
+        """
+        Returns a sample URL for use in tests
+        """
         return "http://www.edx.org/sample_url"
 
 
@@ -52,9 +67,15 @@ class MockS3Connection(object):
         pass
 
     def create_bucket(self, bucket_name, **kwargs):
+        """
+        Mock boto operation: create_bucket -- returns a simple string value
+        """
         return "edX Bucket"
 
     def lookup(self, bucket_name):
+        """
+        Mock boto operation: lookup -- returns None
+        """
         return None
 
 
@@ -70,9 +91,15 @@ class MockUploadedFile(object):
         self.name = name
 
     def seek(self, index):
+        """
+        Returns the file contents at the provided index
+        """
         return self.mock_file.seek(index)
 
     def read(self):
+        """
+        Returns the contents of the mock file
+        """
         return self.mock_file.read()
 
 
@@ -82,9 +109,15 @@ class DummyModulestore(object):
     """
 
     def get_module_system(self, descriptor):
+        """
+        Pseudo-abstract method that forces derivatives to devise a module system implementation
+        """
         raise NotImplementedError("Sub-tests must specify how to generate a module-system")
 
     def setup_modulestore(self, name):
+        """
+        Sets the modulestore to an XMLModuleStore instance
+        """
         # pylint: disable=attribute-defined-outside-init
         self.modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
 
@@ -94,6 +127,9 @@ class DummyModulestore(object):
         return courses[0]
 
     def get_module_from_location(self, usage_key):
+        """
+        Returns the content descriptor for the given usage key
+        """
         descriptor = self.modulestore.get_item(usage_key, depth=None)
         descriptor.xmodule_runtime = self.get_module_system(descriptor)
         return descriptor
@@ -921,6 +957,8 @@ STATE_POST_ASSESSMENT = serialize_open_ended_instance_state("""
     "max_attempts": 1
 }""")
 
+
+# pylint: disable=line-too-long
 # Task state with self assessment only.
 TEST_STATE_SA = ["{\"child_created\": false, \"child_attempts\": 1, \"version\": 1, \"child_history\": [{\"answer\": \"Censorship in the Libraries\\r<br>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author\\r<br><br>Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.\", \"post_assessment\": \"[3, 3, 2, 2, 2]\", \"score\": 12}], \"max_score\": 12, \"child_state\": \"done\"}", "{\"child_created\": false, \"child_attempts\": 0, \"version\": 1, \"child_history\": [{\"answer\": \"Censorship in the Libraries\\r<br>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author\\r<br><br>Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.\", \"post_assessment\": \"{\\\"submission_id\\\": 1461, \\\"score\\\": 12, \\\"feedback\\\": \\\"{\\\\\\\"feedback\\\\\\\": \\\\\\\"\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 5414, \\\"grader_type\\\": \\\"IN\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>\\\\nIdeas\\\\n</description><score>3</score><option points='0'>\\\\nDifficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.\\\\n</option><option points='1'>\\\\nAttempts a main idea.  Sometimes loses focus or ineffectively displays focus.\\\\n</option><option points='2'>\\\\nPresents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.\\\\n</option><option points='3'>\\\\nPresents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.\\\\n</option></category><category><description>\\\\nContent\\\\n</description><score>3</score><option points='0'>\\\\nIncludes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.\\\\n</option><option points='1'>\\\\nIncludes little information and few or no details.  Explores only one or two facets of the topic.\\\\n</option><option points='2'>\\\\nIncludes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.\\\\n</option><option points='3'>\\\\nIncludes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.\\\\n</option></category><category><description>\\\\nOrganization\\\\n</description><score>2</score><option points='0'>\\\\nIdeas organized illogically, transitions weak, and response difficult to follow.\\\\n</option><option points='1'>\\\\nAttempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.\\\\n</option><option points='2'>\\\\nIdeas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.\\\\n</option></category><category><description>\\\\nStyle\\\\n</description><score>2</score><option points='0'>\\\\nContains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.\\\\n</option><option points='1'>\\\\nContains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).\\\\n</option><option points='2'>\\\\nIncludes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.\\\\n</option></category><category><description>\\\\nVoice\\\\n</description><score>2</score><option points='0'>\\\\nDemonstrates language and tone that may be inappropriate to task and reader.\\\\n</option><option points='1'>\\\\nDemonstrates an attempt to adjust language and tone to task and reader.\\\\n</option><option points='2'>\\\\nDemonstrates effective adjustment of language and tone to task and reader.\\\\n</option></category></rubric>\\\"}\", \"score\": 12}], \"max_score\": 12, \"child_state\": \"post_assessment\"}"]
 

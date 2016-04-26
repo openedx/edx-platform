@@ -6,9 +6,9 @@ define([ // jshint ignore:line
     'backbone',
     'gettext',
     'js/utils/templates',
-    'js/views/utils/view_utils',
-    'js/views/feedback_prompt',
-    'js/views/feedback_notification',
+    'common/js/components/utils/view_utils',
+    'common/js/components/views/feedback_prompt',
+    'common/js/components/views/feedback_notification',
     'js/models/uploads',
     'js/views/uploads'
 ],
@@ -85,8 +85,10 @@ function ($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'name',
-                this.$('.signatory-name-input').val()
+                this.$('.signatory-name-input').val(),
+                { silent: true }
             );
+            this.toggleValidationErrorMessage('name');
             this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
@@ -95,8 +97,10 @@ function ($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'title',
-                this.$('.signatory-title-input').val()
+                this.$('.signatory-title-input').val(),
+                { silent:true }
             );
+            this.toggleValidationErrorMessage('title');
             this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
 
@@ -105,7 +109,8 @@ function ($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
                 'organization',
-                this.$('.signatory-organization-input').val()
+                this.$('.signatory-organization-input').val(),
+                { silent: true }
             );
             this.eventAgg.trigger("onSignatoryUpdated", this.model);
         },
@@ -167,7 +172,7 @@ function ($, _, Backbone, gettext,
             event.preventDefault();
             var upload = new FileUploadModel({
                 title: gettext("Upload signature image."),
-                message: gettext("Image must be 450px X 150px transparent PNG."),
+                message: gettext("Image must be in PNG format."),
                 mimeTypes: ['image/png']
             });
             var self = this;
@@ -178,7 +183,31 @@ function ($, _, Backbone, gettext,
                 }
             });
             modal.show();
+        },
+
+        /**
+         * @desc Toggle the validation error messages. If given model attribute is not valid then show the error message
+         * else remove it.
+         * @param string modelAttribute - the attribute of the signatory model e.g. name, title.
+        */
+        toggleValidationErrorMessage: function(modelAttribute) {
+            var selector = "div.add-signatory-" + modelAttribute;
+            if (!this.model.isValid() && _.has(this.model.validationError, modelAttribute)) {
+
+                // Show the error message if it is not exist before.
+                if( !$(selector).hasClass('error')) {
+                    var errorMessage = this.model.validationError[modelAttribute];
+                    $(selector).addClass("error");
+                    $(selector).append("<span class='message-error'>" + errorMessage + "</span>");
+                }
+            }
+            else {
+                // Remove the error message.
+                $(selector).removeClass("error");
+                $(selector + ">span.message-error").remove();
+            }
         }
+
     });
     return SignatoryEditorView;
 });

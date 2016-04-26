@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
+from xmodule_django.models import CourseKeyField
 from util.organizations_helpers import get_course_organizations
 
 from certificates.models import (
@@ -70,7 +71,7 @@ def get_certificates_for_user(username):
             # In the future, we can update this to construct a URL to the webview certificate
             # for courses that have this feature enabled.
             "download_url": (
-                cert.download_url
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -412,6 +413,7 @@ def get_certificate_template(course_key, mode):
     if not template and org_id and mode:
         template = CertificateTemplate.objects.filter(
             organization_id=org_id,
+            course_key=CourseKeyField.Empty,
             mode=mode,
             is_active=True
         )
@@ -419,11 +421,15 @@ def get_certificate_template(course_key, mode):
     if not template and org_id:
         template = CertificateTemplate.objects.filter(
             organization_id=org_id,
+            course_key=CourseKeyField.Empty,
+            mode=None,
             is_active=True
         )
     # if we still don't template find by only course mode
     if not template and mode:
         template = CertificateTemplate.objects.filter(
+            organization_id=None,
+            course_key=CourseKeyField.Empty,
             mode=mode,
             is_active=True
         )

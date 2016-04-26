@@ -130,18 +130,18 @@ class TestContentstore(unittest.TestCase):
         Test export
         """
         self.set_up_assets(deprecated)
-        root_dir = path.path(mkdtemp())
+        root_dir = path.Path(mkdtemp())
         try:
             self.contentstore.export_all_for_course(
                 self.course1_key, root_dir,
-                path.path(root_dir / "policy.json"),
+                path.Path(root_dir / "policy.json"),
             )
             for filename in self.course1_files:
-                filepath = path.path(root_dir / filename)
+                filepath = path.Path(root_dir / filename)
                 self.assertTrue(filepath.isfile(), "{} is not a file".format(filepath))
             for filename in self.course2_files:
                 if filename not in self.course1_files:
-                    filepath = path.path(root_dir / filename)
+                    filepath = path.Path(root_dir / filename)
                     self.assertFalse(filepath.isfile(), "{} is unexpected exported a file".format(filepath))
         finally:
             shutil.rmtree(root_dir)

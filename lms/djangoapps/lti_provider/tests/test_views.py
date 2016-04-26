@@ -163,7 +163,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
@@ -174,15 +174,28 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
                 'usage_id': unicode(self.html_block.location)
             }
         )
+        if url_encoded_params:
+            lti_launch_url += '?' + url_encoded_params
         SignatureValidator.verify = MagicMock(return_value=True)
         return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)
 
+    # The following test methods override the base tests for verifying access
+    # by unenrolled and unauthenticated students, since there is a discrepancy
+    # of access rules between the 2 endpoints (LTI and xBlock_render).
+    # TODO fix this access discrepancy to the same underlying data.
+
     def test_unenrolled_student(self):
+        """
+        Override since LTI allows access to unenrolled students.
+        """
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
         self.verify_response()
 
     def test_unauthenticated(self):
+        """
+        Override since LTI allows access to unauthenticated users.
+        """
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()

@@ -1,10 +1,12 @@
 ;(function (define) {
     'use strict';
-
-    define(['jquery', 'underscore', 'backbone', 'teams/js/views/teams_tab'],
-        function ($, _, Backbone, TeamsTabView) {
+    define(['jquery', 'teams/js/views/teams_tab'],
+        function ($, TeamsTabView) {
             return function (options) {
-                var teamsTab = new TeamsTabView(_.extend(options, {el: $('.teams-content')}));
+                var teamsTab = new TeamsTabView({
+                    el: $('.teams-content'),
+                    context: options
+                });
                 teamsTab.start();
             };
         });

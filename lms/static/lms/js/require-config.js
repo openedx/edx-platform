@@ -35,6 +35,8 @@
             "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
+            "moment": "js/vendor/moment.min",
+            "moment-with-locales": "js/vendor/moment-with-locales.min",
             "text": "js/vendor/requirejs/text",
             "logger": "js/src/logger",
             "backbone": "js/vendor/backbone-min",
@@ -44,6 +46,7 @@
             "underscore.string": "js/vendor/underscore.string.min",
             "jquery": "js/vendor/jquery.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
+            'jquery.timeago': 'js/vendor/jquery.timeago',
             "jquery.url": "js/vendor/url.min",
             "jquery.ui": "js/vendor/jquery-ui.min",
             "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
@@ -51,7 +54,6 @@
             "URI": "js/vendor/URI.min",
             "string_utils": "js/src/string_utils",
             "utility": "js/src/utility",
-            "moment": "js/vendor/moment.min",
 
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
@@ -93,6 +95,10 @@
             "jquery.cookie": {
                 deps: ["jquery"],
                 exports: "jQuery.fn.cookie"
+            },
+            "jquery.timeago": {
+                deps: ["jquery"],
+                exports: "jQuery.timeago"
             },
             "jquery.url": {
                 deps: ["jquery"],
@@ -180,8 +186,14 @@
             },
             "tinymce": {
                 exports: "tinymce"
-            }
+            },
             // End of needed by OVA
+            "moment": {
+                exports: "moment"
+            },
+            "moment-with-locales": {
+                exports: "moment"
+            }
         }
     });
 }).call(this, require || RequireJS.require, define || RequireJS.define);

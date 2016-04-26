@@ -118,7 +118,7 @@ class GenerateUserCertificatesTest(EventTestMixin, ModuleStoreTestCase):
 
     ERROR_REASON = "Kaboom!"
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(GenerateUserCertificatesTest, self).setUp('certificates.api.tracker')
 
         self.student = UserFactory.create(
@@ -233,7 +233,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(CertificateGenerationEnabledTest, self).setUp('certificates.api.tracker')
 
         # Since model-based configuration is cached, we need

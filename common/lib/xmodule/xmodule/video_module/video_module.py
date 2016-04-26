@@ -85,6 +85,9 @@ except ImportError:
     BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -187,7 +190,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return track_url, transcript_language, sorted_languages
 
     def get_html(self):
-        transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
+        track_status = (self.download_track and self.track)
+        transcript_download_format = self.transcript_download_format if not track_status else None
         sources = filter(None, self.html5_sources)
 
         download_video_link = None
@@ -460,7 +464,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         languages.sort(key=lambda l: l['label'])
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
-        editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(self, 'studio_transcript', 'translation').rstrip('/?')
+        editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
+            self,
+            'studio_transcript',
+            'translation'
+        ).rstrip('/?')
         editable_fields['handout']['type'] = 'FileUploader'
 
         return editable_fields
@@ -570,6 +578,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
+            """
+            Returns the fully-qualified YouTube URL for the given video identifier
+            """
             # First try a lookup in VAL. If we have a YouTube entry there, it overrides the
             # one passed in.
             if self.edx_video_id and edxval_api:
@@ -584,7 +595,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
-            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or .webm video file hosted elsewhere on the Internet.'),
+            'help': _('The URL for your video. This can be a YouTube URL or a link to an .mp4, .ogg, or .webm video file hosted elsewhere on the Internet.'),  # pylint: disable=line-too-long
             'display_name': _('Default Video URL'),
             'field_name': 'video_url',
             'type': 'VideoList',
@@ -775,11 +786,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
 
-    def student_view_json(self, context):
+    def student_view_data(self, context=None):
         """
         Returns a JSON representation of the student_view of this XModule.
         The contract of the JSON content is between the caller and the particular XModule.
         """
+        context = context or {}
+
         # If the "only_on_web" field is set on this video, do not return the rest of the video's data
         # in this json view, since this video is to be accessed only through its web view."
         if self.only_on_web:
@@ -790,7 +803,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
-            video_profile_names = context.get("profiles", [])
+            video_profile_names = context.get("profiles", ["mobile_low"])
 
             # get and cache bulk VAL data for course
             val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)

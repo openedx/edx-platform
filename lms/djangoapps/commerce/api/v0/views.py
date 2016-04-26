@@ -1,7 +1,7 @@
 """ API v0 views. """
 import logging
 
-from ecommerce_api_client import exceptions
+from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
@@ -9,7 +9,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
-from commerce import ecommerce_api_client
 from commerce.constants import Messages
 from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
@@ -19,6 +18,7 @@ from courseware import courses
 from embargo import api as embargo_api
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
@@ -45,7 +45,7 @@ class BasketsView(APIView):
         Returns
             Tuple (data_is_valid, course_key, error_msg)
         """
-        course_id = request.DATA.get('course_id')
+        course_id = request.data.get('course_id')
 
         if not course_id:
             return False, None, u'Field course_id is missing.'
@@ -69,7 +69,7 @@ class BasketsView(APIView):
 
         Errors here aren't expected, but should not break the outer enrollment transaction.
         """
-        email_opt_in = request.DATA.get('email_opt_in', None)
+        email_opt_in = request.data.get('email_opt_in', None)
         if email_opt_in is not None:
             try:
                 update_email_opt_in(user, course_key.org, email_opt_in)

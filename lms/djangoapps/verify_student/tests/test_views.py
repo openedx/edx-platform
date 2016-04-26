@@ -33,6 +33,7 @@ from opaque_keys.edx.keys import UsageKey
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
+from common.test.utils import XssTestMixin
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
 from embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -47,11 +48,11 @@ from verify_student.views import (
 )
 from verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
-    VerificationCheckpoint, VerificationStatus
+    VerificationCheckpoint, VerificationStatus,
+    IcrvStatusEmailsConfiguration,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -325,14 +326,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self._enroll(course.id, "honor")
         response = self._get_page(page_name, course.id, expected_status_code=302)
         self._assert_redirects_to_upgrade(response, course.id)
-
-    def test_verify_later(self):
-        """ The deprecated verify-later page should redirect to the verification start page. """
-        course = self._create_course("verified")
-        course_key = course.id
-        self._enroll(course_key, "verified")
-        response = self._get_page("verify_student_verify_later", course_key, expected_status_code=301)
-        self._assert_redirects_to_verify_start(response, course_key, 301)
 
     def test_payment_confirmation(self):
         course = self._create_course("verified")
@@ -1428,11 +1421,15 @@ class TestSubmitPhotosForVerification(TestCase):
             "Photo ID image is required if the user does not have an initial verification attempt."
         )
 
-        # Create the initial verification attempt
+        # Create the initial verification attempt with some dummy
+        # value set for field 'photo_id_key'
         self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
         )
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        attempt.photo_id_key = "dummy_photo_id_key"
+        attempt.save()
 
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
@@ -1720,6 +1717,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        # Verify that ICRV status email was sent when config is enabled
+        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
         self.create_reverification_xblock()
 
         data = {
@@ -1741,9 +1740,38 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
 
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
-        # Verify that photo re-verification status email was sent
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("Re-verification Status", mail.outbox[0].subject)
+
+    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    def test_icrv_status_email_with_disable_config(self):
+        """
+        Verify that photo re-verification status email was not sent when config is disable
+        """
+        IcrvStatusEmailsConfiguration.objects.create(enabled=False)
+
+        self.create_reverification_xblock()
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+
+        json_data = json.dumps(data)
+
+        response = self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+
+        self.assertEqual(attempt.status, u'approved')
+        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 0)
 
     @mock.patch('verify_student.views._send_email')
     @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
@@ -1751,6 +1779,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test software secure callback flow for re-verification.
         """
+        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
+
         # Create the 'edx-reverification-block' in course tree
         self.create_reverification_xblock()
 
@@ -1947,8 +1977,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         url += u"?{params}".format(params=urllib.urlencode({"checkpoint": self.reverification_location}))
         self.assertRedirects(response, url)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_get(self):
         """
         Test incourse reverification.
@@ -1971,6 +2001,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
             },
 
             context={
+                'ip': '127.0.0.1',
                 'Google Analytics':
                 {'clientId': None}
             }
@@ -2002,8 +2033,8 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         response = self._submit_photos(self.course_key, self.reverification_location, "")
         self.assertEqual(response.status_code, 400)
 
-    @override_settings(SEGMENT_IO_LMS_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True, 'SEGMENT_IO_LMS': True})
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_post(self):
         self._create_checkpoint()
         self._create_initial_verification()
@@ -2028,6 +2059,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
                 'checkpoint': self.reverification_assessment
             },
             context={
+                'ip': '127.0.0.1',
                 'Google Analytics':
                 {'clientId': None}
             }
@@ -2045,7 +2077,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """
         Helper method for initial verification.
         """
-        attempt = SoftwareSecurePhotoVerification(user=self.user)
+        attempt = SoftwareSecurePhotoVerification(user=self.user, photo_id_key="dummy_photo_id_key")
         attempt.mark_ready()
         attempt.save()
         attempt.submit()

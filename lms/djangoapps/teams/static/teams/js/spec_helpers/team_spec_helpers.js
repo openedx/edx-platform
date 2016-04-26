@@ -3,11 +3,15 @@ define([
     'underscore',
     'teams/js/collections/team',
     'teams/js/collections/team_membership',
-], function (Backbone, _, TeamCollection, TeamMembershipCollection) {
+    'teams/js/collections/topic',
+    'teams/js/models/topic'
+], function (Backbone, _, TeamCollection, TeamMembershipCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
+        createMockTopicData, createMockTopicCollection, createMockTopic,
         testCourseID = 'course/1',
         testUser = 'testUser',
+        testTopicID = 'test-topic-1',
         testTeamDiscussionID = "12345",
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -25,34 +29,45 @@ define([
 
     var createMockTeamData = function (startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            var id = "id" + i;
             return {
                 name: "team " + i,
-                id: "id " + i,
+                id: id,
                 language: testLanguages[i%4][0],
                 country: testCountries[i%4][0],
-                is_active: true,
-                membership: []
+                membership: [],
+                last_activity_at: '',
+                topic_id: 'topic_id' + i,
+                url: 'api/team/v0/teams/' + id
             };
         });
     };
 
-    var createMockTeams = function(teamData) {
-        if (!teamData) {
-            teamData = createMockTeamData(1, 5);
-        }
-        return new TeamCollection(
+    var createMockTeamsResponse = function(options) {
+        return _.extend(
             {
                 count: 6,
                 num_pages: 2,
                 current_page: 1,
                 start: 0,
-                results: teamData
+                results: createMockTeamData(1, 5)
             },
-            {
+            options
+        );
+    };
+
+    var createMockTeams = function(responseOptions, options, collectionType) {
+        if(_.isUndefined(collectionType)) {
+            collectionType = TeamCollection;
+        }
+        return new collectionType(
+            createMockTeamsResponse(responseOptions),
+            _.extend({
                 teamEvents: teamEvents,
-                course_id: 'my/course/id',
+                course_id: testCourseID,
+                per_page: 2,
                 parse: true
-            }
+            }, options)
         );
     };
 
@@ -61,37 +76,15 @@ define([
         return _.map(_.range(startIndex, stopIndex + 1), function (i) {
             return {
                 user: {
-                    'username': testUser,
-                    'url': 'https://openedx.example.com/api/user/v1/accounts/' + testUser
+                    username: testUser,
+                    url: 'https://openedx.example.com/api/user/v1/accounts/' + testUser,
+                    profile_image: {
+                        image_url_small: 'test_profile_image'
+                    }
                 },
                 team: teams[i-1]
             };
         });
-    };
-
-    var createMockTeamMemberships = function(teamMembershipData, options) {
-        if (!teamMembershipData) {
-            teamMembershipData = createMockTeamMembershipsData(1, 5);
-        }
-        return new TeamMembershipCollection(
-            {
-                count: 11,
-                num_pages: 3,
-                current_page: 1,
-                start: 0,
-                results: teamMembershipData
-            },
-            _.extend(_.extend({}, {
-                    teamEvents: teamEvents,
-                    course_id: 'my/course/id',
-                    parse: true,
-                    url: 'api/teams/team_memberships',
-                    username: testUser,
-                    privileged: false,
-                    staff: false
-                }),
-                options)
-        );
     };
 
     var createMockUserInfo = function(options) {
@@ -114,6 +107,10 @@ define([
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
             expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
         });
+    };
+
+    var triggerTeamEvent = function (action) {
+        teamEvents.trigger('teams:update', {action: action});
     };
 
     createMockPostResponse = function(options) {
@@ -142,7 +139,7 @@ define([
                 group_id: 1,
                 endorsed: false
             },
-            options || {}
+            options
         );
     };
 
@@ -226,7 +223,75 @@ define([
                 context: "standalone",
                 endorsed: false
             },
-            options || {}
+            options
+        );
+    };
+
+    createMockTopicData = function (startIndex, stopIndex) {
+        return _.map(_.range(startIndex, stopIndex + 1), function (i) {
+            return {
+                "description": "Test description " + i,
+                "name": "Test Topic " + i,
+                "id": "test-topic-" + i,
+                "team_count": 0
+            };
+        });
+    };
+
+    createMockTopic = function(options) {
+        return new TopicModel(_.extend(
+            {
+                id: testTopicID,
+                name: 'Test Topic 1',
+                description: 'Test description 1'
+            },
+            options
+        ));
+    };
+
+    var testContext = {
+        courseID: testCourseID,
+        topics: {
+            count: 5,
+            num_pages: 1,
+            current_page: 1,
+            start: 0,
+            results: createMockTopicData(1, 5)
+        },
+        maxTeamSize: 6,
+        languages: testLanguages,
+        countries: testCountries,
+        topicUrl: '/api/team/v0/topics/topic_id,' + testCourseID,
+        teamsUrl: '/api/team/v0/teams/',
+        teamsDetailUrl: '/api/team/v0/teams/team_id',
+        teamMembershipsUrl: '/api/team/v0/team_memberships/',
+        teamMembershipDetailUrl: '/api/team/v0/team_membership/team_id,' + testUser,
+        myTeamsUrl: '/api/team/v0/teams/',
+        userInfo: createMockUserInfo()
+    };
+
+    var createMockContext = function(options) {
+        return _.extend({}, testContext, options);
+    };
+
+    createMockTopicCollection = function (topicData) {
+        topicData = topicData !== undefined ? topicData : createMockTopicData(1, 5);
+
+        return new TopicCollection(
+            {
+                count: topicData.length + 1,
+                current_page: 1,
+                num_pages: 2,
+                start: 0,
+                results: topicData,
+                sort_order: 'name'
+            },
+            {
+                teamEvents: teamEvents,
+                course_id: testCourseID,
+                parse: true,
+                url: testContext.topicUrl
+            }
         );
     };
 
@@ -234,18 +299,24 @@ define([
         teamEvents: teamEvents,
         testCourseID: testCourseID,
         testUser: testUser,
+        testTopicID: testTopicID,
         testCountries: testCountries,
         testLanguages: testLanguages,
         testTeamDiscussionID: testTeamDiscussionID,
+        testContext: testContext,
         createMockTeamData: createMockTeamData,
+        createMockTeamsResponse: createMockTeamsResponse,
         createMockTeams: createMockTeams,
-        createMockTeamMembershipsData: createMockTeamMembershipsData,
-        createMockTeamMemberships: createMockTeamMemberships,
         createMockUserInfo: createMockUserInfo,
+        createMockContext: createMockContext,
+        createMockTopic: createMockTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,
         createMockThreadResponse: createMockThreadResponse,
+        createMockTopicData: createMockTopicData,
+        createMockTopicCollection: createMockTopicCollection,
+        triggerTeamEvent: triggerTeamEvent,
         verifyCards: verifyCards
     };
 });

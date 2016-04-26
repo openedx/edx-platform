@@ -6,9 +6,9 @@ from nose.tools import raises
 from nose.plugins.attrib import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from student.roles import CourseBetaTesterRole, CourseStaffRole
+from student.roles import CourseBetaTesterRole, CourseStaffRole, CourseCcxCoachRole
 
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)
@@ -19,13 +19,15 @@ from instructor.access import (allow_access,
 
 
 @attr('shard_1')
-class TestInstructorAccessList(ModuleStoreTestCase):
+class TestInstructorAccessList(SharedModuleStoreTestCase):
     """ Test access listings. """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAccessList, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TestInstructorAccessList, self).setUp()
-
-        self.course = CourseFactory.create()
-
         self.instructors = [UserFactory.create() for _ in xrange(4)]
         for user in self.instructors:
             allow_access(self.course, user, 'instructor')
@@ -43,8 +45,13 @@ class TestInstructorAccessList(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestInstructorAccessAllow(ModuleStoreTestCase):
+class TestInstructorAccessAllow(SharedModuleStoreTestCase):
     """ Test access allow. """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAccessAllow, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TestInstructorAccessAllow, self).setUp()
 
@@ -60,6 +67,11 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
         self.assertTrue(CourseStaffRole(self.course.id).has_user(user))
+
+    def test_allow_ccx_coach(self):
+        user = UserFactory()
+        allow_access(self.course, user, 'ccx_coach')
+        self.assertTrue(CourseCcxCoachRole(self.course.id).has_user(user))
 
     def test_allow_beta(self):
         """ Test allow beta against list beta. """
@@ -79,13 +91,15 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestInstructorAccessRevoke(ModuleStoreTestCase):
+class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
     """ Test access revoke. """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAccessRevoke, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TestInstructorAccessRevoke, self).setUp()
-
-        self.course = CourseFactory.create()
-
         self.staff = [UserFactory.create() for _ in xrange(4)]
         for user in self.staff:
             allow_access(self.course, user, 'staff')
@@ -115,15 +129,17 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class TestInstructorAccessForum(ModuleStoreTestCase):
+class TestInstructorAccessForum(SharedModuleStoreTestCase):
     """
     Test forum access control.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAccessForum, cls).setUpClass()
+        cls.course = CourseFactory.create()
+
     def setUp(self):
         super(TestInstructorAccessForum, self).setUp()
-
-        self.course = CourseFactory.create()
-
         self.mod_role = Role.objects.create(
             course_id=self.course.id,
             name=FORUM_ROLE_MODERATOR

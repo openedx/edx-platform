@@ -188,7 +188,7 @@ class PhotoVerification(StatusModel):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         abstract = True
         ordering = ['-created_at']
 
@@ -588,16 +588,23 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     photo_id_key = models.TextField(max_length=1024)
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
+    copy_id_photo_from = models.ForeignKey("self", null=True, blank=True)
 
     @classmethod
     def get_initial_verification(cls, user):
-        """Get initial verification for a user
+        """Get initial verification for a user with the 'photo_id_key'.
+
         Arguments:
             user(User): user object
+
         Return:
             SoftwareSecurePhotoVerification (object)
         """
-        init_verification = cls.objects.filter(user=user, status__in=["submitted", "approved"])
+        init_verification = cls.objects.filter(
+            user=user,
+            status__in=["submitted", "approved"]
+        ).exclude(photo_id_key='')
+
         return init_verification.latest('created_at') if init_verification.exists() else None
 
     @status_before_must_be("created")
@@ -640,6 +647,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
         if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            # fake photo id key is set only for initial verification
+            self.photo_id_key = 'fake-photo-id-key'
+            self.save()
             return
 
         aes_key = random_aes_key()
@@ -1036,7 +1046,7 @@ class VerificationCheckpoint(models.Model):
     checkpoint_location = models.CharField(max_length=255)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = ('course_id', 'checkpoint_location')
 
     def __unicode__(self):
@@ -1126,11 +1136,16 @@ class VerificationStatus(models.Model):
     A verification status represents a user’s progress through the verification
     process for a particular checkpoint.
     """
+    SUBMITTED_STATUS = "submitted"
+    APPROVED_STATUS = "approved"
+    DENIED_STATUS = "denied"
+    ERROR_STATUS = "error"
+
     VERIFICATION_STATUS_CHOICES = (
-        ("submitted", "submitted"),
-        ("approved", "approved"),
-        ("denied", "denied"),
-        ("error", "error")
+        (SUBMITTED_STATUS, SUBMITTED_STATUS),
+        (APPROVED_STATUS, APPROVED_STATUS),
+        (DENIED_STATUS, DENIED_STATUS),
+        (ERROR_STATUS, ERROR_STATUS)
     )
 
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="checkpoint_status")
@@ -1140,7 +1155,7 @@ class VerificationStatus(models.Model):
     response = models.TextField(null=True, blank=True)
     error = models.TextField(null=True, blank=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = "timestamp"
         verbose_name = "Verification Status"
         verbose_name_plural = "Verification Statuses"
@@ -1199,15 +1214,15 @@ class VerificationStatus(models.Model):
             return None
 
     @classmethod
-    def get_user_attempts(cls, user_id, course_key, related_assessment_location):
+    def get_user_attempts(cls, user_id, course_key, checkpoint_location):
         """
         Get re-verification attempts against a user for a given 'checkpoint'
         and 'course_id'.
 
         Arguments:
-            user_id(str): User Id string
-            course_key(str): A CourseKey of a course
-            related_assessment_location(str): Verification checkpoint location
+            user_id (str): User Id string
+            course_key (str): A CourseKey of a course
+            checkpoint_location (str): Verification checkpoint location
 
         Returns:
             Count of re-verification attempts
@@ -1216,8 +1231,8 @@ class VerificationStatus(models.Model):
         return cls.objects.filter(
             user_id=user_id,
             checkpoint__course_id=course_key,
-            checkpoint__checkpoint_location=related_assessment_location,
-            status="submitted"
+            checkpoint__checkpoint_location=checkpoint_location,
+            status=cls.SUBMITTED_STATUS
         ).count()
 
     @classmethod
@@ -1236,6 +1251,49 @@ class VerificationStatus(models.Model):
         except cls.DoesNotExist:
             return ""
 
+    @classmethod
+    def get_all_checkpoints(cls, user_id, course_key):
+        """Return dict of all the checkpoints with their status.
+        Args:
+            user_id(int): Id of user.
+            course_key(unicode): Unicode of course key
+
+        Returns:
+            dict: {checkpoint:status}
+        """
+        all_checks_points = cls.objects.filter(
+            user_id=user_id, checkpoint__course_id=course_key
+        )
+        check_points = {}
+        for check in all_checks_points:
+            check_points[check.checkpoint.checkpoint_location] = check.status
+
+        return check_points
+
+    @classmethod
+    def cache_key_name(cls, user_id, course_key):
+        """Return the name of the key to use to cache the current configuration
+        Args:
+            user_id(int): Id of user.
+            course_key(unicode): Unicode of course key
+
+        Returns:
+            Unicode cache key
+        """
+        return u"verification.{}.{}".format(user_id, unicode(course_key))
+
+
+@receiver(models.signals.post_save, sender=VerificationStatus)
+@receiver(models.signals.post_delete, sender=VerificationStatus)
+def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+    """Invalidate the cache of VerificationStatus model. """
+
+    cache_key = VerificationStatus.cache_key_name(
+        instance.user.id,
+        unicode(instance.checkpoint.course_id)
+    )
+    cache.delete(cache_key)
+
 
 # DEPRECATED: this feature has been permanently enabled.
 # Once the application code has been updated in production,
@@ -1253,6 +1311,15 @@ class InCourseReverificationConfiguration(ConfigurationModel):
     pass
 
 
+class IcrvStatusEmailsConfiguration(ConfigurationModel):
+    """Toggle in-course reverification (ICRV) status emails
+
+    Disabled by default. When disabled, ICRV status emails will not be sent.
+    When enabled, ICRV status emails are sent.
+    """
+    pass
+
+
 class SkippedReverification(models.Model):
     """Model for tracking skipped Reverification of a user against a specific
     course.
@@ -1265,7 +1332,7 @@ class SkippedReverification(models.Model):
     checkpoint = models.ForeignKey(VerificationCheckpoint, related_name="skipped_checkpoint")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
@@ -1283,15 +1350,40 @@ class SkippedReverification(models.Model):
         cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
 
     @classmethod
-    def check_user_skipped_reverification_exists(cls, user, course_id):
+    def check_user_skipped_reverification_exists(cls, user_id, course_id):
         """Check existence of a user's skipped re-verification attempt for a
         specific course.
 
         Arguments:
-            user(User): user object
+            user_id(str): user id
             course_id(CourseKey): CourseKey
 
         Returns:
             Boolean
         """
-        return cls.objects.filter(user=user, course_id=course_id).exists()
+        has_skipped = cls.objects.filter(user_id=user_id, course_id=course_id).exists()
+        return has_skipped
+
+    @classmethod
+    def cache_key_name(cls, user_id, course_key):
+        """Return the name of the key to use to cache the current configuration
+        Arguments:
+            user(User): user object
+            course_key(CourseKey): CourseKey
+
+        Returns:
+            string: cache key name
+        """
+        return u"skipped_reverification.{}.{}".format(user_id, unicode(course_key))
+
+
+@receiver(models.signals.post_save, sender=SkippedReverification)
+@receiver(models.signals.post_delete, sender=SkippedReverification)
+def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+    """Invalidate the cache of skipped verification model. """
+
+    cache_key = SkippedReverification.cache_key_name(
+        instance.user.id,
+        unicode(instance.course_id)
+    )
+    cache.delete(cache_key)
