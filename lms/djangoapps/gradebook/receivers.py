@@ -30,9 +30,9 @@ def on_score_changed(sender, **kwargs):
     """
     Listens for a 'score_changed' signal invoke grade book update task
     """
-    user = kwargs['user']
-    course_key = kwargs['course_key']
-    update_user_gradebook.delay(course_key, user)
+    user_id = kwargs['user'].id
+    course_key = unicode(kwargs['course_key'])
+    update_user_gradebook.delay(course_key, user_id)
 
 
 @receiver(course_deleted)
