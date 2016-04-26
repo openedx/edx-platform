@@ -668,11 +668,13 @@ class TestTOC(ModuleStoreTestCase):
 
             course = self.store.get_course(self.toy_course.id, depth=2)
             with check_mongo_calls(toc_finds):
-                actual = render.toc_for_course(
+                actual, prev_sequential, next_sequential = render.toc_for_course(
                     self.request.user, self.request, course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
             self.assertIn(toc_section, actual)
+        self.assertIsNone(prev_sequential)
+        self.assertIsNone(next_sequential)
 
     # Mongo makes 3 queries to load the course to depth 2:
     #     - 1 for the course
@@ -707,11 +709,13 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             with check_mongo_calls(toc_finds):
-                actual = render.toc_for_course(
+                actual, prev_sequential, next_sequential = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache
                 )
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
+            self.assertEquals(prev_sequential['url_name'], 'Toy_Videos')
+            self.assertEquals(next_sequential['url_name'], 'video_123456789012')
 
 
 @attr('shard_1')
@@ -852,7 +856,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         """
         self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
-        actual = render.toc_for_course(
+        actual, prev_sequential, next_sequential = render.toc_for_course(
             self.request.user,
             self.request,
             self.toy_course,
@@ -867,6 +871,8 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         else:
             # we expect there not to be a 'proctoring' key in the dict
             self.assertNotIn('proctoring', section_actual)
+        self.assertIsNone(prev_sequential)
+        self.assertEquals(next_sequential['url_name'], u"Welcome")
 
     @ddt.data(
         (
@@ -1108,7 +1114,7 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         """
         Test generation of TOC for a course with a gated subsection
         """
-        actual = render.toc_for_course(
+        actual, prev_sequential, next_sequential = render.toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -1119,6 +1125,8 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         self.assertIsNotNone(self._find_sequential(actual, 'Chapter', 'Open_Sequential'))
         self.assertIsNone(self._find_sequential(actual, 'Chapter', 'Gated_Sequential'))
         self.assertIsNone(self._find_sequential(actual, 'Non-existant_Chapter', 'Non-existant_Sequential'))
+        self.assertIsNone(prev_sequential)
+        self.assertIsNone(next_sequential)
 
 
 @attr('shard_1')

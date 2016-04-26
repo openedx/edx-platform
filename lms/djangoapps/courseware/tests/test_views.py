@@ -35,6 +35,7 @@ from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
+from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.url_helpers import get_redirect_url
@@ -413,16 +414,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertIn(
             'activate_block_id',
             get_redirect_url(self.course_key, self.section.location),
-        )
-
-        self.assertIn(
-            'child=first',
-            get_redirect_url(self.course_key, self.section.location, child='first'),
-        )
-
-        self.assertIn(
-            'child=last',
-            get_redirect_url(self.course_key, self.section.location, child='last'),
         )
 
     def test_redirect_to_course_position(self):
@@ -926,10 +917,10 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the accordion """
-        return views.render_accordion(
-            self.request.user, self.request, course,
-            unicode(course.get_children()[0].scope_ids.usage_id), None, None
+        table_of_contents, __, __ = toc_for_course(
+            self.request.user, self.request, course, unicode(course.get_children()[0].scope_ids.usage_id), None, None
         )
+        return views.render_accordion(self.request, course, table_of_contents)
 
 
 @attr('shard_1')
