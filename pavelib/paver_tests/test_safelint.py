@@ -5,7 +5,9 @@ import unittest
 from mock import patch
 
 import pavelib.quality
-from paver.easy import BuildFailure
+from paver.easy import BuildFailure, call_task
+
+from .utils import PaverTestCase
 
 
 class TestPaverSafeLint(unittest.TestCase):
@@ -48,3 +50,35 @@ class TestPaverSafeLint(unittest.TestCase):
         """
         _mock_count.return_value = 1
         pavelib.quality.run_safelint("")
+
+
+class SafeLintViolationTest(PaverTestCase):
+    """
+    Test run_safelint with a mocked environment in order to pass in opts
+    """
+
+    def setUp(self):
+        super(SafeLintViolationTest, self).setUp()
+        self.reset_task_messages()
+
+    @patch.object(pavelib.quality, '_write_metric')
+    @patch.object(pavelib.quality, '_prepare_report_dir')
+    @patch.object(pavelib.quality, '_get_count_from_last_line')
+    def test_safelint_too_many_violations(self, _mock_count, _mock_report_dir, _mock_write_metric):
+        """
+        run_safelint finds more violations than are allowed
+        """
+        _mock_count.return_value = 4
+        with self.assertRaises(SystemExit):
+            call_task('pavelib.quality.run_safelint', options={"limit": "3"})
+
+    @patch.object(pavelib.quality, '_write_metric')
+    @patch.object(pavelib.quality, '_prepare_report_dir')
+    @patch.object(pavelib.quality, '_get_count_from_last_line')
+    def test_safelint_under_limit(self, _mock_count, _mock_report_dir, _mock_write_metric):
+        """
+        run_safelint finds fewer violations than are allowed
+        """
+        _mock_count.return_value = 4
+        # No System Exit is expected
+        call_task('pavelib.quality.run_safelint', options={"limit": "5"})
