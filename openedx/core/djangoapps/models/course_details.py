@@ -58,6 +58,10 @@ class CourseDetails(object):
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.banner_image_name = ""
+        self.banner_image_asset_path = ""
+        self.video_thumbnail_image_name = ""
+        self.video_thumbnail_image_asset_path = ""
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -97,7 +101,11 @@ class CourseDetails(object):
         course_details.enrollment_end = descriptor.enrollment_end
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
-        course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.course_image_asset_path = course_image_url(descriptor, 'course_image')
+        course_details.banner_image_name = descriptor.banner_image
+        course_details.banner_image_asset_path = course_image_url(descriptor, 'banner_image')
+        course_details.video_thumbnail_image_name = descriptor.video_thumbnail_image
+        course_details.video_thumbnail_image_asset_path = course_image_url(descriptor, 'video_thumbnail_image')
         course_details.language = descriptor.language
         course_details.self_paced = descriptor.self_paced
 
@@ -215,6 +223,15 @@ class CourseDetails(object):
 
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']
+            dirty = True
+
+        if 'banner_image_name' in jsondict and jsondict['banner_image_name'] != descriptor.banner_image:
+            descriptor.banner_image = jsondict['banner_image_name']
+            dirty = True
+
+        if 'video_thumbnail_image_name' in jsondict \
+                and jsondict['video_thumbnail_image_name'] != descriptor.video_thumbnail_image:
+            descriptor.video_thumbnail_image = jsondict['video_thumbnail_image_name']
             dirty = True
 
         if 'pre_requisite_courses' in jsondict \

@@ -172,6 +172,8 @@ class AdvancedSettingsPage(CoursePage):
             'cert_name_short',
             'certificates_display_behavior',
             'course_image',
+            'banner_image',
+            'video_thumbnail_image',
             'cosmetic_display_price',
             'advertised_start',
             'announcement',

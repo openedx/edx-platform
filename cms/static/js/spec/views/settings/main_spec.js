@@ -31,6 +31,10 @@ define([
                 effort : null,
                 course_image_name : '',
                 course_image_asset_path : '',
+                banner_image_name : '',
+                banner_image_asset_path : '',
+                video_thumbnail_image_name : '',
+                video_thumbnail_image_asset_path : '',
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50',
@@ -180,6 +184,70 @@ define([
             expect(this.model.get('language')).toEqual('');
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(requests, 'POST', urlRoot, modelData);
+        });
+
+        it('should save title', function(){
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    title: 'course title'
+                });
+
+            // Input some value.
+            this.view.$("#course-title").val('course title');
+            this.view.$("#course-title").trigger('change');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
+        });
+
+        it('should save subtitle', function(){
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    subtitle: 'course subtitle'
+                });
+
+            // Input some value.
+            this.view.$("#course-subtitle").val('course subtitle');
+            this.view.$("#course-subtitle").trigger('change');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
+        });
+
+        it('should save duration', function(){
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    duration: '8 weeks'
+                });
+
+            // Input some value.
+            this.view.$("#course-duration").val('8 weeks');
+            this.view.$("#course-duration").trigger('change');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
+        });
+
+        it('should save description', function(){
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    description: 'course description'
+                });
+
+            // Input some value.
+            this.view.$("#course-description").val('course description');
+            this.view.$("#course-description").trigger('change');
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
         });
 
     });
