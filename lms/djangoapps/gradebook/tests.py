@@ -483,6 +483,18 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
+    def test_update_user_gradebook_task_arguments(self):
+        """
+        Tests update_user_gradebook task is called with appropriate arguments
+        """
+        self._create_course()
+        user = UserFactory()
+        module = self.get_module_for_user(user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': user.id}
+        with patch('gradebook.receivers.update_user_gradebook.delay') as mock_task:
+            module.system.publish(module, 'grade', grade_dict)
+            mock_task.assert_called_with(unicode(self.course.id), user.id)
+
     @patch.dict(settings.FEATURES, {
         'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
         'SIGNAL_ON_SCORE_CHANGED': True
