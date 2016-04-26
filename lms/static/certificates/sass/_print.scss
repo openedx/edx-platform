@@ -73,7 +73,7 @@
 
     body {
         height: auto;
-        margin: 0 auto !important;
+        margin: spacing-vertical(mid-large) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
         padding: 0;
     }
 
@@ -191,12 +191,14 @@
 
     .accomplishment-rendering {
         top: 0 !important;
-        border: 2rem solid #172D32;
-        zoom: 1.4;
+        border: rem(1) solid palette(grayscale, light);
+        border-top: rem(2) solid $cert-base-color;
         box-shadow: none;
+        padding: spacing-vertical(small) spacing-horizontal(mid-large);
+
 
         .accomplishment-type {
-            margin-top: 0;
+            margin-top: -(spacing-vertical(mid-large));
         }
 
         .accomplishment-type-symbol {
@@ -205,7 +207,7 @@
         }
 
         .wrapper-statement-and-signatories {
-            border-bottom: none;
+            border-bottom: rem(2) solid palette(grayscale-cool, x-light);
         }
 
         .accomplishment-statement {
@@ -264,10 +266,6 @@
             .signatory-credentials {
                 margin-bottom: 0 !important;
             }
-
-            .signatory {
-                width: 100% !important;
-             }
 
             // CASE: > 4 signatures
             &.has-many {
@@ -337,3 +335,4 @@
         }
     }
 }
+

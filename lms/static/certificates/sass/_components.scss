@@ -26,11 +26,6 @@
     padding-bottom: spacing-vertical(x-small);
 }
 
-div.signatory h4.hd-5 {
-    font-size: 1.15rem;
-    margin: -1rem 0 1rem 0;
-}
-
 // ------------------------------
 // #DEPTH
 // ------------------------------
@@ -200,6 +195,7 @@ div.signatory h4.hd-5 {
 
 %rendering-section {
     margin-bottom: spacing-vertical(base);
+    border-bottom: rem(2) solid palette(grayscale-cool, x-light);
     padding-bottom: spacing-vertical(base);
 }
 
@@ -215,20 +211,17 @@ div.signatory h4.hd-5 {
     @extend %depth-card;
     position: relative;
     top: -(spacing-vertical(base));
-    border: 2rem solid #172D32;
-    background: #fff url("http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png") center no-repeat;
-    background-size: 90%;
+    border-top: rem(4) solid $cert-base-color;
 
     // type
     .accomplishment-type {
         @include text-align(center);
-        margin-top: 0;
+        margin-top: -(spacing-vertical(large));
         margin-bottom: spacing-vertical(base);
     }
 
     .accomplishment-type-label, .accomplishment-type-symbol {
-        display: inherit;
-	width: 20% !important;
+        display: block;
     }
 
     .accomplishment-type-label {
@@ -254,9 +247,6 @@ div.signatory h4.hd-5 {
 
     .accomplishment-recipient {
         @extend %rendering-accomplishment-line;
-        font-size: 60px;
-        font-weight: 100;
-        color: #0a222b;
     }
 
     .accomplishment-summary {
@@ -323,23 +313,11 @@ div.signatory h4.hd-5 {
                 display: block;
             }
         }
-
-        .signatory {
-            width: 100% !important;
-        }
     }
 
     .accomplishment-signatories-title {
         @extend %rendering-hd-section;
     }
-}
-
-p.accomplishment-statement-lead span.accomplishment-summary {
-    margin-top: 2rem;
-}
-
-p.accomplishment-statement-lead span.copy {
-    color: #0A222B;
 }
 
 // metadata
@@ -468,7 +446,7 @@ p.accomplishment-statement-lead span.copy {
         .accomplishment-recipient,
         .accomplishment-course,
          {
-            font-family: "Source Sans Pro",sans-serif !important;
+            font-family: $font-family-serif;
         }
 
         .accomplishment-recipient,
@@ -490,17 +468,15 @@ p.accomplishment-statement-lead span.copy {
     }
 
     .accomplishment-rendering {
-     	background: palette(grayscale, white-t) url('http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png') center no-repeat;
-        background-size: 80%;
 
-	.accomplishment-type {
+        .accomplishment-type {
             margin-top: 0;
         }
 
         // hide the fancy
         .accomplishment-signatories .signatory-signature,
         .accomplishment-type-symbol {
-            display: block;
+            display: none;
         }
     }
 }
@@ -517,8 +493,8 @@ p.accomplishment-statement-lead span.copy {
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('http://1505f.http.tor01.cdn.softlayer.net/BDU-ASSETS/images/bdu_book.png') center no-repeat;
-        background-size: 80%;
+        background: palette(grayscale, white-t) url('../images/bg-verified.png') center no-repeat;
+        background-size: 65%;
 
         .deco-corner-tl {
             @include triangle(20px, $cert-distinguished-color, up-right);
