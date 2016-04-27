@@ -320,22 +320,7 @@
             },
             'js/commerce/views/receipt_view': {
                 exports: 'edx.commerce.ReceiptView',
-                deps: ['jquery', 'backbone', 'underscore', 'underscore.string'],
-                init: function() {
-                    // Set global variables that the payment code is expecting to be defined
-                    require([
-                        'underscore',
-                        'underscore.string',
-                        'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
-                    ], function (_, str, HtmlUtils, StringUtils) {
-                        window._ = _;
-                        _s = str;
-                        window.edx = edx || {};
-                        window.edx.HtmlUtils = HtmlUtils;
-                        window.edx.StringUtils = StringUtils;
-                    });
-                }
+                deps: ['jquery', 'backbone', 'underscore', 'underscore.string']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
