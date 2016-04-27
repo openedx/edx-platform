@@ -37,7 +37,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jquery.simulate.js
     - xmodule_js/common_static/common/js/vendor/underscore.js
     - xmodule_js/common_static/common/js/vendor/underscore.string.js
-    - xmodule_js/common_static/js/vendor/backbone-min.js
+    - xmodule_js/common_static/common/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/backbone-relational.min.js

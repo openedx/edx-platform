@@ -45,7 +45,7 @@ var libraryFiles = [
     {pattern: 'common_static/js/vendor/jquery.cookie.js', included: true},
     {pattern: 'common_static/js/vendor/json2.js', included: true},
     {pattern: 'common_static/common/js/vendor/underscore.js', included: true},
-    {pattern: 'common_static/js/vendor/backbone-min.js', included: true},
+    {pattern: 'common_static/common/js/vendor/backbone-min.js', included: true},
     {pattern: 'common_static/js/vendor/jquery.leanModal.js', included: true},
     {pattern: 'common_static/js/vendor/CodeMirror/codemirror.js', included: true},
     {pattern: 'common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', included: true},
