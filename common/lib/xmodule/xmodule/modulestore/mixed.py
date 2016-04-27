@@ -1,7 +1,7 @@
 """
 MixedModuleStore allows for aggregation between multiple modulestores.
 
-In this way, courses can be served up via either SplitMongoModuleStore or MongoModuleStore.
+In this way, courses can be served up both - say - XMLModuleStore or MongoModuleStore
 
 """
 
@@ -169,6 +169,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         for store_settings in stores:
             key = store_settings['NAME']
+            is_xml = 'XMLModuleStore' in store_settings['ENGINE']
+            if is_xml:
+                # restrict xml to only load courses in mapping
+                store_settings['OPTIONS']['course_ids'] = [
+                    course_key.to_deprecated_string()
+                    for course_key, store_key in self.mappings.iteritems()
+                    if store_key == key
+                ]
+
             store = create_modulestore_instance(
                 store_settings['ENGINE'],
                 self.contentstore,

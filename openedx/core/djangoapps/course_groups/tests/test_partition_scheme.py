@@ -15,8 +15,7 @@ from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -32,7 +31,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
     """
     Test the logic for linking a user to a partition group based on their cohort.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         """
@@ -41,7 +40,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         """
         super(TestCohortPartitionScheme, self).setUp()
 
-        self.course_key = ToyCourseFactory.create().id
+        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         config_course_cohorts(self.course, is_cohorted=True)
 
@@ -279,7 +278,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
     """
     Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         """
@@ -287,7 +286,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         and a student for each test.
         """
         super(TestGetCohortedUserPartition, self).setUp()
-        self.course_key = ToyCourseFactory.create().id
+        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()
 

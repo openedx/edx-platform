@@ -51,7 +51,7 @@ from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
@@ -63,7 +63,7 @@ class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TestJumpTo, self).setUp()
