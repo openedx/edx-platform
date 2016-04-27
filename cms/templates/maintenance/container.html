@@ -4,6 +4,7 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
+<%block name="title">${command['name']}</%block>
 <%block name="commandtitle">
 <h3 class="info-course">
   <span>${command['name']}</span>
@@ -11,7 +12,7 @@ from django.core.urlresolvers import reverse
 </%block>
 <%block name="content">
 <div class="wrapper-content wrapper">
-    <section class="container outside-app">
+    <section class="container command-list">
         <%include file="_${command['slug']}.html" />
     </section>
 </div>

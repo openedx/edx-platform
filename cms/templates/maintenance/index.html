@@ -7,12 +7,12 @@ from django.core.urlresolvers import reverse
 <%block name="title">Maintenance Dashboard</%block>
 <%block name="content">
 <div class="wrapper-content wrapper">
-    <section class="container outside-app">
-    <ul>
-    % for item in commands:
-        <li><a href='${commands[item]["url"]}'>${unicode(commands[item]["name"])}</a>: ${unicode(commands[item]["description"])}</li>
-    % endfor
-    </ul>
-</section>
+    <section class="container command-list">
+        <ul>
+        % for item in commands:
+            <li><a href='${commands[item]["url"]}'>${unicode(commands[item]["name"])}</a>${unicode(commands[item]["description"])}</li>
+        % endfor
+        </ul>
+    </section>
 </div>
 </%block>

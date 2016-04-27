@@ -2,6 +2,7 @@
 Views for the maintenance app.
 """
 from django.core.urlresolvers import reverse_lazy
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View
@@ -9,6 +10,7 @@ from django.views.generic import View
 from edxmako.shortcuts import render_to_response
 from util.course_key_utils import course_key_from_string_or_404
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from util.views import require_global_staff
 
@@ -90,12 +92,39 @@ class ShowOrphansView(View):
     def post(self, request):
         """ Process and return course orphans"""
         course_id = request.POST.get('course-id')
-        branch = request.POST.get('draft-published-branch')
-        orphans = self.get_orphans(course_id, branch)
-        return render_to_response('maintenance/container.html', {
+        branch = request.POST.get('draft-published-branch', 'draft')
+        orphans = []
+        context = {
             'command': MAINTENANCE_COMMANDS['show_orphans'],
+            'error': False,
+            'msg': '',
+            'success': True,
             'orphans': orphans,
-        })
+            'form_data': {
+                'course_id': course_id,
+                'branch': branch
+            },
+        }
+        if course_id:
+            try:
+                orphans = self.get_orphans(course_id, branch)
+                if orphans:
+                    context['orphans'] = orphans
+                else:
+                    context['msg'] = "No orphans found."
+            except Http404:
+                context['success'] = False
+                context['error'] = True
+                context['msg'] = "Invalid course key."
+            except ItemNotFoundError:
+                context['success'] = False
+                context['error'] = True
+                context['msg'] = "No matching course found."
+        else:
+            context['success'] = False
+            context['error'] = True
+            context['msg'] = "Please provide course id."
+        return render_to_response('maintenance/container.html', context)
 
 
 class DeleteOrphansView(View):

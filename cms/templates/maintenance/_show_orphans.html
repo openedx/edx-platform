@@ -1,39 +1,60 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 %>
-<div class="wrap-instructor-info studio-view">
+<div class="wrap-instructor-info studio-view command-form">
     <form class="form-create" method="post">
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-        <div class="wrapper-error is-hidden"></div>
-            <div class="wrapper-form">
-                <fieldset>
-                  <legend class="sr">${_("Required Information to view orphans of a course")}</legend>
-
-                  <ol class="list-input">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+        <div class="wrapper-form">
+            <fieldset>
+                <ol class="list-input">
                     <li class="field text required" id="field-course-name">
-                      <label for="course-id">${_("Course ID")}</label>
-                      <input id="course-id" type="text" name="course-id" aria-required="true" value="" placeholder="${_('e.g. edX+DemoX+Demo_Course')}" />
-                      <span class="tip tip-error is-hidden"></span>
+                        <label for="course-id">${_("Course ID")}</label>
+                        <input id="course-id" type="text" name="course-id" aria-required="true" value=""
+                               placeholder="${_('e.g. edX+DemoX+Demo_Course')}"/>
+                        % if error:
+                        <div class="error">${msg}</div>
+                        % endif
                     </li>
                     <li class="field-radio">
-                        <input type="radio" id="draft-branch" name="draft-published-branch" class="input input-radio" checked="checked" value="draft"/>
-                        <label for="draft-branch" class="label">${_("Draft")}</label>
-                        <input type="radio" id="published-branch" name="draft-published-branch" class="input input-radio" value="published"/>
-                        <label for="published-branch" class="label">${_("Published")}</label>
-                    </li>
-                  </ol>
-                </fieldset>
-              </div>
+                        <div>
+                            <input type="radio" id="draft-branch" name="draft-published-branch"
+                                   class="input input-radio" checked="checked" value="draft"/>
+                            <label for="draft-branch" class="label">${_("Draft")}</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="published-branch" name="draft-published-branch"
+                                   class="input input-radio" value="published"/>
+                            <label for="published-branch" class="label">${_("Published")}</label>
+                        </div>
 
-              <div class="actions">
-                <button type="submit" class="action action-primary" aria-disabled="true" >${_("View Orphans")}</button>
-                <a href="${command['url']}" class="action action-secondary action-cancel">${_("Reset")}</a>
-              </div>
+                    </li>
+                </ol>
+            </fieldset>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="action action-primary" aria-disabled="true">${_("View Orphans")}</button>
+            <a href="${command['url']}" class="action action-secondary action-cancel">${_("Reset")}</a>
+        </div>
     </form>
     % if orphans:
-        ${orphans}
+    <div class="result">
+        <p>Total orphans found for <strong>${form_data['course_id']}</strong> in <strong>${form_data['branch']}</strong>
+            branch : <strong>${len(orphans)}</strong></p>
+        <article>
+            <ul class="orphan-list">
+                % for orphan in orphans:
+                <li>${orphan}</li>
+                % endfor
+            </ul>
+        </article>
+    </div>
+    % elif success:
+    <div class="wrapper-error">
+        <div class="error" role="alert">${msg}</div>
+    </div>
     % endif
 </div>
