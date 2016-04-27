@@ -7,7 +7,6 @@ from django.http import Http404
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from unittest import skip
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
