@@ -6,11 +6,12 @@
 .program-card{
   @include span-columns(12);  
   border: 1px solid $border-color-l3;
+  border-bottom: none;
   box-sizing: border-box;
-  padding: $baseline;
   margin-bottom: $baseline;
   position: relative;
   display: inline;
+
   .card-link{
     position: absolute;
     top: 0;
@@ -38,24 +39,34 @@
       }
     }
   }
+
   .text-section{
+    padding: 40px $baseline $baseline;
     margin-top: 106px;
+    position: relative;
+
     .meta-info{
       @include outer-container;
-      margin-bottom: $baseline*0.25;
       font-size: em(12);
       color: $gray;
+      position: absolute;
+      top: $baseline;
+      width: calc(100% - 40px);
+
       .organization{
         @include span-columns(6);
         white-space: nowrap;
         overflow: hidden;
       }
+
       .category{
         @include span-columns(6);
         text-align: right;
+
         .category-text{
             @include float(right);
         }
+
         .xseries-icon{
           @include float(right);
           @include margin-right($baseline*0.25);
@@ -67,11 +78,37 @@
         }
       }
     }
+ 
     .title{
+      @extend %t-title4;
       font-size: em(24);
       color: $gray-d2;
       margin-bottom: 10px;
       line-height: 1.2;
+    }
+  }
+
+  .certificate-status {
+    font-size: em(12);
+    color: $gray;
+  }
+
+  .progress {
+    height: 5px;
+    background: $x-light;
+
+    .bar {
+      height: 100%;
+      position: relative;
+      float: left;
+
+      &.complete {
+        background: $success-dark;
+      }
+
+      &.in-progress {
+        background: $warning-base;
+      }
     }
   }
 }
@@ -80,11 +117,13 @@
   .program-card{
     @include omega(n);
     @include span-columns(4);
+
     .card-link{
       .banner-image-container{
         height: 166px;
       }
     }
+
     .text-section{
       margin-top: 156px;
     }
@@ -96,11 +135,13 @@
   .program-card{
     @include omega(n);
     @include span-columns(8);
+
     .card-link{
       .banner-image-container{
         height: 242px;
       }
     }
+
     .text-section{
       margin-top: 232px;
     }
@@ -113,11 +154,13 @@
   .program-card{
     @include omega(2n);
     @include span-columns(6);
+
     .card-link{
       .banner-image-container{
         height: 116px;
       }
     }
+
     .text-section{
       margin-top: 106px;
     }
@@ -128,11 +171,13 @@
   .program-card{
     @include omega(2n);
     @include span-columns(6);
+
     .card-link{
       .banner-image-container{
         height: 145px;
       }
     }
+
     .text-section{
       margin-top: 135px;
     }
