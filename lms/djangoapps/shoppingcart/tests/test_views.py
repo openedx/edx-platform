@@ -69,6 +69,10 @@ postpay_mock = Mock()
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
+    """
+    Test shopping cart view under various states
+    """
+
     @classmethod
     def setUpClass(cls):
         super(ShoppingCartViewsTests, cls).setUpClass()
