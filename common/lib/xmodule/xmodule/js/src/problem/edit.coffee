@@ -574,8 +574,14 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       }
 
       // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      xml = '<question>\n' + xml + demandhints + '\n</question>';
 
       return xml;
     }`
-    return toXml markdown
+    questionsXML = []
+    questionsMarkdown = markdown.split('---')
+    console.log(questionsMarkdown)
+    _.each questionsMarkdown, (questionMarkdown, index) ->
+      if questionMarkdown.trim().length > 0
+        questionsXML.push toXml(questionMarkdown)
+    return '<problem>\n' + questionsXML.join('\n\n') + '\n</problem>'
