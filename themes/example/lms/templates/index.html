@@ -16,7 +16,9 @@ from django.core.urlresolvers import reverse
         <div class="row">
           <div class="col col-10 sm-col-10 md-col-10 lg-col-8 xl-col-6 text-tint">
             <p>Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem </p>
-            <a href="#" class="btn-neutral btn-large">Watch video <i class="fa fa-play"></i></a>
+            % if show_homepage_promo_video:
+              <a href="#video-modal" class="btn-neutral btn-large" rel="leanModal">Watch video <i class="fa fa-play"></i></a>
+            % endif
           </div>
         </div>
       </div>
