@@ -330,7 +330,7 @@
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function (_, str, HtmlUtils, StringUtils) {
                         window._ = _;
-                        window._.str = str;
+                        _s = str;
                         window.edx = edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
