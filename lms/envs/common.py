@@ -2584,6 +2584,7 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     # Taiwan is specifically not translated to avoid it being translated as "Taiwan (Province of China)"
     "TW": "Taiwan",
+    'XK': _('Kosovo'),
 }
 
 # which access.py permission name to check in order to determine if a course is visible in
