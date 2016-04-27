@@ -2,6 +2,7 @@
 """
 Modulestore configuration for test cases.
 """
+import copy
 import functools
 from uuid import uuid4
 from contextlib import contextmanager
@@ -192,6 +193,8 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
 
     MODULESTORE = mixed_store_config(mkdtemp_clean(), {})
     ENABLED_CACHES = ['mongo_metadata_inheritance', 'loc_cache']
+    __settings_overrides = []
+    __old_modulestores = []
 
     @classmethod
     def start_modulestore_isolation(cls):
@@ -201,10 +204,13 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         be flushed (all content will be deleted).
         """
         cls.start_cache_isolation()
-        cls.__settings_override = override_settings(
+        override = override_settings(
             MODULESTORE=cls.MODULESTORE,
         )
-        cls.__settings_override.__enter__()
+
+        cls.__old_modulestores.append(copy.deepcopy(settings.MODULESTORE))
+        override.__enter__()
+        cls.__settings_overrides.append(override)
         XMODULE_FACTORY_LOCK.enable()
         clear_existing_modulestores()
         cls.store = modulestore()
@@ -218,7 +224,9 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         """
         drop_mongo_collections()  # pylint: disable=no-value-for-parameter
         XMODULE_FACTORY_LOCK.disable()
-        cls.__settings_override.__exit__(None, None, None)
+        cls.__settings_overrides.pop().__exit__(None, None, None)
+
+        assert settings.MODULESTORE == cls.__old_modulestores.pop()
         cls.end_cache_isolation()
 
 

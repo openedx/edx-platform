@@ -1,3 +1,15 @@
+"""
+Utility classes for testing django applications.
+
+:py:class:`CacheIsolationMixin`
+    A mixin helping to write tests which are isolated from cached data.
+
+:py:class:`CacheIsolationTestCase`
+    A TestCase baseclass that has per-test isolated caches.
+"""
+
+import copy
+
 from django.core.cache import caches
 from django.test import TestCase, override_settings
 from django.conf import settings
@@ -27,7 +39,9 @@ class CacheIsolationMixin(object):
 
     CACHES = None
     ENABLED_CACHES = None
-    __settings_override = None
+
+    __settings_overrides = []
+    __old_settings = []
 
     @classmethod
     def start_cache_isolation(cls):
@@ -61,8 +75,12 @@ class CacheIsolationMixin(object):
         if cache_settings is None:
             return
 
-        cls.__settings_override = override_settings(CACHES=cache_settings)
-        cls.__settings_override.__enter__()
+        cls.__old_settings.append(copy.deepcopy(settings.CACHES))
+        override = override_settings(CACHES=cache_settings)
+        override.__enter__()
+        cls.__settings_overrides.append(override)
+
+        assert settings.CACHES == cache_settings
 
         # Start with empty caches
         cls.clear_caches()
@@ -76,9 +94,9 @@ class CacheIsolationMixin(object):
         # Make sure that cache contents don't leak out after the isolation is ended
         cls.clear_caches()
 
-        if cls.__settings_override is not None:
-            cls.__settings_override.__exit__(None, None, None)
-            cls.__settings_override = None
+        if cls.__settings_overrides:
+            cls.__settings_overrides.pop().__exit__(None, None, None)
+            assert settings.CACHES == cls.__old_settings.pop()
 
     @classmethod
     def clear_caches(cls):
