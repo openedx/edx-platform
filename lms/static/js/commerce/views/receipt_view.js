@@ -300,7 +300,7 @@ var edx = edx || {};
         el: $('#receipt-container')
     });
 
-})(jQuery, _, Backbone);
+})(jQuery, _, Backbone);     // jshint ignore:line
 
 function completeOrder(event) {     // jshint ignore:line
     var courseKey = $(event).data("course-key"),
