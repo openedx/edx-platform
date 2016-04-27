@@ -180,7 +180,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         return username, user_id
 
 
-@attr('shard_4')
+@attr(shard=4)
 class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify a student's own profile page.
@@ -695,7 +695,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
             profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
     """
     Tests that verify viewing the profile page of a different user.

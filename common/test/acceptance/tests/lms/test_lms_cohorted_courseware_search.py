@@ -25,7 +25,7 @@ from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDash
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CoursewareSearchCohortTest(ContainerBase):
     """
     Test courseware search.

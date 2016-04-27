@@ -64,7 +64,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         return response
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksListViewTests(BookmarksViewsTestsBase):
@@ -369,7 +369,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class BookmarksDetailViewTests(BookmarksViewsTestsBase):

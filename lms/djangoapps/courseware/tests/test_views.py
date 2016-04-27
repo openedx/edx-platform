@@ -64,7 +64,7 @@ from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -189,7 +189,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -936,7 +936,7 @@ class ViewsTestCase(ModuleStoreTestCase, MilestonesTestCaseMixin):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -1052,7 +1052,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         return self.client.get(reverse('courseware', args=[unicode(course.id)]), follow=True)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -1105,7 +1105,7 @@ class StartDateTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access, no-member
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
@@ -1591,7 +1591,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         }
 
 
-@attr('shard_1')
+@attr(shard=1)
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
@@ -1617,7 +1617,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         self.assertFalse(mocked_view.called)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class IsCoursePassedTests(ModuleStoreTestCase):
     """
     Tests for the is_course_passed helper function
@@ -1662,7 +1662,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -1814,7 +1814,7 @@ class ViewCheckerBlock(XBlock):
         return result
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """

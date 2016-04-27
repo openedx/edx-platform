@@ -122,7 +122,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -338,7 +338,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
@@ -1410,7 +1410,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
     Tests for toggling single annotation.
@@ -1479,7 +1479,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         self.assertTrue(note_2.is_visible)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
     Tests for toggling visibility of all notes.

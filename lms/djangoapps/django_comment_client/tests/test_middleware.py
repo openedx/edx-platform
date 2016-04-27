@@ -7,7 +7,7 @@ import lms.lib.comment_client
 import django_comment_client.middleware as middleware
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AjaxExceptionTestCase(TestCase):
     def setUp(self):
         super(AjaxExceptionTestCase, self).setUp()

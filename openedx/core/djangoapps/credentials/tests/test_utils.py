@@ -23,7 +23,7 @@ from student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@attr('shard_2')
+@attr(shard=2)
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, CacheIsolationTestCase):
     """ Tests covering the retrieval of user credentials from the Credentials

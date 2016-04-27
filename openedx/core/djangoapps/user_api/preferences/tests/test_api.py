@@ -40,7 +40,7 @@ from ...preferences.api import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestPreferenceAPI(TestCase):
     """
@@ -329,7 +329,7 @@ class TestPreferenceAPI(TestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """

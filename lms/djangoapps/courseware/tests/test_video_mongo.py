@@ -34,7 +34,7 @@ from .test_video_xml import SOURCE_XML
 from .test_video_handlers import TestVideo
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -96,7 +96,7 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -175,7 +175,7 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
     Make sure that `get_html` works correctly.
@@ -805,7 +805,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideoCDNRewriting(BaseTestXmodule):
     """
     Tests for Video CDN.
@@ -862,7 +862,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
         self.assertIsNone(rewrite_video_url("", ""))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
     Make sure that module initialization works correctly.
@@ -933,7 +933,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.download_video)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1167,7 +1167,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         self.verify_result_with_fallback_and_youtube(result)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.

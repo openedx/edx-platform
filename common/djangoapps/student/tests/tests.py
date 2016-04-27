@@ -890,7 +890,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 
 
 # TODO: Clean up these tests so that they use program factories and don't mention XSeries!
-@attr('shard_3')
+@attr(shard=3)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):

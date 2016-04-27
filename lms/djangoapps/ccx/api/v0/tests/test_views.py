@@ -139,7 +139,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.assertEqual(expected_field_errors, resp_dict_error)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CcxListTest(CcxRestApiTest):
     """
@@ -655,7 +655,7 @@ class CcxListTest(CcxRestApiTest):
             self.assertEqual(course_user, ccx_user)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CcxDetailTest(CcxRestApiTest):
     """

@@ -6,7 +6,7 @@ from nose.plugins.attrib import attr
 from util.testing import UrlResetMixin
 
 
-@attr('shard_1')
+@attr(shard=1)
 class FaviconTestCase(UrlResetMixin, TestCase):
     """
     Tests of the courseware favicon.

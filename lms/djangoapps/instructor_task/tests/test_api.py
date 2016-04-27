@@ -83,7 +83,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(set(task_ids), set())
 
 
-@attr('shard_3')
+@attr(shard=3)
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
@@ -174,7 +174,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""

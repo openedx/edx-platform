@@ -15,7 +15,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
     """

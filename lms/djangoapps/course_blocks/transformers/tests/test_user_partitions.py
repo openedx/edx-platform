@@ -68,7 +68,7 @@ class UserPartitionTestMixin(object):
             self.partition_cohorts.append(partition_cohorts)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTestCase):
     """
@@ -241,7 +241,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
         )
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase):
     """

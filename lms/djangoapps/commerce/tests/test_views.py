@@ -23,7 +23,7 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password='test')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class ReceiptViewTests(UserMixin, TestCase):
     """ Tests for the receipt view. """

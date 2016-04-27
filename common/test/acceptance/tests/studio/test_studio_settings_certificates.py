@@ -13,7 +13,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.tests.helpers import skip_if_browser
 
 
-@attr('shard_8')
+@attr(shard=8)
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.

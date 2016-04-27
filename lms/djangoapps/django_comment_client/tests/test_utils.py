@@ -31,7 +31,7 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class DictionaryTestCase(TestCase):
     def test_extract(self):
         d = {'cats': 'meow', 'dogs': 'woof'}
@@ -56,7 +56,7 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the
@@ -112,7 +112,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@attr('shard_1')
+@attr(shard=1)
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     Base testcase class for courseware context for the
@@ -201,7 +201,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
@@ -334,7 +334,7 @@ class CategoryMapTestMixin(object):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
@@ -1022,7 +1022,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
     """
     Tests `get_discussion_category_map` on discussion xblocks which are
@@ -1196,7 +1196,7 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         self.assertEqual(reparsed, text)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class RenderMustacheTests(TestCase):
     """
     Test the `render_mustache` utility function.

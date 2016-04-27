@@ -71,7 +71,7 @@ urlpatterns = patterns(
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""

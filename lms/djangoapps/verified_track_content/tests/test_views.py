@@ -19,7 +19,7 @@ from verified_track_content.models import VerifiedTrackCohortedCourse
 from verified_track_content.views import cohorting_settings
 
 
-@attr('shard_2')
+@attr(shard=2)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class CohortingSettingsTestCase(SharedModuleStoreTestCase):
     """

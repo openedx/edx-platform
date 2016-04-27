@@ -85,7 +85,7 @@ class TestTransformer1(MockTransformer):
         return data_key + 't1.val1.' + unicode(block_key)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
     """
     Test class for BlockStructureManager.

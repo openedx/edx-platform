@@ -43,7 +43,7 @@ def intercept_renderer(path, context):
     return response
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """

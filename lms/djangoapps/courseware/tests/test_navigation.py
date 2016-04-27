@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Check that navigation state is saved properly.

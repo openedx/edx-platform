@@ -26,7 +26,7 @@ from util.milestones_helpers import (
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt
 class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """

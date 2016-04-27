@@ -221,7 +221,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         return self.client.post(path=reverse('password_change_request'), data=data)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """

@@ -64,7 +64,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(status['message'], expected_message)
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.

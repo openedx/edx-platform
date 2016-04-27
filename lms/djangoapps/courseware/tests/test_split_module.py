@@ -15,7 +15,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestBase(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Sets up a basic course and user for split test testing.
@@ -285,7 +285,7 @@ class TestVertSplitTestVert(SplitTestBase):
         ]
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
