@@ -78,23 +78,14 @@ source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
 <%def name="require_module(module_name, class_name)">
+    % if not settings.REQUIRE_DEBUG:
+      <script type="text/javascript" src="${staticfiles_storage.url(module_name + '.js') + '?raw'}"></script>
+    % endif
     <script type="text/javascript">
         (function (require) {
-            % if settings.REQUIRE_DEBUG:
-                require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
-                    ${caller.body() | n, decode.utf8}
-                });
-            % else:
-                ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-                ## static_replace calls (as woudl happen if require_module is used within courseware).
-                ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
-                ## being appended more than once, causing the import to fail in production environments.
-                require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {
-                    require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
-                        ${caller.body() | n, decode.utf8}
-                    });
-                });
-            % endif
+            require(['${module_name | n, js_escaped_string}'], function (${class_name | n, decode.utf8}) {
+                ${caller.body() | n, decode.utf8}
+            });
         }).call(this, require || RequireJS.require);
     </script>
 </%def>
