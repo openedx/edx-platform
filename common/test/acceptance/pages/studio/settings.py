@@ -272,7 +272,10 @@ class SettingsPage(CoursePage):
 
         filepath = SettingsPage.get_asset_path(file_to_upload)
         self.q(css=self.upload_image_browse_button_selector).results[0].send_keys(filepath)
+
+        self.wait_for_element_presence(self.upload_image_upload_button_selector, 'upload button is present')
         self.q(css=self.upload_image_upload_button_selector).results[0].click()
+
         self.wait_for_ajax()
 
     def get_uploaded_image_path(self):
