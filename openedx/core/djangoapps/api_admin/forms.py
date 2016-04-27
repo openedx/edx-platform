@@ -38,17 +38,22 @@ class ApiAccessRequestForm(forms.ModelForm):
 class CatalogForm(forms.ModelForm):
     """Form to create a catalog."""
 
-    username = forms.CharField(max_length=30)
+    # viewers = forms.Textarea()
 
     class Meta(object):
         model = Catalog
-        fields = ('name', 'query', 'username')
+        fields = ('name', 'query',)
+        # help_texts = {
+        #     'viewers': _('Comma-separated list of usernames which will be able to view this catalog.'),
+        # }
 
     def clean(self):
         cleaned_data = super(CatalogForm, self).clean()
-        username = cleaned_data.get('username')
-        try:
-            user = User.objects.get(username=username)
-            self.instance.user = user
-        except User.DoesNotExist:
-            self.add_error('username', _('The specified user does not exist.'))
+        # viewers = cleaned_data.get('viewers')
+        # usernames = [username.strip() for username in viewers.split(',')]
+        # for username in usernames:
+        #     try:
+        #         User.objects.get(username=username)
+        #         self.instance.viewers.add(username)
+        #     except User.DoesNotExist:
+        #         self.add_error('viewers', _('The specified user does not exist.'))

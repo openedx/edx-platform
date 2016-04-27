@@ -14,6 +14,7 @@ from edxmako.shortcuts import render_to_response
 
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
+from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
 
 log = logging.getLogger(__name__)
 
@@ -86,26 +87,33 @@ class CatalogListView(View):
 
     def get(self, request, username):
         """Display a list of a user's catalogs."""
-        # TODO actually get these catalogs, and filter by user
+        client = course_discovery_api_client(request.user)
+        response = client.api.v1.catalogs.get(username=username)
+        catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
         return render_to_response(self.template, {
             'username': username,
-            'catalogs': Catalog.all(),
+            'catalogs': catalogs,
             'form': CatalogForm(initial={'username': username}),
         })
 
     def post(self, request, username):
         """Create a new catalog for a user."""
         form = CatalogForm(request.POST)
+        client = course_discovery_api_client(request.user)
+
         if not form.is_valid():
+            response = client.api.v1.catalogs.get(username=username)
+            catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
             return render_to_response(self.template, {
                 'form': form,
-                'catalogs': Catalog.all(),
+                'catalogs': catalogs,
                 'username': username,
             })
-        form.save()
-        # return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': form.instance.id}))
-        # TODO: redirect to the correct catalog. right now we don't have an ID.
-        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': '1'}))
+
+        attrs = form.instance.attributes
+        attrs.update({'viewers':['honor']})
+        catalog = client.api.v1.catalogs.post(attrs)
+        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': catalog['id']}))
 
 
 class CatalogDetailView(View):
@@ -113,13 +121,12 @@ class CatalogDetailView(View):
 
     def get(self, request, catalog_id):
         """Display this catalog."""
-        catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+        client = course_discovery_api_client(request.user)
+        response = client.api.v1.catalogs(catalog_id).get()
         return render_to_response('api_admin/catalogs/detail.html', {
-            'catalog': catalog,
+            'catalog': Catalog(attributes=response),
             'edit_link': reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}),
-            'preview_link': urljoin(  # TODO: link to a preview in CD
-                settings.COURSE_DISCOVERY_API_URL, 'catalogs/{id}/courses'.format(id=catalog_id)
-            ),
+            'preview_link': '', #TODO remove this in favor of interactive preview
         })
 
 
@@ -128,7 +135,9 @@ class CatalogEditView(View):
 
     def get(self, request, catalog_id):
         """Display a form to edit this catalog"""
-        catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+        client = course_discovery_api_client(request.user)
+        response = client.api.v1.catalogs(catalog_id).get()
+        catalog = Catalog(attributes=response)
         form = CatalogForm(instance=catalog)
         return render_to_response('api_admin/catalogs/edit.html', {
             'catalog': catalog,
@@ -137,15 +146,18 @@ class CatalogEditView(View):
 
     def post(self, request, catalog_id):
         """Update or delete this catalog."""
+        client = course_discovery_api_client(request.user)
         if request.POST.get('delete-catalog') == 'on':
-            # TODO delete catalog
+            client.api.v1.catalogs(catalog_id).delete()
             return redirect(reverse('api_admin:catalog-list', kwargs={'username': 'TODO'}))  # TODO redirect correctly
+
         form = CatalogForm(request.POST)
         if not form.is_valid():
-            catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
+            response = client.api.v1.catalogs(catalog_id).get()
             return render_to_response('api_admin/catalogs/edit.html', {
-                'catalog': catalog,
+                'catalog': Catalog(attributes=response),
                 'form': form,
             })
-        form.save()
-        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': catalog_id}))
+
+        catalog = client.api.v1.catalogs(catalog_id).patch(form.instance.attributes)
+        return redirect(reverse('api_admin:catalog-detail', kwargs={'catalog_id': catalog['id']}))

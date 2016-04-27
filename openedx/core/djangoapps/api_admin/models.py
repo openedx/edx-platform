@@ -187,7 +187,7 @@ class Catalog(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, blank=False)
     query = models.TextField(null=False, blank=False)
-    user = models.ForeignKey(User)
+    # viewers = []
 
     class Meta(object):
         # Catalogs live in course discovery, so we do not create any
@@ -195,19 +195,29 @@ class Catalog(models.Model):
         # this catalog to discovery.
         managed = False
 
+    def __init__(self, *args, **kwargs):
+        attributes = kwargs.get('attributes')
+        if attributes:
+            self.id = attributes['id']
+            self.name = attributes['name']
+            self.query = attributes['query']
+            # self.viewers = attributes['viewers']
+        else:
+            super(Catalog, self).__init__(*args, **kwargs)
+
     def save(self, **kwargs):  # pylint: disable=unused-argument
         # TODO: save this catalog to discovery
         return None
 
-    @classmethod
-    def all(cls):
-        """
-        TODO: get these from the course discovery service. This method is
-        just for testing right now.
-        """
-        return [
-            Catalog(id=i, name='test_' + str(i), query='*') for i in xrange(5)
-        ]
+    @property
+    def attributes(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'query': self.query,
+            # 'viewers': self.viewers,
+        }
+
 
     def __unicode__(self):
         return u'Catalog {name} {query}'.format(name=self.name, query=self.query)
