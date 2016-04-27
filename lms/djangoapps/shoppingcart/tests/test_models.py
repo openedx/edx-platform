@@ -50,6 +50,11 @@ from opaque_keys.edx.locator import CourseLocator
 @attr('shard_3')
 @ddt.ddt
 class OrderTest(ModuleStoreTestCase):
+    """
+    Test shopping cart orders (e.g., cart contains various items,
+    order is taken through various pieces of cart state, etc.)
+    """
+
     def setUp(self):
         super(OrderTest, self).setUp()
 

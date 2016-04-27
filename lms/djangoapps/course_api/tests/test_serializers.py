@@ -125,7 +125,6 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['pacing'], expected_pacing)
 
 
-@attr('shard_3')
 class TestCourseDetailSerializer(TestCourseSerializer):  # pylint: disable=test-inherits-tests
     """
     Test CourseDetailSerializer by rerunning all the tests
