@@ -528,4 +528,4 @@ class StudioUploadCourseImageTest(StudioCourseTest):
         # upload image
         file_to_upload = 'image.jpg'
         self.settings_page.upload_image(file_to_upload)
-        self.assertContains(file_to_upload, self.settings_page.get_uploaded_image_path())
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path())
