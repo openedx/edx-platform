@@ -508,3 +508,24 @@ class StudioSettingsA11yTest(StudioCourseTest):
         })
 
         self.settings_page.a11y_audit.check_for_accessibility_errors()
+
+
+class StudioUploadCourseImageTest(StudioCourseTest):
+
+    """
+    Class to test course image upload.
+    """
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioUploadCourseImageTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+
+    def test_upload_course_image(self):
+        self.settings_page.visit()
+        self.settings_page.wait_for_page()
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image(file_to_upload)
+        self.assertContains(self.file_to_upload, self.settings_page.get_uploaded_image_path())

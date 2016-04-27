@@ -2,6 +2,7 @@
 """
 Course Schedule and Details Settings page.
 """
+import os
 from __future__ import unicode_literals
 from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import requirejs
@@ -17,6 +18,8 @@ class SettingsPage(CoursePage):
     """
 
     url_path = "settings/details"
+    upload_image_browse_button_selector = 'form.upload-dialog input[type=file]'
+    upload_image_upload_button_selector = '.modal-actions li:nth(0) a'
 
     ################
     # Helpers
@@ -234,3 +237,39 @@ class SettingsPage(CoursePage):
             ).fulfill()
         self.wait_for_require_js()
         self.wait_for_ajax()
+
+    @staticmethod
+    def get_asset_path(file_name):
+        """
+        Returns the full path of the file to upload.
+        These files have been placed in edx-platform/common/test/data/uploads/
+        """
+
+        # Separate the list of folders in the path reaching to the current file,
+        # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
+        #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
+        folders_list_in_path = __file__.split(os.sep)
+
+        # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
+        # to point to the 'test' folder, a shared point in the path's tree.
+        folders_list_in_path = folders_list_in_path[:-4]
+
+        # Append the folders in the asset's path
+        folders_list_in_path.extend(['data', 'uploads', file_name])
+
+        # Return the joined path of the required asset.
+        return os.sep.join(folders_list_in_path)
+
+    def upload_image(self, file_to_upload):
+        self.q(css='#upload-course-image').click()
+
+        # wait for popup
+        self.wait_for_element_presence(".assetupload-modal", 'upload dialog is present')
+
+        filepath = SettingsPage.get_asset_path(self.file_to_upload)
+        self.q(css=self.upload_image_browse_button_selector).results[0].send_keys(filepath)
+        self.q(css=self.upload_image_upload_button_selector).results[0].click()
+        self.wait_for_ajax()
+
+    def get_uploaded_image_path(self):
+        return self.q(css='#course-image-url').text
