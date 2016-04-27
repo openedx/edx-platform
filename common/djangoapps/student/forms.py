@@ -21,6 +21,8 @@ from util.password_policy_validators import (
     validate_password_dictionary,
 )
 
+from student.models import MdlToEdx
+
 
 class PasswordResetFormNoActive(PasswordResetForm):
     error_messages = {
@@ -246,3 +248,76 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+
+class DetailsResetFormNoActive(PasswordResetForm):
+    error_messages = {
+        'unknown': _("That e-mail address doesn't have an associated "
+                     "user account. Are you sure you've registered?"),
+        'unusable': _("The user account associated with this e-mail "
+                      "address cannot reset the password."),
+    }
+
+    def clean_email(self):
+        """
+        This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
+        Except removing the requirement of active users
+        Validates that a user exists with the given email address.
+        """
+        email = self.cleaned_data["email"]
+        #The line below contains the only change, removing is_active=True
+        self.users_cache = User.objects.filter(email__iexact=email)
+        if not len(self.users_cache):
+            raise forms.ValidationError(self.error_messages['unknown'])
+        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
+               for user in self.users_cache):
+            raise forms.ValidationError(self.error_messages['unusable'])
+        return email
+
+    def save(
+            self,
+            domain_override=None,
+            subject_template_name='registration/details_reset_subject.txt', # figure out how to fix this
+            email_template_name='registration/details_reset_email.html',
+            use_https=False,
+            token_generator=default_token_generator,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            request=None
+    ):
+        """
+        Generates a one-use only link for resetting password and sends to the
+        user.
+        """
+        # This import is here because we are copying and modifying the .save from Django 1.4.5's
+        # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
+        from django.core.mail import send_mail
+        for user in self.users_cache:
+            if not domain_override:
+                site_name = microsite.get_value(
+                    'SITE_NAME',
+                    settings.SITE_NAME
+                )
+            else:
+                site_name = domain_override
+            context = {
+                'email': user.email,
+                'site_name': site_name,
+                'uid': int_to_base36(user.id),
+                'user': user,
+                'token': token_generator.make_token(user),
+                'protocol': 'https' if use_https else 'http',
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
+            }
+            subject = loader.render_to_string(subject_template_name, context)
+            # Email subject *must not* contain newlines
+            subject = subject.replace('\n', '')
+            email = loader.render_to_string(email_template_name, context)
+            send_mail(subject, email, from_email, [user.email])
+            # update, well this user should exist already,
+            try:
+                user_to_mail = MdlToEdx.objects.get(user_id=user.id)
+                user_to_mail.link = "{0}-{1}".format(int_to_base36(user.id), token_generator.make_token(user)) # extract into variables
+                user_to_mail.visited = False
+                user_to_mail.save()
+            except:
+                pass

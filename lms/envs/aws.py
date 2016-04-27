@@ -18,6 +18,7 @@ Common traits:
 
 import datetime
 import json
+import ssl
 
 from .common import *
 from openedx.core.lib.logsettings import get_logger_config
@@ -489,6 +490,9 @@ CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
 CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
+BROKER_USE_SSL = ENV_TOKENS.get("CELERY_BROKER_USE_SSL", False)
+if BROKER_USE_SSL:
+    BROKER_USE_SSL = { 'cert_reqs': ssl.CERT_NONE } # TODO: improve
 BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_USER,
                                             CELERY_BROKER_PASSWORD,
