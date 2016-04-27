@@ -10,11 +10,15 @@ from django.core.urlresolvers import reverse
 </%block>
 
 <section class="home">
-  <header class="hero-main grid-manual">
-    <div class="row">
-      <div class="col col-10 sm-col-10 md-col-10 lg-col-8 xl-col-6 text-tint">
-        <p>Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem </p>
-        <a href="#" class="btn-neutral btn-large">Watch video <i class="fa fa-play"></i></a>
+  <header class="hero-main">
+    <div class="tint-dark">
+      <div class="grid-container grid-manual">
+        <div class="row">
+          <div class="col col-10 sm-col-10 md-col-10 lg-col-8 xl-col-6 text-tint">
+            <p>Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem </p>
+            <a href="#" class="btn-neutral btn-large">Watch video <i class="fa fa-play"></i></a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -26,30 +30,34 @@ from django.core.urlresolvers import reverse
 </section>
 
 % if show_homepage_promo_video:
-  <section id="video-modal" class="modal home-page-video-modal video-modal">
-    <div class="inner-wrapper">
-      <iframe title="YouTube Video" width="640" height="360" src="//www.youtube.com/embed/${homepage_promo_video_youtube_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
-    </div>
-  </section>
+<section id="video-modal" class="modal home-page-video-modal video-modal">
+  <div class="inner-wrapper">
+    <iframe title="YouTube Video" width="640" height="360"
+            src="//www.youtube.com/embed/${homepage_promo_video_youtube_id}?showinfo=0" frameborder="0"
+            allowfullscreen></iframe>
+  </div>
+</section>
 % endif
 
 <%block name="js_extra">
-   <script type="text/javascript">
-      $(window).load(function() {
-         if(getParameterByName('next')) {
-              $('#login').trigger("click");
-         }
-      })
-   </script>
+<script type="text/javascript">
+  $(window).load(function () {
+    if (getParameterByName('next')) {
+      $('#login').trigger("click");
+    }
+  })
+</script>
 
 <script type="text/javascript" src="${static.url('js/slick.min.js')}"></script>
 
 </%block>
 
 % if show_signup_immediately is not UNDEFINED:
-  ## NOTE: This won't work in production, because anonymous views are cached, so it will
-  ## show either with or without this extra js for 3 minutes at a time.
+## NOTE: This won't work in production, because anonymous views are cached, so it will
+## show either with or without this extra js for 3 minutes at a time.
 <script type="text/javascript">
-  $(window).load(function() {$('#signup_action').trigger("click");});
+  $(window).load(function () {
+    $('#signup_action').trigger("click");
+  });
 </script>
 % endif
