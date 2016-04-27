@@ -3,7 +3,7 @@
  */
 var edx = edx || {};
 
-(function ($, _, Backbone) {
+(function ($, _, _s, Backbone) {
     'use strict';
 
     edx.commerce = edx.commerce || {};
@@ -305,7 +305,7 @@ var edx = edx || {};
         el: $('#receipt-container')
     });
 
-})(jQuery, _, Backbone);
+})(jQuery, _, _.str, Backbone);
 
 function completeOrder(event) {     // jshint ignore:line
     var courseKey = $(event).data("course-key"),
