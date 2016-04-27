@@ -11,7 +11,7 @@ import ddt
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MixedModulestoreBuilder, VersioningModulestoreBuilder,
     MongoModulestoreBuilder, TEST_DATA_DIR
 )
@@ -108,9 +108,9 @@ class CountMongoCallsCourseTraversal(TestCase):
         # The line below shows the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 41),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 143),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 143),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 41),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 4),
         # TODO: The call count below seems like a bug - should be 4?

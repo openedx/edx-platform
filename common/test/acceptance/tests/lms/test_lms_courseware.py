@@ -253,6 +253,86 @@ class ProctoredExamTest(UniqueCourseTest):
         # Then I am taken to the exam with a timer bar showing
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
+    def test_time_allotted_field_is_not_visible_with_none_exam(self):
+        """
+        Test that the time allotted text field is not shown if 'none' radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the 'None' exams radio button
+        self.course_outline.select_none_exam()
+
+        # Then the time allotted text field becomes invisible
+        self.assertFalse(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_timed_exam(self):
+        """
+        Test that the time allotted text field is shown if timed exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the timed exams radio button
+        self.course_outline.select_timed_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_proctored_exam(self):
+        """
+        Test that the time allotted text field is shown if proctored exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the proctored exams radio button
+        self.course_outline.select_proctored_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
+
+    def test_time_allotted_field_is_visible_with_practice_exam(self):
+        """
+        Test that the time allotted text field is shown if practice exam radio
+        button is selected
+        """
+
+        # Given that I am a staff member
+        # And I have visited the course outline page in studio.
+        # And the subsection edit dialog is open
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        self.course_outline.open_exam_settings_dialog()
+
+        # When I select the practice exams radio button
+        self.course_outline.select_practice_exam()
+
+        # Then the time allotted text field becomes visible
+        self.assertTrue(self.course_outline.time_allotted_field_visible())
+
 
 class CoursewareMultipleVerticalsTest(UniqueCourseTest):
     """

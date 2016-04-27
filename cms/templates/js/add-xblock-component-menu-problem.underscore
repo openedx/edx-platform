@@ -1,5 +1,11 @@
-<div class="tab-group tabs">
-    <ul class="problem-type-tabs nav-tabs">
+<div class="tab-group tabs" tabindex="-1" role="dialog" aria-label="<%-
+    interpolate(
+        gettext('%(type)s Component Template Menu'),
+            {type: type},
+            true
+    )
+%>">
+    <ul class="problem-type-tabs nav-tabs" tabindex='-1'>
         <li class="current">
             <a class="link-tab" href="#tab1"><%= gettext("Common Problem Types") %></a>
         </li>
@@ -13,16 +19,16 @@
                 <% if (templates[i].tab == "common") { %>
                     <% if (!templates[i].boilerplate_name) { %>
                     <li class="editor-md empty">
-                        <a href="#" data-category="<%= templates[i].category %>">
+                        <button type="button" class="button-component" data-category="<%= templates[i].category %>">
                             <span class="name"><%= templates[i].display_name %></span>
-                        </a>
+                        </button>
                     </li>
                     <% } else { %>
                     <li class="editor-md">
-                        <a href="#" data-category="<%= templates[i].category %>"
+                        <button type="button" class="button-component" data-category="<%= templates[i].category %>"
                            data-boilerplate="<%= templates[i].boilerplate_name %>">
                             <span class="name"><%= templates[i].display_name %></span>
-                        </a>
+                        </button>
                     </li>
                     <% } %>
                 <% } %>
@@ -34,14 +40,14 @@
             <% for (var i = 0; i < templates.length; i++) { %>
                 <% if (templates[i].tab == "advanced") { %>
                 <li class="editor-manual">
-                    <a href="#" data-category="<%= templates[i].category %>"
+                    <button type="button" class="button-component" data-category="<%= templates[i].category %>"
                        data-boilerplate="<%= templates[i].boilerplate_name %>">
                         <span class="name"><%= templates[i].display_name %></span>
-                    </a>
+                    </button>
                 </li>
                 <% } %>
             <% } %>
         </ul>
     </div>
+    <button class="cancel-button" data-type="<%= type %>"><%= gettext("Cancel") %></button>
 </div>
-<a href="#" class="cancel-button"><%= gettext("Cancel") %></a>

@@ -223,7 +223,7 @@ import pytz
                    collapsible: true
                });
 
-     $('a[rel*=leanModal]').leanModal();
+     $('a[rel*=leanModal]').leanModal({ top : -70, position: "absolute", closeButton: ".modal_close" });
      $.each($("a.edit-right"), function () {
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
          $(this).removeAttr('href')

@@ -1,19 +1,20 @@
 <%
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
+from contentstore.utils import ancestor_has_staff_lock, get_visibility_partition_info
 
-from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
-from contentstore.utils import ancestor_has_staff_lock
+partition_info = get_visibility_partition_info(xblock)
+user_partitions = partition_info["user_partitions"]
+cohort_partitions = partition_info["cohort_partitions"]
+verification_partitions = partition_info["verification_partitions"]
+has_selected_groups = partition_info["has_selected_groups"]
+selected_verified_partition_id = partition_info["selected_verified_partition_id"]
 
-cohorted_user_partition = get_cohorted_user_partition(xblock.location.course_key)
-unsorted_groups = cohorted_user_partition.groups if cohorted_user_partition else []
-groups = sorted(unsorted_groups, key=lambda group: group.name)
-selected_group_ids = xblock.group_access.get(cohorted_user_partition.id, []) if cohorted_user_partition else []
-has_selected_groups = len(selected_group_ids) > 0
 is_staff_locked = ancestor_has_staff_lock(xblock)
 %>
 
 <div class="modal-section visibility-summary">
-    % if len(groups) == 0:
+    % if len(user_partitions) == 0:
         <div class="is-not-configured has-actions">
             <h4 class="title">${_('No content groups exist')}</h4>
 
@@ -42,7 +43,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
     % endif
 </div>
 
-% if len(groups) > 0:
+% if len(user_partitions) > 0:
     <form class="visibility-controls-form" method="post" action="">
 
         <div class="modal-section visibility-controls">
@@ -51,49 +52,83 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
             <div class="modal-section-content">
 
                 <section class="visibility-controls-primary">
-                    <ul class="list-fields list-radio">
-                        <li class="field field-radio field-visibility-level">
+                    <div class="list-fields list-radio">
+                        <div class="field field-radio field-visibility-level">
                             <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not has_selected_groups else ''} />
                             <label for="visibility-level-all" class="label">${_('All Students and Staff')}</label>
-                        </li>
+                        </div>
 
-                        <li class="field field-radio field-visibility-level">
+                        <div class="field field-radio field-visibility-level">
                             <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_groups else ''} />
                             <label for="visibility-level-specific" class="label">${_('Specific Content Groups')}</label>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </section>
 
-                <div class="wrapper-visibility-specific" data-user-partition-id="${cohorted_user_partition.id}">
+                <div class="wrapper-visibility-specific">
                     <section class="visibility-controls-secondary">
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
-                            <ul class="list-fields list-checkbox">
-                                <%
-                                missing_group_ids = set(selected_group_ids)
-                                %>
-                                % for group in groups:
-                                    <%
-                                    is_group_selected = group.id in selected_group_ids
-                                    if is_group_selected:
-                                        missing_group_ids.remove(group.id)
-                                    %>
-                                    <li class="field field-checkbox field-visibility-content-group">
-                                        <input type="checkbox" id="visibility-content-group-${group.id}" name="visibility-content-group" value="${group.id}" class="input input-checkbox"  ${'checked="checked"' if group.id in selected_group_ids else ''}/>
-                                        <label for="visibility-content-group-${group.id}" class="label">${group.name | h}</label>
-                                    </li>
+                            <div class="list-fields list-checkbox">
+                            % for partition in cohort_partitions:
+                                % for group in partition["groups"]:
+                                    <div class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
+                                        <input type="checkbox"
+                                            id="visibility-content-group-${partition["id"]}-${group["id"]}"
+                                            name="visibility-content-group"
+                                            value="${partition["id"]}-${group["id"]}"
+                                            class="input input-checkbox"
+                                            ${'checked="checked"' if group["selected"] else ''}
+                                        />
+                                        % if group["deleted"]:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">
+                                                ${_('Deleted Content Group')}
+                                                <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
+                                            </label>
+                                        % else:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
+                                        % endif
+                                    </div>
                                 % endfor
+                            % endfor
 
-                                % for group_id in missing_group_ids:
-                                    <li class="field field-checkbox field-visibility-content-group was-removed">
-                                        <input type="checkbox" id="visibility-content-group-${group_id}" name="visibility-content-group" value="${group_id}" class="input input-checkbox" checked="checked" />
-                                        <label for="visibility-content-group-${group_id}" class="label">
-                                            ${_('Deleted Content Group')}
-                                            <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
+                            ## Allow only one verification checkpoint to be selected at a time.
+                            % if verification_partitions:
+                                <div role="group" aria-labelledby="verification-access-title">
+                                    <div id="verification-access-title" class="sr">${_('Verification Checkpoint')}</div>
+                                    <div class="field field-checkbox field-visibility-verification">
+                                        <input type="checkbox"
+                                            id="verification-access-checkbox"
+                                            name="verification-access-checkbox"
+                                            class="input input-checkbox"
+                                            value=""
+                                            aria-describedby="verification-help-text"
+                                            ${'checked="checked"' if selected_verified_partition_id is not None else ''}
+                                        />
+                                        <label for="verification-access-checkbox" class="label">
+                                            ${_('Verification Checkpoint')}:
                                         </label>
-                                    </li>
-                                % endfor
-                            </ul>
+
+                                        <label class="sr" for="verification-access-dropdown">
+                                            ${_('Verification checkpoint to complete')}
+                                        </label>
+
+                                        <select id="verification-access-dropdown">
+                                            % for partition in verification_partitions:
+                                            <option
+                                                value="${partition["id"]}"
+                                                ${ "selected" if partition["id"] == selected_verified_partition_id else ""}
+                                            >${partition["name"]}</option>
+                                            % endfor
+                                        </select>
+
+                                        <div class="note" id="verification-help-text">
+                                            ${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}
+                                        </div>
+                                    </div>
+                                </div>
+                            % endif
+                            </div>
                         </div>
                     </section>
                 </div>

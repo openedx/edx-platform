@@ -47,6 +47,9 @@ body.discussion, .discussion-module {
     .response-header-actions {
       width: flex-grid(2,12);
       @include float(right);
+      @include right($baseline);
+      position: absolute;
+      top: ($baseline);
     }
   }
 

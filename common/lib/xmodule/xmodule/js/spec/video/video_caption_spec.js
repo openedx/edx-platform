@@ -622,6 +622,49 @@
                 expect(Caption.hideSubtitlesEl).toBeHidden();
             });
 
+            msg = 'on error: for Html5 player an attempt to fetch transcript ' +
+                    'with youtubeId if there are no additional transcripts';
+            it(msg, function () {
+                spyOn(Caption, 'fetchAvailableTranslations');
+                spyOn(Caption, 'fetchCaption').andCallThrough();
+                $.ajax.andCallFake(function (settings) {
+                    _.result(settings, 'error');
+                });
+
+                state.config.transcriptLanguages = {};
+                state.videoType = 'html5';
+
+                Caption.fetchCaption();
+
+                expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
+                expect($.ajaxWithPrefix.mostRecentCall.args[0]['data'])
+                    .toEqual({'videoId':'Z5KLxerq05Y'});
+                expect(Caption.hideCaptions.mostRecentCall.args)
+                    .toEqual([true, false]);
+                expect(Caption.fetchCaption.mostRecentCall.args[0]).toEqual(true);
+                expect(Caption.fetchCaption.callCount).toEqual(2);
+            });
+
+            msg = 'on success: when fetchCaption called with fetch_with_youtubeId to ' +
+                    'get transcript with youtubeId for html5';
+            it(msg, function () {
+                spyOn(Caption, 'fetchAvailableTranslations');
+                spyOn(Caption, 'fetchCaption').andCallThrough();
+
+                Caption.loaded = true;
+                state.config.transcriptLanguages = {};
+                state.videoType = 'html5';
+
+                Caption.fetchCaption(true);
+
+                expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
+                expect($.ajaxWithPrefix.mostRecentCall.args[0]['data'])
+                    .toEqual({'videoId':'Z5KLxerq05Y'});
+                expect(Caption.hideCaptions).toHaveBeenCalledWith(false);
+                expect(Caption.fetchCaption.mostRecentCall.args[0]).toEqual(true);
+                expect(Caption.fetchCaption.callCount).toEqual(1);
+            });
+
             msg = 'on error: fetch available translations if there are ' +
                     'additional transcripts';
             xit(msg, function () {

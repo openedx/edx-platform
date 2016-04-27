@@ -42,27 +42,45 @@ class ProblemPage(PageObject):
         """
         return self.q(css="div.problem div.problem-hint").text[0]
 
-    @property
-    def mathjax_rendered_in_problem(self):
+    def verify_mathjax_rendered_in_problem(self):
         """
         Check that MathJax have been rendered in problem hint
         """
-        mathjax_container = self.q(css="div.problem p .MathJax .math")
-        return mathjax_container.visible and mathjax_container.present
+        def mathjax_present():
+            """ Returns True if MathJax css is present in the problem body """
+            mathjax_container = self.q(css="div.problem p .MathJax .math")
+            return mathjax_container.visible and mathjax_container.present
 
-    @property
-    def mathjax_rendered_in_hint(self):
+        self.wait_for(
+            mathjax_present,
+            description="MathJax rendered in problem body"
+        )
+
+    def verify_mathjax_rendered_in_hint(self):
         """
         Check that MathJax have been rendered in problem hint
         """
-        mathjax_container = self.q(css="div.problem div.problem-hint .MathJax .math")
-        return mathjax_container.visible and mathjax_container.present
+        def mathjax_present():
+            """ Returns True if MathJax css is present in the problem body """
+            mathjax_container = self.q(css="div.problem div.problem-hint .MathJax .math")
+            return mathjax_container.visible and mathjax_container.present
+
+        self.wait_for(
+            mathjax_present,
+            description="MathJax rendered in hint"
+        )
 
     def fill_answer(self, text):
         """
         Fill in the answer to the problem.
         """
         self.q(css='div.problem div.capa_inputtype.textline input').fill(text)
+
+    def fill_answer_numerical(self, text):
+        """
+        Fill in the answer to a numerical problem.
+        """
+        self.q(css='div.problem section.inputtype input').fill(text)
 
     def click_check(self):
         """
@@ -78,11 +96,36 @@ class ProblemPage(PageObject):
         self.q(css='div.problem button.hint-button').click()
         self.wait_for_ajax()
 
+    def click_choice(self, choice_value):
+        """
+        Click the choice input(radio, checkbox or option) where value matches `choice_value` in choice group.
+        """
+        self.q(css='div.problem .choicegroup input[value="' + choice_value + '"]').click()
+        self.wait_for_ajax()
+
     def is_correct(self):
         """
         Is there a "correct" status showing?
         """
         return self.q(css="div.problem div.capa_inputtype.textline div.correct span.status").is_present()
+
+    def simpleprob_is_correct(self):
+        """
+        Is there a "correct" status showing? Works with simple problem types.
+        """
+        return self.q(css="div.problem section.inputtype div.correct span.status").is_present()
+
+    def simpleprob_is_partially_correct(self):
+        """
+        Is there a "partially correct" status showing? Works with simple problem types.
+        """
+        return self.q(css="div.problem section.inputtype div.partially-correct span.status").is_present()
+
+    def simpleprob_is_incorrect(self):
+        """
+        Is there an "incorrect" status showing? Works with simple problem types.
+        """
+        return self.q(css="div.problem section.inputtype div.incorrect span.status").is_present()
 
     def click_clarification(self, index=0):
         """

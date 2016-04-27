@@ -10,26 +10,19 @@
         var TeamsView = PaginatedView.extend({
             type: 'teams',
 
-            events: {
-                'click button.action': '' // entry point for team creation
-            },
-
             srInfo: {
                 id: "heading-browse-teams",
                 text: gettext('All teams')
             },
 
             initialize: function (options) {
-                this.topic = options.topic;
-                this.teamMemberships = options.teamMemberships;
-                this.teamParams = options.teamParams;
+                this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
-                    topic: options.topic,
-                    maxTeamSize: options.maxTeamSize,
+                    maxTeamSize: this.context.maxTeamSize,
                     srInfo: this.srInfo,
-                    countries: TeamUtils.selectorOptionsArrayToHashWithBlank(options.teamParams.countries),
-                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(options.teamParams.languages)
+                    countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
+                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages)
                 });
                 PaginatedView.prototype.initialize.call(this);
             }

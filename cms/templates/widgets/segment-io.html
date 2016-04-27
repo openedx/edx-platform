@@ -6,28 +6,24 @@
 %>
 % endif
 
-% if settings.FEATURES.get('SEGMENT_IO'):
-<!-- begin Segment.io -->
+% if settings.CMS_SEGMENT_KEY:
+<!-- begin Segment -->
 <script type="text/javascript">
   // if inside course, inject the course location into the JS namespace
   %if context_course:
       var course_location_analytics = "${locator | escapejs}";
   %endif
 
-  var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
-  analytics.load("${ settings.SEGMENT_IO_KEY }");
-
-  % if user.is_authenticated():
-  analytics.identify("${ user.id }", {
-      email     : "${ user.email }",
-      username  : "${ user.username }"
-  });
-
-  % endif
+  // Asynchronously load Segment's analytics.js library
+  !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+  analytics.load("${ settings.CMS_SEGMENT_KEY }");
+  analytics.page();
+  }}();
+  // Note: user tracking moved to segment-io-footer.html
 </script>
-<!-- end Segment.io -->
+<!-- end Segment -->
 % else:
-<!-- dummy segment.io -->
+<!-- dummy Segment -->
 <script type="text/javascript">
   %if context_course:
   var course_location_analytics = "${locator | escapejs}";
@@ -36,5 +32,5 @@
     "track": function() {}
   };
 </script>
-<!-- end dummy segment.io -->
+<!-- end dummy Segment -->
 % endif

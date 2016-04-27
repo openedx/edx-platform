@@ -4,7 +4,7 @@
 
 import json
 from nose.plugins.attrib import attr
-from path import path
+from path import Path as path
 import shutil
 from StringIO import StringIO
 import tarfile

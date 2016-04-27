@@ -57,7 +57,7 @@ class Role(models.Model):
     users = models.ManyToManyField(User, related_name="roles")
     course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         # use existing table that was originally created from django_comment_client app
         db_table = 'django_comment_client_role'
 
@@ -99,7 +99,7 @@ class Permission(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
     roles = models.ManyToManyField(Role, related_name="permissions")
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         # use existing table that was originally created from django_comment_client app
         db_table = 'django_comment_client_permission'
 

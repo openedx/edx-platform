@@ -101,6 +101,9 @@ class ModuleStoreEnum(object):
         # user ID to use for tests that do not have a django user available
         test = -3
 
+        # user ID for automatic update by the system
+        system = -4
+
     class SortOrder(object):
         """
         Values for sorting asset metadata.
@@ -264,6 +267,12 @@ class BulkOperationsMixin(object):
         if not bulk_ops_record.active:
             return
 
+        # Send the pre-publish signal within the context of the bulk operation.
+        # Writes performed by signal handlers will be persisted when the bulk
+        # operation ends.
+        if emit_signals and bulk_ops_record.is_root:
+            self.send_pre_publish_signal(bulk_ops_record, structure_key)
+
         bulk_ops_record.unnest()
 
         # If this wasn't the outermost context, then don't close out the
@@ -293,12 +302,21 @@ class BulkOperationsMixin(object):
         """
         return self._get_bulk_ops_record(course_key, ignore_case).active
 
+    def send_pre_publish_signal(self, bulk_ops_record, course_id):
+        """
+        Send a signal just before items are published in the course.
+        """
+        signal_handler = getattr(self, "signal_handler", None)
+        if signal_handler and bulk_ops_record.has_publish_item:
+            signal_handler.send("pre_publish", course_key=course_id)
+
     def send_bulk_published_signal(self, bulk_ops_record, course_id):
         """
         Sends out the signal that items have been published from within this course.
         """
         if self.signal_handler and bulk_ops_record.has_publish_item:
-            self.signal_handler.send("course_published", course_key=course_id)
+            # We remove the branch, because publishing always means copying from draft to published
+            self.signal_handler.send("course_published", course_key=course_id.for_branch(None))
             bulk_ops_record.has_publish_item = False
 
     def send_bulk_library_updated_signal(self, bulk_ops_record, library_id):
@@ -889,6 +907,14 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @abstractmethod
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        pass
+
+    @abstractmethod
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
@@ -1327,22 +1353,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
-
-    def _flag_publish_event(self, course_key):
-        """
-        Wrapper around calls to fire the course_published signal
-        Unless we're nested in an active bulk operation, this simply fires the signal
-        otherwise a publish will be signalled at the end of the bulk operation
-
-        Arguments:
-            course_key - course_key to which the signal applies
-        """
-        if self.signal_handler:
-            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
-            if bulk_record and bulk_record.active:
-                bulk_record.has_publish_item = True
-            else:
-                self.signal_handler.send("course_published", course_key=course_key)
 
     def _flag_library_updated_event(self, library_key):
         """

@@ -9,7 +9,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from survey.models import SurveyForm
+from survey.models import SurveyForm, SurveyAnswer
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -32,15 +32,20 @@ class SurveyViewsTests(ModuleStoreTestCase):
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
 
         self.test_survey_name = 'TestSurvey'
-        self.test_form = '<input name="field1" /><input name="field2" /><select name="ddl"><option>1</option></select>'
+        self.test_form = '''
+            <input name="field1" /><input name="field2" /><select name="ddl"><option>1</option></select>
+            <textarea name="textarea" />
+        '''
 
         self.student_answers = OrderedDict({
             u'field1': u'value1',
             u'field2': u'value2',
             u'ddl': u'1',
+            u'textarea': u'textarea'
         })
 
         self.course = CourseFactory.create(
+            display_name='Test Course',
             course_survey_required=True,
             course_survey_name=self.test_survey_name
         )
@@ -124,6 +129,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
 
         data['csrfmiddlewaretoken'] = 'foo'
         data['_redirect_url'] = 'bar'
+        data['course_id'] = unicode(self.course.id)
 
         resp = self.client.post(
             self.postback_url,
@@ -133,6 +139,16 @@ class SurveyViewsTests(ModuleStoreTestCase):
         answers = self.survey.get_answers(self.student)
         self.assertNotIn('csrfmiddlewaretoken', answers[self.student.id])
         self.assertNotIn('_redirect_url', answers[self.student.id])
+        self.assertNotIn('course_id', answers[self.student.id])
+
+        # however we want to make sure we persist the course_id
+        answer_objs = SurveyAnswer.objects.filter(
+            user=self.student,
+            form=self.survey
+        )
+
+        for answer_obj in answer_objs:
+            self.assertEquals(unicode(answer_obj.course_key), data['course_id'])
 
     def test_encoding_answers(self):
         """

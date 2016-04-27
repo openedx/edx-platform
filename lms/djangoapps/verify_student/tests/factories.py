@@ -10,6 +10,7 @@ class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
     """
     Factory for SoftwareSecurePhotoVerification
     """
-    FACTORY_FOR = SoftwareSecurePhotoVerification
+    class Meta(object):
+        model = SoftwareSecurePhotoVerification
 
     status = 'approved'

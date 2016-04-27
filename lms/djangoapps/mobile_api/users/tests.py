@@ -28,6 +28,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from .. import errors
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileCourseAccessTestMixin
 from .serializers import CourseEnrollmentSerializer
+from util.testing import UrlResetMixin
 
 
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
@@ -60,7 +61,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 
 
 @ddt.ddt
-class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
+class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
     """
@@ -71,7 +72,14 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
     LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
     ADVERTISED_START = "Spring 2016"
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self, *args, **kwargs):
+        super(TestUserEnrollmentApi, self).setUp()
+
     def verify_success(self, response):
+        """
+        Verifies user course enrollment response for success
+        """
         super(TestUserEnrollmentApi, self).verify_success(response)
         courses = response.data
         self.assertEqual(len(courses), 1)
@@ -204,6 +212,14 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin):
         response = self.api_response()
         course_data = response.data[0]['course']
         self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_discussion_url(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        response_discussion_url = response.data[0]['course']['discussion_url']  # pylint: disable=E1101
+        self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):

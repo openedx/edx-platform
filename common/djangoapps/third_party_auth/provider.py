@@ -2,8 +2,8 @@
 Third-party auth provider configuration API.
 """
 from .models import (
-    OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig,
-    _PSA_OAUTH2_BACKENDS, _PSA_SAML_BACKENDS
+    OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig, LTIProviderConfig,
+    _PSA_OAUTH2_BACKENDS, _PSA_SAML_BACKENDS, _LTI_BACKENDS,
 )
 
 
@@ -26,11 +26,20 @@ class Registry(object):
                 provider = SAMLProviderConfig.current(idp_slug)
                 if provider.enabled and provider.backend_name in _PSA_SAML_BACKENDS:
                     yield provider
+        for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
+            provider = LTIProviderConfig.current(consumer_key)
+            if provider.enabled and provider.backend_name in _LTI_BACKENDS:
+                yield provider
 
     @classmethod
     def enabled(cls):
         """Returns list of enabled providers."""
         return sorted(cls._enabled_providers(), key=lambda provider: provider.name)
+
+    @classmethod
+    def accepting_logins(cls):
+        """Returns list of providers that can be used to initiate logins currently"""
+        return [provider for provider in cls.enabled() if provider.accepts_logins]
 
     @classmethod
     def get(cls, provider_id):
@@ -81,5 +90,10 @@ class Registry(object):
             idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)
             for idp_name in idp_names:
                 provider = SAMLProviderConfig.current(idp_name)
+                if provider.backend_name == backend_name and provider.enabled:
+                    yield provider
+        elif backend_name in _LTI_BACKENDS:
+            for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
+                provider = LTIProviderConfig.current(consumer_key)
                 if provider.backend_name == backend_name and provider.enabled:
                     yield provider

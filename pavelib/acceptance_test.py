@@ -30,7 +30,7 @@ __test__ = False  # do not collect
 ])
 def test_acceptance(options):
     """
-    Run the acceptance tests for the either lms or cms
+    Run the acceptance tests for either lms or cms
     """
     opts = {
         'fasttest': getattr(options, 'fasttest', False),
@@ -46,13 +46,13 @@ def test_acceptance(options):
             'red',
             'No system specified, running tests for both cms and lms.'
         )
-        print(msg)
+        print msg
     if opts['default_store'] not in ['draft', 'split']:
         msg = colorize(
             'red',
             'No modulestore specified, running tests for both draft and split.'
         )
-        print(msg)
+        print msg
 
     suite = AcceptanceTestSuite('{} acceptance'.format(opts['system']), **opts)
     suite.run()

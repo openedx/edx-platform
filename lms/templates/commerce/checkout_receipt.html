@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 <script src="${static.url('js/vendor/jquery.ajax-retry.js')}"></script>
 <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
 <script src="${static.url('js/src/tooltip_manager.js')}"></script>
+<script src="${static.url('js/commerce/credit.js')}"></script>
 <script src="${static.url('js/commerce/views/receipt_view.js')}"></script>
 </%block>
 
@@ -56,7 +57,6 @@ from django.utils.translation import ugettext as _
             <h1>${_("Loading Order Data...")}</h1>
             <span>${ _("Please wait while we retrieve your order details.") }</span>
         </div>
-        <form id="complete-order-form"></form>
     </section>
 </div>
 </%block>

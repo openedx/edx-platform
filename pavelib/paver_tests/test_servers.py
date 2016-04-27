@@ -11,15 +11,22 @@ EXPECTED_COFFEE_COMMAND = (
     "{platform_root}/cms {platform_root}/common -type f -name \"*.coffee\"`"
 )
 EXPECTED_SASS_COMMAND = (
-    "sass --update --cache-location /tmp/sass-cache --default-encoding utf-8 --style compressed"
-    " --quiet --load-path common/static --load-path common/static/sass"
-    " --load-path lms/static/sass --load-path lms/static/certificates/sass"
-    " --load-path cms/static/sass --load-path common/static/sass"
-    " lms/static/sass:lms/static/css lms/static/certificates/sass:lms/static/certificates/css"
-    " cms/static/sass:cms/static/css common/static/sass:common/static/css"
+    "libsass {sass_directory}"
 )
+EXPECTED_COMMON_SASS_DIRECTORIES = [
+    "common/static/sass",
+]
+EXPECTED_LMS_SASS_DIRECTORIES = [
+    "lms/static/sass",
+    "lms/static/themed_sass",
+    "lms/static/certificates/sass",
+]
+EXPECTED_CMS_SASS_DIRECTORIES = [
+    "cms/static/sass",
+]
 EXPECTED_PREPROCESS_ASSETS_COMMAND = (
     "python manage.py {system} --settings={asset_settings} preprocess_assets"
+    " {system}/static/sass/*.scss {system}/static/themed_sass"
 )
 EXPECTED_COLLECT_STATIC_COMMAND = (
     "python manage.py {system} --settings={asset_settings} collectstatic --noinput > /dev/null"
@@ -29,6 +36,9 @@ EXPECTED_CELERY_COMMAND = (
 )
 EXPECTED_RUN_SERVER_COMMAND = (
     "python manage.py {system} --settings={settings} runserver --traceback --pythonpath=. 0.0.0.0:{port}"
+)
+EXPECTED_INDEX_COURSE_COMMAND = (
+    "python manage.py {system} --settings={settings} reindex_course --setup"
 )
 
 
@@ -83,13 +93,27 @@ class TestPaverServerTasks(PaverTestCase):
         Test the "devstack" task.
         """
         options = server_options.copy()
+        is_optimized = options.get("optimized", False)
+        expected_settings = "devstack_optimized" if is_optimized else options.get("settings", "devstack")
 
         # First test with LMS
         options["system"] = "lms"
+        options["expected_messages"] = [
+            EXPECTED_INDEX_COURSE_COMMAND.format(
+                system="cms",
+                settings=expected_settings,
+            )
+        ]
         self.verify_server_task("devstack", options, contracts_default=True)
 
         # Then test with Studio
         options["system"] = "cms"
+        options["expected_messages"] = [
+            EXPECTED_INDEX_COURSE_COMMAND.format(
+                system="cms",
+                settings=expected_settings,
+            )
+        ]
         self.verify_server_task("devstack", options, contracts_default=True)
 
     @ddt.data(
@@ -196,7 +220,7 @@ class TestPaverServerTasks(PaverTestCase):
             call_task("pavelib.servers.devstack", args=args)
         else:
             call_task("pavelib.servers.{task_name}".format(task_name=task_name), options=options)
-        expected_messages = []
+        expected_messages = options.get("expected_messages", [])
         expected_settings = settings if settings else "devstack"
         expected_asset_settings = asset_settings if asset_settings else expected_settings
         if is_optimized:
@@ -210,7 +234,7 @@ class TestPaverServerTasks(PaverTestCase):
             ))
             expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=platform_root))
-            expected_messages.append(EXPECTED_SASS_COMMAND)
+            expected_messages.extend(self.expected_sass_commands(system=system))
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
                 system=system, asset_settings=expected_asset_settings
@@ -252,7 +276,7 @@ class TestPaverServerTasks(PaverTestCase):
             ))
             expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=platform_root))
-            expected_messages.append(EXPECTED_SASS_COMMAND)
+            expected_messages.extend(self.expected_sass_commands())
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
                 system="lms", asset_settings=expected_asset_settings
@@ -276,3 +300,15 @@ class TestPaverServerTasks(PaverTestCase):
         )
         expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="dev_with_worker"))
         self.assertEquals(self.task_messages, expected_messages)
+
+    def expected_sass_commands(self, system=None):
+        """
+        Returns the expected SASS commands for the specified system.
+        """
+        expected_sass_directories = []
+        expected_sass_directories.extend(EXPECTED_COMMON_SASS_DIRECTORIES)
+        if system != 'cms':
+            expected_sass_directories.extend(EXPECTED_LMS_SASS_DIRECTORIES)
+        if system != 'lms':
+            expected_sass_directories.extend(EXPECTED_CMS_SASS_DIRECTORIES)
+        return [EXPECTED_SASS_COMMAND.format(sass_directory=directory) for directory in expected_sass_directories]

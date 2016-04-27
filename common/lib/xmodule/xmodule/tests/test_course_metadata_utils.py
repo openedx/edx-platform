@@ -22,7 +22,7 @@ from xmodule.course_metadata_utils import (
     may_certify_for_course,
 )
 from xmodule.fields import Date
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MongoModulestoreBuilder,
     VersioningModulestoreBuilder,
     MixedModulestoreBuilder

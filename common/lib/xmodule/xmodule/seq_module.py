@@ -6,14 +6,13 @@ xModule implementation of a learning sequence
 
 import json
 import logging
+from pkg_resources import resource_string
 import warnings
 
 from lxml import etree
-
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
-from pkg_resources import resource_string
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -28,7 +27,8 @@ log = logging.getLogger(__name__)
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -52,7 +52,7 @@ class SequenceFields(object):
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=False,
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
 
@@ -96,6 +96,16 @@ class ProctoringFields(object):
         default=False,
         scope=Scope.settings,
     )
+
+    @property
+    def is_proctored_exam(self):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        return self.is_proctored_enabled
+
+    @is_proctored_exam.setter
+    def is_proctored_exam(self, value):
+        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
+        self.is_proctored_enabled = value
 
 
 @XBlock.wants('proctoring')
@@ -179,7 +189,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
-            titles = child.get_content_titles()
+            # `titles` is a list of titles to inject into the sequential tooltip display.
+            # We omit any blank titles to avoid blank lines in the tooltip display.
+            titles = [title.strip() for title in child.get_content_titles() if title.strip()]
             childinfo = {
                 'content': rendered_child.content,
                 'title': "\n".join(titles),
@@ -193,13 +205,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)
 
-        params = {'items': contents,
-                  'element_id': self.location.html_id(),
-                  'item_id': self.location.to_deprecated_string(),
-                  'position': self.position,
-                  'tag': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  }
+        params = {
+            'items': contents,
+            'element_id': self.location.html_id(),
+            'item_id': self.location.to_deprecated_string(),
+            'position': self.position,
+            'tag': self.location.category,
+            'ajax_url': self.system.ajax_url,
+        }
 
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
@@ -218,14 +231,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
 
-        # Is the feature turned on and do we have all required services
-        # Also, the ENABLE_PROCTORED_EXAMS feature flag must be set to
-        # True and the Sequence in question, should have the
-        # fields set to indicate this is a timed/proctored exam
+        # Is this sequence designated as a Timed Examination, which includes
+        # Proctored Exams
         feature_enabled = (
             proctoring_service and
             credit_service and
-            proctoring_service.is_feature_enabled()
+            self.is_time_limited
         )
         if feature_enabled:
             user_id = self.runtime.user_id
@@ -239,7 +250,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     self.default_time_limit_minutes if
                     self.default_time_limit_minutes else 0
                 ),
-                'is_practice_exam': self.is_practice_exam
+                'is_practice_exam': self.is_practice_exam,
+                'due_date': self.due
             }
 
             # inject the user's credit requirements and fulfillments

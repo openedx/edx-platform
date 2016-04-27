@@ -13,7 +13,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import MemoryCache
+from xmodule.modulestore.tests.utils import MemoryCache
 
 
 @attr('mongo')

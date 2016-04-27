@@ -1987,23 +1987,6 @@ function update_schematics() {
 }
 window.update_schematics = update_schematics;
 
-// add ourselves to the tasks that get performed when window is loaded
-function add_schematic_handler(other_onload) {
-    return function() {
-	// execute othe onload functions first
-	if (other_onload) other_onload();
-
-	update_schematics();
-    }
-}
-
-// ask each schematic input widget to update its value field for submission
-function prepare_schematics() {
-    var schematics = $('.schematic');
-    for (var i = schematics.length - 1; i >= 0; i--)
-	schematics[i].schematic.update_value();
-}
-
 schematic = (function() {
     var background_style = 'rgb(220,220,220)';
     var element_style = 'rgb(255,255,255)';
@@ -6196,4 +6179,3 @@ schematic = (function() {
 	}
 	return module;
     }());
-

@@ -2,7 +2,7 @@
  * XBlockContainerPage is used to display Studio's container page for an xblock which has children.
  * This page allows the user to understand and manipulate the xblock and its children.
  */
-define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/view_utils",
+define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "common/js/components/utils/view_utils",
         "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
         "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
         "js/views/unit_outline", "js/views/utils/xblock_utils"],

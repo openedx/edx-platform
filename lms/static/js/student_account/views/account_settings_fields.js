@@ -116,11 +116,20 @@
             },
 
             render: function () {
+                var linkTitle;
+                if (this.options.connected) {
+                    linkTitle = gettext('Unlink');
+                } else if (this.options.acceptsLogins) {
+                    linkTitle = gettext('Link')
+                } else {
+                    linkTitle = ''
+                }
+
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle,
-                    linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
+                    linkTitle: linkTitle,
                     linkHref: '',
                     message: this.helpMessage
                 }));

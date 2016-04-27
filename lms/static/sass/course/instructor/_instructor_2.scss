@@ -137,12 +137,12 @@
   .request-response-error {
     margin: 0;
     padding-bottom: ($baseline);
-    color: $error-red;
+    color: $error-color;
   }
 
   .display-errors {
     line-height: 3em;
-    color: $error-red;
+    color: $error-color;
   }
 
   .slickgrid {
@@ -1894,7 +1894,6 @@ input[name="subject"] {
       font-size: 12px;
       color: #646464
     }
-    top: 100px !important;
     width: 650px;
     @include margin-left(-325px);
     border-radius: 2px;
@@ -2233,29 +2232,32 @@ input[name="subject"] {
       height: 40px;
       border-bottom: 1px solid #BEBEBE;
 
-      th:nth-child(5){
+      th:nth-child(5), th:nth-child(4){
         text-align: center;
-        width: 120px;
       }
       th:first-child{
         padding-left: $baseline;
       }
       th {
+        @extend %t-action2;
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        font-size: 16px;
         &.attempt-allowed-time {
-            width: 140px;
-            word-wrap: break-word;
+            width: 90px;
+        }
+        &.attempt-type {
+          width: 90px;
         }
         &.attempt-started-at {
-          width: 160px;
+          width: 170px;
         }
         &.attempt-completed-at {
           width: 160px;
+          text-align: center;
         }
         &.attempt-status {
           width: 100px;
+          text-align: center;
         }
         &.exam-name {
           width: 150px;
@@ -2264,16 +2266,20 @@ input[name="subject"] {
           width: 140px;
         }
         &.email {
-          width: 250px;
+          @include text-align(center);
+          width: ($baseline*8);
           word-wrap: break-word;
         }
         &.allowance-name {
-          width: 140px;
+          width: ($baseline*5);
+          text-align: center;
         }
         &.allowance-value {
-          width: 150px;
+          @include text-align(center);
+          width: ($baseline*5);
         }
         &.c_action {
+          @include text-align(center);
           width: 60px;
         }
       }
@@ -2286,7 +2292,7 @@ input[name="subject"] {
         line-height: normal;
         font-size: 14px;
       }
-      td:nth-child(5),td:first-child{
+      td:first-child{
         @include padding-left($baseline);
       }
       td:nth-child(2){
@@ -2294,16 +2300,27 @@ input[name="subject"] {
         @include padding-right(0px);
         word-wrap: break-word;
       }
-      td:nth-child(5){
+      td:nth-child(5), td:nth-child(4), td:nth-child(6){
         @include padding-left(0);
         text-align: center;
       }
-      td{
-        a.remove_allowance{
-          @include margin-left(15px);
-        }
+      td:nth-child(3){
+        word-wrap: break-word;
+        text-align: center;
+      }
+      td:nth-child(7){
+        word-wrap: break-word;
+        text-align: center;
+      }
+
+      td:last-child {
+        padding-left: 17px;
       }
     }
+  }
+  .exam-attempts-content, .exam-allowances-content {
+    padding-left: 0;
+    padding-right: 0;
   }
   .top-header {
     margin-top: -30px;
@@ -2318,7 +2335,7 @@ input[name="subject"] {
         box-shadow: none;
         border-radius: 5px;
         font-size: 14px;
-        width: 240px;
+        width: 285px;
       }
       span:first-child {
         margin-right: -5px;
@@ -2326,7 +2343,7 @@ input[name="subject"] {
       span {
         background-color: #ccc;
         display: inline-block;
-        padding: 4px 12px;
+        padding: 7px 12px;
         cursor: pointer;
       }
     }
@@ -2411,6 +2428,87 @@ input[name="subject"] {
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
   @include left(2em);
   @include right(auto);
+}
+
+#certificate-white-list-editor{
+  .msg-success{
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+    color: $confirm-color;
+  }
+
+  .certificate-exception-inputs{
+    .student-username-or-email{
+      width: 300px;
+    }
+    .notes-field{
+      width: 400px;
+    }
+    p+p{
+      margin-top: 5px;
+    }
+    .message{
+      margin-top: 10px;
+    }
+  }
+}
+
+.white-listed-students {
+
+  table {
+    width: 100%;
+    word-wrap: break-word;
+
+    th {
+      @extend %t-copy-sub2;
+      background-color: $gray-l5;
+      padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
+      vertical-align: middle;
+      text-align: left;
+      color: $gray;
+
+      &.date-column{
+        width: 230px;
+      }
+    }
+
+    td {
+      padding: ($baseline/2);
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    tbody {
+      box-shadow: 0 2px 2px $shadow-l1;
+      border: 1px solid $gray-l4;
+      background: $white;
+
+      tr {
+        @include transition(all $tmg-f2 ease-in-out 0s);
+        border-top: 1px solid $gray-l4;
+
+        &:first-child {
+          border-top: none;
+        }
+
+        &:nth-child(odd) {
+          background-color: $gray-l6;
+        }
+
+        a {
+          color: $gray-d1;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+
+        &:hover {
+          background-color: $blue-l5;
+        }
+      }
+    }
+  }
 }
 
 .course-specific-container {

@@ -166,6 +166,81 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
             actual_events)
 
 
+class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
+    """
+    Tests that hints containing html get rendered properly
+    """
+
+    def get_problem(self):
+        """
+        Problem with extended hint features.
+        """
+        xml = dedent("""
+            <problem>
+            <p>question text</p>
+            <stringresponse answer="A">
+                <stringequalhint answer="C"><a href="#">aa bb</a> cc</stringequalhint>
+                <textline size="20"/>
+            </stringresponse>
+            <demandhint>
+              <hint>aa <a href="#">bb</a> cc</hint>
+              <hint><a href="#">dd  ee</a> ff</hint>
+            </demandhint>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'PROBLEM HTML HINT TEST', data=xml)
+
+    def test_check_hint(self):
+        """
+        Test clicking Check shows the extended hint in the problem message.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_text[0], u'question text')
+        problem_page.fill_answer('C')
+        problem_page.click_check()
+        self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
+        # Check for corresponding tracking event
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
+            number_of_matches=1
+        )
+        self.assert_events_match(
+            [{'event': {'hint_label': u'Incorrect',
+                        'trigger_type': 'single',
+                        'student_answer': [u'C'],
+                        'correctness': False,
+                        'question_type': 'stringresponse',
+                        'hints': [{'text': '<a href="#">aa bb</a> cc'}]}}],
+            actual_events)
+
+    def test_demand_hint(self):
+        """
+        Test clicking hint button shows the demand hint in its div.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        # The hint button rotates through multiple hints
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): dd ee ff')
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
+        # Check corresponding tracking events
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
+            number_of_matches=3
+        )
+        self.assert_events_match(
+            [
+                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}},
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}},
+                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}}
+            ],
+            actual_events)
+
+
 class ProblemWithMathjax(ProblemsTest):
     """
     Tests the <MathJax> used in problem
@@ -200,16 +275,47 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name, "MATHJAX TEST PROBLEM")
 
-        # Verify Mathjax have been rendered
-        self.assertTrue(problem_page.mathjax_rendered_in_problem, "MathJax did not rendered in body")
+        problem_page.verify_mathjax_rendered_in_problem()
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
         self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.hint_text)
-        self.assertTrue(problem_page.mathjax_rendered_in_hint, "MathJax did not rendered in problem hint")
+        problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
         self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
-        self.assertTrue(problem_page.mathjax_rendered_in_hint, "MathJax did not rendered in problem hint")
+        problem_page.verify_mathjax_rendered_in_hint()
+
+
+class ProblemPartialCredit(ProblemsTest):
+    """
+    Makes sure that the partial credit is appearing properly.
+    """
+    def get_problem(self):
+        """
+        Create a problem with partial credit.
+        """
+        xml = dedent("""
+            <problem>
+                <p>The answer is 1. Partial credit for -1.</p>
+                <numericalresponse answer="1" partial_credit="list">
+                    <formulaequationinput label="How many miles away from Earth is the sun? Use scientific notation to answer." />
+                    <responseparam type="tolerance" default="0.01" />
+                    <responseparam partial_answers="-1" />
+                </numericalresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'PARTIAL CREDIT TEST PROBLEM', data=xml)
+
+    def test_partial_credit(self):
+        """
+        Test that we can see the partial credit value and feedback.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
+        problem_page.fill_answer_numerical('-1')
+        problem_page.click_check()
+        self.assertTrue(problem_page.simpleprob_is_partially_correct())

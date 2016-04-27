@@ -64,6 +64,7 @@ import urllib
 import analytics
 from eventtracking import tracker
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
@@ -99,13 +100,6 @@ AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
 AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
 
-# This is left-over from an A/B test
-# of the new combined login/registration page (ECOM-369)
-# We need to keep both the old and new entry points
-# until every session from before the test ended has expired.
-AUTH_ENTRY_LOGIN_2 = 'account_login'
-AUTH_ENTRY_REGISTER_2 = 'account_register'
-
 # Entry modes into the authentication process by a remote API call (as opposed to a browser session).
 AUTH_ENTRY_LOGIN_API = 'login_api'
 AUTH_ENTRY_REGISTER_API = 'register_api'
@@ -126,28 +120,12 @@ AUTH_DISPATCH_URLS = {
     AUTH_ENTRY_LOGIN: '/login',
     AUTH_ENTRY_REGISTER: '/register',
     AUTH_ENTRY_ACCOUNT_SETTINGS: '/account/settings',
-
-    # This is left-over from an A/B test
-    # of the new combined login/registration page (ECOM-369)
-    # We need to keep both the old and new entry points
-    # until every session from before the test ended has expired.
-    AUTH_ENTRY_LOGIN_2: '/account/login/',
-    AUTH_ENTRY_REGISTER_2: '/account/register/',
-
 }
 
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_REGISTER,
     AUTH_ENTRY_ACCOUNT_SETTINGS,
-
-    # This is left-over from an A/B test
-    # of the new combined login/registration page (ECOM-369)
-    # We need to keep both the old and new entry points
-    # until every session from before the test ended has expired.
-    AUTH_ENTRY_LOGIN_2,
-    AUTH_ENTRY_REGISTER_2,
-
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
 ])
@@ -193,11 +171,17 @@ class ProviderUserState(object):
     lms/templates/dashboard.html.
     """
 
-    def __init__(self, enabled_provider, user, association_id=None):
-        # UserSocialAuth row ID
-        self.association_id = association_id
+    def __init__(self, enabled_provider, user, association):
         # Boolean. Whether the user has an account associated with the provider
-        self.has_account = association_id is not None
+        self.has_account = association is not None
+        if self.has_account:
+            # UserSocialAuth row ID
+            self.association_id = association.id
+            # Identifier of this user according to the remote provider:
+            self.remote_id = enabled_provider.get_remote_id_from_social_auth(association)
+        else:
+            self.association_id = None
+            self.remote_id = None
         # provider.BaseProvider child. Callers must verify that the provider is
         # enabled.
         self.provider = enabled_provider
@@ -390,14 +374,15 @@ def get_provider_user_states(user):
     found_user_auths = list(models.DjangoStorage.user.get_social_auth_for_user(user))
 
     for enabled_provider in provider.Registry.enabled():
-        association_id = None
+        association = None
         for auth in found_user_auths:
             if enabled_provider.match_social_auth(auth):
-                association_id = auth.id
+                association = auth
                 break
-        states.append(
-            ProviderUserState(enabled_provider, user, association_id)
-        )
+        if enabled_provider.accepts_logins or association:
+            states.append(
+                ProviderUserState(enabled_provider, user, association)
+            )
 
     return states
 
@@ -508,13 +493,13 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     if not user:
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
-        elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+        elif auth_entry == AUTH_ENTRY_LOGIN:
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
             if should_force_account_creation():
                 return dispatch_to_register()
             return dispatch_to_login()
-        elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:
+        elif auth_entry == AUTH_ENTRY_REGISTER:
             # User has authenticated with the third party provider and now wants to finish
             # creating their edX account.
             return dispatch_to_register()
@@ -600,15 +585,15 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
 @partial.partial
 def login_analytics(strategy, auth_entry, *args, **kwargs):
-    """ Sends login info to Segment.io """
+    """ Sends login info to Segment """
 
     event_name = None
-    if auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+    if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
-    if event_name is not None:
+    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.track(
             kwargs['user'].id,
@@ -619,6 +604,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
                 'provider': getattr(kwargs['backend'], 'name')
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }

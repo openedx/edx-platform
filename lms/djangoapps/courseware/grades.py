@@ -15,6 +15,7 @@ from django.core.cache import cache
 import dogstats_wrapper as dog_stats_api
 
 from courseware import courses
+from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
 from student.models import anonymous_id_for_user
 from util.module_utils import yield_dynamic_descriptor_descendants
@@ -24,7 +25,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from submissions import api as sub_api  # installed from the edx-submissions repository
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
@@ -125,6 +125,51 @@ class MaxScoresCache(object):
             max_score = self._max_scores_cache.get(loc_str)
 
         return max_score
+
+
+class ProgressSummary(object):
+    """
+    Wrapper class for the computation of a user's scores across a course.
+
+    Attributes
+       chapters: a summary of all sections with problems in the course. It is
+       organized as an array of chapters, each containing an array of sections,
+       each containing an array of scores. This contains information for graded
+       and ungraded problems, and is good for displaying a course summary with
+       due dates, etc.
+
+       weighted_scores: a dictionary mapping module locations to weighted Score
+       objects.
+
+       locations_to_children: a dictionary mapping module locations to their
+       direct descendants.
+    """
+    def __init__(self, chapters, weighted_scores, locations_to_children):
+        self.chapters = chapters
+        self.weighted_scores = weighted_scores
+        self.locations_to_children = locations_to_children
+
+    def score_for_module(self, location):
+        """
+        Calculate the aggregate weighted score for any location in the course.
+        This method returns a tuple containing (earned_score, possible_score).
+
+        If the location is of 'problem' type, this method will return the
+        possible and earned scores for that problem. If the location refers to a
+        composite module (a vertical or section ) the scores will be the sums of
+        all scored problems that are children of the chosen location.
+        """
+        if location in self.weighted_scores:
+            score = self.weighted_scores[location]
+            return score.earned, score.possible
+        children = self.locations_to_children[location]
+        earned = 0.0
+        possible = 0.0
+        for child in children:
+            child_earned, child_possible = self.score_for_module(child)
+            earned += child_earned
+            possible += child_possible
+        return earned, possible
 
 
 def descriptor_affects_grading(block_types_affecting_grading, descriptor):
@@ -261,7 +306,7 @@ def grade(student, request, course, keep_raw_scores=False, field_data_cache=None
         grade_summary = _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client)
         responses = GRADES_UPDATED.send_robust(
             sender=None,
-            username=request.user.username,
+            username=student.username,
             grade_summary=grade_summary,
             course_key=course.id,
             deadline=course.end
@@ -303,8 +348,13 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
     # means only openassessment (edx-ora2)
+    # We need to import this here to avoid a circular dependency of the form:
+    # XBlock --> submissions --> Django Rest Framework error strings -->
+    # Django translation --> ... --> courseware --> submissions
+    from submissions import api as sub_api  # installed from the edx-submissions repository
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
     max_scores_cache = MaxScoresCache.create_for_course(course)
+
     # For the moment, we have to get scorable_locations from field_data_cache
     # and not from scores_client, because scores_client is ignorant of things
     # in the submissions API. As a further refactoring step, submissions should
@@ -360,6 +410,10 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
 
                 descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
                 for module_descriptor in descendants:
+                    user_access = has_access(student, 'load', module_descriptor, module_descriptor.location.course_key)
+                    if not user_access:
+                        continue
+
                     (correct, total) = get_score(
                         student,
                         module_descriptor,
@@ -459,6 +513,21 @@ def progress_summary(student, request, course, field_data_cache=None, scores_cli
     in case there are unanticipated errors.
     """
     with manual_transaction():
+        progress = _progress_summary(student, request, course, field_data_cache, scores_client)
+        if progress:
+            return progress.chapters
+        else:
+            return None
+
+
+@transaction.commit_manually
+def get_weighted_scores(student, course, field_data_cache=None, scores_client=None):
+    """
+    Uses the _progress_summary method to return a ProgressSummmary object
+    containing details of a students weighted scores for the course.
+    """
+    with manual_transaction():
+        request = _get_mock_request(student)
         return _progress_summary(student, request, course, field_data_cache, scores_client)
 
 
@@ -500,7 +569,12 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
         course_module = getattr(course_module, '_x_module', course_module)
 
+    # We need to import this here to avoid a circular dependency of the form:
+    # XBlock --> submissions --> Django Rest Framework error strings -->
+    # Django translation --> ... --> courseware --> submissions
+    from submissions import api as sub_api  # installed from the edx-submissions repository
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+
     max_scores_cache = MaxScoresCache.create_for_course(course)
     # For the moment, we have to get scorable_locations from field_data_cache
     # and not from scores_client, because scores_client is ignorant of things
@@ -509,6 +583,8 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
 
     chapters = []
+    locations_to_children = defaultdict(list)
+    locations_to_weighted_scores = {}
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
@@ -516,7 +592,6 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
             continue
 
         sections = []
-
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
             with manual_transaction():
@@ -531,7 +606,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                 for module_descriptor in yield_dynamic_descriptor_descendants(
                         section_module, student.id, module_creator
                 ):
-                    course_id = course.id
+                    locations_to_children[module_descriptor.parent].append(module_descriptor.location)
                     (correct, total) = get_score(
                         student,
                         module_descriptor,
@@ -543,15 +618,16 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                     if correct is None and total is None:
                         continue
 
-                    scores.append(
-                        Score(
-                            correct,
-                            total,
-                            graded,
-                            module_descriptor.display_name_with_default,
-                            module_descriptor.location
-                        )
+                    weighted_location_score = Score(
+                        correct,
+                        total,
+                        graded,
+                        module_descriptor.display_name_with_default,
+                        module_descriptor.location
                     )
+
+                    scores.append(weighted_location_score)
+                    locations_to_weighted_scores[module_descriptor.location] = weighted_location_score
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
@@ -577,7 +653,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
     max_scores_cache.push_to_remote()
 
-    return chapters
+    return ProgressSummary(chapters, locations_to_weighted_scores, locations_to_children)
 
 
 def weighted_score(raw_correct, raw_total, weight):
@@ -705,15 +781,10 @@ def iterate_grades_for(course_or_id, students, keep_raw_scores=False):
     else:
         course = course_or_id
 
-    # We make a fake request because grading code expects to be able to look at
-    # the request. We have to attach the correct user to the request before
-    # grading that student.
-    request = RequestFactory().get('/')
-
     for student in students:
         with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course.id)]):
             try:
-                request.user = student
+                request = _get_mock_request(student)
                 # Grading calls problem rendering, which calls masquerading,
                 # which checks session vars -- thus the empty session dict below.
                 # It's not pretty, but untangling that is currently beyond the
@@ -732,3 +803,14 @@ def iterate_grades_for(course_or_id, students, keep_raw_scores=False):
                     exc.message
                 )
                 yield student, {}, exc.message
+
+
+def _get_mock_request(student):
+    """
+    Make a fake request because grading code expects to be able to look at
+    the request. We have to attach the correct user to the request before
+    grading that student.
+    """
+    request = RequestFactory().get('/')
+    request.user = student
+    return request

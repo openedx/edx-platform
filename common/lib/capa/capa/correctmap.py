@@ -10,7 +10,7 @@ class CorrectMap(object):
     in a capa problem.  The response evaluation result for each answer_id includes
     (correctness, npoints, msg, hint, hintmode).
 
-    - correctness : either 'correct' or 'incorrect'
+    - correctness : 'correct', 'incorrect', or 'partially-correct'
     - npoints     : None, or integer specifying number of points awarded for this answer_id
     - msg         : string (may have HTML) giving extra message response
                     (displayed below textline or textbox)
@@ -101,8 +101,21 @@ class CorrectMap(object):
                 self.set(k, **correct_map[k])
 
     def is_correct(self, answer_id):
+        """
+        Takes an answer_id
+        Returns true if the problem is correct OR partially correct.
+        """
         if answer_id in self.cmap:
             return self.cmap[answer_id]['correctness'] in ['correct', 'partially-correct']
+        return None
+
+    def is_partially_correct(self, answer_id):
+        """
+        Takes an answer_id
+        Returns true if the problem is partially correct.
+        """
+        if answer_id in self.cmap:
+            return self.cmap[answer_id]['correctness'] == 'partially-correct'
         return None
 
     def is_queued(self, answer_id):

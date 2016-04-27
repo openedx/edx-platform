@@ -1,3 +1,6 @@
+"""
+Django ORM model specifications for the Course Structures sub-application
+"""
 import json
 import logging
 
@@ -12,6 +15,9 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class CourseStructure(TimeStampedModel):
+    """
+    The CourseStructure model is an aggregated representation of the course content tree
+    """
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
 
     # Right now the only thing we do with the structure doc is store it and
@@ -26,6 +32,9 @@ class CourseStructure(TimeStampedModel):
 
     @property
     def structure(self):
+        """
+        Deserializes a course structure JSON object
+        """
         if self.structure_json:
             return json.loads(self.structure_json)
         return None

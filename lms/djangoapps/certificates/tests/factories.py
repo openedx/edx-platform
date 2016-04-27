@@ -1,5 +1,7 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
+import factory
+from django.core.files.base import ContentFile
 from factory.django import DjangoModelFactory, ImageField
 
 from student.models import LinkedInAddToProfileConfiguration
@@ -12,7 +14,8 @@ from certificates.models import (
 
 class GeneratedCertificateFactory(DjangoModelFactory):
 
-    FACTORY_FOR = GeneratedCertificate
+    class Meta(object):
+        model = GeneratedCertificate
 
     course_id = None
     status = CertificateStatuses.unavailable
@@ -22,29 +25,40 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 
 class CertificateWhitelistFactory(DjangoModelFactory):
 
-    FACTORY_FOR = CertificateWhitelist
+    class Meta(object):
+        model = CertificateWhitelist
 
     course_id = None
     whitelist = True
+    notes = None
 
 
 class BadgeAssertionFactory(DjangoModelFactory):
-    FACTORY_FOR = BadgeAssertion
+    class Meta(object):
+        model = BadgeAssertion
 
     mode = 'honor'
 
 
 class BadgeImageConfigurationFactory(DjangoModelFactory):
 
-    FACTORY_FOR = BadgeImageConfiguration
+    class Meta(object):
+        model = BadgeImageConfiguration
 
     mode = 'honor'
-    icon = ImageField(color='blue', height=50, width=50, filename='test.png', format='PNG')
+    icon = factory.LazyAttribute(
+        lambda _: ContentFile(
+            ImageField()._make_data(  # pylint: disable=protected-access
+                {'color': 'blue', 'width': 50, 'height': 50, 'format': 'PNG'}
+            ), 'test.png'
+        )
+    )
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
 
-    FACTORY_FOR = CertificateHtmlViewConfiguration
+    class Meta(object):
+        model = CertificateHtmlViewConfiguration
 
     enabled = True
     configuration = """{
@@ -61,22 +75,23 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             },
             "honor": {
                 "certificate_type": "Honor Code",
-                "document_body_class_append": "is-honorcode"
+                "certificate_title": "Certificate of Achievement"
             },
             "verified": {
                 "certificate_type": "Verified",
-                "document_body_class_append": "is-idverified"
+                "certificate_title": "Verified Certificate of Achievement"
             },
             "xseries": {
-                "certificate_type": "XSeries",
-                "document_body_class_append": "is-xseries"
+                "certificate_title": "XSeries Certificate of Achievement",
+                "certificate_type": "XSeries"
             }
         }"""
 
 
 class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
 
-    FACTORY_FOR = LinkedInAddToProfileConfiguration
+    class Meta(object):
+        model = LinkedInAddToProfileConfiguration
 
     enabled = True
     company_identifier = "0_0dPSPyS070e0HsE9HNz_13_d11_"

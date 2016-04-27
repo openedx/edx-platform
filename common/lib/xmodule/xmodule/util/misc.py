@@ -1,6 +1,9 @@
 """
 Miscellaneous utility functions.
 """
+import re
+
+from xmodule.annotator_mixin import html_to_text
 
 
 def escape_invalid_characters(name, invalid_char_list, replace_with='_'):
@@ -24,3 +27,34 @@ def escape_invalid_characters(name, invalid_char_list, replace_with='_'):
         if char in name:
             name = name.replace(char, replace_with)
     return name
+
+
+def escape_html_characters(content):
+    """
+    Remove HTML characters that shouldn't be indexed using ElasticSearch indexer
+    This method is complementary to html_to_text method found in xmodule/annotator_mixin.py
+
+    Args:
+        content (str): variable to escape html characters from
+
+    Returns:
+        content (str): content ready to be index by ElasticSearch
+
+    """
+
+    # Removing HTML comments
+    return re.sub(
+        r"<!--.*-->",
+        "",
+        # Removing HTML CDATA
+        re.sub(
+            r"<!\[CDATA\[.*\]\]>",
+            "",
+            # Removing HTML-encoded non-breaking space characters
+            re.sub(
+                r"(\s|&nbsp;|//)+",
+                " ",
+                html_to_text(content)
+            )
+        )
+    )

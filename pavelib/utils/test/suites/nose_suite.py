@@ -145,20 +145,23 @@ class SystemTestSuite(NoseTestSuite):
         # django-nose will import them early in the test process,
         # thereby making sure that we load any django models that are
         # only defined in test files.
-        default_test_id = "{system}/djangoapps/* common/djangoapps/* openedx/core/djangoapps/*".format(
-            system=self.root
+        default_test_id = (
+            "{system}/djangoapps/*"
+            " common/djangoapps/*"
+            " openedx/core/djangoapps/*"
+            " openedx/tests/*"
         )
 
         if self.root in ('lms', 'cms'):
-            default_test_id += " {system}/lib/*".format(system=self.root)
+            default_test_id += " {system}/lib/*"
 
         if self.root == 'lms':
-            default_test_id += " {system}/tests.py".format(system=self.root)
+            default_test_id += " {system}/tests.py"
 
         if self.root == 'cms':
-            default_test_id += " {system}/tests/*".format(system=self.root)
+            default_test_id += " {system}/tests/*"
 
-        return default_test_id
+        return default_test_id.format(system=self.root)
 
 
 class LibTestSuite(NoseTestSuite):

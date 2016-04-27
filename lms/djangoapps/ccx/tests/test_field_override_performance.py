@@ -24,7 +24,7 @@ from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
     TEST_DATA_SPLIT_MODULESTORE, TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, check_sum_of_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
 from ccx.tests.factories import CcxFactory
@@ -142,7 +142,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         Assert that mongodb is queried ``calls`` times in the surrounded
         context.
         """
-        return check_mongo_calls(calls)
+        return check_mongo_calls_range(max_finds=calls)
 
     def assertXBlockInstantiations(self, instantiations):
         """
@@ -214,24 +214,24 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True, False): (27, 7, 14),
-        ('no_overrides', 2, True, False): (72, 7, 85),
-        ('no_overrides', 3, True, False): (267, 7, 336),
-        ('ccx', 1, True, False): (27, 7, 14),
-        ('ccx', 2, True, False): (72, 7, 85),
-        ('ccx', 3, True, False): (267, 7, 336),
-        ('ccx', 1, True, True): (27, 7, 14),
-        ('ccx', 2, True, True): (72, 7, 85),
-        ('ccx', 3, True, True): (267, 7, 336),
-        ('no_overrides', 1, False, False): (27, 7, 14),
-        ('no_overrides', 2, False, False): (72, 7, 85),
-        ('no_overrides', 3, False, False): (267, 7, 336),
-        ('ccx', 1, False, False): (27, 7, 14),
-        ('ccx', 2, False, False): (72, 7, 85),
-        ('ccx', 3, False, False): (267, 7, 336),
-        ('ccx', 1, False, True): (27, 7, 14),
-        ('ccx', 2, False, True): (72, 7, 85),
-        ('ccx', 3, False, True): (267, 7, 336),
+        ('no_overrides', 1, True, False): (27, 6, 13),
+        ('no_overrides', 2, True, False): (72, 6, 84),
+        ('no_overrides', 3, True, False): (267, 6, 335),
+        ('ccx', 1, True, False): (27, 6, 13),
+        ('ccx', 2, True, False): (72, 6, 84),
+        ('ccx', 3, True, False): (267, 6, 335),
+        ('ccx', 1, True, True): (27, 6, 13),
+        ('ccx', 2, True, True): (72, 6, 84),
+        ('ccx', 3, True, True): (267, 6, 335),
+        ('no_overrides', 1, False, False): (27, 6, 13),
+        ('no_overrides', 2, False, False): (72, 6, 84),
+        ('no_overrides', 3, False, False): (267, 6, 335),
+        ('ccx', 1, False, False): (27, 6, 13),
+        ('ccx', 2, False, False): (72, 6, 84),
+        ('ccx', 3, False, False): (267, 6, 335),
+        ('ccx', 1, False, True): (27, 6, 13),
+        ('ccx', 2, False, True): (72, 6, 84),
+        ('ccx', 3, False, True): (267, 6, 335),
     }
 
 

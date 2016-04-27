@@ -10,7 +10,7 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import pytz
 
@@ -31,7 +31,6 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-from xmodule.util.django import get_current_request_hostname
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
@@ -51,30 +50,20 @@ from student.models import UserProfile
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     any_unfulfilled_milestones,
+    is_prerequisite_courses_enabled,
 )
 from ccx_keys.locator import CCXLocator
 
 import dogstats_wrapper as dog_stats_api
 
 from courseware.access_response import (
-    AccessResponse,
     MilestoneError,
     MobileAvailabilityError,
-    StartDateError,
     VisibilityError,
 )
-
-DEBUG_ACCESS = False
-ACCESS_GRANTED = AccessResponse(True)
-ACCESS_DENIED = AccessResponse(False)
+from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
 
 log = logging.getLogger(__name__)
-
-
-def debug(*args, **kwargs):
-    # to avoid overly verbose output, this is off by default
-    if DEBUG_ACCESS:
-        log.debug(*args, **kwargs)
 
 
 def has_access(user, action, obj, course_key=None):
@@ -173,24 +162,7 @@ def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pyl
         AccessResponse: The result of this access check. Possible results are
             ACCESS_GRANTED or a StartDateError.
     """
-    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
-    if start_dates_disabled and not is_masquerading_as_student(user, course_key):
-        return ACCESS_GRANTED
-    else:
-        now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(
-            user,
-            descriptor,
-            course_key=course_key
-        )
-        if (
-            descriptor.start is None
-            or now > effective_start
-            or in_preview_mode()
-        ):
-            return ACCESS_GRANTED
-
-        return StartDateError(descriptor.start)
+    return check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
@@ -212,7 +184,7 @@ def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=in
         """
         Checks if prerequisites are disabled in the settings.
         """
-        return ACCESS_DENIED if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] else ACCESS_GRANTED
+        return ACCESS_DENIED if is_prerequisite_courses_enabled() else ACCESS_GRANTED
 
     return (
         _is_prerequisites_disabled()
@@ -556,16 +528,24 @@ def _has_group_access(descriptor, user, course_key):
 
     # resolve the partition IDs in group_access to actual
     # partition objects, skipping those which contain empty group directives.
-    # if a referenced partition could not be found, access will be denied.
-    try:
-        partitions = [
-            descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
-            for partition_id, group_ids in merged_access.items()
-            if group_ids is not None
-        ]
-    except NoSuchUserPartitionError:
-        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
-        return ACCESS_DENIED
+    # If a referenced partition could not be found, it will be denied
+    # If the partition is found but is no longer active (meaning it's been disabled)
+    # then skip the access check for that partition.
+    partitions = []
+    for partition_id, group_ids in merged_access.items():
+        try:
+            partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
+            if partition.active:
+                if group_ids is not None:
+                    partitions.append(partition)
+            else:
+                log.debug(
+                    "Skipping partition with ID %s in course %s because it is no longer active",
+                    partition.id, course_key
+                )
+        except NoSuchUserPartitionError:
+            log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+            return ACCESS_DENIED
 
     # next resolve the group IDs specified within each partition
     partition_groups = []
@@ -762,7 +742,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # pylint: disable=invalid-name
+def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name,unused-argument
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -781,21 +761,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor, course_key=None):  # p
     NOTE: For now, this function assumes that the descriptor's location is in the course
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
-
-    NOTE: If testing manually, make sure FEATURES['DISABLE_START_DATES'] = False
-    in envs/dev.py!
     """
-    if descriptor.days_early_for_beta is None:
-        # bail early if no beta testing is set up
-        return descriptor.start
-
-    if CourseBetaTesterRole(course_key).has_user(user):
-        debug("Adjust start time: user in beta role for %s", descriptor)
-        delta = timedelta(descriptor.days_early_for_beta)
-        effective = descriptor.start - delta
-        return effective
-
-    return descriptor.start
+    return adjust_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _has_instructor_access_to_location(user, location, course_key=None):
@@ -962,11 +929,3 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
-
-
-def in_preview_mode():
-    """
-    Returns whether the user is in preview mode or not.
-    """
-    hostname = get_current_request_hostname()
-    return bool(hostname and settings.PREVIEW_DOMAIN in hostname.split('.'))

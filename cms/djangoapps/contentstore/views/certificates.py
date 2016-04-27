@@ -176,6 +176,7 @@ class CertificateManager(object):
             "id": certificate_data['id'],
             "name": certificate_data['name'],
             "description": certificate_data['description'],
+            "is_active": certificate_data['is_active'],
             "version": CERTIFICATE_SCHEMA_VERSION,
             "signatories": certificate_data['signatories']
         }
@@ -217,7 +218,7 @@ class CertificateManager(object):
         # including the actual 'certificates' list that we're working with in this context
         certificates = course.certificates.get('certificates', [])
         if only_active:
-            certificates = [certificate for certificate in certificates if certificate['is_active']]
+            certificates = [certificate for certificate in certificates if certificate.get('is_active', False)]
         return certificates
 
     @staticmethod
@@ -353,7 +354,9 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(course.id)]
+            course_modes = [mode.slug for mode in CourseMode.modes_for_course(
+                course_id=course.id, include_expired=True
+            )]
             certificate_web_view_url = get_lms_link_for_certificate_web_view(
                 user_id=request.user.id,
                 course_key=course_key,
@@ -373,7 +376,7 @@ def certificates_list_handler(request, course_key_string):
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
                 'upload_asset_url': upload_asset_url,
-                'certificates': json.dumps(certificates),
+                'certificates': certificates,
                 'course_modes': course_modes,
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,

@@ -24,6 +24,22 @@ def get_namespace_choices():
     return NAMESPACE_CHOICES
 
 
+def is_entrance_exams_enabled():
+    """
+    Checks to see if the Entrance Exams feature is enabled
+    Use this operation instead of checking the feature flag all over the place
+    """
+    return settings.FEATURES.get('ENTRANCE_EXAMS', False)
+
+
+def is_prerequisite_courses_enabled():
+    """
+    Returns boolean indicating prerequisite courses enabled system wide or not.
+    """
+    return settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False) \
+        and settings.FEATURES.get('MILESTONES_APP', False)
+
+
 def add_prerequisite_course(course_key, prerequisite_course_key):
     """
     It would create a milestone, then it would set newly created
@@ -31,7 +47,7 @@ def add_prerequisite_course(course_key, prerequisite_course_key):
     and it would set newly created milestone as fulfillment
     milestone for course referred by `prerequisite_course_key`.
     """
-    if not settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False):
+    if not is_prerequisite_courses_enabled():
         return None
     from milestones import api as milestones_api
     milestone_name = _('Course {course_id} requires {prerequisite_course_id}').format(
@@ -55,7 +71,7 @@ def remove_prerequisite_course(course_key, milestone):
     It would remove pre-requisite course milestone for course
     referred by `course_key`.
     """
-    if not settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False):
+    if not is_prerequisite_courses_enabled():
         return None
     from milestones import api as milestones_api
     milestones_api.remove_course_milestone(
@@ -71,7 +87,7 @@ def set_prerequisite_courses(course_key, prerequisite_course_keys):
     To only remove course milestones pass `course_key` and empty list or
     None as `prerequisite_course_keys` .
     """
-    if not settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False):
+    if not is_prerequisite_courses_enabled():
         return None
     from milestones import api as milestones_api
     #remove any existing requirement milestones with this pre-requisite course as requirement
@@ -104,7 +120,7 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: 
         If a course has no incomplete prerequisites, it will be excluded from the
         dictionary.
     """
-    if not settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False):
+    if not is_prerequisite_courses_enabled():
         return {}
 
     from milestones import api as milestones_api
@@ -137,7 +153,7 @@ def get_prerequisite_courses_display(course_descriptor):
     and course display name as `display` field.
     """
     pre_requisite_courses = []
-    if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False) and course_descriptor.pre_requisite_courses:
+    if is_prerequisite_courses_enabled() and course_descriptor.pre_requisite_courses:
         for course_id in course_descriptor.pre_requisite_courses:
             course_key = CourseKey.from_string(course_id)
             required_course_descriptor = modulestore().get_course(course_key)
@@ -173,6 +189,18 @@ def fulfill_course_milestone(course_key, user):
     course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="fulfills")
     for milestone in course_milestones:
         milestones_api.add_user_milestone({'id': user.id}, milestone)
+
+
+def remove_course_milestones(course_key, user, relationship):
+    """
+    Remove all user milestones for the course specified by course_key.
+    """
+    if not settings.FEATURES.get('MILESTONES_APP', False):
+        return None
+    from milestones import api as milestones_api
+    course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship=relationship)
+    for milestone in course_milestones:
+        milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
 def get_required_content(course, user):
@@ -319,6 +347,19 @@ def get_course_content_milestones(course_id, content_id, relationship):
         return []
     from milestones import api as milestones_api
     return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
+
+
+def remove_course_content_user_milestones(course_key, content_key, user, relationship):
+    """
+    Removes the specified User-Milestone link from the system for the specified course content module.
+    """
+    if not settings.FEATURES.get('MILESTONES_APP', False):
+        return []
+    from milestones import api as milestones_api
+
+    course_content_milestones = milestones_api.get_course_content_milestones(course_key, content_key, relationship)
+    for milestone in course_content_milestones:
+        milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
 def remove_content_references(content_id):

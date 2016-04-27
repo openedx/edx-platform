@@ -12,7 +12,7 @@ import tarfile
 from tempfile import mktemp, mkdtemp
 from textwrap import dedent
 
-from path import path
+from path import Path as path
 
 from django.core.management.base import BaseCommand, CommandError
 

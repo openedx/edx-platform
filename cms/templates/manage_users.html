@@ -1,8 +1,8 @@
 <%inherit file="base.html" />
 <%!
-import json
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%def name="online_help_token()"><% return "team_course" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
@@ -95,8 +95,9 @@ from django.core.urlresolvers import reverse
       <div class="bit">
         <h3 class="title-3">${_("Course Team Roles")}</h3>
         <p>${_("Course team members with the Staff role are course co-authors. They have full writing and editing privileges on all course content.")}</p>
+        ## Note that the "Admin" role below is identified as "Instructor" in the Django admin panel.
         <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
-        <p>${_("All course team members are automatically enrolled in the course and can access content in Studio, the LMS, and Insights.")}</p>
+        <p>${_("All course team members can access content in Studio, the LMS, and Insights, but are not automatically enrolled in the course.")}</p>
       </div>
 
       % if show_transfer_ownership_hint:
@@ -114,7 +115,7 @@ from django.core.urlresolvers import reverse
   require(["js/factories/manage_users"], function(ManageCourseUsersFactory) {
       ManageCourseUsersFactory(
         "${context_course.display_name | h}",
-        ${json.dumps(users)},
+        ${escape_json_dumps(users) | n},
         "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}",
         ${ request.user.id },
         ${str(allow_actions).lower()}

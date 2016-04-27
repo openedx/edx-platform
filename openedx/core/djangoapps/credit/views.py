@@ -1,8 +1,8 @@
 """
 Views for the credit Django app.
 """
-import json
 import datetime
+import json
 import logging
 
 from django.conf import settings
@@ -12,20 +12,24 @@ from django.http import (
     HttpResponseForbidden,
     Http404
 )
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 import pytz
-from rest_framework import viewsets, mixins, permissions, authentication
+from rest_framework import viewsets, mixins, permissions
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 
-from util.json_request import JsonResponse
-from util.date_utils import from_timestamp
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.exceptions import CreditApiBadRequest, CreditRequestNotFound
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.serializers import CreditCourseSerializer
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from openedx.core.lib.api.mixins import PutAsCreateMixin
+from util.date_utils import from_timestamp
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -72,8 +76,8 @@ def get_providers_detail(request):
         * 404 Not Found: The provider does not exist.
 
     """
-    provider_id = request.GET.get("provider_id", None)
-    providers_list = provider_id.split(",") if provider_id else None
+    provider_ids = request.GET.get("provider_ids", None)
+    providers_list = provider_ids.split(",") if provider_ids else None
     providers = api.get_credit_providers(providers_list)
     return JsonResponse(providers)
 
@@ -110,7 +114,7 @@ def create_credit_request(request, provider_id):
                 course_org: "ASUx"
                 course_num: "DemoX"
                 course_run: "1T2015"
-                final_grade: 0.95,
+                final_grade: "0.95",
                 user_username: "john",
                 user_email: "john@example.com"
                 user_full_name: "John Smith"
@@ -369,21 +373,35 @@ def _validate_timestamp(timestamp_value, provider_id):
         return HttpResponseForbidden(u"Timestamp is too far in the past.")
 
 
-class CreditCourseViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
+class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
     """ CreditCourse endpoints. """
 
     lookup_field = 'course_key'
     lookup_value_regex = settings.COURSE_KEY_REGEX
     queryset = CreditCourse.objects.all()
     serializer_class = CreditCourseSerializer
-    authentication_classes = (authentication.OAuth2Authentication, authentication.SessionAuthentication,)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
+    # In Django Rest Framework v3, there is a default pagination
+    # class that transmutes the response data into a dictionary
+    # with pagination information.  The original response data (a list)
+    # is stored in a "results" value of the dictionary.
+    # For backwards compatibility with the existing API, we disable
+    # the default behavior by setting the pagination_class to None.
+    pagination_class = None
+
+    # This CSRF exemption only applies when authenticating without SessionAuthentication.
+    # SessionAuthentication will enforce CSRF protection.
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        # Convert the course ID/key from a string to an actual CourseKey object.
-        course_id = kwargs.get(self.lookup_field, None)
-
-        if course_id:
-            kwargs[self.lookup_field] = CourseKey.from_string(course_id)
-
         return super(CreditCourseViewSet, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        # Convert the serialized course key into a CourseKey instance
+        # so we can look up the object.
+        course_key = self.kwargs.get(self.lookup_field)
+        if course_key is not None:
+            self.kwargs[self.lookup_field] = CourseKey.from_string(course_key)
+
+        return super(CreditCourseViewSet, self).get_object()

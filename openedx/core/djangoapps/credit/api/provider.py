@@ -162,7 +162,7 @@ def create_credit_request(course_key, provider_id, username):
                 "course_org": "HogwartsX",
                 "course_num": "Potions101",
                 "course_run": "1T2015",
-                "final_grade": 0.95,
+                "final_grade": "0.95",
                 "user_username": "ron",
                 "user_email": "ron@example.com",
                 "user_full_name": "Ron Weasley",
@@ -246,8 +246,16 @@ def create_credit_request(course_key, provider_id, username):
             username=username,
             requirement__namespace="grade",
             requirement__name="grade",
+            requirement__course__course_key=course_key,
             status="satisfied"
         ).reason["final_grade"]
+
+        # NOTE (CCB): Limiting the grade to seven characters is a hack for ASU.
+        if len(unicode(final_grade)) > 7:
+            final_grade = u'{:.5f}'.format(final_grade)
+        else:
+            final_grade = unicode(final_grade)
+
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
         log.exception(
             "Could not retrieve final grade from the credit eligibility table "
@@ -266,11 +274,7 @@ def create_credit_request(course_key, provider_id, username):
         "user_username": user.username,
         "user_email": user.email,
         "user_full_name": user.profile.name,
-        "user_mailing_address": (
-            user.profile.mailing_address
-            if user.profile.mailing_address is not None
-            else ""
-        ),
+        "user_mailing_address": "",
         "user_country": (
             user.profile.country.code
             if user.profile.country.code is not None

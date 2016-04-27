@@ -7,8 +7,9 @@ Profile Images API Profile Images Resource
 With the Profile Images API **Profile Images** resource, you can complete the
 following tasks.
 
-* :ref:`Upload a profile image <Upload a Profile Image>`.
-* :ref:`Remove profile images <Remove a Profile Image>`.
+.. contents::
+   :local:
+   :depth: 1
 
 .. _Upload a Profile Image:
 

@@ -6,7 +6,8 @@ import logging
 
 from django.conf import settings
 from django.http import Http404
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.exceptions import AuthenticationFailed, ParseError
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -21,7 +22,6 @@ from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.api.view_utils import view_course_access, view_auth_classes
-from openedx.core.lib.api.serializers import PaginationSerializer
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from student.roles import CourseInstructorRole, CourseStaffRole
 from util.module_utils import get_dynamic_descriptor_children
@@ -157,13 +157,10 @@ class CourseList(CourseViewMixin, ListAPIView):
             * end: The course end date. If course end date is not specified, the
               value is null.
     """
-    paginate_by = 10
-    paginate_by_param = 'page_size'
-    pagination_serializer_class = PaginationSerializer
     serializer_class = serializers.CourseSerializer
 
     def get_queryset(self):
-        course_ids = self.request.QUERY_PARAMS.get('course_id', None)
+        course_ids = self.request.query_params.get('course_id', None)
 
         results = []
         if course_ids:
@@ -257,7 +254,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
           * format: The assignment type.
 
           * children: If the block has child blocks, a list of IDs of the child
-            blocks.
+            blocks in the order they appear in the course.
     """
 
     @CourseViewMixin.course_check
@@ -661,8 +658,8 @@ class CourseBlocksAndNavigation(ListAPIView):
         method, add the response from the 'student_view_json" method as the data for the block.
         """
         if block_info.type in request_info.block_json:
-            if getattr(block_info.block, 'student_view_json', None):
-                block_info.value["block_json"] = block_info.block.student_view_json(
+            if getattr(block_info.block, 'student_view_data', None):
+                block_info.value["block_json"] = block_info.block.student_view_data(
                     context=request_info.block_json[block_info.type]
                 )
 

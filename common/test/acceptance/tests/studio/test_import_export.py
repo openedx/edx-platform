@@ -12,6 +12,8 @@ from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, I
 from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.container import ContainerPage
 from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.staff_view import StaffPage
 
 
 class ExportTestMixin(object):
@@ -267,6 +269,51 @@ class ImportTestMixin(object):
         """
         self.import_page.upload_tarball(self.bad_tarball_name)
         self.import_page.wait_for_tasks(fail_on='Updating')
+
+
+class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
+    """
+    Tests the Course import page
+    """
+    tarball_name = 'entrance_exam_course.2015.tar.gz'
+    bad_tarball_name = 'bad_course.tar.gz'
+    import_page_class = ImportCoursePage
+    landing_page_class = CourseOutlinePage
+
+    def page_args(self):
+        return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
+
+    def test_course_updated_with_entrance_exam(self):
+        """
+        Given that I visit an empty course before import
+        I should not see a section named 'Section' or 'Entrance Exam'
+        When I visit the import page
+        And I upload a course that has an entrance exam section named 'Entrance Exam'
+        And I visit the course outline page again
+        The section named 'Entrance Exam' should now be available.
+        And when I switch the view mode to student view and Visit CourseWare
+        Then I see one section in the sidebar that is 'Entrance Exam'
+        """
+        self.landing_page.visit()
+        # Should not exist yet.
+        self.assertRaises(IndexError, self.landing_page.section, "Section")
+        self.assertRaises(IndexError, self.landing_page.section, "Entrance Exam")
+        self.import_page.visit()
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+        self.landing_page.visit()
+        # There should be two sections. 'Entrance Exam' and 'Section' on the landing page.
+        self.landing_page.section("Entrance Exam")
+        self.landing_page.section("Section")
+
+        self.landing_page.view_live()
+        courseware = CoursewarePage(self.browser, self.course_id)
+        courseware.wait_for_page()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
+        self.assertEqual(courseware.num_sections, 1)
+        self.assertIn(
+            "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
+        )
 
 
 class TestCourseImport(ImportTestMixin, StudioCourseTest):

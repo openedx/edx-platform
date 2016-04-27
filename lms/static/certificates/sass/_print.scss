@@ -72,12 +72,14 @@
     }
 
     body {
-        margin: spacing-vertical(base) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
+        height: auto;
+        margin: spacing-vertical(mid-large) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
         padding: 0;
     }
 
     .wrapper-view {
         margin-bottom: 0 !important;
+
     }
 }
 
@@ -178,8 +180,8 @@
     }
 
     .copy-micro {
-        font-size: font-size(x-small);
-        line-height: line-height(small);
+        font-size: font-size(xx-small);
+        line-height: line-height(x-small);
     }
 
     // accomplishment
@@ -204,33 +206,39 @@
             border: none !important;
         }
 
+        .wrapper-statement-and-signatories {
+            border-bottom: rem(2) solid palette(grayscale-cool, x-light);
+        }
+
         .accomplishment-statement {
             @extend %print-rendering-section;
-            @include text-align(left);
+            width: span(8);
+            margin: 0 auto;
         }
 
-        .accomplishment-course,
-        .accomplishment-recipient,
         .accomplishment-summary,
         .accomplishment-statement-detail {
-            width: 100% !important;
-            margin-left: 0;
-            margin-right: 0;
+            margin-bottom: spacing-vertical(mid-small);
         }
 
-        .wrapper-statement-and-signatories {
-            @include span(8 first);
+        .wrapper-orgs::after {
+            display: none;
         }
 
         .accomplishment-orgs {
-            @include span(4 last);
-            margin-bottom: 0;
+            margin-bottom: 0 !important;
             border-bottom: none !important;
             padding-bottom: 0 !important;
 
             .wrapper-organization {
-                @include gallery(2 of 4);
+                height: rem(48);
+                margin-top: spacing-vertical(mid-small) !important;
                 margin-bottom: spacing-vertical(mid-small) !important;
+            }
+
+            .organization-logo {
+                max-width: 100%;
+                max-height: 80%;
             }
         }
 
@@ -238,12 +246,17 @@
             @extend %print-rendering-section;
             @include span(12 last);
 
-            .signatory {
-                @include gallery(3);
+            .signatory-credentials {
+                font-size: 8pt;
+                line-height: 1.3;
             }
 
             .signatory-signature {
-                // height: rem(60) !important;
+                height: spacing-vertical(small);
+                max-width: 100%;
+                margin-top: 0;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
             }
 
             .signatory-name {
@@ -264,7 +277,7 @@
         }
     }
 
-    .wrapper-accomplishment-metadata {
+    .layout-accomplishment .wrapper-accomplishment-metadata {
         margin-bottom: 0;
     }
 

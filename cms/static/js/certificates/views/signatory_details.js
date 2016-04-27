@@ -7,7 +7,7 @@ define([ // jshint ignore:line
     'backbone',
     'gettext',
     'js/utils/templates',
-    'js/views/utils/view_utils',
+    'common/js/components/utils/view_utils',
     'js/views/baseview',
     'js/certificates/views/signatory_editor'
 ],
@@ -40,6 +40,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
                 eventAgg: this.eventAgg
             });
             this.template = this.loadTemplate('signatory-details');
+            this.signatory_action_template = this.loadTemplate('signatory-actions');
         },
 
         loadTemplate: function(name) {
@@ -51,6 +52,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
             this.$el.html(this.edit_view.render());
+            $(this.signatory_action_template()).appendTo(this.el);
             this.edit_view.delegateEvents();
             this.delegateEvents();
         },
@@ -82,6 +84,7 @@ function ($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Sign
         closeSignatoryEditView: function(event) {
             // Enable the cancellation workflow for the editing view
             if (event && event.preventDefault) { event.preventDefault(); }
+            if (event) { this.model.reset(); }
             this.render();
         },
 

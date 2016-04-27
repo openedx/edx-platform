@@ -7,10 +7,10 @@ define([ // jshint ignore:line
     'js/certificates/models/signatory',
     'js/certificates/collections/certificates',
     'js/certificates/views/certificate_editor',
-    'js/views/feedback_notification',
+    'common/js/components/views/feedback_notification',
     'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
+    'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
     'js/certificates/spec/custom_matchers'
 ],
@@ -18,7 +18,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
          Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
-    var MAX_SIGNATORIES = 4;
+    var MAX_SIGNATORIES = 100;
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -198,7 +198,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 expect(this.collection.length).toBe(1);
             });
 
-            it('user can only add signatories up to max 4', function() {
+            it('user can only add signatories up to max 100', function() {
                 for(var i = 1; i < MAX_SIGNATORIES ; i++) {
                     this.view.$(SELECTORS.addSignatoryButton).click();
                 }
@@ -228,10 +228,10 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             );
 
-            it('signatories should not save when title has more than 40 characters per line', function() {
+            it('signatories should save when fields have too many characters per line', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
-                    inputCertificateName: 'New Certificate Name'
+                    inputCertificateName: 'New Certificate Name that has too many characters without any limit'
                 });
 
                 setValuesToInputs(this.view, {
@@ -239,18 +239,14 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 setValuesToInputs(this.view, {
-                    inputSignatoryTitle: 'New Signatory title longer than 40 characters on one line'
-                });
-
-                setValuesToInputs(this.view, {
-                    inputSignatoryOrganization: 'New Signatory Organization longer than 40 characters'
+                    inputSignatoryTitle: 'This is a certificate signatory title that has waaaaaaay more than 106 characters, in order to cause an exception.'
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
-            it('signatories should not save when title span on more than 2 lines', function() {
+            it('signatories should save when title span on more than 2 lines', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 setValuesToInputs(this.view, {
                     inputCertificateName: 'New Certificate Name'
@@ -269,7 +265,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.saveCertificateButton).click();
-                expect(this.view.$('.certificate-edit-error')).toHaveClass('is-shown');
+                expect(this.view.$('.certificate-edit-error')).not.toHaveClass('is-shown');
             });
 
             it('user can delete those signatories already saved', function() {

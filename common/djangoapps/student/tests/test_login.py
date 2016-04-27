@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
@@ -252,7 +253,7 @@ class LoginTest(TestCase):
         self._assert_response(response, success=True)
 
         # Reload the user from the database
-        self.user = UserFactory.FACTORY_FOR.objects.get(pk=self.user.pk)
+        self.user = User.objects.get(pk=self.user.pk)
 
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 

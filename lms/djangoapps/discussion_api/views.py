@@ -3,13 +3,15 @@ Discussion API views
 """
 from django.core.exceptions import ValidationError
 
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
 from discussion_api.api import (
     create_comment,
@@ -17,13 +19,15 @@ from discussion_api.api import (
     delete_thread,
     delete_comment,
     get_comment_list,
+    get_response_comments,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
     update_thread,
 )
-from discussion_api.forms import CommentListGetForm, ThreadListGetForm
+from discussion_api.forms import CommentListGetForm, ThreadListGetForm, _PaginationForm
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 
@@ -97,7 +101,9 @@ class CourseTopicsView(_ViewMixin, DeveloperErrorViewMixin, APIView):
     def get(self, request, course_id):
         """Implements the GET method as described in the class docstring."""
         course_key = CourseKey.from_string(course_id)
-        return Response(get_course_topics(request, course_key))
+        with modulestore().bulk_operations(course_key):
+            response = get_course_topics(request, course_key)
+        return Response(response)
 
 
 class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
@@ -227,6 +233,8 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * has_endorsed: Boolean indicating whether this thread has been answered
 
+        * response_count: The number of direct responses for a thread
+
     **DELETE response values:
 
         No content is returned for a DELETE request
@@ -257,19 +265,25 @@ class ThreadViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             )
         )
 
+    def retrieve(self, request, thread_id=None):
+        """
+        Implements the GET method for thread ID
+        """
+        return Response(get_thread(request, thread_id))
+
     def create(self, request):
         """
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        return Response(create_thread(request, request.DATA))
+        return Response(create_thread(request, request.data))
 
     def partial_update(self, request, thread_id):
         """
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
-        return Response(update_thread(request, thread_id, request.DATA))
+        return Response(update_thread(request, thread_id, request.data))
 
     def destroy(self, request, thread_id):
         """
@@ -291,6 +305,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         GET /api/discussion/v1/comments/?thread_id=0123456789abcdef01234567
 
+        GET /api/discussion/v1/comments/2123456789abcdef01234555
+
         POST /api/discussion/v1/comments/
         {
             "thread_id": "0123456789abcdef01234567",
@@ -302,7 +318,7 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         DELETE /api/discussion/v1/comments/comment_id
 
-    **GET Parameters**:
+    **GET Comment List Parameters**:
 
         * thread_id (required): The thread to retrieve comments for
 
@@ -316,6 +332,15 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
 
         * mark_as_read: Will mark the thread of the comments as read. (default
             is False)
+
+    **GET Child Comment List Parameters**:
+
+        * comment_id (required): The comment to retrieve child comments for
+
+        * page: The (1-indexed) page to retrieve (default is 1)
+
+        * page_size: The number of items per page (default is 10, max is 100)
+
 
     **POST Parameters**:
 
@@ -351,8 +376,8 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
           comment is anonymous
 
         * author_label: A label indicating whether the author has a special
-          role in the course, either "staff" for moderators and
-          administrators or "community_ta" for community TAs
+          role in the course, either "Staff" for moderators and
+          administrators or "Community TA" for community TAs
 
         * created_at: The ISO 8601 timestamp for the creation of the comment
 
@@ -412,12 +437,28 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
             )
         )
 
+    def retrieve(self, request, comment_id=None):
+        """
+        Implements the GET method for comments against response ID
+        """
+        form = _PaginationForm(request.GET)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        return Response(
+            get_response_comments(
+                request,
+                comment_id,
+                form.cleaned_data["page"],
+                form.cleaned_data["page_size"]
+            )
+        )
+
     def create(self, request):
         """
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        return Response(create_comment(request, request.DATA))
+        return Response(create_comment(request, request.data))
 
     def destroy(self, request, comment_id):
         """
@@ -432,4 +473,4 @@ class CommentViewSet(_ViewMixin, DeveloperErrorViewMixin, ViewSet):
         Implements the PATCH method for the instance endpoint as described in
         the class docstring.
         """
-        return Response(update_comment(request, comment_id, request.DATA))
+        return Response(update_comment(request, comment_id, request.data))

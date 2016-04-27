@@ -1,13 +1,16 @@
 """
 Declaration of CourseOverview model
 """
-
 import json
+from django.db import models
 
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
 from django.utils.translation import ugettext
+from lms.djangoapps import django_comment_client
 from model_utils.models import TimeStampedModel
+
+from opaque_keys.edx.keys import CourseKey
 
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
@@ -29,7 +32,7 @@ class CourseOverview(TimeStampedModel):
     """
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 1
+    VERSION = 2
 
     # Cache entry versioning.
     version = IntegerField()
@@ -151,7 +154,7 @@ class CourseOverview(TimeStampedModel):
         )
 
     @classmethod
-    def _load_from_module_store(cls, course_id):
+    def load_from_module_store(cls, course_id):
         """
         Load a CourseDescriptor, create a new CourseOverview from it, cache the
         overview, and return it.
@@ -175,6 +178,10 @@ class CourseOverview(TimeStampedModel):
                 course_overview = cls._create_from_course(course)
                 try:
                     course_overview.save()
+                    CourseOverviewTab.objects.bulk_create([
+                        CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                        for tab in course.tabs
+                    ])
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a
@@ -219,13 +226,13 @@ class CourseOverview(TimeStampedModel):
         """
         try:
             course_overview = cls.objects.get(id=course_id)
-            if course_overview.version != cls.VERSION:
+            if course_overview.version < cls.VERSION:
                 # Throw away old versions of CourseOverview, as they might contain stale data.
                 course_overview.delete()
                 course_overview = None
         except cls.DoesNotExist:
             course_overview = None
-        return course_overview or cls._load_from_module_store(course_id)
+        return course_overview or cls.load_from_module_store(course_id)
 
     def clean_id(self, padding_char='='):
         """
@@ -289,6 +296,13 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def starts_within(self, days):
+        """
+        Returns True if the course starts with-in given number of days otherwise returns False.
+        """
+
+        return course_metadata_utils.course_starts_within(self.start, days)
+
     def start_datetime_text(self, format_string="SHORT_DATE"):
         """
         Returns the desired text corresponding the course's start date and
@@ -340,3 +354,32 @@ class CourseOverview(TimeStampedModel):
         Returns a list of ID strings for this course's prerequisite courses.
         """
         return json.loads(self._pre_requisite_courses_json)
+
+    @classmethod
+    def get_all_course_keys(cls):
+        """
+        Returns all course keys from course overviews.
+        """
+        return [
+            CourseKey.from_string(course_overview['id'])
+            for course_overview in CourseOverview.objects.values('id')
+        ]
+
+    def is_discussion_tab_enabled(self):
+        """
+        Returns True if course has discussion tab and is enabled
+        """
+        tabs = self.tabs.all()  # pylint: disable=E1101
+        # creates circular import; hence explicitly referenced is_discussion_enabled
+        for tab in tabs:
+            if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
+                return True
+        return False
+
+
+class CourseOverviewTab(models.Model):
+    """
+    Model for storing and caching tabs information of a course.
+    """
+    tab_id = models.CharField(max_length=50)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
