@@ -126,7 +126,7 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
+from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
@@ -2452,8 +2452,8 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                             'xseries' + '/{}'
                         ).format(program['marketing_slug'])
                     })
-                    programs_for_course['display_category'] = program.get('display_category')
                     programs_for_course['category'] = program.get('category')
+                    programs_for_course['display_category'] = get_display_category(program)
                 except KeyError:
                     log.warning('Program structure is invalid, skipping display: %r', program)
 

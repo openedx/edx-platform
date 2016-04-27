@@ -13,6 +13,7 @@ from openedx.core.djangolib.js_utils import (
 ProgramListFactory({
     programsData: ${programs | n, dump_js_escaped_json},
     certificatesData: ${credentials | n, dump_js_escaped_json},
+    userProgress: ${progress | n, dump_js_escaped_json},
     xseriesUrl: '${xseries_url | n, js_escaped_string}',
     xseriesImage: '${static.url('images/xseries-certificate-visual.png')}'
 });
