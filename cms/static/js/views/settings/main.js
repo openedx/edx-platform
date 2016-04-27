@@ -352,19 +352,19 @@ var DetailsView = ValidatingView.extend({
         var title = "", selector = "", image_key = "", image_path_key = "";
         switch (event.currentTarget.id) {
             case 'upload-course-image':
-                title = "Upload your course image.";
+                title = gettext("Upload your course image.");
                 selector = "#course-image";
                 image_key = 'course_image_name';
                 image_path_key = 'course_image_asset_path';
                 break;
             case 'upload-hero-image':
-                title = "Upload your hero image.";
+                title = gettext("Upload your hero image.");
                 selector = "#hero-image";
                 image_key = 'hero_image_name';
                 image_path_key = 'hero_image_asset_path';
                 break;
             case 'upload-thumbnail-image':
-                title = "Upload your video thumbnail image.";
+                title = gettext("Upload your video thumbnail image.");
                 selector = "#thumbnail-image";
                 image_key = 'thumbnail_image_name';
                 image_path_key = 'thumbnail_image_asset_path';
@@ -372,7 +372,7 @@ var DetailsView = ValidatingView.extend({
         }
 
         var upload = new FileUploadModel({
-            title: gettext(title),
+            title: title,
             message: gettext("Files must be in JPEG or PNG format."),
             mimeTypes: ['image/jpeg', 'image/png']
         });
