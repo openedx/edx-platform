@@ -110,27 +110,27 @@
 
 <section class="group-settings course-learning-info">
     <header>
-        <h2 class="title-2">Course Learning Information</h2>
-        <span class="tip">Provide the course learning details</span>
+        <h2 class="title-2">Learning Outcomes</h2>
+        <span class="tip">Add the learning outcomes for this course</span>
     </header>
     <ol class="list-input enum">
       <li class="course-settings-learning-fields"></li>
       <li>
-          <a href="javascript:void(0)" class="add-course-learning-info">Add Learning Details</a></li>
+          <a href="javascript:void(0)" class="add-course-learning-info">Add another learning outcome</a>
+      </li>
     </ol>
 </section>
 
 <section class="group-settings instructor-types">
   <header>
-    <h2 class="title-2">Course Instructors Information</h2>
-    <span class="tip">Information for course instructors</span>
+    <h2 class="title-2">Instructors</h2>
+    <span class="tip">Add details about the instructors for this course</span>
   </header>
   <ol class="list-input enum">
       <span class="course-instructor-details-fields">
       </span>
       <li>
-         <a href="javascript:void(0)" class="add-course-instructor-info add-new-data">
-             Add Instructor Details</a>
+         <a href="javascript:void(0)" class="add-course-instructor-info add-new-data">Add Another Instructor</a>
      </li>
   </ol>
 </section>

@@ -1,7 +1,7 @@
- <div class="field text" id="fields-course-learning-info-<%- index %>">
-    <label for= "course-learning-info-<%- index %>"> <%- gettext("What You'll Learn") %></label>
-    <input type="text" class=<% if (info_count > 1) { %>"input-learning-info" <% } else { %> "input-learning-info-stretch" <% } %> id="course-learning-info-<%- index %>" value="<%- info %>" data-index=<%- index %>>
-    <% if (info_count > 1 ) { %>
-        <input type="button" value='Delete' class="button delete-button standard remove-item delete-course-learning-info" data-index=<%- index %>>
-    <% } %>
- </div>
+<div class="field text" id="fields-course-learning-info-<%- index %>">
+  <label for= "course-learning-info-<%- index %>"><%- gettext("Learning Outcome") %> <%- index + 1 %></label>
+  <input type="text" class=<% if (info_count > 1) { %>"input-learning-info" <% } else { %> "input-learning-info-stretch" <% } %> id="course-learning-info-<%- index %>" value="<%- info %>" data-index="<%- index %>" placeholder="<%- gettext('Add a learning outcome here') %>">
+  <% if (info_count > 1 ) { %>
+    <input type="button" value="Delete" class="button delete-button standard remove-item delete-course-learning-info" data-index="<%- index %>">
+  <% } %>
+</div>

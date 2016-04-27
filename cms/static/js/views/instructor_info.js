@@ -42,6 +42,14 @@ define([  // jshint ignore:line
                         instructors: instructors.length
                     }));
                 });
+
+                // Avoid showing broken image on mistyped/nonexistent image
+                this.$el.find('img').error(function() {
+                    $(this).hide();
+                });
+                this.$el.find('img').load(function() {
+                    $(this).show();
+                });
             },
 
             removeInstructor: function(event) {

@@ -117,9 +117,7 @@ def test_a11y(options):
 
 @task
 @needs('pavelib.prereqs.install_prereqs')
-@cmdopts(BOKCHOY_OPTS + [
-    ('imports_dir=', 'd', 'Directory containing (un-archived) courses to be imported'),
-])
+@cmdopts(BOKCHOY_OPTS)
 def perf_report_bokchoy(options):
     """
     Generates a har file for with page performance info.

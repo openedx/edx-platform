@@ -389,35 +389,40 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                   % endif
               </ol>
             </section>
-         <hr class="divide" />
-          <section class="group-settings course-learning-info">
+
+          % if enable_extended_course_details:
+            <hr class="divide" />
+            <section class="group-settings course-learning-info">
               <header>
-                <h2 class="title-2">${_("Course Learning Information")}</h2>
-                <span class="tip">${_("Provide the course learning details")}</span>
+                <h2 class="title-2">${_("Learning Outcomes")}</h2>
+                <span class="tip">${_("Add the learning outcomes for this course")}</span>
               </header>
               <ol class="list-input enum">
-                  <li class="course-settings-learning-fields"></li>
-                  <li>
-                      <a href="javascript:void(0)" class="action action-primary button new-button add-new-data add-course-learning-info">
-                          <i class="icon fa fa-plus icon-inline"></i>${_("Add Learning Details")}</a>
-                  </li>
+                <li class="course-settings-learning-fields"></li>
+                <li>
+                  <a href="javascript:void(0)" class="action action-primary button new-button add-new-data add-course-learning-info">
+                    <i class="icon fa fa-plus icon-inline"></i>${_("Add another learning outcome")}
+                  </a>
+                </li>
               </ol>
             </section>
 
-        <hr class="divide" />
-          <section class="group-settings instructor-types">
+            <hr class="divide" />
+            <section class="group-settings instructor-types">
               <header>
-                <h2 class="title-2">${_("Course Instructors Information")}</h2>
-                <span class="tip">${_("Information for course instructors")}</span>
+                <h2 class="title-2">${_("Instructors")}</h2>
+                <span class="tip">${_("Add details about the instructors for this course")}</span>
               </header>
               <ol class="list-input enum">
                   <span class="course-instructor-details-fields"></span>
                   <li>
                      <a href="javascript:void(0)" class="action action-primary button new-button add-course-instructor-info add-new-data">
-                         <i class="icon fa fa-plus icon-inline"></i>${_("Add Instructor Details")}</a>
+                         <i class="icon fa fa-plus icon-inline"></i>${_("Add Another Instructor")}</a>
                  </li>
               </ol>
             </section>
+          % endif
+
           % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
             <hr class="divide" />
 
