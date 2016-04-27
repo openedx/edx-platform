@@ -2,8 +2,8 @@
 """
 Course Schedule and Details Settings page.
 """
-import os
 from __future__ import unicode_literals
+import os
 from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import requirejs
 
