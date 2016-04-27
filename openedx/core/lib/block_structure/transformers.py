@@ -99,7 +99,7 @@ class BlockStructureTransformers(object):
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
-            logger.debug(
+            logger.info(
                 "Collected Block Structure data for the following transformers is outdated: '%s'.",
                 [(transformer.name(), transformer.VERSION) for transformer in outdated_transformers],
             )
