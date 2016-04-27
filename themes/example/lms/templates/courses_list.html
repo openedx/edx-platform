@@ -19,21 +19,13 @@
             </div>
 
             <div class="row course-list">
-              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
-                <div class="courses-listing-item">
-                  <%include file="course.html" args="course=courses[0]" />
+              %for course in courses[:3]:
+                <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                  <div class="courses-listing-item">
+                    <%include file="course.html" args="course=course" />
+                  </div>
                 </div>
-              </div>
-              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
-                <div class="courses-listing-item">
-                  <%include file="course.html" args="course=courses[1]" />
-                </div>
-              </div>
-              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
-                <div class="courses-listing-item">
-                  <%include file="course.html" args="course=courses[2]" />
-                </div>
-              </div>
+              %endfor
             </div>
 
             <div class="row">

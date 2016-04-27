@@ -44,6 +44,28 @@ from openedx.core.lib.courses import course_image_url
     $(".about-container").html( $("#about-content").html());
     addSlider();
 
+    // Truncating the Course Description
+    var description_content = $(".course-description").html();        //replace course description from the context
+    if (description_content.length > 500){
+      $(".course-description").html(description_content.substring(0, description_content.indexOf(" ", 500)) + '... <a id="description_show" href="#" class="brand-link">See More</a>');
+    }
+    $("#description_show").click(function(event){
+      $(".course-description").html(description_content);
+      event.preventDefault();
+    });
+
+    // Truncating the Course learning points
+    var learning_content = $(".course-learning .list-bulleted").html(),
+        learning_points_count = $(".course-learning .list-bulleted").children().length;
+    if (learning_points_count > 6){
+      $(".course-learning .list-bulleted").children().slice((6 - learning_points_count)).remove();
+      $(".course-learning .list-bulleted").append('<a id="learning_show" href="#" class="brand-link">See More</a>');
+    }
+    $("#learning_show").click(function(event){
+      $(".course-learning .list-bulleted").html(learning_content);
+      event.preventDefault();
+    });
+
 
     $(".register").click(function(event) {
       $("#class_enroll_form").submit();
@@ -160,7 +182,12 @@ from openedx.core.lib.courses import course_image_url
       <div class="row">
         <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
           <div class="video-data">
-            <a href="#"><img src="${static.url('images/vid-img.jpg')}" alt=""></a>
+            <a href="#">
+              <img src="${static.url('images/vid-img.jpg')}" alt="">
+              <span class="play-btn">
+
+              </span>
+            </a>
           </div>
         </div>
         <div class="col col-12 sm-col-12 md-col-8 lg-col-8 xl-col-8 description">
@@ -177,14 +204,11 @@ from openedx.core.lib.courses import course_image_url
       <div class="inner-container">
         <div class="row">
           <div class="col col-12 sm-col-12 md-col-4">
-            Available:
+            Duration:
             <span>Jan.12, 2016 - Feb.23, 2016</span>
           </div>
-          <div class="col col-12 sm-col-12 md-col-2">
-            Language:
-            <span>English</span>
-          </div>
-          <div class="col col-12 sm-col-12 md-col-3">
+
+          <div class="col col-12 sm-col-12 md-col-4">
             Price:
             <span>$495 USD</span>
           </div>
@@ -264,7 +288,7 @@ from openedx.core.lib.courses import course_image_url
             % endif
         % endif
 
-          <div class="col col-12 sm-col-12 md-col-3">
+          <div class="col col-12 sm-col-12 md-col-4">
             <a href="${btn_href}" id="${btn_id}" class="btn-block btn-success btn-large btn-enroll ${btn_class}">
               ${_(btn_text)}
             </a>
@@ -335,7 +359,7 @@ from openedx.core.lib.courses import course_image_url
           <div class="col col-12 sm-col-12 md-col-8">
 
             <h2> Course Description</h2>
-            <div class="expandable">
+            <div class="course-description">
               <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
                 Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
                 Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
@@ -350,8 +374,11 @@ from openedx.core.lib.courses import course_image_url
             </div>
 
             <h2> What you'll learn</h2>
-            <div class="expandable">
+            <div class="course-learning">
               <ul class="list-bulleted">
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
                 <li>Lorem Ipsum</li>
                 <li>Lorem Ipsum</li>
                 <li>Lorem Ipsum</li>

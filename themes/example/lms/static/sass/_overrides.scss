@@ -31,7 +31,9 @@ a{
     color: $brand-color !important;
   }
 }
-
+.grid-container{
+  padding: 0 1rem;
+}
 .show{
   display: block !important;
 }
@@ -192,7 +194,7 @@ header.header-main {
 
   .logo{
     line-height: 94px;
-    margin-left: 1em;
+    margin-left: 0;
     a{
       img{
         max-width:190px;
@@ -294,32 +296,38 @@ header.header-main {
   min-height: 22em;
   position: relative;
   z-index: 0;
-  .text-tint{
-    background: -moz-linear-gradient(left,  rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right,  rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 */
-    position: absolute;
-    top:0;
-    bottom:0;
-    left: 0px;
-    p{
-      padding: 1em 0 0 1em;
-      font-size: 24px;
-      color: $white;
-      line-height: 1.5em;
-    }
-    .btn-neutral{
-      border-color: $white;
-      padding: 0.8em 2em;
-      color: $white;
-      margin-left: 1.6em;
-      font-weight:normal;
-      background-color: transparent;
-      i.fa{
-        font-size: 0.6em;
-        margin-left: 1.5em;
-        vertical-align: middle;
+  .tint-dark {
+    background: -moz-linear-gradient(left, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#a6000000', endColorstr='#00000000', GradientType=1); /* IE6-9 */
+    min-height: 22em;
+    .grid-manual {
+      position: relative;
+      .text-tint {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        p {
+          padding: 1em 0 0 0;
+          font-size: 1.5rem;
+          color: $white;
+          line-height: 1.5em;
+        }
+        .btn-neutral {
+          border-color: $white;
+          padding: 0.8em 2em;
+          color: $white;
+          margin-left: 2px;
+          font-weight: normal;
+          background-color: transparent;
+          i.fa {
+            font-size: 0.6em;
+            margin-left: 1.5em;
+            vertical-align: middle;
+            margin-top: 1px;
+          }
+        }
       }
     }
   }
@@ -362,7 +370,7 @@ header.header-main {
               border: 0;
               width: 100%;
             }
-            &:before{
+            .play-btn{
               content: "";
               background: url("../images/vid-btn.png") no-repeat center center;
               width: 80px;
@@ -565,9 +573,9 @@ header.header-main {
   }
   .description-container{
     padding: 2.25rem 0;
-    .expandable{
-      max-height: 120px;
-      overflow: hidden;
+    #learning_show{
+      display: block;
+      padding: 1rem 0.6rem;
     }
     h2{
       color: $black;
@@ -787,10 +795,13 @@ header.header-main {
 
 @media screen and (min-width: 30em){
   .hero-main{
-    .text-tint{
-      .btn-neutral{
-        padding: 0.8em 2em;
-        margin-left: 2.5em;
+    .tint-dark {
+      .grid-manual {
+        .text-tint {
+          .btn-neutral {
+            padding: 0.8em 2em;
+          }
+        }
       }
     }
   }
@@ -888,9 +899,13 @@ header.header-main {
     }
   }
   .hero-main {
-    .text-tint {
-      p {
-        font-size: 40px;
+    .tint-dark {
+      .grid-manual {
+        .text-tint {
+          p {
+            font-size: 40px;
+          }
+        }
       }
     }
     &.hero-video{
