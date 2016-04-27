@@ -261,15 +261,23 @@ class SettingsPage(CoursePage):
         return os.sep.join(folders_list_in_path)
 
     def upload_image(self, file_to_upload):
+        """
+        upload course_image specified by file_to_upload
+        """
+
         self.q(css='#upload-course-image').click()
 
         # wait for popup
         self.wait_for_element_presence(".assetupload-modal", 'upload dialog is present')
 
-        filepath = SettingsPage.get_asset_path(self.file_to_upload)
+        filepath = SettingsPage.get_asset_path(file_to_upload)
         self.q(css=self.upload_image_browse_button_selector).results[0].send_keys(filepath)
         self.q(css=self.upload_image_upload_button_selector).results[0].click()
         self.wait_for_ajax()
 
     def get_uploaded_image_path(self):
+        """
+        returns the uploaded image path
+        """
+
         return self.q(css='#course-image-url').text
