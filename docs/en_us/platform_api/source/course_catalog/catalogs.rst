@@ -183,18 +183,6 @@ Example Request
 Response Values
 =====================
 
-.. _Course:
-
-Course
-*******
-
-* count (integer): The number of courses in the catalog.
-* next (string): The URL for the next page of results.
-* previous (string): The URL for the previous page of results.
-* results (array): See :ref:`Results`.
-
-The ``results`` array contains the response values from the Courses API, including course title, description, run, and start and end date information.
-
 .. include:: ../shared/courses_response_values.rst
 
 

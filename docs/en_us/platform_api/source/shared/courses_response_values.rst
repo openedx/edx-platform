@@ -47,6 +47,8 @@ course_runs
 
 Parent: ``results``
 
+A list of course runs for each course.
+
 * course
 * key (string): The unique identifier for the course.
 * title (string): The title of the course.
@@ -117,12 +119,17 @@ The ``organization`` object has the following response values.
 person
 =========
 
-``instructor`` or ``staff``
+The following ``person`` objects have identical response values.
 
-* key
-* name
-* title
-* bio
+* ``instructor`` (parent: ``course_runs``)
+* ``staff`` (parent: ``course_runs``)
+
+The ``person`` object has the following response values.
+
+* key (string): A unique identifier for the instructor or staff member.
+* name (string): The first and last name of the instructor or staff member.
+* title (string): The official title of the instructor or staff member.
+* bio (string): Biographical information about the instructor or staff member.
 * profile_image (array): See :ref:`Image`.
 
 .. _Prerequisites:
@@ -130,30 +137,43 @@ person
 Prerequisites
 ==================
 
+Parent: ``results``
+
 Any courses a learner must complete before enrolling in the current course.
 
-* name (string): ---The name of the prerequisite course. (Not course ID? Full name?)---
+* name (string): ---The name of the prerequisite course. This is in
+  strikethrough text in the Google doc. Is it to be deleted?---
 
 .. _Seats:
 
 Seats
 =========
 
-* type (string): Audit, verified, professional education
-* price
-* currency
-* upgrade_deadline
-* credit_provider
-* credit_hours
+Parent: ``course_runs``
+
+* type (string): The course mode or modes that the course offers. Possible
+  values are ``audit``, ``verified``, or ``professional education``.
+* price (string): The cost in USD of a verified certificate, a professional
+  education certificate, or academic credit for the course.
+* currency (string): The currency in which the course accepts payment. This
+  value must be ``USD``.
+* upgrade_deadline (string): The deadline for learners to upgrade from the
+  audit track to the verified certificate track.
+* credit_provider (string): The institution that offers academic credit for
+  learners who pass the course.
+* credit_hours (integer): The number of credit hours that learners who pass the
+  course earn.
 
 .. _Subjects:
 
 Subjects
 =========
 
+Parent: ``results``
+
 Academic subjects that this course covers.
 
-* name (string): Name of a subject (such as "computer science" or "history".)
+* name (string): Name of a subject, such as "computer science" or "history".
 
 **Possible values:**
 
@@ -191,14 +211,13 @@ Academic subjects that this course covers.
     Science
     Social Sciences
 
-
 .. _Video:
 
 Video
 =========
 
-``video`` array
+Parent: ``course``, ``course_runs``
 
-* src (string)
-* description (string)
+* src (string): URL for the video.
+* description (string): Description of the video.
 * image (array): See :ref:`Image`.
