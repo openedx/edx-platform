@@ -13,7 +13,7 @@ from xmodule.modulestore import ModuleStoreEnum
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
+    if course.static_asset_path:
         # If we are a static course with the course_image attribute
         # set different than the default, return that path so that
         # courses can use custom course image paths, otherwise just
