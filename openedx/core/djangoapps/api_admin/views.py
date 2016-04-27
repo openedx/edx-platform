@@ -3,29 +3,17 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.template import RequestContext
+from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.decorators.cache import never_cache
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from edx_rest_api_client.client import EdxRestApiClient
 from edxmako.shortcuts import render_to_response
-from rest_framework import permissions
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
-from openedx.core.lib.token_utils import get_asymmetric_token
 
 log = logging.getLogger(__name__)
 
@@ -95,6 +83,7 @@ class CatalogListView(View):
     template = 'api_admin/catalogs/list.html'
 
     def get(self, request, username):
+        """Display a list of a user's catalogs."""
         # TODO actually get these catalogs, and filter by user
         return render_to_response(self.template, {
             'username': username,
@@ -103,6 +92,7 @@ class CatalogListView(View):
         })
 
     def post(self, request, username):
+        """Create a new catalog for a user."""
         form = CatalogForm(request.POST)
         if not form.is_valid():
             return render_to_response(self.template, {
@@ -120,6 +110,7 @@ class CatalogDetailView(View):
     """View to show an individual catalog."""
 
     def get(self, request, catalog_id):
+        """Display this catalog."""
         catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
         return render_to_response('api_admin/catalogs/detail.html', {
             'catalog': catalog,
@@ -134,6 +125,7 @@ class CatalogEditView(View):
     """View to edit an individual catalog."""
 
     def get(self, request, catalog_id):
+        """Display a form to edit this catalog"""
         catalog = Catalog.all()[int(catalog_id)]  # TODO: actually get this catalog
         form = CatalogForm(instance=catalog)
         return render_to_response('api_admin/catalogs/edit.html', {
@@ -142,6 +134,7 @@ class CatalogEditView(View):
         })
 
     def post(self, request, catalog_id):
+        """Update or delete this catalog."""
         if request.POST.get('delete-catalog') == 'on':
             # TODO delete catalog
             return redirect(reverse('api_admin:catalog-list', kwargs={'username': 'TODO'}))  # TODO redirect correctly

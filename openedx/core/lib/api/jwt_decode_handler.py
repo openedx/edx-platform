@@ -80,4 +80,3 @@ def asymmetric_decode(token):
         exc_type = u'{}.{}'.format(exc.__class__.__module__, exc.__class__.__name__)
         log.exception("raised_invalid_token: exc_type=%r, exc_detail=%r", exc_type, exc.message)
         raise
-

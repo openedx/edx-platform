@@ -195,7 +195,7 @@ class Catalog(models.Model):
         # this catalog to discovery.
         managed = False
 
-    def save(self, **kwargs):
+    def save(self, **kwargs):  # pylint: disable=unused-argument
         # TODO: save this catalog to discovery
         return None
 
@@ -208,3 +208,6 @@ class Catalog(models.Model):
         return [
             Catalog(id=i, name='test_' + str(i), query='*') for i in xrange(5)
         ]
+
+    def __unicode__(self):
+        return u'Catalog {name} {query}'.format(self.name, self.query)
