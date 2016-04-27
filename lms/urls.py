@@ -12,6 +12,7 @@ from microsite_configuration import microsite
 import auth_exchange.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
+from courseware.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
@@ -462,28 +463,28 @@ urlpatterns += (
         r'^courses/{}/courseware/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_chapter',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_position',
     ),
 

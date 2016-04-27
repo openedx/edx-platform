@@ -62,7 +62,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             parent=self.course,
             display_name='Overview'
         )
-        ItemFactory.create(
+        self.welcome = ItemFactory.create(
             parent=self.chapter,
             display_name='Welcome'
         )
@@ -250,7 +250,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                kwargs={
                                    'course_id': unicode(self.course.id),
                                    'chapter': self.chapter.location.name,
-                                   'section': self.chapter_subsection.location.name
+                                   'section': self.welcome.location.name
                                })
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
@@ -278,14 +278,14 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         test get entrance exam content method
         """
-        exam_chapter = get_entrance_exam_content(self.request, self.course)
+        exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter.url_name, self.entrance_exam.url_name)
         self.assertFalse(user_has_passed_entrance_exam(self.request, self.course))
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
-        exam_chapter = get_entrance_exam_content(self.request, self.course)
+        exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter, None)
         self.assertTrue(user_has_passed_entrance_exam(self.request, self.course))
 
@@ -314,7 +314,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             kwargs={
                 'course_id': unicode(self.course.id),
                 'chapter': self.entrance_exam.location.name,
-                'section': self.exam_1.location.name
+                'section': self.exam_1.location.name,
             }
         )
         resp = self.client.get(url)
@@ -457,11 +457,13 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             kwargs={'course_id': unicode(self.course.id), 'chapter': self.chapter.url_name}
         )
         response = self.client.get(url)
-        redirect_url = reverse('courseware', args=[unicode(self.course.id)])
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=302)
-        response = self.client.get(redirect_url)
-        exam_url = response.get('Location')
-        self.assertRedirects(response, exam_url)
+        expected_url = reverse('courseware_section',
+                               kwargs={
+                                   'course_id': unicode(self.course.id),
+                                   'chapter': self.entrance_exam.location.name,
+                                   'section': self.exam_1.location.name
+                               })
+        self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
     @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseinfo_page_access_without_passing_entrance_exam(self):
@@ -516,7 +518,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test can_skip_entrance_exam method with anonymous user
         """
-        self.assertFalse(user_can_skip_entrance_exam(self.request, self.anonymous_user, self.course))
+        self.assertFalse(user_can_skip_entrance_exam(self.anonymous_user, self.course))
 
     def test_has_passed_entrance_exam_with_anonymous_user(self):
         """
@@ -583,7 +585,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.request.user,
             self.entrance_exam
         )
-        toc, __, __ = toc_for_course(
+        toc = toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -591,7 +593,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.exam_1.url_name,
             self.field_data_cache
         )
-        return toc
+        return toc['chapters']
 
 
 def answer_entrance_exam_problem(course, request, problem, user=None):

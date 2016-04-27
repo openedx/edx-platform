@@ -123,12 +123,19 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     Create a table of contents from the module store
 
     Return format:
-    [ {'display_name': name, 'url_name': url_name,
-       'sections': SECTIONS, 'active': bool}, ... ]
+    { 'chapters': [
+            {'display_name': name, 'url_name': url_name, 'sections': SECTIONS, 'active': bool},
+        ],
+        'previous_of_active_section': {..},
+        'next_of_active_section': {..}
+    }
 
     where SECTIONS is a list
     [ {'display_name': name, 'url_name': url_name,
        'format': format, 'due': due, 'active' : bool, 'graded': bool}, ...]
+
+    where previous_of_active_section and next_of_active_section have information on the
+    next/previous sections of the active section.
 
     active is set for the section and chapter corresponding to the passed
     parameters, which are expected to be url_names of the chapter+section.
@@ -139,7 +146,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     NOTE: assumes that if we got this far, user has access to course.  Returns
     None if this is not the case.
 
-    field_data_cache must include data from the course module and 2 levels of its descendents
+    field_data_cache must include data from the course module and 2 levels of its descendants
     '''
 
     with modulestore().bulk_operations(course.id):
@@ -221,7 +228,11 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 'sections': sections,
                 'active': chapter.url_name == active_chapter
             })
-        return toc_chapters, previous_of_active_section, next_of_active_section
+        return {
+            'chapters': toc_chapters,
+            'previous_of_active_section': previous_of_active_section,
+            'next_of_active_section': next_of_active_section,
+        }
 
 
 def _add_timed_exam_info(user, course, section, section_context):
