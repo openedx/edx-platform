@@ -65,3 +65,21 @@ class CourseImageTestCase(ModuleStoreTestCase):
             'static/test.png',
             course_image_url(course),
         )
+
+    def test_get_hero_image_url(self):
+        """Test hero image URL formatting."""
+        hero_image = u'hero_image.jpg'
+        course = CourseFactory.create(hero_image=hero_image)
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', hero_image)),
+            course_image_url(course, 'hero_image')
+        )
+
+    def test_get_thumbnail_image_url(self):
+        """Test thumbnail image URL formatting."""
+        thumbnail_image = u'thumbnail_image.jpg'
+        course = CourseFactory.create(thumbnail_image=thumbnail_image)
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', thumbnail_image)),
+            course_image_url(course, 'thumbnail_image')
+        )
