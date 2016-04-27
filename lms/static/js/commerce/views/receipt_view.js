@@ -3,7 +3,7 @@
  */
 var edx = edx || {};
 
-(function ($, _, _s, Backbone) {
+(function ($, _, Backbone) {
     'use strict';
 
     edx.commerce = edx.commerce || {};
@@ -18,11 +18,6 @@ var edx = edx || {};
             this.ecommerceOrderNumber = $.url('?orderNum');
             this.useEcommerceApi = this.ecommerceBasketId || this.ecommerceOrderNumber;
             _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider', 'getCourseData');
-
-            /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
-             * the Underscore namespace.
-             */
-            _.mixin(_.str.exports());
 
             this.render();
         },
@@ -124,17 +119,17 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getReceiptData: function (orderId) {
-            var urlFormat = '/shoppingcart/receipt/%s/';
+            var urlFormat = '/shoppingcart/receipt/' + orderId + '/';
 
             if (this.ecommerceOrderNumber) {
-                urlFormat = '/api/commerce/v1/orders/%s/';
+                urlFormat = '/api/commerce/v1/orders/' + orderId + '/';
             } else if (this.ecommerceBasketId){
-                urlFormat = '/api/commerce/v0/baskets/%s/order/';
+                urlFormat = '/api/commerce/v0/baskets/' + orderId + '/order/';
             }
 
 
             return $.ajax({
-                url: _.sprintf(urlFormat, orderId),
+                url: urlFormat,
                 type: 'GET',
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});
@@ -145,10 +140,10 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getProviderData: function (providerId) {
-            var providerUrl = '/api/credit/v1/providers/%s/';
+            var providerUrl = '/api/credit/v1/providers/' + providerId + '/';
 
             return $.ajax({
-                url: _.sprintf(providerUrl, providerId),
+                url: providerUrl,
                 type: 'GET',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -163,9 +158,9 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getCourseData: function (courseId) {
-            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            var courseDetailUrl = '/api/course_structure/v0/courses/' + courseId + '/';
             return $.ajax({
-                url: _.sprintf(courseDetailUrl, courseId),
+                url: courseDetailUrl,
                 type: 'GET',
                 dataType: 'json'
             });
@@ -305,7 +300,7 @@ var edx = edx || {};
         el: $('#receipt-container')
     });
 
-})(jQuery, _, _.str, Backbone);
+})(jQuery, _, Backbone);
 
 function completeOrder(event) {     // jshint ignore:line
     var courseKey = $(event).data("course-key"),
