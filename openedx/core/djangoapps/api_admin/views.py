@@ -64,12 +64,14 @@ class ApiTosView(TemplateView):
 
 
 class CatalogSearchView(View):
-    """View to search for catalogs belong to a user."""
+    """View to search for catalogs belonging to a user."""
 
     def get(self, request):
+        """Display a form to search for catalogs belonging to a user."""
         return render_to_response('api_admin/catalogs/search.html')
 
     def post(self, request):
+        """Redirect to the list view for the given user."""
         username = request.POST.get('username')
         # If no username is provided, bounce back to this page.
         if not username:

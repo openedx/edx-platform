@@ -210,4 +210,4 @@ class Catalog(models.Model):
         ]
 
     def __unicode__(self):
-        return u'Catalog {name} {query}'.format(self.name, self.query)
+        return u'Catalog {name} {query}'.format(name=self.name, query=self.query)
