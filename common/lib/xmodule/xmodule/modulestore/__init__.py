@@ -55,6 +55,7 @@ class ModuleStoreEnum(object):
         """
         split = 'split'
         mongo = 'mongo'
+        xml = 'xml'
 
     class RevisionOption(object):
         """
