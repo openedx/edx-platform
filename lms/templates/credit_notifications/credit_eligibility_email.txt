@@ -6,7 +6,7 @@ ${_(u"Hi,")}
 % endif
 
 % if providers:
-    ${_(u"Congratulations! You are eligible to receive course credit from {providers} for successfully completing your edX course!").format(providers=providers)}
+    ${_(u"Congratulations ! You are eligible to receive course credit from {providers} for successfully completing your edX course!").format(providers=providers)}
 % else:
     ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your edX course!")}
 % endif
