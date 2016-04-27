@@ -2,10 +2,8 @@ define([
     'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
     'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
     'js/edxnotes/models/note', 'js/edxnotes/views/note_item',
-    'js/spec/edxnotes/custom_matchers'
 ], function(
-    $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView,
-    customMatchers
+    $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView
 ) {
     'use strict';
     describe('EdxNotes NoteItemView', function() {
@@ -27,16 +25,15 @@ define([
         };
 
         beforeEach(function() {
-            customMatchers(this);
             TemplateHelpers.installTemplate('templates/edxnotes/note-item');
-            spyOn(Logger, 'log').andCallThrough();
+            spyOn(Logger, 'log').and.callThrough();
         });
 
         it('can be rendered properly', function() {
             var view = getView(),
                 unitLink = view.$('.reference-unit-link').get(0);
 
-            expect(view.$el).toContain('.note-excerpt-more-link');
+            expect(view.$el).toContainElement('.note-excerpt-more-link');
             expect(view.$el).toContainText(Helpers.PRUNED_TEXT);
             expect(view.$el).toContainText('More');
             view.$('.note-excerpt-more-link').click();

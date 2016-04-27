@@ -1,5 +1,6 @@
 class @Sequence
   constructor: (element) ->
+    @updatedProblems = {}
     @requestToken = $(element).data('request-token')
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
@@ -39,6 +40,33 @@ class @Sequence
     position_link = @link_for(@position)
     if position_link and position_link.data('page-title')
         document.title = position_link.data('page-title') + @base_page_title
+
+  hookUpContentStateChangeEvent: ->
+    $('.problems-wrapper').bind(
+      'contentChanged',
+      (event, problem_id, new_content_state) =>
+        @addToUpdatedProblems problem_id, new_content_state
+    )
+
+  addToUpdatedProblems: (problem_id, new_content_state) =>
+    # Used to keep updated problem's state temporarily.
+    # params:
+    #   'problem_id' is problem id.
+    #   'new_content_state' is updated problem's state.
+
+    # initialize for the current sequence if there isn't any updated problem
+    # for this position.
+    if not @anyUpdatedProblems @position
+      @updatedProblems[@position] = {}
+
+    # Now, put problem content against problem id for current active sequence.
+    @updatedProblems[@position][problem_id] = new_content_state
+
+  anyUpdatedProblems:(position) ->
+    # check for the updated problems for given sequence position.
+    # params:
+    #   'position' can be any sequence position.
+    return @updatedProblems[position] != undefined
 
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
@@ -129,12 +157,21 @@ class @Sequence
 
       bookmarked = if @el.find('.active .bookmark-icon').hasClass('bookmarked') then true else false
       @content_container.html(current_tab.text()).attr("aria-labelledby", current_tab.attr("aria-labelledby")).data('bookmarked', bookmarked)
+
+      # update the data-attributes with latest contents only for updated problems.
+      if @anyUpdatedProblems new_position
+        $.each @updatedProblems[new_position], (problem_id, latest_content) =>
+          @content_container
+          .find("[data-problem-id='#{ problem_id }']")
+          .data('content', latest_content)
+
       XBlock.initializeBlocks(@content_container, @requestToken)
 
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
       @toggleArrows()
+      @hookUpContentStateChangeEvent()
       @hookUpProgressEvent()
       @updatePageTitle()
 

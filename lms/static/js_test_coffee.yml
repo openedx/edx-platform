@@ -31,19 +31,21 @@ lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/logger.js
-    - xmodule_js/common_static/js/vendor/jasmine-jquery.js
+    - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/requirejs/require.js
     - js/RequireJS-namespace-undefine.js
-    - xmodule_js/common_static/js/vendor/jquery.min.js
     - xmodule_js/common_static/js/vendor/jquery-ui.min.js
     - xmodule_js/common_static/js/vendor/jquery.cookie.js
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
+    - xmodule_js/common_static/js/vendor/moment.min.js
+    - xmodule_js/common_static/js/vendor/moment-with-locales.min.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/js/xblock
     - xmodule_js/common_static/coffee/src/xblock
+    - moment_requirejs.js
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
@@ -75,7 +77,7 @@ fixture_paths:
 # When loading many files, this can be slow, so
 # exclude any files you don't need.
 #exclude_from_page:
-#    - path/to/lib/exclude/*
+#    - coffee/spec/helper.js
 
 # Regular expression used to guarantee that a *.js file
 # is included in the test runner page.

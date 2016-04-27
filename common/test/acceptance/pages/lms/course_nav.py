@@ -103,20 +103,20 @@ class CourseNavPage(PageObject):
         self.q(css=subsection_css).first.click()
         self._on_section_promise(section_title, subsection_title).fulfill()
 
-    def go_to_sequential(self, sequential_title):
+    def go_to_vertical(self, vertical_title):
         """
-        Within a section/subsection, navigate to the sequential with `sequential_title`.
+        Within a section/subsection, navigate to the vertical with `vertical_title`.
         """
 
         # Get the index of the item in the sequence
         all_items = self.sequence_items
 
         try:
-            seq_index = all_items.index(sequential_title)
+            seq_index = all_items.index(vertical_title)
 
         except ValueError:
             msg = "Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
-                sequential_title, ", ".join(all_items)
+                vertical_title, ", ".join(all_items)
             )
             self.warning(msg)
 

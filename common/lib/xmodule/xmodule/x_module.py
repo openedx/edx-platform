@@ -366,6 +366,13 @@ class XModuleMixin(XModuleFields, XBlock):
         return course_metadata_utils.display_name_with_default_escaped(self)
 
     @property
+    def tooltip_title(self):
+        """
+        Return the title for the sequence item containing this xmodule as its top level item.
+        """
+        return self.display_name_with_default
+
+    @property
     def xblock_kvs(self):
         """
         Retrieves the internal KeyValueStore for this XModule.

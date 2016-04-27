@@ -117,22 +117,6 @@ class CourseEndingTest(TestCase):
             }
         )
 
-        cert_status = {'status': 'regenerating', 'grade': '67', 'mode': 'verified'}
-        self.assertEqual(
-            _cert_info(user, course, cert_status, course_mode),
-            {
-                'status': 'generating',
-                'show_disabled_download_button': True,
-                'show_download_url': False,
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '67',
-                'mode': 'verified',
-                'linked_in_url': None,
-                'can_unenroll': False,
-            }
-        )
-
         download_url = 'http://s3.edx/cert'
         cert_status = {
             'status': 'downloadable', 'grade': '67',
@@ -501,8 +485,8 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))
 
-        # "Find courses" is shown in the side panel
-        self.assertContains(response, "Find courses")
+        # "Explore courses" is shown in the side panel
+        self.assertContains(response, "Explore courses")
 
         # But other links are hidden in the navigation
         self.assertNotContains(response, "How it Works")

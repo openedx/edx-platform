@@ -29,8 +29,8 @@ prepend_path: common/static
 # Paths to library JavaScript files (optional)
 lib_paths:
     - js/vendor/jquery.min.js
-    - js/vendor/jasmine-jquery.js
     - js/vendor/jasmine-imagediff.js
+    - js/libs/jasmine-waituntil.js
     - js/vendor/jquery.truncate.js
     - js/vendor/mustache.js
     - common/js/vendor/underscore.js

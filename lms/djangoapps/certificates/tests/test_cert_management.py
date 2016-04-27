@@ -103,7 +103,6 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         CertificateStatuses.downloadable,
         CertificateStatuses.generating,
         CertificateStatuses.notpassing,
-        CertificateStatuses.regenerating,
         CertificateStatuses.restricted,
         CertificateStatuses.unavailable,
     )

@@ -52,6 +52,18 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
         self.assertIsNone(jsondetails['language'], "language somehow initialized")
 
+    def test_pre_1900_date(self):
+        """
+        Tests that the encoder can handle a pre-1900 date, since strftime
+        doesn't work for these dates.
+        """
+        details = CourseDetails.fetch(self.course.id)
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
+        details.enrollment_start = pre_1900
+        dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
+        loaded_jsondetails = json.loads(dumped_jsondetails)
+        self.assertEqual(loaded_jsondetails['enrollment_start'], pre_1900.isoformat())
+
     def test_ooc_encoder(self):
         """
         Test the encoder out of its original constrained purpose to see if it functions for general use

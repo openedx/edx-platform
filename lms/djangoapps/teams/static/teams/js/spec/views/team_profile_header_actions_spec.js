@@ -250,7 +250,7 @@ define([
                 expect(editButton.length).toEqual(1);
                 $(editButton).click();
 
-                expect(Backbone.history.navigate.calls[0].args[0]).toContain('/edit-team');
+                expect(Backbone.history.navigate.calls.mostRecent().args[0]).toContain('/edit-team');
             });
         });
     });

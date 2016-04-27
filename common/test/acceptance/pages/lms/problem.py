@@ -30,6 +30,13 @@ class ProblemPage(PageObject):
         return self.q(css="div.problem p").text
 
     @property
+    def problem_content(self):
+        """
+        Return the content of the problem
+        """
+        return self.q(css="div.problems-wrapper").text[0]
+
+    @property
     def message_text(self):
         """
         Return the "message" text of the question of the problem.
@@ -103,9 +110,23 @@ class ProblemPage(PageObject):
 
     def click_check(self):
         """
-        Click the Check button!
+        Click the Check button.
         """
         self.q(css='div.problem button.check').click()
+        self.wait_for_ajax()
+
+    def click_save(self):
+        """
+        Click the Save button.
+        """
+        self.q(css='div.problem button.save').click()
+        self.wait_for_ajax()
+
+    def click_reset(self):
+        """
+        Click the Reset button.
+        """
+        self.q(css='div.problem button.reset').click()
         self.wait_for_ajax()
 
     def wait_for_status_icon(self):
@@ -113,6 +134,17 @@ class ProblemPage(PageObject):
         wait for status icon
         """
         self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
+
+    def wait_for_expected_status(self, status_selector, message):
+        """
+        Waits for the expected status indicator.
+
+        Args:
+            status_selector(str): status selector string.
+            message(str): description of promise, to be logged.
+        """
+        msg = "Wait for status to be {}".format(message)
+        self.wait_for_element_visibility(status_selector, msg)
 
     def click_hint(self):
         """

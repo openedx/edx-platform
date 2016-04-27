@@ -3095,6 +3095,210 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
                 chapter_aside2 = new_chapter2.runtime.get_asides(new_chapter2)[0]
                 self.assertEqual('another one value', chapter_aside2.data_field)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_export_course_with_asides(self, default_store):
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default_store):
+                dest_course_key = self.store.make_course_key('edX', "aside_test", "2012_Fall")
+                dest_course_key2 = self.store.make_course_key('edX', "aside_test_2", "2012_Fall_2")
+
+                courses = import_course_from_xml(
+                    self.store,
+                    self.user_id,
+                    DATA_DIR,
+                    ['aside'],
+                    load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_id=dest_course_key,
+                    create_if_not_present=True,
+                )
+
+                def update_block_aside(block):
+                    """
+                    Check whether block has the expected aside w/ its fields and then recurse to the block's children
+                    """
+                    asides = block.runtime.get_asides(block)
+                    asides[0].data_field = ''.join(['Exported data_field ', asides[0].data_field])
+                    asides[0].content = ''.join(['Exported content ', asides[0].content])
+
+                    self.store.update_item(block, self.user_id, asides=[asides[0]])
+
+                    for child in block.get_children():
+                        update_block_aside(child)
+
+                update_block_aside(courses[0])
+
+                # export course to xml
+                top_level_export_dir = 'exported_source_course_with_asides'
+                export_course_to_xml(
+                    self.store,
+                    contentstore,
+                    dest_course_key,
+                    self.export_dir,
+                    top_level_export_dir,
+                )
+
+                # and restore the new one from the exported xml
+                courses2 = import_course_from_xml(
+                    self.store,
+                    self.user_id,
+                    self.export_dir,
+                    source_dirs=[top_level_export_dir],
+                    static_content_store=contentstore,
+                    target_id=dest_course_key2,
+                    create_if_not_present=True,
+                    raise_on_failure=True,
+                )
+
+                self.assertEquals(1, len(courses2))
+
+                # check that the imported blocks have the right asides and values
+                def check_block(block):
+                    """
+                    Check whether block has the expected aside w/ its fields and then recurse to the block's children
+                    """
+                    asides = block.runtime.get_asides(block)
+
+                    self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                    self.assertIsInstance(asides[0], AsideTestType)
+                    category = block.scope_ids.block_type
+                    self.assertEqual(asides[0].data_field, "Exported data_field {} aside data".format(category))
+                    self.assertEqual(asides[0].content, "Exported content {} Aside".format(category.capitalize()))
+
+                    for child in block.get_children():
+                        check_block(child)
+
+                check_block(courses2[0])
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    def test_export_course_after_creating_new_items_with_asides(self, default_store):  # pylint: disable=too-many-statements
+        if default_store == ModuleStoreEnum.Type.mongo:
+            raise SkipTest("asides not supported in old mongo")
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default_store):
+                dest_course_key = self.store.make_course_key('edX', "aside_test", "2012_Fall")
+                dest_course_key2 = self.store.make_course_key('edX', "aside_test_2", "2012_Fall_2")
+
+                courses = import_course_from_xml(
+                    self.store,
+                    self.user_id,
+                    DATA_DIR,
+                    ['aside'],
+                    load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_id=dest_course_key,
+                    create_if_not_present=True,
+                )
+
+                # create new chapter and modify aside for it
+                new_chapter_display_name = 'New Chapter'
+                new_chapter = self.store.create_child(self.user_id, courses[0].location, 'chapter', 'new_chapter')
+                new_chapter.display_name = new_chapter_display_name
+                asides = new_chapter.runtime.get_asides(new_chapter)
+
+                self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                chapter_aside = asides[0]
+                self.assertIsInstance(chapter_aside, AsideTestType)
+                chapter_aside.data_field = 'new value'
+                self.store.update_item(new_chapter, self.user_id, asides=[chapter_aside])
+
+                # create new problem and modify aside for it
+                sequence = courses[0].get_children()[0].get_children()[0]
+                new_problem_display_name = 'New Problem'
+                new_problem = self.store.create_child(self.user_id, sequence.location, 'problem', 'new_problem')
+                new_problem.display_name = new_problem_display_name
+                asides = new_problem.runtime.get_asides(new_problem)
+
+                self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                problem_aside = asides[0]
+                self.assertIsInstance(problem_aside, AsideTestType)
+                problem_aside.data_field = 'new problem value'
+                problem_aside.content = 'new content value'
+                self.store.update_item(new_problem, self.user_id, asides=[problem_aside])
+
+                # export course to xml
+                top_level_export_dir = 'exported_source_course_with_asides'
+                export_course_to_xml(
+                    self.store,
+                    contentstore,
+                    dest_course_key,
+                    self.export_dir,
+                    top_level_export_dir,
+                )
+
+                # and restore the new one from the exported xml
+                courses2 = import_course_from_xml(
+                    self.store,
+                    self.user_id,
+                    self.export_dir,
+                    source_dirs=[top_level_export_dir],
+                    static_content_store=contentstore,
+                    target_id=dest_course_key2,
+                    create_if_not_present=True,
+                    raise_on_failure=True,
+                )
+
+                self.assertEquals(1, len(courses2))
+
+                # check that aside for the new chapter was exported/imported properly
+                chapters = courses2[0].get_children()
+                self.assertEquals(2, len(chapters))
+                self.assertIn(new_chapter_display_name, [item.display_name for item in chapters])
+
+                found = False
+                for child in chapters:
+                    if new_chapter.display_name == child.display_name:
+                        found = True
+                        asides = child.runtime.get_asides(child)
+                        self.assertEqual(len(asides), 1)
+                        child_aside = asides[0]
+                        self.assertIsInstance(child_aside, AsideTestType)
+                        self.assertEquals(child_aside.data_field, 'new value')
+                        break
+
+                self.assertTrue(found, "new_chapter not found")
+
+                # check that aside for the new problem was exported/imported properly
+                sequence_children = courses2[0].get_children()[0].get_children()[0].get_children()
+                self.assertEquals(2, len(sequence_children))
+                self.assertIn(new_problem_display_name, [item.display_name for item in sequence_children])
+
+                found = False
+                for child in sequence_children:
+                    if new_problem.display_name == child.display_name:
+                        found = True
+                        asides = child.runtime.get_asides(child)
+                        self.assertEqual(len(asides), 1)
+                        child_aside = asides[0]
+                        self.assertIsInstance(child_aside, AsideTestType)
+                        self.assertEquals(child_aside.data_field, 'new problem value')
+                        self.assertEquals(child_aside.content, 'new content value')
+                        break
+
+                self.assertTrue(found, "new_chapter not found")
+
 
 @ddt.ddt
 @attr('mongo')

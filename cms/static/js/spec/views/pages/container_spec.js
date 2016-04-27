@@ -70,7 +70,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     containerPage.render();
                     respondWithHtml(html);
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
-                    AjaxHelpers.respondWithJson(requests, options);
+                    AjaxHelpers.respondWithJson(requests, options || {});
                 };
 
                 handleContainerPageRefresh = function(requests) {
