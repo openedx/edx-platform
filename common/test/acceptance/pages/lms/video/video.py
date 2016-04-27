@@ -374,6 +374,13 @@ class VideoPage(PageObject):
         speed_selector = self.get_element_selector('li[data-speed="{speed}"] a'.format(speed=speed))
         self.q(css=speed_selector).first.click()
 
+    def verify_speed_changed(self, expected_speed):
+        """
+        Wait for the video to change its speed to the expected value. If it does not change,
+        the wait call will fail the test.
+        """
+        self.wait_for(lambda: self.speed == expected_speed, "Video speed changed")
+
     def click_player_button(self, button):
         """
         Click on `button`.
@@ -604,9 +611,6 @@ class VideoPage(PageObject):
 
         button = self.q(css=button_selector).results[0]
 
-        coord_y = button.location_once_scrolled_into_view['y']
-        self.browser.execute_script("window.scrollTo(0, {});".format(coord_y))
-
         hover = ActionChains(self.browser).move_to_element(button)
         hover.perform()
 
@@ -617,7 +621,7 @@ class VideoPage(PageObject):
         menu_items = self.q(css=menu_selector + ' a').results
         for item in menu_items:
             if item.get_attribute('data-value') == transcript_format:
-                item.click()
+                ActionChains(self.browser).move_to_element(item).click().perform()
                 self.wait_for_ajax()
                 break
 

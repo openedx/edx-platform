@@ -123,7 +123,8 @@ class GlobalStaffFactory(UserFactory):
 
 
 class StudentModuleFactory(DjangoModelFactory):
-    FACTORY_FOR = StudentModule
+    class Meta(object):
+        model = StudentModule
 
     module_type = "problem"
     student = factory.SubFactory(UserFactory)
@@ -135,7 +136,8 @@ class StudentModuleFactory(DjangoModelFactory):
 
 
 class UserStateSummaryFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleUserStateSummaryField
+    class Meta(object):
+        model = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
@@ -143,7 +145,8 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
 
 class StudentPrefsFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleStudentPrefsField
+    class Meta(object):
+        model = XModuleStudentPrefsField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
@@ -152,7 +155,8 @@ class StudentPrefsFactory(DjangoModelFactory):
 
 
 class StudentInfoFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleStudentInfoField
+    class Meta(object):
+        model = XModuleStudentInfoField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')

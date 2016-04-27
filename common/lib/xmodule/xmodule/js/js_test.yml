@@ -51,15 +51,15 @@ lib_paths:
     - common_static/js/vendor/CodeMirror/codemirror.js
     - common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js
     - common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js
-    - common_static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js
     - common_static/js/vendor/jquery.timeago.js
-    - common_static/js/vendor/sinon-1.7.1.js
+    - common_static/js/vendor/sinon-1.17.0.js
     - common_static/js/vendor/analytics.js
     - common_static/js/test/add_ajax_prefix.js
     - common_static/js/src/utility.js
     - public/js/split_test_staff.js
     - common_static/js/src/accessibility_tools.js
     - common_static/js/vendor/moment.min.js
+    - spec/main_requirejs.js
 
 # Paths to spec (test) JavaScript files
 spec_paths:

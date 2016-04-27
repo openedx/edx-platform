@@ -1,7 +1,7 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from path import path
+from path import Path as path
 import unittest
 from tempfile import mkdtemp
 import itertools
@@ -16,7 +16,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MODULESTORE_SETUPS,
     SHORT_NAME_MAP,
     TEST_DATA_DIR,

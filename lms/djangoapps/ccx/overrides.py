@@ -93,7 +93,10 @@ def get_override_for_ccx(ccx, block, name, default=None):
 
     block_overrides = overrides.get(non_ccx_key, {})
     if name in block_overrides:
-        return block.fields[name].from_json(block_overrides[name])
+        try:
+            return block.fields[name].from_json(block_overrides[name])
+        except KeyError:
+            return block_overrides[name]
     else:
         return default
 
@@ -114,6 +117,8 @@ def _get_overrides_for_ccx(ccx):
         for override in query:
             block_overrides = overrides.setdefault(override.location, {})
             block_overrides[override.field] = json.loads(override.value)
+            block_overrides[override.field + "_id"] = override.id
+            block_overrides[override.field + "_instance"] = override
 
         overrides_cache[ccx] = overrides
 
@@ -130,23 +135,33 @@ def override_field_for_ccx(ccx, block, name, value):
     field = block.fields[name]
     value_json = field.to_json(value)
     serialized_value = json.dumps(value_json)
-    try:
-        override = CcxFieldOverride.objects.create(
-            ccx=ccx,
-            location=block.location,
-            field=name,
-            value=serialized_value
-        )
-    except IntegrityError:
-        transaction.commit()
-        override = CcxFieldOverride.objects.get(
-            ccx=ccx,
-            location=block.location,
-            field=name
-        )
+    override_has_changes = False
+
+    override = get_override_for_ccx(ccx, block, name + "_instance")
+    if override:
+        override_has_changes = serialized_value != override.value
+
+    if not override:
+        try:
+            override = CcxFieldOverride.objects.create(
+                ccx=ccx,
+                location=block.location,
+                field=name,
+                value=serialized_value
+            )
+            _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_id"] = override.id
+        except IntegrityError:
+            transaction.commit()
+            kwargs = {'ccx': ccx, 'location': block.location, 'field': name}
+            override = CcxFieldOverride.objects.get(**kwargs)
+            override_has_changes = serialized_value != override.value
+
+    if override_has_changes:
         override.value = serialized_value
-    override.save()
+        override.save()
+
     _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name] = value_json
+    _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_instance"] = override
 
 
 def clear_override_for_ccx(ccx, block, name):
@@ -162,7 +177,30 @@ def clear_override_for_ccx(ccx, block, name):
             location=block.location,
             field=name).delete()
 
-        _get_overrides_for_ccx(ccx).setdefault(block.location, {}).pop(name)
+        clear_ccx_field_info_from_ccx_map(ccx, block, name)
 
     except CcxFieldOverride.DoesNotExist:
         pass
+
+
+def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=invalid-name
+    """
+    Remove field information from ccx overrides mapping dictionary
+    """
+    try:
+        ccx_override_map = _get_overrides_for_ccx(ccx).setdefault(block.location, {})
+        ccx_override_map.pop(name)
+        ccx_override_map.pop(name + "_id")
+        ccx_override_map.pop(name + "_instance")
+    except KeyError:
+        pass
+
+
+def bulk_delete_ccx_override_fields(ccx, ids):
+    """
+    Bulk delete for CcxFieldOverride model
+    """
+    ids = filter(None, ids)
+    ids = list(set(ids))
+    if ids:
+        CcxFieldOverride.objects.filter(ccx=ccx, id__in=ids).delete()

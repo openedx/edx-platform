@@ -383,7 +383,8 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     lang,
                 )
             except TranscriptException as ex:
-                item.transcripts.pop(lang)  # remove key from transcripts because proper srt file does not exist in assets.
+                # remove key from transcripts because proper srt file does not exist in assets.
+                item.transcripts.pop(lang)
                 reraised_message += ' ' + ex.message
         if reraised_message:
             item.save_with_metadata(user)

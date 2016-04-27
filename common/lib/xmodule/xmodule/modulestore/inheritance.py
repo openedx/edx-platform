@@ -4,15 +4,18 @@ Support for inheritance of fields down an XBlock hierarchy.
 from __future__ import absolute_import
 
 from datetime import datetime
+from django.conf import settings
 from pytz import UTC
+
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.fields import Date, Timedelta
-from django.conf import settings
+from ..course_metadata_utils import DEFAULT_START_DATE
 
 
 # Make '_' a no-op so we can scrape strings
+# Using lambda instead of `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -36,7 +39,7 @@ class InheritanceMixin(XBlockMixin):
     )
     start = Date(
         help="Start time when this module is visible",
-        default=datetime(2030, 1, 1, tzinfo=UTC),
+        default=DEFAULT_START_DATE,
         scope=Scope.settings
     )
     due = Date(

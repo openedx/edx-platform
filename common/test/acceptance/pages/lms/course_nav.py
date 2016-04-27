@@ -82,7 +82,7 @@ class CourseNavPage(PageObject):
 
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
-        section_css = 'nav>div.chapter:nth-of-type({0})>h3>a'.format(sec_index + 1)
+        section_css = '.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
         self.q(css=section_css).first.click()
 
         # Get the subsection by index
@@ -94,9 +94,10 @@ class CourseNavPage(PageObject):
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = "nav>div.chapter:nth-of-type({0})>ul>li:nth-of-type({1})>a".format(
-            sec_index + 1, subsec_index + 1
-        )
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".menu-item:nth-of-type({1})"
+        ).format(sec_index + 1, subsec_index + 1)
 
         # Click the subsection and ensure that the page finishes reloading
         self.q(css=subsection_css).first.click()
@@ -130,7 +131,7 @@ class CourseNavPage(PageObject):
         """
         Return a list of all section titles on the page.
         """
-        chapter_css = 'nav > div.chapter > h3 > a'
+        chapter_css = '.course-navigation .chapter .group-heading'
         return self.q(css=chapter_css).map(lambda el: el.text.strip()).results
 
     def _subsection_titles(self, section_index):
@@ -140,7 +141,10 @@ class CourseNavPage(PageObject):
         """
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = 'nav>div.chapter:nth-of-type({0})>ul>li>a>p:nth-of-type(1)'.format(section_index)
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".menu-item a p:nth-of-type(1)"
+        ).format(section_index)
 
         # If the element is visible, we can get its text directly
         # Otherwise, we need to get the HTML
@@ -171,8 +175,8 @@ class CourseNavPage(PageObject):
         That's true right after we click the section/subsection, but not true in general
         (the user could go to a section, then expand another tab).
         """
-        current_section_list = self.q(css='nav>div.chapter.is-open>h3>a').text
-        current_subsection_list = self.q(css='nav>div.chapter.is-open li.active>a>p').text
+        current_section_list = self.q(css='.course-navigation .chapter.is-open .group-heading').text
+        current_subsection_list = self.q(css='.course-navigation .chapter-content-container .menu-item.active a p').text
 
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")

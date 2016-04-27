@@ -34,12 +34,12 @@ class TemplateLookupTests(TestCase):
 
         add_lookup('main', 'external_module', __name__)
         directories = LOOKUP['main'].directories
-        self.assertEqual(len([dir for dir in directories if 'external_module' in dir]), 1)
+        self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 
         # This should not clear the directories list
         startup.enable_microsites()
         directories = LOOKUP['main'].directories
-        self.assertEqual(len([dir for dir in directories if 'external_module' in dir]), 1)
+        self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_FEEDBACK_SUBMISSION': True})

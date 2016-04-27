@@ -6,33 +6,37 @@
             'gettext',
             'js/views/fields',
             'teams/js/models/team',
+            'common/js/components/utils/view_utils',
             'text!teams/templates/edit-team.underscore'],
-        function (Backbone, _, gettext, FieldViews, TeamModel, editTeamTemplate) {
+        function (Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
                 maxTeamDescriptionLength: 300,
 
                 events: {
-                    'click .action-primary': 'createTeam',
-                    'submit form': 'createTeam',
-                    'click .action-cancel': 'goBackToTopic'
+                    'click .action-primary': ViewUtils.withDisabledElement('createOrUpdateTeam'),
+                    'submit form': ViewUtils.withDisabledElement('createOrUpdateTeam'),
+                    'click .action-cancel': 'cancelAndGoBack'
                 },
 
                 initialize: function(options) {
                     this.teamEvents = options.teamEvents;
-                    this.courseID = options.teamParams.courseID;
-                    this.topicID = options.teamParams.topicID;
+                    this.context = options.context;
+                    this.topic = options.topic;
                     this.collection = options.collection;
-                    this.teamsUrl = options.teamParams.teamsUrl;
-                    this.languages = options.teamParams.languages;
-                    this.countries = options.teamParams.countries;
-                    this.primaryButtonTitle = options.primaryButtonTitle || 'Submit';
+                    this.action = options.action;
 
-                    _.bindAll(this, 'goBackToTopic', 'createTeam');
-
-                    this.teamModel = new TeamModel({});
-                    this.teamModel.url = this.teamsUrl;
+                    if (this.action === 'create') {
+                        this.teamModel = new TeamModel({});
+                        this.teamModel.url = this.context.teamsUrl;
+                        this.primaryButtonTitle = gettext("Create");
+                    } else if(this.action === 'edit' ) {
+                        this.teamModel = options.model;
+                        this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id')) +
+                            '?expand=user';
+                        this.primaryButtonTitle = gettext("Update");
+                    }
 
                     this.teamNameField = new FieldViews.TextFieldView({
                         model: this.teamModel,
@@ -57,7 +61,7 @@
                         required: false,
                         showMessages: false,
                         titleIconName: 'fa-comment-o',
-                        options: this.languages,
+                        options: this.context.languages,
                         helpMessage: gettext('The language that team members primarily use to communicate with each other.')
                     });
 
@@ -68,13 +72,17 @@
                         required: false,
                         showMessages: false,
                         titleIconName: 'fa-globe',
-                        options: this.countries,
+                        options: this.context.countries,
                         helpMessage: gettext('The country that team members primarily identify with.')
                     });
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate)({primaryButtonTitle: this.primaryButtonTitle}));
+                    this.$el.html(_.template(editTeamTemplate) ({
+                        primaryButtonTitle: this.primaryButtonTitle,
+                        action: this.action,
+                        totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
+                    }));
                     this.set(this.teamNameField, '.team-required-fields');
                     this.set(this.teamDescriptionField, '.team-required-fields');
                     this.set(this.teamLanguageField, '.team-optional-fields');
@@ -91,35 +99,42 @@
                     }
                 },
 
-                createTeam: function (event) {
+                createOrUpdateTeam: function (event) {
                     event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
-                        teamCountry = this.teamCountryField.fieldValue();
+                        teamCountry = this.teamCountryField.fieldValue(),
+                        data = {
+                            name: this.teamNameField.fieldValue(),
+                            description: this.teamDescriptionField.fieldValue(),
+                            language: _.isNull(teamLanguage) ? '' : teamLanguage,
+                            country: _.isNull(teamCountry) ? '' : teamCountry
+                        },
+                        saveOptions = {
+                            wait: true
+                        };
 
-                    var data = {
-                        course_id: this.courseID,
-                        topic_id: this.topicID,
-                        name: this.teamNameField.fieldValue(),
-                        description: this.teamDescriptionField.fieldValue(),
-                        language: _.isNull(teamLanguage) ? '' : teamLanguage,
-                        country: _.isNull(teamCountry) ? '' : teamCountry
-                    };
+                    if (this.action === 'create') {
+                        data.course_id = this.context.courseID;
+                        data.topic_id = this.topic.id;
+                    } else if (this.action === 'edit' ) {
+                        saveOptions.patch = true;
+                        saveOptions.contentType = 'application/merge-patch+json';
+                    }
 
                     var validationResult = this.validateTeamData(data);
                     if (validationResult.status === false) {
                         this.showMessage(validationResult.message, validationResult.srMessage);
-                        return;
+                        return $().promise();
                     }
-
-                    this.teamModel.save(data, { wait: true })
+                    return view.teamModel.save(data, saveOptions)
                         .done(function(result) {
                             view.teamEvents.trigger('teams:update', {
-                                action: 'create',
+                                action: view.action,
                                 team: result
                             });
                             Backbone.history.navigate(
-                                'teams/' + view.topicID + '/' + view.teamModel.id,
+                                'teams/' + view.topic.id + '/' + view.teamModel.id,
                                 {trigger: true}
                             );
                         })
@@ -186,8 +201,15 @@
                     }
                 },
 
-                goBackToTopic: function () {
-                    Backbone.history.navigate('topics/' + this.topicID, {trigger: true});
+                cancelAndGoBack: function (event) {
+                    event.preventDefault();
+                    var url;
+                    if (this.action === 'create') {
+                        url = 'topics/' + this.topic.id;
+                    } else if (this.action === 'edit' ) {
+                        url = 'teams/' + this.topic.id + '/' + this.teamModel.get('id');
+                    }
+                    Backbone.history.navigate(url, {trigger: true});
                 }
             });
         });

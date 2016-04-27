@@ -6,7 +6,9 @@ import cgi
 from urllib import urlencode
 import ddt
 import json
+import itertools
 import unittest
+import pytz
 from datetime import datetime
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
@@ -17,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
@@ -36,6 +39,7 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from student.tests.factories import NonRegisteredUserFactory
@@ -46,7 +50,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 @attr('shard_1')
@@ -361,134 +365,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         else:
             self.assertNotContains(result, "Classes End")
 
-    def test_chat_settings(self):
-        mock_user = MagicMock()
-        mock_user.username = "johndoe"
-
-        mock_course = MagicMock()
-        mock_course.id = "a/b/c"
-
-        # Stub this out in the case that it's not in the settings
-        domain = "jabber.edx.org"
-        settings.JABBER_DOMAIN = domain
-
-        chat_settings = views.chat_settings(mock_course, mock_user)
-
-        # Test the proper format of all chat settings
-        self.assertEqual(chat_settings['domain'], domain)
-        self.assertEqual(chat_settings['room'], "a-b-c_class")
-        self.assertEqual(chat_settings['username'], "johndoe@%s" % domain)
-
-        # TODO: this needs to be changed once we figure out how to
-        #       generate/store a real password.
-        self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    def test_course_mktg_about_coming_soon(self):
-        # We should not be able to find this course
-        url = reverse('mktg_about_course', kwargs={'course_id': 'no/course/here'})
-        response = self.client.get(url, {'org': self.org})
-        self.assertIn('Coming Soon', response.content)
-
-        # Verify that the checkbox is not displayed
-        self._email_opt_in_checkbox(response)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    @ddt.data(
-        # One organization name
-        (u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ", u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"),
-        # Two organization names
-        (",".join([u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"] * 2), u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + " and " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"),
-        # Three organization names
-        (",".join([u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"] * 3), u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + ", " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + ", " + "and " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ")
-    )
-    @ddt.unpack
-    def test_course_mktg_register(self, org, org_name_string):
-        response = self._load_mktg_about(org=org)
-        self.assertIn('Enroll in', response.content)
-        self.assertNotIn('and choose your student track', response.content)
-
-        # Verify that the checkbox is displayed
-        self._email_opt_in_checkbox(response, org_name_string)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    @ddt.data(
-        # One organization name
-        (u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ", u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"),
-        # Two organization names
-        (",".join([u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"] * 2), u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + " and " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"),
-        # Three organization names
-        (",".join([u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"] * 3), u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + ", " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ" + ", " + "and " + u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ")
-    )
-    @ddt.unpack
-    def test_course_mktg_register_multiple_modes(self, org, org_name_string):
-        CourseMode.objects.get_or_create(
-            mode_slug='honor',
-            mode_display_name='Honor Code Certificate',
-            course_id=self.course_key
-        )
-        CourseMode.objects.get_or_create(
-            mode_slug='verified',
-            mode_display_name='Verified Certificate',
-            course_id=self.course_key
-        )
-
-        response = self._load_mktg_about(org=org)
-        self.assertIn('Enroll in', response.content)
-        self.assertIn('and choose your student track', response.content)
-
-        # Verify that the checkbox is displayed
-        self._email_opt_in_checkbox(response, org_name_string)
-
-        # clean up course modes
-        CourseMode.objects.all().delete()
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    def test_course_mktg_no_organization_name(self):
-        # Don't pass an organization name as a GET parameter, even though the email
-        # opt-in feature is enabled.
-        response = response = self._load_mktg_about()
-
-        # Verify that the checkbox is not displayed
-        self._email_opt_in_checkbox(response)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': False})
-    def test_course_mktg_opt_in_disabled(self):
-        # Pass an organization name as a GET parameter, even though the email
-        # opt-in feature is disabled.
-        response = self._load_mktg_about(org=self.org)
-
-        # Verify that the checkbox is not displayed
-        self._email_opt_in_checkbox(response)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    def test_course_mktg_organization_html(self):
-        response = self._load_mktg_about(org=self.org_html)
-
-        # Verify that the checkbox is displayed with the organization name
-        # in the label escaped as expected.
-        self._email_opt_in_checkbox(response, cgi.escape(self.org_html))
-
-    @patch.dict(settings.FEATURES, {
-        'IS_EDX_DOMAIN': True,
-        'ENABLE_MKTG_EMAIL_OPT_IN': True
-    })
-    def test_mktg_about_language_edx_domain(self):
-        # Since we're in an edx-controlled domain, and our marketing site
-        # supports only English, override the language setting
-        # and use English.
-        response = self._load_mktg_about(language='eo', org=self.org_html)
-        self.assertContains(response, "Enroll in")
-        self.assertContains(response, "and learn about its other programs")
-
-    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
-    def test_mktg_about_language_openedx(self):
-        # If we're in an OpenEdX installation,
-        # may want to support languages other than English,
-        # so respect the language code.
-        response = self._load_mktg_about(language='eo')
-        self.assertContains(response, u"Énröll ïn".encode('utf-8'))
-
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account
         admin = AdminFactory()
@@ -560,7 +436,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         })
         response = self.client.get(url)
         response_content = HTMLParser().unescape(response.content)
-
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
@@ -573,32 +448,33 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertIn("Score: 3.0 / 3.0", response_content)
         self.assertIn('#4', response_content)
 
-    def _load_mktg_about(self, language=None, org=None):
-        """Retrieve the marketing about button (iframed into the marketing site)
-        and return the HTTP response.
-
-        Keyword Args:
-            language (string): If provided, send this in the 'Accept-Language' HTTP header.
-            org (string): If provided, send the string as a GET parameter.
-
-        Returns:
-            Response
-
-        """
-        # Log in as an administrator to guarantee that we can access the button
-        admin = AdminFactory()
-        self.client.login(username=admin.username, password='test')
-
-        # If provided, set the language header
-        headers = {}
-        if language is not None:
-            headers['HTTP_ACCEPT_LANGUAGE'] = language
-
-        url = reverse('mktg_about_course', kwargs={'course_id': unicode(self.course_key)})
-        if org:
-            return self.client.get(url, {'org': org}, **headers)
-        else:
-            return self.client.get(url, **headers)
+    @ddt.data('America/New_York',  # UTC - 5
+              'Asia/Pyongyang',      # UTC + 9
+              'Europe/London',       # UTC
+              'Canada/Yukon',        # UTC - 8
+              'Europe/Moscow',)      # UTC + 3
+    def test_submission_history_timezone(self, timezone):
+        with (override_settings(TIME_ZONE=timezone)):
+            course = CourseFactory.create()
+            course_key = course.id
+            client = Client()
+            admin = AdminFactory.create()
+            client.login(username=admin.username, password='test')
+            state_client = DjangoXBlockUserStateClient(admin)
+            usage_key = course_key.make_usage_key('problem', 'test-history')
+            state_client.set(
+                username=admin.username,
+                block_key=usage_key,
+                state={'field_a': 'x', 'field_b': 'y'}
+            )
+            url = reverse('submission_history', kwargs={
+                'course_id': unicode(course_key),
+                'student_username': admin.username,
+                'location': unicode(usage_key),
+            })
+            response = client.get(url)
+            response_content = HTMLParser().unescape(response.content)
+            self.assertIn(settings.TIME_ZONE, response_content)
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
@@ -824,16 +700,34 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request.user = self.user
 
         mako_middleware_process_request(self.request)
+
+        self.setup_course()
+
+    def setup_course(self, **options):
+        """Create the test course."""
         course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+            **options
         )
+
+        # pylint: disable=attribute-defined-outside-init
         self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
+
+    @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
+    def test_progress_page_xss_prevent(self, malicious_code):
+        """
+        Test that XSS attack is prevented
+        """
+        resp = views.progress(self.request, course_id=unicode(self.course.id), student_id=self.user.id)
+        self.assertEqual(resp.status_code, 200)
+        # Test that malicious code does not appear in html
+        self.assertNotIn(malicious_code, resp.content)
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
@@ -974,6 +868,18 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertContains(resp, u"Download Your Certificate")
 
+    @ddt.data(
+        *itertools.product(((21, 4, True), (21, 4, False)), (True, False))
+    )
+    @ddt.unpack
+    def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
+        """Test that query counts remain the same for self-paced and instructor-paced courses."""
+        SelfPacedConfiguration(enabled=self_paced_enabled).save()
+        self.setup_course(self_paced=self_paced)
+        with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):
+            resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertEqual(resp.status_code, 200)
+
 
 @attr('shard_1')
 class VerifyCourseKeyDecoratorTests(TestCase):
@@ -1074,7 +980,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
@@ -1099,6 +1005,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                 },
 
                 context={
+                    'ip': '127.0.0.1',
                     'Google Analytics':
                     {'clientId': None}
                 }
@@ -1120,7 +1027,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertIn("Certificate is being created.", resp.content)
 
     @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
-    @override_settings(CERT_QUEUE='certificates', SEGMENT_IO_LMS_KEY="foobar", FEATURES={'SEGMENT_IO_LMS': True})
+    @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
         # then json will return cert generating message with bad request code
@@ -1283,14 +1190,29 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_RENDER_XBLOCK_API': True})
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
         url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        if url_encoded_params:
+            url += '?' + url_encoded_params
         return self.client.get(url)
+
+
+class TestRenderXBlockSelfPaced(TestRenderXBlock):
+    """
+    Test rendering XBlocks for a self-paced course. Relies on the query
+    count assertions in the tests defined by RenderXBlockMixin.
+    """
+
+    def setUp(self):
+        super(TestRenderXBlockSelfPaced, self).setUp()
+        SelfPacedConfiguration(enabled=True).save()
+
+    def course_options(self):
+        return {'self_paced': True}

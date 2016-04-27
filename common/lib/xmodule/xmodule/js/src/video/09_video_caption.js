@@ -271,7 +271,7 @@ function (Sjson, AsyncProcess) {
         /**
         * @desc Fetch the caption file specified by the user. Upon successful
         *     receipt of the file, the captions will be rendered.
-        *
+        * @param {boolean} [fetchWithYoutubeId] Fetch youtube captions if true.
         * @returns {boolean}
         *     true: The user specified a caption file. NOTE: if an error happens
         *         while the specified file is being retrieved (for example the
@@ -280,7 +280,7 @@ function (Sjson, AsyncProcess) {
         *     false: No caption file was specified, or an empty string was
         *         specified for the Youtube type player.
         */
-        fetchCaption: function () {
+        fetchCaption: function (fetchWithYoutubeId) {
             var self = this,
                 state = this.state,
                 language = state.getCurrentLanguage(),
@@ -295,8 +295,12 @@ function (Sjson, AsyncProcess) {
                 this.fetchXHR.abort();
             }
 
-            if (state.videoType === 'youtube') {
-                youtubeId = state.youtubeId('1.0');
+            if (state.videoType === 'youtube' || fetchWithYoutubeId) {
+                try {
+                    youtubeId = state.youtubeId('1.0');
+                } catch (err) {
+                    youtubeId = null;
+                }
 
                 if (!youtubeId) {
                     return false;
@@ -350,8 +354,14 @@ function (Sjson, AsyncProcess) {
                     );
                     // If initial list of languages has more than 1 item, check
                     // for availability other transcripts.
+                    // If player mode is html5 and there are no initial languages
+                    // then try to fetch youtube version of transcript with
+                    // youtubeId.
                     if (_.keys(state.config.transcriptLanguages).length > 1) {
                         self.fetchAvailableTranslations();
+                    } else if (!fetchWithYoutubeId && state.videoType === 'html5') {
+                        console.log('[Video info]: Html5 mode fetching caption with youtubeId.');
+                        self.fetchCaption(true);
                     } else {
                         self.hideCaptions(true, false);
                         self.hideSubtitlesEl.hide();

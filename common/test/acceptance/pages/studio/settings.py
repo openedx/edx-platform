@@ -4,11 +4,13 @@ Course Schedule and Details Settings page.
 """
 from __future__ import unicode_literals
 from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import requirejs
 
 from .course_page import CoursePage
 from .utils import press_the_notification_button
 
 
+@requirejs('js/factories/settings')
 class SettingsPage(CoursePage):
     """
     Course Schedule and Details Settings page.
@@ -21,6 +23,13 @@ class SettingsPage(CoursePage):
     ################
     def is_browser_on_page(self):
         return self.q(css='body.view-settings').present
+
+    def wait_for_require_js(self):
+        """
+        Wait for require-js to load javascript files.
+        """
+        if hasattr(self, 'wait_for_js'):
+            self.wait_for_js()  # pylint: disable=no-member
 
     def refresh_and_wait_for_load(self):
         """
@@ -122,6 +131,47 @@ class SettingsPage(CoursePage):
             raise Exception("Invalid license name: {name}".format(name=license_name))
         button.click()
 
+    pacing_css = 'section.pacing input[type=radio]'
+
+    @property
+    def checked_pacing_css(self):
+        """CSS for the course pacing button which is currently checked."""
+        return self.pacing_css + ':checked'
+
+    @property
+    def course_pacing(self):
+        """
+        Returns the label text corresponding to the checked pacing radio button.
+        """
+        self.wait_for_element_presence(self.checked_pacing_css, 'course pacing controls present and rendered')
+        checked = self.q(css=self.checked_pacing_css).results[0]
+        checked_id = checked.get_attribute('id')
+        return self.q(css='label[for={checked_id}]'.format(checked_id=checked_id)).results[0].text
+
+    @course_pacing.setter
+    def course_pacing(self, pacing):
+        """
+        Sets the course to either self-paced or instructor-paced by checking
+        the appropriate radio button.
+        """
+        self.wait_for_element_presence(self.checked_pacing_css, 'course pacing controls present')
+        self.q(xpath="//label[contains(text(), '{pacing}')]".format(pacing=pacing)).click()
+
+    @property
+    def course_pacing_disabled_text(self):
+        """
+        Return the message indicating that course pacing cannot be toggled.
+        """
+        return self.q(css='#course-pace-toggle-tip').results[0].text
+
+    def course_pacing_disabled(self):
+        """
+        Return True if the course pacing controls are disabled; False otherwise.
+        """
+        self.wait_for_element_presence(self.checked_pacing_css, 'course pacing controls present')
+        statuses = self.q(css=self.pacing_css).map(lambda e: e.get_attribute('disabled')).results
+        return all((s == 'true' for s in statuses))
+
     ################
     # Waits
     ################
@@ -182,4 +232,5 @@ class SettingsPage(CoursePage):
                 lambda: self.q(css='body.view-settings').present,
                 'Page is refreshed'
             ).fulfill()
+        self.wait_for_require_js()
         self.wait_for_ajax()

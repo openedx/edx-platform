@@ -309,6 +309,7 @@
         .signatory-credentials {
 
             .role, .organization {
+                white-space: pre-line;
                 display: block;
             }
         }
@@ -456,8 +457,7 @@
 }
 
 // certificate - base + honor
-.layout-accomplishment.certificate-honor,
-.layout-accomplishment.certificate-base {
+.layout-accomplishment.certificate-honor {
 
     .introduction {
         margin-bottom: 0;
@@ -482,8 +482,7 @@
 }
 
 // certificate - distinguished + verified
-.layout-accomplishment.certificate-verified,
-.layout-accomplishment.certificate-distinguished {
+.layout-accomplishment.certificate-verified {
 
     .introduction {
         margin-bottom: spacing-vertical(base);
@@ -494,7 +493,7 @@
     }
 
     .accomplishment-rendering {
-        background: palette(grayscale, white-t) url('../images/bg-distinguished.png') center no-repeat;
+        background: palette(grayscale, white-t) url('../images/bg-verified.png') center no-repeat;
         background-size: 65%;
 
         .deco-corner-tl {

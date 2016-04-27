@@ -1,24 +1,22 @@
 define([
     'backbone',
-    'teams/js/collections/team',
-    'teams/js/collections/team_membership',
+    'underscore',
     'teams/js/views/topic_teams',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers'
-], function (Backbone, TeamCollection, TeamMembershipCollection, TopicTeamsView, TeamSpecHelpers, AjaxHelpers) {
+    'common/js/spec_helpers/page_helpers'
+], function (Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function () {
         var createTopicTeamsView = function(options) {
+            options = options || {};
+            var myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
+                model: TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                teamMemberships: options.teamMemberships || TeamSpecHelpers.createMockTeamMemberships(),
+                myTeamsCollection: myTeamsCollection,
                 showActions: true,
-                teamParams: {
-                    topicID: 'test-topic',
-                    countries: TeamSpecHelpers.testCountries,
-                    languages: TeamSpecHelpers.testLanguages
-                }
+                context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
 
@@ -27,8 +25,8 @@ define([
                 options = {showActions: true};
             }
             var expectedTitle = 'Are you having trouble finding a team to join?',
-                expectedMessage = 'Try browsing all teams or searching team descriptions. If you ' +
-                    'still can\'t find a team to join, create a new team in this topic.',
+                expectedMessage = 'Browse teams in other topics or search teams in this topic. ' +
+                    'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
             if (options.showActions) {
@@ -42,13 +40,15 @@ define([
 
         beforeEach(function () {
             setFixtures('<div class="teams-container"></div>');
+            PageHelpers.preventBackboneChangingUrl();
         });
 
         it('can render itself', function () {
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams(testTeamData),
-                    teamMemberships: TeamSpecHelpers.createMockTeamMemberships([])
+                    teams: TeamSpecHelpers.createMockTeams({
+                        results: testTeamData
+                    })
                 });
 
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
@@ -62,50 +62,40 @@ define([
         });
 
         it('can browse all teams', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
+            var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
-            teamsView.$('a.browse-teams').click();
+            teamsView.$('.browse-teams').click();
             expect(Backbone.history.navigate.calls[0].args).toContain('browse');
         });
 
-        it('can search teams', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
-            spyOn(Backbone.history, 'navigate');
-            teamsView.$('a.search-teams').click();
-            // TODO! Should be updated once team description search feature is available
-            expect(Backbone.history.navigate.calls[0].args).toContain('browse');
+        it('gives the search field focus when clicking on the search teams link', function () {
+            var teamsView = createTopicTeamsView();
+            spyOn($.fn, 'focus').andCallThrough();
+            teamsView.$('.search-teams').click();
+            expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
         });
 
         it('can show the create team modal', function () {
-            var emptyMembership = TeamSpecHelpers.createMockTeamMemberships([]),
-                teamsView = createTopicTeamsView({ teamMemberships: emptyMembership });
+            var teamsView = createTopicTeamsView();
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
-            expect(Backbone.history.navigate.calls[0].args).toContain('topics/test-topic/create-team');
+            expect(Backbone.history.navigate.calls[0].args).toContain(
+                'topics/' + TeamSpecHelpers.testTopicID + '/create-team'
+            );
         });
 
         it('does not show actions for a user already in a team', function () {
-            var teamsView = createTopicTeamsView({});
+            var teamsView = createTopicTeamsView({myTeamsCollection: TeamSpecHelpers.createMockTeams()});
             verifyActions(teamsView, {showActions: false});
         });
 
         it('shows actions for a privileged user already in a team', function () {
-            var staffMembership = TeamSpecHelpers.createMockTeamMemberships(
-                    TeamSpecHelpers.createMockTeamMembershipsData(1, 5),
-                    { privileged: true }
-                ),
-                teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
+            var teamsView = createTopicTeamsView({ privileged: true });
             verifyActions(teamsView);
         });
 
         it('shows actions for a staff user already in a team', function () {
-            var staffMembership = TeamSpecHelpers.createMockTeamMemberships(
-                    TeamSpecHelpers.createMockTeamMembershipsData(1, 5),
-                    { privileged: false, staff: true }
-                ),
-                teamsView = createTopicTeamsView({ teamMemberships: staffMembership });
+            var teamsView = createTopicTeamsView({ privileged: false, staff: true });
             verifyActions(teamsView);
         });
 
@@ -118,13 +108,13 @@ define([
             verifyActions(teamsView, {showActions: true});
             teamMemberships.teamEvents.trigger('teams:update', { action: 'create' });
             teamsView.render();
-            AjaxHelpers.expectJsonRequestURL(
+            AjaxHelpers.expectRequestURL(
                 requests,
                 'foo',
                 {
                     expand : 'team',
                     username : 'testUser',
-                    course_id : 'my/course/id',
+                    course_id : TeamSpecHelpers.testCourseID,
                     page : '1',
                     page_size : '10'
                 }

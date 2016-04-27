@@ -98,7 +98,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "common/j
         };
 
         verifyXBlockRequest = function (requests, expectedJson) {
-            var request = requests[requests.length - 1],
+            var request = AjaxHelpers.currentRequest(requests),
                 actualJson = JSON.parse(request.requestBody);
             expect(request.url).toEqual("/xblock/");
             expect(request.method).toEqual("POST");

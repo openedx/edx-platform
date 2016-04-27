@@ -9,10 +9,14 @@
         var PagingHeader = Backbone.View.extend({
             initialize: function (options) {
                 this.srInfo = options.srInfo;
-                this.collections = options.collection;
+                this.showSortControls = options.showSortControls;
                 this.collection.bind('add', _.bind(this.render, this));
                 this.collection.bind('remove', _.bind(this.render, this));
                 this.collection.bind('reset', _.bind(this.render, this));
+            },
+
+            events: {
+                'change #paging-header-select': 'sortCollection'
             },
 
             render: function () {
@@ -31,9 +35,24 @@
                 }
                 this.$el.html(_.template(headerTemplate, {
                     message: message,
-                    srInfo: this.srInfo
+                    srInfo: this.srInfo,
+                    sortableFields: this.collection.sortableFields,
+                    sortOrder: this.sortOrder,
+                    showSortControls: this.showSortControls
                 }));
                 return this;
+            },
+
+            /**
+             * Updates the collection's sort order, and fetches an updated set of
+             * results.
+             * @returns {*} A promise for the collection being updated
+             */
+            sortCollection: function () {
+                var selected = this.$('#paging-header-select option:selected');
+                this.sortOrder = selected.attr('value');
+                this.collection.setSortField(this.sortOrder);
+                return this.collection.refresh();
             }
         });
         return PagingHeader;

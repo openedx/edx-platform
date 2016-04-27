@@ -1,6 +1,6 @@
 define [
     "jquery", "backbone", "xblock/runtime.v1", "URI", "gettext",
-    "js/utils/modal", "js/views/feedback_notification"
+    "js/utils/modal", "common/js/components/views/feedback_notification"
 ], ($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) ->
 
     @BaseRuntime = {}

@@ -7,7 +7,7 @@ from django.dispatch import receiver
 
 from xmodule.modulestore.django import SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
-from contentstore.proctoring import register_proctored_exams
+from contentstore.proctoring import register_special_exams
 from openedx.core.djangoapps.credit.signals import on_course_publish
 
 
@@ -21,7 +21,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # first is to registered exams, the credit subsystem will assume that
     # all proctored exams have already been registered, so we have to do that first
-    register_proctored_exams(course_key)
+    register_special_exams(course_key)
 
     # then call into the credit subsystem (in /openedx/djangoapps/credit)
     # to perform any 'on_publish' workflow

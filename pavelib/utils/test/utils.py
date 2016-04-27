@@ -18,7 +18,10 @@ def clean_test_files():
     Clean fixture files used by tests and .pyc files
     """
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
-    sh("find . -type f -name \"*.pyc\" -not -path './.git/*' -delete")
+    # This find command removes all the *.pyc files that aren't in the .git
+    # directory.  See this blog post for more details:
+    # http://nedbatchelder.com/blog/201505/be_careful_deleting_files_around_git.html
+    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")
     sh("rm -rf test_root/log/auto_screenshots/*")
     sh("rm -rf /tmp/mako_[cl]ms")
 
@@ -41,7 +44,7 @@ def clean_reports_dir(options):
     Clean coverage files, to ensure that we don't use stale data to generate reports.
     """
     if getattr(options, 'skip_clean', False):
-        print('--skip_clean is set, skipping...')
+        print '--skip_clean is set, skipping...'
         return
 
     # We delete the files but preserve the directory structure
@@ -68,16 +71,23 @@ def check_firefox_version():
     """
     expected_firefox_ver = "Mozilla Firefox 28.0"
     firefox_ver = subprocess.check_output("firefox --version", shell=True).strip()
+    debian_location = 'https://s3.amazonaws.com/vagrant.testeng.edx.org/'
+    debian_package = 'firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb'
+    debian_path = '{location}{package}'.format(location=debian_location, package=debian_package)
 
     if firefox_ver != expected_firefox_ver:
         raise Exception(
             'Required firefox version not found.\n'
             'Expected: {expected_version}; Actual: {actual_version}.\n\n'
             'As the vagrant user in devstack, run the following:\n\n'
-            '\t$ sudo wget -O /tmp/firefox_28.deb https://s3.amazonaws.com/vagrant.testeng.edx.org/firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb\n'
+            '\t$ sudo wget -O /tmp/firefox_28.deb {debian_path}\n'
             '\t$ sudo apt-get remove firefox\n\n'
             '\t$ sudo gdebi -nq /tmp/firefox_28.deb\n\n'
             'Confirm the new version:\n'
             '\t$ firefox --version\n'
-            '\t{expected_version}'.format(actual_version=firefox_ver, expected_version=expected_firefox_ver)
+            '\t{expected_version}'.format(
+                actual_version=firefox_ver,
+                expected_version=expected_firefox_ver,
+                debian_path=debian_path
+            )
         )

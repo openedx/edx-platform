@@ -46,7 +46,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
 
-    def test_index_dictionary(self):
+    def test_index_dictionary_simple_html_module(self):
         sample_xml = '''
             <html>
                 <p>Hello World!</p>
@@ -58,6 +58,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_cdata_html_module(self):
         sample_xml_cdata = '''
             <html>
                 <p>This has CDATA in it.</p>
@@ -70,6 +71,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_multiple_spaces_html_module(self):
         sample_xml_tab_spaces = '''
             <html>
                 <p>     Text has spaces :)  </p>
@@ -81,6 +83,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_html_module_with_comment(self):
         sample_xml_comment = '''
             <html>
                 <p>This has HTML comment in it.</p>
@@ -93,6 +96,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_html_module_with_both_comments_and_cdata(self):
         sample_xml_mix_comment_cdata = '''
             <html>
                 <!-- Beginning of the html -->
@@ -103,6 +107,26 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_mix_comment_cdata)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
+            "content_type": "Text"
+        })
+
+    def test_index_dictionary_html_module_with_script_and_style_tags(self):
+        sample_xml_style_script_tags = '''
+            <html>
+                <style>p {color: green;}</style>
+                <!-- Beginning of the html -->
+                <p>This has HTML comment in it.<!-- Commenting Content --></p>
+                <!-- Here comes CDATA -->
+                <![CDATA[This is just a CDATA!]]>
+                <p>HTML end.</p>
+                <script>
+                    var message = "Hello world!"
+                </script>
+            </html>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml_style_script_tags)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
             "content_type": "Text"

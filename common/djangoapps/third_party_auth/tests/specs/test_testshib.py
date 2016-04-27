@@ -1,14 +1,19 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+
+import json
+import unittest
 import httpretty
 from mock import patch
+
+from django.core.urlresolvers import reverse
+
 from student.tests.factories import UserFactory
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
-import unittest
+from openedx.core.lib.js_utils import escape_json_dumps
+
 
 TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
 TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.xml'
@@ -38,7 +43,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
 
         def metadata_callback(_request, _uri, headers):
             """ Return a cached copy of TestShib's metadata by reading it from disk """
-            return (200, headers, self._read_data_file('testshib_metadata.xml'))
+            return (200, headers, self.read_data_file('testshib_metadata.xml'))
         httpretty.register_uri(httpretty.GET, TESTSHIB_METADATA_URL, content_type='text/xml', body=metadata_callback)
         self.addCleanup(httpretty.disable)
         self.addCleanup(httpretty.reset)
@@ -82,11 +87,11 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         # We'd now like to see if the "You've successfully signed into TestShib" message is
         # shown, but it's managed by a JavaScript runtime template, and we can't run JS in this
         # type of test, so we just check for the variable that triggers that message.
-        self.assertIn('&#34;currentProvider&#34;: &#34;TestShib&#34;', register_response.content)
-        self.assertIn('&#34;errorMessage&#34;: null', register_response.content)
+        self.assertIn('"currentProvider": "TestShib"', register_response.content)
+        self.assertIn('"errorMessage": null', register_response.content)
         # Now do a crude check that the data (e.g. email) from the provider is displayed in the form:
-        self.assertIn('&#34;defaultValue&#34;: &#34;myself@testshib.org&#34;', register_response.content)
-        self.assertIn('&#34;defaultValue&#34;: &#34;Me Myself And I&#34;', register_response.content)
+        self.assertIn('"defaultValue": "myself@testshib.org"', register_response.content)
+        self.assertIn('"defaultValue": "Me Myself And I"', register_response.content)
         # Now complete the form:
         ajax_register_response = self.client.post(
             reverse('user_api_registration'),
@@ -106,7 +111,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
 
         # Now check that we can login again:
         self.client.logout()
-        self._verify_user_email('myself@testshib.org')
+        self.verify_user_email('myself@testshib.org')
         self._test_return_login()
 
     def test_login(self):
@@ -129,8 +134,8 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         # We'd now like to see if the "You've successfully signed into TestShib" message is
         # shown, but it's managed by a JavaScript runtime template, and we can't run JS in this
         # type of test, so we just check for the variable that triggers that message.
-        self.assertIn('&#34;currentProvider&#34;: &#34;TestShib&#34;', login_response.content)
-        self.assertIn('&#34;errorMessage&#34;: null', login_response.content)
+        self.assertIn('"currentProvider": "TestShib"', login_response.content)
+        self.assertIn('"errorMessage": null', login_response.content)
         # Now the user enters their username and password.
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
@@ -184,7 +189,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         response = self.client.get(self.login_page_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("TestShib", response.content)
-        self.assertIn(TPA_TESTSHIB_LOGIN_URL.replace('&', '&amp;'), response.content)
+        self.assertIn(escape_json_dumps(TPA_TESTSHIB_LOGIN_URL), response.content)
         return response
 
     def _check_register_page(self):
@@ -192,7 +197,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         response = self.client.get(self.register_page_url)
         self.assertEqual(response.status_code, 200)
         self.assertIn("TestShib", response.content)
-        self.assertIn(TPA_TESTSHIB_REGISTER_URL.replace('&', '&amp;'), response.content)
+        self.assertIn(escape_json_dumps(TPA_TESTSHIB_REGISTER_URL), response.content)
         return response
 
     def _configure_testshib_provider(self, **kwargs):
@@ -220,11 +225,5 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         return self.client.post(
             TPA_TESTSHIB_COMPLETE_URL,
             content_type='application/x-www-form-urlencoded',
-            data=self._read_data_file('testshib_response.txt'),
+            data=self.read_data_file('testshib_response.txt'),
         )
-
-    def _verify_user_email(self, email):
-        """ Mark the user with the given email as verified """
-        user = User.objects.get(email=email)
-        user.is_active = True
-        user.save()

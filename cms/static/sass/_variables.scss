@@ -1,7 +1,8 @@
 // studio - utilities - variables
 // ====================
 
-// Table of Contents 
+// Table of Contents
+// * +Paths
 // * +Grid
 // * +Fonts
 // * +Colors - Utility
@@ -15,8 +16,12 @@
 
 $baseline: 20px;
 
+// +Paths
+// ====================
+$static-path: '..' !default;
+
 // +Grid
-// ==================== 
+// ====================
 $gw-column: ($baseline*3);
 $gw-gutter: $baseline;
 $fg-column: $gw-column;
@@ -26,16 +31,16 @@ $fg-max-width: 1280px;
 $fg-min-width: 900px;
 
 // +Fonts
-// ==================== 
+// ====================
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // +Colors - Utility
-// ==================== 
+// ====================
 $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 
 // +Colors - Primary
-// ==================== 
+// ====================
 $black: rgb(0,0,0);
 $black-t0: rgba($black, 0.125);
 $black-t1: rgba($black, 0.25);
@@ -168,7 +173,7 @@ $orange-u2: desaturate($orange,30%);
 $orange-u3: desaturate($orange,45%);
 
 // +Colors - Shadows
-// ==================== 
+// ====================
 $shadow: rgba($black, 0.2);
 $shadow-l1: rgba($black, 0.1);
 $shadow-l2: rgba($black, 0.05);
@@ -176,7 +181,7 @@ $shadow-d1: rgba($black, 0.4);
 $shadow-d2: rgba($black, 0.6);
 
 // +Colors - Application
-// ==================== 
+// ====================
 $color-draft: $gray-l3;
 $color-live: $blue;
 $color-ready: $green;
@@ -190,7 +195,7 @@ $color-copy-base: $gray-l1;
 $color-copy-emphasized: $gray-d2;
 
 // +Timing
-// ==================== 
+// ====================
 // used for animation/transition mixin syncing
 $tmg-s3: 3.0s;
 $tmg-s2: 2.0s;
@@ -201,7 +206,7 @@ $tmg-f2: 0.25s;
 $tmg-f3: 0.125s;
 
 // +Archetype UI
-// ==================== 
+// ====================
 $ui-action-primary-color: $blue-u2;
 $ui-action-primary-color-focus: $blue-s1;
 
@@ -209,12 +214,12 @@ $ui-link-color: $blue-u2;
 $ui-link-color-focus: $blue-s1;
 
 // +Specific UI
-// ==================== 
+// ====================
 $ui-notification-height: ($baseline*10);
 $ui-update-color: $blue-l4;
 
-// +Deprecated 
-// ==================== 
+// +Deprecated
+// ====================
 // do not use, future clean up will use updated styles
 $baseFontColor: $gray-d2;
 $lighter-base-font-color: rgb(100,100,100);

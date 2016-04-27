@@ -15,12 +15,13 @@ from courseware.module_render import get_module_for_descriptor
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (
+    get_edxnotes_id_token,
     get_notes,
-    get_id_token,
     is_feature_enabled,
     search,
     get_course_position,
 )
+
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +95,7 @@ def get_token(request, course_id):
     """
     Get JWT ID-Token, in case you need new one.
     """
-    return HttpResponse(get_id_token(request.user), content_type='text/plain')
+    return HttpResponse(get_edxnotes_id_token(request.user), content_type='text/plain')
 
 
 @login_required

@@ -5,6 +5,7 @@ Unittests for deleting a course in an chosen modulestore
 import unittest
 import mock
 
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core.management import CommandError
 from contentstore.management.commands.delete_course import Command  # pylint: disable=import-error
 from contentstore.tests.utils import CourseTestCase  # pylint: disable=import-error
@@ -94,27 +95,23 @@ class DeleteCourseTest(CourseTestCase):
             run=course_run
         )
 
-    def test_courses_keys_listing(self):
-        """
-        Test if the command lists out available course key courses
-        """
-        courses = [str(key) for key in modulestore().get_courses_keys()]
-        self.assertIn("TestX/TS01/2015_Q1", courses)
-
     def test_course_key_not_found(self):
         """
         Test for when a non-existing course key is entered
         """
         errstring = "Course with 'TestX/TS01/2015_Q7' key not found."
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("TestX/TS01/2015_Q7", "commit")
+            self.command.handle('TestX/TS01/2015_Q7', "commit")
 
     def test_course_deleted(self):
         """
         Testing if the entered course was deleted
         """
+
+        #Test if the course that is about to be deleted exists
+        self.assertIsNotNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))
+
         with mock.patch(self.YESNO_PATCH_LOCATION) as patched_yes_no:
             patched_yes_no.return_value = True
-            self.command.handle("TestX/TS01/2015_Q1", "commit")
-            courses = [unicode(key) for key in modulestore().get_courses_keys()]
-            self.assertNotIn("TestX/TS01/2015_Q1", courses)
+            self.command.handle('TestX/TS01/2015_Q1', "commit")
+            self.assertIsNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))

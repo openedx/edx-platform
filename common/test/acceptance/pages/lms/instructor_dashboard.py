@@ -66,14 +66,14 @@ class InstructorDashboardPage(CoursePage):
         certificates_section.wait_for_page()
         return certificates_section
 
-    def select_proctoring(self):
+    def select_special_exams(self):
         """
-        Selects the proctoring tab and returns the ProctoringSection
+        Selects the timed exam tab and returns the Special Exams Section
         """
-        self.q(css='a[data-section=proctoring]').first.click()
-        proctoring_section = ProctoringPage(self.browser)
-        proctoring_section.wait_for_ajax()
-        return proctoring_section
+        self.q(css='a[data-section=special_exams]').first.click()
+        timed_exam_section = SpecialExamsPage(self.browser)
+        timed_exam_section.wait_for_page()
+        return timed_exam_section
 
     @staticmethod
     def get_asset_path(file_name):
@@ -114,20 +114,20 @@ class MembershipPage(PageObject):
         return MembershipPageAutoEnrollSection(self.browser)
 
 
-class ProctoringPage(PageObject):
+class SpecialExamsPage(PageObject):
     """
-    Proctoring section of the Instructor dashboard.
+    Timed exam section of the Instructor dashboard.
     """
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=proctoring].active-section').present
+        return self.q(css='a[data-section=special_exams].active-section').present
 
     def select_allowance_section(self):
         """
         Expand the allowance section
         """
-        allowance_section = ProctoringPageAllowanceSection(self.browser)
+        allowance_section = SpecialExamsPageAllowanceSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]",
@@ -139,7 +139,7 @@ class ProctoringPage(PageObject):
         """
         Expand the Student Attempts Section
         """
-        exam_attempts_section = ProctoringPageAttemptsSection(self.browser)
+        exam_attempts_section = SpecialExamsPageAttemptsSection(self.browser)
         if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present:
             self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1").click()
             self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]",
@@ -548,6 +548,7 @@ class CohortManagementSection(PageObject):
         """
         if state != self.is_cohorted:
             self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+            self.wait_for_ajax()
 
     def toggles_showing_of_discussion_topics(self):
         """
@@ -750,9 +751,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.click_upload_file_button()
 
 
-class ProctoringPageAllowanceSection(PageObject):
+class SpecialExamsPageAllowanceSection(PageObject):
     """
-    Allowance section of the Instructor dashboard's Proctoring tab.
+    Allowance section of the Instructor dashboard's Special Exams tab.
     """
     url = None
 
@@ -767,14 +768,15 @@ class ProctoringPageAllowanceSection(PageObject):
         return self.q(css="a#add-allowance").present
 
 
-class ProctoringPageAttemptsSection(PageObject):
+class SpecialExamsPageAttemptsSection(PageObject):
     """
-    Exam Attempts section of the Instructor dashboard's Proctoring tab.
+    Exam Attempts section of the Instructor dashboard's Special Exams tab.
     """
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present
+        return self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present and\
+            self.q(css="#search_attempt_id").present
 
     @property
     def is_search_text_field_visible(self):
@@ -994,6 +996,23 @@ class CertificatesPage(PageObject):
     url = None
     PAGE_SELECTOR = 'section#certificates'
 
+    def wait_for_certificate_exceptions_section(self):
+        """
+        Wait for Certificate Exceptions to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate_exception-container',
+            'Certificate Exception Section is visible'
+        )
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+    def refresh(self):
+        """
+        Refresh Certificates Page and wait for the page to load completely.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
     def is_browser_on_page(self):
         return self.q(css='a[data-section=certificates].active-section').present
 
@@ -1002,6 +1021,33 @@ class CertificatesPage(PageObject):
         Makes query selector by pre-pending certificates section
         """
         return self.q(css=' '.join([self.PAGE_SELECTOR, css_selector]))
+
+    def add_certificate_exception(self, student, free_text_note):
+        """
+        Add Certificate Exception for 'student'.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+        self.get_selector('#certificate-exception').fill(student)
+        self.get_selector('#notes').fill(free_text_note)
+        self.get_selector('#add-exception').click()
+
+        self.wait_for(
+            lambda: student in self.get_selector('div.white-listed-students table tr:last-child td').text,
+            description='Certificate Exception added to list'
+        )
+
+    def click_generate_certificate_exceptions_button(self):  # pylint: disable=invalid-name
+        """
+        Click 'Generate Exception Certificates' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#generate-exception-certificates').click()
+
+    def click_add_exception_button(self):
+        """
+        Click 'Add Exception' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#add-exception').click()
 
     @property
     def generate_certificates_button(self):
@@ -1023,3 +1069,24 @@ class CertificatesPage(PageObject):
         Returns the "Pending Instructor Tasks" section.
         """
         return self.get_selector('div.running-tasks-container')
+
+    @property
+    def certificate_exceptions_section(self):
+        """
+        Returns the "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.certificate_exception-container')
+
+    @property
+    def last_certificate_exception(self):
+        """
+        Returns the Last Certificate Exception in Certificate Exceptions list in "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.white-listed-students table tr:last-child td')
+
+    @property
+    def message(self):
+        """
+        Returns the Message (error/success) in "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.message')

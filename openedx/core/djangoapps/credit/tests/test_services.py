@@ -66,7 +66,9 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.credit_course.enabled = False
         self.credit_course.save()
 
-        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertIsNotNone(credit_state)
+        self.assertFalse(credit_state['is_credit_course'])
 
     @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False), 'This is contrived and does not work for CME')
     def test_no_profile_name(self):
@@ -85,6 +87,8 @@ class CreditServiceTests(ModuleStoreTestCase):
         """
         Happy path through the service
         """
+
+        self.assertTrue(self.service.is_credit_course(self.course.id))
 
         CourseEnrollment.enroll(self.user, self.course.id)
 
@@ -114,11 +118,165 @@ class CreditServiceTests(ModuleStoreTestCase):
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
 
         self.assertIsNotNone(credit_state)
+        self.assertTrue(credit_state['is_credit_course'])
         self.assertEqual(credit_state['enrollment_mode'], 'honor')
         self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
         self.assertEqual(len(credit_state['credit_requirement_status']), 1)
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
         self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
+
+    def test_remove_credit_requirement_status(self):
+        """
+        Happy path when deleting the requirement status.
+        """
+        self.assertTrue(self.service.is_credit_course(self.course.id))
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        # set course requirements
+        set_credit_requirements(
+            self.course.id,
+            [
+                {
+                    "namespace": "grade",
+                    "name": "grade",
+                    "display_name": "Grade",
+                    "criteria": {
+                        "min_grade": 0.8
+                    },
+                },
+            ]
+        )
+
+        # mark the grade as satisfied
+        self.service.set_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+
+        # now the status should be "satisfied" when looking at the credit_requirement_status list
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], "satisfied")
+
+        # remove the requirement status.
+        self.service.remove_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+
+        # now the status should be None when looking at the credit_requirement_status list
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], None)
+
+    def test_invalid_user(self):
+        """
+        Try removing requirement status with a invalid user_id
+        """
+
+        # set course requirements
+        set_credit_requirements(
+            self.course.id,
+            [
+                {
+                    "namespace": "grade",
+                    "name": "grade",
+                    "display_name": "Grade",
+                    "criteria": {
+                        "min_grade": 0.8
+                    },
+                },
+            ]
+        )
+
+        # mark the grade as satisfied
+        retval = self.service.set_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+        self.assertIsNone(retval)
+
+        # remove the requirement status with the invalid user id
+        retval = self.service.remove_credit_requirement_status(
+            0,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+        self.assertIsNone(retval)
+
+    def test_remove_status_non_credit(self):
+        """
+        assert that we can still try to update a credit status but return quickly if
+        a course is not credit eligible
+        """
+
+        no_credit_course = CourseFactory.create(org='NoCredit', number='NoCredit', display_name='Demo_Course')
+
+        self.assertFalse(self.service.is_credit_course(no_credit_course.id))
+
+        CourseEnrollment.enroll(self.user, no_credit_course.id)
+
+        # this should be a no-op
+        self.service.remove_credit_requirement_status(
+            self.user.id,
+            no_credit_course.id,
+            'grade',
+            'grade'
+        )
+
+        credit_state = self.service.get_credit_state(self.user.id, no_credit_course.id)
+
+        self.assertIsNotNone(credit_state)
+        self.assertFalse(credit_state['is_credit_course'])
+        self.assertEqual(len(credit_state['credit_requirement_status']), 0)
+
+    def test_course_name(self):
+        """
+        Make sure we can get back the optional course name
+        """
+
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        # make sure it is not returned by default
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertNotIn('course_name', credit_state)
+
+        # now make sure it is in there when we pass in the flag
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_name=True)
+        self.assertIn('course_name', credit_state)
+        self.assertEqual(credit_state['course_name'], self.course.display_name)
+
+    def test_set_status_non_credit(self):
+        """
+        assert that we can still try to update a credit status but return quickly if
+        a course is not credit eligible
+        """
+
+        no_credit_course = CourseFactory.create(org='NoCredit', number='NoCredit', display_name='Demo_Course')
+
+        self.assertFalse(self.service.is_credit_course(no_credit_course.id))
+
+        CourseEnrollment.enroll(self.user, no_credit_course.id)
+
+        # this should be a no-op
+        self.service.set_credit_requirement_status(
+            self.user.id,
+            no_credit_course.id,
+            'grade',
+            'grade'
+        )
+
+        credit_state = self.service.get_credit_state(self.user.id, no_credit_course.id)
+
+        self.assertIsNotNone(credit_state)
+        self.assertFalse(credit_state['is_credit_course'])
+        self.assertEqual(len(credit_state['credit_requirement_status']), 0)
 
     def test_bad_user(self):
         """

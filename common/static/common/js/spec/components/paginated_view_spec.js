@@ -109,9 +109,8 @@ define([
             expectHeader('Showing 1-5 out of 6 total');
             expectItems(initialItems);
             expectFooter({currentPage: 1, totalPages: 2, isHidden: false});
-            expect(requests.length).toBe(0);
+            AjaxHelpers.expectNoRequests(requests);
             testView.$(nextPageButtonCss).click();
-            expect(requests.length).toBe(1);
             AjaxHelpers.respondWithJson(requests, {
                 "count": 6,
                 "num_pages": 2,

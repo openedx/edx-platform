@@ -5,7 +5,7 @@ to the archive format used by a different version of export.
 Sample invocation: ./manage.py export_convert_format mycourse.tar.gz ~/newformat/
 """
 import os
-from path import path
+from path import Path as path
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 finally:
                     tar_file.close()
 
-            print("Created archive {0}".format(archive_name))
+            print "Created archive {0}".format(archive_name)
 
         except ValueError as err:
             raise CommandError(err)

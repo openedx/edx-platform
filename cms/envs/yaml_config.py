@@ -21,7 +21,7 @@ from openedx.core.lib.logsettings import get_logger_config
 from util.config_parse import convert_tokens
 import os
 
-from path import path
+from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects
@@ -120,7 +120,7 @@ ADDL_INSTALLED_APPS = []
 AUTH_USE_CAS = False
 CAS_ATTRIBUTE_CALLBACK = None
 MICROSITE_ROOT_DIR = ''
-SEGMENT_IO = False
+CMS_SEGMENT_KEY = None
 DATADOG = {}
 ADDL_INSTALLED_APPS = []
 LOCAL_LOGLEVEL = 'INFO'
@@ -145,7 +145,7 @@ ENV_TOKENS = convert_tokens(ENV_TOKENS)
 # into settings some dictionary settings
 # need to be merged from common.py
 
-ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
@@ -234,9 +234,6 @@ vars().update(AUTH_TOKENS)
 ##########################################
 # Manipulate imported settings with code
 #
-
-if SEGMENT_IO_KEY:
-    FEATURES['SEGMENT_IO'] = SEGMENT_IO
 
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None

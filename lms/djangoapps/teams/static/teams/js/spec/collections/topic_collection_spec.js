@@ -1,58 +1,21 @@
-define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'teams/js/collections/topic'],
-    function (Backbone, URI, _, AjaxHelpers, TopicCollection) {
+define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+        'teams/js/spec_helpers/team_spec_helpers'],
+    function (Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
         'use strict';
         describe('TopicCollection', function () {
             var topicCollection;
             beforeEach(function () {
-                topicCollection = new TopicCollection(
-                    {
-                        "count": 6,
-                        "num_pages": 2,
-                        "current_page": 1,
-                        "start": 0,
-                        "results": [
-                            {
-                                "description": "asdf description",
-                                "name": "asdf",
-                                "id": "_asdf"
-                            },
-                            {
-                                "description": "bar description",
-                                "name": "bar",
-                                "id": "_bar"
-                            },
-                            {
-                                "description": "baz description",
-                                "name": "baz",
-                                "id": "_baz"
-                            },
-                            {
-                                "description": "foo description",
-                                "name": "foo",
-                                "id": "_foo"
-                            },
-                            {
-                                "description": "qwerty description",
-                                "name": "qwerty",
-                                "id": "_qwerty"
-                            }
-                        ],
-                        "sort_order": "name"
-                    },
-                    {
-                        teamEvents:_.clone(Backbone.Events),
-                        course_id: 'my/course/id',
-                        parse: true
-                    });
+                topicCollection = TeamSpecHelpers.createMockTopicCollection();
             });
 
             var testRequestParam = function (self, param, value) {
                 var requests = AjaxHelpers.requests(self),
+                    request,
                     url,
                     params;
                 topicCollection.fetch();
-                expect(requests.length).toBe(1);
-                url = new URI(requests[0].url);
+                request = AjaxHelpers.currentRequest(requests);
+                url = new URI(request.url);
                 params = url.query(true);
                 expect(params[param]).toBe(value);
             };
@@ -66,12 +29,21 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers', 
             });
 
             it('passes a course_id to the server', function () {
-                testRequestParam(this, 'course_id', 'my/course/id');
+                testRequestParam(this, 'course_id', TeamSpecHelpers.testCourseID);
             });
 
             it('URL encodes its course_id ', function () {
                 topicCollection.course_id = 'my+course+id';
                 testRequestParam(this, 'course_id', 'my+course+id');
+            });
+
+            it('sets itself to stale on receiving a teams create or delete event', function () {
+                expect(topicCollection.isStale).toBe(false);
+                TeamSpecHelpers.triggerTeamEvent('create');
+                expect(topicCollection.isStale).toBe(true);
+                topicCollection.isStale = false;
+                TeamSpecHelpers.triggerTeamEvent('delete');
+                expect(topicCollection.isStale).toBe(true);
             });
         });
     });

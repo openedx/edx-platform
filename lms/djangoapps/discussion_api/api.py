@@ -8,13 +8,14 @@ from urlparse import urlunparse
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
+import itertools
 
 from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-
 from courseware.courses import get_course_with_access
+
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.pagination import get_paginated_data
 from discussion_api.permissions import (
@@ -31,6 +32,16 @@ from django_comment_client.base.views import (
     get_thread_created_event_data,
     track_forum_event,
 )
+from django_comment_common.signals import (
+    thread_created,
+    thread_edited,
+    thread_deleted,
+    thread_voted,
+    comment_created,
+    comment_edited,
+    comment_voted,
+    comment_deleted,
+)
 from django_comment_client.utils import get_accessible_discussion_modules, is_commentable_cohorted
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
@@ -45,7 +56,7 @@ def _get_course_or_404(course_key, user):
     disabled for the course.
     """
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
-    if not any([tab.type == 'discussion' for tab in course.tabs]):
+    if not any([tab.type == 'discussion' and tab.is_enabled(course, user) for tab in course.tabs]):
         raise Http404
     return course
 
@@ -281,7 +292,7 @@ def get_thread_list(
     if exclusive_param_count > 1:  # pragma: no cover
         raise ValueError("More than one mutually exclusive param passed to get_thread_list")
 
-    cc_map = {"last_activity_at": "date", "comment_count": "comments", "vote_count": "votes"}
+    cc_map = {"last_activity_at": "activity", "comment_count": "comments", "vote_count": "votes"}
     if order_by not in cc_map:
         raise ValidationError({
             "order_by":
@@ -368,7 +379,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, mark_as_read
         request,
         thread_id,
         retrieve_kwargs={
-            "recursive": True,
+            "recursive": False,
             "user_id": request.user.id,
             "mark_as_read": mark_as_read,
             "response_skip": response_skip,
@@ -501,10 +512,14 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                     cc_content.unFlagAbuse(context["cc_requester"], cc_content, removeAll=False)
             else:
                 assert field == "voted"
+                signal = thread_voted if cc_content.type == 'thread' else comment_voted
+                signal.send(sender=None, user=context["request"].user, post=cc_content)
                 if form_value:
                     context["cc_requester"].vote(cc_content, "up")
+                    api_content["vote_count"] += 1
                 else:
                     context["cc_requester"].unvote(cc_content)
+                    api_content["vote_count"] -= 1
 
 
 def create_thread(request, thread_data):
@@ -524,11 +539,12 @@ def create_thread(request, thread_data):
         detail.
     """
     course_id = thread_data.get("course_id")
+    user = request.user
     if not course_id:
         raise ValidationError({"course_id": ["This field is required."]})
     try:
         course_key = CourseKey.from_string(course_id)
-        course = _get_course_or_404(course_key, request.user)
+        course = _get_course_or_404(course_key, user)
     except (Http404, InvalidKeyError):
         raise ValidationError({"course_id": ["Invalid value."]})
 
@@ -539,14 +555,14 @@ def create_thread(request, thread_data):
             is_commentable_cohorted(course_key, thread_data.get("topic_id"))
     ):
         thread_data = thread_data.copy()
-        thread_data["group_id"] = get_cohort_id(request.user, course_key)
+        thread_data["group_id"] = get_cohort_id(user, course_key)
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     serializer.save()
-
-    cc_thread = serializer.object
+    cc_thread = serializer.instance
+    thread_created.send(sender=None, user=user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context)
 
@@ -591,8 +607,8 @@ def create_comment(request, comment_data):
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
     serializer.save()
-
-    cc_comment = serializer.object
+    cc_comment = serializer.instance
+    comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context)
 
@@ -634,6 +650,8 @@ def update_thread(request, thread_id, update_data):
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
+        # signal to update Teams when a user edits a thread
+        thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context)
     return api_thread
@@ -677,9 +695,77 @@ def update_comment(request, comment_id, update_data):
     # Only save comment object if some of the edited fields are in the comment data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
+        comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context)
     return api_comment
+
+
+def get_thread(request, thread_id):
+    """
+    Retrieve a thread.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        thread_id: The id for the thread to retrieve
+
+    """
+    cc_thread, context = _get_thread_and_context(request, thread_id)
+    serializer = ThreadSerializer(cc_thread, context=context)
+    return serializer.data
+
+
+def get_response_comments(request, comment_id, page, page_size):
+    """
+    Return the list of comments for the given thread response.
+
+    Arguments:
+
+        request: The django request object used for build_absolute_uri and
+          determining the requesting user.
+
+        comment_id: The id of the comment/response to get child comments for.
+
+        page: The page number (1-indexed) to retrieve
+
+        page_size: The number of comments to retrieve per page
+
+    Returns:
+
+        A paginated result containing a list of comments
+
+    """
+    try:
+        cc_comment = Comment(id=comment_id).retrieve()
+        cc_thread, context = _get_thread_and_context(
+            request,
+            cc_comment["thread_id"],
+            retrieve_kwargs={
+                "recursive": True,
+            }
+        )
+        if cc_thread["thread_type"] == "question":
+            thread_responses = itertools.chain(cc_thread["endorsed_responses"], cc_thread["non_endorsed_responses"])
+        else:
+            thread_responses = cc_thread["children"]
+        response_comments = []
+        for response in thread_responses:
+            if response["id"] == comment_id:
+                response_comments = response["children"]
+                break
+
+        response_skip = page_size * (page - 1)
+        paged_response_comments = response_comments[response_skip:(response_skip + page_size)]
+        results = [CommentSerializer(comment, context=context).data for comment in paged_response_comments]
+
+        comments_count = len(response_comments)
+        num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1
+        return get_paginated_data(request, results, page, num_pages)
+    except CommentClientRequestError:
+        raise Http404
 
 
 def delete_thread(request, thread_id):
@@ -701,6 +787,7 @@ def delete_thread(request, thread_id):
     cc_thread, context = _get_thread_and_context(request, thread_id)
     if can_delete(cc_thread, context):
         cc_thread.delete()
+        thread_deleted.send(sender=None, user=request.user, post=cc_thread)
     else:
         raise PermissionDenied
 
@@ -724,5 +811,6 @@ def delete_comment(request, comment_id):
     cc_comment, context = _get_comment_and_context(request, comment_id)
     if can_delete(cc_comment, context):
         cc_comment.delete()
+        comment_deleted.send(sender=None, user=request.user, post=cc_comment)
     else:
         raise PermissionDenied

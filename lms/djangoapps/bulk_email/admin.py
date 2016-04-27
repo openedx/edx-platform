@@ -54,7 +54,9 @@ unsupported tags will cause email sending to fail.
         return True
 
     def has_delete_permission(self, request, obj=None):
-        """Disables the ability to remove existing templates, as we'd like to make sure we don't have dangling references."""
+        """
+        Disables the ability to remove existing templates, as we'd like to make sure we don't have dangling references.
+        """
         return False
 
 

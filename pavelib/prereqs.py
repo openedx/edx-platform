@@ -11,6 +11,7 @@ from .utils.envs import Env
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
+NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
@@ -20,6 +21,7 @@ PYTHON_REQ_FILES = [
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
+    'requirements/edx/paver.txt',
     'requirements/edx/post.txt',
 ]
 
@@ -57,19 +59,19 @@ def compute_fingerprint(path_list):
 
     hasher = hashlib.sha1()
 
-    for path in path_list:
+    for path_item in path_list:
 
         # For directories, create a hash based on the modification times
         # of first-level subdirectories
-        if os.path.isdir(path):
-            for dirname in sorted(os.listdir(path)):
-                p = os.path.join(path, dirname)
-                if os.path.isdir(p):
-                    hasher.update(str(os.stat(p).st_mtime))
+        if os.path.isdir(path_item):
+            for dirname in sorted(os.listdir(path_item)):
+                path_name = os.path.join(path_item, dirname)
+                if os.path.isdir(path_name):
+                    hasher.update(str(os.stat(path_name).st_mtime))
 
         # For files, hash the contents of the file
-        if os.path.isfile(path):
-            with open(path, "rb") as file_handle:
+        if os.path.isfile(path_item):
+            with open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
@@ -113,7 +115,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
-        print('{cache} unchanged, skipping...'.format(cache=cache_name))
+        print '{cache} unchanged, skipping...'.format(cache=cache_name)
 
 
 def ruby_prereqs_installation():
@@ -138,7 +140,7 @@ def python_prereqs_installation():
     Installs Python prerequisites
     """
     for req_file in PYTHON_REQ_FILES:
-        sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
+        sh("pip install -q --disable-pip-version-check --exists-action w -r {req_file}".format(req_file=req_file))
 
 
 @task
@@ -147,6 +149,7 @@ def install_ruby_prereqs():
     Installs Ruby prereqs
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
@@ -158,6 +161,7 @@ def install_node_prereqs():
     Installs Node prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -169,6 +173,7 @@ def install_python_prereqs():
     Installs Python prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
@@ -180,6 +185,7 @@ def install_prereqs():
     Installs Ruby, Node and Python prerequisites
     """
     if no_prereq_install():
+        print NO_PREREQ_MESSAGE
         return
 
     install_ruby_prereqs()

@@ -1,7 +1,25 @@
 [run]
 data_file = reports/bok_choy/.coverage
-source = lms, cms, common/djangoapps, common/lib
-omit = lms/envs/*, cms/envs/*, common/djangoapps/terrain/*, common/djangoapps/*/migrations/*, openedx/core/djangoapps/*/migrations/*, */test*, */management/*, */urls*, */wsgi*, lms/djangoapps/*/migrations/*, cms/djangoapps/*/migrations/*
+source =
+    lms
+    cms
+    common/djangoapps
+    common/lib
+    openedx/core/djangoapps
+
+omit =
+    lms/envs/*
+    cms/envs/*
+    common/djangoapps/terrain/*
+    common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/*/migrations/*
+    */test*
+    */management/*
+    */urls*
+    */wsgi*
+    lms/djangoapps/*/migrations/*
+    cms/djangoapps/*/migrations/*
+
 parallel = True
 
 [report]

@@ -2,7 +2,7 @@
     <button data-facet="<%= facet %>" data-value="<%= term %>" data-text="<%= name %>" class="facet-option discovery-button <%= selected ? 'selected' : '' %>">
         <%= name %>
         <span class="count">
-            <%= count %>
+            <span class="count-number"><%= count %></span>
         </span>
     </button>
 </li>

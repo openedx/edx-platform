@@ -100,11 +100,16 @@ class CourseMode(models.Model):
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
 
+    # Modes that allow a student to pursue a non-verified certificate
+    NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
+
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
 
+    # Modes that are allowed to upsell
+    UPSELL_TO_VERIFIED_MODES = [HONOR]
+
     class Meta(object):
-        """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
 
     def clean(self):
@@ -122,6 +127,16 @@ class CourseMode(models.Model):
         self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
         super(CourseMode, self).save(force_insert, force_update, using)
+
+    @property
+    def slug(self):
+        """
+        Returns mode_slug
+
+        NOTE (CCB): This is a silly hack needed because all of the class methods use tuples
+        with a property named slug instead of mode_slug.
+        """
+        return self.mode_slug
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):

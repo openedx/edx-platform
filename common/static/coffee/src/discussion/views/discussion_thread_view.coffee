@@ -162,6 +162,7 @@ if Backbone?
           )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
+          @$el.find('.discussion-article[data-id="' + @model.id + '"]').focus() # Sends focus to the discussion once the thread loads
         error: (xhr, textStatus) =>
           return if textStatus == 'abort'
 

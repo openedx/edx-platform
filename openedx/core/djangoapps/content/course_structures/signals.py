@@ -1,3 +1,6 @@
+"""
+Django Signals classes and functions for the Course Structure application
+"""
 from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
@@ -7,6 +10,9 @@ from .models import CourseStructure
 
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Course Structure application receiver for the course_published signal
+    """
     # Import tasks here to avoid a circular import.
     from .tasks import update_course_structure
 

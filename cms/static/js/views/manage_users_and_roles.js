@@ -1,7 +1,8 @@
 /*
  Code for editing users and assigning roles within a course or library team context.
  */
-define(['jquery', 'underscore', 'gettext', "js/views/baseview", 'js/views/feedback_prompt', 'js/views/utils/view_utils'],
+define(['jquery', 'underscore', 'gettext', "js/views/baseview",
+        'common/js/components/views/feedback_prompt', 'common/js/components/utils/view_utils'],
     function ($, _, gettext, BaseView, PromptView, ViewUtils) {
         'use strict';
         var default_messages = {

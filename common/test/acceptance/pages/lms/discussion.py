@@ -116,11 +116,19 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def is_discussion_body_visible(self):
         return self._is_element_visible(".post-body")
 
-    def is_mathjax_preview_available(self):
-        return self.q(css=".MathJax_Preview").text[0] == ""
+    def verify_mathjax_preview_available(self):
+        """ Checks that MathJax Preview css class is present """
+        self.wait_for(
+            lambda: len(self.q(css=".MathJax_Preview").text) > 0 and self.q(css=".MathJax_Preview").text[0] == "",
+            description="MathJax Preview is rendered"
+        )
 
-    def is_mathjax_rendered(self):
-        return self._is_element_visible(".MathJax")
+    def verify_mathjax_rendered(self):
+        """ Checks that MathJax css class is present """
+        self.wait_for(
+            lambda: self._is_element_visible(".MathJax"),
+            description="MathJax Preview is rendered"
+        )
 
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
@@ -402,6 +410,7 @@ class InlineDiscussionPage(PageObject):
         return self.q(css=self._discussion_selector + " " + selector)
 
     def is_browser_on_page(self):
+        self.wait_for_ajax()
         return self.q(css=self._discussion_selector).present
 
     def is_discussion_expanded(self):

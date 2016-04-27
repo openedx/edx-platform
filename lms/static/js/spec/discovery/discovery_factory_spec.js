@@ -130,6 +130,9 @@ define([
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
             jasmine.Clock.tick(500);
+
+            // TODO: determine why the search API is invoked twice
+            AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(2);
         });

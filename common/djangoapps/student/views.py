@@ -7,6 +7,8 @@ import uuid
 import json
 import warnings
 from collections import defaultdict
+from urlparse import urljoin
+
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
@@ -28,7 +30,6 @@ from django.shortcuts import redirect
 from django.utils.translation import ungettext
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _, get_language
-from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
@@ -114,7 +115,8 @@ import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
     check_verify_status_by_course,
-    auth_pipeline_urls, get_next_url_for_login_page
+    auth_pipeline_urls, get_next_url_for_login_page,
+    DISABLE_UNENROLL_CERT_STATES,
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user
@@ -130,6 +132,8 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.programs.views import get_course_programs_for_dashboard
+from openedx.core.djangoapps.programs.utils import is_student_dashboard_programs_enabled
 
 
 log = logging.getLogger("edx.student")
@@ -211,7 +215,7 @@ def cert_info(user, course_overview, course_mode):
         course_mode (str): The enrollment mode (honor, verified, audit, etc.)
 
     Returns:
-        dict: A dictionary with keys:
+        dict: Empty dict if certificates are disabled or hidden, or a dictionary with keys:
             'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
             'show_download_url': bool
             'download_url': url, only present if show_download_url is True
@@ -219,6 +223,7 @@ def cert_info(user, course_overview, course_mode):
             'show_survey_button': bool
             'survey_url': url, only if show_survey_button is True
             'grade': if status is not 'processing'
+            'can_unenroll': if status allows for unenrollment
     """
     if not course_overview.may_certify():
         return {}
@@ -319,6 +324,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     'show_disabled_download_button': False,
                     'show_download_url': False,
                     'show_survey_button': False,
+                    'can_unenroll': True
                     }
 
     if cert_status is None:
@@ -327,7 +333,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     is_hidden_status = cert_status['status'] in ('unavailable', 'processing', 'generating', 'notpassing')
 
     if course_overview.certificates_display_behavior == 'early_no_info' and is_hidden_status:
-        return None
+        return {}
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -336,7 +342,8 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
         'show_download_url': status == 'ready',
         'show_disabled_download_button': status == 'generating',
         'mode': cert_status.get('mode', None),
-        'linked_in_url': None
+        'linked_in_url': None,
+        'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
@@ -376,7 +383,10 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
             # Clicking this button sends the user to LinkedIn where they
             # can add the certificate information to their profile.
             linkedin_config = LinkedInAddToProfileConfiguration.current()
-            if linkedin_config.enabled:
+
+            # posting certificates to LinkedIn is not currently
+            # supported in microsites/White Labels
+            if linkedin_config.enabled and not microsite.is_request_in_microsite():
                 status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
                     course_overview.id,
                     course_overview.display_name,
@@ -476,10 +486,11 @@ def register_user(request, extra_context=None):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-        overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.name
-        context.update(overrides)
+        if current_provider is not None:
+            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+            overrides['running_pipeline'] = running_pipeline
+            overrides['selected_provider'] = current_provider.name
+            context.update(overrides)
 
     return render_to_response('register.html', context)
 
@@ -497,9 +508,9 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         modes = CourseMode.modes_for_course_dict(course_id)
 
     mode_info = {'show_upsell': False, 'days_for_upsell': None}
-    # we want to know if the user is already verified and if verified is an
-    # option
-    if 'verified' in modes and enrollment.mode != 'verified':
+    # we want to know if the user is already enrolled as verified or credit and
+    # if verified is an option.
+    if CourseMode.VERIFIED in modes and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES:
         mode_info['show_upsell'] = True
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
@@ -602,6 +613,13 @@ def dashboard(request):
         if has_access(request.user, 'load', enrollment.course_overview)
         and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
+
+    # get the programs associated with courses being displayed.
+    # pass this along in template context in order to render additional
+    # program-related information on the dashboard view.
+    course_programs = {}
+    if is_student_dashboard_programs_enabled():
+        course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -723,6 +741,7 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
+        'course_programs': course_programs,
     }
 
     return render_to_response('dashboard.html', context)
@@ -1095,8 +1114,14 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
     elif action == "unenroll":
-        if not CourseEnrollment.is_enrolled(user, course_id):
+        enrollment = CourseEnrollment.get_enrollment(user, course_id)
+        if not enrollment:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
+
+        certificate_info = cert_info(user, enrollment.course_overview, enrollment.mode)
+        if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
+            return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
+
         CourseEnrollment.unenroll(user, course_id)
         return HttpResponse()
     else:
@@ -1171,25 +1196,6 @@ def _check_can_enroll_in_course(user, course_key, access_type="enroll"):
     return True, ""
 
 
-@never_cache
-@ensure_csrf_cookie
-def accounts_login(request):
-    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-    external_auth_response = external_auth_login(request)
-    if external_auth_response is not None:
-        return external_auth_response
-
-    redirect_to = get_next_url_for_login_page(request)
-    context = {
-        'login_redirect_url': redirect_to,
-        'pipeline_running': 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
-        'platform_name': settings.PLATFORM_NAME,
-        'account_name': settings.ACCOUNT_NAME,
-    }
-    return render_to_response('login.html', context)
-
-
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
@@ -1205,6 +1211,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
+    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 
     if third_party_auth_requested and not trumped_by_first_party_auth:
         # The user has already authenticated via third-party auth and has not
@@ -1226,17 +1233,17 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                     username=username, backend_name=backend_name))
             return HttpResponse(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
+                    platform_name=platform_name, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.name
+                      platform_name=platform_name, provider_name=requested_provider.name
                 )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, "
                   "click <strong>Register</strong> at the top of the page.").format(
-                      platform_name=settings.PLATFORM_NAME),
+                      platform_name=platform_name),
                 content_type="text/plain",
                 status=403
             )
@@ -1330,11 +1337,11 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         LoginFailures.clear_lockout_counter(user)
 
     # Track the user's sign in
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.identify(user.id, {
             'email': email,
-            'username': username,
+            'username': username
         })
 
         analytics.track(
@@ -1346,6 +1353,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                 'provider': None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1768,12 +1776,30 @@ def create_account_with_params(request, params):
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
     # Track the user's registration
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(user.id, {
-            'email': user.email,
-            'username': user.username,
-        })
+        identity_args = [
+            user.id,  # pylint: disable=no-member
+            {
+                'email': user.email,
+                'username': user.username,
+                'name': profile.name,
+                'age': profile.age,
+                'education': profile.level_of_education_display,
+                'address': profile.mailing_address,
+                'gender': profile.gender_display,
+                'country': unicode(profile.country),
+            }
+        ]
+
+        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
+            identity_args.append({
+                "MailChimp": {
+                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
+                }
+            })
+
+        analytics.identify(*identity_args)
 
         analytics.track(
             user.id,
@@ -1784,6 +1810,7 @@ def create_account_with_params(request, params):
                 'provider': third_party_provider.name if third_party_provider else None
             },
             context={
+                'ip': tracking_context.get('ip'),
                 'Google Analytics': {
                     'clientId': tracking_context.get('client_id')
                 }
@@ -1938,7 +1965,12 @@ def auto_auth(request):
     email = request.GET.get('email', unique_name + "@example.com")
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
+    is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
+
+    # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
+    enrollment_mode = request.GET.get('enrollment_mode', 'honor')
+
     course_key = None
     if course_id:
         course_key = CourseLocator.from_string(course_id)
@@ -1974,6 +2006,10 @@ def auto_auth(request):
         user.is_staff = (is_staff == "true")
         user.save()
 
+    if is_superuser is not None:
+        user.is_superuser = (is_superuser == "true")
+        user.save()
+
     # Activate the user
     reg.activate()
     reg.save()
@@ -1986,7 +2022,7 @@ def auto_auth(request):
 
     # Enroll the user in a course
     if course_key is not None:
-        CourseEnrollment.enroll(user, course_key)
+        CourseEnrollment.enroll(user, course_key, mode=enrollment_mode)
 
     # Apply the roles
     for role_name in role_names:
@@ -2078,7 +2114,7 @@ def password_reset(request):
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
-                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  from_email=microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
                   request=request,
                   domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -2164,12 +2200,12 @@ def password_reset_confirm_wrapper(
             'form': None,
             'title': _('Password reset unsuccessful'),
             'err_msg': err_msg,
-            'platform_name': settings.PLATFORM_NAME,
+            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
         return TemplateResponse(request, 'registration/password_reset_confirm.html', context)
     else:
         # we also want to pass settings.PLATFORM_NAME in as extra_context
-        extra_context = {"platform_name": settings.PLATFORM_NAME}
+        extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
 
         if request.method == 'POST':
             # remember what the old password hash is before we call down
@@ -2395,3 +2431,39 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invalid-name
+    """ Returns a dictionary of programs courses data require for the student
+    dashboard.
+
+    Given a user and an iterable of course keys, find all
+    the programs relevant to the user and return them in a
+    dictionary keyed by the course_key.
+
+    Arguments:
+        user (user object): Currently logged-in User
+        user_enrolled_courses (list): List of course keys in which user is
+            enrolled
+
+    Returns:
+        Dictionary response containing programs or {}
+    """
+    course_programs = get_course_programs_for_dashboard(user, user_enrolled_courses)
+    programs_data = {}
+    for course_key, program in course_programs.viewitems():
+        if program.get('status') == 'active' and program.get('category') == 'xseries':
+            try:
+                programs_data[course_key] = {
+                    'course_count': len(program['course_codes']),
+                    'display_name': program['name'],
+                    'category': program.get('category'),
+                    'program_marketing_url': urljoin(
+                        settings.MKTG_URLS.get('ROOT'), 'xseries' + '/{}'
+                    ).format(program['marketing_slug']),
+                    'display_category': 'XSeries'
+                }
+            except KeyError:
+                log.warning('Program structure is invalid, skipping display: %r', program)
+
+    return programs_data

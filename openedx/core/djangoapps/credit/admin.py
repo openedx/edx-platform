@@ -9,23 +9,42 @@ from openedx.core.djangoapps.credit.models import (
 
 class CreditCourseAdmin(admin.ModelAdmin):
     """Admin for credit courses. """
-    search_fields = ("course_key",)
+    list_display = ('course_key', 'enabled',)
+    list_filter = ('enabled',)
+    search_fields = ('course_key',)
+
+    class Meta(object):
+        model = CreditCourse
 
 
 class CreditProviderAdmin(admin.ModelAdmin):
     """Admin for credit providers. """
-    search_fields = ("provider_id", "display_name")
+    list_display = ('provider_id', 'display_name', 'active',)
+    list_filter = ('active',)
+    search_fields = ('provider_id', 'display_name')
+
+    class Meta(object):
+        model = CreditProvider
 
 
 class CreditEligibilityAdmin(admin.ModelAdmin):
     """Admin for credit eligibility. """
-    search_fields = ("username", "course__course_key")
+    list_display = ('course', 'username', 'deadline')
+    search_fields = ('username', 'course__course_key')
+
+    class Meta(object):
+        model = CreditEligibility
 
 
 class CreditRequestAdmin(admin.ModelAdmin):
     """Admin for credit requests. """
-    search_fields = ("uuid", "username", "course__course_key", "provider__provider_id")
-    readonly_fields = ("uuid",)
+    list_display = ('provider', 'course', 'status', 'username')
+    list_filter = ('provider', 'status',)
+    readonly_fields = ('uuid',)
+    search_fields = ('uuid', 'username', 'course__course_key', 'provider__provider_id')
+
+    class Meta(object):
+        model = CreditRequest
 
 
 admin.site.register(CreditCourse, CreditCourseAdmin)

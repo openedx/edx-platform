@@ -130,7 +130,11 @@ class TestCourseIndex(CourseTestCase):
         outline_url = reverse_course_url('course_handler', self.course.id)
         chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
         lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
-        subsection = ItemFactory.create(parent_location=lesson.location, category='vertical', display_name='Subsection 1')
+        subsection = ItemFactory.create(
+            parent_location=lesson.location,
+            category='vertical',
+            display_name='Subsection 1'
+        )
         ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
@@ -173,8 +177,16 @@ class TestCourseIndex(CourseTestCase):
         self.assertEquals(resp.status_code, 400)
 
         # create a test notification
-        rerun_state = CourseRerunState.objects.update_state(course_key=self.course.id, new_state=state, allow_not_found=True)
-        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=UserFactory(), should_display=should_display)
+        rerun_state = CourseRerunState.objects.update_state(
+            course_key=self.course.id,
+            new_state=state,
+            allow_not_found=True
+        )
+        CourseRerunState.objects.update_should_display(
+            entry_id=rerun_state.id,
+            user=UserFactory(),
+            should_display=should_display
+        )
 
         # try to get information on this notification
         notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
@@ -198,8 +210,16 @@ class TestCourseIndex(CourseTestCase):
         add_instructor(rerun_course_key, self.user, user2)
 
         # create a test notification
-        rerun_state = CourseRerunState.objects.update_state(course_key=rerun_course_key, new_state=state, allow_not_found=True)
-        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=user2, should_display=should_display)
+        rerun_state = CourseRerunState.objects.update_state(
+            course_key=rerun_course_key,
+            new_state=state,
+            allow_not_found=True
+        )
+        CourseRerunState.objects.update_should_display(
+            entry_id=rerun_state.id,
+            user=user2,
+            should_display=should_display
+        )
 
         # try to get information on this notification
         notification_dismiss_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
@@ -225,6 +245,48 @@ class TestCourseIndex(CourseTestCase):
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response)
+
+    def test_course_updates_invalid_url(self):
+        """
+        Tests the error conditions for the invalid course updates URL.
+        """
+        # Testing the response code by passing slash separated course id whose format is valid but no course
+        # having this id exists.
+        invalid_course_key = '{}_blah_blah_blah'.format(self.course.id)
+        course_updates_url = reverse_course_url('course_info_handler', invalid_course_key)
+        response = self.client.get(course_updates_url)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response code by passing split course id whose format is valid but no course
+        # having this id exists.
+        split_course_key = CourseLocator(org='orgASD', course='course_01213', run='Run_0_hhh_hhh_hhh')
+        course_updates_url_split = reverse_course_url('course_info_handler', split_course_key)
+        response = self.client.get(course_updates_url_split)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response by passing split course id whose format is invalid.
+        invalid_course_id = 'invalid.course.key/{}'.format(split_course_key)
+        course_updates_url_split = reverse_course_url('course_info_handler', invalid_course_id)
+        response = self.client.get(course_updates_url_split)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_index_invalid_url(self):
+        """
+        Tests the error conditions for the invalid course index URL.
+        """
+        # Testing the response code by passing slash separated course key, no course
+        # having this key exists.
+        invalid_course_key = '{}_some_invalid_run'.format(self.course.id)
+        course_outline_url = reverse_course_url('course_handler', invalid_course_key)
+        response = self.client.get_html(course_outline_url)
+        self.assertEqual(response.status_code, 404)
+
+        # Testing the response code by passing split course key, no course
+        # having this key exists.
+        split_course_key = CourseLocator(org='invalid_org', course='course_01111', run='Run_0_invalid')
+        course_outline_url_split = reverse_course_url('course_handler', split_course_key)
+        response = self.client.get_html(course_outline_url_split)
+        self.assertEqual(response.status_code, 404)
 
 
 @ddt.ddt
@@ -488,7 +550,6 @@ class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
-
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     def setUp(self):

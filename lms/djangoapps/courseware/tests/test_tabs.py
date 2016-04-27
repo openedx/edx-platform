@@ -19,7 +19,13 @@ from courseware.tests.factories import InstructorFactory, StaffFactory
 from courseware.views import get_static_tab_contents, static_tab
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from util import milestones_helpers
+from util.milestones_helpers import (
+    seed_milestone_relationship_types,
+    get_milestone_relationship_types,
+    add_milestone,
+    add_course_milestone,
+    add_course_content_milestone
+)
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
@@ -303,112 +309,112 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr('shard_1')
+@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
     MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
 
-    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    def setUp(self):
+        """
+        Test case scaffolding
+        """
+        super(EntranceExamsTabsTestCase, self).setUp()
 
-        def setUp(self):
-            """
-            Test case scaffolding
-            """
-            super(EntranceExamsTabsTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.instructor_tab = ItemFactory.create(
+            category="instructor", parent_location=self.course.location,
+            data="Instructor Tab", display_name="Instructor"
+        )
+        self.extra_tab_2 = ItemFactory.create(
+            category="static_tab", parent_location=self.course.location,
+            data="Extra Tab", display_name="Extra Tab 2"
+        )
+        self.extra_tab_3 = ItemFactory.create(
+            category="static_tab", parent_location=self.course.location,
+            data="Extra Tab", display_name="Extra Tab 3"
+        )
+        self.setup_user()
+        self.enroll(self.course)
+        self.user.is_staff = True
+        seed_milestone_relationship_types()
+        self.relationship_types = get_milestone_relationship_types()
 
-            self.course = CourseFactory.create()
-            self.instructor_tab = ItemFactory.create(
-                category="instructor", parent_location=self.course.location,
-                data="Instructor Tab", display_name="Instructor"
-            )
-            self.extra_tab_2 = ItemFactory.create(
-                category="static_tab", parent_location=self.course.location,
-                data="Extra Tab", display_name="Extra Tab 2"
-            )
-            self.extra_tab_3 = ItemFactory.create(
-                category="static_tab", parent_location=self.course.location,
-                data="Extra Tab", display_name="Extra Tab 3"
-            )
-            self.setup_user()
-            self.enroll(self.course)
-            self.user.is_staff = True
-            self.relationship_types = milestones_helpers.get_milestone_relationship_types()
-            milestones_helpers.seed_milestone_relationship_types()
+    def test_get_course_tabs_list_entrance_exam_enabled(self):
+        """
+        Unit Test: test_get_course_tabs_list_entrance_exam_enabled
+        """
+        entrance_exam = ItemFactory.create(
+            category="chapter",
+            parent_location=self.course.location,
+            data="Exam Data",
+            display_name="Entrance Exam",
+            is_entrance_exam=True
+        )
+        milestone = {
+            'name': 'Test Milestone',
+            'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+            'description': 'Testing Courseware Tabs'
+        }
+        self.user.is_staff = False
+        request = get_request_for_user(self.user)
+        self.course.entrance_exam_enabled = True
+        self.course.entrance_exam_id = unicode(entrance_exam.location)
+        milestone = add_milestone(milestone)
+        add_course_milestone(
+            unicode(self.course.id),
+            self.relationship_types['REQUIRES'],
+            milestone
+        )
+        add_course_content_milestone(
+            unicode(self.course.id),
+            unicode(entrance_exam.location),
+            self.relationship_types['FULFILLS'],
+            milestone
+        )
+        course_tab_list = get_course_tab_list(request, self.course)
+        self.assertEqual(len(course_tab_list), 1)
+        self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
+        self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
 
-        def test_get_course_tabs_list_entrance_exam_enabled(self):
-            """
-            Unit Test: test_get_course_tabs_list_entrance_exam_enabled
-            """
-            entrance_exam = ItemFactory.create(
-                category="chapter",
-                parent_location=self.course.location,
-                data="Exam Data",
-                display_name="Entrance Exam",
-                is_entrance_exam=True
-            )
-            milestone = {
-                'name': 'Test Milestone',
-                'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
-                'description': 'Testing Courseware Tabs'
-            }
-            self.user.is_staff = False
-            request = get_request_for_user(self.user)
-            self.course.entrance_exam_enabled = True
-            self.course.entrance_exam_id = unicode(entrance_exam.location)
-            milestone = milestones_helpers.add_milestone(milestone)
-            milestones_helpers.add_course_milestone(
-                unicode(self.course.id),
-                self.relationship_types['REQUIRES'],
-                milestone
-            )
-            milestones_helpers.add_course_content_milestone(
-                unicode(self.course.id),
-                unicode(entrance_exam.location),
-                self.relationship_types['FULFILLS'],
-                milestone
-            )
-            course_tab_list = get_course_tab_list(request, self.course)
-            self.assertEqual(len(course_tab_list), 1)
-            self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
-            self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
+    def test_get_course_tabs_list_skipped_entrance_exam(self):
+        """
+        Tests tab list is not limited if user is allowed to skip entrance exam.
+        """
+        #create a user
+        student = UserFactory()
+        # login as instructor hit skip entrance exam api in instructor app
+        instructor = InstructorFactory(course_key=self.course.id)
+        self.client.logout()
+        self.client.login(username=instructor.username, password='test')
 
-        def test_get_course_tabs_list_skipped_entrance_exam(self):
-            """
-            Tests tab list is not limited if user is allowed to skip entrance exam.
-            """
-            #create a user
-            student = UserFactory()
-            # login as instructor hit skip entrance exam api in instructor app
-            instructor = InstructorFactory(course_key=self.course.id)
-            self.client.logout()
-            self.client.login(username=instructor.username, password='test')
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': student.email,
+        })
+        self.assertEqual(response.status_code, 200)
 
-            url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
-            response = self.client.post(url, {
-                'unique_student_identifier': student.email,
-            })
-            self.assertEqual(response.status_code, 200)
+        # log in again as student
+        self.client.logout()
+        self.login(self.email, self.password)
+        request = get_request_for_user(self.user)
+        course_tab_list = get_course_tab_list(request, self.course)
+        self.assertEqual(len(course_tab_list), 5)
 
-            # log in again as student
-            self.client.logout()
-            self.login(self.email, self.password)
-            request = get_request_for_user(self.user)
-            course_tab_list = get_course_tab_list(request, self.course)
-            self.assertEqual(len(course_tab_list), 5)
-
-        def test_course_tabs_list_for_staff_members(self):
-            """
-            Tests tab list is not limited if user is member of staff
-            and has not passed entrance exam.
-            """
-            # Login as member of staff
-            self.client.logout()
-            staff_user = StaffFactory(course_key=self.course.id)
-            self.client.login(username=staff_user.username, password='test')
-            request = get_request_for_user(staff_user)
-            course_tab_list = get_course_tab_list(request, self.course)
-            self.assertEqual(len(course_tab_list), 5)
+    def test_course_tabs_list_for_staff_members(self):
+        """
+        Tests tab list is not limited if user is member of staff
+        and has not passed entrance exam.
+        """
+        # Login as member of staff
+        self.client.logout()
+        staff_user = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff_user.username, password='test')
+        request = get_request_for_user(staff_user)
+        course_tab_list = get_course_tab_list(request, self.course)
+        self.assertEqual(len(course_tab_list), 5)
 
 
 @attr('shard_1')

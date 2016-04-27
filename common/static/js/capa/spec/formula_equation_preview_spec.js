@@ -115,6 +115,27 @@ describe("Formula Equation Preview", function () {
             ]);
         });
 
+        it('does not request again if the initial request has already been made', function () {
+            // jshint undef:false
+            expect(Problem.inputAjax.callCount).toEqual(1);
+
+            // Reset the spy in order to check calls again.
+            Problem.inputAjax.reset();
+
+            // Enabling the formulaEquationPreview again to see if this will
+            // reinitialize input request once again.
+            formulaEquationPreview.enable();
+
+            // This part may be asynchronous, so wait.
+            waitsFor(function () {
+                return !Problem.inputAjax.wasCalled;
+            }, "times out in case of AJAX call", 1000);
+
+            // Expect Problem.inputAjax was not called as input request was
+            // initialized before.
+            expect(Problem.inputAjax).not.toHaveBeenCalled();
+        });
+
         it('makes a request on user input', function () {
             Problem.inputAjax.reset();
             $('#input_THE_ID').val('user_input').trigger('input');
@@ -235,8 +256,7 @@ describe("Formula Equation Preview", function () {
 
                 // Refresh the MathJax.
                 expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                    ['Text', this.jax, 'THE_FORMULA'],
-                    ['Reprocess', this.jax]
+                    ['Text', this.jax, 'THE_FORMULA']
                 );
             });
         });
@@ -302,8 +322,7 @@ describe("Formula Equation Preview", function () {
             runs(function () {
                 // Refresh the MathJax.
                 expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                    ['Text', this.jax, '\\text{OOPSIE}'],
-                    ['Reprocess', this.jax]
+                    ['Text', this.jax, '\\text{OOPSIE}']
                 );
                 expect($img.css('visibility')).toEqual('hidden');
             });
@@ -349,17 +368,15 @@ describe("Formula Equation Preview", function () {
 
             this.callbacks[0](this.responses[0]);
             expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                ['Text', this.jax, 'THE_FORMULA_0'],
-                ['Reprocess', this.jax]
+                ['Text', this.jax, 'THE_FORMULA_0']
             );
             expect($img.css('visibility')).toEqual('visible');
 
             this.callbacks[1](this.responses[1]);
             expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                ['Text', this.jax, 'THE_FORMULA_1'],
-                ['Reprocess', this.jax]
+                ['Text', this.jax, 'THE_FORMULA_1']
             );
-            expect($img.css('visibility')).toEqual('hidden')
+            expect($img.css('visibility')).toEqual('hidden');
         });
 
         it("doesn't display outdated information", function () {
@@ -370,15 +387,14 @@ describe("Formula Equation Preview", function () {
             // Switch the order (1 returns before 0)
             this.callbacks[1](this.responses[1]);
             expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                ['Text', this.jax, 'THE_FORMULA_1'],
-                ['Reprocess', this.jax]
+                ['Text', this.jax, 'THE_FORMULA_1']
             );
-            expect($img.css('visibility')).toEqual('hidden')
+            expect($img.css('visibility')).toEqual('hidden');
 
             MathJax.Hub.Queue.reset();
             this.callbacks[0](this.responses[0]);
             expect(MathJax.Hub.Queue).not.toHaveBeenCalled();
-            expect($img.css('visibility')).toEqual('hidden')
+            expect($img.css('visibility')).toEqual('hidden');
         });
 
         it("doesn't show an error if the responses are close together",
@@ -392,8 +408,7 @@ describe("Formula Equation Preview", function () {
 
                this.callbacks[1](this.responses[1]);
                expect(MathJax.Hub.Queue).toHaveBeenCalledWith(
-                   ['Text', this.jax, 'THE_FORMULA_1'],
-                   ['Reprocess', this.jax]
+                   ['Text', this.jax, 'THE_FORMULA_1']
                );
 
                // Make sure that it doesn't indeed show up later

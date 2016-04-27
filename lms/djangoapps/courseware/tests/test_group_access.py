@@ -126,15 +126,16 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             user_partitions=[self.animal_partition, self.color_partition],
         )
-        chapter = ItemFactory.create(category='chapter', parent=self.course)
-        section = ItemFactory.create(category='sequential', parent=chapter)
-        vertical = ItemFactory.create(category='vertical', parent=section)
-        component = ItemFactory.create(category='problem', parent=vertical)
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            chapter = ItemFactory.create(category='chapter', parent=self.course)
+            section = ItemFactory.create(category='sequential', parent=chapter)
+            vertical = ItemFactory.create(category='vertical', parent=section)
+            component = ItemFactory.create(category='problem', parent=vertical)
 
-        self.chapter_location = chapter.location
-        self.section_location = section.location
-        self.vertical_location = vertical.location
-        self.component_location = component.location
+            self.chapter_location = chapter.location
+            self.section_location = section.location
+            self.vertical_location = vertical.location
+            self.component_location = component.location
 
         self.red_cat = UserFactory()  # student in red and cat groups
         self.set_user_group(self.red_cat, self.animal_partition, self.cat_group)

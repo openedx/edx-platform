@@ -40,7 +40,9 @@ class CourseEmailTest(TestCase):
         html_message = "<html>dummy message</html>"
         template_name = "branded_template"
         from_addr = "branded@branding.com"
-        email = CourseEmail.create(course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr)
+        email = CourseEmail.create(
+            course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr
+        )
         self.assertEquals(email.course_id, course_id)
         self.assertEquals(email.to_option, SEND_TO_STAFF)
         self.assertEquals(email.subject, subject)

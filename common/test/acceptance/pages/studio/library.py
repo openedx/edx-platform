@@ -9,7 +9,9 @@ from .component_editor import ComponentEditorView
 from .container import XBlockWrapper
 from ...pages.studio.users import UsersPageMixin
 from ...pages.studio.pagination import PaginatedMixin
-from .utils import confirm_prompt, wait_for_notification
+
+from ..common.utils import confirm_prompt, wait_for_notification
+
 from . import BASE_URL
 
 

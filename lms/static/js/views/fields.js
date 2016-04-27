@@ -225,7 +225,7 @@
             },
 
             finishEditing: function() {
-                if (this.persistChanges === false) {return;}
+                if (this.persistChanges === false || this.mode !== 'edit') {return;}
                 if (this.fieldValue() !== this.modelValue()) {
                     this.saveValue();
                 } else {
@@ -271,11 +271,11 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value input').val();
+                return this.$('.u-field-value').text();
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value input').val(_.escape(this.modelValue()));
+                this.$('.u-field-value ').html(_.escape(this.modelValue()));
             }
         });
 
@@ -345,9 +345,10 @@
                 this.$el.html(this.template({
                     id: this.options.valueAttribute,
                     mode: this.mode,
+                    editable: this.editable,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
-                    titleVisible: this.options.titleVisible || true,
+                    titleVisible: this.options.titleVisible !== undefined ? this.options.titleVisible : true,
                     iconName: this.options.iconName,
                     showBlankOption: (!this.options.required || !this.modelValueIsSet()),
                     selectOptions: this.options.options,
@@ -376,7 +377,13 @@
             },
 
             fieldValue: function () {
-                var value = this.$('.u-field-value select').val();
+                var value;
+                if (this.editable === 'never') {
+                    value = this.modelValueIsSet() ? this.modelValue () : null;
+                }
+                else {
+                    value = this.$('.u-field-value select').val();
+                }
                 return value === '' ? null : value;
             },
 
@@ -390,7 +397,9 @@
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value select').val(this.modelValue() || '');
+                if (this.editable !== 'never') {
+                    this.$('.u-field-value select').val(this.modelValue() || '');
+                }
 
                 var value = this.displayValue(this.modelValue() || '');
                 if (this.modelValueIsSet() === false) {
@@ -437,7 +446,9 @@
             },
 
             disableField: function(disable) {
-                this.$('.u-field-value select').prop('disabled', disable);
+                if (this.editable !== 'never') {
+                    this.$('.u-field-value select').prop('disabled', disable);
+                }
             }
         });
 
@@ -473,6 +484,7 @@
                     id: this.options.valueAttribute,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     mode: this.mode,
+                    editable: this.editable,
                     value: value,
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
@@ -504,11 +516,16 @@
 
             modelValue: function() {
                 var value = this._super();
-                return  value ? $.trim(value) : '';
+                return value ? $.trim(value) : '';
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value textarea').val();
+                if (this.mode === 'edit') {
+                    return this.$('.u-field-value textarea').val();
+                }
+                else {
+                    return this.$('.u-field-value .u-field-value-readonly').text();
+                }
             },
 
             saveValue: function () {

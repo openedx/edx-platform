@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response
+from ipware.ip import get_ip
 
 from track import tracker
 from track import contexts
@@ -27,6 +28,14 @@ def _get_request_header(request, header_name, default=''):
     """Helper method to get header values from a request's META dict, if present."""
     if request is not None and hasattr(request, 'META') and header_name in request.META:
         return request.META[header_name]
+    else:
+        return default
+
+
+def _get_request_ip(request, default=''):
+    """Helper method to get IP from a request's META dict, if present."""
+    if request is not None and hasattr(request, 'META'):
+        return get_ip(request)
     else:
         return default
 
@@ -89,7 +98,7 @@ def server_track(request, event_type, event, page=None):
     # define output:
     event = {
         "username": username,
-        "ip": _get_request_header(request, 'REMOTE_ADDR'),
+        "ip": _get_request_ip(request),
         "referer": _get_request_header(request, 'HTTP_REFERER'),
         "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
         "event_source": "server",
