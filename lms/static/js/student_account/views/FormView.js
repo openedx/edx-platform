@@ -69,6 +69,28 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
+                this.getUsernameFromEmail();
+                this.cleanUsername();
+            },
+
+            getUsernameFromEmail: function() {
+                var email = $('#register-email');
+                email.keyup(function() {
+                    if (email.val().indexOf('@') === -1) {
+                        $('#register-username').val(email.val().replace(".", ""));
+                    }
+                });
+            },
+
+            cleanUsername: function() {
+                var username = $('#register-username');
+                username.val(username.val().replace(".",""));
+                username.keypress( function(e) {
+                    var chr = String.fromCharCode(e.which);
+                    if ("@.".indexOf(chr) >= 0 ) {
+                        return false;
+                    }
+                });
             },
 
             buildForm: function( data ) {
