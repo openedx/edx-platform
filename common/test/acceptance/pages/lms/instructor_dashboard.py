@@ -755,7 +755,7 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Fill in the form with the provided email and submit it.
         """
-        email_selector = "{} >p>textarea".format(self.batch_enrollment_selector)
+        email_selector = "{} textarea".format(self.batch_enrollment_selector)
         enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
 
         # Fill the email addresses after the email selector is visible.
