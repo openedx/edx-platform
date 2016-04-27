@@ -108,7 +108,10 @@ case "$TEST_SUITE" in
                 paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p"
                 ;;
             "3")
-                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_3' --with-flaky" --cov_args="-p"
+                ;;
+            "4")
+                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False,shard_3=False' --with-flaky" --cov_args="-p"
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
