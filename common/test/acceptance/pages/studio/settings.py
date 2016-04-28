@@ -284,4 +284,4 @@ class SettingsPage(CoursePage):
         returns the uploaded image path
         """
 
-        return self.q(css='#course-image').results[0].attrs('src')
+        return self.q(css='#course-image').attrs('src')
