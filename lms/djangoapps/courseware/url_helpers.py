@@ -50,3 +50,19 @@ def get_redirect_url(course_key, usage_key):
 
     redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
     return redirect_url
+
+
+def get_redirect_url_for_global_staff(course_key, location):
+    """
+    Returns the redirect url
+
+    Args:
+        course_key(str): Course key string
+        location(str): The location id of course component
+    """
+
+    _next = get_redirect_url(course_key, location)
+    redirect_url = "{url}?next={redirect}".format(
+        url=reverse('enroll_staff', args=[unicode(course_key)]),
+        redirect=_next)
+    return redirect_url

@@ -203,12 +203,12 @@ class CourseNotEnrollTest(WebAppTest):
         Returns the serialized course_key for the test
         """
         # TODO - is there a better way to make this agnostic to the underlying default module store?
-        default_store = os.environ.get('DEFAULT_STORE', 'draft')
+        default_store = os.environ.get('DEFAULT_STORE', 'split')
         course_key = CourseLocator(
             self.course_org,
             self.course_number,
             self.course_run,
-            deprecated=(default_store == 'draft')
+            deprecated=(default_store == 'split')
         )
         return unicode(course_key)
 
@@ -221,8 +221,8 @@ class CourseNotEnrollTest(WebAppTest):
             Login with the staff user which is not enrolled in the course
             click the view live button of the course
             Here are two scenario:
-             First click the continue button
-             Second click the Enroll button and see the response.
+                -First click the Don't Enroll button
+                -Second click the Enroll button and see the response.
         """
         self.auth_page.visit()
         self.dashboard_page.visit()
@@ -241,7 +241,7 @@ class CourseNotEnrollTest(WebAppTest):
         AutoAuthPage(self.browser, course_id=None, staff=True).visit()
 
         self.dashboard_page.visit()
-        self.dashboard_page.view_live('.submit>input:last-child')
+        self.dashboard_page.view_live('input[name= "dont_enroll"]')
 
         about_page = AboutPage(self.browser, self.course_id)
         about_page.wait_for_page()
@@ -249,7 +249,7 @@ class CourseNotEnrollTest(WebAppTest):
         self.assertTrue(about_page.is_register_button_present)
 
         self.dashboard_page.visit()
-        self.dashboard_page.view_live('.submit>input:first-child')
+        self.dashboard_page.view_live('input[name= "enroll"]')
         course_ware = CoursewarePage(self.browser, self.course_id)
         course_ware.wait_for_page()
         self.assertTrue(course_ware.is_browser_on_page())

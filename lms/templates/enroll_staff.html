@@ -1,3 +1,4 @@
+<%page expression_filter="h" />
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -6,11 +7,11 @@
 %>
 
 <%block name="headextra">
-    <meta property="og:title" content="${course.display_name_with_default_escaped}"/>
+    <meta property="og:title" content="${course.display_name_with_default}"/>
     <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}"/>
 </%block>
 
-<%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
+<%block name="pagetitle">${course.display_name_with_default}</%block>
 
 <section class="course-info">
     <header class="course-profile">
@@ -22,15 +23,15 @@
                     </div>
                     <div class="heading-group">
                         <h1>
-                            ${course.display_name_with_default_escaped}
-                            <a href="#">${course.display_org_with_default | h}</a>
+                            ${course.display_name_with_default}
+                            <a href="#">${course.display_org_with_default}</a>
                         </h1>
                     </div>
                     <form role="form" id="enroll_staff_form" method="post" action="">
                         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }"/>
                         <div class="main-cta">
-                            <input class="register" name="enroll" type="submit" value="${_(" Enroll")}"/>
-                            <input class="register" name="dont_enroll" type="submit" value="${_(" Don't enroll")}"/>
+                            <input class="register" name="enroll" type="submit" value="${_('Enroll')}"/>
+                            <input class="register" name="dont_enroll" type="submit" value="${_('Don\'t enroll')}"/>
                         </div>
                     </form>
                 </section>

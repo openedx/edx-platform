@@ -65,7 +65,7 @@ class DashboardPage(PageObject):
         """
         Clicks the "View Live" link and switches to the new tab
         """
-        self.mouse_hover(self.browser.find_element_by_css_selector('.view-button'))
+        self.mouse_hover(self.browser.find_element_by_css_selector('.course-item'))
         click_css(self, '.view-button', require_notification=False)
         self.browser.switch_to_window(self.browser.window_handles[-1])
         click_css(self, element, require_notification=False)

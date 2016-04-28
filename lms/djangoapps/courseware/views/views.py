@@ -18,11 +18,13 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.generic import View
 from eventtracking import tracker
 from ipware.ip import get_ip
 from markupsafe import escape
@@ -59,7 +61,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, ScoresClient
 from courseware.models import StudentModule, BaseStudentModuleHistory
-from courseware.url_helpers import get_redirect_url
+from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
@@ -79,6 +81,7 @@ from student.roles import GlobalStaff
 from student.views import is_course_blocked
 
 from util.cache import cache, cache_if_anonymous
+from util.course_key_utils import from_string_or_404
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
@@ -354,13 +357,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
-        if bool(staff_access):
-            usage_key = UsageKey.from_string(course.location.to_deprecated_string()).replace(course_key=course_key)
-            redirect_url = get_redirect_url(course_key, usage_key)
-            return redirect("{url}?{redirect}".format(
-                url=reverse(enroll_staff, args=[course_key.to_deprecated_string()]),
-                redirect=redirect_url))
-        return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+        if GlobalStaff().has_user(user):
+            redirect_url = get_redirect_url_for_global_staff(course_key, course.location)
+            return redirect(redirect_url)
+        return redirect(reverse('about_course', args=[unicode(course_key)]))
 
     # see if all pre-requisites (as per the milestones app feature) have been fulfilled
     # Note that if the pre-requisite feature flag has been turned off (default) then this check will
@@ -630,10 +630,7 @@ def jump_to(_request, course_id, location):
         user = _request.user
         redirect_url = get_redirect_url(course_key, usage_key)
         if GlobalStaff().has_user(user) and not CourseEnrollment.is_enrolled(user, course_key):
-            redirect_url = "{url}?next={redirect}".format(
-                url=reverse(enroll_staff, args=[course_key.to_deprecated_string()]),
-                redirect=redirect_url
-            )
+            redirect_url = get_redirect_url_for_global_staff(course_key, usage_key)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -839,57 +836,58 @@ def get_cosmetic_display_price(course, registration_price):
         return _('Free')
 
 
-@require_global_staff
-@ensure_valid_course_key
-def enroll_staff(request, course_id):
+class EnrollStaffView(View):
     """
-    1. Should be staff
-    2. should be a valid course_id
-    3. shouldn't be enrolled before
-    4. The requested view url to redirect
+        Determine If user is global staff, it will be redirected to page "enroll_satff.html"
+        that asks you if you want to register for the course.
+        This pages has the courseware link you were heading to as a ?next parameter
+        Click "enroll" and be redirected to the page you wanted to go to
+        Click "Don't enroll" and go back to the course about page
 
-    GET
-        html: return enroll staff page
+    Arguments:
+     - request    : HTTP request
+     - course_id  : course id
 
-    POST
-        1. You want to register for this course?
-            Confirm:
-                1. User is valid staff user who wants to enroll.
-                2. Course is valid course
-        2. Yes
-        3. Post request, enroll the user and redirect him to the requested view
-
-    :param request:
-    :param course_id:
-    :return:
+    Returns:
+     -RedirectResponse
     """
-    user = request.user
-    course_key = CourseKey.from_string(course_id)
-    _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+    template_name = 'enroll_staff.html'
 
-    if request.method == 'GET':
+    @method_decorator(require_global_staff)
+    @method_decorator(ensure_valid_course_key)
+    def get(self, request, course_id):
+        """
+        Renders Enroll Staff View
+        """
+        user = request.user
+        course_key = from_string_or_404(course_id)
         with modulestore().bulk_operations(course_key):
-            course = get_course_with_access(user, 'load', course_key, depth=2)
+            course = get_course_with_access(user, 'load', course_key)
+            if not registered_for_course(course, user):
+                context = {'course': course,
+                           'csrftoken': csrf(request)["csrf_token"]}
+                return render_to_response(self.template_name, context)
 
-        # Prompt for enrollment if Globalstaff is not enrolled in the course
-        if not registered_for_course(course, user):
-            return render_to_response('enroll_staff.html', {
-                'course': course,
-                'csrftoken': csrf(request)["csrf_token"]
-            })
-
-    elif request.method == 'POST':
+    @method_decorator(require_global_staff)
+    @method_decorator(ensure_valid_course_key)
+    def post(self, request, course_id):
+        """
+        Enroll and returns the response
+        """
+        _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+        course_key = from_string_or_404(course_id)
         if 'enroll' in request.POST:
-            enrollment = CourseEnrollment.get_or_create_enrollment(user, course_key)
-            enrollment.update_enrollment(is_active=True)
+            CourseEnrollment.enroll(request.user, course_key)
             log.info(
                 u"User %s enrolled in %s via `enroll_staff` view",
-                user.username,
+                request.user.username,
                 course_id
             )
             return redirect(_next)
+        elif 'dont_enroll' in request.POST:
+            return redirect(reverse('about_course', args=[unicode(course_key)]))
         else:
-            return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+            raise Http404
 
 
 @ensure_csrf_cookie

@@ -290,7 +290,7 @@ class CoursewareSequentialTabPage(CoursePage):
 
 class AboutPage(CoursePage):
     """
-    Course about.
+    Course about page.
     """
 
     url_path = "about/"
@@ -301,6 +301,6 @@ class AboutPage(CoursePage):
     @property
     def is_register_button_present(self):
         """
-        Returns True if the timed/proctored exam timer bar is visible on the courseware.
+        Returns True if the Enrollment button is visible on the about page.
         """
         return self.q(css=".register").is_present()
