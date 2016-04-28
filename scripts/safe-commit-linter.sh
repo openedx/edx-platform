@@ -18,6 +18,10 @@ show_help() {
     echo "  -m, --main-branch=COMMIT    Run against files changed between the"
     echo "                              current branch and this commit."
     echo "                              Defaults to origin/master."
+    echo ""
+    echo "For additional help:"
+    echo "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter"
+
 }
 
 for i in "$@"; do
