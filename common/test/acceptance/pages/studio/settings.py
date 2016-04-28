@@ -20,6 +20,7 @@ class SettingsPage(CoursePage):
     url_path = "settings/details"
     upload_image_browse_button_selector = 'form.upload-dialog input[type=file]'
     upload_image_upload_button_selector = '.modal-actions li:nth-child(1) a'
+    upload_image_popup_window_selector = '.assetupload-modal'
 
     ################
     # Helpers
@@ -268,15 +269,15 @@ class SettingsPage(CoursePage):
         self.q(css='#upload-course-image').results[0].click()
 
         # wait for popup
-        self.wait_for_element_presence(".assetupload-modal", 'upload dialog is present')
+        self.wait_for_element_presence(self.upload_image_popup_window_selector, 'upload dialog is present')
 
+        # upload image
         filepath = SettingsPage.get_asset_path(file_to_upload)
         self.q(css=self.upload_image_browse_button_selector).results[0].send_keys(filepath)
-
-        self.wait_for_element_presence(self.upload_image_upload_button_selector, 'upload button is present')
         self.q(css=self.upload_image_upload_button_selector).results[0].click()
 
-        self.wait_for_ajax()
+        # wait for popup closed
+        self.wait_for_element_absence(self.upload_image_popup_window_selector, 'upload dialog is hidden')
 
     def get_uploaded_image_path(self):
         """
