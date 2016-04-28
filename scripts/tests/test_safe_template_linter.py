@@ -82,6 +82,19 @@ class TestSafeTemplateLinter(TestCase):
     Test some top-level linter functions
     """
 
+    def patch_is_valid_directory(self, linter_class):
+        """
+        Creates a mock patch for _is_valid_directory on a Linter to always
+        return true. This avoids nested patch calls.
+
+        Arguments:
+            linter_class: The linter class to be patched
+        """
+        patcher = mock.patch.object(linter_class, '_is_valid_directory', return_value=True)
+        patch_start = patcher.start()
+        self.addCleanup(patcher.stop)
+        return patch_start
+
     def test_process_os_walk(self):
         """
         Tests the top-level processing of template files, including Mako
@@ -90,24 +103,27 @@ class TestSafeTemplateLinter(TestCase):
         out = StringIO()
 
         options = {
-            'is_quiet': False,
+            'list_files': False,
         }
 
-        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter()]
+        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter(), PythonLinter()]
 
-        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True):
-            with mock.patch.object(JavaScriptLinter, '_is_valid_directory', return_value=True):
-                with mock.patch.object(UnderscoreTemplateLinter, '_is_valid_directory', return_value=True):
-                    num_violations = _process_os_walk('scripts/tests/templates', template_linters, options, out)
+        self.patch_is_valid_directory(MakoTemplateLinter)
+        self.patch_is_valid_directory(JavaScriptLinter)
+        self.patch_is_valid_directory(UnderscoreTemplateLinter)
+        self.patch_is_valid_directory(PythonLinter)
+
+        num_violations = _process_os_walk('scripts/tests/templates', template_linters, options, out)
 
         output = out.getvalue()
-        self.assertEqual(num_violations, 6)
+        self.assertEqual(num_violations, 7)
         self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
         self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
         self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))
         self.assertIsNotNone(re.search('test\.js.*javascript-concat-html', output))
         self.assertIsNotNone(re.search('test\.js.*underscore-not-escaped', output))
         self.assertIsNotNone(re.search('test\.underscore.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.py.*python-interpolate-html', output))
 
 
 @ddt
