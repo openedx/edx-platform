@@ -69,6 +69,21 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
+                $('.text-city').hide();
+                $('.select-country').hide();
+                this.setUserCityAndCountry();
+            },
+
+            setUserCityAndCountry: function() {
+                $.get(
+                   '/geo',
+                   function(response) {
+                      if(typeof response.country !== "undefined") {
+                          $('#register-city').val(response.city);
+                          $('#register-country').val(response.country);
+                      }
+                   }
+                );
             },
 
             buildForm: function( data ) {
@@ -214,7 +229,7 @@
             },
 
             /* Allows extended views to add non-form attributes
-             * to the data before saving it to model 
+             * to the data before saving it to model
              */
             setExtraData: function( data ) {
                 return data;
