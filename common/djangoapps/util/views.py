@@ -151,15 +151,13 @@ class _FreshdeskApi(object):
         """
         headers = {'Content-Type': 'application/json'}
         payload = {
-            'helpdesk_ticket': {
-                'subject': subject,
-                'description': desc,
-                'name': name,
-                'email': email,
-                'priority': priority,
-                'status': status,
-                'group_id': group_id
-            },
+            'subject': subject,
+            'description': desc,
+            'name': name,
+            'email': email,
+            'priority': priority,
+            'status': status,
+            'group_id': group_id,
             'cc_emails': cc
         }
 
@@ -185,10 +183,8 @@ class _FreshdeskApi(object):
         """
         headers = {'Content-Type': 'application/json'}
         payload = {
-            'helpdesk_note': {
-                "body" : note,
-                "private" : True
-            }
+            "body" : note,
+            "private" : True
         }
 
         response = requests.post(settings.HELPDESK_URL + '/api/v2/tickets/' + str(ticket_id) + '/notes',
