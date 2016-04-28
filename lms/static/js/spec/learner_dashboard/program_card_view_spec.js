@@ -37,13 +37,13 @@ define([
                 },
                 userProgress = [
                     {
-                        programId: 146,
+                        id: 146,
                         completed: ['courses', 'the', 'user', 'completed'],
                         in_progress: ['in', 'progress'],
                         not_started : ['courses', 'not', 'yet', 'started']
                     },
                     {
-                        programId: 147,
+                        id: 147,
                         completed: ['Course 1'],
                         in_progress: [],
                         not_started: ['Course 2', 'Course 3', 'Course 4']
@@ -104,7 +104,7 @@ define([
             });
 
             it('should display the correct completed courses message', function() {
-                var program = _.findWhere(userProgress, {programId: 146}),
+                var program = _.findWhere(userProgress, {id: 146}),
                     completed = program.completed.length,
                     total = completed + program.in_progress.length + program.not_started.length;
 

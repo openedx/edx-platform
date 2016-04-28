@@ -64,13 +64,13 @@ define([
                     ],
                     userProgress: [
                         {
-                            programId: 146,
+                            id: 146,
                             completed: ['courses', 'the', 'user', 'completed'],
                             in_progress: ['in', 'progress'],
                             not_started : ['courses', 'not', 'yet', 'started']
                         },
                         {
-                            programId: 147,
+                            id: 147,
                             completed: ['Course 1'],
                             in_progress: [],
                             not_started: ['Course 2', 'Course 3', 'Course 4']
