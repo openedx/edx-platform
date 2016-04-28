@@ -105,6 +105,7 @@ def track_thread_created_event(request, course, thread, followed):
         'title': thread.title,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
+        'private_to_peers': thread.private_to_peers,
         'options': {'followed': followed},
         # There is a stated desire for an 'origin' property that will state
         # whether this thread was created via courseware or the forum.
@@ -215,6 +216,11 @@ def create_thread(request, course_id, commentable_id):
     else:
         anonymous_to_peers = False
 
+    if course.allow_private_to_peers:
+        private_to_peers = post.get('private_to_peers', 'false').lower() == 'true'
+    else:
+        private_to_peers = False
+
     if 'title' not in post or not post['title'].strip():
         return JsonError(_("Title can't be empty"))
     if 'body' not in post or not post['body'].strip():
@@ -223,6 +229,7 @@ def create_thread(request, course_id, commentable_id):
     params = {
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
+        'private_to_peers': private_to_peers,
         'commentable_id': commentable_id,
         'course_id': course_key.to_deprecated_string(),
         'user_id': user.id,

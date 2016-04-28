@@ -44,6 +44,12 @@
             <%- gettext("post anonymously to classmates") %>
         </label>
         <% } %>
+        <% if (allow_private_to_peers) { %>
+        <label class="post-option">
+            <input type="checkbox" name="private_to_peers" class="post-option-input js-private-peers">
+            <%- gettext("post privately to staff") %>
+        </label>
+        <% } %>
     </div>
     <div>
         <input type="submit" class="submit" value="<%- gettext('Add Post') %>">
