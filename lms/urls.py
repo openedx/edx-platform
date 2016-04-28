@@ -925,6 +925,10 @@ urlpatterns += (
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^update_example_certificate$', 'certificates.views.update_example_certificate'),
     url(r'^request_certificate$', 'certificates.views.request_certificate'),
+
+    # REST APIs
+    url(r'^api/certificates/',
+        include('lms.djangoapps.certificates.apis.urls', namespace='certificates_api')),
 )
 
 # XDomain proxy
@@ -962,7 +966,7 @@ if settings.DEBUG:
     )
 
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
-    urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
+    urlpatterns += url(r'^template/(?P<template>.+)$', 'openedx.core.djangoapps.debug.views.show_reference_template'),
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar

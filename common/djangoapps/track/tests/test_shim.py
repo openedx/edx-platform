@@ -1,10 +1,16 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
+from collections import namedtuple
+
+import ddt
 from mock import sentinel
 from django.test.utils import override_settings
 
 from openedx.core.lib.tests.assertions.events import assert_events_equal
-from track.tests import EventTrackingTestCase, FROZEN_TIME
+
+from . import EventTrackingTestCase, FROZEN_TIME
+from ..shim import PrefixedEventProcessor
+from .. import transformers
 
 
 LEGACY_SHIM_PROCESSOR = [
@@ -216,3 +222,100 @@ class MultipleShimGoogleAnalyticsProcessorTestCase(EventTrackingTestCase):
             'timestamp': FROZEN_TIME,
         }
         assert_events_equal(expected_event, log_emitted_event)
+
+
+SequenceDDT = namedtuple('SequenceDDT', ['action', 'tab_count', 'current_tab', 'legacy_event_type'])
+
+
+@ddt.ddt
+class EventTransformerRegistryTestCase(EventTrackingTestCase):
+    """
+    Test the behavior of the event registry
+    """
+
+    def setUp(self):
+        super(EventTransformerRegistryTestCase, self).setUp()
+        self.registry = transformers.EventTransformerRegistry()
+
+    @ddt.data(
+        ('edx.ui.lms.sequence.next_selected', transformers.NextSelectedEventTransformer),
+        ('edx.ui.lms.sequence.previous_selected', transformers.PreviousSelectedEventTransformer),
+        ('edx.ui.lms.sequence.tab_selected', transformers.SequenceTabSelectedEventTransformer),
+        ('edx.video.foo.bar', transformers.VideoEventTransformer),
+    )
+    @ddt.unpack
+    def test_event_registry_dispatch(self, event_name, expected_transformer):
+        event = {'name': event_name}
+        transformer = self.registry.create_transformer(event)
+        self.assertIsInstance(transformer, expected_transformer)
+
+    @ddt.data(
+        'edx.ui.lms.sequence.next_selected.what',
+        'edx',
+        'unregistered_event',
+    )
+    def test_dispatch_to_nonexistent_events(self, event_name):
+        event = {'name': event_name}
+        with self.assertRaises(KeyError):
+            self.registry.create_transformer(event)
+
+
+@ddt.ddt
+class PrefixedEventProcessorTestCase(EventTrackingTestCase):
+    """
+    Test PrefixedEventProcessor
+    """
+
+    @ddt.data(
+        SequenceDDT(action=u'next', tab_count=5, current_tab=3, legacy_event_type=u'seq_next'),
+        SequenceDDT(action=u'next', tab_count=5, current_tab=5, legacy_event_type=None),
+        SequenceDDT(action=u'previous', tab_count=5, current_tab=3, legacy_event_type=u'seq_prev'),
+        SequenceDDT(action=u'previous', tab_count=5, current_tab=1, legacy_event_type=None),
+    )
+    def test_sequence_linear_navigation(self, sequence_ddt):
+        event_name = u'edx.ui.lms.sequence.{}_selected'.format(sequence_ddt.action)
+
+        event = {
+            u'name': event_name,
+            u'event': {
+                u'current_tab': sequence_ddt.current_tab,
+                u'tab_count': sequence_ddt.tab_count,
+                u'id': u'ABCDEFG',
+            }
+        }
+
+        process_event_shim = PrefixedEventProcessor()
+        result = process_event_shim(event)
+
+        # Legacy fields get added when needed
+        if sequence_ddt.action == u'next':
+            offset = 1
+        else:
+            offset = -1
+        if sequence_ddt.legacy_event_type:
+            self.assertEqual(result[u'event_type'], sequence_ddt.legacy_event_type)
+            self.assertEqual(result[u'event'][u'old'], sequence_ddt.current_tab)
+            self.assertEqual(result[u'event'][u'new'], sequence_ddt.current_tab + offset)
+        else:
+            self.assertNotIn(u'event_type', result)
+            self.assertNotIn(u'old', result[u'event'])
+            self.assertNotIn(u'new', result[u'event'])
+
+    def test_sequence_tab_navigation(self):
+        event_name = u'edx.ui.lms.sequence.tab_selected'
+        event = {
+            u'name': event_name,
+            u'event': {
+                u'current_tab': 2,
+                u'target_tab': 5,
+                u'tab_count': 9,
+                u'id': u'block-v1:abc',
+                u'widget_placement': u'top',
+            }
+        }
+
+        process_event_shim = PrefixedEventProcessor()
+        result = process_event_shim(event)
+        self.assertEqual(result[u'event_type'], u'seq_goto')
+        self.assertEqual(result[u'event'][u'old'], 2)
+        self.assertEqual(result[u'event'][u'new'], 5)

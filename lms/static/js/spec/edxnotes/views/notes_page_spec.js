@@ -1,14 +1,13 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
-    'js/edxnotes/views/page_factory', 'js/spec/edxnotes/custom_matchers'
-], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory, customMatchers) {
+    'js/edxnotes/views/page_factory'
+], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
     describe('EdxNotes NotesPage', function() {
         var notes = Helpers.getDefaultNotes();
 
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'

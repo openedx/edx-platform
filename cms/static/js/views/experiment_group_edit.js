@@ -3,9 +3,9 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview'
+    'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore'
 ],
-function(BaseView) {
+function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
     var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
@@ -22,7 +22,6 @@ function(BaseView) {
         },
 
         initialize: function() {
-            this.template = this.loadTemplate('group-edit');
             this.listenTo(this.model, 'change', this.render);
         },
 
@@ -30,7 +29,7 @@ function(BaseView) {
             var collection = this.model.collection,
                 index = collection.indexOf(this.model);
 
-            this.$el.html(this.template({
+            this.$el.html(_.template(groupEditTemplate)({
                 name: this.model.get('name'),
                 allocation: this.getAllocation(),
                 index: index,

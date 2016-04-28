@@ -12,7 +12,7 @@
     ${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}
   </h1>
 
-  <form action="" method="post" id="api-access-request">
+  <form action="" method="post" class="api-management-form">
     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
     ${form.as_p() | n}
     <input id="api-access-submit" type="submit" value="${_('Request API Access')}"/>

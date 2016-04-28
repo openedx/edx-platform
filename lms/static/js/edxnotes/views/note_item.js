@@ -17,6 +17,7 @@ define([
         },
 
         initialize: function (options) {
+            this.options = _.extend({}, options);
             this.template = templateUtils.loadTemplate('note-item');
             this.logger = NotesLogger.getLogger('note_item', options.debug);
             this.listenTo(this.model, 'change:is_expanded', this.render);

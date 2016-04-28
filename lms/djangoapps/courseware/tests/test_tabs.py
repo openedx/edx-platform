@@ -27,10 +27,13 @@ from util.milestones_helpers import (
 from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE,
-    SharedModuleStoreTestCase)
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_MIXED_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
 class TabTestCase(SharedModuleStoreTestCase):
@@ -225,7 +228,7 @@ class TextbooksTestCase(TabTestCase):
 class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -237,10 +240,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         )
         cls.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='New Tab', url_slug='new_tab'))
         cls.course.save()
-        cls.toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-
-    def setUp(self):
-        super(StaticTabDateTestCase, self).setUp()
 
     def test_logged_in(self):
         self.setup_user()
@@ -263,13 +262,13 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
     def test_get_static_tab_contents(self):
         self.setup_user()
-        course = get_course_by_id(self.toy_course_key)
+        course = get_course_by_id(self.course.id)
         request = get_request_for_user(self.user)
-        tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
+        tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'new_tab')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)
-        self.assertIn(self.toy_course_key.to_deprecated_string(), tab_content)
+        self.assertIn(self.course.id.to_deprecated_string(), tab_content)
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
@@ -287,17 +286,33 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests for the static tab dates of an XML course
     """
 
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
-    # The following XML test course (which lives at common/test/data/2014)
-    # is closed; we're testing that tabs still appear when
-    # the course is already closed
-    xml_course_key = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    def setUp(self):
+        """
+        Set up the tests
+        """
+        super(StaticTabDateTestCaseXML, self).setUp()
 
-    # this text appears in the test course's tab
-    # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html
-    xml_data = "static 463139"
-    xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
+        # The following XML test course (which lives at common/test/data/2014)
+        # is closed; we're testing that tabs still appear when
+        # the course is already closed
+        self.xml_course_key = self.store.make_course_key('edX', 'detached_pages', '2014')
+        import_course_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['2014'],
+            static_content_store=None,
+            target_id=self.xml_course_key,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # this text appears in the test course's tab
+        # common/test/data/2014/tabs/8e4cce2b4aaf4ba28b1220804619e41f.html
+        self.xml_data = "static 463139"
+        self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
@@ -321,7 +336,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
     """
     Validate tab behavior when dealing with Entrance Exams
     """
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
     def setUp(self):
@@ -428,7 +443,7 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
     """
     Validate tab behavior when dealing with textbooks.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     @classmethod
     def setUpClass(cls):

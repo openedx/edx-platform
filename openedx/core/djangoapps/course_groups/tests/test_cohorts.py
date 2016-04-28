@@ -16,7 +16,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
@@ -138,14 +139,14 @@ class TestCohorts(ModuleStoreTestCase):
     """
     Test the cohorts feature
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
         super(TestCohorts, self).setUp()
-        self.toy_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.toy_course_key = ToyCourseFactory.create().id
 
     def _create_cohort(self, course_id, cohort_name, assignment_type):
         """
@@ -732,7 +733,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """
     Test Cohorts and Partitions Groups.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
@@ -740,7 +741,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
         """
         super(TestCohortsAndPartitionGroups, self).setUp()
 
-        self.test_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.test_course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.test_course_key)
 
         self.first_cohort = CohortFactory(course_id=self.course.id, name="FirstCohort")

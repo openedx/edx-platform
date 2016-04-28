@@ -6,6 +6,7 @@ from paver.easy import call_task
 
 import pavelib.js_test
 from .utils import PaverTestCase
+from pavelib.utils.envs import Env
 
 
 @ddt.ddt
@@ -20,21 +21,15 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         u'node_modules/.bin/coffee --compile `find {platform_root}/lms {platform_root}/cms '
         u'{platform_root}/common -type f -name "*.coffee"`'
     )
-    EXPECTED_JS_TEST_TOOL_OPTIONS = (
-        u"{platform_root}/lms/static/js_test.yml "
-        u"{platform_root}/lms/static/js_test_coffee.yml "
-        u"{platform_root}/cms/static/js_test.yml "
-        u"{platform_root}/cms/static/js_test_squire.yml "
-        u"{platform_root}/common/lib/xmodule/xmodule/js/js_test.yml "
-        u"{platform_root}/common/static/js_test.yml "
-        u"{platform_root}/common/static/js_test_requirejs.yml "
-        u"--use-firefox "
-        u"--timeout-sec 600 "
-        u"--xunit-report "
-        u"{platform_root}/reports/javascript/javascript_xunit.xml"
+    EXPECTED_KARMA_OPTIONS = (
+        u"{config_file} "
+        u"--single-run={single_run} "
+        u"--capture-timeout=60000 "
+        u"--junitreportpath="
+        u"{platform_root}/reports/javascript/javascript_xunit-{suite}.xml"
     )
     EXPECTED_COVERAGE_OPTIONS = (
-        u' --coverage-xml {platform_root}/reports/javascript/coverage.xml'
+        u' --coverage --coveragereportpath={platform_root}/reports/javascript/coverage-{suite}.xml'
     )
 
     EXPECTED_COMMANDS = [
@@ -115,6 +110,8 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         is_coverage = options['coverage']
         port = options['port']
         expected_messages = []
+        suites = Env.JS_TEST_ID_KEYS if options['suite'] == 'all' else [options['suite']]
+
         expected_messages.extend(self.EXPECTED_COMMANDS)
         if not dev_mode and not is_coverage:
             expected_messages.append(self.EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND.format(
@@ -122,13 +119,25 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
             ))
         expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
         expected_messages.append(self.EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-        expected_test_tool_command = u'js-test-tool {command} {options}'.format(
-            command='dev' if dev_mode else 'run',
-            options=self.EXPECTED_JS_TEST_TOOL_OPTIONS.format(platform_root=self.platform_root),
-        )
-        if is_coverage:
-            expected_test_tool_command += self.EXPECTED_COVERAGE_OPTIONS.format(platform_root=self.platform_root)
-        if port:
-            expected_test_tool_command += u" -p {port}".format(port=port)
-        expected_messages.append(expected_test_tool_command)
+
+        for suite in suites:
+            # Karma test command
+            karma_config_file = Env.KARMA_CONFIG_FILES[Env.JS_TEST_ID_KEYS.index(suite)]
+            expected_test_tool_command = u'karma start {options}'.format(
+                options=self.EXPECTED_KARMA_OPTIONS.format(
+                    config_file=karma_config_file,
+                    single_run='false' if dev_mode else 'true',
+                    suite=suite,
+                    platform_root=self.platform_root,
+                ),
+            )
+            if is_coverage:
+                expected_test_tool_command += self.EXPECTED_COVERAGE_OPTIONS.format(
+                    platform_root=self.platform_root,
+                    suite=suite
+                )
+            if port:
+                expected_test_tool_command += u" --port {port}".format(port=port)
+            expected_messages.append(expected_test_tool_command)
+
         self.assertEquals(self.task_messages, expected_messages)

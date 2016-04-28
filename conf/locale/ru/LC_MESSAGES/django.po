@@ -89,6 +89,7 @@
 # Dmitriy <polevaiabrest@gmail.com>, 2014
 # Dmitry Ganchev <dima.ganchev@gmail.com>, 2014
 # Dmitry Oshkalo <dmitry.oshkalo@gmail.com>, 2015
+# Dzmitryi Halyava, 2016
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Gubin Pavel <pashkun73@gmail.com>, 2013
 # Gubin Pavel <pashkun73@gmail.com>, 2013
@@ -193,7 +194,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-30 19:39+0000\n"
+"POT-Creation-Date: 2016-04-15 11:05+0000\n"
 "PO-Revision-Date: 2016-02-29 15:22+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -360,7 +361,7 @@ msgstr "Вы зачислены на курс, ваша личность под�
 #: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
-msgstr "Подтверждено"
+msgstr "Подтверждённые"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "ID Verified Ribbon/Badge"
@@ -456,6 +457,10 @@ msgstr ""
 "expiration_datetime."
 
 #: common/djangoapps/course_modes/models.py
+msgid "Verified modes cannot be free."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
 msgid ""
 "The time period before a course ends in which a course mode will expire"
 msgstr ""
@@ -497,6 +502,7 @@ msgid "Student"
 msgstr "Обучающийся"
 
 #: common/djangoapps/embargo/forms.py
+#: lms/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr "КУРС НЕ НАЙДЕН. Убедитесь, что идентификатор курса указан правильно."
 
@@ -595,8 +601,8 @@ msgid ""
 "Usernames must contain only letters, numbers, underscores (_), and hyphens "
 "(-)."
 msgstr ""
-"Имена пользователей должны содержать только буквы, цифры, нижнее "
-"подчёркивание (_) и дефисы (-)."
+"Имена пользователей должны содержать только буквы латинского алфавита, "
+"цифры, нижнее подчёркивание (_) и дефисы (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -4508,6 +4514,83 @@ msgstr "Все слова, добавленные обучающимися."
 msgid "Top num_top_words words for word cloud."
 msgstr "Наиболее часто встречающиеся num_top_words слов для облака."
 
+#: lms/djangoapps/badges/events/course_complete.py
+msgid ""
+"Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
+"{end_date})"
+msgstr ""
+"Окончил/а курс «{course_name}» ({course_mode}, {start_date} – {end_date})"
+
+#: lms/djangoapps/badges/events/course_complete.py
+msgid "Completed the course \"{course_name}\" ({course_mode})"
+msgstr "Окончен курс «{course_name}» ({course_mode})"
+
+#: lms/djangoapps/badges/models.py
+msgid "The badge image must be square."
+msgstr "Изображение значка должно быть квадратным."
+
+#: lms/djangoapps/badges/models.py
+msgid "The badge image file size must be less than 250KB."
+msgstr "Размер изображения не должен превышать 250 КБ."
+
+#: lms/djangoapps/badges/models.py
+msgid "This value must be all lowercase."
+msgstr ""
+
+#: lms/djangoapps/badges/models.py
+msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
+msgstr ""
+"Статус сертификата для значка. Например, «Подтверждённый сертификат» или "
+"«Сертификат Кодекса чести»."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Badge images must be square PNG files. The file size should be under 250KB."
+msgstr ""
+"Загрузите квадратное изображение в формате PNG. Его размер не должен "
+"превышать 250 КБ."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Set this value to True if you want this image to be the default image for "
+"any course modes that do not have a specified badge image. You can have only"
+" one default image."
+msgstr ""
+"Если вы хотите, чтобы это изображение использовалось для курсов без "
+"специальных значков, установите значение true. Значок по умолчанию может "
+"быть только один."
+
+#: lms/djangoapps/badges/models.py
+msgid "There can be only one default image."
+msgstr "Может использоваться только одно изображение по умолчанию."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"On each line, put the number of completed courses to award a badge for, a "
+"comma, and the slug of a badge class you have created that has the issuing "
+"component 'openedx__course'. For example: 3,enrolled_3_courses"
+msgstr ""
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"On each line, put the number of enrolled courses to award a badge for, a "
+"comma, and the slug of a badge class you have created that has the issuing "
+"component 'openedx__course'. For example: 3,enrolled_3_courses"
+msgstr ""
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Each line is a comma-separated list. The first item in each line is the slug"
+" of a badge class you have created that has an issuing component of "
+"'openedx__course'. The remaining items in each line are the course keys the "
+"learner needs to complete to be awarded the badge. For example: "
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
+msgstr ""
+
+#: lms/djangoapps/badges/models.py
+msgid "Please check the syntax of your entry."
+msgstr ""
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
@@ -4637,17 +4720,6 @@ msgstr ""
 "Невозможно создать CCX на основе курса с устаревшим идентификатором. "
 "Перезапустите курс в edX Studio."
 
-#: lms/djangoapps/certificates/badge_handler.py
-msgid ""
-"Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
-"{end_date})"
-msgstr ""
-"Окончил/а курс «{course_name}» ({course_mode}, {start_date} – {end_date})"
-
-#: lms/djangoapps/certificates/badge_handler.py
-msgid "Completed the course \"{course_name}\" ({course_mode})"
-msgstr "Окончен курс «{course_name}» ({course_mode})"
-
 #: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
 msgid "created"
 msgstr "создано"
@@ -4722,41 +4794,6 @@ msgstr "Причина ошибки, произошедшей во время в
 #: lms/djangoapps/certificates/models.py
 msgid "The download URL for the generated certificate."
 msgstr "Ссылка для скачивания сертификата"
-
-#: lms/djangoapps/certificates/models.py
-msgid "The badge image must be square."
-msgstr "Изображение значка должно быть квадратным."
-
-#: lms/djangoapps/certificates/models.py
-msgid "The badge image file size must be less than 250KB."
-msgstr "Размер изображения не должен превышать 250 КБ."
-
-#: lms/djangoapps/certificates/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Статус сертификата для значка. Например, «Подтверждённый сертификат» или "
-"«Сертификат Кодекса чести»."
-
-#: lms/djangoapps/certificates/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Загрузите квадратное изображение в формате PNG. Его размер не должен "
-"превышать 250 КБ."
-
-#: lms/djangoapps/certificates/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Если вы хотите, чтобы это изображение использовалось для курсов без "
-"специальных значков, установите значение true. Значок по умолчанию может "
-"быть только один."
-
-#: lms/djangoapps/certificates/models.py
-msgid "There can be only one default image."
-msgstr "Может использоваться только одно изображение по умолчанию."
 
 #: lms/djangoapps/certificates/models.py
 msgid "Name of template."
@@ -5265,6 +5302,10 @@ msgid ""
 msgstr ""
 "Для получения сертификата вам необходимо выполнить все требования к "
 "указанному сроку."
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "After this date, course content will be archived."
+msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6309,12 +6350,8 @@ msgstr ""
 "повторите попытку."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data, Please refresh the page and then try again."
-msgstr "Получены неверные JSON-данные. Пожалуйста обновите страницу."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Invalid data, user_id must be present for all certificate exceptions."
-msgstr "Неверные данные, user_id должен присутствовать в списке исключений."
+msgid "Invalid data, generate_for must be \"new\" or \"all\"."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Certificate generation started for white listed students."
@@ -6675,6 +6712,7 @@ msgid "Last Name"
 msgstr "Фамилия"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "Наименование компании"
@@ -8250,6 +8288,10 @@ msgstr ""
 "Пользователь {username} не зарегистрирован на курс, связанный с этой "
 "командой."
 
+#: lms/djangoapps/verified_track_content/models.py
+msgid "The course key for the course we would like to be auto-cohorted."
+msgstr ""
+
 #: lms/djangoapps/verify_student/models.py
 msgid "Your {platform_name} verification has expired."
 msgstr "Срок действия вашей верификации {platform_name} истёк."
@@ -9075,6 +9117,26 @@ msgstr "Эта версия была удалена."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Если восстановить эту версию, статья будет помечена как удалённая."
 
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "Company Address"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "Describe what your application does."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The URL of your company's website."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The name of your company."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The contact address of your company."
+msgstr ""
+
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Denied"
 msgstr "Отказано"
@@ -9093,6 +9155,27 @@ msgstr ""
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "The reason this user wants to access the API."
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "API access request from {company}"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "API access request"
+msgstr ""
+
+#: openedx/core/djangoapps/api_admin/views.py
+msgid "TODO"
+msgstr ""
+
+#. Translators: link_start and link_end are HTML tags for a link to the terms
+#. of service.
+#. platform_name is the name of this Open edX installation.
+#: openedx/core/djangoapps/api_admin/widgets.py
+msgid ""
+"I, and my company, accept the {link_start}{platform_name} API Terms of "
+"Service{link_end}."
 msgstr ""
 
 #: openedx/core/djangoapps/bookmarks/views.py
@@ -9126,6 +9209,10 @@ msgstr ""
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "Закладки с usage_id: {usage_id} не существует."
+
+#: openedx/core/djangoapps/course_groups/cohorts.py
+msgid "Default Group"
+msgstr ""
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -9395,6 +9482,14 @@ msgstr ""
 "Это максимальное количество попыток повторной обработки запроса о получении "
 "сертификата при неуспешном завершении предыдущего запроса."
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show xseries program advertising"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program listing page"
+msgstr ""
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr "Разрешить улучшенную страницу курса."
@@ -9450,7 +9545,7 @@ msgstr "username@domain.com"
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
-"Это электронный адрес, который вы использовали для регистрации на "
+"Электронный адрес, который вы использовали для регистрации на "
 "{platform_name}"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -9463,7 +9558,6 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Пароль"
@@ -10066,11 +10160,7 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "Неверный формат для поля '{name}'. {detailed_message}"
 
-#: cms/lib/xblock/tagging.py
-msgid "Difficulty"
-msgstr "Сложность"
-
-#: cms/lib/xblock/tagging.py
+#: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "Словарь тегов"
 
@@ -10135,32 +10225,22 @@ msgstr "Номер курса:"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Курсы"
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
+#: cms/templates/index.html cms/templates/widgets/header.html
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
 msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "Нет учетной записи {studio_name}? Зарегистрируйтесь!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Информация, необходимая для входа в {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -10172,14 +10252,13 @@ msgstr "Адрес электронной почты"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "образец: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
@@ -10405,12 +10484,13 @@ msgid "My Courses"
 msgstr "Мои курсы"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "Кажется, вы ещё не записаны ни на один курс."
+msgid "You are not enrolled in any courses yet."
+msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr "Найти курсы прямо сейчас!"
+#: lms/templates/dashboard.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Explore courses"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -10572,31 +10652,23 @@ msgstr "Помощь {platform_name}"
 
 #: lms/templates/help_modal.html
 msgid ""
-"For <strong>questions on course lectures, homework, tools, or materials for "
-"this course</strong>, post in the {link_start}course discussion "
-"forum{link_end}."
+"For {strong_start}questions on course lectures, homework, tools, or "
+"materials for this course{strong_end}, post in the {link_start}course "
+"discussion forum{link_end}."
 msgstr ""
-"Если у вас есть <strong>вопросы о лекциях курса, домашних заданиях, "
-"инструментах или материалах</strong>, напишите об этом на {link_start}форуме"
-" обсуждений курса{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
-"Have <strong>general questions about {platform_name}</strong>? You can find "
-"lots of helpful information in the {platform_name} "
+"Have {strong_start}general questions about {platform_name}{strong_end}? You "
+"can find lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
-"Появились <strong>общие вопросы о {platform_name}</strong>? Вы можете найти "
-"много полезной информации в  разделе {link_start}Вопросы и ответы{link_end} "
-"{platform_name}."
 
 #: lms/templates/help_modal.html
 msgid ""
-"Have a <strong>question about something specific</strong>? You can contact "
-"the {platform_name} general support team directly:"
+"Have a {strong_start}question about something specific{strong_end}? You can "
+"contact the {platform_name} general support team directly:"
 msgstr ""
-"Есть <strong>вопросы о чём-то конкретном</strong>? Свяжитесь с командой "
-"поддержки {platform_name} напрямую."
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -10670,14 +10742,10 @@ msgid "Brief description of the problem"
 msgstr "Краткое описание проблемы"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering"
-msgstr "Подробное описание возникшей проблемы"
-
-#: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc."
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
-"Включите текст сообщения об ошибке, действия, которые привели к проблеме и "
-"т.д."
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -10886,8 +10954,6 @@ msgstr ""
 msgid "Account Preferences"
 msgstr "Настройки учётной записи"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication provider (like Google or LinkedIn).
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
 msgstr "Войти с помощью {provider_name}"
@@ -11013,8 +11079,7 @@ msgstr "{platform_name} Главная страница"
 msgid "How it Works"
 msgstr "Как это работает"
 
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "Найти курсы"
@@ -11064,14 +11129,10 @@ msgid "Register"
 msgstr "Регистрация"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"<strong>Предупреждение.</strong> Ваш браузер поддерживается не полностью. Мы"
-" настоятельно рекомендуем использовать {chrome_link} или {ff_link}."
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
@@ -11152,8 +11213,6 @@ msgstr ""
 msgid "The following errors occurred while processing your registration:"
 msgstr "При обработки вашей заявки на регистрацию произошли следующие ошибки:"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
@@ -11767,10 +11826,6 @@ msgstr ""
 "Chrome это можно сделать одновременным нажатием Ctrl и + или Ctrl и -."
 
 #: lms/templates/video.html
-msgid "Skip to a navigable version of this video's transcript."
-msgstr "Перейти к управляемой версии текста видео."
-
-#: lms/templates/video.html
 msgid "Loading video player"
 msgstr "Загрузка видеоплеера"
 
@@ -11781,14 +11836,6 @@ msgstr "Просмотреть видео"
 #: lms/templates/video.html
 msgid "No playable video sources found."
 msgstr "Воспроизводимых видеоматериалов не найдено."
-
-#: lms/templates/video.html
-msgid "Skip to end of transcript."
-msgstr "Перейти к концу стенограммы."
-
-#: lms/templates/video.html
-msgid "Go back to start of transcript."
-msgstr "Вернуться к началу стенограммы."
 
 #: lms/templates/video.html
 msgid "Download video"
@@ -11809,6 +11856,476 @@ msgstr "Ваши слова:"
 #: lms/templates/word_cloud.html
 msgid "Total number of words:"
 msgstr "Общее количество слов:"
+
+#: lms/templates/api_admin/api_access_request_form.html
+msgid "API Access Request"
+msgstr ""
+
+#: lms/templates/api_admin/api_access_request_form.html
+#: lms/templates/api_admin/status.html
+msgid "{platform_name} API Access Request"
+msgstr ""
+
+#: lms/templates/api_admin/api_access_request_form.html
+msgid "Request API Access"
+msgstr ""
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#. "link_start" and "link_end" are the HTML for a link to the API
+#. documentation. "api_support_email_link" is HTML for a link to email the API
+#. support staff.
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API is being "
+"processed. You will receive a message at the email address in your profile "
+"when processing is complete. You can also return to this page to see the "
+"status of your API access request. To learn more about the {platform_name} "
+"Course Catalog API, visit {link_start}our API documentation page{link_end}. "
+"For questions about using this API, visit our FAQ page or contact "
+"{api_support_email_link}."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Terms of Service for {platform_name} APIs"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Effective Date: April 12th, 2016"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Welcome to {platform_name}. Thank you for using {platform_name}'s Course "
+"Discovery API and any additional APIs that we may offer from time to time "
+"(collectively, the \"APIs\"). Please read these Terms of Service prior to "
+"accessing or using the APIs. These Terms of Service, any additional terms "
+"within accompanying API documentation, and any applicable policies and "
+"guidelines that {platform_name} makes available and/or updates from time to "
+"time are agreements (collectively, the \"Terms\") between you and "
+"{platform_name}. By accessing or using the APIs, you accept and agree to be "
+"legally bound by the Terms, whether or not you are a registered user. If you"
+" do not understand or do not wish to be bound by the Terms, you should not "
+"use the APIs."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "API Access"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To access the APIs, you will need to create an {platform_name} user account "
+"for your application (not for personal use). This account will provide you "
+"with access to our API request page at {request_url}. On that page, you must"
+" complete the API request form including a description of your proposed uses"
+" for the APIs. Any account and registration information that you provide to "
+"{platform_name} must be accurate and up to date, and you agree to inform us "
+"promptly of any changes. {platform_name} will review your API request form "
+"and, upon approval in {platform_name}'s sole discretion, will provide you "
+"with instructions for obtaining your API shared secret and client ID."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Permissible Use"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to use the APIs solely for the purpose of delivering content that "
+"is accessed through the APIs (the \"API Content\") to your own website, "
+"mobile site, app, blog, email distribution list, or social media property or"
+" for another commercial use that you described in your request for access "
+"and that {platform_name} has approved on a case-by-case basis. "
+"{platform_name} may monitor your use of the APIs for compliance with the "
+"Terms and may deny your access or shut down your integration if you try to "
+"go around or exceed the requirements and limitations set by {platform_name}."
+" Your Application or other approved use of the API or the API Content must "
+"not prompt your end users to provide their {platform_name} username, "
+"password or other {platform_name} user credentials anywhere other than the "
+"{platform_name} website at {platform_url}."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Prohibited Uses and Activities"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} shall have the sole right to determine whether or not any "
+"given use of the APIs is acceptable, and {platform_name} reserves the right "
+"to revoke API access for any use that {platform_name} determines at any "
+"time, in its sole discretion, does not benefit or serve the best interests "
+"of {platform_name}, its users and its partners."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The following activities are not acceptable when using the APIs (this is not"
+" an exhaustive list):"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"collecting or storing the names, passwords, or other credentials of "
+"{platform_name} users;"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"scraping or similar techniques to aggregate or otherwise create permanent "
+"copies of API Content;"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"violating, misappropriating or infringing any copyright, trademark rights, "
+"rights of privacy or publicity, confidential information or any other right "
+"of any third party;"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"altering or removing any trademark, copyright or other proprietary or legal "
+"notices contained in, or appearing on, the APIs or any API Content;"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "altering or editing any content or graphics in the API Content"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"sublicensing, re-distributing, renting, selling or leasing access to the "
+"APIs or your client secret to any third party;"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"distributing any virus, Trojan horse, spyware, adware, malware, bot, time "
+"bomb, worm, or other harmful or malicious component; or"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"using the APIs for any purpose which or might overburden, impair or disrupt "
+"the {platform_name} platform, servers or networks."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Usage and Quotas"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} reserves the right, in its discretion, to impose "
+"restrictions and limitations on the number and frequency of calls made by "
+"you or your Application to the APIs. You must not attempt to circumvent any "
+"restrictions or limitations that we impose."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Compliance"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to comply with all applicable law, regulation, and third party "
+"rights (including without limitation laws regarding the import or export of "
+"data or software, privacy, copyright, and local laws). You will not use the "
+"APIs to encourage or promote illegal activity or violation of third party "
+"rights. You will not violate any other terms of service with "
+"{platform_name}. You will only access (or attempt to access) an API by the "
+"means described in the documentation of that API. You will not misrepresent "
+"or mask either your identity or yourApplication's identity when using the "
+"APIs."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Ownership"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You acknowledge and agree that the APIs and all API Content contain valuable"
+" intellectual property of {platform_name} and its partners. The APIs and all"
+" API Content are protected by United States and foreign copyright, "
+"trademark, and other laws. All rights in the APIs and the API Content, if "
+"not expressly granted, are reserved. By using the APIs or any API Content, "
+"you do not acquire ownership of any rights in the APIs or API Content. You "
+"must not claim or attempt to claim ownership in the APIs or any API Content "
+"or misrepresent yourself or your company or your Application as being the "
+"source of any API Content. You may not modify, create derivative works of, "
+"or attempt to use, license, or in any way exploit any API Content in whole "
+"or in part on your own behalf or on behalf of any third party. You may not "
+"distribute or modify the APIs or any API Content (including adaptation, "
+"editing, excerpting, or creating derivative works)."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"All names, logos and seals (\"Trademarks\") that appear in the APIs, API "
+"Content, or on or through the services made available on or through the "
+"APIs, if any, are the property of their respective owners. You may not "
+"remove, alter, or obscure any copyright, Trademark, or other proprietary "
+"rightrs notices incorporated in or accompanying the API Content. If any "
+"third party revokes access to API Content owned or controlled by that third "
+"party, including without limitation any Trademarks, you must ensure that all"
+" API Content pertaining to that third party is deleted from your app, "
+"networks, systems and servers as soon as reasonably possible. If you stop "
+"using the APIs altogether or if your API access is revoked, you must delete "
+"all API Content in the same way."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To the extent that you submit any content to {platform_name} in connection "
+"with your use of the APIs or any API Content, you hereby grant to "
+"{platform_name} a worldwide, non-exclusive, transferable, assignable, sub "
+"licensable, fully paid-up, royalty-free, perpetual, irrevocable right and "
+"license to host, transfer, display, perform, reproduce, modify, distribute, "
+"re-distribute, relicense and otherwise use, make available and exploit such "
+"content, in whole or in part, in any form and in any media formats and "
+"through any media channels (now known or hereafter developed)."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Privacy"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to comply with all applicable privacy laws and regulations and to "
+"be transparent with respect to any collection and use of end user data. You "
+"will provide and adhere to a privacy policy for your Application that "
+"clearly and accurately describes to your end users what user information you"
+" collect and how you may use and share such information (including for "
+"advertising) with {platform_name} and other third parties."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Right to Charge"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} reserves the right to modify the Terms at any time without "
+"advance notice. Any changes to the Terms will be effective immediately upon "
+"posting on this page, with an updated effective date. By accessing or using "
+"the APIs after any changes have been made, you signify your agreement on a "
+"prospective basis to the modified Terms and all of the changes. Be sure to "
+"return to this page periodically to ensure familiarity with the most current"
+" version of the Terms."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} may also update or modify the APIs from time to time without"
+" advance notice. These changes may affect your use of the APIs or the way "
+"your integration interacts with the API. If we make a change that is "
+"unacceptable to you, you should stop using the APIs. Continued use of the "
+"APIs means you accept the change."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Confidentiality"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Your credentials (such as client secret and IDs) are intended to be used "
+"solely by you. You will keep your credentials confidential and discourage "
+"others from using your credentials. Your credentials may not be embedded in "
+"open source projects."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"In the event that {platform_name} provides you with access to information "
+"specific to {platform_name} and/or the APIs that is either marked as "
+"\"Confidential\" or which a reasonable person would assume to be "
+"confidential or proprietary given the terms of its disclosure "
+"(\"Confidential Information\"), you agree to use this information only to "
+"use and build with the APIs. You may not disclose the Confidential "
+"Information to anyone without {platform_name}'s prior written consent, and "
+"you agree to protect the Confidential Information from unauthorized use and "
+"disclosure in the same way that you would protect your own confidential "
+"information. Confidential information does not include information that you "
+"independently developed, that was rightfully given to you by a third party "
+"without confidentiality obligation, or that becomes public through no fault "
+"of your own. You may disclose Confidential Information when compelled to do "
+"so by law if you provide {platform_name} with reasonable prior notice, "
+"unless a court orders that {platform_name} not receive notice."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Disclaimer of Warranty / Limitation of Liabilities"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"THE APIS AND ANY INFORMATION, API CONTENT OR SERVICES MADE AVAILABLE ON OR "
+"THROUGH THE APIS ARE PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT "
+"WARRANTY OF ANY KIND (EXPRESS, IMPLIED OR OTHERWISE), INCLUDING, WITHOUT "
+"LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A "
+"PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT INSOFAR AS ANY SUCH IMPLIED "
+"WARRANTIES MAY NOT BE DISCLAIMED UNDER APPLICABLE LAW."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} AND THE {platform_name} PARTICIPANTS (AS HERINAFTER DEFINED)"
+" DO NOT WARRANT THAT THE APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE"
+" MANNER, THAT THE APIS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR "
+"THAT THE APIS OR API CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. "
+"{platform_name} AND THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY "
+"ABOUT THE ACCURACY, COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY "
+"API CONTENT, OR THAT ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE "
+"AVAILABLE. \"{platform_name} PARTICIPANTS\" MEANS MIT, HARVARD, THE OTHER "
+"MEMBERS, THE ENTITIES PROVIDING INFORMATION, API CONTENT OR SERVICES FOR THE"
+" APIS, THE COURSE INSTRUCTORS AND THEIR STAFFS."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"USE OF THE APIS, AND THE API CONTENT AND ANY SERVICES OBTAINED FROM OR "
+"THROUGH THE APIS, IS AT YOUR OWN RISK. YOUR ACCESS TO OR DOWNLOAD OF "
+"INFORMATION, MATERIALS OR DATA THROUGH THE APIS IS AT YOUR OWN DISCRETION "
+"AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY"
+" (INCLUDING YOUR COMPUTER SYSTEM) OR LOSS OF DATA THAT RESULTS FROM THE "
+"DOWNLOAD OR USE OF SUCH MATERIAL OR DATA, UNLESS OTHERWISE EXPRESSLY "
+"PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AGREE THAT NEITHER "
+"{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL BE LIABLE "
+"TO YOU FOR ANY LOSS OR DAMAGES, EITHER ACTUAL OR CONSEQUENTIAL, ARISING OUT "
+"OF OR RELATING TO THESE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
+"INABILITY TO USE THE APIS OR ANY API CONTENT, OR YOUR RELIANCE UPON "
+"INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
+"IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"IN PARTICULAR, TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, NEITHER "
+"{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL HAVE ANY "
+"LIABILITY FOR ANY CONSEQUENTIAL, INDIRECT, PUNITIVE, SPECIAL, EXEMPLARY OR "
+"INCIDENTAL DAMAGES, WHETHER FORESEEABLE OR UNFORESEEABLE AND WHETHER OR NOT "
+"{platform_name} OR ANY OF THE {platform_name} PARTICIPANTS HAS BEEN "
+"NEGLIGENT OR OTHERWISE AT FAULT (INCLUDING, BUT NOT LIMITED TO, CLAIMS FOR "
+"DEFAMATION, ERRORS, LOSS OF PROFITS, LOSS OF DATA OR INTERRUPTION IN "
+"AVAILABILITY OF DATA)."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"CERTAIN STATE LAWS DO NOT ALLOW LIMITATIONS ON IMPLIED WARRANTIES OR THE "
+"EXCLUSION OR LIMITATION OF CERTAIN DAMAGES. IF THESE LAWS APPLY TO YOU, SOME"
+" OR ALL OF THE ABOVE DISCLAIMERS, EXCLUSIONS, OR LIMITATIONS MAY NOT APPLY "
+"TO YOU, AND YOU MIGHT HAVE ADDITIONAL RIGHTS."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The APIs and API Content may include hyperlinks to sites maintained or "
+"controlled by others. {platform_name} and the {platform_name} Participants "
+"are not responsible for and do not routinely screen, approve, review or "
+"endorse the contents of or use of any of the products or services that may "
+"be offered at these sites. If you decide to access linked third-party "
+"websites, you do so at your own risk."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To the maximum extent permitted by applicable law, you agree to defend, hold"
+" harmless and indemnify {platform_name} and the {platform_name} "
+"Participants, and their respective subsidiaries, affiliates, officers, "
+"faculty, students, fellows, governing board members, agents and employees "
+"from and against any third-party claims, actions or demands arising out of, "
+"resulting from or in any way related to your use of the APIs and any API "
+"Content, including any liability or expense arising from any and all claims,"
+" losses, damages (actual and consequential), suits, judgments, litigation "
+"costs and attorneys' fees, of every kind and nature. In such a case, "
+"{platform_name} or one of the {platform_name} Participants will provide you "
+"with written notice of such claim, suit or action."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "General Legal Terms"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The Terms constitute the entire agreement between you and {platform_name} "
+"with respect to your use of the APIs and API Content, superseding any prior "
+"agreements between you and {platform_name} regarding your use of the APIs "
+"and API Content. The failure of {platform_name} to exercise or enforce any "
+"right or provision of the Terms shall not constitute a waiver of such right "
+"or provision. If any provision of the Terms is found by a court of competent"
+" jurisdiction to be invalid, the parties nevertheless agree that the court "
+"should endeavor to give effect to the parties' intentions as reflected in "
+"the provision and the other provisions of the Terms shall remain in full "
+"force and effect. The Terms do not create any third party beneficiary rights"
+" or any agency, partnership, or joint venture. For any notice provided to "
+"you by {platform_name} under these Terms, {platform_name} may notify you via"
+" the email address associated with your {platform_name} account."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree that the Terms, the APIs, and any claim or dispute arising out of "
+"or relating to the Terms or the APIs will be governed by the laws of the "
+"Commonwealth of Massachusetts, excluding its conflicts of law provisions. "
+"You agree that all such claims and disputes will be heard and resolved "
+"exclusively in the federal or state courts located in and serving Cambridge,"
+" Massachusetts, U.S.A. You consent to the personal jurisdiction of those "
+"courts over you for this purpose, and you waive and agree not to assert any "
+"objection to such proceedings in those courts (including any defense or "
+"objection of lack of proper jurisdiction or venue or inconvenience of "
+"forum). Notwithstanding the foregoing, you agree that {platform_name} shall "
+"still be allowed to apply to injunctive remedies (or an equivalent type of "
+"urgent legal relief) in any jursdiction."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Termination"
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You may stop using the APIs at any time. You agree that {platform_name}, in "
+"its sole discretion and at any time, may terminate your use of the APIs or "
+"any API Content for any reason or no reason, without prior notice or "
+"liabiliy."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} and the {platform_name} Participants reserve the right at "
+"any time in their sole discretion to cancel, delay, reschedule or alter the "
+"format of any API or API Content offered through {platform_name}, or to "
+"cease providing any part or all of the APIs or API Content or related "
+"services, and you agree that neither {platform_name} nor any of the "
+"{platform_name} Participants will have any liability to you for such an "
+"action."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Upon any termination of the Terms or discontinuation of your access to an "
+"API for any reason, your right to use any API and API Content will "
+"immediately cease. You will immediately stop using the APIs and delete any "
+"cached or stored API Content. All provisions of the Terms that by their "
+"nature should survive termination shall survive termination, including, "
+"without limitation, ownership provisions, warranty disclaimers, and "
+"limitation of liability. Termination of your access to and use of the APIs "
+"and API Content shall not relieve you of any obligations arising or "
+"accrusing prior to such termination or limit any liability that you "
+"otherwise may have to {platform_name}, including without limitation any "
+"indemnification obligations contained herein."
+msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -12038,24 +12555,17 @@ msgid "Auto Enroll"
 msgstr "Автоматически вносить в список"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users who have not yet registered for "
-"{platform_name} will be automatically enrolled."
+"If this option is {em_start}checked{em_end}, users who have not yet "
+"registered for {platform_name} will be automatically enrolled."
 msgstr ""
-"Если эта опция <em>отмечена</em>, пользователи, не зарегистрированные в "
-"{platform_name}, будут автоматически зачислены на курс."
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is left <em>unchecked</em>, users who have not yet registered"
-" for {platform_name} will not be enrolled, but will be allowed to enroll "
-"once they make an account."
+"If this option is left {em_start}unchecked{em_end}, users who have not yet "
+"registered for {platform_name} will not be enrolled, but will be allowed to "
+"enroll once they make an account."
 msgstr ""
-"Если эта опция <em>не отмечена</em>, пользователи, не зарегистрированные в "
-"{platform_name} не будут зачислены на курс. Однако они смогут записать на "
-"него, создав учетную запись."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -12070,13 +12580,10 @@ msgid "Notify users by email"
 msgstr "Уведомить слушателей по электронной почте"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users will receive an email "
+"If this option is {em_start}checked{em_end}, users will receive an email "
 "notification."
 msgstr ""
-"Если эта опция <em>отмечена</em>, пользователи будут получать уведомления по"
-" электронной почте."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
@@ -12506,6 +13013,10 @@ msgid "{chapter} current chapter"
 msgstr "{chapter} текущая глава"
 
 #: lms/templates/courseware/accordion.html
+msgid "{span_start}current section{span_end}"
+msgstr ""
+
+#: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "до {date}"
@@ -12931,8 +13442,8 @@ msgid "Verification Declined"
 msgstr "Подтверждение отклонено"
 
 #: lms/templates/courseware/progress.html
-msgid "Completed"
-msgstr "Завершено"
+msgid "Completed by"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -13319,12 +13830,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "It's official. It's easily shareable. It's a proven motivator to complete "
-"the course. <br>{link_start}Learn more about the verified "
+"the course. {line_break}{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
-"Это официальный сертификат. О нём легко рассказать. Стремление получить его "
-"мотивирует закончить курс. <br>{link_start}Узнать больше про подтверждённый "
-"{cert_name_long}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -15605,6 +16113,32 @@ msgid "Reason"
 msgstr "Причина"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not yet registered for "
+"{platform_name} will be automatically enrolled."
+msgstr ""
+"Если эта опция <em>отмечена</em>, пользователи, не зарегистрированные в "
+"{platform_name}, будут автоматически зачислены на курс."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is left <em>unchecked</em>, users who have not yet registered"
+" for {platform_name} will not be enrolled, but will be allowed to enroll "
+"once they make an account."
+msgstr ""
+"Если эта опция <em>не отмечена</em>, пользователи, не зарегистрированные в "
+"{platform_name} не будут зачислены на курс. Однако они смогут записать на "
+"него, создав учетную запись."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users will receive an email "
+"notification."
+msgstr ""
+"Если эта опция <em>отмечена</em>, пользователи будут получать уведомления по"
+" электронной почте."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
 msgstr "Зарегистрировать/зачислить слушателей"
 
@@ -17182,15 +17716,11 @@ msgstr "Необходимые технические приспособлени
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid ""
-"Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
-"turned on, and allowed to function in your web browser (commonly adjustable "
-"in your browser settings).</strong>"
+"Please make sure your browser is updated to the {strong_start}{a_start}most "
+"recent version possible{a_end}{strong_end}. Also, please make sure your "
+"{strong_start}webcam is plugged in, turned on, and allowed to function in "
+"your web browser (commonly adjustable in your browser settings).{strong_end}"
 msgstr ""
-"Пожалуйста, убедитесь, что ваш браузер обновлен до {a_start} последней "
-"возможной версии{a_end}.  Также пожалуйста убедитесь, что ваша<strong> веб-"
-"камера подключена к сети, включена, и позволяет функционировать в вашем веб-"
-"браузере  (обычно регулируется в настройках вашего браузера).</strong>"
 
 #: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
@@ -17274,6 +17804,15 @@ msgstr ""
 "© edX Inc. Все права защищены, за исключением оговоренных случаев.  EdX, "
 "Open edX и их логотипы являются зарегистрированными товарными знаками edX "
 "Inc."
+
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>Предупреждение.</strong> Ваш браузер поддерживается не полностью. Мы"
+" настоятельно рекомендуем использовать {chrome_link} или {ff_link}."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -19332,10 +19871,6 @@ msgstr ""
 msgid "Libraries"
 msgstr "Библиотеки"
 
-#: cms/templates/index.html cms/templates/widgets/header.html
-msgid "Programs"
-msgstr "Программы"
-
 #: cms/templates/index.html
 msgid "Re-run Course"
 msgstr "Перезапустить курс"
@@ -19610,6 +20145,22 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "Доп. информация о библиотеках материалов"
+
+#: cms/templates/login.html cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"

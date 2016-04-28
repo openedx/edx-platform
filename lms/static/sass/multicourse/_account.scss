@@ -217,7 +217,7 @@
   // aside
   aside {
 
-    .cta {
+    .btn {
       margin: 0 0 ($baseline*2) 0;
 
       &:last-child {
@@ -230,7 +230,7 @@
       }
     }
 
-    .cta-login {
+    .btn-login {
 
       h3.title,
       .instructions {
@@ -238,7 +238,7 @@
         margin-bottom: 0;
       }
 
-      .cta-login-action {
+      .btn-login-action {
         @extend %btn-secondary-grey-outline;
         padding: ($baseline/10) ($baseline*0.75);
         @include margin-left($baseline/4);
@@ -631,7 +631,7 @@
 // login
 .view-login {
 
-  header.global  .nav-courseware .cta-login {
+  .header-global  .nav-courseware .btn-login {
     display: none;
   }
 
@@ -657,7 +657,7 @@
 // password reset
 .view-passwordreset {
 
-  header.global .nav-courseware .cta-login {
+  .header-global .nav-courseware .btn-login {
     display: none;
   }
 

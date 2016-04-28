@@ -175,7 +175,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     textbooks = TextbookList(
-        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        help=_("List of Textbook objects with (title, url) for textbooks used in this course"),
         default=[],
         scope=Scope.content
     )

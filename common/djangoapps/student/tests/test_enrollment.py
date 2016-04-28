@@ -4,6 +4,7 @@ Tests for student enrollment.
 import ddt
 import unittest
 from mock import patch
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,6 +21,7 @@ from student.roles import (
 )
 
 
+@attr('shard_3')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):

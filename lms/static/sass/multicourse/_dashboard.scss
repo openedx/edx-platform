@@ -456,7 +456,7 @@
           }
 
           // TYPE: facebook share
-          &.action-facebook, {
+          &.action-facebook {
             color: $facebook-blue;
           }
 
@@ -931,7 +931,7 @@
               @include float(left);
               @include margin(0, 15px, 0, 0);
 
-              .btn, .cta {
+              .btn {
                 display: inline-block;
               }
 
@@ -954,7 +954,7 @@
                 }
               }
 
-              .cta {
+              .btn {
                 @include float(left);
                 font: normal 0.8rem/1.2rem $sans-serif;
                 letter-spacing: 1px;
@@ -1013,7 +1013,7 @@
 
           &.course-status-certrendering {
 
-            .cta {
+            .btn {
               margin-top: 2px;
             }
           }
@@ -1093,7 +1093,7 @@
             @include float(left);
             position: relative;
 
-            .cta {
+            .btn {
               @extend %btn-pl-green-base;
               @include float(right);
             }

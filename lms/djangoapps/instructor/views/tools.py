@@ -66,10 +66,9 @@ def bulk_email_is_enabled_for_course(course_id):
     """
 
     bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] is True)
-    is_studio_course = (modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml)
     bulk_email_enabled_for_course = CourseAuthorization.instructor_email_enabled(course_id)
 
-    if bulk_email_enabled_globally and is_studio_course and bulk_email_enabled_for_course:
+    if bulk_email_enabled_globally and bulk_email_enabled_for_course:
         return True
 
     return False

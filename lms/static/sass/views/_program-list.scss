@@ -19,7 +19,7 @@ $pl-button-color: #0079bc;
 .sidebar{
   @include outer-container;
   @include span-columns(12);
-  float: right !important;
+  @include float(right);
   margin-bottom: $baseline;
   .certificate-container{
     @include xseries-certificate-container();
@@ -99,11 +99,17 @@ $pl-button-color: #0079bc;
     padding: ($baseline*2) 0;
     text-align: center;
 
-    p {
+    .text {
       @include font-size(24);
-      color: $lighter-base-font-color;
-      margin-bottom: $baseline;
+      margin: {
+        top: 0;
+        bottom: $baseline;
+      }
       text-shadow: 0 1px rgba(255,255,255, 0.6);
+      text-transform: none;
+      font-family: $sans-serif;
+      letter-spacing: initial;
+      color: $black;
     }
 
     a {

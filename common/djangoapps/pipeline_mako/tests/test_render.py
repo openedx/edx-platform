@@ -15,7 +15,7 @@ class RequireJSPathOverridesTest(TestCase):
 
     OVERRIDES = {
         'jquery': 'common/js/vendor/jquery.js',
-        'backbone': 'js/vendor/backbone-min.js',
+        'backbone': 'common/js/vendor/backbone-min.js',
         'text': 'js/vendor/text.js'
     }
 
@@ -26,7 +26,7 @@ class RequireJSPathOverridesTest(TestCase):
         "paths: {",
         "'jquery': 'common/js/vendor/jquery',",
         "'text': 'js/vendor/text',",
-        "'backbone': 'js/vendor/backbone-min'",
+        "'backbone': 'common/js/vendor/backbone-min'",
         "}",
         "});",
         "}).call(this, require || RequireJS.require);",

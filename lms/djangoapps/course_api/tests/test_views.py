@@ -5,6 +5,7 @@ from hashlib import md5
 
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
+from nose.plugins.attrib import attr
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from .mixins import CourseApiFactoryMixin, TEST_PASSWORD
@@ -46,6 +47,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
+@attr('shard_3')
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseListView.

@@ -32,11 +32,12 @@ lib_paths:
     - common/js/vendor/jquery-migrate.js
     - js/vendor/jasmine-jquery.js
     - js/vendor/jasmine-imagediff.js
+    - js/libs/jasmine-waituntil.js
     - js/vendor/jquery.truncate.js
     - js/vendor/mustache.js
     - common/js/vendor/underscore.js
     - common/js/vendor/underscore.string.js
-    - js/vendor/backbone-min.js
+    - common/js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
     - js/vendor/draggabilly.js

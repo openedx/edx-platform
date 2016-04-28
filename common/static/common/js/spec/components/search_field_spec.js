@@ -21,8 +21,7 @@ define([
                     current_page: 1,
                     start: 0,
                     results: _.first(results, perPage)
-                },
-                {parse: true}
+                }
             );
             collection.start = 0;
             collection.totalCount = results.length;

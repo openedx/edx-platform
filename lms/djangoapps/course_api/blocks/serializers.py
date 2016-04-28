@@ -1,6 +1,7 @@
 """
 Serializers for Course Blocks related return objects.
 """
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -44,7 +45,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
             ),
         }
 
-        if 'lti_url' in self.context['requested_fields']:
+        if settings.FEATURES.get("ENABLE_LTI_PROVIDER") and 'lti_url' in self.context['requested_fields']:
             data['lti_url'] = reverse(
                 'lti_provider_launch',
                 kwargs={'course_id': unicode(block_key.course_key), 'usage_id': unicode(block_key)},

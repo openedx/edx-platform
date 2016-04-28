@@ -7,8 +7,7 @@ define([ // jshint ignore:line
     'js/certificates/views/certificate_preview',
     'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers',
-    'common/js/spec_helpers/ajax_helpers',
-    'jasmine-stealth'
+    'common/js/spec_helpers/ajax_helpers'
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';
@@ -121,7 +120,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
             it('certificate web preview should be removed when method "remove" called', function () {
                 this.view.remove();
-                expect(this.view.el.innerHTML).toContain("");
+                expect(this.view.el.innerHTML).toBe('');
             });
 
             it('method "show" should call the render function', function () {

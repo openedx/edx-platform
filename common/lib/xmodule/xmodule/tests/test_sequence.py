@@ -8,7 +8,7 @@ from xmodule.tests import get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.x_module import STUDENT_VIEW
-from xmodule.seq_module import _compute_next_url, _compute_previous_url, SequenceModule
+from xmodule.seq_module import SequenceModule
 
 
 class StubUserService(UserService):
@@ -96,11 +96,16 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertEquals(seq_module.position, 2)  # matches position set in the runtime
 
     def test_render_student_view(self):
-        html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
+        html = self._get_rendered_student_view(
+            self.sequence_3_1,
+            requested_child=None,
+            next_url='NextSequential',
+            prev_url='PrevSequential'
+        )
         self._assert_view_at_position(html, expected_position=1)
         self.assertIn(unicode(self.sequence_3_1.location), html)
-        self.assertIn("'next_url': u'{}'".format(unicode(self.chapter_4.location)), html)
-        self.assertIn("'prev_url': u'{}'".format(unicode(self.chapter_2.location)), html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
 
     def test_student_view_first_child(self):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child='first')
@@ -110,7 +115,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         html = self._get_rendered_student_view(self.sequence_3_1, requested_child='last')
         self._assert_view_at_position(html, expected_position=3)
 
-    def _get_rendered_student_view(self, sequence, requested_child):
+    def _get_rendered_student_view(self, sequence, requested_child, next_url=None, prev_url=None):
         """
         Returns the rendered student view for the given sequence and the
         requested_child parameter.
@@ -119,8 +124,9 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             sequence,
             STUDENT_VIEW,
             {
-                'redirect_url_func': lambda course_key, block_location, child: unicode(block_location),
                 'requested_child': requested_child,
+                'next_url': next_url,
+                'prev_url': prev_url,
             },
         ).content
 
@@ -130,34 +136,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         self.assertIn("'position': {}".format(expected_position), rendered_html)
 
-    def test_compute_next_url(self):
-
-        for sequence, parent, expected_next_sequence_location in [
-                (self.sequence_1_1, self.chapter_1, self.sequence_1_2.location),
-                (self.sequence_1_2, self.chapter_1, self.chapter_2.location),
-                (self.sequence_3_1, self.chapter_3, self.chapter_4.location),
-                (self.sequence_4_1, self.chapter_4, self.sequence_4_2.location),
-                (self.sequence_4_2, self.chapter_4, None),
-        ]:
-            actual_next_sequence_location = _compute_next_url(
-                sequence.location,
-                parent,
-                lambda course_key, block_location, child: block_location,
-            )
-            self.assertEquals(actual_next_sequence_location, expected_next_sequence_location)
-
-    def test_compute_previous_url(self):
-
-        for sequence, parent, expected_prev_sequence_location in [
-                (self.sequence_1_1, self.chapter_1, None),
-                (self.sequence_1_2, self.chapter_1, self.sequence_1_1.location),
-                (self.sequence_3_1, self.chapter_3, self.chapter_2.location),
-                (self.sequence_4_1, self.chapter_4, self.chapter_3.location),
-                (self.sequence_4_2, self.chapter_4, self.sequence_4_1.location),
-        ]:
-            actual_next_sequence_location = _compute_previous_url(
-                sequence.location,
-                parent,
-                lambda course_key, block_location, child: block_location,
-            )
-            self.assertEquals(actual_next_sequence_location, expected_prev_sequence_location)
+    def test_tooltip(self):
+        html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
+        for child in self.sequence_3_1.children:
+            self.assertIn("'page_title': '{}'".format(child.name), html)

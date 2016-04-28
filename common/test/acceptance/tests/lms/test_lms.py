@@ -9,6 +9,7 @@ from unittest import skip
 from nose.plugins.attrib import attr
 import pytz
 import urllib
+from ..helpers import skip_if_browser
 
 from bok_choy.promise import EmptyPromise
 from ..helpers import (
@@ -168,7 +169,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         # Navigate to the login page
         self.login_page.visit()
-        self.assertScreenshot('#login .login-providers', 'login-providers')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name))
 
         # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
@@ -209,7 +211,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # We should now be redirected to the login page
         self.login_page.wait_for_page()
         self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
-        self.assertScreenshot('#hinted-login-form', 'hinted-login')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
         self.login_page.click_third_party_dummy_provider()
 
         # We should now be redirected to the course page
@@ -335,7 +338,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         """
         # Navigate to the register page
         self.register_page.visit()
-        self.assertScreenshot('#register .login-providers', 'register-providers')
+        # Baseline screen-shots are different for chrome and firefox.
+        self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name))
 
         # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()
@@ -824,13 +828,13 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(3, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Locked Subsection")
-        self.assertEqual(["Html Child in locked subsection"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
     def test_visible_to_student(self):
         """
@@ -846,10 +850,10 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(2, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
 @attr('shard_1')

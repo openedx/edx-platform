@@ -83,7 +83,6 @@ class CertificateStatuses(object):
     error = 'error'
     generating = 'generating'
     notpassing = 'notpassing'
-    regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
     auditing = 'auditing'
@@ -96,7 +95,7 @@ class CertificateStatuses(object):
         error: "error states"
     }
 
-    PASSED_STATUSES = (downloadable, generating, regenerating)
+    PASSED_STATUSES = (downloadable, generating)
 
     @classmethod
     def is_passing_status(cls, status):

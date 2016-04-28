@@ -49,7 +49,8 @@ NPM_INSTALLED_LIBRARIES = [
     'jquery-migrate/dist/jquery-migrate.js',
     'underscore/underscore.js',
     'underscore.string/dist/underscore.string.js',
-    'picturefill/dist/picturefill.min.js'
+    'picturefill/dist/picturefill.js',
+    'backbone/backbone-min.js',
 ]
 
 # Directory to install static vendor files

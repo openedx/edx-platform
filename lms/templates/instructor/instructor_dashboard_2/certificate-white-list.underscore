@@ -2,7 +2,7 @@
 <p class="under-heading">
 <label>
     <input type='radio' name='generate-exception-certificates-radio' checked="checked" value='new' aria-describedby='generate-exception-certificates-radio-new-tip'>
-    <span id='generate-exception-certificates-radio-new-tip'><%- gettext('Generate certificates for all users on the Exception list for whom certificates have not yet been run') %></span>
+    <span id='generate-exception-certificates-radio-new-tip'><%- gettext('Generate certificates for all users on the Exception list who do not yet have a certificate') %></span>
 
 </label>
 <br/>

@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 import logging
 
+from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 
@@ -46,7 +48,6 @@ def flatten_programs(programs, course_ids):
                 for run in course_code['run_modes']:
                     run_id = run['course_key']
                     if run_id in course_ids:
-                        program['display_category'] = get_display_category(program)
                         flattened.setdefault(run_id, []).append(program)
         except KeyError:
             log.exception('Unable to parse Programs API response: %r', program)
@@ -132,28 +133,142 @@ def get_display_category(program):
     return display_candidate
 
 
-def get_engaged_programs(user, enrollments):
-    """Derive a list of programs in which the given user is engaged.
+def get_completed_courses(student):
+    """
+    Determine which courses have been completed by the user.
+
+    Args:
+        student:
+            User object representing the student
+
+    Returns:
+        iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
+
+    """
+    all_certs = get_certificates_for_user(student.username)
+    return [
+        {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
+        for cert in all_certs
+        if is_passing_status(cert['status'])
+    ]
+
+
+class ProgramProgressMeter(object):
+    """Utility for gauging a user's progress towards program completion.
 
     Arguments:
         user (User): The user for which to find programs.
-        enrollments (list): The user's enrollments.
-
-    Returns:
-        list of serialized programs, ordered by most recent enrollment
+        enrollments (list): The user's active enrollments.
     """
-    programs = get_programs(user)
+    def __init__(self, user, enrollments):
+        self.user = user
 
-    enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
-    # enrollment.course_id is really a course key.
-    course_ids = [unicode(e.course_id) for e in enrollments]
+        enrollments = sorted(enrollments, key=lambda e: e.created, reverse=True)
+        # enrollment.course_id is really a course key ಠ_ಠ
+        self.course_ids = [unicode(e.course_id) for e in enrollments]
 
-    flattened = flatten_programs(programs, course_ids)
+        self.engaged_programs = self._find_engaged_programs(self.user)
+        self.course_certs = None
 
-    engaged_programs = []
-    for course_id in course_ids:
-        for program in flattened.get(course_id, []):
-            if program not in engaged_programs:
-                engaged_programs.append(program)
+    def _find_engaged_programs(self, user):
+        """Derive a list of programs in which the given user is engaged.
 
-    return engaged_programs
+        Arguments:
+            user (User): The user for which to find engaged programs.
+
+        Returns:
+            list of program dicts, ordered by most recent enrollment.
+        """
+        programs = get_programs(user)
+        flattened = flatten_programs(programs, self.course_ids)
+
+        engaged_programs = []
+        for course_id in self.course_ids:
+            for program in flattened.get(course_id, []):
+                if program not in engaged_programs:
+                    engaged_programs.append(program)
+
+        return engaged_programs
+
+    @property
+    def progress(self):
+        """Gauge a user's progress towards program completion.
+
+        Returns:
+            list of dict, each containing information about a user's progress
+                towards completing a program.
+        """
+        self.course_certs = get_completed_courses(self.user)
+
+        progress = []
+        for program in self.engaged_programs:
+            completed, in_progress, not_started = [], [], []
+
+            for course_code in program['course_codes']:
+                name = course_code['display_name']
+
+                if self._is_complete(course_code):
+                    completed.append(name)
+                elif self._is_in_progress(course_code):
+                    in_progress.append(name)
+                else:
+                    not_started.append(name)
+
+            progress.append({
+                'id': program['id'],
+                'completed': completed,
+                'in_progress': in_progress,
+                'not_started': not_started,
+            })
+
+        return progress
+
+    def _is_complete(self, course_code):
+        """Check if a user has completed a course code.
+
+        A course code qualifies as completed if the user has earned a
+        certificate in the right mode for any nested run.
+
+        Arguments:
+            course_code (dict): Containing nested run modes.
+
+        Returns:
+            bool, whether the course code is complete.
+        """
+        return any([
+            self._parse(run_mode) in self.course_certs
+            for run_mode in course_code['run_modes']
+        ])
+
+    def _is_in_progress(self, course_code):
+        """Check if a user is in the process of completing a course code.
+
+        A user is in the process of completing a course code if they're
+        enrolled in the course.
+
+        Arguments:
+            course_code (dict): Containing nested run modes.
+
+        Returns:
+            bool, whether the course code is in progress.
+        """
+        return any([
+            run_mode['course_key'] in self.course_ids
+            for run_mode in course_code['run_modes']
+        ])
+
+    def _parse(self, run_mode):
+        """Modify the structure of a run mode dict.
+
+        Arguments:
+            run_mode (dict): With `course_key` and `mode_slug` keys.
+
+        Returns:
+            dict, with `course_id` and `mode` keys.
+        """
+        parsed = {
+            'course_id': run_mode['course_key'],
+            'mode': run_mode['mode_slug'],
+        }
+
+        return parsed
