@@ -364,16 +364,39 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         """
         Tests organization user link removal API works as expected if given user ids are valid
         """
-        organization = self.setup_test_organization(org_data={'users': [self.test_user.id, self.test_user2.id]})
+        org_users = [self.test_user.id, self.test_user2.id]
+        organization = self.setup_test_organization(org_data={'users': org_users})
         test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"users": "{user_id1},{user_id2}".format(user_id1=self.test_user.id, user_id2=self.test_user2.id)}
         response = self.do_delete(users_uri, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['detail'], _("2 users removed from organization"))
+        self.assertEqual(response.data['detail'], _("2 user(s) removed from organization"))
         response = self.do_get("{}?view=ids".format(users_uri))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+        # users in User model are not deleted
+        self.assertEqual(len(org_users), User.objects.filter(id__in=org_users).count())
+
+    def test_organizations_single_user_delete(self):
+        """
+        Tests organization user link removal API works as expected if single user needs to be deleted
+        """
+        org_users = [self.test_user.id, self.test_user2.id]
+        organization = self.setup_test_organization(org_data={'users': org_users})
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        data = {"users": "{user_id1}".format(user_id1=self.test_user.id)}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['detail'], _("1 user(s) removed from organization"))
+        response = self.do_get("{}?view=ids".format(users_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        # users in User model are not deleted
+        self.assertEqual(len(org_users), User.objects.filter(id__in=org_users).count())
 
     def test_organizations_users_delete_invalid(self):
         """
@@ -392,7 +415,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
 
         data = {"users": 112323333329}
         response = self.do_delete(users_uri, data=data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
     def test_organizations_users_delete_non_existing(self):
         """
@@ -403,8 +426,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         users_uri = '{}users/'.format(test_uri)
         data = {"users": 112323333329}
         response = self.do_delete(users_uri, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['detail'], _("0 users removed from organization"))
+        self.assertEqual(response.status_code, 204)
 
     def test_organizations_users_delete_without_param(self):
         """
