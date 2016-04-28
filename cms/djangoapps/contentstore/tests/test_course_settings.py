@@ -255,7 +255,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Short Description")
             self.assertNotContains(response, "Course Title")
             self.assertNotContains(response, "Course Subtitle")
@@ -264,7 +264,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
-            self.assertNotContains(response, "Hero Image")
+            self.assertNotContains(response, "Course Details Background")
             self.assertNotContains(response, "Course Video Thumbnail Image")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
@@ -387,7 +387,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Image")
+            self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Title")
             self.assertContains(response, "Course Subtitle")
             self.assertContains(response, "Course Duration")
@@ -396,7 +396,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
-            self.assertContains(response, "Hero Image")
+            self.assertContains(response, "Course Details Background")
             self.assertContains(response, "Course Video Thumbnail Image")
 
 

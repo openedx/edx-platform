@@ -297,17 +297,17 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                 <li class="field text" id="field-course-title">
                   <label for="course-title">${_("Course Title")}</label>
                   <input type="text" id="course-title" data-display-name="${context_course.display_name}">
-                  <span class="tip tip-stacked">${_("Displayed as hero image overlay on the course details page. Limit to 50 characters.")}</span>
+                  <span class="tip tip-stacked">${_("Displayed as title on the course details page. Limit to 50 characters.")}</span>
                 </li>
                 <li class="field text" id="field-course-subtitle">
                   <label for="course-subtitle">${_("Course Subtitle")}</label>
                   <input type="text" id="course-subtitle">
-                  <span class="tip tip-stacked">${_("Displayed as hero image overlay on the course details page below the Course Title in a smaller font. Limit to 150 characters.")}</span>
+                  <span class="tip tip-stacked">${_("Displayed as subtitle on the course details page. Limit to 150 characters.")}</span>
                 </li>
                 <li class="field text" id="field-course-duration">
                   <label for="course-duration">${_("Course Duration")}</label>
                   <input type="text" id="course-duration">
-                  <span class="tip tip-stacked">${_("Displayed on the course details page below the hero image. Limit to 50 characters.")}</span>
+                  <span class="tip tip-stacked">${_("Displayed on the course details page. Limit to 50 characters.")}</span>
                 </li>
                 <li class="field text" id="field-course-description">
                   <label for="course-description">${_("Course Description")}</label>
@@ -339,7 +339,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                 % endif
 
                 <li class="field image" id="field-course-image">
-                  <label for="course-image-url">${_("Course Image")}</label>
+                  <label for="course-image-url">${_("Course Card Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
@@ -370,7 +370,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
 
                 % if enable_extended_course_details:
                 <li class="field image" id="field-hero-image">
-                  <label for="hero-image-url">${_("Hero Image")}</label>
+                  <label for="hero-image-url">${_("Course Details Background")}</label>
                   <div class="current current-course-image">
                     % if context_course.hero_image:
                     <span class="wrapper-course-image">
