@@ -47,6 +47,11 @@ body, h1, h2, h3, h4, h5, h6, p, label {
   font-family: $sans-serif;
 }
 
+// we want to hide the outline on the focusable <main> element
+main {
+    outline: none;
+}
+
 table {
   table-layout: fixed;
 }
