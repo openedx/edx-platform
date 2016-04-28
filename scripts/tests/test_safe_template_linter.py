@@ -73,6 +73,7 @@ class TestLinter(TestCase):
         elif data['rule'] is not None:
             rules.append(data['rule'])
         self.assertEqual(len(results.violations), len(rules))
+        results.violations.sort(key=lambda violation: violation.sort_key())
         for violation, rule in zip(results.violations, rules):
             self.assertEqual(violation.rule, rule)
 
@@ -104,6 +105,7 @@ class TestSafeTemplateLinter(TestCase):
 
         options = {
             'list_files': False,
+            'verbose': False,
         }
 
         template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter(), PythonLinter()]
@@ -117,13 +119,14 @@ class TestSafeTemplateLinter(TestCase):
 
         output = out.getvalue()
         self.assertEqual(num_violations, 7)
-        self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
-        self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
-        self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))
-        self.assertIsNotNone(re.search('test\.js.*javascript-concat-html', output))
-        self.assertIsNotNone(re.search('test\.js.*underscore-not-escaped', output))
-        self.assertIsNotNone(re.search('test\.underscore.*underscore-not-escaped', output))
-        self.assertIsNotNone(re.search('test\.py.*python-interpolate-html', output))
+        self.assertIsNotNone(re.search('test\.html.*{}'.format(Rules.mako_missing_default.rule_id), output))
+        self.assertIsNotNone(re.search('test\.coffee.*{}'.format(Rules.javascript_concat_html.rule_id), output))
+        self.assertIsNotNone(re.search('test\.coffee.*{}'.format(Rules.underscore_not_escaped.rule_id), output))
+        self.assertIsNotNone(re.search('test\.js.*{}'.format(Rules.javascript_concat_html.rule_id), output))
+        self.assertIsNotNone(re.search('test\.js.*{}'.format(Rules.underscore_not_escaped.rule_id), output))
+        self.assertIsNotNone(re.search('test\.underscore.*{}'.format(Rules.underscore_not_escaped.rule_id), output))
+        self.assertIsNone(re.search('test\.py.*{}'.format(Rules.python_parse_error.rule_id), output))
+        self.assertIsNotNone(re.search('test\.py.*{}'.format(Rules.python_wrap_html.rule_id), output))
 
 
 @ddt
@@ -254,7 +257,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )}
                 """),
-            'rule': Rules.mako_html_requires_text
+            'rule': Rules.python_requires_html_or_text
         },
         {
             'expression':
@@ -275,7 +278,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )}
                 """),
-            'rule': Rules.mako_html_requires_text
+            'rule': Rules.python_requires_html_or_text
         },
         {
             'expression':
@@ -285,7 +288,7 @@ class TestMakoTemplateLinter(TestLinter):
                         link_end=HTML("</a>"),
                     ))}
                 """),
-            'rule': Rules.python_close_before_format
+            'rule': [Rules.python_close_before_format, Rules.python_requires_html_or_text]
         },
         {
             'expression':
@@ -305,7 +308,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end="</span>",
                     )}
                 """),
-            'rule': Rules.python_wrap_html
+            'rule': [Rules.python_wrap_html, Rules.python_wrap_html]
         },
         {
             'expression':
@@ -334,10 +337,6 @@ class TestMakoTemplateLinter(TestLinter):
             'rule': Rules.python_wrap_html
         },
         {
-            'expression': "${ Text('text') }",
-            'rule': Rules.mako_text_redundant
-        },
-        {
             'expression': "${ HTML('<span></span>') }",
             'rule': None
         },
@@ -346,8 +345,12 @@ class TestMakoTemplateLinter(TestLinter):
             'rule': None
         },
         {
-            'expression': "${ HTML('<span></span>') + 'some other text' }",
-            'rule': Rules.mako_html_alone
+            'expression': "${ '<span></span>' + 'some other text' }",
+            'rule': [Rules.python_concat_html, Rules.python_wrap_html]
+        },
+        {
+            'expression': "${ HTML('<span>missing closing parentheses.</span>' }",
+            'rule': Rules.python_parse_error
         },
         {
             'expression': "${'Rock &amp; Roll'}",
@@ -373,6 +376,21 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self._validate_data_rules(data, results)
+
+    def test_check_mako_entity_with_no_default(self):
+        """
+        Test _check_mako_file_is_safe does not fail on entities when
+        safe-by-default is not set.
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = "${'Rock &#38; Roll'}"
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertEqual(results.violations[0].rule, Rules.mako_missing_default)
 
     def test_check_mako_expression_default_disabled(self):
         """
@@ -1126,10 +1144,10 @@ class TestPythonLinter(TestLinter):
     @data(
         {'template': 'm = "Plain text " + message + "plain text"', 'rule': None},
         {'template': 'm = "檌檒濦 " + message + "plain text"', 'rule': None},
-        {'template': 'm = "<p>" + message + "</p>"', 'rule': Rules.python_concat_html},
         {'template': '  # m = "<p>" + commentedOutMessage + "</p>"', 'rule': None},
-        {'template': 'm = " <p> " + message + " </p> "', 'rule': Rules.python_concat_html},
-        {'template': 'm = " <p> " + message + " broken string', 'rule': Rules.python_concat_html},
+        {'template': 'm = "<p>" + message + "</p>"', 'rule': [Rules.python_concat_html, Rules.python_concat_html]},
+        {'template': 'm = " <p> " + message + " </p> "', 'rule': [Rules.python_concat_html, Rules.python_concat_html]},
+        {'template': 'm = " <p> " + message + " broken string', 'rule': Rules.python_parse_error},
     )
     def test_concat_with_html(self, data):
         """
@@ -1139,6 +1157,7 @@ class TestPythonLinter(TestLinter):
         results = FileResults('')
 
         linter.check_python_file_is_safe(data['template'], results)
+
         self._validate_data_rules(data, results)
 
     def test_check_python_expression_display_name(self):
@@ -1180,22 +1199,22 @@ class TestPythonLinter(TestLinter):
         {
             'python':
                 textwrap.dedent("""
-                    msg = "Mixed {span_start}text{span_end}".format(
-                        span_start=HTML("<span>"),
-                        span_end=HTML("</span>"),
-                    )
-                """),
-            'rule': Rules.python_requires_html_or_text
-        },
-        {
-            'python':
-                textwrap.dedent("""
                     msg = Text("Mixed {span_start}text{span_end}").format(
                         span_start=HTML("<span>"),
                         span_end=HTML("</span>"),
                     )
                 """),
             'rule': None
+        },
+        {
+            'python':
+                textwrap.dedent("""
+                    msg = "Mixed {span_start}text{span_end}".format(
+                        span_start=HTML("<span>"),
+                        span_end=HTML("</span>"),
+                    )
+                """),
+            'rule': Rules.python_requires_html_or_text
         },
         {
             'python':
@@ -1231,6 +1250,22 @@ class TestPythonLinter(TestLinter):
         {
             'python':
                 textwrap.dedent("""
+                    msg = Text("Mixed {link_start}text{link_end}".format(
+                        link_start=HTML("<a href='{}'>".format(HTML('<b>'))),
+                        link_end=HTML("</a>"),
+                    ))
+                """),
+            'rule':
+                [
+                    Rules.python_close_before_format,
+                    Rules.python_requires_html_or_text,
+                    Rules.python_close_before_format,
+                    Rules.python_requires_html_or_text
+                ]
+        },
+        {
+            'python':
+                textwrap.dedent("""
                     msg = "Mixed {span_start}text{span_end}".format(
                         span_start="<span>",
                         span_end="</span>",
@@ -1249,6 +1284,7 @@ class TestPythonLinter(TestLinter):
                                 'data-course-id="{course_id}" '
                                 'href="#test-modal">'
                             ).format(
+                                # Line comment with ' to throw off parser
                                 course_id=course_overview.id
                             ),
                             link_end=HTML('</a>'),
@@ -1266,15 +1302,28 @@ class TestPythonLinter(TestLinter):
         },
         {
             'python': r"""msg = '<a href="{}"'.format(url)""",
-            'rule': Rules.python_interpolate_html
+            'rule': Rules.python_wrap_html
         },
         {
             'python': r"""msg = '{}</p>'.format(message)""",
-            'rule': Rules.python_interpolate_html
+            'rule': Rules.python_wrap_html
+        },
+        {
+            'python': r"""r'regex with {} and named group(?P<id>\d+)?$'.format(test)""",
+            'rule': None
         },
         {
             'python': r"""msg = '<a href="%s"' % url""",
             'rule': Rules.python_interpolate_html
+        },
+        {
+            'python':
+                textwrap.dedent("""
+                    def __repr__(self):
+                        # Assume repr implementations are safe, and not HTML
+                        return '<CCXCon {}>'.format(self.title)
+                """),
+            'rule': None
         },
         {
             'python': r"""msg = '%s</p>' % message""",
@@ -1283,6 +1332,17 @@ class TestPythonLinter(TestLinter):
         {
             'python': "msg = HTML('<span></span>'",
             'rule': Rules.python_parse_error
+        },
+        {
+            'python':
+                textwrap.dedent("""
+                    response_str = textwrap.dedent('''
+                        <div>
+                            <h3 class="result">{response}</h3>
+                        </div>
+                    ''').format(response=response_text)
+                """),
+            'rule': Rules.python_wrap_html
         },
     )
     def test_check_python_with_text_and_html(self, data):
@@ -1311,38 +1371,20 @@ class TestPythonLinter(TestLinter):
 
         file_content = textwrap.dedent("""
             msg1 = '<a href="{}"'.format(url)
-            msg2 = Text("Mixed {link_start}text{link_end}").format(
+            msg2 = "Mixed {link_start}text{link_end}".format(
                 link_start=HTML("<a href='{}'>".format(url)),
-                link_end=HTML("</a>"),
+                link_end="</a>",
             )
-            msg3 = HTML('<span></span>'
-            msg4 = "Mixed {span_start}text{span_end}".format(
-                span_start="<span>",
-                span_end="</span>",
-            )
-            msg5 = '{}</p>'.format(message)
-            msg6 = Text(_("String with multiple lines "
-                "{link_start}unenroll{link_end} "
-                "and final line")).format(
-                    link_start=HTML(
-                        '<a id="link__over_multiple_lines" '
-                        'data-course-id="{course_id}" '
-                        'href="#test-modal">'
-                    ).format(
-                        course_id=course_overview.id
-                    ),
-                    link_end=HTML('</a>'),
-            )
-            msg7 = '<a href="%s"' % url
+            msg3 = '<a href="%s"' % url
         """)
 
         linter.check_python_file_is_safe(file_content, results)
 
-        self.assertEqual(len(results.violations), 7)
-        self.assertEqual(results.violations[0].rule, Rules.python_interpolate_html)
-        self.assertEqual(results.violations[1].rule, Rules.python_close_before_format)
-        self.assertEqual(results.violations[2].rule, Rules.python_parse_error)
+        results.violations.sort(key=lambda violation: violation.sort_key())
+
+        self.assertEqual(len(results.violations), 5)
+        self.assertEqual(results.violations[0].rule, Rules.python_wrap_html)
+        self.assertEqual(results.violations[1].rule, Rules.python_requires_html_or_text)
+        self.assertEqual(results.violations[2].rule, Rules.python_close_before_format)
         self.assertEqual(results.violations[3].rule, Rules.python_wrap_html)
-        self.assertEqual(results.violations[4].rule, Rules.python_wrap_html)
-        self.assertEqual(results.violations[5].rule, Rules.python_interpolate_html)
-        self.assertEqual(results.violations[6].rule, Rules.python_interpolate_html)
+        self.assertEqual(results.violations[4].rule, Rules.python_interpolate_html)
