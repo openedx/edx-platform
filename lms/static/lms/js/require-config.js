@@ -59,7 +59,7 @@
             "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
             "text": "js/vendor/requirejs/text",
             "logger": "js/src/logger",
-            "backbone": "common/js/vendor/backbone-min",
+            "backbone": "common/js/vendor/backbone",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
             "underscore": "common/js/vendor/underscore",
