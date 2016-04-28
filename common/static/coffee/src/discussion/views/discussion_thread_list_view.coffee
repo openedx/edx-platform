@@ -13,7 +13,6 @@ if Backbone?
       "click .forum-nav-load-more-link": "loadMorePages"
       "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
-      "load body": "retrieveAllThreads"
 
     initialize: (options) ->
       @courseSettings = options.courseSettings
@@ -138,6 +137,8 @@ if Backbone?
       @displayedCollection.on "thread:remove", @renderThreads
       @displayedCollection.on "change:commentable_id", (model, commentable_id) =>
         @retrieveDiscussions @discussionIds.split(",") if @mode is "commentables"
+
+      @retrieveAllThreads()
       @renderThreads()
       @
 
