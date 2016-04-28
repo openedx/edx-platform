@@ -34,7 +34,7 @@ define([  // jshint ignore:line
                 // Assemble the render view for this model.
                 $("span.course-instructor-details-fields").empty();
                 var self = this;
-                var instructors = this.model.get('instructor_info')['instructors'];
+                var instructors = this.model.get('instructor_info').instructors;
                 $.each(instructors, function( index, data ) {
                     $(self.el).append(self.template({
                         data: data,
@@ -59,7 +59,7 @@ define([  // jshint ignore:line
                 event.preventDefault();
                 var index = event.currentTarget.getAttribute('data-index'),
                     existing_info = _.clone(this.model.get('instructor_info'));
-                existing_info['instructors'].splice(index, 1);
+                existing_info.instructors.splice(index, 1);
                 this.model.set('instructor_info', existing_info);
                 this.model.trigger("change:instructor_info", this.model );
                 this.render();

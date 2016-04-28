@@ -225,7 +225,7 @@ var DetailsView = ValidatingView.extend({
                value = $(event.currentTarget).val();
                var field = event.currentTarget.getAttribute('data-field'),
                    instructor_info = _.clone(this.model.get('instructor_info'));
-            instructor_info['instructors'][index][field] = value;
+            instructor_info.instructors[index][field] = value;
             this.model.set('instructor_info', instructor_info);
             this.model.trigger("change:instructor_info");
             break;
