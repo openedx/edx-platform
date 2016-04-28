@@ -258,13 +258,6 @@ class LTIFields(object):
     accept_grades_past_due = Boolean(
         display_name=_("Accept grades past deadline"),
         help=_("Select True to allow third party systems to post grades past the deadline."),
-        default=False,
-        scope=Scope.settings
-    )
-
-    accept_grades_past_due = Boolean(
-        display_name=_("Accept grades past deadline"),
-        help=_("Select True to allow third party systems to post grades past the deadline."),
         default=True,
         scope=Scope.settings
     )
