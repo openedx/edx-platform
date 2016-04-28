@@ -9,123 +9,6 @@ import os
 import re
 import sys
 
-_skip_dirs = (
-    '.pycharm_helpers',
-    'common/static/xmodule/modules',
-    'node_modules',
-    'reports/diff_quality',
-    'spec',
-    'scripts/tests/templates',
-    'test_root',
-    'vendor',
-)
-
-
-def _is_skip_dir(skip_dirs, directory):
-    """
-    Determines whether a directory should be skipped or linted.
-
-    Arguments:
-        skip_dirs: The configured directories to be skipped.
-        directory: The current directory to be tested.
-
-    Returns:
-         True if the directory should be skipped, and False otherwise.
-
-    """
-    for skip_dir in skip_dirs:
-        dir_contains_skip_dir = '/' + skip_dir + '/' in directory
-        if dir_contains_skip_dir or directory.startswith(skip_dir) or directory.endswith(skip_dir):
-            return True
-    return False
-
-
-def _load_file(file_full_path):
-    """
-    Loads a file into a string.
-
-    Arguments:
-        file_full_path: The full path of the file to be loaded.
-
-    Returns:
-        A string containing the files contents.
-
-    """
-    with open(file_full_path, 'r') as input_file:
-        file_contents = input_file.read()
-        return file_contents.decode(encoding='utf-8')
-
-
-def _find_closing_char_index(start_delim, open_char, close_char, template, start_index, num_open_chars=0, strings=None):
-    """
-    Finds the index of the closing char that matches the opening char.
-
-    For example, this could be used to find the end of a Mako expression,
-    where the open and close characters would be '{' and '}'.
-
-    Arguments:
-        start_delim: If provided (e.g. '${' for Mako expressions), the
-            closing character must be found before the next start_delim.
-        open_char: The opening character to be matched (e.g '{')
-        close_char: The closing character to be matched (e.g '}')
-        template: The template to be searched.
-        start_index: The start index of the last open char.
-        num_open_chars: The current number of open chars.
-        strings: A list of ParseStrings already parsed
-
-    Returns:
-        A dict containing the following, or None if unparseable:
-            close_char_index: The index of the closing character
-            strings: a list of ParseStrings
-
-    """
-    strings = [] if strings is None else strings
-    close_char_index = template.find(close_char, start_index)
-    if close_char_index < 0:
-        # if we can't find an end_char, let's just quit
-        return None
-    open_char_index = template.find(open_char, start_index, close_char_index)
-    parse_string = ParseString(template, start_index, close_char_index)
-
-    valid_index_list = [close_char_index]
-    if 0 <= open_char_index:
-        valid_index_list.append(open_char_index)
-    if parse_string.start_index is not None:
-        valid_index_list.append(parse_string.start_index)
-    min_valid_index = min(valid_index_list)
-
-    if parse_string.start_index == min_valid_index:
-        strings.append(parse_string)
-        if parse_string.end_index is None:
-            return None
-        else:
-            return _find_closing_char_index(
-                start_delim, open_char, close_char, template, start_index=parse_string.end_index,
-                num_open_chars=num_open_chars, strings=strings
-            )
-
-    if open_char_index == min_valid_index:
-        if start_delim is not None:
-            # if we find another starting delim, consider this unparseable
-            start_delim_index = template.find(start_delim, start_index, close_char_index)
-            if 0 <= start_delim_index < open_char_index:
-                return None
-        return _find_closing_char_index(
-            start_delim, open_char, close_char, template, start_index=open_char_index + 1,
-            num_open_chars=num_open_chars + 1, strings=strings
-        )
-
-    if num_open_chars == 0:
-        return {
-            'close_char_index': close_char_index,
-            'strings': strings,
-        }
-    else:
-        return _find_closing_char_index(
-            start_delim, open_char, close_char, template, start_index=close_char_index + 1,
-            num_open_chars=num_open_chars - 1, strings=strings
-        )
-
 
 class StringLines(object):
     """
@@ -336,17 +219,9 @@ class Rules(Enum):
         'mako-js-html-string',
         'A JavaScript string containing HTML should not have an embedded Mako expression.'
     )
-    mako_deprecated_display_name = (
-        'mako-deprecated-display-name',
-        'Replace deprecated display_name_with_default_escaped with display_name_with_default.'
-    )
     mako_html_requires_text = (
         'mako-html-requires-text',
         'You must begin with Text() if you use HTML() during interpolation.'
-    )
-    mako_close_before_format = (
-        'mako-close-before-format',
-        'You must close any call to Text() or HTML() before calling format().'
     )
     mako_text_redundant = (
         'mako-text-redundant',
@@ -355,10 +230,6 @@ class Rules(Enum):
     mako_html_alone = (
         'mako-html-alone',
         "Only use HTML() alone with properly escaped HTML(), and make sure it is really alone."
-    )
-    mako_wrap_html = (
-        'mako-wrap-html',
-        "String containing HTML should be wrapped with call to HTML()."
     )
     mako_html_entities = (
         'mako-html-entities',
@@ -399,6 +270,38 @@ class Rules(Enum):
     javascript_interpolate = (
         'javascript-interpolate',
         'Use StringUtils.interpolate() or HtmlUtils.interpolateHtml() as appropriate.'
+    )
+    python_concat_html = (
+        'python-concat-html',
+        'Use HTML() and Text() functions rather than concatenating strings with HTML.'
+    )
+    python_custom_escape = (
+        'python-custom-escape',
+        "Use markupsafe.escape() rather than custom escaping for '<'."
+    )
+    python_deprecated_display_name = (
+        'python-deprecated-display-name',
+        'Replace deprecated display_name_with_default_escaped with display_name_with_default.'
+    )
+    python_requires_html_or_text = (
+        'python-requires-html-or-text',
+        'You must start with Text() or HTML() if you use HTML() or Text() during interpolation.'
+    )
+    python_close_before_format = (
+        'python-close-before-format',
+        'You must close any call to Text() or HTML() before calling format().'
+    )
+    python_wrap_html = (
+        'python-wrap-html',
+        "String containing HTML should be wrapped with call to HTML()."
+    )
+    python_interpolate_html = (
+        'python-interpolate-html',
+        "Use HTML(), Text(), and format() functions for interpolating strings with HTML."
+    )
+    python_parse_error = (
+        'python-parse-error',
+        'Error parsing Python function or string.'
     )
 
     def __init__(self, rule_id, rule_summary):
@@ -863,12 +766,223 @@ class ParseString(object):
                 }
 
 
-class UnderscoreTemplateLinter(object):
+class BaseLinter(object):
+    """
+    BaseLinter provides some helper functions that are used by multiple linters.
+
+    """
+    def __init__(self):
+        """
+        Init method.
+        """
+        self._skip_dirs = (
+            '.pycharm_helpers',
+            'common/static/xmodule/modules',
+            'node_modules',
+            'reports/diff_quality',
+            'spec',
+            'scripts/tests/templates',
+            'test_root',
+            'vendor',
+            'perf_tests'
+        )
+
+    def _is_skip_dir(self, skip_dirs, directory):
+        """
+        Determines whether a directory should be skipped or linted.
+
+        Arguments:
+            skip_dirs: The configured directories to be skipped.
+            directory: The current directory to be tested.
+
+        Returns:
+             True if the directory should be skipped, and False otherwise.
+
+        """
+        for skip_dir in skip_dirs:
+            skip_dir_regex = re.compile("(.*/)*{}(/.*)*".format(skip_dir))
+            if skip_dir_regex.match(directory) is not None:
+                return True
+        return False
+
+    def _is_valid_directory(self, skip_dirs, directory):
+        """
+        Determines if the provided directory is a directory that could contain
+        a file that needs to be linted.
+
+        Arguments:
+            skip_dirs: The directories to be skipped.
+            directory: The directory to be linted.
+
+        Returns:
+            True if this directory should be linted for violations and False
+            otherwise.
+        """
+        if self._is_skip_dir(skip_dirs, directory):
+            return False
+
+        return True
+
+    def _load_file(self, file_full_path):
+        """
+        Loads a file into a string.
+
+        Arguments:
+            file_full_path: The full path of the file to be loaded.
+
+        Returns:
+            A string containing the files contents.
+
+        """
+        with open(file_full_path, 'r') as input_file:
+            file_contents = input_file.read()
+            return file_contents.decode(encoding='utf-8')
+
+    def _load_and_check_file_is_safe(self, file_full_path, lint_function, results):
+        """
+        Loads the Python file and checks if it is in violation.
+
+        Arguments:
+            file_full_path: The file to be loaded and linted.
+            lint_function: A function that will lint for violations. It must
+                take two arguments:
+                1) string contents of the file
+                2) results object
+            results: A FileResults to be used for this file
+
+        Returns:
+            The file results containing any violations.
+
+        """
+        file_contents = self._load_file(file_full_path)
+        lint_function(file_contents, results)
+        return results
+
+    def _find_closing_char_index(
+            self, start_delim, open_char, close_char, template, start_index, num_open_chars=0, strings=None
+    ):
+        """
+        Finds the index of the closing char that matches the opening char.
+
+        For example, this could be used to find the end of a Mako expression,
+        where the open and close characters would be '{' and '}'.
+
+        Arguments:
+            start_delim: If provided (e.g. '${' for Mako expressions), the
+                closing character must be found before the next start_delim.
+            open_char: The opening character to be matched (e.g '{')
+            close_char: The closing character to be matched (e.g '}')
+            template: The template to be searched.
+            start_index: The start index of the last open char.
+            num_open_chars: The current number of open chars.
+            strings: A list of ParseStrings already parsed
+
+        Returns:
+            A dict containing the following, or None if unparseable:
+                close_char_index: The index of the closing character
+                strings: a list of ParseStrings
+
+        """
+        strings = [] if strings is None else strings
+        close_char_index = template.find(close_char, start_index)
+        if close_char_index < 0:
+            # if we can't find a close char, let's just quit
+            return None
+        open_char_index = template.find(open_char, start_index, close_char_index)
+        parse_string = ParseString(template, start_index, close_char_index)
+
+        valid_index_list = [close_char_index]
+        if 0 <= open_char_index:
+            valid_index_list.append(open_char_index)
+        if parse_string.start_index is not None:
+            valid_index_list.append(parse_string.start_index)
+        min_valid_index = min(valid_index_list)
+
+        if parse_string.start_index == min_valid_index:
+            strings.append(parse_string)
+            if parse_string.end_index is None:
+                return None
+            else:
+                return self._find_closing_char_index(
+                    start_delim, open_char, close_char, template, start_index=parse_string.end_index,
+                    num_open_chars=num_open_chars, strings=strings
+                )
+
+        if open_char_index == min_valid_index:
+            if start_delim is not None:
+                # if we find another starting delim, consider this unparseable
+                start_delim_index = template.find(start_delim, start_index, close_char_index)
+                if 0 <= start_delim_index < open_char_index:
+                    return None
+            return self._find_closing_char_index(
+                start_delim, open_char, close_char, template, start_index=open_char_index + 1,
+                num_open_chars=num_open_chars + 1, strings=strings
+            )
+
+        if num_open_chars == 0:
+            return {
+                'close_char_index': close_char_index,
+                'strings': strings,
+            }
+        else:
+            return self._find_closing_char_index(
+                start_delim, open_char, close_char, template, start_index=close_char_index + 1,
+                num_open_chars=num_open_chars - 1, strings=strings
+            )
+
+    def _check_concat_with_html(self, file_contents, rule, results):
+        """
+        Checks that strings with HTML are not concatenated
+
+        Arguments:
+            file_contents: The contents of the JavaScript file.
+            rule: The rule that was violated if this fails.
+            results: A file results objects to which violations will be added.
+
+        """
+        lines = StringLines(file_contents)
+        last_expression = None
+        # attempt to match a string that starts with '<' or ends with '>'
+        regex_string_with_html = r"""["'](?:\s*<.*|.*>\s*)["']"""
+        regex_concat_with_html = r"(\+\s*{}|{}\s*\+)".format(regex_string_with_html, regex_string_with_html)
+        for match in re.finditer(regex_concat_with_html, file_contents):
+            found_new_violation = False
+            if last_expression is not None:
+                last_line = lines.index_to_line_number(last_expression.start_index)
+                # check if violation should be expanded to more of the same line
+                if last_line == lines.index_to_line_number(match.start()):
+                    last_expression = Expression(
+                        last_expression.start_index, match.end(), template=file_contents
+                    )
+                else:
+                    results.violations.append(ExpressionRuleViolation(
+                        rule, last_expression
+                    ))
+                    found_new_violation = True
+            else:
+                found_new_violation = True
+            if found_new_violation:
+                last_expression = Expression(
+                    match.start(), match.end(), template=file_contents
+                )
+
+        # add final expression
+        if last_expression is not None:
+            results.violations.append(ExpressionRuleViolation(
+                rule, last_expression
+            ))
+
+
+class UnderscoreTemplateLinter(BaseLinter):
     """
     The linter for Underscore.js template files.
     """
-
-    _skip_underscore_dirs = _skip_dirs + ('test',)
+    def __init__(self):
+        """
+        Init method.
+        """
+        super(UnderscoreTemplateLinter, self).__init__()
+        self._skip_underscore_dirs = self._skip_dirs + ('test',)
 
     def process_file(self, directory, file_name):
         """
@@ -886,45 +1000,13 @@ class UnderscoreTemplateLinter(object):
         full_path = os.path.normpath(directory + '/' + file_name)
         results = FileResults(full_path)
 
-        if not self._is_valid_directory(directory):
+        if not self._is_valid_directory(self._skip_underscore_dirs, directory):
             return results
 
         if not file_name.lower().endswith('.underscore'):
             return results
 
-        return self._load_and_check_underscore_file_is_safe(full_path, results)
-
-    def _is_valid_directory(self, directory):
-        """
-        Determines if the provided directory is a directory that could contain
-        Underscore.js template files that need to be linted.
-
-        Arguments:
-            directory: The directory to be linted.
-
-        Returns:
-            True if this directory should be linted for Underscore.js template
-            violations and False otherwise.
-        """
-        if _is_skip_dir(self._skip_underscore_dirs, directory):
-            return False
-
-        return True
-
-    def _load_and_check_underscore_file_is_safe(self, file_full_path, results):
-        """
-        Loads the Underscore.js template file and checks if it is in violation.
-
-        Arguments:
-            file_full_path: The file to be loaded and linted
-
-        Returns:
-            The file results containing any violations.
-
-        """
-        underscore_template = _load_file(file_full_path)
-        self.check_underscore_file_is_safe(underscore_template, results)
-        return results
+        return self._load_and_check_file_is_safe(full_path, self.check_underscore_file_is_safe, results)
 
     def check_underscore_file_is_safe(self, underscore_template, results):
         """
@@ -1003,14 +1085,19 @@ class UnderscoreTemplateLinter(object):
         return expressions
 
 
-class JavaScriptLinter(object):
+class JavaScriptLinter(BaseLinter):
     """
     The linter for JavaScript and CoffeeScript files.
     """
-
-    _skip_javascript_dirs = _skip_dirs + ('i18n', 'static/coffee')
-    _skip_coffeescript_dirs = _skip_dirs
     underScoreLinter = UnderscoreTemplateLinter()
+
+    def __init__(self):
+        """
+        Init method.
+        """
+        super(JavaScriptLinter, self).__init__()
+        self._skip_javascript_dirs = self._skip_dirs + ('i18n', 'static/coffee')
+        self._skip_coffeescript_dirs = self._skip_dirs
 
     def process_file(self, directory, file_name):
         """
@@ -1041,40 +1128,7 @@ class JavaScriptLinter(object):
         if not self._is_valid_directory(skip_dirs, directory):
             return results
 
-        return self._load_and_check_javascript_file_is_safe(file_full_path, results)
-
-    def _is_valid_directory(self, skip_dirs, directory):
-        """
-        Determines if the provided directory is a directory that could contain
-        a JavaScript file that needs to be linted.
-
-        Arguments:
-            skip_dirs: The directories to be skipped.
-            directory: The directory to be linted.
-
-        Returns:
-            True if this directory should be linted for JavaScript violations
-            and False otherwise.
-        """
-        if _is_skip_dir(skip_dirs, directory):
-            return False
-
-        return True
-
-    def _load_and_check_javascript_file_is_safe(self, file_full_path, results):
-        """
-        Loads the JavaScript file and checks if it is in violation.
-
-        Arguments:
-            file_full_path: The file to be loaded and linted.
-
-        Returns:
-            The file results containing any violations.
-
-        """
-        file_contents = _load_file(file_full_path)
-        self.check_javascript_file_is_safe(file_contents, results)
-        return results
+        return self._load_and_check_file_is_safe(file_full_path, self.check_javascript_file_is_safe, results)
 
     def check_javascript_file_is_safe(self, file_contents, results):
         """
@@ -1109,7 +1163,7 @@ class JavaScriptLinter(object):
         )
         self._check_javascript_interpolate(file_contents, results)
         self._check_javascript_escape(file_contents, results)
-        self._check_concat_with_html(file_contents, results)
+        self._check_concat_with_html(file_contents, Rules.javascript_concat_html, results)
         self.underScoreLinter.check_underscore_file_is_safe(file_contents, results)
         results.prepare_results(file_contents, line_comment_delim='//')
 
@@ -1129,7 +1183,7 @@ class JavaScriptLinter(object):
         """
         start_index = function_start_match.start()
         inner_start_index = function_start_match.end()
-        result = _find_closing_char_index(
+        result = self._find_closing_char_index(
             None, "(", ")", file_contents, start_index=inner_start_index
         )
         if result is not None:
@@ -1348,54 +1402,11 @@ class JavaScriptLinter(object):
             return True
         return False
 
-    def _check_concat_with_html(self, file_contents, results):
-        """
-        Checks that strings with HTML are not concatenated
 
-        Arguments:
-            file_contents: The contents of the JavaScript file.
-            results: A file results objects to which violations will be added.
-
-        """
-        lines = StringLines(file_contents)
-        last_expression = None
-        # attempt to match a string that starts with '<' or ends with '>'
-        regex_string_with_html = r"""["'](?:\s*<.*|.*>\s*)["']"""
-        regex_concat_with_html = r"(\+\s*{}|{}\s*\+)".format(regex_string_with_html, regex_string_with_html)
-        for match in re.finditer(regex_concat_with_html, file_contents):
-            found_new_violation = False
-            if last_expression is not None:
-                last_line = lines.index_to_line_number(last_expression.start_index)
-                # check if violation should be expanded to more of the same line
-                if last_line == lines.index_to_line_number(match.start()):
-                    last_expression = Expression(
-                        last_expression.start_index, match.end(), template=file_contents
-                    )
-                else:
-                    results.violations.append(ExpressionRuleViolation(
-                        Rules.javascript_concat_html, last_expression
-                    ))
-                    found_new_violation = True
-            else:
-                found_new_violation = True
-            if found_new_violation:
-                last_expression = Expression(
-                    match.start(), match.end(), template=file_contents
-                )
-
-        # add final expression
-        if last_expression is not None:
-            results.violations.append(ExpressionRuleViolation(
-                Rules.javascript_concat_html, last_expression
-            ))
-
-
-class MakoTemplateLinter(object):
+class MakoTemplateLinter(BaseLinter):
     """
     The linter for Mako template files.
     """
-
-    _skip_mako_dirs = _skip_dirs
     javaScriptLinter = JavaScriptLinter()
 
     def process_file(self, directory, file_name):
@@ -1429,7 +1440,7 @@ class MakoTemplateLinter(object):
         if not (file_name.lower().endswith('.html') or file_name.lower().endswith('.xml')):
             return results
 
-        return self._load_and_check_mako_file_is_safe(mako_file_full_path, results)
+        return self._load_and_check_file_is_safe(mako_file_full_path, self._check_mako_file_is_safe, results)
 
     def _is_valid_directory(self, directory):
         """
@@ -1443,7 +1454,7 @@ class MakoTemplateLinter(object):
             True if this directory should be linted for Mako template violations
             and False otherwise.
         """
-        if _is_skip_dir(self._skip_mako_dirs, directory):
+        if self._is_skip_dir(self._skip_dirs, directory):
             return False
 
         # TODO: This is an imperfect guess concerning the Mako template
@@ -1453,21 +1464,6 @@ class MakoTemplateLinter(object):
             return True
 
         return False
-
-    def _load_and_check_mako_file_is_safe(self, mako_file_full_path, results):
-        """
-        Loads the Mako template file and checks if it is in violation.
-
-        Arguments:
-            mako_file_full_path: The file to be loaded and linted.
-
-        Returns:
-            The file results containing any violations.
-
-        """
-        mako_template = _load_file(mako_file_full_path)
-        self._check_mako_file_is_safe(mako_template, results)
-        return results
 
     def _check_mako_file_is_safe(self, mako_template, results):
         """
@@ -1641,7 +1637,7 @@ class MakoTemplateLinter(object):
         """
         if '.display_name_with_default_escaped' in expression.expression:
             results.violations.append(ExpressionRuleViolation(
-                Rules.mako_deprecated_display_name, expression
+                Rules.python_deprecated_display_name, expression
             ))
 
     def _check_html_and_text(self, expression, has_page_default, results):
@@ -1662,7 +1658,7 @@ class MakoTemplateLinter(object):
         template_inner_start_index += expression.expression.find(expression_inner)
         if 'HTML(' in expression_inner:
             if expression_inner.startswith('HTML('):
-                close_paren_index = _find_closing_char_index(
+                close_paren_index = self._find_closing_char_index(
                     None, "(", ")", expression_inner, start_index=len('HTML(')
                 )['close_char_index']
                 # check that the close paren is at the end of the stripped expression.
@@ -1683,14 +1679,14 @@ class MakoTemplateLinter(object):
         # strings to be checked for HTML
         unwrapped_html_strings = expression.strings
         for match in re.finditer(r"(HTML\(|Text\()", expression_inner):
-            result = _find_closing_char_index(None, "(", ")", expression_inner, start_index=match.end())
+            result = self._find_closing_char_index(None, "(", ")", expression_inner, start_index=match.end())
             if result is not None:
                 close_paren_index = result['close_char_index']
                 # the argument sent to HTML() or Text()
                 argument = expression_inner[match.end():close_paren_index]
                 if ".format(" in argument:
                     results.violations.append(ExpressionRuleViolation(
-                        Rules.mako_close_before_format, expression
+                        Rules.python_close_before_format, expression
                     ))
                 if match.group() == "HTML(":
                     # remove expression strings wrapped in HTML()
@@ -1704,7 +1700,7 @@ class MakoTemplateLinter(object):
         for string in unwrapped_html_strings:
             if '<' in string.string_inner:
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_wrap_html, expression
+                    Rules.python_wrap_html, expression
                 ))
                 break
         # check strings not wrapped in HTML() for HTML entities
@@ -1930,7 +1926,7 @@ class MakoTemplateLinter(object):
             if start_index < 0:
                 break
 
-            result = _find_closing_char_index(
+            result = self._find_closing_char_index(
                 start_delim, '{', '}', mako_template, start_index=start_index + len(start_delim)
             )
             if result is None:
@@ -1953,6 +1949,296 @@ class MakoTemplateLinter(object):
                 start_index = expression.end_index
             expressions.append(expression)
         return expressions
+
+
+class PythonLinter(BaseLinter):
+    """
+    The linter for Python files.
+
+    The current implementation of the linter does naive Python parsing. It does
+    not use the parser. One known issue is that parsing errors found inside a
+    docstring need to be disabled, rather than being automatically skipped.
+    Skipping docstrings is an enhancement that could be added.
+    """
+
+    def __init__(self):
+        """
+        Init method.
+        """
+        super(PythonLinter, self).__init__()
+        self._skip_python_dirs = self._skip_dirs + ('tests', 'test/acceptance')
+
+    def process_file(self, directory, file_name):
+        """
+        Process file to determine if it is a Python file and
+        if it is safe.
+
+        Arguments:
+            directory (string): The directory of the file to be checked
+            file_name (string): A filename for a potential Python file
+
+        Returns:
+            The file results containing any violations.
+
+        """
+        file_full_path = os.path.normpath(directory + '/' + file_name)
+        results = FileResults(file_full_path)
+
+        if not results.is_file:
+            return results
+
+        if file_name.lower().endswith('.py') is False:
+            return results
+
+        # skip this linter code (i.e. safe_template_linter.py)
+        if file_name == os.path.basename(__file__):
+            return results
+
+        if not self._is_valid_directory(self._skip_python_dirs, directory):
+            return results
+
+        return self._load_and_check_file_is_safe(file_full_path, self.check_python_file_is_safe, results)
+
+    def check_python_file_is_safe(self, file_contents, results):
+        """
+        Checks for violations in a Python file.
+
+        Arguments:
+            file_contents: The contents of the Python file.
+            results: A file results objects to which violations will be added.
+
+        """
+        self._check_concat_with_html(file_contents, Rules.python_concat_html, results)
+        self._check_deprecated_display_name(file_contents, results)
+        self._check_custom_escape(file_contents, results)
+        self._check_html(file_contents, results)
+        results.prepare_results(file_contents, line_comment_delim='#')
+
+    def _check_deprecated_display_name(self, file_contents, results):
+        """
+        Checks that the deprecated display_name_with_default_escaped is not
+        used. Adds violation to results if there is a problem.
+
+        Arguments:
+            file_contents: The contents of the Python file
+            results: A list of results into which violations will be added.
+
+        """
+        for match in re.finditer(r'\.display_name_with_default_escaped', file_contents):
+            expression = Expression(match.start(), match.end())
+            results.violations.append(ExpressionRuleViolation(
+                Rules.python_deprecated_display_name, expression
+            ))
+
+    def _check_custom_escape(self, file_contents, results):
+        """
+        Checks for custom escaping calls, rather than using a standard escaping
+        method.
+
+        Arguments:
+            file_contents: The contents of the Python file
+            results: A list of results into which violations will be added.
+
+        """
+        for match in re.finditer("(<.*&lt;|&lt;.*<)", file_contents):
+            expression = Expression(match.start(), match.end())
+            results.violations.append(ExpressionRuleViolation(
+                Rules.python_custom_escape, expression
+            ))
+
+    def _check_html(self, file_contents, results):
+        """
+        Checks many rules related to HTML in a Python file.
+
+        Arguments:
+            file_contents: The contents of the Python file
+            results: A list of results into which violations will be added.
+
+        """
+        # Text() Expressions keyed by its end index
+        text_calls_by_end_index = {}
+        # HTML() Expressions keyed by its end index
+        html_calls_by_end_index = {}
+        start_index = 0
+        while True:
+
+            # check HTML(), Text() and format() calls
+            result = self._check_html_text_format(
+                file_contents, start_index, text_calls_by_end_index, html_calls_by_end_index, results
+            )
+            next_start_index = result['next_start_index']
+            interpolate_end_index = result['interpolate_end_index']
+
+            # check for interpolation including HTML outside of function calls
+            self._check_interpolate_with_html(
+                file_contents, start_index, interpolate_end_index, results
+            )
+
+            # advance the search
+            start_index = next_start_index
+
+            # end if there is nothing left to search
+            if interpolate_end_index is None:
+                break
+
+    def _check_html_text_format(
+            self, file_contents, start_index, text_calls_by_end_index, html_calls_by_end_index, results
+    ):
+        """
+        Checks for HTML(), Text() and format() calls, and various rules related
+        to these calls.
+
+        Arguments:
+            file_contents: The contents of the Python file
+            start_index: The index at which to begin searching for a function
+                call.
+            text_calls_by_end_index: Text() Expressions keyed by its end index.
+            html_calls_by_end_index: HTML() Expressions keyed by its end index.
+            results: A list of results into which violations will be added.
+
+        Returns:
+            A dict with the following keys:
+                'next_start_index': The start index of the next search for a
+                    function call.
+                'interpolate_end_index': The end index of the next next search
+                    for interpolation with html, or None if the end of file
+                    should be used.
+
+        """
+        # used to find opening of .format(), Text() and HTML() calls
+        regex_function_open = re.compile(r"(\.format\(|(?<!\w)HTML\(|(?<!\w)Text\()")
+        interpolate_end_index = None
+        end_index = None
+        strings = None
+        html_calls = []
+        while True:
+            # first search for HTML(), Text(), or .format()
+            if end_index is None:
+                function_match = regex_function_open.search(file_contents, start_index)
+            else:
+                function_match = regex_function_open.search(file_contents, start_index, end_index)
+            if function_match is not None:
+                if interpolate_end_index is None:
+                    interpolate_end_index = function_match.start()
+                function_close_result = self._find_closing_char_index(
+                    None, '(', ')', file_contents, start_index=function_match.end(),
+                )
+                if function_close_result is None:
+                    results.violations.append(ExpressionRuleViolation(
+                        Rules.python_parse_error, Expression(function_match.start())
+                    ))
+                else:
+                    expression = Expression(
+                        function_match.start(), function_close_result['close_char_index'] + 1, file_contents,
+                        start_delim=function_match.group(), end_delim=")"
+                    )
+                    # if this an outer most Text(), HTML(), or format() call
+                    if end_index is None:
+                        end_index = expression.end_index
+                        interpolate_end_index = expression.start_index
+                        strings = function_close_result['strings']
+                    if function_match.group() == '.format(':
+                        if 'HTML(' in expression.expression_inner or 'Text(' in expression.expression_inner:
+                            is_wrapped_with_text = str(function_match.start()) in text_calls_by_end_index.keys()
+                            is_wrapped_with_html = str(function_match.start()) in html_calls_by_end_index.keys()
+                            if is_wrapped_with_text is False and is_wrapped_with_html is False:
+                                results.violations.append(ExpressionRuleViolation(
+                                    Rules.python_requires_html_or_text, expression
+                                ))
+                    else:  # expression is 'HTML(' or 'Text('
+                        # HTML() and Text() calls cannot contain any inner HTML(), Text(), or format() calls.
+                        # Generally, format() would be the issue if there is one.
+                        if regex_function_open.search(expression.expression_inner) is not None:
+                            results.violations.append(ExpressionRuleViolation(
+                                Rules.python_close_before_format, expression
+                            ))
+                        if function_match.group() == 'Text(':
+                            text_calls_by_end_index[str(expression.end_index)] = expression
+                        else:  # function_match.group() == 'HTML(':
+                            html_calls_by_end_index[str(expression.end_index)] = expression
+                            html_calls.append(expression)
+
+                start_index = function_match.end()
+            else:
+                break
+
+        # checks strings in the outer most call to ensure they are properly
+        # wrapped with HTML()
+        self._check_format_html_strings_wrapped(strings, html_calls, results)
+
+        # compute where to continue the search
+        if function_match is None and end_index is None:
+            next_start_index = start_index
+        elif end_index is None:
+            next_start_index = function_match.end()
+        else:
+            next_start_index = end_index
+
+        return {
+            'next_start_index': next_start_index,
+            'interpolate_end_index': interpolate_end_index,
+        }
+
+    def _check_format_html_strings_wrapped(self, strings, html_calls, results):
+        """
+        Checks that any string inside a format call that seems to contain HTML
+        is wrapped with a call to HTML().
+
+        Arguments:
+            strings: A list of ParseStrings for each string inside the format()
+                call.
+            html_calls: A list of Expressions representing all of the HTML()
+                calls inside the format() call.
+            results: A list of results into which violations will be added.
+
+        """
+        html_strings = []
+        html_wrapped_strings = []
+        if strings is not None:
+            # find all strings that contain HTML
+            for string in strings:
+                if '<' in string.string:
+                    html_strings.append(string)
+                    # check if HTML string is appropriately wrapped
+                    for html_call in html_calls:
+                        if html_call.start_index < string.start_index < string.end_index < html_call.end_index:
+                            html_wrapped_strings.append(string)
+                            break
+            # loop through all unwrapped strings
+            for unsafe_string in set(html_strings) - set(html_wrapped_strings):
+                unsafe_string_expression = Expression(unsafe_string.start_index)
+                results.violations.append(ExpressionRuleViolation(
+                    Rules.python_wrap_html, unsafe_string_expression
+                ))
+
+    def _check_interpolate_with_html(self, file_contents, start_index, end_index, results):
+        """
+        Find interpolations with html that fall outside of any calls to HTML(),
+        Text(), and .format().
+
+        Arguments:
+            file_contents: The contents of the Python file
+            start_index: The index to start the search, or None if nothing to
+                search
+            end_index: The index to end the search, or None if the end of file
+                should be used.
+            results: A list of results into which violations will be added.
+
+        """
+        # used to find interpolation with HTML
+        pattern_interpolate_html_inner = r'(<.*%s|%s.*<|<.*{\w*}|{\w*}.*<)'
+        regex_interpolate_html = re.compile(r"""(".*{}.*"|'.*{}.*')""".format(
+            pattern_interpolate_html_inner, pattern_interpolate_html_inner
+        ))
+        if end_index is None:
+            interpolate_string_iter = regex_interpolate_html.finditer(file_contents, start_index)
+        else:
+            interpolate_string_iter = regex_interpolate_html.finditer(file_contents, start_index, end_index)
+        for match_html_string in interpolate_string_iter:
+            expression = Expression(match_html_string.start(), match_html_string.end())
+            results.violations.append(ExpressionRuleViolation(
+                Rules.python_interpolate_html, expression
+            ))
 
 
 def _process_file(full_path, template_linters, options, out):
@@ -2032,15 +2318,23 @@ def main():
     epilog = 'rules:\n'
     for rule in Rules.__members__.values():
         epilog += "  {0[0]}: {0[1]}\n".format(rule.value)
+    epilog += "\n"
+    epilog += "additional help:\n"
+    # pylint: disable=line-too-long
+    epilog += "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter\n"
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Checks that templates are safe.',
         epilog=epilog
     )
-    parser.add_argument('--quiet', dest='quiet', action='store_true', help='only display the filenames that contain violations')
+    parser.add_argument(
+        '--quiet', dest='quiet', action='store_true', help='only display the filenames that contain violations'
+    )
     parser.add_argument('--file', dest='file', nargs=1, default=None, help='a single file to lint')
-    parser.add_argument('--dir', dest='directory', nargs=1, default=['.'], help='the directory to lint (including sub-directories)')
+    parser.add_argument(
+        '--dir', dest='directory', nargs=1, default=['.'], help='the directory to lint (including sub-directories)'
+    )
 
     args = parser.parse_args()
 
@@ -2048,7 +2342,7 @@ def main():
         'is_quiet': args.quiet,
     }
 
-    template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter()]
+    template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()]
     if args.file is not None:
         if os.path.isfile(args.file[0]) is False:
             raise ValueError("File [{}] is not a valid file.".format(args.file[0]))
