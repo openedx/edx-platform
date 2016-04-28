@@ -1,31 +1,31 @@
 <%!
-  import json
-  from django.utils.translation import ugettext as _
-  from openedx.core.djangolib.js_utils import dump_js_escaped_json
+import json
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%inherit file="../main.html" />
 <%
-  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
 %>
 
 <%namespace name='static' file='../static_content.html'/>
 
 % if course_discovery_enabled:
 <%block name="header_extras">
-  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
-  <script type="text/template" id="${template_name}-tpl">
-      <%static:include path="discovery/${template_name}.underscore" />
-  </script>
-  % endfor
-  <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
-    DiscoveryFactory(
-      ${course_discovery_meanings | n, dump_js_escaped_json},
-      getParameterByName('search_query')
-    );
-  </%static:require_module>
+% for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="discovery/${template_name}.underscore" />
+</script>
+% endfor
+<%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
+DiscoveryFactory(
+${course_discovery_meanings | n, dump_js_escaped_json},
+getParameterByName('search_query')
+);
+</%static:require_module>
 </%block>
 % endif
-
+${hasnain}
 <section class="home">
   <header class="hero-main">
     <div class="tint-dark">
@@ -41,11 +41,9 @@
   </header>
 
   <section class="courses-section">
-  <div class="courses-container">
-    <div class="highlighted-courses">
-
+    <div class="courses-container">
+      <div class="highlighted-courses">
         <section class="courses">
-
           <div class="grid-manual">
             <div class="row">
               <div class="col col-12 text-center">
@@ -54,27 +52,17 @@
                 </h2>
               </div>
             </div>
-
-
-
-
-
-          <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-            <ul class="courses-listing">
-              %for course in courses:
-              <li class="courses-listing-item">
-                <%include file="../course.html" args="course=course" />
-              </li>
-              %endfor
-            </ul>
-          </div>
-
+            <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region"
+                 aria-label="${_('List of Courses')}">
+              <ul class="courses-listing">
+              </ul>
+            </div>
           </div>
         </section>
 
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 </section>
 
 
