@@ -166,6 +166,17 @@ h1, h2, h3, h4, h5, h6{
   }
 }
 
+//Modals
+.modal {
+  border-radius: 0px !important;
+  background: #FFFFFF !important;
+
+  .inner-wrapper {
+    padding: 0px !important;
+    border: none !important;
+  }
+}
+
 //Header
 header.header-main {
   min-height: 100px;
