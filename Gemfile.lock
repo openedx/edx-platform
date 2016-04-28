@@ -7,7 +7,7 @@ GEM
     neat (1.6.0)
       bourbon (>= 3.1)
       sass (>= 3.3)
-    sass (3.3.5)
+    sass (3.4.21)
     thor (0.19.1)
 
 PLATFORMS
@@ -16,4 +16,3 @@ PLATFORMS
 DEPENDENCIES
   bourbon (~> 4.0.2)
   neat (~> 1.6.0)
-  sass (= 3.3.5)

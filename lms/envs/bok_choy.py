@@ -11,7 +11,7 @@ from the same directory.
 """
 
 import os
-from path import path
+from path import Path as path
 from tempfile import mkdtemp
 
 # Pylint gets confused by path.py instances, which report themselves as class
@@ -64,7 +64,7 @@ DEBUG = True
 # Note: optimized files for testing are generated with settings from test_static_optimized
 STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
 )
 STATICFILES_DIRS = (
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
@@ -73,6 +73,9 @@ STATICFILES_DIRS = (
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
+
+# Don't use compression during tests
+PIPELINE_JS_COMPRESSOR = None
 
 ################################# CELERY ######################################
 
@@ -125,11 +128,14 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
+# Use the auto_auth workflow for creating users and logging them in
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
-FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080

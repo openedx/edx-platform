@@ -1,3 +1,6 @@
+"""
+Test cases covering workflows and behaviors for the Randomize XModule
+"""
 import unittest
 from datetime import datetime, timedelta
 

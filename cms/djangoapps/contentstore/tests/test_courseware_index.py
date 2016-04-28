@@ -29,8 +29,10 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
-from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, MixedSplitTestCase
+from xmodule.modulestore.tests.utils import (
+    create_modulestore_instance, LocationMixin,
+    MixedSplitTestCase, MongoContentstoreBuilder
+)
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 from xmodule.partitions.partitions import UserPartition

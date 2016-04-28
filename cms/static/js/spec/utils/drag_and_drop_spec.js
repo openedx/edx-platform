@@ -1,4 +1,4 @@
-define(["js/utils/drag_and_drop", "js/views/feedback_notification", "common/js/spec_helpers/ajax_helpers", "jquery", "underscore"],
+define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notification", "common/js/spec_helpers/ajax_helpers", "jquery", "underscore"],
     function (ContentDragger, Notification, AjaxHelpers, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {
@@ -309,7 +309,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "common/js/s
                     this.clock.restore();
                 });
                 it("should send an update on reorder from one parent to another", function () {
-                    var requests, savingOptions;
+                    var requests, request, savingOptions;
                     requests = AjaxHelpers["requests"](this);
                     ContentDragger.dragState.dropDestination = $('#unit-4');
                     ContentDragger.dragState.attachMethod = "after";
@@ -323,15 +323,15 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "common/js/s
                     }, null, {
                         clientX: $('#unit-1').offset().left
                     });
-                    expect(requests.length).toEqual(1);
+                    request = AjaxHelpers.currentRequest(requests);
                     expect(this.savingSpies.constructor).toHaveBeenCalled();
                     expect(this.savingSpies.show).toHaveBeenCalled();
                     expect(this.savingSpies.hide).not.toHaveBeenCalled();
                     savingOptions = this.savingSpies.constructor.mostRecentCall.args[0];
                     expect(savingOptions.title).toMatch(/Saving/);
                     expect($('#unit-1')).toHaveClass('was-dropped');
-                    expect(requests[0].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
-                    requests[0].respond(200);
+                    expect(request.requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
+                    request.respond(200);
                     expect(this.savingSpies.hide).toHaveBeenCalled();
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
@@ -341,7 +341,8 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "common/js/s
                     expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
                 });
                 it("should send an update on reorder within the same parent", function () {
-                    var requests = AjaxHelpers["requests"](this);
+                    var requests = AjaxHelpers["requests"](this),
+                        request;
                     ContentDragger.dragState.dropDestination = $('#unit-2');
                     ContentDragger.dragState.attachMethod = "after";
                     ContentDragger.dragState.parentList = $('#subsection-1');
@@ -354,12 +355,12 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "common/js/s
                     }, null, {
                         clientX: $('#unit-1').offset().left
                     });
-                    expect(requests.length).toEqual(1);
+                    request = AjaxHelpers.currentRequest(requests);
                     expect($('#unit-1')).toHaveClass('was-dropped');
-                    expect(requests[0].requestBody).toEqual(
+                    expect(request.requestBody).toEqual(
                         '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
                     );
-                    requests[0].respond(200);
+                    request.respond(200);
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
                     // parent

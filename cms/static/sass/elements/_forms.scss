@@ -456,7 +456,7 @@ input.search {
   @include box-sizing(border-box);
   border: 1px solid $darkGrey;
   border-radius: 20px;
-  background: url(../images/search-icon.png) no-repeat 8px 7px #edf1f5;
+  background: url('#{$static-path}/images/search-icon.png') no-repeat 8px 7px #edf1f5;
   font-family: 'Open Sans', sans-serif;
   color: $baseFontColor;
   outline: 0;

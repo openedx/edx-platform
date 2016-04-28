@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import status, response
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import clone_request
 from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
@@ -23,7 +24,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import IsUserInUrl
-from util.milestones_helpers import any_unfulfilled_milestones
 
 
 class DeveloperErrorViewMixin(object):
@@ -62,10 +62,14 @@ class DeveloperErrorViewMixin(object):
             return self.make_error_response(400, validation_error.messages[0])
 
     def handle_exception(self, exc):
+        """
+        Generalized helper method for managing specific API exception workflows
+        """
+
         if isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404):
-            return self.make_error_response(404, "Not found.")
+            return self.make_error_response(404, exc.message or "Not found.")
         elif isinstance(exc, ValidationError):
             return self.make_validation_error_response(exc)
         else:
@@ -78,7 +82,7 @@ class ExpandableFieldViewMixin(object):
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
         result = super(ExpandableFieldViewMixin, self).get_serializer_context()
-        result['expand'] = [x for x in self.request.QUERY_PARAMS.get('expand', '').split(',') if x]
+        result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
         return result
 
 
@@ -172,7 +176,7 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
 
     def patch(self, request, *args, **kwargs):
         """Checks for validation errors, then updates the model using the UpdateModelMixin."""
-        field_errors = self._validate_patch(request.DATA)
+        field_errors = self._validate_patch(request.data)
         if field_errors:
             return Response({'field_errors': field_errors}, status=status.HTTP_400_BAD_REQUEST)
         return self.partial_update(request, *args, **kwargs)
@@ -193,3 +197,23 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
         add_serializer_errors(serializer, patch, field_errors)
 
         return field_errors
+
+    def get_object_or_none(self):
+        """
+        Retrieve an object or return None if the object can't be found.
+
+        NOTE: This replaces functionality that was removed in Django Rest Framework v3.1.
+        """
+        try:
+            return self.get_object()
+        except Http404:
+            if self.request.method == 'PUT':
+                # For PUT-as-create operation, we need to ensure that we have
+                # relevant permissions, as if this was a POST request.  This
+                # will either raise a PermissionDenied exception, or simply
+                # return None.
+                self.check_permissions(clone_request(self.request, 'POST'))
+            else:
+                # PATCH requests where the object does not exist should still
+                # return a 404 response.
+                raise

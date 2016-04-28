@@ -62,12 +62,13 @@ from verify_student.views import PayAndVerifyView
       data-course-mode-name='${course_mode.name}'
       data-course-mode-slug='${course_mode.slug}'
       data-course-mode-min-price='${course_mode.min_price}'
+      data-course-mode-sku='${course_mode.sku or ''}'
       data-course-mode-suggested-prices='${course_mode.suggested_prices}'
       data-course-mode-currency='${course_mode.currency}'
       data-contribution-amount='${contribution_amount}'
       data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
-      data-display-steps='${json.dumps(display_steps)}'
+      data-display-steps='${json.dumps(display_steps) | h}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
@@ -76,9 +77,9 @@ from verify_student.views import PayAndVerifyView
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
 
-      # If we reached the verification flow from an in-course checkpoint,
-      # then pass the checkpoint location in so that we can associate
-      # the attempt with the checkpoint on submission.
+      ## If we reached the verification flow from an in-course checkpoint,
+      ## then pass the checkpoint location in so that we can associate
+      ## the attempt with the checkpoint on submission.
       % if checkpoint_location is not None:
         data-checkpoint-location='${checkpoint_location}'
       % endif

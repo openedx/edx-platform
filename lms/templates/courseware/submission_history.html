@@ -1,10 +1,10 @@
-<% import json  %>
+<% import json, pytz %>
 <h3>${username | h} > ${course_id | h} > ${location | h}</h3>
 
 % for i, (entry, score) in enumerate(zip(history_entries, scores)):
 <hr/>
 <div>
-<b>#${len(history_entries) - i}</b>: ${entry.updated} (${TIME_ZONE} time)</br>
+<b>#${len(history_entries) - i}</b>: ${entry.updated.astimezone(pytz.timezone(settings.TIME_ZONE))} (${settings.TIME_ZONE} time)</br>
 Score: ${score.grade} / ${score.max_grade}
 <pre>
 ${json.dumps(entry.state, indent=2, sort_keys=True) | h}

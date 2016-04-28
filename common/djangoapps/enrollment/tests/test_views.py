@@ -30,8 +30,9 @@ from enrollment.errors import CourseEnrollmentError
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
-from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
+from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
 from embargo.test_utils import restrict_course
 
 
@@ -135,6 +136,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
+    OTHER_USERNAME = "Jane"
+    OTHER_EMAIL = "jane@example.com"
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp()
@@ -151,8 +155,16 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         # miss; the modulestore is queried and course metadata is cached.
         __ = CourseOverview.get_from_id(self.course.id)
 
-        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-        self.other_user = UserFactory.create()
+        self.user = UserFactory.create(
+            username=self.USERNAME,
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
+        self.other_user = UserFactory.create(
+            username=self.OTHER_USERNAME,
+            email=self.OTHER_EMAIL,
+            password=self.PASSWORD,
+        )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
     @ddt.data(
@@ -302,20 +314,57 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.client.logout()
         self.assert_enrollment_status(username=self.other_user.username, as_server=True)
 
-    def test_user_does_not_match_param_for_list(self):
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.HONOR,
-            mode_display_name=CourseMode.HONOR,
+    def _assert_enrollments_visible_in_list(self, courses, use_server_key=False):
+        """
+        Check that the list of enrollments of self.user returned for the currently logged in user
+        matches the list of courses passed in in 'courses'.
+        """
+        kwargs = {}
+        if use_server_key:
+            kwargs.update(HTTP_X_EDX_API_KEY=self.API_KEY)
+        response = self.client.get(reverse('courseenrollments'), {'user': self.user.username}, **kwargs)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertItemsEqual(
+            [enrollment['course_details']['course_id'] for enrollment in data],
+            [unicode(course.id) for course in courses]
         )
-        resp = self.client.get(reverse('courseenrollments'), {'user': self.other_user.username})
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        # Verify that the server still has access to this endpoint.
+
+    def test_enrollment_list_permissions(self):
+        """
+        Test that the correct list of enrollments is returned, depending on the permissions of the
+        requesting user.
+        """
+        # Create another course, and enroll self.user in both courses.
+        other_course = CourseFactory.create()
+        for course in self.course, other_course:
+            CourseModeFactory.create(
+                course_id=unicode(course.id),
+                mode_slug=CourseMode.HONOR,
+                mode_display_name=CourseMode.HONOR,
+            )
+            self.assert_enrollment_status(
+                course_id=unicode(course.id),
+                max_mongo_calls=1,
+            )
+        # Verify the user himself can see both of his enrollments.
+        self._assert_enrollments_visible_in_list([self.course, other_course])
+        # Verify that self.other_user can't see any of the enrollments.
+        self.client.login(username=self.OTHER_USERNAME, password=self.PASSWORD)
+        self._assert_enrollments_visible_in_list([])
+        # Create a staff user for self.course (but nor for other_course) and log her in.
+        staff_user = UserFactory.create(username='staff', email='staff@example.com', password=self.PASSWORD)
+        CourseStaffRole(self.course.id).add_users(staff_user)
+        self.client.login(username='staff', password=self.PASSWORD)
+        # Verify that she can see only the enrollment in the course she has staff privileges for.
+        self._assert_enrollments_visible_in_list([self.course])
+        # Create a global staff user, and verify she can see all enrollments.
+        AdminFactory(username='global_staff', email='global_staff@example.com', password=self.PASSWORD)
+        self.client.login(username='global_staff', password=self.PASSWORD)
+        self._assert_enrollments_visible_in_list([self.course, other_course])
+        # Verify the server can see all enrollments.
         self.client.logout()
-        resp = self.client.get(
-            reverse('courseenrollments'), {'username': self.other_user.username}, **{'HTTP_X_EDX_API_KEY': self.API_KEY}
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self._assert_enrollments_visible_in_list([self.course, other_course], use_server_key=True)
 
     def test_user_does_not_match_param(self):
         """
@@ -989,7 +1038,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     @cross_domain_config
     def test_cross_domain_missing_csrf(self, *args):  # pylint: disable=unused-argument
         resp = self._cross_domain_post('invalid_csrf_token')
-        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(resp.status_code, 403)
 
     def _get_csrf_cookie(self):
         """Retrieve the cross-domain CSRF cookie. """

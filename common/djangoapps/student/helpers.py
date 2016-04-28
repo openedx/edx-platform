@@ -18,6 +18,11 @@ VERIFY_STATUS_APPROVED = "verify_approved"
 VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
+DISABLE_UNENROLL_CERT_STATES = [
+    'generating',
+    'ready',
+]
+
 
 def check_verify_status_by_course(user, course_enrollments):
     """
@@ -189,7 +194,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
     return {
         provider.provider_id: third_party_auth.pipeline.get_login_url(
             provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.enabled()
+        ) for provider in third_party_auth.provider.Registry.accepting_logins()
     }
 
 

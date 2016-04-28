@@ -1,8 +1,8 @@
 <%inherit file="base.html" />
 <%!
-import json
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.lib.js_utils import escape_json_dumps
 %>
 <%def name="online_help_token()"><% return "team_library" %></%def>
 <%block name="title">${_("Library User Access")}</%block>
@@ -108,7 +108,7 @@ from django.core.urlresolvers import reverse
   require(["js/factories/manage_users_lib"], function(ManageLibraryUsersFactory) {
       ManageLibraryUsersFactory(
         "${context_library.display_name_with_default | h}",
-        ${json.dumps(users)},
+        ${escape_json_dumps(users) | n},
         "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'})}",
         ${ request.user.id },
         ${str(allow_actions).lower()}

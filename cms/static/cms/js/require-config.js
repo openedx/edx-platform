@@ -1,3 +1,16 @@
+if (window) {
+    // MathJax Fast Preview was introduced in 2.5. However, it
+    // causes undesirable flashing/font size changes when
+    // MathJax is used for interactive preview (equation editor).
+    // Setting processSectionDelay to 0 (see below) fully eliminates
+    // fast preview, but to reduce confusion, we are also setting
+    // the option as displayed in the context menu to false.
+    // When upgrading to 2.6, check if this variable name changed.
+    window.MathJax = {
+      menuSettings: {CHTMLpreview: false}
+    };
+}
+
 require.config({
     // NOTE: baseUrl has been previously set in cms/static/templates/base.html
     waitSeconds: 60,
@@ -27,8 +40,9 @@ require.config({
         "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
-        "text": 'js/vendor/requirejs/text',
         "moment": "js/vendor/moment.min",
+        "moment-with-locales": "js/vendor/moment-with-locales.min",
+        "text": 'js/vendor/requirejs/text',
         "underscore": "js/vendor/underscore-min",
         "underscore.string": "js/vendor/underscore.string.min",
         "backbone": "js/vendor/backbone-min",
@@ -69,15 +83,8 @@ require.config({
         // end of Annotation tool files
 
         // externally hosted files
-        "tender": [
-            // if TENDER_SUBDOMAIN is defined, use that; otherwise, use a dummy value
-            // (the application JS will never `require(['tender'])` if it's not defined)
-            "//" + (typeof TENDER_SUBDOMAIN === "string" ? TENDER_SUBDOMAIN : "example") + ".tenderapp.com/tender_widget",
-            // if tender fails to load, fallback on a local file
-            // so that require doesn't fall over
-            "js/src/tender_fallback"
-        ],
         "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
+
         "youtube": [
             // youtube URL does not end in ".js". We add "?noext" to the path so
             // that require.js adds the ".js" to the query component of the URL,
@@ -171,9 +178,6 @@ require.config({
             deps: ["backbone"],
             exports: "Backbone.Paginator"
         },
-        "tender": {
-            exports: 'Tender'
-        },
         "youtube": {
             exports: "YT"
         },
@@ -201,6 +205,12 @@ require.config({
                   ]
                 }
               });
+              // In order to eliminate all flashing during interactive
+              // preview, it is necessary to set processSectionDelay to 0
+              // (remove delay between input and output phases). This
+              // effectively disables fast preview, regardless of
+              // the fast preview setting as shown in the context menu.
+              MathJax.Hub.processSectionDelay = 0;
               MathJax.Hub.Configured();
             }
         },

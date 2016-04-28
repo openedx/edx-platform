@@ -115,7 +115,8 @@ Feature: LMS.Answer problems
         | drop down         | incorrect     | never           |
         | multiple choice   | incorrect     | never           |
         | checkbox          | incorrect     | never           |
-        | radio             | incorrect     | never           |
+        # TE-572
+        #| radio             | incorrect     | never           |
         #| string            | incorrect     | never           |
         | numerical         | incorrect     | never           |
         | formula           | incorrect     | never           |

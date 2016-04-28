@@ -509,7 +509,7 @@ class Order(models.Model):
 
         """
         try:
-            if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+            if settings.LMS_SEGMENT_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
                 analytics.track(self.user.id, event_name, {  # pylint: disable=no-member
                     'orderId': self.id,  # pylint: disable=no-member
@@ -517,6 +517,7 @@ class Order(models.Model):
                     'currency': self.currency,
                     'products': [item.analytics_data() for item in orderitems]
                 }, context={
+                    'ip': tracking_context.get('ip'),
                     'Google Analytics': {
                         'clientId': tracking_context.get('client_id')
                     }
@@ -1163,7 +1164,7 @@ class InvoiceHistory(models.Model):
         elif hasattr(instance, 'invoice'):
             InvoiceHistory.save_invoice_snapshot(instance.invoice)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         get_latest_by = "timestamp"
 
 
@@ -1189,7 +1190,7 @@ class CourseRegistrationCode(models.Model):
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
-    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    created_at = models.DateTimeField(auto_now_add=True)
     order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
     mode_slug = models.CharField(max_length=100, null=True)
     is_valid = models.BooleanField(default=True)
@@ -1224,7 +1225,7 @@ class RegistrationCodeRedemption(models.Model):
     order = models.ForeignKey(Order, db_index=True, null=True)
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
-    redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
+    redeemed_at = models.DateTimeField(auto_now_add=True, null=True)
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
 
     @classmethod
@@ -1299,7 +1300,7 @@ class Coupon(models.Model):
     course_id = CourseKeyField(max_length=255)
     percentage_discount = models.IntegerField(default=0)
     created_by = models.ForeignKey(User)
-    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
 

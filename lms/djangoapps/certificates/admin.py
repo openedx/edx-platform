@@ -11,6 +11,7 @@ from certificates.models import (
     BadgeImageConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
+    GeneratedCertificate,
 )
 
 
@@ -18,13 +19,16 @@ class CertificateTemplateForm(forms.ModelForm):
     """
     Django admin form for CertificateTemplate model
     """
-    organizations = get_organizations()
-    org_choices = [(org["id"], org["name"]) for org in organizations]
-    org_choices.insert(0, ('', 'None'))
-    organization_id = forms.TypedChoiceField(choices=org_choices, required=False, coerce=int, empty_value=None)
+    def __init__(self, *args, **kwargs):
+        super(CertificateTemplateForm, self).__init__(*args, **kwargs)
+        organizations = get_organizations()
+        org_choices = [(org["id"], org["name"]) for org in organizations]
+        org_choices.insert(0, ('', 'None'))
+        self.fields['organization_id'] = forms.TypedChoiceField(
+            choices=org_choices, required=False, coerce=int, empty_value=None
+        )
 
     class Meta(object):
-        """ Meta definitions for CertificateTemplateForm  """
         model = CertificateTemplate
 
 
@@ -43,8 +47,17 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     list_display = ('description', '__unicode__')
 
 
+class GeneratedCertificateAdmin(admin.ModelAdmin):
+    """
+    Django admin customizations for GeneratedCertificate model
+    """
+    search_fields = ('course_id', 'user__username')
+    list_display = ('id', 'course_id', 'mode', 'user')
+
+
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(BadgeImageConfiguration)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
+admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)

@@ -19,6 +19,7 @@ from instructor_task.tasks import (
     reset_problem_attempts,
     delete_problem_state,
     send_bulk_course_email,
+    calculate_problem_responses_csv,
     calculate_grades_csv,
     calculate_problem_grade_report,
     calculate_students_features_csv,
@@ -30,6 +31,7 @@ from instructor_task.tasks import (
     enrollment_report_features_csv,
     calculate_may_enroll_csv,
     exec_summary_report_csv,
+    course_survey_report_csv,
     generate_certificates,
     proctored_exam_results_csv
 )
@@ -42,6 +44,7 @@ from instructor_task.api_helper import (
     submit_task,
 )
 from bulk_email.models import CourseEmail
+from util import milestones_helpers
 
 
 def get_running_instructor_tasks(course_id):
@@ -274,6 +277,8 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     Module state for all problems in entrance exam will be deleted
     for specified student.
 
+    All User Milestones of entrance exam will be removed for the specified student
+
     Parameters are `usage_key`, which must be a :class:`Location`
     representing entrance exam section and the `student` as a User object.
 
@@ -290,6 +295,14 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     """
     # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
+
+    # Remove Content milestones that user has completed
+    milestones_helpers.remove_course_content_user_milestones(
+        course_key=usage_key.course_key,
+        content_key=usage_key,
+        user=student,
+        relationship='fulfills'
+    )
 
     task_type = 'delete_problem_state'
     task_class = delete_problem_state
@@ -335,6 +348,21 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_problem_responses_csv(request, course_key, problem_location):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a CSV file containing all student
+    answers to a given problem.
+
+    Raises AlreadyRunningError if said file is already being updated.
+    """
+    task_type = 'problem_responses_csv'
+    task_class = calculate_problem_responses_csv
+    task_input = {'problem_location': problem_location}
+    task_key = ""
+
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
@@ -466,6 +494,20 @@ def submit_executive_summary_report(request, course_key):  # pylint: disable=inv
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
+def submit_course_survey_report(request, course_key):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate a HTML File containing the executive summary report.
+
+    Raises AlreadyRunningError if HTML File is already being updated.
+    """
+    task_type = 'course_survey_report'
+    task_class = course_survey_report_csv
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
 def submit_proctored_exam_results_report(request, course_key, features):  # pylint: disable=invalid-name
     """
     Submits a task to generate a HTML File containing the executive summary report.
@@ -503,6 +545,27 @@ def generate_certificates_for_all_students(request, course_key):   # pylint: dis
     task_type = 'generate_certificates_all_student'
     task_class = generate_certificates
     task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate certificates for given students enrolled in the course or
+    all students if argument 'students' is None
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    if students:
+        task_type = 'generate_certificates_certain_student'
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'generate_certificates_all_student'
+        task_input = {}
+
+    task_class = generate_certificates
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

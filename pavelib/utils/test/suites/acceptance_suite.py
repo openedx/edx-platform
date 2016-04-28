@@ -51,6 +51,9 @@ class AcceptanceTest(TestSuite):
         return cmd
 
     def _update_assets(self):
+        """
+        Internal helper method to manage asset compilation
+        """
         args = [self.system, '--settings=acceptance']
 
         if self.fasttest:

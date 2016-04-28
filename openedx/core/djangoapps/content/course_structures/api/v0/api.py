@@ -124,4 +124,4 @@ def course_grading_policy(course_key):
                 final grade.
     """
     course = _retrieve_course(course_key)
-    return GradingPolicySerializer(course.raw_grader).data
+    return GradingPolicySerializer(course.raw_grader, many=True).data

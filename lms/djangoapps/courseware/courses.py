@@ -1,9 +1,15 @@
+"""
+Functions for accessing and displaying courses within the
+courseware.
+"""
+from datetime import datetime
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
 import inspect
 
-from path import path
+from path import Path as path
+import pytz
 from django.http import Http404
 from django.conf import settings
 
@@ -21,6 +27,13 @@ from util.date_utils import get_default_time_display
 from util.keyword_substitution import substitute_keywords_with_data
 
 from courseware.access import has_access
+from courseware.date_summary import (
+    CourseEndDate,
+    CourseStartDate,
+    TodaysDate,
+    VerificationDeadlineDate,
+    VerifiedUpgradeDeadlineDate,
+)
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
@@ -29,6 +42,7 @@ import branding
 from student.models import CourseEnrollment
 
 from opaque_keys.edx.keys import UsageKey
+
 
 log = logging.getLogger(__name__)
 
@@ -318,6 +332,43 @@ def get_course_info_section(request, course, section_key):
             )
 
     return html
+
+
+def get_course_date_summary(course, user):
+    """
+    Return the snippet of HTML to be included on the course info page
+    in the 'Date Summary' section.
+    """
+    blocks = _get_course_date_summary_blocks(course, user)
+    return '\n'.join(
+        b.render() for b in blocks
+    )
+
+
+def _get_course_date_summary_blocks(course, user):
+    """
+    Return the list of blocks to display on the course info page,
+    sorted by date.
+    """
+    block_classes = (
+        CourseEndDate,
+        CourseStartDate,
+        TodaysDate,
+        VerificationDeadlineDate,
+        VerifiedUpgradeDeadlineDate,
+    )
+
+    blocks = (cls(course, user) for cls in block_classes)
+
+    def block_key_fn(block):
+        """
+        If the block's date is None, return the maximum datetime in order
+        to force it to the end of the list of displayed blocks.
+        """
+        if block.date is None:
+            return datetime.max.replace(tzinfo=pytz.UTC)
+        return block.date
+    return sorted((b for b in blocks if b.is_enabled), key=block_key_fn)
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

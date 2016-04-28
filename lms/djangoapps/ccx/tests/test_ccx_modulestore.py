@@ -45,7 +45,7 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
             ) for _ in xrange(2) for s in sequentials
         ]
         cls.blocks = [
-            ItemFactory.create(parent=v) for _ in xrange(2) for v in verticals
+            ItemFactory.create(parent=v, category='html') for _ in xrange(2) for v in verticals
         ]
 
     def setUp(self):

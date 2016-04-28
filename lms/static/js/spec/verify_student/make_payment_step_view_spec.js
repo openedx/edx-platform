@@ -66,7 +66,8 @@ define([
                 var params = {
                     contribution: kwargs.amount || "",
                     course_id: kwargs.courseId || "",
-                    processor: kwargs.processor || ""
+                    processor: kwargs.processor || "",
+                    sku: kwargs.sku || ""
                 };
 
                 // Click the "go to payment" button
@@ -82,7 +83,7 @@ define([
                     // TODO put fixture responses in the right place
                     AjaxHelpers.respondWithJson( requests, {payment_page_url: 'http://payment-page-url/', payment_form_data: {foo: 'bar'}} );
                 } else {
-                    AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG );
+                    AjaxHelpers.respondWithTextError( requests, 400, SERVER_ERROR_MSG);
                 }
             };
 
@@ -101,7 +102,8 @@ define([
                 var $el = $( '.payment-button' );
                 expect($el.length).toEqual(_.size(buttons));
                 _.each(buttons, function( expectedText, expectedId ) {
-                    var buttonEl = $( '#' + expectedId );
+                    var buttonEl = $( '#' + expectedId),
+                        request;
 
                     buttonEl.removeAttr('disabled');
                     expect( buttonEl.length ).toEqual( 1 );
@@ -111,7 +113,9 @@ define([
                     buttonEl[0].click();
                     expect( buttonEl[0] ).toHaveClass( 'is-selected' );
                     expectPaymentButtonEnabled( false );
-                    expect(requests[requests.length - 1].requestBody.split('&')).toContain('processor=' + expectedId);
+                    request = AjaxHelpers.currentRequest(requests);
+                    expect(request.requestBody.split('&')).toContain('processor=' + expectedId);
+                    AjaxHelpers.respondWithJson(requests, {});
                 });
             };
 

@@ -54,6 +54,7 @@ set -e
 # Note that you will still need to pass a value for 'TEST_SUITE'
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
+NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
 
 # Clean up previous builds
 git clean -qxfd
@@ -66,16 +67,16 @@ case "$TEST_SUITE" in
         echo "Finding pep8 violations and storing report..."
         paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
         echo "Finding pylint violations and storing in report..."
-        paver run_pylint -l $PYLINT_THRESHOLD || { cat pylint.log; EXIT=1; }
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        paver run_quality -p 100 || EXIT=1
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
 
         mkdir -p reports
         echo "Finding jshint violations and storing report..."
-        PATH=$PATH:node_modules/.bin
         paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        paver run_quality -p 100 || EXIT=1
+
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
         cat > reports/quality.xml <<END
@@ -111,6 +112,7 @@ END
 
     "js-unit")
         paver test_js --coverage
+        paver diff_coverage
         ;;
 
     "commonlib-js-unit")
@@ -147,31 +149,31 @@ END
                 ;;
 
             "1")
-                paver test_bokchoy --extra_args="-a shard_1 --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1 --with-flaky"
                 ;;
 
             "2")
-                paver test_bokchoy --extra_args="-a 'shard_2' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_2' --with-flaky"
                 ;;
 
             "3")
-                paver test_bokchoy --extra_args="-a 'shard_3' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_3' --with-flaky"
                 ;;
 
             "4")
-                paver test_bokchoy --extra_args="-a 'shard_4' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_4' --with-flaky"
                 ;;
 
             "5")
-                paver test_bokchoy --extra_args="-a 'shard_5' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_5' --with-flaky"
                 ;;
 
             "6")
-                paver test_bokchoy --extra_args="-a 'shard_6' --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a 'shard_6' --with-flaky"
                 ;;
 
             "7")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False --with-flaky"
+                paver test_bokchoy -n $NUMBER_OF_BOKCHOY_THREADS --extra_args="-a shard_1=False,shard_2=False,shard_3=False,shard_4=False,shard_5=False,shard_6=False,a11y=False --with-flaky"
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins

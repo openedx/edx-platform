@@ -24,6 +24,16 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
 
+    def visit_account_settings_page(self):
+        """
+        Visit the account settings page for the current user, and store the page instance
+        as self.account_settings_page.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.account_settings_page = AccountSettingsPage(self.browser)
+        self.account_settings_page.visit()
+        self.account_settings_page.wait_for_ajax()
+
     def log_in_as_unique_user(self, email=None):
         """
         Create a unique user and return the account's username and id.
@@ -115,14 +125,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         super(AccountSettingsPageTest, self).setUp()
         self.username, self.user_id = self.log_in_as_unique_user()
         self.visit_account_settings_page()
-
-    def visit_account_settings_page(self):
-        """
-        Visit the account settings page for the current user.
-        """
-        self.account_settings_page = AccountSettingsPage(self.browser)
-        self.account_settings_page.visit()
-        self.account_settings_page.wait_for_ajax()
 
     def test_page_view_event(self):
         """
@@ -444,3 +446,18 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         for field_id, title, link_title in providers:
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)
+
+
+@attr('a11y')
+class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
+    """
+    Class to test account settings accessibility.
+    """
+
+    def test_account_settings_a11y(self):
+        """
+        Test the accessibility of the account settings page.
+        """
+        self.log_in_as_unique_user()
+        self.visit_account_settings_page()
+        self.account_settings_page.a11y_audit.check_for_accessibility_errors()

@@ -1,7 +1,7 @@
 // studio - views - certificates
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Layout - Certificates
 // * +Main - Collection
 // * +Main - Certificate
@@ -49,6 +49,15 @@
 
   .content-supplementary {
     width: flex-grid(3, 12);
+  }
+
+  .certificate-info-section{
+      overflow: auto;
+
+    .course-title-section, .course-number-section{
+      min-width: 47%;
+      @include margin-right(2%);
+    }
   }
 }
 
@@ -380,6 +389,12 @@
             color: $gray-l3;
           }
         }
+        &.custom-signatory-action {
+          position: relative;
+          top: 0;
+          left: 0;
+          opacity: 1.0;
+        }
       }
 
       .copy {
@@ -429,7 +444,11 @@
 
 // * +Main - Certificate
 // ====================
-// TO-DO: refactor to use collection styling where possible. 
+// TO-DO: refactor to use collection styling where possible.
+.view-certificates .activate-cert {
+  margin-left: 5px;
+}
+
 .view-certificates .certificates {
 
   .certificate-details, .certificate-edit {
@@ -500,7 +519,7 @@
 
 // * +Signatories -Certificate
 // ====================
-// TO-DO: refactor to use collection styling where possible. 
+// TO-DO: refactor to use collection styling where possible.
 .view-certificates .certificates {
 
   .signatory-details, .signatory-edit {
@@ -518,6 +537,14 @@
 
     .signatory-panel-body {
       padding: $baseline;
+
+      .signatory-image {
+        margin-top: 20px;
+      }
+
+      .signature-image {
+        max-width: 450px;
+      }
     }
 
     .signatory-panel-body label {
@@ -663,7 +690,7 @@
         .wrapper-signature-image {
           display: block;
           width: 375px;
-          height: 200px;
+          line-height: 200px;
           overflow: hidden;
           margin: 0 auto;
           border: 1px solid $gray-l4;
@@ -673,9 +700,9 @@
         }
 
         .signature-image {
-          display: block;
+          vertical-align: middle;
           width: 100%;
-          min-height: 100%;
+          max-height: 100%;
         }
       }
     }

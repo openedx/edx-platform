@@ -35,6 +35,7 @@ from student.views import (
 from student.helpers import get_next_url_for_login_page
 import third_party_auth
 from third_party_auth import pipeline
+from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
@@ -46,6 +47,7 @@ AUDIT_LOG = logging.getLogger("audit")
 
 @require_http_methods(['GET'])
 @ensure_csrf_cookie
+@xframe_allow_whitelisted
 def login_and_registration_form(request, initial_mode="login"):
     """Render the combined login/registration form, defaulting to login
 
@@ -96,22 +98,26 @@ def login_and_registration_form(request, initial_mode="login"):
 
     # Otherwise, render the combined login/registration page
     context = {
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
-        'disable_courseware_js': True,
-        'initial_mode': initial_mode,
-        'third_party_auth': json.dumps(_third_party_auth_context(request, redirect_to)),
-        'third_party_auth_hint': third_party_auth_hint or '',
-        'platform_name': settings.PLATFORM_NAME,
-        'account_name': settings.ACCOUNT_NAME,
-        'responsive': True,
+        'data': {
+            'login_redirect_url': redirect_to,
+            'initial_mode': initial_mode,
+            'third_party_auth': _third_party_auth_context(request, redirect_to),
+            'third_party_auth_hint': third_party_auth_hint or '',
+            'platform_name': settings.PLATFORM_NAME,
+            'account_name': settings.ACCOUNT_NAME,
 
-        # Include form descriptions retrieved from the user API.
-        # We could have the JS client make these requests directly,
-        # but we include them in the initial page load to avoid
-        # the additional round-trip to the server.
-        'login_form_desc': form_descriptions['login'],
-        'registration_form_desc': form_descriptions['registration'],
-        'password_reset_form_desc': form_descriptions['password_reset'],
+            # Include form descriptions retrieved from the user API.
+            # We could have the JS client make these requests directly,
+            # but we include them in the initial page load to avoid
+            # the additional round-trip to the server.
+            'login_form_desc': json.loads(form_descriptions['login']),
+            'registration_form_desc': json.loads(form_descriptions['registration']),
+            'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
+        },
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
+        'responsive': True,
+        'allow_iframing': True,
+        'disable_courseware_js': True,
     }
 
     return render_to_response('student_account/login_and_register.html', context)
@@ -189,7 +195,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.enabled():
+        for enabled in third_party_auth.provider.Registry.accepting_logins():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -210,12 +216,14 @@ def _third_party_auth_context(request, redirect_to):
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-            context["currentProvider"] = current_provider.name
-            context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
 
-            if current_provider.skip_registration_form:
-                # As a reliable way of "skipping" the registration form, we just submit it automatically
-                context["autoSubmitRegForm"] = True
+            if current_provider is not None:
+                context["currentProvider"] = current_provider.name
+                context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+
+                if current_provider.skip_registration_form:
+                    # As a reliable way of "skipping" the registration form, we just submit it automatically
+                    context["autoSubmitRegForm"] = True
 
         # Check for any error messages we may want to display:
         for msg in messages.get_messages(request):
@@ -398,13 +406,14 @@ def account_settings_context(request):
             'name': state.provider.name,  # The name of the provider e.g. Facebook
             'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
             # If the user is not connected, they should be directed to this page to authenticate
-            # with the particular provider.
+            # with the particular provider, as long as the provider supports initiating a login.
             'connect_url': pipeline.get_login_url(
                 state.provider.provider_id,
                 pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
                 # The url the user should be directed to after the auth process has completed.
                 redirect_url=reverse('account_settings'),
             ),
+            'accepts_logins': state.provider.accepts_logins,
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),

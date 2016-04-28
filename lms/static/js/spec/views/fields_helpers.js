@@ -63,6 +63,10 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expect(view.$('.u-field-title').text().trim()).toContain(expectedTitle);
         };
 
+        var expectDropdownSrTitleToContain = function(view, expectedTitle) {
+            expect(view.$('.u-field-value .sr').text().trim()).toContain(expectedTitle);
+        };
+
         var expectMessageContains = function(view, expectedText) {
             expect(view.$('.u-field-message').html()).toContain(expectedText);
         };
@@ -154,7 +158,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             view.$(valueInputSelector).val(fieldData.validValue).change();
             expect(view.fieldValue()).toBe(fieldData.validValue);
             expectMessageContains(view, view.helpMessage);
-            expect(requests.length).toBe(0);
+            AjaxHelpers.expectNoRequests(requests);
         };
 
         var verifyEditableField = function (view, data, requests) {
@@ -167,7 +171,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 expectMessageContains(view, view.indicators.canEdit);
                 view.$el.click();
             } else {
-                expectTitleAndMessageToContain(view, data.title, data.helpMessage, false);
+                expectTitleAndMessageToContain(view, data.title, data.helpMessage);
             }
             expect(view.el).toHaveClass('mode-edit');
 
@@ -254,6 +258,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             createFieldData: createFieldData,
             createErrorMessage: createErrorMessage,
             expectTitleToContain: expectTitleToContain,
+            expectDropdownSrTitleToContain: expectDropdownSrTitleToContain,
             expectTitleAndMessageToContain: expectTitleAndMessageToContain,
             expectMessageContains: expectMessageContains,
             expectAjaxRequestWithData: expectAjaxRequestWithData,

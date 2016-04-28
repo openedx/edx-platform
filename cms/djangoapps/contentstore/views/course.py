@@ -30,6 +30,7 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -37,6 +38,7 @@ from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
 
 from django.views.decorators.csrf import ensure_csrf_cookie
+from openedx.core.lib.js_utils import escape_json_dumps
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.course_group_config import (
     GroupConfiguration,
@@ -90,7 +92,9 @@ from student.auth import has_course_author_access
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
-    is_valid_course_key
+    is_valid_course_key,
+    is_prerequisite_courses_enabled,
+    is_entrance_exams_enabled
 )
 
 log = logging.getLogger(__name__)
@@ -318,10 +322,10 @@ def course_search_index_handler(request, course_key_string):
         try:
             reindex_course_and_check_access(course_key, request.user)
         except SearchIndexingError as search_err:
-            return HttpResponse(json.dumps({
+            return HttpResponse(escape_json_dumps({
                 "user_message": search_err.error_list
             }), content_type=content_type, status=500)
-        return HttpResponse(json.dumps({
+        return HttpResponse(escape_json_dumps({
             "user_message": _("Course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
@@ -530,6 +534,8 @@ def course_index(request, course_key):
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=None)
+        if not course_module:
+            raise Http404
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
@@ -553,9 +559,6 @@ def course_index(request, course_key):
             'sections': sections,
             'course_structure': course_structure,
             'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
-            'course_graders': json.dumps(
-                CourseGradingModel.fetch(course_key).graders
-            ),
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
@@ -813,9 +816,15 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    course_key = CourseKey.from_string(course_key_string)
+    try:
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError:
+        raise Http404
+
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
+        if not course_module:
+            raise Http404
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             return render_to_response(
                 'course_info.html',
@@ -928,7 +937,6 @@ def settings_handler(request, course_key_string):
         json: update the Course and About xblocks through the CourseDetails model
     """
     course_key = CourseKey.from_string(course_key_string)
-    prerequisite_course_enabled = settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False)
     credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -937,16 +945,20 @@ def settings_handler(request, course_key_string):
 
             # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
             # course about page should be editable in Studio
-            about_page_editable = not microsite.get_value_for_org(
+            marketing_site_enabled = microsite.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
 
+            about_page_editable = not marketing_site_enabled
+            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
 
             default_enroll_email_template_pre = render_to_string('emails/default_pre_enrollment_message.txt', {})
             default_enroll_email_template_post = render_to_string('emails/default_post_enrollment_message.txt', {})
+
+            self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
@@ -966,8 +978,12 @@ def settings_handler(request, course_key_string):
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,
+                'enrollment_end_editable': enrollment_end_editable,
+                'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
+                'is_entrance_exams_enabled': is_entrance_exams_enabled(),
+                'self_paced_enabled': self_paced_enabled,
             }
-            if prerequisite_course_enabled:
+            if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
                 courses = [course for course in courses if course.id != course_key]
@@ -1008,7 +1024,7 @@ def settings_handler(request, course_key_string):
             # For every other possible method type submitted by the caller...
             else:
                 # if pre-requisite course feature is enabled set pre-requisite course
-                if prerequisite_course_enabled:
+                if is_prerequisite_courses_enabled():
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if prerequisite_course_keys:
                         if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
@@ -1019,7 +1035,7 @@ def settings_handler(request, course_key_string):
                 # feature-specific settings and handle them accordingly
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
-                if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+                if is_entrance_exams_enabled():
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
@@ -1079,7 +1095,7 @@ def grading_handler(request, course_key_string, grader_index=None):
             return render_to_response('settings_graders.html', {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
+                'course_details': course_details,
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
             })
@@ -1171,7 +1187,7 @@ def advanced_settings_handler(request, course_key_string):
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
-                'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
+                'advanced_dict': CourseMetadata.fetch(course_module),
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):

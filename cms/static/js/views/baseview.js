@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_binding", "js/utils/templates",
-        "js/views/utils/view_utils"],
+        "common/js/components/utils/view_utils"],
     function ($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
         /*
          This view is extended from backbone to provide useful functionality for all Studio views.

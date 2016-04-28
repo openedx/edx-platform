@@ -33,6 +33,7 @@ FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 CERTIFICATE_JSON = {
     u'name': u'Test certificate',
     u'description': u'Test description',
+    u'is_active': True,
     u'version': CERTIFICATE_SCHEMA_VERSION,
 }
 
@@ -41,6 +42,7 @@ CERTIFICATE_JSON_WITH_SIGNATORIES = {
     u'description': u'Test description',
     u'version': CERTIFICATE_SCHEMA_VERSION,
     u'course_title': 'Course Title Override',
+    u'is_active': True,
     u'signatories': [
         {
             "name": "Bob Smith",
@@ -217,6 +219,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'is_active': True,
             u'signatories': []
         }
         response = self.client.ajax_post(
@@ -332,6 +335,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'signatories': []
         }
 
@@ -383,6 +387,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'Test certificate',
             u'description': u'Test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
             u'signatories': []
         }
@@ -413,6 +418,7 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
             u'version': CERTIFICATE_SCHEMA_VERSION,
             u'name': u'New test certificate',
             u'description': u'New test description',
+            u'is_active': True,
             u'course_title': u'Course Title Override',
             u'signatories': []
 
@@ -439,6 +445,45 @@ class CertificatesDetailHandlerTestCase(EventTestMixin, CourseTestCase, Certific
         self.assertEqual(len(course_certificates), 2)
         self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
         self.assertEqual(course_certificates[1].get('description'), 'New test description')
+
+    def test_can_edit_certificate_without_is_active(self):
+        """
+        Tests user should be able to edit certificate, if is_active attribute is not present
+        for given certificate. Old courses might not have is_active attribute in certificate data.
+        """
+        certificates = [
+            {
+                'id': 1,
+                'name': 'certificate with is_active',
+                'description': 'Description ',
+                'signatories': [],
+                'version': CERTIFICATE_SCHEMA_VERSION,
+            }
+        ]
+        self.course.certificates = {'certificates': certificates}
+        self.save_course()
+
+        expected = {
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'is_active': True,
+            u'course_title': u'Course Title Override',
+            u'signatories': []
+
+        }
+
+        response = self.client.post(
+            self._url(cid=1),
+            data=json.dumps(expected),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+        content = json.loads(response.content)
+        self.assertEqual(content, expected)
 
     def test_can_delete_certificate_with_signatories(self):
         """

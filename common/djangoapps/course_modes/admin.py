@@ -31,7 +31,7 @@ from verify_student import models as verification_models  # pylint: disable=impo
 
 class CourseModeForm(forms.ModelForm):
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseMode
 
     COURSE_MODE_SLUG_CHOICES = (

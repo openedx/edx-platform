@@ -32,7 +32,7 @@ urlpatterns = patterns(
         'contentstore.views.component_handler', name='component_handler'),
 
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
-        'contentstore.views.xblock.xblock_resource', name='xblock_resource_url'),
+        'openedx.core.djangoapps.common_views.xblock.xblock_resource', name='xblock_resource_url'),
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',

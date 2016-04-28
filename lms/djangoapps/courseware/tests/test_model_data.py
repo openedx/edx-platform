@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from functools import partial
 
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
-from courseware.models import StudentModule
+from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from student.tests.factories import UserFactory
@@ -394,7 +394,7 @@ class TestUserStateSummaryStorage(StorageTestBase, TestCase):
     factory = UserStateSummaryFactory
     scope = Scope.user_state_summary
     key_factory = user_state_summary_key
-    storage_class = factory.FACTORY_FOR
+    storage_class = XModuleUserStateSummaryField
 
 
 class TestStudentPrefsStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):

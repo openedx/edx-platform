@@ -5,7 +5,6 @@ Module rendering
 import hashlib
 import json
 import logging
-import mimetypes
 
 import static_replace
 
@@ -38,7 +37,8 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
 from courseware.models import SCORE_CHANGED
 from courseware.entrance_exams import (
     get_entrance_exam_score,
-    user_must_complete_entrance_exam
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
 )
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
@@ -75,6 +75,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
 from util.json_request import JsonResponse
 from util.keyword_substitution import substitute_keywords_with_data
+from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService
@@ -167,6 +168,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
+            display_id = slugify(chapter.display_name_with_default)
             local_hide_from_toc = False
             if required_content:
                 if unicode(chapter.location) not in required_content:
@@ -193,14 +195,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     }
 
                     #
-                    # Add in rendering context for proctored exams
-                    # if applicable
+                    # Add in rendering context if exam is a timed exam (which includes proctored)
                     #
-                    is_proctored_enabled = (
-                        getattr(section, 'is_proctored_enabled', False) and
-                        settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False)
+
+                    section_is_time_limited = (
+                        getattr(section, 'is_time_limited', False) and
+                        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
                     )
-                    if is_proctored_enabled:
+                    if section_is_time_limited:
                         # We need to import this here otherwise Lettuce test
                         # harness fails. When running in 'harvest' mode, the
                         # test service appears to get into trouble with
@@ -223,9 +225,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                         # This will return None, if (user, course_id, content_id)
                         # is not applicable
                         #
-                        proctoring_attempt_context = None
+                        timed_exam_attempt_context = None
                         try:
-                            proctoring_attempt_context = get_attempt_status_summary(
+                            timed_exam_attempt_context = get_attempt_status_summary(
                                 user.id,
                                 unicode(course.id),
                                 unicode(section.location)
@@ -237,17 +239,18 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             # unhandled exception
                             log.exception(ex)
 
-                        if proctoring_attempt_context:
+                        if timed_exam_attempt_context:
                             # yes, user has proctoring context about
                             # this level of the courseware
                             # so add to the accordion data context
                             section_context.update({
-                                'proctoring': proctoring_attempt_context,
+                                'proctoring': timed_exam_attempt_context,
                             })
 
                     sections.append(section_context)
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default,
+                'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
                 'active': chapter.url_name == active_chapter
@@ -468,7 +471,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # Fulfillment Use Case: Entrance Exam
         # If this module is part of an entrance exam, we'll need to see if the student
         # has reached the point at which they can collect the associated milestone
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if milestones_helpers.is_entrance_exams_enabled():
             course = modulestore().get_course(course_key)
             content = modulestore().get_item(content_key)
             entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
@@ -956,23 +959,6 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
-    """
-    Return a package resource for the specified XBlock.
-    """
-    try:
-        xblock_class = XBlock.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
-        content = xblock_class.open_local_resource(uri)
-    except IOError:
-        log.info('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    except Exception:  # pylint: disable=broad-except
-        log.error('Failed to load xblock resource', exc_info=True)
-        raise Http404
-    mimetype, _ = mimetypes.guess_type(uri)
-    return HttpResponse(content, mimetype=mimetype)
-
-
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
@@ -1065,7 +1051,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # New Relic. The suffix is necessary for XModule handlers because the
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
-        nr_tx_name += "/{}".format(suffix) if suffix else ""
+        nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
         newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
@@ -1073,6 +1059,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
                 resp = instance.handle(handler, req, suffix)
+                if suffix == 'problem_check' \
+                        and course \
+                        and getattr(course, 'entrance_exam_enabled', False) \
+                        and getattr(instance, 'in_entrance_exam', False):
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
             log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
@@ -1189,3 +1181,22 @@ def _check_files_limits(files):
                 return msg
 
     return None
+
+
+def append_data_to_webob_response(response, data):
+    """
+    Appends data to a JSON webob response.
+
+    Arguments:
+        response (webob response object):  the webob response object that needs to be modified
+        data (dict):  dictionary containing data that needs to be appended to response body
+
+    Returns:
+        (webob response object):  webob response with updated body.
+
+    """
+    if getattr(response, 'content_type', None) == 'application/json':
+        response_data = json.loads(response.body)
+        response_data.update(data)
+        response.body = json.dumps(response_data)
+    return response

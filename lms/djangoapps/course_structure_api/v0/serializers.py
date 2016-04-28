@@ -11,11 +11,11 @@ class CourseSerializer(serializers.Serializer):
     id = serializers.CharField()  # pylint: disable=invalid-name
     name = serializers.CharField(source='display_name')
     category = serializers.CharField()
-    org = serializers.SerializerMethodField('get_org')
-    run = serializers.SerializerMethodField('get_run')
-    course = serializers.SerializerMethodField('get_course')
-    uri = serializers.SerializerMethodField('get_uri')
-    image_url = serializers.SerializerMethodField('get_image_url')
+    org = serializers.SerializerMethodField()
+    run = serializers.SerializerMethodField()
+    course = serializers.SerializerMethodField()
+    uri = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
 

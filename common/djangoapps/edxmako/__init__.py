@@ -13,4 +13,4 @@
 #   limitations under the License.
 LOOKUP = {}
 
-from .paths import add_lookup, lookup_template, clear_lookups
+from .paths import add_lookup, lookup_template, clear_lookups, save_lookups

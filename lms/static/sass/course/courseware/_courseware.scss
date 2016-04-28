@@ -102,7 +102,6 @@ div.course-wrapper {
     @extend .content;
     padding: ($baseline*2);
     line-height: 1.6;
-
     h1 {
       margin: 0 0 lh();
     }
@@ -137,17 +136,20 @@ div.course-wrapper {
         }
       }
       button.gated-sequence {
-        background-color: transparent;
-        border-bottom: none;
+        background: $transparent;
+        color: $blue-d1;
+        border: none;
         box-shadow: none;
-        text-align: left;
+        @include text-align(left);
+        @extend %t-copy-base;
+        width: 100%;
+
         &:hover {
           background-color: transparent;
+          color: $link-hover;
         }
       }
-      button.gated-sequence > a {
-        color: #147ABA;
-      }
+
       span.proctored-exam-code {
         margin-top: 5px;
         font-size: 1.3em;
@@ -155,6 +157,7 @@ div.course-wrapper {
       .gated-sequence {
         color: #147ABA;
         font-weight: 600;
+        padding: ($baseline / 1.5) ($baseline / 4);
         a.start-timed-exam {
           cursor: pointer;
           color: #147ABA;
@@ -169,6 +172,25 @@ div.course-wrapper {
       .proctored-exam-select-code {
         margin-left: 30px;
       }
+
+      .exam-action-button {
+        @extend %t-weight4;
+        margin-right: $baseline;
+        background-image: none;
+        box-shadow: none;
+        text-shadow: none;
+
+        &.btn-pl-primary {
+          @extend %btn-pl-primary-base;
+          border: 0;
+
+          &:hover,
+          &:focus {
+            border: 0;
+          }
+        }
+      }
+
       background-color: #F2F4F5;
       padding: 30px;
       font-size: 16px;
@@ -186,31 +208,44 @@ div.course-wrapper {
         border-top: 4px solid #22B557 !important;
         margin: 0 auto;
       }
+      &.success-left-bar {
+        border-left: 4px solid #22B557 !important;
+        margin: 0 auto;
+      }
       &.message-top-bar {
         border-top: 4px solid #FAB95C !important;
+        margin: 0 auto;
+      }
+      &.message-left-bar {
+        border-left: 4px solid #FAB95C !important;
         margin: 0 auto;
       }
       &.failure {
         border-left: 4px solid #C93B34 !important;
         margin: 0 auto;
       }
+      &.warning {
+        @include border-left(4px solid $warning-color);
+        margin: 0 auto;
+      }
     }
+
     div.proctored-exam {
       @extend .timed-exam;
+
       .proctored-exam-message {
         border-top: ($baseline/10) solid rgb(207, 216, 220);
         padding-top: 25px;
       }
-      button {
-        background: #126F9A;
-        color: $white;
-        font-size: 16px;
-        padding: 16px 30px;
-        margin-bottom: 10px;
-        font-weight: 200;
-        border: none;
-        &:hover {
-          background-color: #035E88;
+
+      .proctored-exam-skip-actions {
+        padding-top: 20px;
+      }
+
+      // specialized padding override just for the entrance page
+      &.entrance {
+        button.gated-sequence {
+          padding: 0 ($baseline*5) 0 ($baseline*2.5);
         }
       }
       hr {
@@ -218,7 +253,7 @@ div.course-wrapper {
       }
       .gated-sequence {
         border-bottom: 2px solid rgb(207, 216, 220);
-        padding: 15px ($baseline*5) 15px 50px;
+        padding: 22px ($baseline*5) 15px 50px;
         position: relative;
         span {
           .fa {
@@ -226,8 +261,7 @@ div.course-wrapper {
             font-size: 22px;
             left: 0;
             top: $baseline;
-            color: rgb(206, 216, 220)
-
+            color: rgb(206, 216, 220);
           }
         }
         .start-timed-exam {
@@ -246,6 +280,9 @@ div.course-wrapper {
           top: 50%;
           font-size: 30px;
           margin-top: -15px;
+          &.fa-arrow-circle-right {
+            top: 30%;
+          }
         }
         &:last-child {
           > .fa {
@@ -253,6 +290,35 @@ div.course-wrapper {
           }
           border-bottom: none;
         }
+        &:last-child {
+          > .practice-exam {
+            color: #147ABA;
+          }
+          border-bottom: none;
+        }
+      }
+    }
+    .proctored-exam-skip-confirm-wrapper {
+      border-left: ($baseline/4) solid $red;
+      padding: $baseline ($baseline*1.5);;
+      background-color: rgb(242, 244, 245);
+
+      .msg-title {
+        @extend %t-title5;
+        @extend %t-strong;
+      }
+
+      .msg-content {
+        color: $gray-l1;
+
+        strong {
+          @extend %t-strong;
+        }
+      }
+
+      .proctored-exam-skip-actions {
+        @include float(right);
+        margin-top: $baseline;
       }
     }
     .footer-sequence {
@@ -463,7 +529,7 @@ div.course-wrapper {
 
     div.staff_actions {
       p.error {
-        color: $error-red
+        color: $error-color
       }
       p.success {
         color: $success-color;
@@ -516,11 +582,11 @@ div.course-wrapper {
 
       header#open_close_accordion {
         a {
-          background-image: url('../images/slide-right-icon.png');
+          background-image: url('#{$static-path}/images/slide-right-icon.png');
         }
       }
 
-      div#accordion {
+      .accordion {
         visibility: hidden;
         width: 10px;
         padding: 0;
@@ -528,11 +594,6 @@ div.course-wrapper {
         nav {
           white-space: pre;
           overflow: hidden;
-
-          ul {
-            overflow: hidden;
-            white-space: nowrap;
-          }
         }
       }
     }

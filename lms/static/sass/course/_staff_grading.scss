@@ -1,12 +1,12 @@
 div.staff-grading,
 div.peer-grading {
     border: 1px solid lightgray;
-    
+
     textarea.feedback-area {
         margin: 0;
         height: 75px;
     }
-    
+
     div.feedback-area.track-changes {
         position: relative;
         margin: 0;
@@ -76,7 +76,7 @@ div.peer-grading {
         min-width: 50px;
         text-size: 1.5em;
     }
-    
+
     /* Toggled State */
     input[type=radio]:checked + label {
         background: #666;
@@ -92,15 +92,15 @@ div.peer-grading {
         width: 100%;
         table-layout: auto;
         text-align: center;
-        
+
         th {
             padding: ($baseline/10);
         }
-        
+
         td {
             padding: ($baseline/10);
         }
-        
+
         td.problem-name {
             text-align: left;
         }
@@ -124,11 +124,11 @@ div.peer-grading {
         padding: ($baseline/10);
         background-color: #ffcccc;
     }
-    
+
     .submission-wrapper {
         padding: ($baseline/10);
         padding-bottom: ($baseline*0.75);
-        
+
         h3 {
             margin-bottom: ($baseline/10);
         }
@@ -140,7 +140,7 @@ div.peer-grading {
     .meta-info-wrapper {
         padding: ($baseline/10);
         background-color: #eee;
-        
+
         div {
             display: inline;
         }
@@ -151,7 +151,7 @@ div.peer-grading {
         padding: ($baseline/10);
         background-color: $yellow;
     }
-    
+
     .breadcrumbs {
         margin: ($baseline/2) ($baseline/4);
         font-size: .8em;
@@ -162,7 +162,7 @@ div.peer-grading {
         padding: ($baseline/2);
         background-color: #eee;
         font-size: .8em;
-        
+
         > div {
             margin-bottom: ($baseline/4);
             padding: ($baseline/2);
@@ -174,7 +174,7 @@ div.peer-grading {
                 text-align: center;
                 text-transform: uppercase;
             }
-            
+
             p{
                 color: #777;
             }
@@ -192,7 +192,7 @@ div.peer-grading {
         }
         .current-state {
             background: $white;
-            
+
         }
     }
 
@@ -205,7 +205,7 @@ div.peer-grading {
             font-size: 1.2em;
         }
     }
-    
+
     .interstitial-page {
         text-align: center;
 

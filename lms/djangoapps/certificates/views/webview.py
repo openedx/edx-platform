@@ -4,14 +4,18 @@ Certificate HTML webview.
 from datetime import datetime
 from uuid import uuid4
 import logging
+import urllib
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
+from django.core.urlresolvers import reverse
 
 from courseware.courses import course_image_url
+from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from eventtracking import tracker
@@ -20,6 +24,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
+from util.views import handle_500
 from xmodule.modulestore.django import modulestore
 
 from certificates.api import (
@@ -87,12 +92,16 @@ def _update_certificate_context(context, course, user, user_certificate):
     user_fullname = user.profile.name
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     certificate_type = context.get('certificate_type')
-    partner_name = course.org
+    partner_short_name = course.display_organization if course.display_organization else course.org
+    partner_long_name = None
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
-        partner_name = organization.get('name', course.org)
+        partner_long_name = organization.get('name', partner_long_name)
+        partner_short_name = organization.get('short_name', partner_short_name)
+        context['organization_long_name'] = partner_long_name
+        context['organization_short_name'] = partner_short_name
         context['organization_logo'] = organization.get('logo', None)
 
     context['username'] = user.username
@@ -100,11 +109,30 @@ def _update_certificate_context(context, course, user, user_certificate):
     context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
     context['accomplishment_copy_username'] = user.username
-    context['accomplishment_copy_course_org'] = partner_name
-    context['accomplishment_copy_course_name'] = course.display_name
-    context['course_image_url'] = course_image_url(course)
-    context['share_settings'] = settings.FEATURES.get('SOCIAL_SHARING_SETTINGS', {})
-    context['course_number'] = course.number
+    context['accomplishment_copy_course_org'] = partner_short_name
+    course_title_from_cert = context['certificate_data'].get('course_title', '')
+    accomplishment_copy_course_name = course_title_from_cert if course_title_from_cert else course.display_name
+    context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
+    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
+    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_share_text'] = share_settings.get(
+        'CERTIFICATE_FACEBOOK_TEXT',
+        _("I completed the {course_title} course on {platform_name}.").format(
+            course_title=accomplishment_copy_course_name,
+            platform_name=platform_name
+        )
+    )
+    context['twitter_share_enabled'] = share_settings.get('CERTIFICATE_TWITTER', False)
+    context['twitter_share_text'] = share_settings.get(
+        'CERTIFICATE_TWITTER_TEXT',
+        _("I completed a course on {platform_name}. Take a look at my certificate.").format(
+            platform_name=platform_name
+        )
+    )
+
+    course_number = course.display_coursenumber if course.display_coursenumber else course.number
+    context['course_number'] = course_number
     try:
         badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
     except BadgeAssertion.DoesNotExist:
@@ -126,11 +154,20 @@ def _update_certificate_context(context, course, user, user_certificate):
         year=user_certificate.modified_date.year
     )
 
-    context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_name}, '
-                                                          'through {platform_name}.').format(
-        partner_name=partner_name,
-        platform_name=platform_name
-    )
+    if partner_long_name:
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, an '
+                                                              'online learning initiative of {partner_long_name} '
+                                                              'through {platform_name}.').format(
+            partner_short_name=partner_short_name,
+            partner_long_name=partner_long_name,
+            platform_name=platform_name
+        )
+    else:
+        context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
+                                                              'through {platform_name}.').format(
+            partner_short_name=partner_short_name,
+            platform_name=platform_name
+        )
 
     # Translators: Accomplishments describe the awards/certifications obtained by students on this platform
     context['accomplishment_copy_about'] = _('About {platform_name} Accomplishments').format(
@@ -201,17 +238,17 @@ def _update_certificate_context(context, course, user, user_certificate):
 
     # Translators:  This text represents the verification of the certificate
     context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
-                                             'who participated in {partner_name} {course_number}').format(
+                                             'who participated in {partner_short_name} {course_number}').format(
         platform_name=platform_name,
         user_name=user_fullname,
-        partner_name=partner_name,
-        course_number=course.number
+        partner_short_name=partner_short_name,
+        course_number=course_number
     )
 
     # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
-    context['document_title'] = _("{partner_name} {course_number} Certificate | {platform_name}").format(
-        partner_name=partner_name,
-        course_number=course.number,
+    context['document_title'] = _("{partner_short_name} {course_number} Certificate | {platform_name}").format(
+        partner_short_name=partner_short_name,
+        course_number=course_number,
         platform_name=platform_name
     )
 
@@ -227,21 +264,6 @@ def _update_certificate_context(context, course, user, user_certificate):
     certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
-
-    # If enabled, show the LinkedIn "add to profile" button
-    # Clicking this button sends the user to LinkedIn where they
-    # can add the certificate information to their profile.
-    linkedin_config = LinkedInAddToProfileConfiguration.current()
-    if linkedin_config.enabled:
-        context['linked_in_url'] = linkedin_config.add_to_profile_url(
-            course.id,
-            course.display_name,
-            user_certificate.mode,
-            get_certificate_url(
-                user_id=user.id,
-                course_id=unicode(course.id)
-            )
-        )
 
     # Translators: This line is displayed to a user who has completed a course and achieved a certification
     context['accomplishment_banner_opening'] = _("{fullname}, you've earned a certificate!").format(
@@ -259,6 +281,7 @@ def _update_certificate_context(context, course, user, user_certificate):
     )
 
 
+@handle_500(template_path="certificates/server-error.html")
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified student's certificate
@@ -269,6 +292,7 @@ def render_html_view(request, user_id, course_id):
     context = {}
     context['platform_name'] = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     context['course_id'] = course_id
+    preview_mode = request.GET.get('preview', None)
 
     # Update the view context with the default ConfigurationModel settings
     configuration = CertificateHtmlViewConfiguration.get_config()
@@ -316,17 +340,27 @@ def render_html_view(request, user_id, course_id):
             raise CourseDoesNotExist
 
         # Attempt to load the user's generated certificate data
-        user_certificate = GeneratedCertificate.objects.get(
-            user=user,
-            course_id=course_key
-        )
+        if preview_mode:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key,
+                mode=preview_mode
+            )
+        else:
+            user_certificate = GeneratedCertificate.objects.get(
+                user=user,
+                course_id=course_key
+            )
 
     # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
     # If we are, we'll need to create a mock version of the user_certificate container for previewing
     except GeneratedCertificate.DoesNotExist:
-        if request.GET.get('preview', None):
+        if preview_mode and (
+            has_access(request.user, 'instructor', course)
+            or has_access(request.user, 'staff', course)
+        ):
             user_certificate = GeneratedCertificate(
-                mode=request.GET.get('preview'),
+                mode=preview_mode,
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=datetime.now().date()
             )
@@ -365,7 +399,7 @@ def render_html_view(request, user_id, course_id):
     # Get the active certificate configuration for this course
     # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
     # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
-    active_configuration = get_active_web_certificate(course, request.GET.get('preview'))
+    active_configuration = get_active_web_certificate(course, preview_mode)
     if active_configuration is None:
         return render_to_response(invalid_template_path, context)
     else:
@@ -376,6 +410,41 @@ def render_html_view(request, user_id, course_id):
 
     # Append/Override the existing view context values with request-time values
     _update_certificate_context(context, course, user, user_certificate)
+    share_url = request.build_absolute_uri(
+        reverse(
+            'certificates:html_view',
+            kwargs=dict(user_id=str(user_id), course_id=unicode(course_id))
+        )
+    )
+    context['share_url'] = share_url
+    twitter_url = ''
+    if context.get('twitter_share_enabled', False):
+        twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
+            twitter_share_text=smart_str(context['twitter_share_text']),
+            share_url=urllib.quote_plus(smart_str(share_url))
+        )
+    context['twitter_url'] = twitter_url
+    context['full_course_image_url'] = request.build_absolute_uri(course_image_url(course))
+
+    # If enabled, show the LinkedIn "add to profile" button
+    # Clicking this button sends the user to LinkedIn where they
+    # can add the certificate information to their profile.
+    linkedin_config = LinkedInAddToProfileConfiguration.current()
+
+    # posting certificates to LinkedIn is not currently
+    # supported in microsites/White Labels
+    if linkedin_config.enabled and not microsite.is_request_in_microsite():
+        context['linked_in_url'] = linkedin_config.add_to_profile_url(
+            course.id,
+            course.display_name,
+            user_certificate.mode,
+            smart_str(request.build_absolute_uri(get_certificate_url(
+                user_id=user.id,
+                course_id=unicode(course.id)
+            )))
+        )
+    else:
+        context['linked_in_url'] = None
 
     # Microsites will need to be able to override any hard coded
     # content that was put into the context in the
@@ -408,7 +477,13 @@ def render_html_view(request, user_id, course_id):
     if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
         custom_template = get_certificate_template(course_key, user_certificate.mode)
         if custom_template:
-            template = Template(custom_template)
+            template = Template(
+                custom_template,
+                output_encoding='utf-8',
+                input_encoding='utf-8',
+                default_filters=['decode.utf8'],
+                encoding_errors='replace',
+            )
             context = RequestContext(request, context)
             return HttpResponse(template.render(context))
 
