@@ -19,7 +19,7 @@ class SettingsPage(CoursePage):
 
     url_path = "settings/details"
     upload_image_browse_button_selector = 'form.upload-dialog input[type=file]'
-    upload_image_upload_button_selector = '.modal-actions li:nth(0) a'
+    upload_image_upload_button_selector = '.modal-actions li:nth-child(1) a'
 
     ################
     # Helpers
