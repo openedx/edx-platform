@@ -683,6 +683,43 @@ header.header-main {
   }
 }
 
+//All courses
+
+.home{
+  .courses-container{
+    padding: 0 1rem;
+    .courses{
+      .courses-listing{
+        margin: 0;
+        .courses-listing-item{
+          width: 100%;
+          clear: none !important;
+          margin: 1% !important;
+          max-height: none;
+          margin-bottom: 1rem !important;
+          article{
+            margin-bottom: 0;
+          }
+        }
+      }
+      .course-info{
+        .course-name{
+          margin: 1rem 0;
+        }
+        .course-organization{
+          padding: 1rem 1.25rem 0.2rem;
+        }
+        .course-date{
+          padding-left: 1.25rem;
+        }
+        .course-code{
+          display: none;
+        }
+      }
+    }
+  }
+}
+
 // Static pages
 
 .page-heading{
@@ -833,7 +870,21 @@ header.header-main {
       }
     }
   }
-
+  .home{
+    .courses-container{
+      padding: 0 1rem;
+      .courses{
+        .courses-listing{
+          margin: 0;
+          .courses-listing-item{
+            width: 48%;
+            margin-bottom: 0.5rem !important;
+            float: left;
+          }
+        }
+      }
+    }
+  }
   .footer-main{
     .footer-logo{
       text-align: center;
@@ -967,9 +1018,20 @@ header.header-main {
       }
     }
   }
+  .home{
+    .courses-container{
+      .courses{
+        .courses-listing{
+          .courses-listing-item{
+            width: 31.3%;
+          }
+        }
+      }
+    }
+  }
 }
 
-@media screen and (min-width: 64em){
+@media screen and (min-width: 64em){ /* 980px */
   .footer-logo{
     text-align: left;
   }
