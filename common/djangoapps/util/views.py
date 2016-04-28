@@ -168,7 +168,7 @@ class _FreshdeskApi(object):
 
         if 200 <= response.status_code <= 299:
             message = json.loads(response.content)
-            return message['helpdesk_ticket']['display_id'];
+            return message['id'];
         else:
             raise FreshdeskError(response.content, response.status_code, response)
 
