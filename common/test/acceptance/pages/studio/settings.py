@@ -265,7 +265,7 @@ class SettingsPage(CoursePage):
         upload course_image specified by file_to_upload
         """
 
-        self.q(css='#upload-course-image').click()
+        self.q(css='#upload-course-image').results[0].click()
 
         # wait for popup
         self.wait_for_element_presence(".assetupload-modal", 'upload dialog is present')
