@@ -142,7 +142,7 @@ class _FreshdeskApi(object):
         """
 
 
-    def create_ticket(self, subject, desc, name, email, priority=1, status=2, group_id=''):
+    def create_ticket(self, subject, desc, name, email, priority=1, status=2, group_id=None):
         """
         Create the given `ticket` in Freshdesk.
 
@@ -272,7 +272,7 @@ def _record_feedback_in_freshdesk(
     if white_label_org:
         freshdesk_tags = freshdesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
 
-    group_id = ''
+    group_id = None
     if group_name is not None:
         try:
             group = self.get_group(group_name)
