@@ -118,6 +118,13 @@ class AdvancedSettingsPage(CoursePage):
         type_in_codemirror(self, index, new_value)
         self.save()
 
+    def set_value_without_saving(self, key, new_value):
+        """
+        Set value without saving it.
+        """
+        index = self._get_index_of(key)
+        type_in_codemirror(self, index, new_value)
+
     def get(self, key):
         index = self._get_index_of(key)
         return get_codemirror_value(self, index)

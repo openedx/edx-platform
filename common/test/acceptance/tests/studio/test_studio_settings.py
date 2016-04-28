@@ -15,6 +15,7 @@ from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ...pages.lms.courseware import CoursewarePage
 from textwrap import dedent
+import re
 from xmodule.partitions.partitions import Group
 
 
@@ -256,7 +257,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         Test that advanced settings don't save if there's a single wrong input,
         and that it shows the correct error message in the modal.
         """
-
         # Feed an integer value for String field.
         # .set method saves automatically after setting a value
         course_display_name = self.advanced_settings.get('Course Display Name')
@@ -508,3 +508,65 @@ class StudioSettingsA11yTest(StudioCourseTest):
         })
 
         self.settings_page.a11y_audit.check_for_accessibility_errors()
+
+
+class AdvancedSettingsTest(StudioCourseTest):
+    """
+    Tests for Advanced Settings tab in studio.
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(AdvancedSettingsTest, self).setUp()
+        self.advanced_settings = AdvancedSettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.type_fields = ['Course Display Name', 'Advanced Module List', 'Discussion Topic Mapping',
+                            'Maximum Attempts', 'Course Announcement Date']
+
+        # Before every test, make sure to visit the page first
+        self.advanced_settings.visit()
+        self.assertTrue(self.advanced_settings.is_browser_on_page())
+
+    def test_cancel_edit_key_value(self):
+        """
+        Scenario: Test cancel editing key value
+        Given I am on the Advanced Course Settings page in Studio
+        When I edit the value of a policy key
+        And I press the "Cancel" notification button
+        Then the policy key value is unchanged
+        And I reload the page
+        Then the policy key value is unchanged
+        """
+        default_course_name = self.advanced_settings.get('Course Display Name')
+        # Change the value of 'Course Display Name'.
+        self.advanced_settings.set_value_without_saving('Course Display Name', 1)
+        # Cancel and don't save the value when asked in notification.
+        self.advanced_settings.cancel()
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), default_course_name)
+        # Refresh the page
+        self.advanced_settings.refresh_and_wait_for_load()
+        # 'Course Display Name' should be same as before.
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), default_course_name)
+
+    def test_edit_key_value(self):
+        """
+        Scenario: Test editing key value
+        Given I am on the Advanced Course Settings page in Studio
+        When I edit the value of a policy key and save
+        Then the policy key value is changed
+        And I reload the page
+        Then the policy key value is changed
+        """
+        course_name_to_set = "New Course Name"
+        # Change the value of 'Course Display Name' and save it.
+        self.advanced_settings.set('Course Display Name', course_name_to_set)
+        new_course_name = re.sub('["]', '', self.advanced_settings.get('Course Display Name'))
+        self.assertEquals(new_course_name, course_name_to_set)
+        # Refresh the page
+        self.advanced_settings.refresh_and_wait_for_load()
+        new_course_name = re.sub('["]', '', self.advanced_settings.get('Course Display Name'))
+        # 'Course Display Name' should be changed now.
+        self.assertEquals(new_course_name, course_name_to_set)

@@ -15,25 +15,6 @@ Feature: CMS.Advanced (manual) course policy
 
   # Sauce labs does not play nicely with CodeMirror
   @skip_sauce
-  Scenario: Test cancel editing key value
-    Given I am on the Advanced Course Settings page in Studio
-    When I edit the value of a policy key
-    And I press the "Cancel" notification button
-    Then the policy key value is unchanged
-    And I reload the page
-    Then the policy key value is unchanged
-
-  # Sauce labs does not play nicely with CodeMirror
-  @skip_sauce
-  Scenario: Test editing key value
-    Given I am on the Advanced Course Settings page in Studio
-    When I edit the value of a policy key and save
-    Then the policy key value is changed
-    And I reload the page
-    Then the policy key value is changed
-
-  # Sauce labs does not play nicely with CodeMirror
-  @skip_sauce
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value for "Discussion Topic Mapping"
