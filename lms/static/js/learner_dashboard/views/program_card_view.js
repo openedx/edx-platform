@@ -33,7 +33,7 @@
                     this.progressCollection = data.context.progressCollection; 
                     if ( this.progressCollection ) {                   
                         this.progressModel = this.progressCollection.findWhere({
-                            programId: this.model.get('id')
+                            id: this.model.get('id')
                         });
                     }
                     this.render();
