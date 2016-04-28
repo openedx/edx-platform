@@ -174,7 +174,6 @@ var DetailsView = ValidatingView.extend({
         $(e.currentTarget).attr('title', currentTimeText);
     },
     updateModel: function(event) {
-        var url, image_name;
         switch (event.currentTarget.id) {
         case 'course-image-url':
             this.updateImageField(event, 'course_image_name', '#course-image');
