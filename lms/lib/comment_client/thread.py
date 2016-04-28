@@ -13,8 +13,8 @@ class Thread(models.Model):
 
     # accessible_fields can be set and retrieved on the model
     accessible_fields = [
-        'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
+        'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'private_to_peers',
+         'course_id', 'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
@@ -25,14 +25,14 @@ class Thread(models.Model):
 
     # updateable_fields are sent in PUT requests
     updatable_fields = [
-        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'private_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 
     # metric_tag_fields are used by Datadog to record metrics about the model
     metric_tag_fields = [
         'course_id', 'group_id', 'pinned', 'closed', 'anonymous', 'anonymous_to_peers',
-        'endorsed', 'read'
+        'private_to_peers', 'endorsed', 'read'
     ]
 
     # initializable_fields are sent in POST requests
