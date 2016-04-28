@@ -2,6 +2,7 @@
 """ Tests for student account views. """
 
 import re
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 from urllib import urlencode
 
@@ -203,6 +204,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
         return self.client.post(path=reverse('password_change_request'), data=data)
 
 
+@attr('shard_3')
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """

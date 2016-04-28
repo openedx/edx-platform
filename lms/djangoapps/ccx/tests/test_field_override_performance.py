@@ -30,7 +30,7 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
+@attr('shard_3')
 @mock.patch.dict(
     'django.conf.settings.FEATURES',
     {

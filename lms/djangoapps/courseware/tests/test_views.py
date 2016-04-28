@@ -184,7 +184,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_1')
+@attr('shard_2')
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """

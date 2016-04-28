@@ -8,6 +8,7 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.core.urlresolvers import reverse
@@ -225,6 +226,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 self.client.get(course_url)
 
 
+@attr('shard_3')
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -615,6 +617,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
+@attr('shard_3')
 @ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
@@ -864,6 +867,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr('shard_3')
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
