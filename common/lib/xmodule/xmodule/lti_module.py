@@ -253,6 +253,8 @@ class LTIFields(object):
         help=_(
             "Enter the text on the button used to launch the third party application."
         ),
+        default="",
+        scope=Scope.settings
     )
 
     accept_grades_past_due = Boolean(
