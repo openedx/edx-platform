@@ -1,20 +1,28 @@
 #pylint: disable=missing-docstring
 import unittest
+import json
+from urlparse import urljoin
 
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_oauth2_provider.tests.factories import ClientFactory
+import httpretty
 from oauth2_provider.models import get_application_model
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
-from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory, ApplicationFactory
+from openedx.core.djangoapps.api_admin.tests.factories import (
+    ApiAccessRequestFactory, ApplicationFactory, CatalogFactory
+)
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 from student.tests.factories import UserFactory
 
 
 Application = get_application_model()  # pylint: disable=invalid-name
+
+MOCK_CATALOG_API_URL_ROOT = 'https://api.example.com/'
 
 
 class ApiAdminTest(TestCase):
@@ -206,3 +214,169 @@ class ApiTosViewTest(ApiAdminTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn('Terms of Service', response.content)
+
+
+class CatalogTest(ApiAdminTest):
+
+    def setUp(self):
+        super(CatalogTest, self).setUp()
+        password = 'abc123'
+        self.user = UserFactory(password=password, is_staff=True)
+        self.client.login(username=self.user.username, password=password)
+        ClientFactory(user=self.user, name='course-discovery', url=MOCK_CATALOG_API_URL_ROOT)
+
+    def mock_catalog_api(self, url, data, method=httpretty.GET, status_code=200):
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
+        httpretty.reset()
+        httpretty.register_uri(
+            method,
+            urljoin(MOCK_CATALOG_API_URL_ROOT, url),
+            body=json.dumps(data),
+            content_type='application/json',
+            status=status_code
+        )
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CatalogSearchViewTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogSearchViewTest, self).setUp()
+        self.url = reverse('api_admin:catalog-search')
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    @httpretty.activate
+    def test_post(self):
+        catalog_user = UserFactory()
+        self.mock_catalog_api('api/v1/catalogs/', {'results': []})
+        response = self.client.post(self.url, {'username': catalog_user.username})
+        self.assertRedirects(response, reverse('api_admin:catalog-list', kwargs={'username': catalog_user.username}))
+
+    def test_post_without_username(self):
+        response = self.client.post(self.url, {'username': ''})
+        self.assertRedirects(response, reverse('api_admin:catalog-search'))
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CatalogListViewTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogListViewTest, self).setUp()
+        self.catalog_user = UserFactory()
+        self.url = reverse('api_admin:catalog-list', kwargs={'username': self.catalog_user.username})
+
+    @httpretty.activate
+    def test_get(self):
+        catalog = CatalogFactory(viewers=[self.catalog_user.username])
+        self.mock_catalog_api('api/v1/catalogs/', {
+            'results': [catalog.attributes]
+        })
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(catalog.name, response.content.decode('utf-8'))
+
+    @httpretty.activate
+    def test_post(self):
+        catalog_data = {
+            'name': 'test-catalog',
+            'query': '*',
+            'viewers': [self.catalog_user.username]
+        }
+        catalog_id = 123
+        self.mock_catalog_api('api/v1/catalogs/', dict(catalog_data, id=catalog_id), method=httpretty.POST)
+        response = self.client.post(self.url, catalog_data)
+        self.assertEqual(httpretty.last_request().method, 'POST')
+        self.mock_catalog_api('api/v1/catalogs/{}/'.format(catalog_id), CatalogFactory().attributes)
+        self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}))
+
+    @httpretty.activate
+    def test_post_invalid(self):
+        catalog = CatalogFactory(viewers=[self.catalog_user.username])
+        self.mock_catalog_api('api/v1/catalogs/', {
+            'results': [catalog.attributes]
+        })
+        response = self.client.post(self.url, {
+            'name': '',
+            'query': '*',
+            'viewers': [self.catalog_user.username]
+        })
+        self.assertEqual(response.status_code, 400)
+        # Assert that no POST was made to the catalog API
+        self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'POST']), 0)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CatalogEditViewTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogEditViewTest, self).setUp()
+        self.catalog_user = UserFactory()
+        self.catalog = CatalogFactory(viewers=[self.catalog_user.username])
+        self.url = reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id})
+
+    @httpretty.activate
+    def test_get(self):
+        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), self.catalog.attributes)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.catalog.name, response.content.decode('utf-8'))
+
+    @httpretty.activate
+    def test_delete(self):
+        self.mock_catalog_api(
+            'api/v1/catalogs/{}/'.format(self.catalog.id),
+            self.catalog.attributes,
+            method=httpretty.DELETE
+        )
+        response = self.client.post(self.url, {'delete-catalog': 'on'})
+        self.assertRedirects(response, reverse('api_admin:catalog-search'))
+        self.assertEqual(httpretty.last_request().method, 'DELETE')
+        self.assertEqual(
+            httpretty.last_request().path,
+            '/api/v1/catalogs/{}/'.format(self.catalog.id)
+        )
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
+
+    @httpretty.activate
+    def test_edit(self):
+        self.mock_catalog_api(
+            'api/v1/catalogs/{}/'.format(self.catalog.id),
+            self.catalog.attributes, method=httpretty.PATCH
+        )
+        new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': 'changed'})
+        response = self.client.post(self.url, new_attributes)
+        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), new_attributes)
+        self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
+
+    @httpretty.activate
+    def test_edit_invalid(self):
+        self.mock_catalog_api('api/v1/catalogs/{}/'.format(self.catalog.id), self.catalog.attributes)
+        new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': ''})
+        response = self.client.post(self.url, new_attributes)
+        self.assertEqual(response.status_code, 400)
+        # Assert that no PATCH was made to the Catalog API
+        self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'PATCH']), 0)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CatalogPreviewViewTest(CatalogTest):
+
+    def setUp(self):
+        super(CatalogPreviewViewTest, self).setUp()
+        self.url = reverse('api_admin:catalog-preview')
+
+    @httpretty.activate
+    def test_get(self):
+        data = {'count': 1, 'results': ['test data'], 'next': None, 'prev': None}
+        self.mock_catalog_api('api/v1/courses/', data)
+        response = self.client.get(self.url, {'q': '*'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), data)
+
+    def test_get_without_query(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'count': 0, 'results': [], 'next': None, 'prev': None})
