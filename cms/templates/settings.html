@@ -370,7 +370,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
 
                 % if enable_extended_course_details:
                 <li class="field image" id="field-hero-image">
-                  <label>${_("Hero Image")}</label>
+                  <label for="hero-image-url">${_("Hero Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.hero_image:
                     <span class="wrapper-course-image">
@@ -400,7 +400,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}'
                 </li>
 
                 <li class="field image" id="field-thumbnail-image">
-                  <label>${_("Course Video Thumbnail Image")}</label>
+                  <label for="thumbnail-image-url">${_("Course Video Thumbnail Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.thumbnail_image:
                     <span class="wrapper-course-image">
