@@ -16,10 +16,11 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from rest_framework.test import APIClient
 
+from api_manager.models import CourseGroupRelationship
 from gradebook.models import StudentGradebook
 from student.models import UserProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, GroupFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -307,6 +308,71 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['username'], self.test_user.username)
         self.assertEqual(response.data[0]['email'], self.test_user.email)
+
+    def test_organizations_courses_get(self):
+        organization = self.setup_test_organization()
+        courses = CourseFactory.create_batch(2)
+        groups = GroupFactory.create_batch(2)
+
+        for i in xrange(2):
+            CourseGroupRelationship.objects.create(course_id=courses[i].id, group=groups[i])
+            groups[i].organizations.add(organization['id'])
+
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        courses_uri = '{}courses/'.format(test_uri)
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 0)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+        # test organization course having multiple coursegrouprelationships
+        CourseGroupRelationship.objects.create(course_id=courses[0].id, group=groups[1])
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 0)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+    def test_organizations_courses_get_enrolled_users(self):
+        organization = self.setup_test_organization()
+        courses = CourseFactory.create_batch(2)
+        groups = GroupFactory.create_batch(2)
+
+        for i in xrange(2):
+            CourseGroupRelationship.objects.create(course_id=courses[i].id, group=groups[i])
+            groups[i].organizations.add(organization['id'])
+
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=courses[0].id)
+
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        courses_uri = '{}courses/'.format(test_uri)
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 1)
+        self.assertEqual(response.data[0]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=courses[1].id)
+        CourseEnrollmentFactory.create(user=self.test_user2, course_id=courses[1].id)
+
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 1)
+        self.assertEqual(response.data[0]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 2)
+        self.assertEqual(response.data[1]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['enrolled_users'][1], self.test_user2.id)
 
     def test_organizations_users_get_with_course_count(self):
         CourseEnrollmentFactory.create(user=self.test_user, course_id=self.course.id)

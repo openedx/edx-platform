@@ -60,7 +60,12 @@ class CourseSerializer(serializers.Serializer):
         """
         return "{}/{}".format(generate_base_uri(self.context['request']), course.id)
 
-    class Meta:
+
+class OrganizationCourseSerializer(CourseSerializer):
+    """ Serializer for Organization Courses """
+    name = serializers.CharField(source='display_name')
+    enrolled_users = serializers.CharField()
+
+    class Meta(object):
         """ Serializer/field specification """
-        #lookup_field = 'id'
-        #fields = ('id', 'name', 'category', 'number', 'org', 'uri', 'due', 'start', 'end')
+        fields = ('id', 'name', 'number', 'org', 'start', 'end', 'due', 'enrolled_users', )
