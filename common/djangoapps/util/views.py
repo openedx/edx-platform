@@ -163,7 +163,7 @@ class _FreshdeskApi(object):
             'cc_emails': cc
         }
 
-        response = requests.post(settings.HELPDESK_URL + '/helpdesk/tickets.json',
+        response = requests.post(settings.HELPDESK_URL + '/api/v2/tickets',
                 auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
                 headers=headers,
                 data=json.dumps(payload),
@@ -191,7 +191,7 @@ class _FreshdeskApi(object):
             }
         }
 
-        response = requests.post(settings.HELPDESK_URL + '/helpdesk/tickets/' + str(ticket_id) + '/conversations/note.json',
+        response = requests.post(settings.HELPDESK_URL + '/api/v2/tickets/' + str(ticket_id) + '/notes',
                 auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
                 headers=headers,
                 data=json.dumps(payload),
@@ -220,7 +220,7 @@ class _FreshdeskApi(object):
             return cached
 
         headers = {'Content-Type': 'application/json'}
-        response = requests.get(settings.HELPDESK_URL + '/groups.json',
+        response = requests.get(settings.HELPDESK_URL + '/api/v2/groups',
                 auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
                 headers=headers,
                 allow_redirects=False)
