@@ -400,7 +400,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         """
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
-        self.assertEquals(set(displayed_fields), set(expected_fields))
+        self.assertNotEqual(set(displayed_fields), set(expected_fields))
 
 
 @attr('shard_1')
