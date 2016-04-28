@@ -177,37 +177,13 @@ var DetailsView = ValidatingView.extend({
         var url, image_name;
         switch (event.currentTarget.id) {
         case 'course-image-url':
-            this.setField(event);
-            url = $(event.currentTarget).val();
-            image_name = _.last(url.split('/'));
-            this.model.set('course_image_name', image_name);
-            // Wait to set the image src until the user stops typing
-            clearTimeout(this.imageTimer);
-            this.imageTimer = setTimeout(function() {
-                $('#course-image').attr('src', $(event.currentTarget).val());
-            }, 1000);
+            this.updateImageField(event, 'course_image_name', '#course-image');
             break;
         case 'hero-image-url':
-            this.setField(event);
-            url = $(event.currentTarget).val();
-            image_name = _.last(url.split('/'));
-            this.model.set('hero_image_name', image_name);
-            // Wait to set the hero image src until the user stops typing
-            clearTimeout(this.imageTimer);
-            this.imageTimer = setTimeout(function() {
-                $('#hero-image').attr('src', $(event.currentTarget).val());
-            }, 1000);
+            this.updateImageField(event, 'hero_image_name', '#hero-image');
             break;
          case 'thumbnail-image-url':
-            this.setField(event);
-            url = $(event.currentTarget).val();
-            image_name = _.last(url.split('/'));
-            this.model.set('thumbnail_image_name', image_name);
-            // Wait to set the thumbnail image src until the user stops typing
-            clearTimeout(this.imageTimer);
-            this.imageTimer = setTimeout(function() {
-                $('#thumbnail-image').attr('src', $(event.currentTarget).val());
-            }, 1000);
+            this.updateImageField(event, 'thumbnail_image_name', '#thumbnail-image');
             break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
@@ -265,7 +241,17 @@ var DetailsView = ValidatingView.extend({
             break;
         }
     },
-
+    updateImageField: function(event, image_field, selector) {
+        this.setField(event);
+        var url = $(event.currentTarget).val();
+        var image_name = _.last(url.split('/'));
+        this.model.set(image_field, image_name);
+        // Wait to set the image src until the user stops typing
+        clearTimeout(this.imageTimer);
+        this.imageTimer = setTimeout(function() {
+            $(selector).attr('src', $(event.currentTarget).val());
+        }, 1000);
+    },
     removeVideo: function(event) {
         event.preventDefault();
         if (this.model.has('intro_video')) {
