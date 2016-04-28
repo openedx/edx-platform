@@ -507,6 +507,39 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
             sequence_ui_events
         )
 
+    def test_accordion_events(self):
+        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
+
+        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
+
+        # test UI events emitted by navigating via the course outline
+        filter_outline_ui_event = lambda event: event.get('name', '') == 'edx.ui.lms.outline.selected'
+
+        outline_ui_events = self.wait_for_events(event_filter=filter_outline_ui_event, timeout=2)
+
+        # note: target_url is tested in unit tests, as the url changes here with every test (it includes GUIDs).
+        self.assert_events_match(
+            [
+                {
+                    'event_type': 'edx.ui.lms.outline.selected',
+                    'name': 'edx.ui.lms.outline.selected',
+                    'event': {
+                        'target_name': 'Test Subsection 1,2 ',
+                        'widget_placement': 'accordion',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.outline.selected',
+                    'name': 'edx.ui.lms.outline.selected',
+                    'event': {
+                        'target_name': 'Test Subsection 2,1 ',
+                        'widget_placement': 'accordion',
+                    }
+                },
+            ],
+            outline_ui_events
+        )
+
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
