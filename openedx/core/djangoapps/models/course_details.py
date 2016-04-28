@@ -50,6 +50,7 @@ class CourseDetails(object):
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.hero_image_name = ""
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -90,6 +91,7 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.hero_image_name = descriptor.hero_image
         course_details.language = descriptor.language
         course_details.self_paced = descriptor.self_paced
 
