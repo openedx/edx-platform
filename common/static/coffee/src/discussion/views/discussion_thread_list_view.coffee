@@ -13,6 +13,7 @@ if Backbone?
       "click .forum-nav-load-more-link": "loadMorePages"
       "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
+      "load body": "retrieveAllThreads"
 
     initialize: (options) ->
       @courseSettings = options.courseSettings
