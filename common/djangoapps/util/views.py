@@ -142,7 +142,7 @@ class _FreshdeskApi(object):
         """
 
 
-    def create_ticket(self, subject, desc, name, email, priority=1, status=2, group_id='', cc=''):
+    def create_ticket(self, subject, desc, name, email, priority=1, status=2, group_id=''):
         """
         Create the given `ticket` in Freshdesk.
 
@@ -157,8 +157,7 @@ class _FreshdeskApi(object):
             'email': email,
             'priority': priority,
             'status': status,
-            'group_id': group_id,
-            'cc_emails': cc
+            'group_id': group_id
         }
 
         response = requests.post(settings.HELPDESK_URL + '/api/v2/tickets',
