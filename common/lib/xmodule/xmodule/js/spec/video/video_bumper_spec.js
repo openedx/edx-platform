@@ -1,6 +1,6 @@
 (function (WAIT_TIMEOUT) {
     'use strict';
-    xdescribe('VideoBumper', function () {
+    describe('VideoBumper', function () {
         var state, oldOTBD, waitForPlaying;
 
         waitForPlaying = function (state, done) {
@@ -36,7 +36,7 @@
         });
 
         it('can show the main video on error', function (done) {
-            state.el.trigger('error');
+            state.el.triggerHandler('error');
             jasmine.clock().tick(20);
             expect($('.is-bumper')).not.toExist();
             waitForPlaying(state, done);
@@ -85,7 +85,7 @@
          it('can save appropriate states correctly on error', function () {
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
-            state.el.trigger('error');
+            state.el.triggerHandler('error');
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.clock().tick(20);
             expect(saveState).toHaveBeenCalledWith(true, {
