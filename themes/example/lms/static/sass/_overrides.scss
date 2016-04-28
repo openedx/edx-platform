@@ -689,8 +689,11 @@ header.header-main {
   .courses-container{
     padding: 0 1rem;
     .courses{
+      .course{
+        border-bottom-width: 6px;
+        background-color: $white;
+      }
       .courses-listing{
-        margin: 0;
         .courses-listing-item{
           width: 100%;
           clear: none !important;
@@ -703,14 +706,16 @@ header.header-main {
         }
       }
       .course-info{
+        height: 165px;
         .course-name{
           margin: 1rem 0;
         }
         .course-organization{
-          padding: 1rem 1.25rem 0.2rem;
+          padding: 0.3rem 1.25rem;
         }
         .course-date{
           padding-left: 1.25rem;
+          color: $base;
         }
         .course-code{
           display: none;
@@ -858,7 +863,7 @@ header.header-main {
       .highlighted-courses {
         .courses {
           .course-info{
-            height: 192px;
+            height: 165px;
           }
           .course-list{
             .courses-listing-item{
@@ -875,7 +880,7 @@ header.header-main {
       padding: 0 1rem;
       .courses{
         .courses-listing{
-          margin: 0;
+          margin: -1% 0 0 0;
           .courses-listing-item{
             width: 48%;
             margin-bottom: 0.5rem !important;
