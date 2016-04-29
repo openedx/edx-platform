@@ -73,6 +73,7 @@
                 $('.select-country').hide();
                 this.setUserCityAndCountry();
                 this.showPassword();
+                this.getUsernameFromEmail();
             },
 
             setUserCityAndCountry: function() {
@@ -91,6 +92,15 @@
                 var password = $('#register-show_password');
                 password.click(function() {
                     $('#register-password').get(0).type = (this.checked) ? 'text' : 'password';
+                });
+            },
+
+            getUsernameFromEmail: function() {
+                var email = $('#register-email');
+                email.keyup(function() {
+                    if (email.val().indexOf('@') === -1) {
+                        $('#register-username').val(email.val().replace(".", ""));
+                    }
                 });
             },
 
