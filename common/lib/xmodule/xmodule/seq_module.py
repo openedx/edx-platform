@@ -402,6 +402,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    resources_dir = None
 
     show_in_read_only_mode = True
 

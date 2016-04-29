@@ -899,6 +899,7 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     Descriptor for LTI Xmodule.
     """
     module_class = LTIModule
+    resources_dir = None
     grade_handler = module_attr('grade_handler')
     preview_handler = module_attr('preview_handler')
     lti_2_0_result_rest_handler = module_attr('lti_2_0_result_rest_handler')
