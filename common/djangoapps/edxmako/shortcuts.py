@@ -41,6 +41,7 @@ def marketing_link(name):
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
+    cms_mktg_urls = getattr(settings, 'CMS_MKTG_URLS', {})
 
     if enable_mktg_site and name in settings.MKTG_URLS:
         # special case for when we only want the root marketing URL
@@ -52,6 +53,8 @@ def marketing_link(name):
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
             return reverse(link_map[name])
+    elif not enable_mktg_site and name in cms_mktg_urls:
+        return cms_mktg_urls[name] or '#'
     else:
         log.debug("Cannot find corresponding link for name: %s", name)
         return '#'
