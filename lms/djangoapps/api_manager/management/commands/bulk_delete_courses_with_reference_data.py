@@ -48,7 +48,7 @@ class Command(BaseCommand):
         """
         Deletes reference data for course
         """
-        print 'removing reference data for course %s' % unicode(course_key)
+        log.info('removing reference data for course %s', unicode(course_key))
         CourseGroupRelationship.objects.filter(course_id=course_key).delete()
         CourseContentGroupRelationship.objects.filter(course_id=course_key).delete()
         CourseCohortsSettings.objects.filter(course_id=course_key).delete()
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         """
         user_id = ModuleStoreEnum.UserID.mgmt_command
         with self.module_store.bulk_operations(course_key):
-            print 'Removing course %s from modulestore' % unicode(course_key)
+            log.info('Removing course %s from modulestore', unicode(course_key))
             self.module_store.delete_course(course_key, user_id)
 
     @transaction.commit_on_success
@@ -95,7 +95,8 @@ class Command(BaseCommand):
             courses = self.module_store.get_courses()
 
             for course in courses:
-                if course.edited_on < created_time:
+                last_edited_on = getattr(course, 'edited_on')
+                if last_edited_on and last_edited_on < created_time:
                     self.total_courses += 1
                     try:
                         self.delete_course_and_data(course.id)
@@ -107,4 +108,3 @@ class Command(BaseCommand):
                 self.total_deleted, self.total_courses
             )
             log.info(completion_message)
-            print completion_message
