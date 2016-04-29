@@ -48,6 +48,8 @@ def marketing_link(name):
         settings.MKTG_URLS
     )
 
+    cms_mktg_urls = getattr(settings, 'CMS_MKTG_URLS', {})
+
     if enable_mktg_site and name in marketing_urls:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
@@ -62,6 +64,8 @@ def marketing_link(name):
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
             return reverse(link_map[name])
+    elif not enable_mktg_site and name in cms_mktg_urls:
+        return cms_mktg_urls[name] or '#'
     else:
         log.debug("Cannot find corresponding link for name: %s", name)
         return '#'
