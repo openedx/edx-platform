@@ -11,7 +11,7 @@ from collections import Counter
 import logging
 
 import dogstats_wrapper as dog_stats_api
-from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
+from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException, SMTPRecipientsRefused
 from boto.ses.exceptions import (
     SESAddressNotVerifiedError,
     SESIdentityNotVerifiedError,
@@ -63,6 +63,7 @@ SINGLE_EMAIL_FAILURE_ERRORS = (
     SESDomainEndsWithDotError,  # Recipient's email address' domain ends with a period/dot.
     SESIllegalAddressError,  # Raised when an illegal address is encountered.
     SESLocalAddressCharacterError,  # An address contained a control or whitespace character.
+    SMTPRecipientsRefused, # code 501 from SMTP server
 )
 
 # Exceptions that, if caught, should cause the task to be re-tried.
