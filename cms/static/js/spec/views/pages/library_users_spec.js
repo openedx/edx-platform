@@ -5,11 +5,11 @@ define([
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     "use strict";
     describe("Library Instructor Access Page", function () {
-        const changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
+        var changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
         var team_member_fixture = readFixtures("team-member.underscore");
 
         function setRole(email, role){
-            var user_li = $("li.user-item[data-email="+ email + "]");
+            var user_li = $('li.user-item[data-email="'+ email + '"]');
             var role_action = $("li.action-role a.make-"+role, user_li);
             expect(role_action).toBeVisible();
             role_action.click();
@@ -48,7 +48,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can give a user permission to use the library", function () {
-                const email = 'other@example.com';
+                var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
@@ -61,7 +61,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can promote user", function() {
-                const email = "staff@example.com";
+                var email = "staff@example.com";
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole("staff@example.com", 'staff');

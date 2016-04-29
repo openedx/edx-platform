@@ -240,8 +240,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > input'
-                }, data
-            ), requests);
+                }, data),
+                requests);
         };
 
         var verifyDropDownField = function (view, data, requests) {

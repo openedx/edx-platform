@@ -7,7 +7,8 @@ define([ // jshint ignore:line
     'js/certificates/views/certificate_preview',
     'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers',
-    'common/js/spec_helpers/ajax_helpers'
+    'common/js/spec_helpers/ajax_helpers',
+    'jasmine-stealth'
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';
@@ -28,8 +29,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         };
 
         beforeEach(function() {
-            appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
-
             window.course = new Course({
                 id: '5',
                 name: 'Course Name',
@@ -40,6 +39,8 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
             window.CMS.User = {isGlobalStaff: true};
 
+            TemplateHelpers.installTemplate('certificate-web-preview', true);
+            appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
             this.view = new CertificatePreview({
                 el: $('.preview-certificate'),
                 course_modes: ['test1', 'test2', 'test3'],

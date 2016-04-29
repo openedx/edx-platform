@@ -10,7 +10,6 @@
         "date": "1.0",
         "domready": "2.0.1",
         "draggabilly": "1.2.4",
-        "jquery": "1.7.2",
         "jquery-form": "3.18.0",
         "jquery-watch": "2.0",
         "moment": "2.10.6",

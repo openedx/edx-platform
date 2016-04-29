@@ -45,6 +45,8 @@ SASS_LOAD_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
+    'jquery/dist/jquery.js',
+    'jquery-migrate/dist/jquery-migrate.js',
     'underscore/underscore.js',
     'underscore.string/dist/underscore.string.js',
     'picturefill/dist/picturefill.js',

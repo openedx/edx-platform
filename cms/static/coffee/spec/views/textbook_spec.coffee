@@ -87,7 +87,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 savingOptions = @savingSpies.constructor.calls.mostRecent().args[0]
                 expect(savingOptions.title).toMatch(/Deleting/)
                 # return a success response
-                requests[0].respond(200)
+                requests[0].respond(204)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 expect(@collection.contains(@model)).toBeFalsy()
 
