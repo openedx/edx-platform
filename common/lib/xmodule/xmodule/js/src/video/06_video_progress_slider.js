@@ -83,7 +83,6 @@ function () {
         // handle, behaves as a slider named 'video position'.
         state.videoProgressSlider.handle.attr({
             'role': 'slider',
-            'title': gettext('Video position'),
             'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider
                 .slider.slider('option', 'value')),
@@ -91,6 +90,7 @@ function () {
             'aria-valuemin': '0',
             'aria-valuenow': state.videoPlayer.currentTime,
             'tabindex': '0'
+            'aria-label': gettext('Video position')
         });
 
         state.el.on('destroy', state.videoProgressSlider.destroy);
