@@ -1,30 +1,7 @@
-<%!
-import json
-from django.utils.translation import ugettext as _
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
-%>
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
-<%
-course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
-%>
-
 <%namespace name='static' file='../static_content.html'/>
 
-% if course_discovery_enabled:
-<%block name="header_extras">
-% for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
-<script type="text/template" id="${template_name}-tpl">
-  <%static:include path="discovery/${template_name}.underscore" />
-</script>
-% endfor
-<%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
-DiscoveryFactory(
-${course_discovery_meanings | n, dump_js_escaped_json},
-getParameterByName('search_query')
-);
-</%static:require_module>
-</%block>
-% endif
 <section class="home">
   <header class="hero-main">
     <div class="tint-dark">
@@ -32,7 +9,9 @@ getParameterByName('search_query')
         <div class="row">
           <div class="col col-10 sm-col-10 md-col-10 lg-col-8 xl-col-6 text-tint">
             <p>Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem </p>
-            <a href="#" class="btn-neutral btn-large">Watch video <i class="fa fa-play"></i></a>
+            % if show_homepage_promo_video:
+            <a href="#video-modal" class="btn-neutral btn-large" rel="leanModal">Watch video <i class="fa fa-play"></i></a>
+            % endif
           </div>
         </div>
       </div>
@@ -51,14 +30,17 @@ getParameterByName('search_query')
                 </h2>
               </div>
             </div>
-            <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region"
-                 aria-label="${_('List of Courses')}">
-              <ul class="courses-listing">
-              </ul>
+            <div class="row course-list">
+              %for course in courses:
+              <div class="col col-12 sm-col-12 md-col-4 lg-col-4">
+                <div class="courses-listing-item">
+                  <%include file="../course.html" args="course=course" />
+                </div>
+              </div>
+              %endfor
             </div>
           </div>
         </section>
-
       </div>
     </div>
   </section>
@@ -73,27 +55,4 @@ getParameterByName('search_query')
             allowfullscreen></iframe>
   </div>
 </section>
-% endif
-
-<%block name="js_extra">
-<script type="text/javascript">
-  $(window).load(function () {
-    if (getParameterByName('next')) {
-      $('#login').trigger("click");
-    }
-  })
-</script>
-
-<script type="text/javascript" src="${static.url('js/slick.min.js')}"></script>
-
-</%block>
-
-% if show_signup_immediately is not UNDEFINED:
-## NOTE: This won't work in production, because anonymous views are cached, so it will
-## show either with or without this extra js for 3 minutes at a time.
-<script type="text/javascript">
-  $(window).load(function () {
-    $('#signup_action').trigger("click");
-  });
-</script>
 % endif
