@@ -512,6 +512,7 @@ def course_about(request, course_id):
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
         ecommerce_checkout_link = ''
+        ecommerce_bulk_checkout_link = ''
         professional_mode = ''
         ecomm_service = EcommerceService()
         if ecomm_service.is_enabled(request.user) and (
@@ -520,7 +521,7 @@ def course_about(request, course_id):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
-
+            ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
         course_price = get_cosmetic_display_price(course, registration_price)
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
@@ -555,6 +556,7 @@ def course_about(request, course_id):
             'in_cart': in_cart,
             'ecommerce_checkout': ecomm_service.is_enabled(request.user),
             'ecommerce_checkout_link': ecommerce_checkout_link,
+            'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,

@@ -161,6 +161,7 @@ class ChooseModeView(View):
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
                 context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
                 context["sku"] = verified_mode.sku
+                context["bulk_sku"] = verified_mode.bulk_sku
 
         return render_to_response("course_modes/choose.html", context)
 

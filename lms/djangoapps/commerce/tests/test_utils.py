@@ -54,10 +54,10 @@ class EcommerceServiceTests(TestCase):
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_microsites(self, is_microsite):
-        """Verify that is_enabled() returns False if used for a microsite."""
+        """Verify that is_enabled() returns True if used for a microsite."""
         is_microsite.return_value = True
-        is_not_enabled = EcommerceService().is_enabled(self.user)
-        self.assertFalse(is_not_enabled)
+        is_enabled = EcommerceService().is_enabled(self.user)
+        self.assertTrue(is_enabled)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_payment_page_url(self):
