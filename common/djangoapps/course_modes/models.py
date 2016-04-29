@@ -22,6 +22,7 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'bulk_sku',
                   ])
 
 
@@ -96,6 +97,17 @@ class CourseMode(models.Model):
         )
     )
 
+    # Optional bulk order SKU for integration with the ecommerce service
+    bulk_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="Bulk SKU",
+        help_text=_(
+            u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
+        )
+    )
+
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
     VERIFIED = "verified"
@@ -103,7 +115,7 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
@@ -123,7 +135,7 @@ class CourseMode(models.Model):
     # "honor" to "audit", we still need to have the shoppingcart
     # use "honor"
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
+    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
@@ -625,7 +637,8 @@ class CourseMode(models.Model):
             self.currency,
             self.expiration_datetime,
             self.description,
-            self.sku
+            self.sku,
+            self.bulk_sku
         )
 
     def __unicode__(self):
