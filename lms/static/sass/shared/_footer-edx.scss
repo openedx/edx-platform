@@ -17,6 +17,10 @@ footer#footer-edx-v3 {
   background: $edx-footer-bg-color;
   padding: 20px;
   border-top: 1px solid $courseware-button-border-color;
+  
+  // To match the Pattern Library
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   .footer-content-wrapper {
     @include outer-container;
