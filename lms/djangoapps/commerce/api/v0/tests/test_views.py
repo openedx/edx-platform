@@ -84,11 +84,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
+            sku_string = uuid4().hex.decode('ascii')
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
                 mode_display_name=mode,
-                sku=uuid4().hex.decode('ascii')
+                sku=sku_string,
+                bulk_sku='BULK-{}'.format(sku_string)
             )
 
         # Ignore events fired from UserFactory creation
@@ -268,8 +270,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
+        sku_string = uuid4().hex.decode('ascii')
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
-                                 sku=uuid4().hex.decode('ascii'))
+                                 sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
 
         with mock_create_basket(expect_called=False):
             response = self._post_to_view()

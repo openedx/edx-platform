@@ -52,7 +52,8 @@ def get_enrollments(user_id):
                             "currency": "usd",
                             "expiration_datetime": null,
                             "description": null,
-                            "sku": null
+                            "sku": null,
+                            "bulk_sku": null
                         }
                     ],
                     "invite_only": False
@@ -78,7 +79,8 @@ def get_enrollments(user_id):
                             "currency": "usd",
                             "expiration_datetime": null,
                             "description": null,
-                            "sku": null
+                            "sku": null,
+                            "bulk_sku": null
                         }
                     ],
                     "invite_only": True
@@ -124,7 +126,8 @@ def get_enrollment(user_id, course_id):
                         "currency": "usd",
                         "expiration_datetime": null,
                         "description": null,
-                        "sku": null
+                        "sku": null,
+                        "bulk_sku": null
                     }
                 ],
                 "invite_only": False
@@ -175,7 +178,8 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
                         "currency": "usd",
                         "expiration_datetime": null,
                         "description": null,
-                        "sku": null
+                        "sku": null,
+                        "bulk_sku": null
                     }
                 ],
                 "invite_only": False
@@ -227,7 +231,8 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
                         "currency": "usd",
                         "expiration_datetime": null,
                         "description": null,
-                        "sku": null
+                        "sku": null,
+                        "bulk_sku": null
                     }
                 ],
                 "invite_only": False
@@ -280,7 +285,8 @@ def get_course_enrollment_details(course_id, include_expired=False):
                     "currency": "usd",
                     "expiration_datetime": null,
                     "description": null,
-                    "sku": null
+                    "sku": null,
+                    "bulk_sku": null
                 }
             ],
             "invite_only": False
