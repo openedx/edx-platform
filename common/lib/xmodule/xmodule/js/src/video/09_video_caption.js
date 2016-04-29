@@ -107,12 +107,8 @@
 
                 var template = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
-                        '<a href="#transcript-end-' + this.state.id + '"',
-                        'id="transcript-start-' + this.state.id + '" class="transcript-start"></a>',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
                         '<ol id="transcript-captions" class="subtitles-menu"></ol>',
-                        '<a href="#transcript-start-' + this.state.id + '"',
-                        'id="transcript-end-' + this.state.id + '" class="transcript-end">\</a>',
                     '</div>'
                 ].join('');
 
@@ -785,14 +781,12 @@
 
                 this.subtitlesMenuEl
                     .prepend(
-                        $('<li class="spacing">')
+                        $('<li class="spacing"><a href="#transcript-end-' + this.state.id + '" id="transcript-start-' + this.state.id + '" class="transcript-start"></a>') // jshint ignore: line
                             .height(this.topSpacingHeight())
-                            .attr('tabindex', -1)
                     )
                     .append(
-                        $('<li class="spacing">')
+                        $('<li class="spacing"><a href="#transcript-start-' + this.state.id + '" id="transcript-end-' + this.state.id + '" class="transcript-end"></a>') // jshint ignore: line
                             .height(this.bottomSpacingHeight())
-                            .attr('tabindex', -1)
                     );
             },
 
