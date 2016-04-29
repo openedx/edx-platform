@@ -50,13 +50,14 @@ function() {
                         '</span>',
                     '</span>',
                 '</button>',
-                '<div class="volume-slider-container" aria-hidden="true">',
+                '<div class="volume-slider-container" aria-hidden="true" title="' + gettext('Adjust video volume') + '">', // jshint ignore: line
                     '<div class="volume-slider" ',
                         'role="slider"',
                         'aria-orientation="vertical" ',
                         'aria-valuemin="0" ',
                         'aria-valuemax="100" ',
-                        'aria-valuenow=""></div>',
+                        'aria-valuenow="" ',
+                        'aria-label="' + gettext('Adjust video volume')  + '"></div>',
                 '</div>',
             '</div>'
         ].join(''),
