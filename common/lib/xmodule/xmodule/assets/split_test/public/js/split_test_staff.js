@@ -1,11 +1,7 @@
-
-/**
- * Creates a new selector for managing toggling which child to show
- * @constructor
- */
-
-function ABTestSelector(runtime, elem) {
-    var _this = this;
+/* Creates a new selector for managing toggling which child to show. */
+window.ABTestSelector = function (runtime, elem) {
+    "use strict";
+    var _this = {};
     _this.elem = $(elem);
     _this.children = _this.elem.find('.split-test-child');
     _this.content_container = _this.elem.find('.split-test-child-container');
@@ -23,17 +19,13 @@ function ABTestSelector(runtime, elem) {
         });
     }
 
-    select = _this.elem.find('.split-test-select');
-    cur_group_id = select.val();
+    var select = _this.elem.find('.split-test-select');
+    var cur_group_id = select.val();
     select_child(cur_group_id);
 
     // bind the change event to the dropdown
     select.change(function() {
-        group_id = $(this).val()
+        var group_id = $(this).val();
         select_child(group_id);
     });
-
-}
-
-
-
+};

@@ -1,5 +1,6 @@
 /* JavaScript for editing operations that can be done on the split test author view. */
 window.SplitTestAuthorView = function (runtime, element) {
+    "use strict";
     var $element = $(element);
     var splitTestLocator = $element.closest('.studio-xblock-wrapper').data('locator');
 

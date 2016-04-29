@@ -503,6 +503,8 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
     """
     Mixin class for standardized parsing of XModule xml.
     """
+    resources_dir = None
+
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """

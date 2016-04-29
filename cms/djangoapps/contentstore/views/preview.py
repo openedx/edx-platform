@@ -9,8 +9,9 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside,\
-    request_token
+from openedx.core.lib.xblock_utils import (
+    replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
+)
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
@@ -31,7 +32,6 @@ from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
-from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
@@ -115,7 +115,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         }) + '?' + query
 
     def local_resource_url(self, block, uri):
-        return local_resource_url(block, uri)
+        return xblock_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """

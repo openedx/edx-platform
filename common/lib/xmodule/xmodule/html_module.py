@@ -118,6 +118,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
     """
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
+    resources_dir = None
     filename_extension = "xml"
     template_dir_name = "html"
     show_in_read_only_mode = True
