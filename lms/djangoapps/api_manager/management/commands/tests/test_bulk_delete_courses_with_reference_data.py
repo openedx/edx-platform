@@ -5,6 +5,7 @@ import mock
 import pytz
 from datetime import datetime, timedelta
 from freezegun import freeze_time
+from mock import PropertyMock
 
 from django.conf import settings
 from django.core.management import call_command
@@ -22,6 +23,7 @@ from student.tests.factories import UserFactory, GroupFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
@@ -183,6 +185,25 @@ class BulkCourseDeleteTests(ModuleStoreTestCase):
 
         with self.assertRaises(ValueError):
             call_command('bulk_delete_courses_with_reference_data', age='junk')
+
+        # assert data still exists
+        for course_id in course_ids:
+            self.assert_reference_data_exists(course_id)
+
+    def test_course_bulk_delete_with_no_edited_on(self):
+        """
+        Test bulk course deletion when course has no edited_on attribute
+        """
+        # Set up courses and data to be deleted
+        course_ids = self.setup_course_data(number_of_courses=2, days_ago=90)
+
+        with mock.patch(self.YESNO_PATCH_LOCATION) as patched_yes_no:
+            patched_yes_no.return_value = True
+            with mock.patch.object(
+                CourseDescriptor, 'edited_on', create=True, new_callable=PropertyMock
+            ) as mocked_edited_on:
+                mocked_edited_on.return_value = None
+                call_command('bulk_delete_courses_with_reference_data', age=60)
 
         # assert data still exists
         for course_id in course_ids:
