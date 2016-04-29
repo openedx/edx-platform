@@ -869,7 +869,7 @@ def course_about(request, course_id):
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
         course = get_course_with_access(request.user, permission, course_key)
-        course_details = CourseDetails.fetch(course_key)
+        course_details = CourseDetails.fetch(course_key, course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if theming_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):

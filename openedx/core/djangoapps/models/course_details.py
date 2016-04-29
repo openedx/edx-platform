@@ -75,12 +75,14 @@ class CourseDetails(object):
         return value
 
     @classmethod
-    def fetch(cls, course_key):
+    def fetch(cls, course_key, descriptor=None):
         """
         Fetch the course details for the given course from persistence
         and return a CourseDetails model.
         """
-        descriptor = modulestore().get_course(course_key)
+        if not descriptor:
+            descriptor = modulestore().get_course(course_key)
+
         course_details = cls(course_key.org, course_key.course, course_key.run)
 
         course_details.start_date = descriptor.start

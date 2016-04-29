@@ -178,20 +178,8 @@ from openedx.core.lib.courses import course_image_url
 
 <section class="course-info" xmlns="http://www.w3.org/1999/html">
   <header class="hero-main grid-manual hero-video">
-
-    <%doc>
-      Field name for background hero image: hero_image_asset_path
-
-      TODO: Hero images is applying as background in scss, in hero-video class, Here are thing we can do:
-      1. Use reletive path and keep this in SCSS (_overrides.scss:922)
-      2. Move background property to inline style
-      3. Update structure, move that in HTML:
-        - use image in image tag, with very low z-index
-        - float the other elements above that image
-        - or adjust them by giving the margin
-    </%doc>
-
-    <div class="grid-container">
+    <img src="${static.url(course_details.hero_image_asset_path)}" alt="" />
+    <div class="grid-container hero-course-container">
       <div class="row">
         <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
           <div class="video-data">
