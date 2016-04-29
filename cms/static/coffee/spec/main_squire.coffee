@@ -26,7 +26,7 @@ requirejs.config({
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "common/js/vendor/underscore",
         "underscore.string": "common/js/vendor/underscore.string",
-        "backbone": "xmodule_js/common_static/common/js/vendor/backbone-min",
+        "backbone": "xmodule_js/common_static/common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min",
