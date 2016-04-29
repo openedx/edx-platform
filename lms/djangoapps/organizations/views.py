@@ -164,19 +164,17 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                     "detail": _('users parameter must be comma separated list of integers.')
                 }, status.HTTP_400_BAD_REQUEST)
 
-            users_removed = 0
             organization = self.get_object()
-            for user_id in user_ids:
-                try:
-                    user = User.objects.get(id=user_id)
-                except ObjectDoesNotExist:
-                    continue
+            users_to_be_deleted = organization.users.filter(id__in=user_ids)
+            total_users = len(users_to_be_deleted)
+            for user in users_to_be_deleted:
                 organization.users.remove(user)
-                users_removed += 1
-            organization.save()
-            return Response({
-                "detail": _("{users_removed} users removed from organization").format(users_removed=users_removed)
-            }, status=status.HTTP_200_OK)
+            if total_users > 0:
+                return Response({
+                    "detail": _("{users_removed} user(s) removed from organization").format(users_removed=total_users)
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             user_id = request.DATA.get('id')
             try:
