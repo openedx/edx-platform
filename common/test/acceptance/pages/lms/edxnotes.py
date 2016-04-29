@@ -260,6 +260,8 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
         self.current_view = self.MAPPING["recent"](self.browser)
 
     def is_browser_on_page(self):
+        # When visiting this page, an ajax request is made for the notes
+        self.wait_for_ajax()
         return self.q(css=".wrapper-student-notes .note-group").visible
 
     def switch_to_tab(self, tab_name):
