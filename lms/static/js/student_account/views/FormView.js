@@ -72,6 +72,7 @@
                 $('.text-city').hide();
                 $('.select-country').hide();
                 this.setUserCityAndCountry();
+                this.showPassword();
             },
 
             setUserCityAndCountry: function() {
@@ -84,6 +85,13 @@
                       }
                    }
                 );
+            },
+
+            showPassword: function() {
+                var password = $('#register-show_password');
+                password.click(function() {
+                    $('#register-password').get(0).type = (this.checked) ? 'text' : 'password';
+                });
             },
 
             buildForm: function( data ) {
