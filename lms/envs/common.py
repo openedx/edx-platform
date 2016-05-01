@@ -2783,6 +2783,9 @@ LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 # Number of seconds before JWT tokens expire
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
+# For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
+JWT_PUBLIC_KEY = ''
+JWT_PRIVATE_KEY = ''
 
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
