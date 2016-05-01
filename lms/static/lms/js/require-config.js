@@ -118,7 +118,6 @@
                 exports: "Date"
             },
             "jquery": {
-                deps: ["_jquery"],
                 exports: "jQuery"
             },
             "jquery-migrate": ['jquery'],
