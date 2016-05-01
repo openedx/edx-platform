@@ -15,8 +15,10 @@
     <% if (context.currentProvider) { %>
         <div class="status" aria-hidden="false">
             <p class="message-copy">
-                <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s."), context ) %>
-                <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
+                <%- _.sprintf( gettext("We have completed the fields below as provided by %(currentProvider)s."), context ) %>
+                <%- _.sprintf( gettext("Please complete the missing required fields. If you clicked the %(currentProvider)s button by mistake and would like to use another %(currentProvider)s account, or another social login button, please clear the cookies in this browser, or try again from another browser. Refer to our"), context ) %>
+                <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs" style="text-decoration: none; color: #27AAE1;">FAQ page</a>
+                <%- _.sprintf( gettext("for more information."), context ) %>
             </p>
         </div>
     <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
