@@ -13,6 +13,11 @@ var options = {
 
     libraryFiles: [],
 
+    libraryFilesToInclude: [
+        {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: true},
+        {pattern: 'xmodule_js/common_static/common/js/vendor/jquery-migrate.js', included: true}
+    ],
+
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [

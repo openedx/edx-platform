@@ -79,11 +79,11 @@ class DataDownload
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_problem_responses_csv_input = @$section.find("input[name='problem-location']")
     @$list_problem_responses_csv_btn = @$section.find("input[name='list-problem-responses-csv']")
-    @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
-    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
-    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']'")
-    @$async_report_btn = @$section.find("input[class='async-report-btn']'")
+    @$list_anon_btn = @$section.find("input[name='list-anon-ids']")
+    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']")
+    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']")
+    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']")
+    @$async_report_btn = @$section.find("input[class='async-report-btn']")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'

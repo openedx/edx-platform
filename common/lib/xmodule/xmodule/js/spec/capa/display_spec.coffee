@@ -289,9 +289,9 @@ describe 'Problem', ->
         $('#input_example_1').replaceWith(html)
         @problem.checkAnswersAndCheckButton true
         @checkDisabled true
-        $('#input_1_1_1').attr('checked', true).trigger('click')
+        $('#input_1_1_1').click()
         @checkDisabled false
-        $('#input_1_1_1').attr('checked', false).trigger('click')
+        $('#input_1_1_1').click()
         @checkDisabled true
 
       it 'should become enabled after a radiobutton is checked', ->
