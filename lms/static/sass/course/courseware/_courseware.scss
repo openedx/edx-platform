@@ -96,6 +96,50 @@ html.video-fullscreen {
   }
 }
 
+.wrapper-course-modes {
+  border-bottom: 3px solid $gray-l5;
+  padding: ($baseline/2);
+}
+
+.courseware-bookmarks-button,
+.courseware-search-bar {
+  @include float(right);
+  @include margin-left($baseline);
+}
+
+.courseware-content-menu,
+.courseware-bookmarks-button,
+.courseware-search-bar {
+  @include box-sizing(border-box);
+  display: inline-block;
+}
+
+.content-menu-button {
+  @extend %ui-clear-button;
+
+  // set styles
+  @extend %btn-pl-secondary-base;
+  @include font-size(13);
+  display: inline-block;
+  padding: ($baseline/4) ($baseline/2);
+
+  &:before {
+    content: "\f0c9";
+    font-family: FontAwesome;
+  }
+
+  &.is-active {
+    background-color: lighten($action-primary-bg,10%);
+    color: $white;
+  }
+}
+
+.breadcrumb-label {
+  @extend %t-title7;
+  @include margin-left($baseline/2);
+  display: inline-block;
+}
+
 // TO-DO should this be content wrapper?
 .course-wrapper {
   position: relative;

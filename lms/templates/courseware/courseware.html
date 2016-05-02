@@ -87,6 +87,14 @@ ${static.get_page_title_breadcrumbs(course_name())}
   % endif
 
   <script type="text/javascript">
+    $(".content-menu-button").click(
+            function(){
+                menu_button_position = $('.content-menu-button').position();
+                $('.course-index').offset({top: menu_button_position.top + 30, left: menu_button_position.left});
+                $(".course-index").toggle();
+            }
+    );
+
     var $$course_id = "${course.id | escapejs}";
 
     $(function(){
@@ -126,35 +134,38 @@ ${fragment.foot_html()}
 <div class="container">
   <div class="course-wrapper" role="presentation">
 
-% if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index">
-
       <div class="wrapper-course-modes">
 
-          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
-              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
-                  ${_('Bookmarks')}
-              </button>
+          <div class="courseware-content-menu">
+              <button type="button" class="content-menu-button list-button is-inactive" aria-pressed="false"></button>
+              <div class="breadcrumb-label"></div>
+
+              % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+                <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+                  <form>
+                    <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                    <div class="search-field-wrapper">
+                      <input id="course-search-input" type="text" class="search-field"/>
+                      <button type="submit" class="search-button">
+                        ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+                      </button>
+                      <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                        <i class="icon fa fa-remove" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              % endif
+
+              <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
+                  <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+                      ${_('Bookmarks')}
+                  </button>
+              </div>
           </div>
 
-          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-              <form>
-                <label for="course-search-input" class="sr">${_('Course Search')}</label>
-                <div class="search-field-wrapper">
-                  <input id="course-search-input" type="text" class="search-field"/>
-                  <button type="submit" class="search-button">
-                    ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
-                  </button>
-                  <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-                    <i class="icon fa fa-remove" aria-hidden="true"></i>
-                  </button>
-                </div>
-              </form>
-            </div>
-          % endif
-
-      </div>
+% if disable_accordion is UNDEFINED or not disable_accordion:
+    <div class="course-index" style="display:none;">
 
       <div class="accordion">
         <nav class="course-navigation" aria-label="${_('Course')}">
@@ -165,11 +176,10 @@ ${fragment.foot_html()}
           % endif
         </nav>
       </div>
-
     </div>
 % endif
-    <section class="course-content" id="course-content">
-        <main id="main" aria-label="Content" tabindex="-1">
+
+    <section class="course-content" id="course-content" role="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -201,7 +211,6 @@ ${fragment.foot_html()}
         % endif
 
           ${fragment.body_html()}
-        </main>
     </section>
 
     <section class="courseware-results-wrapper">
@@ -210,8 +219,11 @@ ${fragment.foot_html()}
       <div class="courseware-results search-results" data-course-id="${course.id}" data-lang-code="${language_preference}"></div>
     </section>
 
-  </div>
 </div>
+</div>
+</div>
+
+
 <div class="container-footer">
   % if settings.FEATURES.get("LICENSING", False):
     <div class="course-license">
