@@ -54,7 +54,7 @@ from openedx.core.djangolib.js_utils import (
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
     <%block name="view_notes"></%block>
 
-    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
+    <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
 
     <script type="text/javascript">
       window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
@@ -72,11 +72,9 @@ from openedx.core.djangolib.js_utils import (
       <%block name="page_alert"></%block>
       </div>
 
-      <main id="main" aria-label="Content" tabindex="-1">
-          <div id="content">
-          <%block name="content"></%block>
-          </div>
-      </main>
+      <div id="content" tabindex="-1">
+      <%block name="content"></%block>
+      </div>
 
       % if user.is_authenticated():
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />

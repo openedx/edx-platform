@@ -7,14 +7,14 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
-                .and.returnValue(null);
+                .andReturn(null);
 
+            jasmine.stubRequests();
             state = jasmine.initializePlayer();
             spyOn(state.storage, 'setItem');
         });
 
         afterEach(function () {
-            
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
@@ -41,7 +41,7 @@
 
             beforeEach(function () {
                 state.videoPlayer.currentTime = videoPlayerCurrentTime;
-                spyOn(window.Time, 'formatFull').and.callThrough();
+                spyOn(Time, 'formatFull').andCallThrough();
             });
 
             it('data is not an object, async is true', function () {
@@ -172,7 +172,7 @@
         });
 
         it('can save state on page unload', function () {
-            $.ajax.calls.reset();
+            $.ajax.reset();
             state.videoSaveStatePlugin.onUnload();
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -212,7 +212,7 @@
 
         it('can destroy itself', function () {
             var plugin = state.videoSaveStatePlugin;
-            spyOn($.fn, 'off').and.callThrough();
+            spyOn($.fn, 'off').andCallThrough();
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({

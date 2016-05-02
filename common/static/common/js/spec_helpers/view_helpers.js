@@ -10,18 +10,16 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden,
-            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError;
+            clickDeleteItem, patchAndVerifyRequest, submitAndVerifyFormSuccess, submitAndVerifyFormError,
+            verifyElementInFocus, verifyElementNotInFocus;
 
         installViewTemplates = function() {
             appendSetFixtures('<div id="page-notification"></div>');
         };
 
         createFeedbackSpy = function(type, intent) {
-            var feedbackSpy = jasmine.stealth.spyOnConstructor(type, intent, ['show', 'hide']);
-            feedbackSpy.show.and.returnValue(feedbackSpy);
-            if (afterEach) {
-               afterEach(jasmine.stealth.clearSpies);
-            }
+            var feedbackSpy = spyOnConstructor(type, intent, ['show', 'hide']);
+            feedbackSpy.show.andReturn(feedbackSpy);
             return feedbackSpy;
         };
 
@@ -30,7 +28,7 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             expect(feedbackSpy.constructor).toHaveBeenCalled();
             expect(feedbackSpy.show).toHaveBeenCalled();
             expect(feedbackSpy.hide).not.toHaveBeenCalled();
-            options = feedbackSpy.constructor.calls.mostRecent().args[0];
+            options = feedbackSpy.constructor.mostRecentCall.args[0];
             expect(options.title).toMatch(text);
         };
 
@@ -57,9 +55,9 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
         confirmPrompt = function(promptSpy, pressSecondaryButton) {
             expect(promptSpy.constructor).toHaveBeenCalled();
             if (pressSecondaryButton) {
-                promptSpy.constructor.calls.mostRecent().args[0].actions.secondary.click(promptSpy);
+                promptSpy.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpy);
             } else {
-                promptSpy.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpy);
+                promptSpy.constructor.mostRecentCall.args[0].actions.primary.click(promptSpy);
             }
         };
 
@@ -130,6 +128,22 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             verifyNotificationShowing(notificationSpy, /Saving/);
         };
 
+        verifyElementInFocus = function(view, selector) {
+            waitsFor(
+              function() { return view.$(selector + ':focus').length === 1; },
+              "element to have focus: " + selector,
+              500
+            );
+        };
+
+        verifyElementNotInFocus = function(view, selector) {
+            waitsFor(
+              function() { return view.$(selector + ':focus').length === 0; },
+              "element to not have focus: " + selector,
+              500
+            );
+        };
+
         return {
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
@@ -146,7 +160,9 @@ define(["jquery", "common/js/components/views/feedback_notification", "common/js
             'clickDeleteItem': clickDeleteItem,
             'patchAndVerifyRequest': patchAndVerifyRequest,
             'submitAndVerifyFormSuccess': submitAndVerifyFormSuccess,
-            'submitAndVerifyFormError': submitAndVerifyFormError
+            'submitAndVerifyFormError': submitAndVerifyFormError,
+            'verifyElementInFocus': verifyElementInFocus,
+            'verifyElementNotInFocus': verifyElementNotInFocus
         };
     });
 }).call(this, define || RequireJS.define);

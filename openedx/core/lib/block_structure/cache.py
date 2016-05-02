@@ -48,7 +48,7 @@ class BlockStructureCache(object):
             self._encode_root_cache_key(block_structure.root_block_usage_key),
             zp_data_to_cache
         )
-        logger.info(
+        logger.debug(
             "Wrote BlockStructure %s to cache, size: %s",
             block_structure.root_block_usage_key,
             len(zp_data_to_cache),
@@ -77,13 +77,13 @@ class BlockStructureCache(object):
         # Find root_block_usage_key in the cache.
         zp_data_from_cache = self._cache.get(self._encode_root_cache_key(root_block_usage_key))
         if not zp_data_from_cache:
-            logger.info(
+            logger.debug(
                 "Did not find BlockStructure %r in the cache.",
                 root_block_usage_key,
             )
             return None
         else:
-            logger.info(
+            logger.debug(
                 "Read BlockStructure %r from cache, size: %s",
                 root_block_usage_key,
                 len(zp_data_from_cache),
@@ -109,7 +109,7 @@ class BlockStructureCache(object):
                 the cache.
         """
         self._cache.delete(self._encode_root_cache_key(root_block_usage_key))
-        logger.info(
+        logger.debug(
             "Deleted BlockStructure %r from the cache.",
             root_block_usage_key,
         )

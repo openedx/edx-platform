@@ -2,14 +2,11 @@
 // VideoCaption module.
     'use strict';
 
-    define('video/09_video_caption.js',[
+    define('video/09_video_caption.js', [
         'video/00_sjson.js',
-        'video/00_async_process.js',
-        'draggabilly',
-        'modernizr',
-        'afontgarde',
-        'edxicons'
-    ], function (Sjson, AsyncProcess, Draggabilly) {
+        'video/00_async_process.js'
+    ],
+    function (Sjson, AsyncProcess) {
 
         /**
          * @desc VideoCaption module exports a function.
@@ -36,14 +33,12 @@
                 'handleKeypress', 'handleKeypressLink', 'openLanguageMenu', 'closeLanguageMenu',
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
-                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop'
+                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle'
             );
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
-            this.listenForDragDrop();
 
             return $.Deferred().resolve().promise();
         };
@@ -107,8 +102,12 @@
 
                 var template = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
+                        '<a href="#transcript-end-' + this.state.id + '"',
+                        'id="transcript-start-' + this.state.id + '" class="transcript-start"></a>',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
                         '<ol id="transcript-captions" class="subtitles-menu"></ol>',
+                        '<a href="#transcript-start-' + this.state.id + '"',
+                        'id="transcript-end-' + this.state.id + '" class="transcript-end">\</a>',
                     '</div>'
                 ].join('');
 
@@ -321,6 +320,9 @@
                 var button = this.languageChooserEl,
                     menu = button.parent().find('.menu');
 
+
+                this.state.el.trigger('language_menu:show');
+
                 button
                     .addClass('is-opened');
 
@@ -333,6 +335,8 @@
                 event.preventDefault();
 
                 var button = this.languageChooserEl;
+
+                this.state.el.trigger('language_menu:hide');
 
                 button
                     .removeClass('is-opened')
@@ -372,13 +376,7 @@
             onContainerMouseEnter: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').addClass('is-opened');
-
-                // We only want to fire the analytics event if a menu is
-                // present instead of on the container hover, since it wraps
-                // the "CC" and "Transcript" buttons as well.
-                if ($(event.currentTarget).find('.lang').length) {
-                    this.state.el.trigger('language_menu:show');
-                }
+                this.state.el.trigger('language_menu:show');
             },
 
             /**
@@ -389,13 +387,7 @@
             onContainerMouseLeave: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').removeClass('is-opened');
-
-                // We only want to fire the analytics event if a menu is
-                // present instead of on the container hover, since it wraps
-                // the "CC" and "Transcript" buttons as well.
-                if ($(event.currentTarget).find('.lang').length) {
-                    this.state.el.trigger('language_menu:hide');
-                }
+                this.state.el.trigger('language_menu:hide');
             },
 
             /**
@@ -539,7 +531,7 @@
                             if (state.isTouch) {
                                 self.subtitlesEl.find('.subtitles-menu')
                                     .text(gettext('Transcript will be displayed when you start playing the video.')) // jshint ignore: line
-                                    .wrapInner('<li></li>');
+                                        .wrapInner('<li></li>');
                             } else {
                                 self.renderCaption(start, captions);
                             }
@@ -781,12 +773,14 @@
 
                 this.subtitlesMenuEl
                     .prepend(
-                        $('<li class="spacing"><a href="#transcript-end-' + this.state.id + '" id="transcript-start-' + this.state.id + '" class="transcript-start"></a>') // jshint ignore: line
+                        $('<li class="spacing">')
                             .height(this.topSpacingHeight())
+                            .attr('tabindex', -1)
                     )
                     .append(
-                        $('<li class="spacing"><a href="#transcript-start-' + this.state.id + '" id="transcript-end-' + this.state.id + '" class="transcript-end"></a>') // jshint ignore: line
+                        $('<li class="spacing">')
                             .height(this.bottomSpacingHeight())
+                            .attr('tabindex', -1)
                     );
             },
 
@@ -1125,8 +1119,6 @@
                     this.captionDisplayEl
                         .text(gettext('(Caption will be displayed when you start playing the video.)'));
                 }
-                
-                this.state.el.trigger('captions:show');
             },
 
             hideClosedCaptions: function() {
@@ -1140,8 +1132,6 @@
                     .removeClass('is-active')
                     .find('.control-text')
                         .text(gettext('Turn on closed captioning'));
-
-                this.state.el.trigger('captions:hide');
             },
 
             updateCaptioningCookie: function(method) {
@@ -1154,17 +1144,6 @@
                     $.cookie('show_closed_captions', null, {
                         path: '/'
                     });
-                }
-            },
-
-            listenForDragDrop: function() {
-                var captions = document.querySelector('.closed-captions'),
-                    draggable;
-
-                if (typeof Draggabilly === "function") {
-                    draggable = new Draggabilly(captions, { containment: true });
-                } else {
-                    console.log('Closed captioning available but not draggable');
                 }
             },
 
@@ -1189,7 +1168,7 @@
                     state.el.addClass('closed');
                     text = gettext('Turn on transcripts');
                     if (trigger_event) {
-                        this.state.el.trigger('transcript:hide');
+                        this.state.el.trigger('captions:hide');
                     }
 
                     transcriptControlEl
@@ -1202,7 +1181,7 @@
                     this.scrollCaption();
                     text = gettext('Turn off transcripts');
                     if (trigger_event) {
-                        this.state.el.trigger('transcript:show');
+                        this.state.el.trigger('captions:show');
                     }
 
                     transcriptControlEl

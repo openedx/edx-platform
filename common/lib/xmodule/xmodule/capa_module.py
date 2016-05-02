@@ -131,7 +131,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     INDEX_CONTENT_TYPE = 'CAPA'
 
     module_class = CapaModule
-    resources_dir = None
 
     has_score = True
     show_in_read_only_mode = True

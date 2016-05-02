@@ -7,7 +7,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').and.returnValue(null);
+                .createSpy('onTouchBasedDevice').andReturn(null);
         });
 
         afterEach(function () {
@@ -24,7 +24,7 @@
             });
 
             it('render the video controls', function () {
-                expect($('.video-controls')).toContainElement(
+                expect($('.video-controls')).toContain(
                     [
                         '.slider',
                         'ul.vcr',
@@ -41,52 +41,61 @@
         describe('constructor with start-time', function () {
             it(
                 'saved position is 0, timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    savedVideoPosition: 0
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        savedVideoPosition: 0
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
-                    return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+
+                    return isFinite(duration) && duration > 0 &&
+                        isFinite(state.videoPlayer.startTime);
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 1:00');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    savedVideoPosition: 15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        savedVideoPosition: 15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:15 / 1:00');
 
@@ -94,30 +103,34 @@
                     expect(expectedValue).toBe(15);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is negative, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    savedVideoPosition: -15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        savedVideoPosition: -15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 1:00');
 
@@ -125,30 +138,34 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    savedVideoPosition: 'a'
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        savedVideoPosition: 'a'
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 1:00');
 
@@ -156,30 +173,34 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    savedVideoPosition: 10000
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        savedVideoPosition: 10000
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 1:00');
 
@@ -187,7 +208,7 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
         });
 
@@ -195,24 +216,28 @@
             it(
                 'saved position is 0, timer slider and VCR set to 0:00 ' +
                 'and ending at specified end-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    end: 20,
-                    savedVideoPosition: 0
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        end: 20,
+                        savedVideoPosition: 0
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:00 / 0:20');
 
@@ -220,30 +245,34 @@
                     expect(expectedValue).toBe(0);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    end: 20,
-                    savedVideoPosition: 15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        end: 20,
+                        savedVideoPosition: 15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:15 / 0:20');
 
@@ -251,30 +280,34 @@
                     expect(expectedValue).toBe(15);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             // TODO: Fix!
             it(
                 'saved position is negative, timer slider and VCR set to 0:00',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    end: 20,
-                    savedVideoPosition: -15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        end: 20,
+                        savedVideoPosition: -15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:00 / 0:20');
 
@@ -282,30 +315,34 @@
                     expect(expectedValue).toBe(0);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to 0:00',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    end: 20,
-                    savedVideoPosition: 'a'
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        end: 20,
+                        savedVideoPosition: 'a'
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:00 / 0:20');
 
@@ -313,31 +350,35 @@
                     expect(expectedValue).toBe(0);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             // TODO: Fix!
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to 0:00',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    end: 20,
-                    savedVideoPosition: 10000
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        end: 20,
+                        savedVideoPosition: 10000
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:00 / 0:20');
 
@@ -345,32 +386,36 @@
                     expect(expectedValue).toBe(0);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
         });
 
         describe('constructor with start-time and end-time', function () {
             it(
                 'saved position is 0, timer slider and VCR set to appropriate start and end times',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    end: 20,
-                    savedVideoPosition: 0
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        end: 20,
+                        savedVideoPosition: 0
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 0:20');
 
@@ -378,31 +423,35 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    end: 20,
-                    savedVideoPosition: 15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        end: 20,
+                        savedVideoPosition: 15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:15 / 0:20');
 
@@ -410,31 +459,35 @@
                     expect(expectedValue).toBe(15);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is negative, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    end: 20,
-                    savedVideoPosition: -15
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        end: 20,
+                        savedVideoPosition: -15
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 0:20');
 
@@ -442,31 +495,35 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    end: 20,
-                    savedVideoPosition: 'a'
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        end: 20,
+                        savedVideoPosition: 'a'
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 0:20');
 
@@ -474,31 +531,35 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
 
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to start-time',
-                function (done)
+                function ()
             {
                 var duration, sliderEl, expectedValue;
 
-                window.VideoState = {};
-                state = jasmine.initializePlayer({
-                    start: 10,
-                    end: 20,
-                    savedVideoPosition: 10000
+                runs(function () {
+                    window.VideoState = {};
+                    state = jasmine.initializePlayer({
+                        start: 10,
+                        end: 20,
+                        savedVideoPosition: 10000
+                    });
+                    sliderEl = state.videoProgressSlider.slider;
+                    spyOn(state.videoPlayer, 'duration').andReturn(60);
                 });
-                sliderEl = state.videoProgressSlider.slider;
-                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     duration = state.videoPlayer.duration();
 
                     return isFinite(duration) && duration > 0 &&
                         isFinite(state.videoPlayer.startTime);
-                }).then(function () {
+                }, 'duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
                     expect(expectedValue).toHaveText('0:10 / 0:20');
 
@@ -506,7 +567,7 @@
                     expect(expectedValue).toBe(10);
 
                     state.storage.clear();
-                }).always(done);
+                });
             });
         });
 
@@ -526,15 +587,16 @@
             expect(state.videoControl).toBeUndefined();
         });
 
-        it('can focus the first control', function (done) {
+        it('can focus the first control', function () {
             var btnPlay;
             state = jasmine.initializePlayer({focusFirstControl: true});
             btnPlay = state.el.find('.video-controls .play');
-            jasmine.waitUntil(function () {
+            waitsFor(function () {
                 return state.el.hasClass('is-initialized');
-            }).then(function () {
+            }, 'Player is not initialized', WAIT_TIMEOUT);
+            runs(function () {
                 expect(btnPlay).toBeFocused();
-            }).always(done);
+            });
         });
     });
 }).call(this, window.WAIT_TIMEOUT);

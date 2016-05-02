@@ -17,11 +17,11 @@ function($, Backbone, _, Utils) {
 
         uploadTpl: '#file-upload',
 
-        initialize: function (options) {
+        initialize: function () {
             _.bindAll(this,
                 'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler'
             );
-            this.options = _.extend({}, options);
+
             this.file = false;
             this.render();
         },

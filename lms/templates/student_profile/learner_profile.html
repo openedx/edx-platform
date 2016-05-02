@@ -9,17 +9,16 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 
 <%block name="pagetitle">${_("Learner Profile")}</%block>
+<%block name="nav_skip">#content</%block>
 
 <%block name="bodyclass">view-profile</%block>
 
 <div class="message-banner" aria-live="polite"></div>
-<main id="main" aria-label="Content" tabindex="-1">
-    <div class="wrapper-profile">
-        <div class="ui-loading-indicator">
-            <p><span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_("Loading")}</span></p>
-        </div>
+<div class="wrapper-profile">
+    <div class="ui-loading-indicator">
+        <p><span class="spin"><i class="icon fa fa-refresh" aria-hidden="true"></i></span> <span class="copy">${_("Loading")}</span></p>
     </div>
-</main>
+</div>
 <%block name="headextra">
     <%static:css group='style-course'/>
 </%block>

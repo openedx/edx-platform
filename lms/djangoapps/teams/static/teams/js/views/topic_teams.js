@@ -15,7 +15,6 @@
                 },
 
                 initialize: function(options) {
-                    this.options = _.extend({}, options);
                     this.showSortControls = options.showSortControls;
                     this.context = options.context;
                     this.myTeamsCollection = options.myTeamsCollection;

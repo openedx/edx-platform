@@ -12,7 +12,7 @@ describe('VideoVolumeControl', function () {
     beforeEach(function () {
         oldOTBD = window.onTouchBasedDevice;
         window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-            .and.returnValue(null);
+            .andReturn(null);
     });
 
     afterEach(function () {
@@ -23,7 +23,7 @@ describe('VideoVolumeControl', function () {
     });
 
     it('Volume level has correct value even if cookie is broken', function () {
-        $.cookie.and.returnValue('broken_cookie');
+        $.cookie.andReturn('broken_cookie');
         state = jasmine.initializePlayer();
         volumeControl = state.videoVolumeControl;
         expect(volumeControl.volume).toEqual(100);
@@ -31,8 +31,8 @@ describe('VideoVolumeControl', function () {
 
     describe('constructor', function () {
         beforeEach(function () {
-            spyOn($.fn, 'slider').and.callThrough();
-            $.cookie.and.returnValue('75');
+            spyOn($.fn, 'slider').andCallThrough();
+            $.cookie.andReturn('75');
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
         });
@@ -46,7 +46,7 @@ describe('VideoVolumeControl', function () {
         });
 
         it('create the slider', function () {
-            expect($.fn.slider.calls.argsFor(2)).toEqual([{
+            expect($.fn.slider.calls[2].args).toEqual([{
                 orientation: 'vertical',
                 range: 'min',
                 min: 0,
@@ -94,23 +94,16 @@ describe('VideoVolumeControl', function () {
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
 
-            jasmine.addMatchers({
-                assertLiveRegionState: function () {
-                    return {
-                        compare: function (actual, volume, expectation) {
-                            var region = $('.video-live-region');
+            this.addMatchers({
+                assertLiveRegionState: function (volume, expectation) {
+                    var region = $('.video-live-region');
 
-                            var getExpectedText = function (text) {
-                                return text + ' Volume.';
-                            };
-
-                            actual.setVolume(volume, true, true);
-                            return {
-                                pass: region.text() === getExpectedText(expectation)
-                            };
-
-                        }
+                    var getExpectedText = function (text) {
+                        return text + ' Volume.';
                     };
+
+                    this.actual.setVolume(volume, true, true);
+                    return region.text() === getExpectedText(expectation);
                 }
             });
         });

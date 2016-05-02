@@ -7,7 +7,9 @@
                 oldOTBD = window.onTouchBasedDevice;
                 window.onTouchBasedDevice = jasmine
                     .createSpy('onTouchBasedDevice')
-                    .and.returnValue(null);
+                    .andReturn(null);
+
+                jasmine.stubRequests();
 
                 state = jasmine.initializePlayer();
 
@@ -18,23 +20,26 @@
                 $('source').remove();
                 window.onTouchBasedDevice = oldOTBD;
                 state.storage.clear();
-                state.videoPlayer.destroy();
             });
 
-            it('initialize', function (done) {
-                jasmine.waitUntil(function () {
+            it('initialize', function () {
+                waitsFor(function () {
                     return state.el.hasClass('is-initialized');
-                }).then(function () {
+                }, 'Player is not initialized.', WAIT_TIMEOUT);
+
+                runs(function () {
                     expect('initialize').not.toHaveBeenTriggeredOn('.video');
-                }).always(done);
+                });
             });
 
-            it('ready', function (done) {
-                jasmine.waitUntil(function () {
+            it('ready', function () {
+                waitsFor(function () {
                     return state.el.hasClass('is-initialized');
-                }).then(function () {
+                }, 'Player is not initialized.', WAIT_TIMEOUT);
+
+                runs(function () {
                     expect('ready').not.toHaveBeenTriggeredOn('.video');
-                }).always(done);
+                });
             });
 
             it('play', function () {
@@ -81,7 +86,9 @@
                 oldOTBD = window.onTouchBasedDevice;
                 window.onTouchBasedDevice = jasmine
                     .createSpy('onTouchBasedDevice')
-                    .and.returnValue(null);
+                    .andReturn(null);
+
+                jasmine.stubRequests();
 
                 state = jasmine.initializePlayerYouTube();
             });
@@ -89,8 +96,6 @@
             afterEach(function () {
                 $('source').remove();
                 window.onTouchBasedDevice = oldOTBD;
-                state.storage.clear();
-                state.videoPlayer.destroy();
             });
 
             it('qualitychange', function () {

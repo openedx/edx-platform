@@ -151,7 +151,6 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
 class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Image annotation descriptor '''
     module_class = ImageAnnotationModule
-    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

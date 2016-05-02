@@ -17,7 +17,6 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from ccx_keys.locator import CCXLocator
 from courseware import courses
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from instructor.enrollment import (
     enroll_email,
     get_email_params,
@@ -362,7 +361,7 @@ class CCXListView(GenericAPIView):
                 ]
     }
     """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
     pagination_class = CCXAPIPagination
@@ -600,7 +599,7 @@ class CCXDetailView(GenericAPIView):
             response is returned.
     """
 
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
 

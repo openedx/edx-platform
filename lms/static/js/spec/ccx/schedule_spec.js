@@ -2,21 +2,18 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
     function(AjaxHelpers) {
         describe("edx.ccx.schedule.ScheduleView", function() {
             var view = null;
-            var data;
 
             beforeEach(function() {
                 loadFixtures("js/fixtures/ccx/schedule.html");
 
                 var scheduleFixture = readFixtures("templates/ccx/schedule.underscore");
-                appendSetFixtures(
-                    "<script id=\"schedule_template\" type=\"text/template\" >" + scheduleFixture + "</script>"
-                );
+                appendSetFixtures("<div id=\"schedule_template\">" + scheduleFixture + "</div>");
                 schedule_template = _.template($('#schedule_template').html());
                 save_url = 'save_ccx';
 
                 $.fn.leanModal = function(param) {
                     return true;
-                };
+                }
 
                 data = [{
                     "category": "chapter",
@@ -47,8 +44,10 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                     ]
                 }];
                 view = new edx.ccx.schedule.ScheduleView({el: $('#new-ccx-schedule')});
-                view.schedule_collection.set(data);
+                view.schedule_collection.set(data)
                 view.render();
+
+
             });
 
             it("verifies correct view setup", function() {

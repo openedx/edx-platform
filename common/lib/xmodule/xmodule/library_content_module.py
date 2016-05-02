@@ -367,9 +367,6 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     """
     Descriptor class for LibraryContentModule XBlock.
     """
-
-    resources_dir = 'assets/library_content'
-
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}

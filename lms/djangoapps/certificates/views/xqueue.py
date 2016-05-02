@@ -110,7 +110,7 @@ def update_certificate(request):
 
                 cert.error_reason = xqueue_body['error_reason']
         else:
-            if cert.status == status.generating:
+            if cert.status in [status.generating, status.regenerating]:
                 cert.download_uuid = xqueue_body['download_uuid']
                 cert.verify_uuid = xqueue_body['verify_uuid']
                 cert.download_url = xqueue_body['url']

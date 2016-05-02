@@ -243,6 +243,7 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
+THEME_CACHE_TIMEOUT = ENV_TOKENS.get('THEME_CACHE_TIMEOUT', THEME_CACHE_TIMEOUT)
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -348,12 +349,6 @@ FOOTER_BROWSER_CACHE_MAX_AGE = ENV_TOKENS.get('FOOTER_BROWSER_CACHE_MAX_AGE', FO
 NOTIFICATION_EMAIL_CSS = ENV_TOKENS.get('NOTIFICATION_EMAIL_CSS', NOTIFICATION_EMAIL_CSS)
 NOTIFICATION_EMAIL_EDX_LOGO = ENV_TOKENS.get('NOTIFICATION_EMAIL_EDX_LOGO', NOTIFICATION_EMAIL_EDX_LOGO)
 
-# Determines whether the CSRF token can be transported on
-# unencrypted channels. It is set to False here for backward compatibility,
-# but it is highly recommended that this is True for enviroments accessed
-# by end users.
-CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
-
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
@@ -450,7 +445,6 @@ AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
-AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
@@ -808,6 +802,3 @@ if FEATURES.get('ENABLE_CSMH_EXTENDED'):
     INSTALLED_APPS += ('coursewarehistoryextended',)
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
-
-# Mobile App Version Upgrade config
-APP_UPGRADE_CACHE_TIMEOUT = ENV_TOKENS.get('APP_UPGRADE_CACHE_TIMEOUT', APP_UPGRADE_CACHE_TIMEOUT)

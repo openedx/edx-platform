@@ -1,9 +1,9 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/ajax_helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
-    'js/spec/edxnotes/helpers'
+    'js/spec/edxnotes/custom_matchers', 'js/spec/edxnotes/helpers', 'jasmine-jquery'
 ], function(
-    $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, Helpers
+    $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, customMatchers, Helpers
 ) {
     'use strict';
     describe('EdxNotes RecentActivityView', function() {
@@ -64,6 +64,7 @@ define([
         recentActivityTabId = '#recent-panel';
 
         beforeEach(function () {
+            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'

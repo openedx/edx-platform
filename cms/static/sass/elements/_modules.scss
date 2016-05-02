@@ -303,7 +303,7 @@ $outline-indent-width: $baseline;
 %outline-item-status {
   @extend %t-copy-sub2;
   @extend %t-strong;
-  color: $gray-d1;
+  color: $color-copy-base;
 
   .icon {
     @extend %t-icon5;
@@ -576,16 +576,12 @@ $outline-indent-width: $baseline;
       > .subsection-status .status-timed-proctored-exam {
         opacity: 1.0;
       }
-
-      > .subsection-status .status-hide-after-due {
-        opacity: 1.0;
-      }
     }
 
     // status - grading
-    .status-grading, .status-timed-proctored-exam, .status-hide-after-due {
+    .status-grading, .status-timed-proctored-exam  {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: 0.75;
+      opacity: 0.65;
     }
 
     .status-grading-value, .status-proctored-exam-value {

@@ -148,7 +148,6 @@
         "JSON",
 
         // edX globals
-        "edx",
-        "XBlock"
+        "edx"
     ]
 }

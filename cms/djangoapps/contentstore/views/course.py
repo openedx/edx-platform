@@ -91,6 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from util.course_key_utils import from_string_or_404
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -874,10 +875,7 @@ def course_info_handler(request, course_key_string):
     GET
         html: return html for editing the course info handouts and updates.
     """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError:
-        raise Http404
+    course_key = from_string_or_404(course_key_string)
 
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
@@ -978,24 +976,18 @@ def settings_handler(request, course_key_string):
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
-            enable_extended_course_details = microsite.get_value_for_org(
-                course_module.location.org,
-                'ENABLE_EXTENDED_COURSE_DETAILS',
-                settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
-            )
 
             about_page_editable = not marketing_site_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+
             self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
-                'course_image_url': course_image_url(course_module, 'course_image'),
-                'banner_image_url': course_image_url(course_module, 'banner_image'),
-                'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
+                'course_image_url': course_image_url(course_module),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
@@ -1009,7 +1001,6 @@ def settings_handler(request, course_key_string):
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
                 'self_paced_enabled': self_paced_enabled,
-                'enable_extended_course_details': enable_extended_course_details
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)

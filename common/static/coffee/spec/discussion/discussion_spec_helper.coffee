@@ -13,7 +13,7 @@ class @DiscussionSpecHelper
         DiscussionUtil.roleIds["Moderator"].push(parseInt(DiscussionUtil.getUser().id))
 
     @makeAjaxSpy = (fakeAjax) ->
-        spyOn($, "ajax").and.callFake(
+        spyOn($, "ajax").andCallFake(
             (params) ->
                 fakeAjax(params)
                 {always: ->}

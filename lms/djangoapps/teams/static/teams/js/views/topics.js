@@ -16,7 +16,6 @@
             },
 
             initialize: function (options) {
-                this.options = _.extend({}, options);
                 this.itemViewClass = TopicCardView.extend({
                     router: options.router,
                     srInfo: this.srInfo

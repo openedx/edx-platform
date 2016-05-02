@@ -7,10 +7,9 @@ define([ // jshint ignore:line
     'gettext',
     'js/views/baseview',
     'common/js/components/utils/view_utils',
-    'common/js/components/views/feedback_notification',
-    "text!templates/certificate-web-preview.underscore"
+    'common/js/components/views/feedback_notification'
 ],
-function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate) {
+function(_, gettext, BaseView, ViewUtils, NotificationView) {
     'use strict';
     var CertificateWebPreview = BaseView.extend({
         el: $(".preview-certificate"),
@@ -24,10 +23,11 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
             this.certificate_web_view_url = options.certificate_web_view_url;
             this.certificate_activation_handler_url = options.certificate_activation_handler_url;
             this.is_active = options.is_active;
+            this.template = this.loadTemplate('certificate-web-preview');
         },
 
         render: function () {
-            this.$el.html(_.template(certificateWebPreviewTemplate)({
+            this.$el.html(this.template({
                 course_modes: this.course_modes,
                 certificate_web_view_url: this.certificate_web_view_url,
                 is_active: this.is_active

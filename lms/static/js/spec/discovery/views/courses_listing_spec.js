@@ -34,7 +34,7 @@ define([
     describe('discovery.views.CoursesListing', function () {
 
         beforeEach(function () {
-            jasmine.clock().install();
+            jasmine.Clock.useMock();
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplate('templates/discovery/course_card');
             var collection = new Backbone.Collection(
@@ -44,12 +44,8 @@ define([
             var mock = {
                 collection: collection,
                 latest: function () { return this.collection.last(20); }
-            };
+            }
             this.view = new CoursesListing({ model: mock });
-        });
-
-        afterEach(function() {
-            jasmine.clock().uninstall();
         });
 
         it('renders search results', function () {
@@ -66,13 +62,13 @@ define([
             this.view.render();
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
-            jasmine.clock().tick(500);
+            jasmine.Clock.tick(500);
             expect(this.onNext).toHaveBeenCalled();
 
             // should not be triggered again (while it is loading)
             $(window).trigger('scroll');
-            jasmine.clock().tick(500);
-            expect(this.onNext.calls.count()).toEqual(1);
+            jasmine.Clock.tick(500);
+            expect(this.onNext.calls.length).toEqual(1);
         });
 
     });

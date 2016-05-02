@@ -4,7 +4,6 @@ Tests for EmbargoMiddleware
 
 from contextlib import contextmanager
 import mock
-from nose.plugins.attrib import attr
 import unittest
 import pygeoip
 import ddt
@@ -35,10 +34,11 @@ from embargo.exceptions import InvalidAccessPoint
 from mock import patch
 
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
-@attr('shard_3')
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

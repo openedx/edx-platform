@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').and.returnValue(['iPad']);
+                .createSpy('onTouchBasedDevice').andReturn(['iPad']);
 
             state = jasmine.initializePlayer();
             spyOn(state.videoCommands, 'execute');
@@ -41,7 +41,7 @@
 
         beforeEach(function () {
             jasmine.stubRequests();
-            spyOn(window.YT, 'Player').and.callThrough();
+            spyOn(window.YT, 'Player').andCallThrough();
         });
 
         it ('works correctly on calling proper methods', function () {
@@ -77,7 +77,7 @@
             it(message, function () {
                 var btnPlay;
 
-                window.onTouchBasedDevice.and.returnValue(data.isTouch);
+                window.onTouchBasedDevice.andReturn(data.isTouch);
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
@@ -97,7 +97,7 @@
             {
                 var btnPlay;
 
-                window.onTouchBasedDevice.and.returnValue([device]);
+                window.onTouchBasedDevice.andReturn([device]);
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
@@ -113,7 +113,7 @@
             {
                 var btnPlay;
 
-                window.onTouchBasedDevice.and.returnValue([device]);
+                window.onTouchBasedDevice.andReturn([device]);
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
@@ -128,7 +128,7 @@
             {
                 var btnPlay;
 
-                window.onTouchBasedDevice.and.returnValue([device]);
+                window.onTouchBasedDevice.andReturn([device]);
                 state = jasmine.initializePlayerYouTube();
                 btnPlay = state.el.find('.btn-play');
 

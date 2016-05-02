@@ -1,6 +1,6 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
-], function($, _, Annotator, Logger, NotesFactory) {
+    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory', 'js/spec/edxnotes/custom_matchers'
+], function($, _, Annotator, Logger, NotesFactory, customMatchers) {
     'use strict';
     describe('EdxNotes Accessibility Plugin', function() {
         function keyDownEvent (key) {
@@ -25,6 +25,7 @@ define([
 
         beforeEach(function() {
             this.KEY = $.ui.keyCode;
+            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.annotator =  NotesFactory.factory(
                 $('div#edx-notes-wrapper-123').get(0), {
@@ -44,7 +45,7 @@ define([
         describe('destroy', function () {
             it('should unbind all events', function () {
                 spyOn($.fn, 'off');
-                spyOn(this.annotator, 'unsubscribe').and.callThrough();
+                spyOn(this.annotator, 'unsubscribe').andCallThrough();
                 this.plugin.destroy();
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationViewerTextField', this.plugin.addAriaAttributes
@@ -81,7 +82,7 @@ define([
                 this.annotator.viewer.load([annotation]);
                 note = $('.annotator-note');
                 expect(note).toExist();
-                expect(note).toHaveAttr('tabindex', "-1");
+                expect(note).toHaveAttr('tabindex', -1);
                 expect(note).toHaveAttr('role', 'note');
                 expect(note).toHaveAttr('class', 'annotator-note');
             });
@@ -115,9 +116,9 @@ define([
                     highlights: [highlight.get(0)]
                 };
                 highlight.data('annotation', annotation);
-                spyOn(this.annotator, 'showViewer').and.callThrough();
-                spyOn(this.annotator.viewer, 'hide').and.callThrough();
-                spyOn(this.plugin, 'focusOnGrabber').and.callThrough();
+                spyOn(this.annotator, 'showViewer').andCallThrough();
+                spyOn(this.annotator.viewer, 'hide').andCallThrough();
+                spyOn(this.plugin, 'focusOnGrabber').andCallThrough();
             });
 
             it('should open the viewer on SPACE keydown and focus on note', function () {
@@ -174,7 +175,7 @@ define([
                 edit= this.annotator.element.find('.annotator-edit').first();
                 del = this.annotator.element.find('.annotator-delete').first();
                 close = this.annotator.element.find('.annotator-close').first();
-                spyOn(this.annotator.viewer, 'hide').and.callThrough();
+                spyOn(this.annotator.viewer, 'hide').andCallThrough();
             });
 
             it('should give focus to Note on Listing TAB keydown', function () {
@@ -220,7 +221,7 @@ define([
                     control.focus();
                     control.trigger(keyDownEvent(this.KEY.ESCAPE));
                 }, this);
-                expect(this.annotator.viewer.hide.calls.count()).toBe(5);
+                expect(this.annotator.viewer.hide.callCount).toBe(5);
             });
         });
 
@@ -242,8 +243,8 @@ define([
                 tags = annotatorItems.first().next().children('input');
                 save  = this.annotator.element.find('.annotator-save');
                 cancel = this.annotator.element.find('.annotator-cancel');
-                spyOn(this.annotator.editor, 'submit').and.callThrough();
-                spyOn(this.annotator.editor, 'hide').and.callThrough();
+                spyOn(this.annotator.editor, 'submit').andCallThrough();
+                spyOn(this.annotator.editor, 'hide').andCallThrough();
             });
 
             it('should give focus to TextArea on Form TAB keydown', function () {
@@ -286,7 +287,7 @@ define([
                 save.focus();
                 save.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
-                this.annotator.editor.submit.calls.reset();
+                this.annotator.editor.submit.reset();
                 save.focus();
                 save.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
@@ -296,7 +297,7 @@ define([
                 textArea.focus();
                 textArea.trigger(enterMetaKeyEvent());
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
-                this.annotator.editor.submit.calls.reset();
+                this.annotator.editor.submit.reset();
                 textArea.focus();
                 textArea.trigger(enterControlKeyEvent());
                 expect(this.annotator.editor.submit).toHaveBeenCalled();
@@ -306,7 +307,7 @@ define([
                 cancel.focus();
                 cancel.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.editor.hide).toHaveBeenCalled();
-                this.annotator.editor.hide.calls.reset();
+                this.annotator.editor.hide.reset();
                 cancel.focus();
                 save.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.editor.hide).toHaveBeenCalled();
@@ -319,7 +320,7 @@ define([
                     control.focus();
                     control.trigger(keyDownEvent(this.KEY.ESCAPE));
                 }, this);
-                expect(this.annotator.editor.hide.calls.count()).toBe(3);
+                expect(this.annotator.editor.hide.callCount).toBe(3);
             });
         });
     });

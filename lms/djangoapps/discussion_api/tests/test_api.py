@@ -1136,7 +1136,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "endorsed": False,
                 "abuse_flaggers": [],
                 "votes": {"up_count": 4},
-                "child_count": 0,
                 "children": [],
             },
             {
@@ -1153,7 +1152,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "endorsed": False,
                 "abuse_flaggers": [str(self.user.id)],
                 "votes": {"up_count": 7},
-                "child_count": 0,
                 "children": [],
             }
         ]
@@ -1176,7 +1174,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 4,
                 "editable_fields": ["abuse_flagged", "voted"],
-                "child_count": 0,
                 "children": [],
             },
             {
@@ -1197,7 +1194,6 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "voted": False,
                 "vote_count": 7,
                 "editable_fields": ["abuse_flagged", "voted"],
-                "child_count": 0,
                 "children": [],
             },
         ]
@@ -1692,8 +1688,7 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
-            "child_count": 0,
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         expected_url = (
@@ -2382,8 +2377,7 @@ class UpdateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
-            "child_count": 0,
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"]
         }
         self.assertEqual(actual, expected)
         self.assertEqual(

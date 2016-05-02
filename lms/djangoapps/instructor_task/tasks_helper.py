@@ -836,7 +836,7 @@ def _order_problems(blocks):
         an OrderedDict that maps a problem id to its headers in the final report.
     """
     problems = OrderedDict()
-    assignments = OrderedDict()
+    assignments = dict()
     # First, sort out all the blocks into their correct assignments and all the
     # assignments into their correct types.
     for block in blocks:
@@ -1420,13 +1420,20 @@ def generate_students_certificates(
         )
 
     elif student_set == 'whitelisted_not_generated':
-        # Whitelist students who did not get certificates already.
+        # All Whitelisted students
         students_to_generate_certs_for = students_to_generate_certs_for.filter(
             certificatewhitelist__course_id=course_id,
             certificatewhitelist__whitelist=True
-        ).exclude(
-            generatedcertificate__course_id=course_id,
-            generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
+        )
+
+        # Whitelisted students which got certificates already.
+        certificate_generated_students = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id=course_id,
+        )
+        certificate_generated_students_ids = set(certificate_generated_students.values_list('user_id', flat=True))
+
+        students_to_generate_certs_for = students_to_generate_certs_for.exclude(
+            id__in=certificate_generated_students_ids
         )
 
     elif student_set == "specific_student":

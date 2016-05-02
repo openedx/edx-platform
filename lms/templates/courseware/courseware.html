@@ -57,6 +57,8 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
+<%block name="nav_skip">${"#content" if section_title else "#content"}</%block>
+
 <%include file="../discussion/_js_head_dependencies.html" />
   ${fragment.head_html()}
 </%block>
@@ -168,8 +170,7 @@ ${fragment.foot_html()}
 
     </div>
 % endif
-    <section class="course-content" id="course-content">
-        <main id="main" aria-label="Content" tabindex="-1">
+    <section class="course-content" id="course-content" role="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -198,10 +199,9 @@ ${fragment.foot_html()}
                 )}
             </p>
             % endif
-        % endif
+      % endif
 
-          ${fragment.body_html()}
-        </main>
+      ${fragment.body_html()}
     </section>
 
     <section class="courseware-results-wrapper">

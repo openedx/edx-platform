@@ -6,14 +6,12 @@ define(["jquery", "underscore", "gettext", "js/views/pages/container", "js/views
         'use strict';
         var PagedXBlockContainerPage = XBlockContainerPage.extend({
 
-            events: _.extend({}, XBlockContainerPage.prototype.events, {
-                'click .toggle-preview-button': 'toggleChildrenPreviews'
-            }),
-
+            events: {"click .toggle-preview-button": "toggleChildrenPreviews"},
             defaultViewClass: PagedContainerView,
             components_on_init: false,
 
-            initialize: function (options) {
+            initialize: function (options){
+                this.events = _.extend({}, XBlockContainerPage.prototype.events, this.events);
                 this.page_size = options.page_size || 10;
                 this.showChildrenPreviews = options.showChildrenPreviews || true;
                 XBlockContainerPage.prototype.initialize.call(this, options);

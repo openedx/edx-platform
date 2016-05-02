@@ -1,6 +1,6 @@
-define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/teams_tab',
+define(['jquery', 'backbone', 'teams/js/teams_tab_factory',
         'common/js/spec_helpers/page_helpers', 'teams/js/spec_helpers/team_spec_helpers'],
-    function($, Backbone, TeamsTabFactory, TeamsTabView, PageHelpers, TeamSpecHelpers) {
+    function($, Backbone, TeamsTabFactory, PageHelpers, TeamSpecHelpers) {
         'use strict';
 
         describe("Teams Tab Factory", function() {
@@ -15,7 +15,6 @@ define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/team
 
             afterEach(function() {
                 Backbone.history.stop();
-                $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
             });
 
             it('can render the "Teams" tab', function() {

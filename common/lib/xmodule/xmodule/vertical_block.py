@@ -24,9 +24,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
     """
     Layout XBlock for rendering subblocks vertically.
     """
-
-    resources_dir = 'assets/vertical'
-
     mako_template = 'widgets/sequence-edit.html'
     js_module_name = "VerticalBlock"
 

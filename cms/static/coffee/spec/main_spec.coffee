@@ -1,5 +1,4 @@
-require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_helpers",
-         "jasmine-stealth", "jasmine-waituntil", "jquery.cookie"],
+require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_helpers", "jasmine-stealth", "jquery.cookie"],
 ($, Backbone, main, AjaxHelpers) ->
     describe "CMS", ->
         it "should initialize URL", ->
@@ -8,12 +7,8 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
     describe "main helper", ->
         beforeEach ->
             @previousAjaxSettings = $.extend(true, {}, $.ajaxSettings)
-            spyOn($, "cookie").and.callFake(
-              (param) ->
-                  if param == "csrftoken"
-                    return "stubCSRFToken"
-            )
-
+            spyOn($, "cookie")
+            $.cookie.when("csrftoken").thenReturn("stubCSRFToken")
             main()
 
         afterEach ->
@@ -26,15 +21,12 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect($.ajaxSettings.headers["X-CSRFToken"]).toEqual("stubCSRFToken")
 
     describe "AJAX Errors", ->
-        server = null
+
         beforeEach ->
             appendSetFixtures(sandbox({id: "page-notification"}))
 
-        afterEach ->
-            server && server.restore()
-
         it "successful AJAX request does not pop an error notification", ->
-            server = AjaxHelpers.server([200, {}, ''])
+            server = AjaxHelpers.server(this, [200, {}, ''])
 
             expect($("#page-notification")).toBeEmpty()
             $.ajax("/test")
@@ -43,15 +35,15 @@ require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_h
             expect($("#page-notification")).toBeEmpty()
 
         it "AJAX request with error should pop an error notification", ->
-            server = AjaxHelpers.server([500, {}, ''])
+            server = AjaxHelpers.server(this, [500, {}, ''])
 
             $.ajax("/test")
             server.respond()
             expect($("#page-notification")).not.toBeEmpty()
-            expect($("#page-notification")).toContainElement('div.wrapper-notification-error')
+            expect($("#page-notification")).toContain('div.wrapper-notification-error')
 
         it "can override AJAX request with error so it does not pop an error notification", ->
-            server = AjaxHelpers.server([500, {}, ''])
+            server = AjaxHelpers.server(this, [500, {}, ''])
 
             $.ajax
                 url: "/test"

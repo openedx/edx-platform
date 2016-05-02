@@ -1,6 +1,4 @@
 describe("CSS3 workarounds", function() {
-	'use strict';
-	var pointerEventsNone = window.pointerEventsNone;
 	describe("pointer-events", function() {
 		beforeEach(function() {
 			var html = "<a href='#' class='is-disabled'>What wondrous life in this I lead</a>";
@@ -23,7 +21,17 @@ describe("CSS3 workarounds", function() {
 		});
 
 		it("should prevent default when pointerEvents is not Supported", function() {
-			pointerEventsNone(".is-disabled", {});
+			// mock document.body.style so it does not include 'pointerEvents'
+			var mockBodyStyle = {},
+			    bodyStyleKeys = Object.keys(document.body.style);
+			for (var index = 0; index < bodyStyleKeys.length; index++) {
+				var key = bodyStyleKeys[index];
+				if (key !== "pointerEvents") {
+					mockBodyStyle[key] = document.body.style[key];
+				};
+			};
+
+			pointerEventsNone(".is-disabled", mockBodyStyle);
 			spyOnEvent(".is-disabled", "click");
 			$(".is-disabled").click();
 			expect("click").toHaveBeenPreventedOn(".is-disabled");

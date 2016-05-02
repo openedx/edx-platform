@@ -26,7 +26,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                 'click .action-cancel': 'cancel'
             },
 
-            options: _.extend({}, BaseView.prototype.options, {
+            options: $.extend({}, BaseView.prototype.options, {
                 type: 'prompt',
                 closeIcon: false,
                 icon: false,

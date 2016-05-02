@@ -1,7 +1,6 @@
 """
 Tests for wiki middleware.
 """
-from django.conf import settings
 from django.test.client import Client
 from nose.plugins.attrib import attr
 from wiki.models import URLPath
@@ -33,7 +32,7 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username='instructor', password='secret')
 
-    @with_comprehensive_theme(settings.REPO_ROOT / 'themes/red-theme')
+    @with_comprehensive_theme('red-theme')
     def test_themed_footer(self):
         """
         Tests that theme footer is used rather than standard

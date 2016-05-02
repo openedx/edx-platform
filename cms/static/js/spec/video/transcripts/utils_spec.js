@@ -2,7 +2,7 @@ define(
     [
         'jquery', 'underscore',
         'js/views/video/transcripts/utils',
-        'underscore.string', 'xmodule'
+        'underscore.string', 'xmodule', 'jasmine-jquery'
     ],
 function ($, _, Utils, _str) {
 'use strict';

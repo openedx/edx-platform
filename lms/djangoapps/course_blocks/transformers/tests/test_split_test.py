@@ -2,7 +2,6 @@
 Tests for SplitTestTransformer.
 """
 import ddt
-from nose.plugins.attrib import attr
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -15,7 +14,6 @@ from ..user_partitions import UserPartitionTransformer, _get_user_partition_grou
 from .helpers import CourseStructureTestCase, create_location
 
 
-@attr('shard_3')
 @ddt.ddt
 class SplitTestTransformerTestCase(CourseStructureTestCase):
     """

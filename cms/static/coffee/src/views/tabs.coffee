@@ -1,9 +1,9 @@
-define ["underscore", "jquery", "jquery.ui", "backbone", "common/js/components/views/feedback_prompt",
+define ["jquery", "jquery.ui", "backbone", "common/js/components/views/feedback_prompt",
         "common/js/components/views/feedback_notification", "coffee/src/views/module_edit", "js/models/module_info", "js/utils/module"],
-(_, $, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) ->
+($, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) ->
   class TabsEdit extends Backbone.View
 
-    initialize: (options) =>
+    initialize: =>
       @$('.component').each((idx, element) =>
           model = new ModuleModel({
               id: $(element).data('locator')
@@ -15,7 +15,7 @@ define ["underscore", "jquery", "jquery.ui", "backbone", "common/js/components/v
               model: model
           )
       )
-      @options = _.extend({}, options)
+
       @options.mast.find('.new-tab').on('click', @addNewTab)
       $('.add-pages .new-tab').on('click', @addNewTab)
       $('.toggle-checkbox').on('click', @toggleVisibilityOfTab)

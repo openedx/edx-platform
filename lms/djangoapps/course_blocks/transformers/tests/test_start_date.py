@@ -5,14 +5,12 @@ import ddt
 from datetime import timedelta
 from django.utils.timezone import now
 from mock import patch
-from nose.plugins.attrib import attr
 
 from courseware.tests.factories import BetaTesterFactory
 from ..start_date import StartDateTransformer, DEFAULT_START_DATE
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr('shard_3')
 @ddt.ddt
 class StartDateTransformerTestCase(BlockParentsMapTestCase):
     """

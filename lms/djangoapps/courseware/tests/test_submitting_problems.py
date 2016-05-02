@@ -316,7 +316,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         return [s.earned for s in hw_section['scores']]
 
 
-@attr('shard_3')
+@attr('shard_1')
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.

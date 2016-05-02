@@ -27,13 +27,13 @@
                 view = new FinishAuthView({});
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).and.callFake( function() {} );
+                spyOn( view, 'redirect' ).andCallFake( function() {} );
 
                 // Mock the enrollment and shopping cart interfaces
-                spyOn( EnrollmentInterface, 'enroll' ).and.callFake( function() {} );
-                spyOn( ShoppingCartInterface, 'addCourseToCart' ).and.callFake( function() {} );
+                spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
+                spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
                 spyOn( EmailOptInInterface, 'setPreference' )
-                    .and.callFake( function() { return {'always': function(r) { r(); }}; } );
+                    .andCallFake( function() { return {'always': function(r) { r(); }}; } );
 
                 view.render();
             };
@@ -45,7 +45,7 @@
              * should be prefixed with '?'
              */
             var setFakeQueryParams = function( params ) {
-                spyOn( $, 'url' ).and.callFake(function( requestedParam ) {
+                spyOn( $, 'url' ).andCallFake(function( requestedParam ) {
                     if ( params.hasOwnProperty(requestedParam) ) {
                         return params[requestedParam];
                     }

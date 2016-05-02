@@ -1,9 +1,11 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs/tags'
+    'js/edxnotes/views/tabs/tags', 'js/spec/edxnotes/custom_matchers',
+    'jasmine-jquery'
 ], function(
-    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, TagsView
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, TagsView,
+    customMatchers
 ) {
     'use strict';
     describe('EdxNotes TagsView', function() {
@@ -36,6 +38,7 @@ define([
         };
 
         beforeEach(function () {
+            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'

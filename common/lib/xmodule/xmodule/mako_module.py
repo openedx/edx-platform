@@ -59,7 +59,5 @@ class MakoModuleDescriptor(MakoTemplateBlockBase, XModuleDescriptor):  # pylint:
     """
     Mixin to use for XModule descriptors.
     """
-    resources_dir = None
-
     def get_html(self):
         return self.studio_view(None).content

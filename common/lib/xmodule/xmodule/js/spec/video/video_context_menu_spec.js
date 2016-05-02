@@ -6,6 +6,7 @@
 
         openMenu = function () {
             var container = $('.video');
+            jasmine.Clock.useMock();
             container.find('video').trigger('contextmenu');
             menu = container.children('.contextmenu');
             menuItems = menu.children('.menu-item').not('.submenu-item');
@@ -22,19 +23,19 @@
 
         openSubmenuMouse = function (menuSubmenuItem) {
             menuSubmenuItem.mouseover();
-            jasmine.clock().tick(200);
+            jasmine.Clock.tick(200);
             expect(menuSubmenuItem).toHaveClass('is-opened');
         };
 
         openSubmenuKeyboard = function (menuSubmenuItem, keyCode) {
             menuSubmenuItem.focus().trigger(keyPressEvent(keyCode || $.ui.keyCode.RIGHT));
             expect(menuSubmenuItem).toHaveClass('is-opened');
-            expect(menuSubmenuItem.children().last().children().first()).toBeFocused();
+            expect(menuSubmenuItem.children().first()).toBeFocused();
         };
 
         closeSubmenuMouse = function (menuSubmenuItem) {
             menuSubmenuItem.mouseleave();
-            jasmine.clock().tick(200);
+            jasmine.Clock.tick(200);
             expect(menuSubmenuItem).not.toHaveClass('is-opened');
         };
 
@@ -45,20 +46,20 @@
         };
 
         beforeEach(function () {
-            jasmine.clock().install();
             // $.cookie is mocked, make sure we have a state with an unmuted volume.
-            $.cookie.and.returnValue('100');
-            jasmine.addMatchers({
-                toHaveCorrectLabels: function () {
+            $.cookie.andReturn('100');
+            this.addMatchers({
+                toBeFocused: function () {
                     return {
-                        compare: function (actual, labelsList) {
-                            return {
-                              pass: _.difference(labelsList, _.map(actual, function (item) {
-                                        return $(item).text();
-                                    })).length === 0
-                            };
+                        compare: function (actual) {
+                            return { pass: $(actual)[0] === $(actual)[0].ownerDocument.activeElement };
                         }
                     };
+                },
+                toHaveCorrectLabels: function (labelsList) {
+                    return _.difference(labelsList, _.map(this.actual, function (item) {
+                        return $(item).text();
+                    })).length === 0;
                 }
             });
         });
@@ -68,7 +69,6 @@
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
             _.result(state.videoPlayer, 'destroy');
-            jasmine.clock().uninstall();
         });
 
         describe('constructor', function () {
@@ -89,7 +89,7 @@
                 */
 
                 // Only one context menu per video container
-                expect(menu).toBeInDOM();
+                expect(menu).toExist();
                 expect(menu).toHaveClass('is-opened');
                 expect(menuItems).toHaveCorrectLabels(['Play', 'Mute', 'Fill browser']);
                 expect(menuSubmenuItem.children('span')).toHaveText('Speed');
@@ -141,8 +141,8 @@
                     menuEvents = ['keydown', 'contextmenu', 'mouseleave', 'mouseover'];
 
                 menu.data('menu').destroy();
-                expect(menu).not.toBeInDOM();
-                expect(overlay).not.toBeInDOM();
+                expect(menu).not.toExist();
+                expect(overlay).not.toExist();
                 _.each(menuitemEvents, function (eventName) {
                     expect(menuItems.first()).not.toHandle(eventName);
                 })
@@ -177,7 +177,7 @@
 
             it('context menu opens', function () {
                 expect(menu).toHaveClass('is-opened');
-                expect(overlay).toBeInDOM();
+                expect(overlay).toExist();
             });
 
             it('mouseover and mouseleave behave as expected', function () {
@@ -193,25 +193,25 @@
                 // Left-click outside of open menu, for example on Play button
                 playButton.click();
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toBeInDOM();
+                expect(overlay).not.toExist();
             });
 
             it('mouse right-clicking outside of video will close it', function () {
                 // Right-click outside of open menu for example on Play button
                 playButton.trigger('contextmenu');
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toBeInDOM();
+                expect(overlay).not.toExist();
             });
 
             it('mouse right-clicking inside video but outside of context menu will not close it', function () {
-                spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
+                spyOn(menu.data('menu'), 'pointInContainerBox').andReturn(true);
                 overlay.trigger('contextmenu');
                 expect(menu).toHaveClass('is-opened');
-                expect(overlay).toBeInDOM();
+                expect(overlay).toExist();
             });
 
             it('mouse right-clicking inside video but outside of context menu will close submenus', function () {
-                spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
+                spyOn(menu.data('menu'), 'pointInContainerBox').andReturn(true);
                 openSubmenuMouse(menuSubmenuItem);
                 expect(menuSubmenuItem).toHaveClass('is-opened');
                 overlay.trigger('contextmenu');
@@ -221,12 +221,12 @@
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
                 spyOn(state.videoPlayer, 'isPlaying');
-                spyOn(state.videoPlayer, 'play').and.callFake(function () {
-                    state.videoPlayer.isPlaying.and.returnValue(true);
+                spyOn(state.videoPlayer, 'play').andCallFake(function () {
+                    state.videoPlayer.isPlaying.andReturn(true);
                     state.el.trigger('play');
                 });
-                spyOn(state.videoPlayer, 'pause').and.callFake(function () {
-                    state.videoPlayer.isPlaying.and.returnValue(false);
+                spyOn(state.videoPlayer, 'pause').andCallFake(function () {
+                    state.videoPlayer.isPlaying.andReturn(false);
                     state.el.trigger('pause');
                 });
                 // Left-click on play
@@ -238,7 +238,7 @@
                 menuItem.click();
                 expect(state.videoPlayer.pause).toHaveBeenCalled();
                 expect(menuItem).toHaveText('Play');
-                state.videoPlayer.play.calls.reset();
+                state.videoPlayer.play.reset();
                 // Right-click on play
                 menuItem.trigger('contextmenu');
                 expect(state.videoPlayer.play).toHaveBeenCalled();
@@ -355,14 +355,14 @@
             it('close the menu on ESCAPE keydown', function () {
                 menu.trigger(keyPressEvent($.ui.keyCode.ESCAPE));
                 expect(menu).not.toHaveClass('is-opened');
-                expect(overlay).not.toBeInDOM();
+                expect(overlay).not.toExist();
             });
 
             it('close the submenu on ESCAPE keydown', function () {
                 openSubmenuKeyboard(menuSubmenuItem);
                 menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.ESCAPE));
                 expect(menuSubmenuItem).not.toHaveClass('is-opened');
-                expect(overlay).not.toBeInDOM();
+                expect(overlay).not.toExist();
             });
 
             it('close the submenu on LEFT keydown on submenu items', function () {
@@ -395,9 +395,9 @@
 
                 menuItems.eq(0).trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuSubmenuItem).toBeFocused(); // Speed
+                menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.UP));
                 // Check if hidden item can be skipped correctly.
                 menuItems.eq(2).hide(); // hide Fullscreen item
-                menuSubmenuItem.trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuItems.eq(1)).toBeFocused(); // Mute
                 menuItems.eq(1).trigger(keyPressEvent($.ui.keyCode.UP));
                 expect(menuItems.eq(0)).toBeFocused(); // Play

@@ -44,28 +44,15 @@ class OAuth2PermissionDelegationTests(WebAppTest):
         assert self.oauth_page.visit()
         self.oauth_page.cancel()
 
-        def check_redirect():
-            """
-            Checks that the page correctly redirects to a url with a
-            denied query param.
-            """
-            query = self._qs(self.browser.current_url)
-            return 'access_denied' in query['error']
-
-        def check_redirect_chrome():
-            """
-            Similar to `check_redirect`, but, due to a bug in ChromeDriver,
-            we use `self.browser.title` here instead of `self.browser.current_url`
-            """
-            query = self._qs(self.browser.title)
-            return 'access_denied' in query['error']
-
         # This redirects to an invalid URI. For chrome verify title, current_url otherwise
         if self.browser.name == 'chrome':
-            self.oauth_page.wait_for(check_redirect_chrome, 'redirected to invalid URL (chrome)')
+            query = self._qs(self.browser.title)
+            self.assertIn('access_denied', query['error'])
         else:
-            self.oauth_page.wait_for(check_redirect, 'redirected to invalid URL')
+            query = self._qs(self.browser.current_url)
+            self.assertIn('access_denied', query['error'])
 
+    @flaky      # TODO, fix this: TNL-4190
     def test_accepting_redirects(self):
         """
         If you accept the request, you're redirected to the redirect_url with
@@ -76,34 +63,14 @@ class OAuth2PermissionDelegationTests(WebAppTest):
 
         # This redirects to an invalid URI.
         self.oauth_page.confirm()
-        self.oauth_page.wait_for_element_absence(
-            'input[name=authorize]', 'Authorization button is not present'
-        )
+        self.oauth_page.wait_for_element_absence('input[name=authorize]', 'Authorization button is not present')
 
-        def check_query_string():
-            """
-            Checks that 'code' appears in the browser's current url.
-            """
-            query = self._qs(self.browser.current_url)
-            return 'code' in query
-
-        def check_query_string_chrome():
-            """
-            Similar to check_query_string, but, due to a bug in ChromeDriver,
-            when chrome is on an invalid URI, `self.browser.current_url` outputs
-            "data:text/html,chromewebdata" instead of the current URI.
-
-            However, since the query string is present in the `title`, we use
-            that for chrome.
-            """
-            query = self._qs(self.browser.title)
-            return 'code' in query
-
+        # Due to a bug in ChromeDriver, when chrome is on invalid URI,self.browser.current_url outputs
+        # data:text/html,chromewebdata. When this happens in our case,query string is present in the title.
+        # So to get query string, we branch out based on selected browser.
         if self.browser.name == 'chrome':
-            self.oauth_page.wait_for(
-                check_query_string_chrome, 'redirected with correct query parameters (chrome)'
-            )
+            query = self._qs(self.browser.title)
         else:
-            self.oauth_page.wait_for(
-                check_query_string, 'redirected with correct query parameters'
-            )
+            query = self._qs(self.browser.current_url)
+
+        self.assertIn('code', query)

@@ -5,7 +5,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .and.returnValue(null);
+                .andReturn(null);
         });
 
         afterEach(function () {
@@ -18,25 +18,26 @@
         describe('constructor', function () {
             describe('on a non-touch based device', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').and.callThrough();
+                    spyOn($.fn, 'slider').andCallThrough();
 
                     state = jasmine.initializePlayer();
                 });
 
                 it('build the slider', function () {
-                    expect($('.slider')).toContain(state.videoProgressSlider.slider);
+                    expect(state.videoProgressSlider.slider).toBe('.slider');
                     expect($.fn.slider).toHaveBeenCalledWith({
                         range: 'min',
                         min: 0,
                         max: null,
+                        change: state.videoProgressSlider.onChange,
                         slide: state.videoProgressSlider.onSlide,
                         stop: state.videoProgressSlider.onStop
                     });
                 });
 
                 it('build the seek handle', function () {
-                    expect($('.ui-slider-handle'))
-                        .toContain(state.videoProgressSlider.handle);
+                    expect(state.videoProgressSlider.handle)
+                        .toBe('.slider .ui-slider-handle');
                 });
 
                 it('add ARIA attributes to time control', function () {
@@ -55,7 +56,7 @@
             describe('on a touch-based device', function () {
                 it('does not build the slider on iPhone', function () {
 
-                    window.onTouchBasedDevice.and.returnValue(['iPhone']);
+                    window.onTouchBasedDevice.andReturn(['iPhone']);
 
                     state = jasmine.initializePlayer();
 
@@ -66,7 +67,7 @@
                 });
                 $.each(['iPad', 'Android'], function (index, device) {
                     it('build the slider on ' + device, function () {
-                        window.onTouchBasedDevice.and.returnValue([device]);
+                        window.onTouchBasedDevice.andReturn([device]);
 
                         state = jasmine.initializePlayer();
 
@@ -86,12 +87,12 @@
 
                 beforeEach(function () {
                     spy = spyOn(state.videoProgressSlider, 'buildSlider');
-                    spy.and.callThrough();
+                    spy.andCallThrough();
                     state.videoPlayer.play();
                 });
 
                 it('does not build the slider', function () {
-                    expect(spy.calls.count()).toEqual(0);
+                    expect(spy.callCount).toEqual(0);
                 });
             });
 
@@ -105,7 +106,7 @@
 
             describe('when frozen', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').and.callThrough();
+                    spyOn($.fn, 'slider').andCallThrough();
                     state.videoProgressSlider.frozen = true;
                     state.videoProgressSlider.updatePlayTime(20, 120);
                 });
@@ -117,7 +118,7 @@
 
             describe('when not frozen', function () {
                 beforeEach(function () {
-                    spyOn($.fn, 'slider').and.callThrough();
+                    spyOn($.fn, 'slider').andCallThrough();
                     state.videoProgressSlider.frozen = false;
                     state.videoProgressSlider.updatePlayTime({
                         time: 20,
@@ -148,8 +149,8 @@
             beforeEach(function () {
                 state = jasmine.initializePlayer();
 
-                spyOn($.fn, 'slider').and.callThrough();
-                spyOn(state.videoPlayer, 'onSlideSeek').and.callThrough();
+                spyOn($.fn, 'slider').andCallThrough();
+                spyOn(state.videoPlayer, 'onSlideSeek').andCallThrough();
             });
 
             // Disabled 12/30/13 due to flakiness in master
@@ -174,15 +175,11 @@
         describe('onStop', function () {
 
             beforeEach(function () {
-                jasmine.clock().install();
+                jasmine.Clock.useMock();
 
                 state = jasmine.initializePlayer();
 
-                spyOn(state.videoPlayer, 'onSlideSeek').and.callThrough();
-            });
-
-            afterEach(function () {
-                jasmine.clock().uninstall();
+                spyOn(state.videoPlayer, 'onSlideSeek').andCallThrough();
             });
 
             // Disabled 12/30/13 due to flakiness in master
@@ -209,7 +206,7 @@
                     jQuery.Event('stop'), { value: 20 }
                 );
 
-                jasmine.clock().tick(200);
+                jasmine.Clock.tick(200);
 
                 expect(state.videoProgressSlider.frozen).toBeFalsy();
             });
@@ -258,7 +255,7 @@
 
                 spyOnEvent(state.videoProgressSlider.handle, 'focus');
                 spyOn(state.videoProgressSlider, 'notifyThroughHandleEnd')
-                    .and.callThrough();
+                    .andCallThrough();
             });
 
             it('params.end = true', function () {
@@ -283,14 +280,17 @@
                 );
             });
 
-            it('is called when video plays', function (done) {
+            it('is called when video plays', function () {
                 state.videoPlayer.play();
-                jasmine.waitUntil(function() {
-                    return state.videoPlayer.isPlaying();
-                }).done(function() {
-                    expect(state.videoProgressSlider.notifyThroughHandleEnd).toHaveBeenCalledWith({end: false});
-                }).always(done);
 
+                waitsFor(function () {
+                    return state.videoPlayer.isPlaying();
+                }, 'duration is set, video is playing', 5000);
+
+                runs(function () {
+                    expect(state.videoProgressSlider.notifyThroughHandleEnd)
+                        .toHaveBeenCalledWith({end: false});
+                });
             });
         });
 

@@ -108,7 +108,11 @@
         // "vjs.youtube": "unknown"
     },
     "devDependencies": {
+        // "jasmine": "unknown",
+        "jasmine.async": "0.1.0",
         "jasmine-imagediff": "1.0.3",
+        "jasmine-jquery": "1.5.1",
+        "jasmine-stealth": "0.0.12",
         // "jquery.simulate": "unknown",
         // "mock-ajax": "unknown",
         "sinon": "1.17.0"

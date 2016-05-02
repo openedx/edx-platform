@@ -30,7 +30,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce.utils import audit_log, EcommerceService
+from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
@@ -338,10 +338,7 @@ class PayAndVerifyView(View):
             already_verified,
             already_paid,
             is_enrolled,
-            course_key,
-            user_is_trying_to_pay,
-            request.user,
-            relevant_course_mode.sku
+            course_key
         )
         if redirect_response is not None:
             return redirect_response
@@ -432,8 +429,12 @@ class PayAndVerifyView(View):
         return render_to_response("verify_student/pay_and_verify.html", context)
 
     def _redirect_if_necessary(
-        self, message, already_verified, already_paid, is_enrolled, course_key,  # pylint: disable=bad-continuation
-        user_is_trying_to_pay, user, sku  # pylint: disable=bad-continuation
+        self,
+        message,
+        already_verified,
+        already_paid,
+        is_enrolled,
+        course_key
     ):
         """Redirect the user to a more appropriate page if necessary.
 
@@ -491,13 +492,6 @@ class PayAndVerifyView(View):
                     url = reverse('verify_student_verify_now', kwargs=course_kwargs)
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
-
-        if user_is_trying_to_pay and user.is_active:
-            # IIf the user is trying to pay, has activated their account, and the ecommerce service
-            # is enabled redirect him to the ecommerce checkout page.
-            ecommerce_service = EcommerceService()
-            if ecommerce_service.is_enabled(user):
-                url = ecommerce_service.checkout_page_url(sku)
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:

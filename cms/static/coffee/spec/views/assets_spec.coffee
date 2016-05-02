@@ -1,25 +1,25 @@
-define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
-($, AjaxHelpers, Squire) ->
+define ["jquery", "jasmine", "common/js/spec_helpers/ajax_helpers", "squire"],
+($, jasmine, AjaxHelpers, Squire) ->
 
     assetLibraryTpl = readFixtures('asset-library.underscore')
     assetTpl = readFixtures('asset.underscore')
 
     describe "Asset view", ->
-        beforeEach (done) ->
+        beforeEach ->
             setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
             appendSetFixtures(sandbox({id: "page-prompt"}))
 
             @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.and.returnValue(@promptSpies)
-            @promptSpies.show.and.returnValue(@promptSpies)
+            @promptSpies.constructor.andReturn(@promptSpies)
+            @promptSpies.show.andReturn(@promptSpies)
 
             @confirmationSpies = jasmine.createSpyObj('Notification.Confirmation', ["constructor", "show"])
-            @confirmationSpies.constructor.and.returnValue(@confirmationSpies)
-            @confirmationSpies.show.and.returnValue(@confirmationSpies)
+            @confirmationSpies.constructor.andReturn(@confirmationSpies)
+            @confirmationSpies.show.andReturn(@confirmationSpies)
 
             @savingSpies = jasmine.createSpyObj('Notification.Mini', ["constructor", "show", "hide"])
-            @savingSpies.constructor.and.returnValue(@savingSpies)
-            @savingSpies.show.and.returnValue(@savingSpies)
+            @savingSpies.constructor.andReturn(@savingSpies)
+            @savingSpies.show.andReturn(@savingSpies)
 
             @injector = new Squire()
             @injector.mock("common/js/components/views/feedback_prompt", {
@@ -29,8 +29,8 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 "Confirmation": @confirmationSpies.constructor,
                 "Mini": @savingSpies.constructor
             })
-
-            @injector.require ["js/models/asset", "js/collections/asset", "js/views/asset"],
+            runs =>
+                @injector.require ["js/models/asset", "js/collections/asset", "js/views/asset"],
                 (AssetModel, AssetCollection, AssetView) =>
                     @model = new AssetModel
                         display_name: "test asset"
@@ -39,8 +39,8 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                         date_added: 'date'
                         thumbnail: null
                         id: 'id'
-                    spyOn(@model, "destroy").and.callThrough()
-                    spyOn(@model, "save").and.callThrough()
+                    spyOn(@model, "destroy").andCallThrough()
+                    spyOn(@model, "save").andCallThrough()
 
                     @collection = new AssetCollection([@model])
                     @collection.url = "assets-url"
@@ -48,7 +48,8 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                         view = new AssetView({model: @model})
                         requests = if test then AjaxHelpers["requests"](test) else null
                         return {view: view, requests: requests}
-                    done()
+
+            waitsFor (=> @createAssetView), "AssetsView Creation function was not initialized", 1000
 
         afterEach ->
             @injector.clean()
@@ -64,7 +65,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView()
                 @view.render().$(".remove-asset-button").click()
                 expect(@promptSpies.constructor).toHaveBeenCalled()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
+                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 expect(ctorOptions.title).toMatch('Delete File Confirmation')
                 # hasn't actually been removed
                 expect(@model.destroy).not.toHaveBeenCalled()
@@ -75,7 +76,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
+                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
@@ -87,7 +88,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 requests[0].respond(200)
                 expect(@confirmationSpies.constructor).toHaveBeenCalled()
                 expect(@confirmationSpies.show).toHaveBeenCalled()
-                savingOptions = @confirmationSpies.constructor.calls.mostRecent().args[0]
+                savingOptions = @confirmationSpies.constructor.mostRecentCall.args[0]
                 expect(savingOptions.title).toMatch("Your file has been deleted.")
                 expect(@collection.contains(@model)).toBeFalsy()
 
@@ -95,7 +96,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetView(this)
 
                 @view.render().$(".remove-asset-button").click()
-                ctorOptions = @promptSpies.constructor.calls.mostRecent().args[0]
+                ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
@@ -114,7 +115,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(requests.length).toEqual(1)
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
-                savingOptions = @savingSpies.constructor.calls.mostRecent().args[0]
+                savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
                 expect(savingOptions.title).toMatch("Saving")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
@@ -133,7 +134,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 expect(@model.get("locked")).toBeFalsy()
 
     describe "Assets view", ->
-        beforeEach (done) ->
+        beforeEach ->
             setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
             appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
@@ -141,8 +142,8 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
             appendSetFixtures(sandbox({id: "asset_table_body"}))
 
             @promptSpies = jasmine.createSpyObj('Prompt.Warning', ["constructor", "show", "hide"])
-            @promptSpies.constructor.and.returnValue(@promptSpies)
-            @promptSpies.show.and.returnValue(@promptSpies)
+            @promptSpies.constructor.andReturn(@promptSpies)
+            @promptSpies.show.andReturn(@promptSpies)
 
             @injector = new Squire()
             @injector.mock("common/js/components/views/feedback_prompt", {
@@ -174,7 +175,8 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 totalCount: 2
             }
 
-            @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
+            runs =>
+                @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
                 (AssetModel, AssetCollection, AssetsView) =>
                     @AssetModel = AssetModel
                     @collection = new AssetCollection();
@@ -186,7 +188,9 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                             el: $('#asset_table_body')
                         view.render()
                         return {view: view, requests: requests}
-                    done()
+
+
+            waitsFor (=> @createAssetsView), "AssetsView Creation function was not initialized", 2000
 
             $.ajax()
 
@@ -290,7 +294,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 setup.call(this, requests)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
+                @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
                 AjaxHelpers.respondWithNoContent(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
@@ -300,7 +304,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 setup.call(this, requests)
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
-                @promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(@promptSpies)
+                @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
                 AjaxHelpers.respondWithError(requests)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
@@ -315,7 +319,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
             it "does not add an asset if asset already exists", ->
                 {view: @view, requests: requests} = @createAssetsView(this)
                 setup.call(this, requests)
-                spyOn(@collection, "add").and.callThrough()
+                spyOn(@collection, "add").andCallThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)
                 expect(@collection.add).not.toHaveBeenCalled()

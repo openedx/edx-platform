@@ -108,9 +108,8 @@ class DiscussionModule(DiscussionFields, XModule):
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
-    module_class = DiscussionModule
-    resources_dir = None
 
+    module_class = DiscussionModule
     # The discussion XML format uses `id` and `for` attributes,
     # but these would overload other module attributes, so we prefix them
     # for actual use in the code

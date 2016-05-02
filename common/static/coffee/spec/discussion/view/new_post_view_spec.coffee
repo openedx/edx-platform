@@ -4,7 +4,7 @@ describe "NewPostView", ->
         DiscussionSpecHelper.setUpGlobals()
         DiscussionSpecHelper.setUnderscoreFixtures()
         window.$$course_id = "edX/999/test"
-        spyOn(DiscussionUtil, "makeWmdEditor").and.callFake(
+        spyOn(DiscussionUtil, "makeWmdEditor").andCallFake(
           ($content, $local, cls_identifier) ->
             $local("." + cls_identifier).html("<textarea></textarea>")
         )
@@ -91,7 +91,7 @@ describe "NewPostView", ->
             @view.$(".js-post-body textarea").val("dummy body")
             @view.$(".forum-new-post-form").submit()
             expect($.ajax).toHaveBeenCalled()
-            $.ajax.calls.reset()
+            $.ajax.reset()
         )
 
     describe "always cohort inline discussions ", ->
@@ -209,7 +209,7 @@ describe "NewPostView", ->
 
     it "posts to the correct URL", ->
       topicId = "test_topic"
-      spyOn($, "ajax").and.callFake(
+      spyOn($, "ajax").andCallFake(
         (params) ->
           expect(params.url.path()).toEqual(DiscussionUtil.urlFor("create_thread", topicId))
           {always: ->}

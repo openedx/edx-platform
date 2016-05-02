@@ -111,10 +111,8 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         token_resp = self.client.post('/oauth2/access_token/', data=token_data)
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
         token_resp_json = json.loads(token_resp.content)
-        return '{token_type} {token}'.format(
-            token_type=token_resp_json['token_type'],
-            token=token_resp_json['access_token']
-        )
+        self.assertIn('access_token', token_resp_json)
+        return 'Bearer {0}'.format(token_resp_json.get('access_token'))
 
     def expect_error(self, http_code, error_code_str, resp_obj):
         """

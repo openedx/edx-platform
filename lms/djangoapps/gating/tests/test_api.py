@@ -2,7 +2,6 @@
 Unit tests for gating.signals module
 """
 from mock import patch
-from nose.plugins.attrib import attr
 from ddt import ddt, data, unpack
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -115,7 +114,6 @@ class TestGetXBlockParent(GatingTestCase):
         self.assertIsNone(result)
 
 
-@attr('shard_3')
 @ddt
 class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """

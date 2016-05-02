@@ -279,7 +279,9 @@ class CourseExportManager(ExportManager):
             policy = {'course/' + courselike.location.name: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
-        _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
+        # xml backed courses don't support drafts!
+        if courselike.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
+            _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
 
 class LibraryExportManager(ExportManager):
