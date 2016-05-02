@@ -235,6 +235,10 @@ class Rules(Enum):
         'mako-html-entities',
         "HTML entities should be plain text or wrapped with HTML()."
     )
+    mako_unknown_context = (
+        'mako-unknown-context',
+        "The context could not be determined."
+    )
     underscore_not_escaped = (
         'underscore-not-escaped',
         'Expressions should be escaped using <%- expression %>.'
@@ -613,7 +617,7 @@ class FileResults(object):
 
         Arguments:
             options: A list of the following options:
-                is_quiet: True to print only file names, and False to print
+                list_files: True to print only file names, and False to print
                     all violations.
             out: output file
 
@@ -623,7 +627,7 @@ class FileResults(object):
 
         """
         num_violations = 0
-        if options['is_quiet']:
+        if options['list_files']:
             if self.violations is not None and 0 < len(self.violations):
                 num_violations += 1
                 print(self.full_path, file=out)
@@ -1727,6 +1731,12 @@ class MakoTemplateLinter(BaseLinter):
             results: A list of results into which violations will be added.
 
         """
+        if context == 'unknown':
+            results.violations.append(ExpressionRuleViolation(
+                Rules.mako_unknown_context, expression
+            ))
+            return
+
         # Example: finds "| n, h}" when given "${x | n, h}"
         filters_regex = re.compile(r'\|([.,\w\s]*)\}')
         filters_match = filters_regex.search(expression.expression)
@@ -1851,15 +1861,25 @@ class MakoTemplateLinter(BaseLinter):
                 - index: the index of the context.
                 - type: the context type (e.g. 'html' or 'javascript').
         """
-        contexts_re = re.compile(r"""
-            <script.*?>|  # script tag start
-            </script>|  # script tag end
-            <%static:require_module.*?>|  # require js script tag start
-            </%static:require_module>  # require js script tag end""", re.VERBOSE | re.IGNORECASE)
+        contexts_re = re.compile(
+            r"""
+                <script.*?> |  # script tag start
+                </script> |  # script tag end
+                <%static:require_module.*?> |  # require js script tag start
+                </%static:require_module> | # require js script tag end
+                <%block[ ]*name=['"]requirejs['"]\w*> |  # require js tag start
+                </%block>  # require js tag end
+            """,
+            re.VERBOSE | re.IGNORECASE
+        )
         media_type_re = re.compile(r"""type=['"].*?['"]""", re.IGNORECASE)
 
         contexts = [{'index': 0, 'type': 'html'}]
-        javascript_types = ['text/javascript', 'text/ecmascript', 'application/ecmascript', 'application/javascript']
+        javascript_types = [
+            'text/javascript', 'text/ecmascript', 'application/ecmascript', 'application/javascript',
+            'text/x-mathjax-config', 'json/xblock-args'
+        ]
+        html_types = ['text/template']
         for context in contexts_re.finditer(mako_template):
             match_string = context.group().lower()
             if match_string.startswith("<script"):
@@ -1869,18 +1889,15 @@ class MakoTemplateLinter(BaseLinter):
                     # get media type (e.g. get text/javascript from
                     # type="text/javascript")
                     match_type = match_type.group()[6:-1].lower()
-                    if match_type not in javascript_types:
-                        # TODO: What are other types found, and are these really
-                        # html?  Or do we need to properly handle unknown
-                        # contexts? Only "text/template" is a known alternative.
+                    if match_type in html_types:
                         context_type = 'html'
+                    elif match_type not in javascript_types:
+                        context_type = 'unknown'
                 contexts.append({'index': context.end(), 'type': context_type})
-            elif match_string.startswith("</script"):
+            elif match_string.startswith("</"):
                 contexts.append({'index': context.start(), 'type': 'html'})
-            elif match_string.startswith("<%static:require_module"):
-                contexts.append({'index': context.end(), 'type': 'javascript'})
             else:
-                contexts.append({'index': context.start(), 'type': 'html'})
+                contexts.append({'index': context.end(), 'type': 'javascript'})
 
         return contexts
 
@@ -2326,33 +2343,33 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description='Checks that templates are safe.',
-        epilog=epilog
+        epilog=epilog,
     )
     parser.add_argument(
-        '--quiet', dest='quiet', action='store_true', help='only display the filenames that contain violations'
+        '--list-files', dest='list_files', action='store_true',
+        help='Only display the filenames that contain violations.'
     )
-    parser.add_argument('--file', dest='file', nargs=1, default=None, help='a single file to lint')
-    parser.add_argument(
-        '--dir', dest='directory', nargs=1, default=['.'], help='the directory to lint (including sub-directories)'
-    )
+    parser.add_argument('path', nargs="?", default=None, help='A file to lint or directory to recursively lint.')
 
     args = parser.parse_args()
 
     options = {
-        'is_quiet': args.quiet,
+        'list_files': args.list_files,
     }
-
     template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()]
-    if args.file is not None:
-        if os.path.isfile(args.file[0]) is False:
-            raise ValueError("File [{}] is not a valid file.".format(args.file[0]))
-        num_violations = _process_file(args.file[0], template_linters, options, out=sys.stdout)
-    else:
-        if os.path.exists(args.directory[0]) is False or os.path.isfile(args.directory[0]) is True:
-            raise ValueError("Directory [{}] is not a valid directory.".format(args.directory[0]))
-        num_violations = _process_os_walk(args.directory[0], template_linters, options, out=sys.stdout)
 
-    if options['is_quiet'] is False:
+    if args.path is not None and os.path.isfile(args.path):
+        num_violations = _process_file(args.path, template_linters, options, out=sys.stdout)
+    else:
+        directory = "."
+        if args.path is not None:
+            if os.path.exists(args.path):
+                directory = args.path
+            else:
+                raise ValueError("Path [{}] is not a valid file or directory.".format(args.path))
+        num_violations = _process_os_walk(directory, template_linters, options, out=sys.stdout)
+
+    if options['list_files'] is False:
         # matches output of jshint for simplicity
         print("")
         print("{} violations found".format(num_violations))

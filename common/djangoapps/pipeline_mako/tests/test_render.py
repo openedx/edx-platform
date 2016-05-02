@@ -1,3 +1,4 @@
+
 """ Tests for rendering functions in the mako pipeline. """
 
 import ddt
@@ -15,7 +16,7 @@ class RequireJSPathOverridesTest(TestCase):
 
     OVERRIDES = {
         'jquery': 'common/js/vendor/jquery.js',
-        'backbone': 'common/js/vendor/backbone-min.js',
+        'backbone': 'common/js/vendor/backbone.js',
         'text': 'js/vendor/text.js'
     }
 
@@ -26,7 +27,7 @@ class RequireJSPathOverridesTest(TestCase):
         "paths: {",
         "'jquery': 'common/js/vendor/jquery',",
         "'text': 'js/vendor/text',",
-        "'backbone': 'common/js/vendor/backbone-min'",
+        "'backbone': 'common/js/vendor/backbone'",
         "}",
         "});",
         "}).call(this, require || RequireJS.require);",

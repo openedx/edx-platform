@@ -1,7 +1,6 @@
 /* JavaScript for Vertical Student View. */
 window.VerticalStudentView = function (runtime, element) {
-
-    'use strict';
+    "use strict";
     RequireJS.require(['js/bookmarks/views/bookmark_button'], function (BookmarkButton) {
         var $element = $(element);
         var $bookmarkButtonElement = $element.find('.bookmark-button');

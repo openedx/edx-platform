@@ -5,6 +5,8 @@ End-to-end tests for the LMS.
 
 import json
 from nose.plugins.attrib import attr
+from datetime import datetime, timedelta
+import ddt
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from ..helpers import UniqueCourseTest, EventsTestMixin
@@ -98,7 +100,7 @@ class CoursewareTest(UniqueCourseTest):
         self.course_outline.visit()
 
         # Set release date for subsection in future.
-        self.course_outline.change_problem_release_date_in_studio()
+        self.course_outline.change_problem_release_date()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -127,6 +129,7 @@ class CoursewareTest(UniqueCourseTest):
             self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
+@ddt.ddt
 class ProctoredExamTest(UniqueCourseTest):
     """
     Test courseware.
@@ -246,7 +249,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
 
-    def test_timed_exam_flow(self):
+    @ddt.data(True, False)
+    def test_timed_exam_flow(self, hide_after_due):
         """
         Given that I am a staff member on the exam settings section
         select advanced settings tab
@@ -255,6 +259,12 @@ class ProctoredExamTest(UniqueCourseTest):
         And visit the courseware as a verified student.
         And I start the timed exam
         Then I am taken to the exam with a timer bar showing
+        When I finish the exam
+        Then I see the exam submitted dialog in place of the exam
+        When I log back into studio as a staff member
+        And change the problem's due date to be in the past
+        And log back in as the original verified student
+        Then I see the exam or message in accordance with the hide_after_due setting
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -262,7 +272,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.course_outline.open_subsection_settings_dialog()
 
         self.course_outline.select_advanced_tab()
-        self.course_outline.make_exam_timed()
+        self.course_outline.make_exam_timed(hide_after_due=hide_after_due)
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
@@ -271,14 +281,32 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.start_timed_exam()
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
-    def test_time_allotted_field_is_not_visible_with_none_exam(self):
+        self.courseware_page.stop_timed_exam()
+        self.assertTrue(self.courseware_page.has_submitted_exam_message())
+
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
+        self.course_outline.change_problem_due_date(last_week)
+
+        LogoutPage(self.browser).visit()
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_page.visit()
+        self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
+
+    def test_field_visiblity_with_all_exam_types(self):
         """
         Given that I am a staff member
         And I have visited the course outline page in studio.
         And the subsection edit dialog is open
         select advanced settings tab
-        When I select the 'None' exams radio button
-        Then the time allotted text field becomes invisible
+        For each of None, Timed, Proctored, and Practice exam types
+        The time allotted, review rules, and hide after due fields have proper visibility
+        None: False, False, False
+        Timed: True, False, True
+        Proctored: True, True, False
+        Practice: True, False, False
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -289,111 +317,23 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.course_outline.select_none_exam()
         self.assertFalse(self.course_outline.time_allotted_field_visible())
-
-    def test_time_allotted_field_is_visible_with_timed_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the timed exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_timed_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
-
-    def test_time_allotted_field_is_visible_with_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the proctored exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertTrue(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
-
-    def test_exam_review_rules_field_is_visible_with_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the proctored exams radio button
-        Then the review rules textarea field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
-
-        self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.exam_review_rules_field_visible())
-
-    def test_exam_review_rules_field_is_not_visible_with_other_than_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the timed exams radio button
-        Then the review rules textarea field is not visible
-        When I select the none exam radio button
-        Then the review rules textarea field is not visible
-        When I select the practice exam radio button
-        Then the review rules textarea field is not visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
-
-        self.course_outline.select_timed_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-        self.course_outline.select_none_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-        self.course_outline.select_practice_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-    def test_time_allotted_field_is_visible_with_practice_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the practice exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_practice_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
 
 class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):

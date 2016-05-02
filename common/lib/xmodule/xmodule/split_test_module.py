@@ -376,6 +376,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
 
+    resources_dir = 'assets/split_test'
+
     filename_extension = "xml"
 
     mako_template = "widgets/metadata-only-edit.html"

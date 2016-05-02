@@ -82,6 +82,19 @@ class TestSafeTemplateLinter(TestCase):
     Test some top-level linter functions
     """
 
+    def patch_is_valid_directory(self, linter_class):
+        """
+        Creates a mock patch for _is_valid_directory on a Linter to always
+        return true. This avoids nested patch calls.
+
+        Arguments:
+            linter_class: The linter class to be patched
+        """
+        patcher = mock.patch.object(linter_class, '_is_valid_directory', return_value=True)
+        patch_start = patcher.start()
+        self.addCleanup(patcher.stop)
+        return patch_start
+
     def test_process_os_walk(self):
         """
         Tests the top-level processing of template files, including Mako
@@ -90,24 +103,27 @@ class TestSafeTemplateLinter(TestCase):
         out = StringIO()
 
         options = {
-            'is_quiet': False,
+            'list_files': False,
         }
 
-        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter()]
+        template_linters = [MakoTemplateLinter(), JavaScriptLinter(), UnderscoreTemplateLinter(), PythonLinter()]
 
-        with mock.patch.object(MakoTemplateLinter, '_is_valid_directory', return_value=True):
-            with mock.patch.object(JavaScriptLinter, '_is_valid_directory', return_value=True):
-                with mock.patch.object(UnderscoreTemplateLinter, '_is_valid_directory', return_value=True):
-                    num_violations = _process_os_walk('scripts/tests/templates', template_linters, options, out)
+        self.patch_is_valid_directory(MakoTemplateLinter)
+        self.patch_is_valid_directory(JavaScriptLinter)
+        self.patch_is_valid_directory(UnderscoreTemplateLinter)
+        self.patch_is_valid_directory(PythonLinter)
+
+        num_violations = _process_os_walk('scripts/tests/templates', template_linters, options, out)
 
         output = out.getvalue()
-        self.assertEqual(num_violations, 6)
+        self.assertEqual(num_violations, 7)
         self.assertIsNotNone(re.search('test\.html.*mako-missing-default', output))
         self.assertIsNotNone(re.search('test\.coffee.*javascript-concat-html', output))
         self.assertIsNotNone(re.search('test\.coffee.*underscore-not-escaped', output))
         self.assertIsNotNone(re.search('test\.js.*javascript-concat-html', output))
         self.assertIsNotNone(re.search('test\.js.*underscore-not-escaped', output))
         self.assertIsNotNone(re.search('test\.underscore.*underscore-not-escaped', output))
+        self.assertIsNotNone(re.search('test\.py.*python-interpolate-html', output))
 
 
 @ddt
@@ -448,9 +464,38 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
+            ## switch to JavaScript context
             <script>
                 {expression}
             </script>
+            ## switch back to HTML context
+            ${{x}}
+        """.format(expression=data['expression']))
+
+        linter._check_mako_file_is_safe(mako_template, results)
+
+        self._validate_data_rules(data, results)
+
+    @data(
+        {'expression': '${x}', 'rule': Rules.mako_invalid_js_filter},
+        {'expression': '"${x | n, js_escaped_string}"', 'rule': None},
+    )
+    def test_check_mako_expressions_in_require_module(self, data):
+        """
+        Test _check_mako_file_is_safe in JavaScript require context provides
+        appropriate violations
+        """
+        linter = MakoTemplateLinter()
+        results = FileResults('')
+
+        mako_template = textwrap.dedent("""
+            <%page expression_filter="h"/>
+            ## switch to JavaScript context (after next line)
+            <%static:require_module module_name="${{x}}" class_name="TestFactory">
+                {expression}
+            </%static:require_module>
+            ## switch back to HTML context
+            ${{x}}
         """.format(expression=data['expression']))
 
         linter._check_mako_file_is_safe(mako_template, results)
@@ -463,7 +508,7 @@ class TestMakoTemplateLinter(TestLinter):
     )
     def test_check_mako_expressions_in_require_js(self, data):
         """
-        Test _check_mako_file_is_safe in JavaScript require context provides
+        Test _check_mako_file_is_safe in JavaScript require js context provides
         appropriate violations
         """
         linter = MakoTemplateLinter()
@@ -471,9 +516,12 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
-            <%static:require_module module_name="${{x}}" class_name="TestFactory">
+            # switch to JavaScript context
+            <%block name="requirejs">
                 {expression}
-            </%static:require_module>
+            </%block>
+            ## switch back to HTML context
+            ${{x}}
         """.format(expression=data['expression']))
 
         linter._check_mako_file_is_safe(mako_template, results)
@@ -481,12 +529,14 @@ class TestMakoTemplateLinter(TestLinter):
         self._validate_data_rules(data, results)
 
     @data(
-        {'media_type': 'text/javascript', 'expected_violations': 0},
-        {'media_type': 'text/ecmascript', 'expected_violations': 0},
-        {'media_type': 'application/ecmascript', 'expected_violations': 0},
-        {'media_type': 'application/javascript', 'expected_violations': 0},
-        {'media_type': 'text/template', 'expected_violations': 1},
-        {'media_type': 'unknown/type', 'expected_violations': 1},
+        {'media_type': 'text/javascript', 'rule': None},
+        {'media_type': 'text/ecmascript', 'rule': None},
+        {'media_type': 'application/ecmascript', 'rule': None},
+        {'media_type': 'application/javascript', 'rule': None},
+        {'media_type': 'text/x-mathjax-config', 'rule': None},
+        {'media_type': 'json/xblock-args', 'rule': None},
+        {'media_type': 'text/template', 'rule': Rules.mako_invalid_html_filter},
+        {'media_type': 'unknown/type', 'rule': Rules.mako_unknown_context},
     )
     def test_check_mako_expressions_in_script_type(self, data):
         """
@@ -497,14 +547,17 @@ class TestMakoTemplateLinter(TestLinter):
 
         mako_template = textwrap.dedent("""
             <%page expression_filter="h"/>
+            # switch to JavaScript context
             <script type="{}">
                 ${{x | n, dump_js_escaped_json}}
             </script>
+            ## switch back to HTML context
+            ${{x}}
         """).format(data['media_type'])
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), data['expected_violations'])
+        self._validate_data_rules(data, results)
 
     def test_check_mako_expressions_in_mixed_contexts(self):
         """

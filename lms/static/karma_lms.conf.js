@@ -61,7 +61,7 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/src/**/*.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.string.js', included: false},
-    {pattern: 'xmodule_js/common_static/common/js/vendor/backbone-min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/backbone.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/backbone.paginator.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: false},
@@ -73,7 +73,8 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
     {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js', included: true},
-    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true}
+    {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true},
+    {pattern: 'common/js/utils/require-serial.js', included: true}
 ];
 
 // Paths to source JavaScript files
@@ -117,7 +118,8 @@ var fixtureFiles = [
     {pattern: 'support/templates/**/*.*', included: false},
     {pattern: 'templates/bookmarks/**/*.*', included: false},
     {pattern: 'templates/learner_dashboard/**/*.*', included: false},
-    {pattern: 'templates/ccx/**/*.*', included: false}
+    {pattern: 'templates/ccx/**/*.*', included: false},
+    {pattern: 'templates/commerce/receipt.underscore', included: false}
 ];
 
 // override fixture path and other config.

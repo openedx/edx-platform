@@ -34,7 +34,7 @@
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
-            'backbone': 'xmodule_js/common_static/common/js/vendor/backbone-min',
+            'backbone': 'xmodule_js/common_static/common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
@@ -99,6 +99,7 @@
             'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
             'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
             'js/views/message_banner': 'js/views/message_banner',
+            'js/commerce/views/receipt_view': 'js/commerce/views/receipt_view',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
@@ -322,6 +323,10 @@
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
+            },
+            'js/commerce/views/receipt_view': {
+                exports: 'edx.commerce.ReceiptView',
+                deps: ['jquery', 'backbone', 'underscore', 'string_utils']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -777,14 +782,17 @@
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
-        'js/spec/learner_dashboard/certificate_view_spec.js'
+        'js/spec/learner_dashboard/certificate_view_spec.js',
+        'js/spec/commerce/receipt_spec.js'
     ];
 
     for (var i = 0; i < testFiles.length; i++) {
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    require(testFiles, function () {
+    // Jasmine has a global stack for creating a tree of specs. We need to load
+    // spec files one by one, otherwise some end up getting nested under others.
+    window.requireSerial(testFiles, function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });

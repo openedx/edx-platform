@@ -28,7 +28,7 @@
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
-            'backbone': 'common/js/vendor/backbone-min',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
@@ -181,7 +181,7 @@
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    require(testFiles, function () {
+    window.requireSerial(testFiles, function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });

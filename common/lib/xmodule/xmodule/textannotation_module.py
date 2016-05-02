@@ -147,6 +147,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Text Annotation Descriptor '''
     module_class = TextAnnotationModule
+    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

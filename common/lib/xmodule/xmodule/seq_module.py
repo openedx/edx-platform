@@ -97,6 +97,16 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    hide_after_due = Boolean(
+        display_name=_("Hide Exam Results After Due Date"),
+        help=_(
+            "This setting overrides the default behavior of showing exam results after the due date has passed."
+            " Currently only supported for timed exams."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     is_practice_exam = Boolean(
         display_name=_("Is Practice Exam"),
         help=_(
@@ -392,6 +402,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    resources_dir = None
 
     show_in_read_only_mode = True
 
