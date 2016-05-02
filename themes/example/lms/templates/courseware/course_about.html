@@ -1,0 +1,540 @@
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import get_course_about_section
+from django.conf import settings
+from edxmako.shortcuts import marketing_link
+from openedx.core.lib.courses import course_image_url
+%>
+
+<%inherit file="../main.html" />
+<%block name="headextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('css/slick.css')}"/>
+  ## OG (Open Graph) title and description added below to give social media info to display
+  ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+  <meta property="og:title" content="${course.display_name_with_default_escaped}" />
+  <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
+</%block>
+
+
+<%block name="js_extra">
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
+  % endif
+  <script type="text/javascript">
+  (function() {
+
+    // Third party code for conversion of tabs
+    $('.tabcordion ul').children('li').first().children('a').addClass('active').next().addClass('is-open').show();
+    $('.tabcordion ul').on('click', 'li > a', function () {
+      if (!$(this).hasClass('active')) {
+        $('.tabcordion ul .is-open').removeClass('is-open').hide();
+        $(this).next().toggleClass('is-open').toggle();
+        $('.tabcordion ul').find('.active').removeClass('active');
+        $(this).addClass('active');
+      } else {
+        $('.tabcordion ul .is-open').removeClass('is-open').hide();
+        $(this).removeClass('active');
+      }
+    });
+
+    // conversion of about site links into swipe on mobile resolution
+    $(".about-container").html( $("#about-content").html());
+    addSlider();
+
+    // Truncating the Course Description
+    var description_content = $(".course-description").html();        //replace course description from the context
+    if (description_content.length > 500){
+      $(".course-description").html(description_content.substring(0, description_content.indexOf(" ", 500)) + '... <a id="description_show" href="#" class="brand-link">See More</a>');
+    }
+    $("#description_show").click(function(event){
+      $(".course-description").html(description_content);
+      event.preventDefault();
+    });
+
+    // Truncating the Course learning points
+    var learning_content = $(".course-learning .list-bulleted").html(),
+        learning_points_count = $(".course-learning .list-bulleted").children().length;
+    if (learning_points_count > 6){
+      $(".course-learning .list-bulleted").children().slice((6 - learning_points_count)).remove();
+      $(".course-learning .list-bulleted").append('<a id="learning_show" href="#" class="brand-link">See More</a>');
+    }
+    $("#learning_show").click(function(event){
+      $(".course-learning .list-bulleted").html(learning_content);
+      event.preventDefault();
+    });
+
+
+    $(".register").click(function(event) {
+      $("#class_enroll_form").submit();
+      event.preventDefault();
+    });
+
+    % if can_add_course_to_cart:
+      add_course_complete_handler = function(jqXHR, textStatus) {
+        if (jqXHR.status == 200) {
+          location.href = "${cart_link}";
+        }
+        if (jqXHR.status == 400) {
+          $("#register_error")
+            .html(jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.")}")
+            .css("display", "block");
+        }
+        else if (jqXHR.status == 403) {
+            location.href = "${reg_then_add_to_cart_link}";
+        }
+      };
+
+      $("#add_to_cart_post").click(function(event){
+        $.ajax({
+          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
+          type: "POST",
+          /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
+          complete: add_course_complete_handler
+        })
+        event.preventDefault();
+      });
+    % endif
+
+    ## making the conditional around this entire JS block for sanity
+    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      <%
+        perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
+                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
+                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
+                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          )
+      %>
+    $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id | u}&enrollment_action=enroll";
+      } else if (xhr.status == 400) { //This means the user did not have permission
+        $('#register_error').html("${perms_error}").css("display", "block");
+      } else {
+        $('#register_error').html(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        ).css("display", "block");
+      }
+    });
+
+    %else:
+
+    $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        if (xhr.responseText == "") {
+          location.href = "${reverse('dashboard')}";
+        }
+        else {
+          location.href = xhr.responseText;
+        }
+      } else if (xhr.status == 403) {
+          location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
+      } else {
+        $('#register_error').html(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        ).css("display", "block");
+      }
+    });
+
+    %endif
+
+  })(this)
+
+  $(window).resize(function(){
+      addSlider();
+  });
+
+  function addSlider(){
+    var isMobileResolution = $(window).width() < 768,
+        sliderExists = $(".about-list").hasClass("slick-slider");
+
+    $(".about-list").toggleClass("slidable", isMobileResolution);
+
+    if (isMobileResolution) {    //Second condition will avoid the multiple calls from resize
+      if (!sliderExists) {
+        $(".about-list").find(".about-list-item").removeClass('col col-4');
+        $(".slidable").slick({
+          nextArrow: '<i class="fa fa-angle-right"></i>',
+          prevArrow: '<i class="fa fa-angle-left"></i>',
+        });
+      }
+    } else {
+        $(".about-container").html($("#about-content").html());
+    }
+  }
+
+  </script>
+
+  <script src="${static.url('js/course_info.js')}"></script>
+  <script src="${static.url('js/slick.min.js')}"></script>
+</%block>
+
+<%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
+
+<section class="course-info" xmlns="http://www.w3.org/1999/html">
+  <header class="hero-main grid-manual hero-video">
+    <div class="grid-container">
+      <div class="row">
+        <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
+          <div class="video-data">
+            <a href="#">
+              <img src="${static.url('images/vid-img.jpg')}" alt="">
+              <span class="play-btn">
+
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="col col-12 sm-col-12 md-col-8 lg-col-8 xl-col-8 description">
+          <div class="data">
+            <h1>Enterpreneural Negotitiaons: <span>The Ours Way</span></h1>
+            <p>Learn negeotiation techniques to help you join community of succesful enterpreneurs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="course-detail light-bg">
+    <div class="grid-manual grid-container">
+      <div class="inner-container">
+        <div class="row">
+          <div class="col col-12 sm-col-12 md-col-4">
+            Duration:
+            <span>Jan.12, 2016 - Feb.23, 2016</span>
+          </div>
+
+          <div class="col col-12 sm-col-12 md-col-4">
+            Price:
+            <span>$495 USD</span>
+          </div>
+          <%
+            btn_text = 'Enroll Now'
+            btn_href = '#'
+            btn_class = ''
+            btn_id = ''
+          %>
+
+          % if user.is_authenticated() and registered:
+            <%
+              btn_text = "You are enrolled in this course"
+              btn_class = "disabled"
+            %>
+
+          % elif in_cart:
+            <%
+              btn_text = "This course is in your cart"
+              btn_href = cart_link
+            %>
+
+          % elif is_course_full:
+            <%
+              btn_text = "Course is full"
+              btn_class = "disabled"
+            %>
+
+          % elif invitation_only and not can_enroll:
+            <%
+              btn_text = "Enrollment in this course is by invitation only"
+              btn_class = "disabled"
+            %>
+
+          % elif not is_shib_course and not can_enroll:
+            <%
+              btn_text = "Enrollment is Closed"
+              btn_class = "disabled"
+            %>
+
+          % elif can_add_course_to_cart:
+            <%
+              btn_class = "add-to-cart"
+              btn_text = "Enroll Now"
+            %>
+
+            % if user.is_authenticated():
+              <%
+                btn_href = "#"
+                btn_id = "add_to_cart_post"
+              %>
+            % else:
+              <%
+                btn_href = reg_then_add_to_cart_link
+                btn_id = "reg_then_add_to_cart"
+              %>
+            % endif
+
+
+            % if ecommerce_checkout:
+                <%
+                  btn_href = ecommerce_checkout_link
+                %>
+            % endif
+
+          % else:
+            % if ecommerce_checkout:
+              <% btn_href = ecommerce_checkout_link %>
+            % else:
+              <% btn_href="#" %>
+            % endif
+
+            % if professional_mode:
+              <% btn_class = "add-to-cart" %>
+            % else:
+              <% btn_class = "register" %>
+            % endif
+        % endif
+
+          <div class="col col-12 sm-col-12 md-col-4">
+            <a href="${btn_href}" id="${btn_id}" class="btn-block btn-success btn-large btn-enroll ${btn_class}">
+              ${_(btn_text)}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-manual grid-container">
+    <div class="inner-container">
+      <div class="description-container">
+        <div class="row">
+          <div class="col col-12 sm-col-12 md-col-4 pull-right extras">
+            <h3>Sponsored by:</h3>
+            <div class="sponsored-logo"><img src="http://placehold.it/190x60" alt="Home Page"/></div>
+            <!-- <h3>Share this course:</h3>
+            <ul class="social-icons">
+              <li>
+                <div class="icon">
+                  <a href="#"><i class="fa fa-facebook-official"></i></a>
+                </div>
+              </li>
+              <li>
+                <div class="icon">
+                  <a href="#"><i class="fa fa-twitter"></i></a>
+                </div>
+              </li>
+              <li>
+                <div class="icon">
+                  <a href="#"><i class="fa fa-linkedin"></i></a>
+                </div>
+              </li>
+              <li>
+                <div class="icon">
+                  <a href="#"><i class="fa fa-google-plus"></i></a>
+                </div>
+              </li>
+              <li>
+                <div class="icon">
+                  <a href="#"><i class="fa fa-envelope-o"></i></a>
+                </div>
+              </li>
+            </ul>
+            <div class="course-features">
+
+              <div class="row">
+                <div class="col col-6">Course Number:</div>
+                <div class="col col-6">IOTx</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Language:</div>
+                <div class="col col-6">English</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Level:</div>
+                <div class="col col-6">Introductory</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Effort Level:</div>
+                <div class="col col-6">Self-Paced</div>
+              </div>
+              <div class="row">
+                <div class="col col-6">Price:</div>
+                <div class="col col-6">$495 USD</div>
+              </div>
+            </div> -->
+          </div>
+          <div class="col col-12 sm-col-12 md-col-8">
+
+            <h2> Course Description</h2>
+            <div class="course-description">
+              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+
+              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+
+              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+            </div>
+
+            <h2> What you'll learn</h2>
+            <div class="course-learning">
+              <ul class="list-bulleted">
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+                <li>Lorem Ipsum</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row instructors">
+          <div class="col col-12"><h2>Instructors</h2></div>
+          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
+            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
+            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
+          </div>
+          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
+            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
+            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
+          </div>
+          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
+            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
+            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="light-bg tabcordion course-about">
+    <div class="grid-manual grid-container">
+      <div class="inner-container">
+        <div class="row">
+          <div class="col col-12">
+            <h2>Still want to know more?</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-12">
+            <ul>
+              <li><a href="">Item 1</a>
+                <section>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id
+                    suscipit
+                    dolor rutrum id. Morbi facilisis porta volutpat. Fusce adipiscing, mauris quis congue tincidunt,
+                    sapien
+                    purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci mattis fringilla.
+                    Praesent eu ipsum in sapien tincidunt molestie sed ut magna. Nam accumsan dui at orci rhoncus
+                    pharetra
+                    tincidunt elit ullamcorper. Sed ac mauris ipsum. Nullam imperdiet sapien id purus pretium id aliquam
+                    mi
+                    ullamcorper.</p>
+                </section>
+              </li>
+              <li><a href="">Item 2</a>
+                <section>
+                  <p>Ut laoreet augue et neque pretium non sagittis nibh pulvinar. Etiam ornare tincidunt orci quis
+                    ultrices. Pellentesque ac sapien ac purus gravida ullamcorper. Duis rhoncus sodales lacus, vitae
+                    adipiscing tellus pharetra sed. Praesent bibendum lacus quis metus condimentum ac accumsan orci
+                    vulputate. Aenean fringilla massa vitae metus facilisis congue. Morbi placerat eros ac sapien semper
+                    pulvinar. Vestibulum facilisis, ligula a molestie venenatis, metus justo ullamcorper ipsum, congue
+                    aliquet dolor tortor eu neque. Sed imperdiet, nibh ut vestibulum tempor, nibh dui volutpat lacus,
+                    vel
+                    gravida magna justo sit amet quam. Quisque tincidunt ligula at nisl imperdiet sagittis. Morbi rutrum
+                    tempor arcu, non ultrices sem semper a. Aliquam quis sem mi.</p>
+                </section>
+              </li>
+              <li><a href="">Item 3</a>
+                <section>
+                  <p>Donec mattis mauris gravida metus laoreet non rutrum sem viverra. Aenean nibh libero, viverra vel
+                    vestibulum in, porttitor ut sapien. Phasellus tempor lorem id justo ornare tincidunt. Nulla
+                    faucibus,
+                    purus eu placerat fermentum, velit mi iaculis nunc, bibendum tincidunt ipsum justo eu mauris. Nulla
+                    facilisi. Vestibulum vel lectus ac purus tempus suscipit nec sit amet eros. Nullam fringilla, enim
+                    eu
+                    lobortis dapibus, quam magna tincidunt nibh, sit amet imperdiet dolor justo congue turpis.</p>
+                </section>
+              </li>
+              <li><a href="">Item 4</a>
+                <section>
+                  <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus dui
+                    urna, mollis vel suscipit in, pharetra at ligula. Pellentesque a est vel est fermentum pellentesque
+                    sed
+                    sit amet dolor. Nunc in dapibus nibh. Aliquam erat volutpat. Phasellus vel dui sed nibh iaculis
+                    convallis id sit amet urna. Proin nec tellus quis justo consequat accumsan. Vivamus turpis enim,
+                    auctor
+                    eget placerat eget, aliquam ut sapien.</p>
+                </section>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about-section">
+  <div class="about-container"> </div>
+</section>
+
+
+<script type="text/template" id="about-content">
+
+  <div class="grid-manual">
+      <div class="row">
+        <div class="col col-12 text-center">
+          <h2> An Online Gateway to Knowledge </h2>
+        </div>
+      </div>
+
+      <div class="row about-list text-center">
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Students</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Faculty</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Courses</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col col-12 text-center">
+          <a href="/about" class="btn-neutral">More about this site</a>
+        </div>
+      </div>
+
+    </div>
+</script>
+
+
+
+## Need to put this hidden form on the page so that the registration button works.
+## Since it's no harm to display a hidden form, we display it with the most permissive conditional
+## which is when the student is not registered.
+%if active_reg_button or is_shib_course:
+  <div style="display: none;">
+    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <fieldset class="enroll_fieldset">
+        <legend class="sr">${_("Enroll")}</legend>
+        <input name="course_id" type="hidden" value="${course.id | h}">
+        <input name="enrollment_action" type="hidden" value="enroll">
+      </fieldset>
+      <div class="submit">
+        <input name="submit" type="submit" value="${_('enroll')}">
+      </div>
+    </form>
+  </div>
+%endif

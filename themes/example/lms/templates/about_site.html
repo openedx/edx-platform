@@ -1,0 +1,80 @@
+<%namespace name='static' file='static_content.html'/>
+<%! from django.utils.translation import ugettext as _ %>
+
+
+<section class="about-section">
+  <div class="about-container"> </div>
+</section>
+
+
+<script type="text/template" id="about-content">
+
+  <div class="grid-manual">
+      <div class="row">
+        <div class="col col-12 text-center">
+          <h2> An Online Gateway to Knowledge </h2>
+        </div>
+      </div>
+
+      <div class="row about-list text-center">
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Students</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Faculty</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+        <div class="col col-4 about-list-item">
+          <div class="about-icon">
+            <img src="${static.url('images/about-img.png')}" alt="" />
+            <p><span>Courses</span> Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem Lorem Ipsem</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col col-12 text-center">
+          <a href="/about" class="btn-neutral">More about this site</a>
+        </div>
+      </div>
+
+    </div>
+  </script>
+
+<script>
+
+  $(document).ready(function() {
+    $(".about-container").html( $("#about-content").html());
+    addSlider();
+  });
+
+  $(window).resize(function(){
+      addSlider();
+  });
+
+  function addSlider(){
+    var isMobileResolution = $(window).width() < 768,
+        sliderExists = $(".about-list").hasClass("slick-slider");
+
+    $(".about-list").toggleClass("slidable", isMobileResolution);
+
+    if (isMobileResolution) {    //Second condition will avoid the multiple calls from resize
+      if (!sliderExists) {
+        $(".about-list").find(".about-list-item").removeClass('col col-4');
+        $(".slidable").slick({
+          nextArrow: '<i class="fa fa-angle-right"></i>',
+          prevArrow: '<i class="fa fa-angle-left"></i>',
+        });
+      }
+    } else {
+        $(".about-container").html($("#about-content").html());
+    }
+  }
+
+
+</script>

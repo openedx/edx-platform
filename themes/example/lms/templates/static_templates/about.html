@@ -1,0 +1,52 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("About")}</%block>
+
+<div class="page-heading">
+  <h1>${_("About")}</h1>
+</div>
+<section class="static-content">
+  <div class="grid-manual grid-container">
+    <div class="inner-container">
+      <div class="row">
+        <div class="col col-12 sm-col-12 md-col-8">
+          <h1>Curabitur ligula sapien tincidunt non</h1>
+          <p>Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et
+            lorem. Fusce ac felis sit amet ligula pharetra condimentum. Fusce a quam. Donec pede justo, fringilla vel,
+            aliquet nec, vulputate eget, arcu.</p>
+          <p>Duis leo. Maecenas egestas arcu quis ligula mattis placerat. Praesent vestibulum dapibus nibh. Ut non
+            enim eleifend felis pretium feugiat.</p>
+          <p>Nunc interdum lacus sit amet orci. Etiam imperdiet imperdiet orci. Cras ultricies mi eu turpis hendrerit
+            fringilla. Fusce egestas elit eget lorem.</p>
+          <p>Nam at tortor in tellus interdum sagittis. Curabitur ullamcorper ultricies nisi. Praesent nonummy mi in
+            odio. Nullam sagittis.</p>
+        </div>
+        <div class="col col-12 sm-col-12 md-col-4 mission-statement">
+            <img src="${static.url('images/user-thumbnail.png')}" alt="Mission Statement" />
+            <p>"Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Suspendisse faucibus, nunc et
+              pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. In consectetuer
+              turpis ut velit."</p>
+            <h3>Lorem Ipsum
+              <span>Lorem ipsem</span>
+              <span>Lorem Ipseume</span>
+            </h3>
+        </div>
+      </div>
+
+      <div class="row edx-intro">
+        <div class="col col-12 sm-col-8">
+          <hr>
+          <img src="${static.url('images/openedx-logo.png')}" width="256" alt="openEdx" />
+            <p>Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et
+              lorem. Fusce ac felis sit amet ligula pharetra condimentum. Fusce a quam. Donec pede justo, fringilla vel,
+              aliquet nec, vulputate eget, arcu. Duis leo. Maecenas egestas arcu quis ligula mattis placerat. Praesent
+              vestibulum dapibus nibh. Ut non enim eleifend felis pretium feugiat.</p>
+            <a class="brand-link" href="#">Praesent egestas neque eu enim</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
