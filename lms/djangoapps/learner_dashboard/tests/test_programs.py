@@ -8,12 +8,13 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
 from django.test import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
 
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests.mixins import CredentialsDataMixin, CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tests.mixins import (
     ProgramsApiConfigMixin,
     ProgramsDataMixin)
@@ -29,25 +30,31 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class TestProgramListing(
         ModuleStoreTestCase,
         ProgramsApiConfigMixin,
-        ProgramsDataMixin):
+        ProgramsDataMixin,
+        CredentialsDataMixin,
+        CredentialsApiConfigMixin):
 
     """
     Unit tests for getting the list of programs enrolled by a logged in user
     """
     PASSWORD = 'test'
+    url = reverse('program_listing_view')
 
     def setUp(self):
         """
             Add a student
         """
         super(TestProgramListing, self).setUp()
+        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.student = UserFactory()
-        self.create_programs_config(xseries_ad_enabled=True)
+        self.create_programs_config(xseries_ad_enabled=True, program_listing_enabled=True)
 
     def _create_course_and_enroll(self, student, org, course, run):
         """
         Creates a course and associated enrollment.
+
+        TODO: Use CourseEnrollmentFactory to avoid course creation.
         """
         course_location = locator.CourseLocator(org, course, run)
         course = CourseFactory.create(
@@ -76,10 +83,9 @@ class TestProgramListing(
         """
         self.mock_programs_api()
         self.client.login(username=self.student.username, password=self.PASSWORD)
-        response = self.client.get(reverse("program_listing_view"))
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.url)
         x_series_url = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries')
-        self.assertIn(x_series_url, response.content)
+        self.assertContains(response, x_series_url)
         return response
 
     def _get_program_checklist(self, program_id):
@@ -92,22 +98,28 @@ class TestProgramListing(
             self.PROGRAMS_API_RESPONSE['results'][program_id]['organizations'][0]['display_name'],
         ]
 
+    def _assert_progress_data_present(self, response):
+        """Verify that progress data is present."""
+        self.assertContains(response, 'userProgress')
+
     @httpretty.activate
     def test_get_program_with_no_enrollment(self):
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
-            self.assertNotIn(program_element, response.content)
+            self.assertNotContains(response, program_element)
         for program_element in self._get_program_checklist(1):
-            self.assertNotIn(program_element, response.content)
+            self.assertNotContains(response, program_element)
 
     @httpretty.activate
     def test_get_one_program(self):
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[0].split('/'))
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
-            self.assertIn(program_element, response.content)
+            self.assertContains(response, program_element)
         for program_element in self._get_program_checklist(1):
-            self.assertNotIn(program_element, response.content)
+            self.assertNotContains(response, program_element)
+
+        self._assert_progress_data_present(response)
 
     @httpretty.activate
     def test_get_both_program(self):
@@ -115,27 +127,81 @@ class TestProgramListing(
         self._create_course_and_enroll(self.student, *self.COURSE_KEYS[5].split('/'))
         response = self._setup_and_get_program()
         for program_element in self._get_program_checklist(0):
-            self.assertIn(program_element, response.content)
+            self.assertContains(response, program_element)
         for program_element in self._get_program_checklist(1):
-            self.assertIn(program_element, response.content)
+            self.assertContains(response, program_element)
+
+        self._assert_progress_data_present(response)
 
     def test_get_programs_dashboard_not_enabled(self):
-        self.create_programs_config(enable_student_dashboard=False)
+        self.create_programs_config(program_listing_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
-        response = self.client.get(reverse("program_listing_view"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
     def test_xseries_advertise_disabled(self):
-        self.create_programs_config(xseries_ad_enabled=False)
+        self.create_programs_config(program_listing_enabled=True, xseries_ad_enabled=False)
         self.client.login(username=self.student.username, password=self.PASSWORD)
-        response = self.client.get(reverse("program_listing_view"))
-        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.url)
         x_series_url = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries')
-        self.assertNotIn(x_series_url, response.content)
+        self.assertNotContains(response, x_series_url)
 
     def test_get_programs_not_logged_in(self):
         self.create_programs_config()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(
+            response,
+            '{}?next={}'.format(reverse('signin_user'), self.url)
+        )
+
+    # TODO: Use a factory to generate this data.
+    def _expected_credentials_data(self):
+        """ Dry method for getting expected credentials."""
+
+        return [
+            {
+                "display_name": "Test Program A",
+                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-1/"
+            },
+            {
+                "display_name": "Test Program B",
+                "credential_url": "http://credentials.edx.org/credentials/dummy-uuid-2/"
+            }
+        ]
+
+    @httpretty.activate
+    def test_get_xseries_certificates_with_data(self):
+
+        self.create_programs_config(program_listing_enabled=True)
+        self.create_credentials_config(is_learner_issuance_enabled=True)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # mock programs and credentials apis
+        self.mock_programs_api()
+        self.mock_credentials_api(self.student, data=self.CREDENTIALS_API_RESPONSE, reset_url=False)
+
         response = self.client.get(reverse("program_listing_view"))
-        self.assertEqual(response.status_code, 302)
-        self.assertIsInstance(response, HttpResponseRedirect)
-        self.assertIn('login', response.url)  # pylint: disable=no-member
+        for certificate in self._expected_credentials_data():
+            self.assertContains(response, certificate['display_name'])
+            self.assertContains(response, certificate['credential_url'])
+
+        self.assertContains(response, 'images/xseries-certificate-visual.png')
+
+    @httpretty.activate
+    def test_get_xseries_certificates_without_data(self):
+
+        self.create_programs_config(program_listing_enabled=True)
+        self.create_credentials_config(is_learner_issuance_enabled=True)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # mock programs and credentials apis
+        self.mock_programs_api()
+        self.mock_credentials_api(self.student, data={"results": []}, reset_url=False)
+
+        response = self.client.get(reverse("program_listing_view"))
+        for certificate in self._expected_credentials_data():
+            self.assertNotContains(response, certificate['display_name'])
+            self.assertNotContains(response, certificate['credential_url'])

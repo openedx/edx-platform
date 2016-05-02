@@ -10,16 +10,16 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access.
 """
 # pylint: disable=no-member
-import ddt
 from datetime import timedelta
+
 from django.utils import timezone
+import ddt
 from mock import patch
-
 from django.core.urlresolvers import reverse
-
 from rest_framework.test import APITestCase
-
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.access_response import (
     MobileAvailabilityError,
@@ -29,10 +29,7 @@ from courseware.access_response import (
 from courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from mobile_api.test_milestones import MobileAPIMilestonesMixin
+from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):

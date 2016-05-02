@@ -7,6 +7,7 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
+from nose.plugins.attrib import attr
 
 from django.test.client import RequestFactory
 
@@ -132,6 +133,7 @@ class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
         self.assertEqual(serialized["voted"], True)
 
 
+@attr('shard_3')
 @ddt.ddt
 class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""
@@ -312,6 +314,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "abuse_flaggers": [],
             "votes": {"up_count": 4},
             "children": [],
+            "child_count": 0,
         }
         expected = {
             "id": "test_comment",
@@ -332,6 +335,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "vote_count": 4,
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
+            "child_count": 0,
         }
         self.assertEqual(self.serialize(comment), expected)
 

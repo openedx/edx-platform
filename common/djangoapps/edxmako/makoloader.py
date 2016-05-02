@@ -48,6 +48,8 @@ class MakoLoader(object):
                                 module_directory=self.module_directory,
                                 input_encoding='utf-8',
                                 output_encoding='utf-8',
+                                default_filters=['decode.utf8'],
+                                encoding_errors='replace',
                                 uri=template_name)
             return template, None
         else:

@@ -2,6 +2,7 @@
 """ Tests for student account views. """
 
 import re
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 from urllib import urlencode
 
@@ -26,7 +27,7 @@ from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
@@ -203,6 +204,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
         return self.client.post(path=reverse('password_change_request'), data=data)
 
 
+@attr('shard_3')
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -247,13 +249,13 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertRedirects(response, reverse("dashboard"))
 
     @ddt.data(
-        (None, "signin_user"),
-        (None, "register_user"),
-        ("edx.org", "signin_user"),
-        ("edx.org", "register_user"),
+        (False, "signin_user"),
+        (False, "register_user"),
+        (True, "signin_user"),
+        (True, "register_user"),
     )
     @ddt.unpack
-    def test_login_and_registration_form_signin_preserves_params(self, theme, url_name):
+    def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
         params = [
             ('course_id', 'edX/DemoX/Demo_Course'),
             ('enrollment_action', 'enroll'),
@@ -261,7 +263,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
@@ -277,7 +279,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ]
 
         # Verify that this parameter is also preserved
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))

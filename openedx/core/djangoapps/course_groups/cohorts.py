@@ -430,7 +430,7 @@ def set_assignment_type(user_group, assignment_type):
     """
     course_cohort = user_group.cohort
 
-    if is_default_cohort(user_group) and course_cohort.assignment_type != assignment_type:
+    if is_last_random_cohort(user_group) and course_cohort.assignment_type != assignment_type:
         raise ValueError(_("There must be one cohort to which students can automatically be assigned."))
 
     course_cohort.assignment_type = assignment_type
@@ -445,9 +445,9 @@ def get_assignment_type(user_group):
     return course_cohort.assignment_type
 
 
-def is_default_cohort(user_group):
+def is_last_random_cohort(user_group):
     """
-    Check if a cohort is default.
+    Check if this cohort is the only random cohort in the course.
     """
     random_cohorts = CourseUserGroup.objects.filter(
         course_id=user_group.course_id,

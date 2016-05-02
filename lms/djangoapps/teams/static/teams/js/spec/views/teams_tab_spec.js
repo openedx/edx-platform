@@ -56,7 +56,11 @@ define([
             spyOn(Logger, 'log');
         });
 
-        afterEach(Backbone.history.stop);
+        afterEach(function() {
+              Backbone.history.stop();
+              $(document).off('ajaxError', TeamsTabView.prototype.errorHandler);
+          }
+        );
 
         describe('Navigation', function () {
             it('does not render breadcrumbs for the top level tabs', function() {

@@ -5,6 +5,7 @@ import os
 import sys
 from lxml import etree
 
+from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.x_module import XModuleDescriptor, DEPRECATION_VSCOMPAT_EVENT
@@ -428,6 +429,12 @@ class XmlParserMixin(object):
         """
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
+        for aside in self.runtime.get_asides(self):
+            if aside.needs_serialization():
+                aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
+                aside.add_xml_to_node(aside_node)
+                xml_object.append(aside_node)
+
         self.clean_metadata_from_xml(xml_object)
 
         # Set the tag on both nodes so we get the file path right.
@@ -496,6 +503,8 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
     """
     Mixin class for standardized parsing of XModule xml.
     """
+    resources_dir = None
+
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import unittest
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -24,6 +25,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareS
 from util.testing import UrlResetMixin
 
 
+@attr('shard_3')
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
@@ -245,7 +247,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Adding another verification with different course.
         # Its created_at is greater than course deadline.
         course2 = CourseFactory.create()
-        CourseModeFactory(
+        CourseModeFactory.create(
             course_id=course2.id,
             mode_slug="verified",
             expiration_datetime=self.PAST
@@ -277,7 +279,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             enrollment_mode (str): The mode of the enrollment.
 
         """
-        CourseModeFactory(
+        CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug="verified",
             expiration_datetime=deadline

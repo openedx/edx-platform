@@ -22,7 +22,7 @@ describe "DiscussionThreadShowView", ->
         @thread = new Thread(@threadData)
         @view = new DiscussionThreadShowView({ model: @thread })
         @view.setElement($("#fixture-element"))
-        @spyOn(@view, "convertMath")
+        spyOn(@view, "convertMath")
 
     describe "voting", ->
 

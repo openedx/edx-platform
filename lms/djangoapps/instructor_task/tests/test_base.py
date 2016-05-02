@@ -330,3 +330,13 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
             else:
                 self.assertItemsEqual(csv_rows, expected_rows)
+
+    def get_csv_row_with_headers(self):
+        """
+        Helper function to return list with the column names from the CSV file (the first row)
+        """
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            return rows.next()

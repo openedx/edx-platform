@@ -1,5 +1,6 @@
 (function(requirejs, define) {
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
             'jquery': 'js/vendor/jquery.min',
@@ -24,15 +25,19 @@
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
-            'backbone': 'js/vendor/backbone-min',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'js/vendor/backbone.paginator.min',
-            "backbone-super": "js/vendor/backbone-super",
-            'jasmine-jquery': 'js/vendor/jasmine-jquery',
+            'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'js/vendor/jasmine-stealth',
-            'jasmine.async': 'js/vendor/jasmine.async',
-            'URI': 'js/vendor/URI.min'
+            'URI': 'js/vendor/URI.min',
+            'modernizr': 'edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'edx-pattern-library/js/afontgarde',
+            'edxicons': 'edx-pattern-library/js/edx-icons',
+            'draggabilly': 'js/vendor/draggabilly',
+            'jasmine-stealth': 'js/libs/jasmine-stealth',
+            'jasmine-waituntil': 'js/libs/jasmine-waituntil',
+            'jasmine-extensions': 'js/libs/jasmine-extensions'
         },
         shim: {
             'gettext': {
@@ -134,37 +139,48 @@
             'URI': {
                 exports: 'URI'
             },
-            'jasmine-jquery': {
-                deps: ['jasmine']
-            },
-            'jasmine-imagediff': {
-                deps: ['jasmine']
-            },
+            'jasmine-imagediff': {},
             'jasmine-stealth': {
-                deps: ['jasmine']
+                deps: ['underscore', 'underscore.string']
             },
-            'jasmine.async': {
-                deps: ['jasmine'],
-                exports: 'AsyncSpec'
+            'jasmine-waituntil': {
+                deps: ['jquery']
+            },
+            'jasmine-extensions': {
+                deps: ['jquery']
             },
             "sinon": {
                 exports: "sinon"
+            },
+            "modernizr": {
+                exports: "Modernizr"
+            },
+            "afontgarde": {
+                exports: "AFontGarde"
             }
         }
     });
 
-    define([
-        // Run the common tests that use RequireJS.
-        'common-requirejs/include/common/js/spec/components/tabbed_view_spec.js',
-        'common-requirejs/include/common/js/spec/components/feedback_spec.js',
-        'common-requirejs/include/common/js/spec/components/list_spec.js',
-        'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_collection_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
-        'common-requirejs/include/common/js/spec/components/search_field_spec.js',
-        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
-        'common-requirejs/include/common/js/spec/utils/edx.utils.validate_spec.js'
-    ]);
+    var testFiles = [
+        'common/js/spec/components/tabbed_view_spec.js',
+        'common/js/spec/components/feedback_spec.js',
+        'common/js/spec/components/list_spec.js',
+        'common/js/spec/components/paginated_view_spec.js',
+        'common/js/spec/components/paging_collection_spec.js',
+        'common/js/spec/components/paging_header_spec.js',
+        'common/js/spec/components/paging_footer_spec.js',
+        'common/js/spec/components/search_field_spec.js',
+        'common/js/spec/components/view_utils_spec.js',
+        'common/js/spec/utils/edx.utils.validate_spec.js'
+    ];
+
+    for (var i = 0; i < testFiles.length; i++) {
+        testFiles[i] = '/base/' + testFiles[i];
+    }
+
+    window.requireSerial(testFiles, function () {
+        // start test run, once Require.js is done
+        window.__karma__.start();
+    });
 
 }).call(this, requirejs, define);

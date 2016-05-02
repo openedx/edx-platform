@@ -49,50 +49,6 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class GetCompletedCoursesTestCase(TestCase):
-    """
-    Test the get_completed_courses function
-    """
-
-    def make_cert_result(self, **kwargs):
-        """
-        Helper to create dummy results from the certificates API
-        """
-        result = {
-            'username': 'dummy-username',
-            'course_key': 'dummy-course',
-            'type': 'dummy-type',
-            'status': 'dummy-status',
-            'download_url': 'http://www.example.com/cert.pdf',
-            'grade': '0.98',
-            'created': '2015-07-31T00:00:00Z',
-            'modified': '2015-07-31T00:00:00Z',
-        }
-        result.update(**kwargs)
-        return result
-
-    @mock.patch(TASKS_MODULE + '.get_certificates_for_user')
-    def test_get_completed_courses(self, mock_get_certs_for_user):
-        """
-        Ensure the function correctly calls to and handles results from the
-        certificates API
-        """
-        student = UserFactory(username='test-username')
-        mock_get_certs_for_user.return_value = [
-            self.make_cert_result(status='downloadable', type='verified', course_key='downloadable-course'),
-            self.make_cert_result(status='generating', type='prof-ed', course_key='generating-course'),
-            self.make_cert_result(status='unknown', type='honor', course_key='unknown-course'),
-        ]
-
-        result = tasks.get_completed_courses(student)
-        self.assertEqual(mock_get_certs_for_user.call_args[0], (student.username, ))
-        self.assertEqual(result, [
-            {'course_id': 'downloadable-course', 'mode': 'verified'},
-            {'course_id': 'generating-course', 'mode': 'prof-ed'},
-        ])
-
-
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class GetCompletedProgramsTestCase(TestCase):
     """
     Test the get_completed_programs function

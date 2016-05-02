@@ -43,13 +43,13 @@ from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_TOY_MODULESTORE,
-    TEST_DATA_XML_MODULESTORE,
-    SharedModuleStoreTestCase)
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+    TEST_DATA_MIXED_MODULESTORE
+)
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
@@ -668,11 +668,13 @@ class TestTOC(ModuleStoreTestCase):
 
             course = self.store.get_course(self.toy_course.id, depth=2)
             with check_mongo_calls(toc_finds):
-                actual = render.toc_for_course(
+                actual, prev_sequential, next_sequential = render.toc_for_course(
                     self.request.user, self.request, course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
             self.assertIn(toc_section, actual)
+        self.assertIsNone(prev_sequential)
+        self.assertIsNone(next_sequential)
 
     # Mongo makes 3 queries to load the course to depth 2:
     #     - 1 for the course
@@ -707,11 +709,13 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             with check_mongo_calls(toc_finds):
-                actual = render.toc_for_course(
+                actual, prev_sequential, next_sequential = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache
                 )
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
+            self.assertEquals(prev_sequential['url_name'], 'Toy_Videos')
+            self.assertEquals(next_sequential['url_name'], 'video_123456789012')
 
 
 @attr('shard_1')
@@ -852,7 +856,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         """
         self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
-        actual = render.toc_for_course(
+        actual, prev_sequential, next_sequential = render.toc_for_course(
             self.request.user,
             self.request,
             self.toy_course,
@@ -867,6 +871,8 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         else:
             # we expect there not to be a 'proctoring' key in the dict
             self.assertNotIn('proctoring', section_actual)
+        self.assertIsNone(prev_sequential)
+        self.assertEquals(next_sequential['url_name'], u"Welcome")
 
     @ddt.data(
         (
@@ -1108,7 +1114,7 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         """
         Test generation of TOC for a course with a gated subsection
         """
-        actual = render.toc_for_course(
+        actual, prev_sequential, next_sequential = render.toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -1119,6 +1125,8 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         self.assertIsNotNone(self._find_sequential(actual, 'Chapter', 'Open_Sequential'))
         self.assertIsNone(self._find_sequential(actual, 'Chapter', 'Gated_Sequential'))
         self.assertIsNone(self._find_sequential(actual, 'Non-existant_Chapter', 'Non-existant_Sequential'))
+        self.assertIsNone(prev_sequential)
+        self.assertIsNone(next_sequential)
 
 
 @attr('shard_1')
@@ -1369,17 +1377,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
         # pylint: disable=attribute-defined-outside-init
         self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
 
-    def setup_xml_course(self):
-        """
-        Define the XML backed course to use.
-        Toy courses are already loaded in XML and mixed modulestores.
-        """
-        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        location = course_key.make_usage_key('chapter', 'Overview')
-        descriptor = modulestore().get_item(location)
-
-        self.module = self._get_module(course_key, descriptor, location)
-
 
 @attr('shard_1')
 class MongoViewInStudioTest(ViewInStudioTest):
@@ -1414,7 +1411,7 @@ class MongoViewInStudioTest(ViewInStudioTest):
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def test_view_in_studio_link_mongo_backed(self):
         """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
@@ -1426,24 +1423,6 @@ class MixedViewInStudioTest(ViewInStudioTest):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
         self.setup_mongo_course(course_edit_method='XML')
         result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-    def test_view_in_studio_link_xml_backed(self):
-        """Course in XML only modulestore should not see 'View in Studio' links."""
-        self.setup_xml_course()
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-
-@attr('shard_1')
-class XmlViewInStudioTest(ViewInStudioTest):
-    """Test the 'View in Studio' link visibility in an xml backed course."""
-    MODULESTORE = TEST_DATA_XML_MODULESTORE
-
-    def test_view_in_studio_link_xml_backed(self):
-        """Course in XML only modulestore should not see 'View in Studio' links."""
-        self.setup_xml_course()
-        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 

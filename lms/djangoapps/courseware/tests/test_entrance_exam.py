@@ -38,7 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr('shard_1')
+@attr('shard_2')
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -255,8 +255,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertNotIn('Exam Problem - Problem 1', resp.content)
-        self.assertNotIn('Exam Problem - Problem 2', resp.content)
+        self.assertNotIn('Exam Vertical - Unit 1', resp.content)
 
     def test_entrance_exam_content_presence(self):
         """
@@ -273,8 +272,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertIn('Exam Problem - Problem 1', resp.content)
-        self.assertIn('Exam Problem - Problem 2', resp.content)
+        self.assertIn('Exam Vertical - Unit 1', resp.content)
 
     def test_get_entrance_exam_content(self):
         """
@@ -585,7 +583,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.request.user,
             self.entrance_exam
         )
-        return toc_for_course(
+        toc, __, __ = toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -593,6 +591,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.exam_1.url_name,
             self.field_data_cache
         )
+        return toc
 
 
 def answer_entrance_exam_problem(course, request, problem, user=None):

@@ -126,7 +126,8 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
+from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
 log = logging.getLogger("edx.student")
@@ -311,7 +312,6 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     # simplify the status for the template using this lookup table
     template_state = {
         CertificateStatuses.generating: 'generating',
-        CertificateStatuses.regenerating: 'generating',
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
@@ -649,7 +649,6 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(enrollment.course_id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(enrollment.course_id)
         )
     )
@@ -741,6 +740,7 @@ def dashboard(request):
         'course_programs': course_programs,
         'disable_courseware_js': True,
         'xseries_credentials': xseries_credentials,
+        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
     }
 
     ecommerce_service = EcommerceService()
@@ -1906,8 +1906,9 @@ def auto_auth(request):
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
     * `no_login`: Define this to create the user but not login
-    * `redirect`: Set to "true" will redirect to course if course_id is defined, otherwise it will redirect to dashboard
-
+    * `redirect`: Set to "true" will redirect to the `redirect_to` value if set, or
+        course home page if course_id is defined, otherwise it will redirect to dashboard
+    * `redirect_to`: will redirect to to this url
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -1923,6 +1924,7 @@ def auto_auth(request):
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
+    redirect_to = request.GET.get('redirect_to', None)
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
@@ -1931,7 +1933,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
-    redirect_when_done = request.GET.get('redirect', '').lower() == 'true'
+    redirect_when_done = request.GET.get('redirect', '').lower() == 'true' or redirect_to
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -1996,8 +1998,11 @@ def auto_auth(request):
     # Provide the user with a valid CSRF token
     # then return a 200 response unless redirect is true
     if redirect_when_done:
+        # Redirect to specific page if specified
+        if redirect_to:
+            redirect_url = redirect_to
         # Redirect to course info page if course_id is known
-        if course_id:
+        elif course_id:
             try:
                 # redirect to course info page in LMS
                 redirect_url = reverse(
@@ -2446,8 +2451,8 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                             'xseries' + '/{}'
                         ).format(program['marketing_slug'])
                     })
-                    programs_for_course['display_category'] = program.get('display_category')
                     programs_for_course['category'] = program.get('category')
+                    programs_for_course['display_category'] = get_display_category(program)
                 except KeyError:
                     log.warning('Program structure is invalid, skipping display: %r', program)
 

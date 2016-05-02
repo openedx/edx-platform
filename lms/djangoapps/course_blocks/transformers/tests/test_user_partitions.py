@@ -4,6 +4,7 @@ Tests for UserPartitionTransformer.
 """
 from collections import namedtuple
 import ddt
+from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
@@ -65,6 +66,7 @@ class UserPartitionTestMixin(object):
             self.partition_cohorts.append(partition_cohorts)
 
 
+@attr('shard_3')
 @ddt.ddt
 class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTestCase):
     """
@@ -212,6 +214,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
         )
 
 
+@attr('shard_3')
 @ddt.ddt
 class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase):
     """

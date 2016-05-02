@@ -158,7 +158,7 @@ def courses(request):
     )
 
 
-def render_accordion(user, request, course, chapter, section, field_data_cache):
+def render_accordion(request, course, toc):
     """
     Draws navigation bar. Takes current position in accordion as
     parameter.
@@ -169,9 +169,6 @@ def render_accordion(user, request, course, chapter, section, field_data_cache):
 
     Returns the html string
     """
-    # grab the table of contents
-    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
-
     context = dict([
         ('toc', toc),
         ('course_id', course.id.to_deprecated_string()),
@@ -442,7 +439,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
@@ -455,6 +451,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'language_preference': language_preference,
             'disable_optimizely': True,
         }
+        table_of_contents, __, __ = toc_for_course(user, request, course, chapter, section, field_data_cache)
+        context['accordion'] = render_accordion(request, course, table_of_contents)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
@@ -472,7 +470,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             if course_has_entrance_exam(course):
                 exam_chapter = get_entrance_exam_content(request, course)
                 if exam_chapter:
-                    exam_section = None
                     if exam_chapter.get_children():
                         exam_section = exam_chapter.get_children()[0]
                         if exam_section:
@@ -556,12 +553,30 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         # Save where we are in the chapter.
         save_child_position(chapter_descriptor, section)
+
+        table_of_contents, prev_section_info, next_section_info = toc_for_course(
+            user, request, course, chapter, section, field_data_cache
+        )
+        context['accordion'] = render_accordion(request, course, table_of_contents)
+
+        def _compute_section_url(section_info, requested_child):
+            """
+            Returns the section URL for the given section_info with the given child parameter.
+            """
+            return "{url}?child={requested_child}".format(
+                url=reverse(
+                    'courseware_section',
+                    args=[unicode(course.id), section_info['chapter_url_name'], section_info['url_name']],
+                ),
+                requested_child=requested_child,
+            )
+
         section_render_context = {
             'activate_block_id': request.GET.get('activate_block_id'),
-            'redirect_url_func': get_redirect_url,
             'requested_child': request.GET.get("child"),
+            'prev_url': _compute_section_url(prev_section_info, 'last') if prev_section_info else None,
+            'next_url': _compute_section_url(next_section_info, 'first') if next_section_info else None,
         }
-        context['accordion'] = render_accordion(user, request, course, chapter, section, field_data_cache)
         context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
         context['section_title'] = section_descriptor.display_name_with_default_escaped
         result = render_to_response('courseware/courseware.html', context)

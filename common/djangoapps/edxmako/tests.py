@@ -116,12 +116,8 @@ class MakoMiddlewareTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in LMS.
         """
-        with patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
-            del context_mock.context
-            self.assertIn(
-                "this module is temporarily unavailable",
-                render_to_string("courseware/error-message.html", None),
-            )
+        del context_mock.context
+        self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @patch("edxmako.middleware.REQUEST_CONTEXT")
@@ -130,9 +126,8 @@ class MakoMiddlewareTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
-        with patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
-            del context_mock.context
-            self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
+        del context_mock.context
+        self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
 
 
 def mako_middleware_process_request(request):

@@ -8,6 +8,7 @@ from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import Text, HTML
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
@@ -317,7 +318,13 @@ from student.helpers import (
             <h4 class="message-title">${_('Your verification will expire soon!')}</h4>
             ## Translators: start_link and end_link will be replaced with HTML tags;
             ## please do not translate these.
-            <p class="message-copy">${Text(_('Your current verification will expire before the verification deadline for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued ID.')).format(start_link=HTML('<a href="{href}">'.format(href=reverse('verify_student_reverify'))), end_link=HTML('</a>'))}</p>
+            <p class="message-copy">${Text(_('Your current verification will expire before the verification deadline '
+              'for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a '
+              'government-issued ID.')).format(
+                start_link=HTML('<a href="{href}">').format(href=reverse('verify_student_reverify')),
+                end_link=HTML('</a>')
+              )}
+            </p>
           % endif
         </div>
         % endif
@@ -334,10 +341,10 @@ from student.helpers import (
                         "It's a proven motivator to complete the course. {line_break}"
                         "{link_start}Learn more about the verified {cert_name_long}{link_end}.")).format(
                           line_break=HTML('<br>'),
-                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">'.format(
+                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
                             marketing_link('WHAT_IS_VERIFIED_CERT'),
                             enrollment.course_id
-                          )),
+                          ),
                           link_end=HTML('</a>'),
                           cert_name_long=cert_name_long
                         )}
@@ -394,7 +401,7 @@ from student.helpers import (
         <li class="prerequisites">
           <p class="tip">
             ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(
-                link_start=HTML('<a href="{}">'.format(prc_target)),
+                link_start=HTML('<a href="{}">').format(prc_target),
                 link_end=HTML('</a>'),
                 prc_display=course_requirements['courses'][0]['display'],
               )}
@@ -409,7 +416,7 @@ from student.helpers import (
 <script>
            $( document ).ready(function() {
 
-               if("${is_course_blocked}" == "True"){
+               if("${is_course_blocked | n, dump_js_escaped_json}" == 'true'){
                    $( "#unregister_block_course" ).click(function() {
                        $('.disable-look-unregister').click();
                    });

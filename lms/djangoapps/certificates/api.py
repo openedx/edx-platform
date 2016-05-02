@@ -8,30 +8,31 @@ import logging
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from branding import api as branding_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField
 from util.organizations_helpers import get_course_organizations
 
 from certificates.models import (
-    CertificateStatuses,
-    certificate_status_for_student,
-    CertificateGenerationCourseSetting,
     CertificateGenerationConfiguration,
-    ExampleCertificateSet,
-    GeneratedCertificate,
+    CertificateGenerationCourseSetting,
+    CertificateStatuses,
     CertificateTemplate,
     CertificateTemplateAsset,
+    ExampleCertificateSet,
+    GeneratedCertificate,
+    certificate_status_for_student,
 )
 from certificates.queue import XQueueCertInterface
-from branding import api as branding_api
+
 
 log = logging.getLogger("edx.certificate")
+MODES = GeneratedCertificate.MODES
 
 
 def is_passing_status(cert_status):
@@ -41,6 +42,36 @@ def is_passing_status(cert_status):
     defined in models.py
     """
     return CertificateStatuses.is_passing_status(cert_status)
+
+
+def format_certificate_for_user(username, cert):
+    """
+    Helper function to serialize an user certificate.
+
+    Arguments:
+        username (unicode): The identifier of the user.
+        cert (GeneratedCertificate): a user certificate
+
+    Returns: dict
+    """
+    return {
+        "username": username,
+        "course_key": cert.course_id,
+        "type": cert.mode,
+        "status": cert.status,
+        "grade": cert.grade,
+        "created": cert.created_date,
+        "modified": cert.modified_date,
+
+        # NOTE: the download URL is not currently being set for webview certificates.
+        # In the future, we can update this to construct a URL to the webview certificate
+        # for courses that have this feature enabled.
+        "download_url": (
+            cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
+            if cert.status == CertificateStatuses.downloadable
+            else None
+        ),
+    }
 
 
 def get_certificates_for_user(username):
@@ -57,7 +88,7 @@ def get_certificates_for_user(username):
     [
         {
             "username": "bob",
-            "course_key": "edX/DemoX/Demo_Course",
+            "course_key": CourseLocator('edX', 'DemoX', 'Demo_Course', None, None),
             "type": "verified",
             "status": "downloadable",
             "download_url": "http://www.example.com/cert.pdf",
@@ -69,26 +100,28 @@ def get_certificates_for_user(username):
 
     """
     return [
-        {
-            "username": username,
-            "course_key": cert.course_id,
-            "type": cert.mode,
-            "status": cert.status,
-            "grade": cert.grade,
-            "created": cert.created_date,
-            "modified": cert.modified_date,
-
-            # NOTE: the download URL is not currently being set for webview certificates.
-            # In the future, we can update this to construct a URL to the webview certificate
-            # for courses that have this feature enabled.
-            "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
-                if cert.status == CertificateStatuses.downloadable
-                else None
-            ),
-        }
+        format_certificate_for_user(username, cert)
         for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id")
     ]
+
+
+def get_certificate_for_user(username, course_key):
+    """
+    Retrieve certificate information for a particular user for a specific course.
+
+    Arguments:
+        username (unicode): The identifier of the user.
+        course_key (CourseKey): A Course Key.
+    Returns: dict
+    """
+    try:
+        cert = GeneratedCertificate.eligible_certificates.get(
+            user__username=username,
+            course_id=course_key
+        )
+    except GeneratedCertificate.DoesNotExist:
+        return None
+    return format_certificate_for_user(username, cert)
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',

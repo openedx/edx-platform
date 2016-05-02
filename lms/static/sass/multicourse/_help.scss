@@ -6,8 +6,8 @@
     nav.categories {
       border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
-      float: left;
-      margin-left: flex-gutter();
+      @include float(left);
+      @include margin-left(flex-gutter());
       padding: 20px;
       width: flex-grid(3);
 
@@ -15,8 +15,8 @@
         display: block;
         letter-spacing: 1px;
         margin: 0px -20px;
-        padding: 12px 0px 12px 20px;
-        text-align: left;
+        @include padding(12px, 0px, 12px, 20px);
+        @include text-align(left);
 
         &:hover, &:focus {
           background: rgb(245,245,245);
@@ -26,7 +26,7 @@
     }
 
     .responses {
-      float: left;
+      @include float(left);
       width: flex-grid(9);
 
       .category {
@@ -58,7 +58,7 @@
         .answer {
           display: none;
           color: #3c3c3c;
-          padding-left: 16px;
+          @include padding-left(16px);
           font-family: $serif;
           li {
             line-height: 1.6em;

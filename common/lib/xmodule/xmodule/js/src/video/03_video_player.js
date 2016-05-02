@@ -70,7 +70,10 @@ function (HTML5Video, Resizer) {
     function _makeFunctionsPublic(state) {
         var debouncedF = _.debounce(
             function (params) {
-                return onSeek.call(this, params);
+                // Can't cancel a queued debounced function on destroy
+                if (state.videoPlayer) {
+                    return onSeek.call(this, params);
+                }
             }.bind(state),
             300
         );

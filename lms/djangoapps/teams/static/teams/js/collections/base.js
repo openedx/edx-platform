@@ -4,6 +4,8 @@
         function(PagingCollection) {
             var BaseCollection = PagingCollection.extend({
                 initialize: function(options) {
+                    this.url = options.url;
+
                     PagingCollection.prototype.initialize.call(this);
 
                     this.course_id = options.course_id;

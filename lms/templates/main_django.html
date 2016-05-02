@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-{% load sekizai_tags i18n microsite theme_pipeline optional_include %}
+{% load sekizai_tags i18n microsite pipeline optional_include staticfiles %}
 {% load url from future %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
   {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
- <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+
+  {% with "js/i18n/"|add:LANGUAGE_CODE|add:"/djangojs.js" as i18njs_path %}
+    <script type="text/javascript" src="{% static i18njs_path %}"></script>
+  {% endwith %}
 
   {% stylesheet 'style-vendor' %}
   {% stylesheet 'style-main-v1' %}
@@ -23,12 +27,12 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
-  <div class="window-wrap" dir="${static.dir_rtl()}">
-    <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to main content" %}</a>
+  <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
+    <a class="nav-skip" href="#main">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
       {% include "header.html"|microsite_template_path %}
     {% endwith %}
-    <div role="main" class="content-wrapper" id="content" tabindex="-1">
+    <div class="content-wrapper" id="content">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>
@@ -38,8 +42,7 @@
 
   </div>
 
-    {% javascript 'application' %}
-    {% javascript 'module-js' %}
+    {% javascript 'base_application' %}
 
     {% render_block "js" %}
 </body>

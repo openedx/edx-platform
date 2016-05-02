@@ -39,7 +39,7 @@
       @include box-sizing(border-box);
       box-shadow: 0 2px 16px 0 $shadow-l1;
       margin: 0 auto;
-      padding: 80px 80px 40px 80px;
+      padding: 80px 80px 40px;
       width: flex-grid(10);
 
       .footer {
@@ -51,8 +51,8 @@
 
     figure {
       display: block;
-      float: right;
-      margin: 20px 0px 60px 20px;
+      @include float(right);
+      @include margin(20px, 0px, 60px, 20px);
       width: 300px;
 
       img {
@@ -98,19 +98,19 @@
 
       .fb-like {
         margin-top: 8px;
-        margin-left: ($baseline/2);
-        float: left;
+        @include margin-left($baseline/2);
+        @include float(left);
       }
 
       p {
-        float: left;
+        @include float(left);
         margin-top: 8px;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
       }
 
       a {
         display: block;
-        float: left;
+        @include float(left);
       }
     }
   }

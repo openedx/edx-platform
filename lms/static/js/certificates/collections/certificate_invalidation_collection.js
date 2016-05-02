@@ -9,7 +9,11 @@
 
         function(Backbone, CertificateInvalidation) {
             return Backbone.Collection.extend({
-                model: CertificateInvalidation
+                model: CertificateInvalidation,
+
+                initialize: function(models, options) {
+                    this.url = options.url;
+                }
             });
         }
     );

@@ -595,6 +595,18 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             else:
                 duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
+        asides_to_create = []
+        for aside in source_item.runtime.get_asides(source_item):
+            for field in aside.fields.values():
+                if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
+                    asides_to_create.append(aside)
+                    break
+
+        for aside in asides_to_create:
+            for field in aside.fields.values():
+                if field.scope not in (Scope.settings, Scope.content,):
+                    field.delete_from(aside)
+
         dest_module = store.create_item(
             user.id,
             dest_usage_key.course_key,
@@ -603,6 +615,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
             metadata=duplicate_metadata,
             runtime=source_item.runtime,
+            asides=asides_to_create
         )
 
         children_handled = False
@@ -922,7 +935,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
                 "exam_review_rules": xblock.exam_review_rules,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes
+                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                "hide_after_due": xblock.hide_after_due,
             })
 
     # Update with gating info

@@ -9,6 +9,9 @@
                     'class': 'wrapper-profile-section-two'
                 },
                 template: _.template(sectionTwoTemplate),
+                initialize: function (options) {
+                    this.options = _.extend({}, options);
+                },
                 render: function () {
                     var self = this;
                     var showFullProfile = this.options.showFullProfile();

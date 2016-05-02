@@ -1,6 +1,5 @@
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from component_editor import ComponentEditorView
+from common.test.acceptance.pages.studio.utils import type_in_codemirror
 
 
 class HtmlComponentEditorView(ComponentEditorView):
@@ -49,16 +48,13 @@ class HtmlComponentEditorView(ComponentEditorView):
 
     def set_raw_content(self, content):
         """Types content in raw html mode, leaving the component open.
-
         Arguments:
             content (str): The content to be used.
         """
         self.q(css=self.editor_mode_css).click()
         self.q(css='[aria-label="Edit HTML"]').click()
         self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
-
-        #Focus goes to the editor by default
-        ActionChains(self.browser).send_keys([Keys.CONTROL, 'a']).\
-            key_up(Keys.CONTROL).send_keys(content).perform()
+        # Set content in the CodeMirror editor.
+        type_in_codemirror(self, 0, content)
 
         self.q(css='.mce-foot .mce-primary').click()

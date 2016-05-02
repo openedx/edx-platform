@@ -79,6 +79,11 @@ class ProgramsApiConfig(ConfigurationModel):
         default=False
     )
 
+    program_listing_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show program listing page"),
+        default=False
+    )
+
     @property
     def internal_api_url(self):
         """
@@ -144,3 +149,10 @@ class ProgramsApiConfig(ConfigurationModel):
         Indicates whether we should show xseries add
         """
         return self.enabled and self.xseries_ad_enabled
+
+    @property
+    def show_program_listing(self):
+        """
+        Indicates whether we want to show program listing page
+        """
+        return self.enabled and self.program_listing_enabled

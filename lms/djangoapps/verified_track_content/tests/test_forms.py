@@ -1,8 +1,6 @@
 """
 Test for forms helpers.
 """
-from opaque_keys.edx.keys import CourseKey
-
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
