@@ -839,7 +839,7 @@ def _calculate_score_for_modules(user_id, course, modules):
 
     # Iterate over all of the exam modules to get score percentage of user for each of them
     module_percentages = []
-    ignore_categories = ['course', 'chapter', 'sequential', 'vertical', 'randomize']
+    ignore_categories = ['course', 'chapter', 'sequential', 'vertical', 'randomize', 'library_content']
     for index, module in enumerate(modules):
         if module.category not in ignore_categories and (module.graded or module.has_score):
             module_score = scores_client.get(locations[index])
