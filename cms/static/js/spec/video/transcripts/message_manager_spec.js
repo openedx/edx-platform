@@ -6,9 +6,9 @@ define(
         "xmodule"
     ],
 function ($, _, Utils, MessageManager, FileUploader, sinon) {
+    'use strict';
 
-    // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests
-    xdescribe('Transcripts.MessageManager', function () {
+    describe('Transcripts.MessageManager', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),
@@ -46,7 +46,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             );
             $container = $('#metadata-videolist-entry');
 
-            spyOn(fileUploader, 'initialize');
+            spyOn(fileUploader, 'initialize').and.callThrough();
             spyOn(console, 'error');
             spyOn(Utils.Storage, 'set');
 
@@ -66,12 +66,11 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             });
         });
 
-        // Disabled 2/6/14 after intermittent failure in master
         describe('Render', function () {
 
             beforeEach(function () {
                 spyOn(_,'template').and.callThrough();
-                spyOn(fileUploader, 'render');
+                spyOn(view.fileUploader, 'render');
             });
 
             it('Template doesn\'t exist', function () {
@@ -81,7 +80,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 expect(_.template).not.toHaveBeenCalled();
                 expect(view.$el.find('.transcripts-status'))
                     .toHaveClass('is-invisible');
-                expect(fileUploader.render).not.toHaveBeenCalled();
+                expect(view.fileUploader.render).not.toHaveBeenCalled();
             });
 
             it('All works okay if correct data is passed', function () {
@@ -90,7 +89,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                 expect(console.error).not.toHaveBeenCalled();
                 expect(_.template).toHaveBeenCalled();
                 expect(view.$el).not.toHaveClass('is-invisible');
-                expect(fileUploader.render).toHaveBeenCalled();
+                expect(view.fileUploader.render).toHaveBeenCalled();
             });
         });
 

@@ -5,8 +5,9 @@ define(
         "xmodule", "jquery.form"
     ],
 function ($, _, Utils, FileUploader) {
-    // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests
-    xdescribe('Transcripts.FileUploader', function () {
+    'use strict';
+
+    describe('Transcripts.FileUploader', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),
@@ -67,18 +68,15 @@ function ($, _, Utils, FileUploader) {
             it('Template doesn\'t exist', function () {
                 spyOn(console, 'error');
                 view.uploadTpl = '';
-                view.render();
 
-                expect(console.error).toHaveBeenCalled();
                 expect(view.render).not.toThrow();
+                expect(console.error).toHaveBeenCalled();
                 expect(_.template).not.toHaveBeenCalled();
             });
 
             it('Container where template will be inserted doesn\'t exist',
                 function () {
                     $('.transcripts-file-uploader').remove();
-
-                    view.render();
 
                     expect(view.render).not.toThrow();
                     expect(_.template).not.toHaveBeenCalled();
@@ -93,8 +91,6 @@ function ($, _, Utils, FileUploader) {
                             }).join(', ');
 
                 view.validFileExtensions = validFileExtensions;
-                view.render();
-
                 expect(view.render).not.toThrow();
                 expect(_.template).toHaveBeenCalled();
                 $.each(elList, function(index, el) {
