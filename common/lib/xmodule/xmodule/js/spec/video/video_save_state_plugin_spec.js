@@ -9,12 +9,14 @@
                 .createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
 
-            state = jasmine.initializePlayer();
+            state = jasmine.initializePlayer({
+                recordedYoutubeIsAvailable: true
+            });
             spyOn(state.storage, 'setItem');
         });
 
         afterEach(function () {
-            
+
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
             state.storage.clear();
@@ -199,7 +201,20 @@
             expect(state.storage.setItem).toHaveBeenCalledWith('language', 'ua');
         });
 
-        it('can save information about youtube availability', function () {
+        it('can save youtube availability', function () {
+            $.ajax.calls.reset();
+
+            // Test the cases where we shouldn't send anything at all -- client
+            // side code determines that YouTube availability is the same as
+            // what's already been recorded on the server side.
+            state.config.recordedYoutubeIsAvailable = true;
+            state.el.trigger('youtube_availability', [true]);
+            state.config.recordedYoutubeIsAvailable = false;
+            state.el.trigger('youtube_availability', [false]);
+            expect($.ajax).not.toHaveBeenCalled();
+
+            // Test that we can go from unavailable -> available
+            state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -207,6 +222,17 @@
                 async: true,
                 dataType: 'json',
                 data: {youtube_is_available: true}
+            });
+
+             // Test that we can go from available -> unavailable
+            state.config.recordedYoutubeIsAvailable = true;
+            state.el.trigger('youtube_availability', [false]);
+            expect($.ajax).toHaveBeenCalledWith({
+                url: state.config.saveStateUrl,
+                type: 'POST',
+                async: true,
+                dataType: 'json',
+                data: {youtube_is_available: false}
             });
         });
 
