@@ -28,6 +28,14 @@
 <div class="status submission-error hidden" aria-live="polite">
     <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
     <ul class="message-copy"></ul>
+    <ul style="margin: 0;padding: 0 0 0 20px;">
+        <li>
+            <%- gettext("If you have an account in bigdatauniversity.com and this is the first time you access beta.bigdatauniversity.com, please") %>
+            <a href="https://courses.bigdatauniversity.com/access_new_account" style="text-decoration: none; color: #27AAE1;">click here</a>
+            <%- gettext("and review the") %>
+            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs" style="text-decoration: none; color: #27AAE1;">FAQ page.</a>
+        </li>
+    </ul>
 </div>
 
 <% if (context.errorMessage) { %>
