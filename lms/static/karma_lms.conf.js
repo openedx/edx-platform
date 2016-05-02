@@ -118,7 +118,8 @@ var fixtureFiles = [
     {pattern: 'support/templates/**/*.*', included: false},
     {pattern: 'templates/bookmarks/**/*.*', included: false},
     {pattern: 'templates/learner_dashboard/**/*.*', included: false},
-    {pattern: 'templates/ccx/**/*.*', included: false}
+    {pattern: 'templates/ccx/**/*.*', included: false},
+    {pattern: 'templates/commerce/receipt.underscore', included: false}
 ];
 
 // override fixture path and other config.
