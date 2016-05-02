@@ -230,7 +230,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
         describe "Basic", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = (requests) ->
-                @view.pagingView.setPage(0)
+                @view.pagingView.setPage(1)
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             $.fn.fileupload = ->
@@ -274,7 +274,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
                 {view: @view, requests: requests} = @createAssetsView(this)
                 appendSetFixtures('<div class="ui-loading"/>')
                 expect($('.ui-loading').is(':visible')).toBe(true)
-                @view.pagingView.setPage(0)
+                @view.pagingView.setPage(1)
                 AjaxHelpers.respondWithError(requests)
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
@@ -323,7 +323,7 @@ define ["jquery", "common/js/spec_helpers/ajax_helpers", "squire"],
         describe "Sorting", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = (requests) ->
-                @view.pagingView.setPage(0)
+                @view.pagingView.setPage(1)
                 AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
 
             it "should have the correct default sort order", ->

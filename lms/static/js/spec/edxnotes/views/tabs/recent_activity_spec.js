@@ -70,6 +70,7 @@ define([
             ]);
 
             this.collection = new NotesCollection(notes, {perPage: 10, parse: true});
+            this.collection.url = '/test/notes/';
             this.tabsCollection = new TabsCollection();
         });
 
@@ -79,7 +80,7 @@ define([
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, notes);
         });
 
-        it("will not render header and footer if there are no notes", function () {
+        it('will not render header and footer if there are no notes', function () {
             var notes = {
                 'count': 0,
                 'current_page': 1,
@@ -95,7 +96,7 @@ define([
             expect(view.$('.pagination.pagination-full.bottom')).toHaveLength(0);
         });
 
-        it("can go to a page number", function () {
+        it('can go to a page number', function () {
             var requests = AjaxHelpers.requests(this);
             var notes = Helpers.createNotesData(
                 {
@@ -108,6 +109,7 @@ define([
             );
 
             var collection = new NotesCollection(notes, {perPage: 10, parse: true});
+            collection.url = '/test/notes/';
             var view = getView(collection, this.tabsCollection);
 
             Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 12 total", false, 1, 2);
@@ -134,7 +136,7 @@ define([
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, notes);
         });
 
-        it("can navigate forward and backward", function () {
+        it('can navigate forward and backward', function () {
             var requests = AjaxHelpers.requests(this);
             var page1Notes = Helpers.createNotesData(
                 {
@@ -146,6 +148,7 @@ define([
                 }
             );
             var collection = new NotesCollection(page1Notes, {perPage: 10, parse: true});
+            collection.url = '/test/notes/';
             var view = getView(collection, this.tabsCollection);
 
             Helpers.verifyPaginationInfo(view, "Showing 1-10 out of 15 total", false, 1, 2);
@@ -180,7 +183,7 @@ define([
             Helpers.verifyPageData(view, this.tabsCollection, tabInfo, recentActivityTabId, page1Notes);
         });
 
-        it("sends correct page size value", function () {
+        it('sends correct page size value', function () {
             var requests = AjaxHelpers.requests(this);
             var notes = Helpers.createNotesData(
                 {
@@ -192,6 +195,7 @@ define([
                 }
             );
             var collection = new NotesCollection(notes, {perPage: 5, parse: true});
+            collection.url = '/test/notes/';
             var view = getView(collection, this.tabsCollection);
 
             view.$('.pagination .next-page-link').click();

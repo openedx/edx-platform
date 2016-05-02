@@ -1,20 +1,24 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'logger',
+        'gettext',
+        'jquery',
+        'underscore',
+        'backbone',
+        'logger',
+        'edx-ui-toolkit/js/pagination/paging-collection',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/views/fields',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
         'js/student_profile/models/badges_model',
-        'common/js/components/collections/paging_collection',
         'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function (gettext, $, _, Backbone, Logger, AccountSettingsModel, AccountPreferencesModel, FieldsView,
-                 LearnerProfileFieldsView, LearnerProfileView, BadgeModel, PagingCollection, BadgeListContainer,
+    ], function (gettext, $, _, Backbone, Logger, PagingCollection, AccountSettingsModel, AccountPreferencesModel,
+                 FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel, BadgeListContainer,
                  AccountSettingsFieldViews, MessageBannerView) {
 
         return function (options) {
@@ -64,7 +68,7 @@
 
             var profileImageFieldView = new LearnerProfileFieldsView.ProfileImageFieldView({
                 model: accountSettingsModel,
-                valueAttribute: "profile_image",
+                valueAttribute: 'profile_image',
                 editable: editable === 'toggle',
                 messageView: messageView,
                 imageMaxBytes: options['profile_image_max_bytes'],
@@ -125,7 +129,12 @@
                 })
             ];
 
-            var badgeCollection = new PagingCollection();
+            var BadgeCollection = PagingCollection.extend({
+                queryParams: {
+                    currentPage: 'current_page'
+                }
+            });
+            var badgeCollection = new BadgeCollection();
             badgeCollection.url = options.badges_api_url;
 
             var badgeListContainer = new BadgeListContainer({

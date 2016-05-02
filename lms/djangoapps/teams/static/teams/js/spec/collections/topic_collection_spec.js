@@ -21,7 +21,7 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
             };
 
             it('sets its perPage based on initial page size', function () {
-                expect(topicCollection.perPage).toBe(5);
+                expect(topicCollection.getPageSize()).toBe(5);
             });
 
             it('sorts by name', function () {

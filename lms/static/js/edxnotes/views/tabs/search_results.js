@@ -142,7 +142,7 @@ define([
         },
 
         onSearchError: function (errorMessage) {
-            this.showErrorMessage(errorMessage);
+            this.showErrorMessageHtml(errorMessage);
             if (this.searchDeferred) {
                 this.searchDeferred.reject();
             }
