@@ -38,6 +38,7 @@ import shoppingcart
 import survey.utils
 import survey.views
 from certificates import api as certs_api
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.gating import api as gating_api
 from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
@@ -883,6 +884,7 @@ def course_about(request, course_id):
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
         course = get_course_with_access(request.user, permission, course_key)
+        course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if theming_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
@@ -962,6 +964,7 @@ def course_about(request, course_id):
 
         context = {
             'course': course,
+            'course_details': course_details,
             'staff_access': staff_access,
             'studio_url': studio_url,
             'registered': registered,
