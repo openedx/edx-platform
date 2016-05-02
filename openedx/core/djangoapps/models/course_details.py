@@ -75,12 +75,14 @@ class CourseDetails(object):
         return value
 
     @classmethod
-    def fetch(cls, course_key):
+    def fetch(cls, course_key, descriptor=None):
         """
         Fetch the course details for the given course from persistence
         and return a CourseDetails model.
         """
-        descriptor = modulestore().get_course(course_key)
+        if not descriptor:
+            descriptor = modulestore().get_course(course_key)
+
         course_details = cls(course_key.org, course_key.course, course_key.run)
 
         course_details.start_date = descriptor.start
@@ -90,6 +92,49 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+
+        # Will be removed after merge
+        course_details.hero_image_asset_path = 'images/dummy-image.png'
+        course_details.thumbnail_image_asset_path = 'images/dummy-image.png'
+        course_details.title = 'Aenean viverra rhoncus pede'
+        course_details.subtitle = 'Mauris turpis nunc, blandit et, volutpat molestie, porta ut, ligula. Vivamus aliquet elit ac nisl.'
+        course_details.duration = '4 Months'
+        course_details.description = 'Donec sodales sagittis magna. Cras varius. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Phasellus ullamcorper ipsum rutrum nunc. Donec interdum, metus et hendrerit aliquet, dolor diam sagittis ligula, eget egestas libero turpis vel mi. Aenean commodo ligula eget dolor. Nam commodo suscipit quam. Vestibulum volutpat pretium libero. Phasellus tempus. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Etiam sollicitudin, ipsum eu pulvinar rutrum, tellus ipsum laoreet sapien, quis venenatis ante odio sit amet eros. Fusce commodo aliquam arcu. In consectetuer turpis ut velit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum dapibus nunc ac augue.'
+        course_details.learning_info = ['Python', 'Django', 'Software Engineering', 'Software Development']
+        course_details.instructor_info = {
+            "instructors": [
+                {
+                    "name": "Donec interdum",
+                    "title": "Assistant Professor",
+                    "organization": "Harvard Medical School",
+                    "image": "image/profile-image.png",
+                    "bio": "Ut id nisl quis enim dignissim sagittis. Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Fusce a quam. In ut quam vitae odio lacinia tincidunt. Pellentesque commodo eros a enim.",
+                },
+                {
+                    "name": "Fusce risus",
+                    "title": "Assistant Professor",
+                    "organization": "MITx",
+                    "image": "image/profile-image.png",
+                    "bio": "Suspendisse eu ligula. Nam eget dui. Aenean commodo ligula eget dolor. Curabitur blandit mollis lacus. Sed augue ipsum, egestas nec, vestibulum et, malesuada adipiscing, dui.",
+                },
+                {
+                    "name": "Phasellus a",
+                    "title": "Assistant Professor",
+                    "organization": "Stanford",
+                    "image": "image/profile-image.png",
+                    "bio": "Etiam sit amet orci eget eros faucibus tincidunt. In consectetuer turpis ut velit. Fusce a quam. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia.",
+                },
+                {
+                    "name": "Phasellus consectetuer",
+                    "title": "Assistant Professor",
+                    "organization": "Harvard Medical School",
+                    "image": "image/profile-image.png",
+                    "bio": "Praesent porttitor, nulla vitae posuere iaculis, arcu nisl dignissim dolor, a pretium mi sem ut ipsum. Pellentesque posuere. Nulla consequat massa quis enim. Phasellus a est. Maecenas vestibulum mollis diam.",
+                },
+            ]
+        }
+
+
         course_details.language = descriptor.language
         course_details.self_paced = descriptor.self_paced
 
