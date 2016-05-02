@@ -23,11 +23,11 @@
       height: calc(100vh - 200px);
       overflow: auto;
     }
-    article{
-          box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
-          margin-top: 15px;
-          padding: 15px 30px;
-          background: #f9f9f9;
+    article {
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      margin-top: 15px;
+      padding: 15px 30px;
+      background: #f9f9f9;
     }
     li {
       font-size: 13px;
@@ -43,6 +43,14 @@
     div.error {
       color: #F00;
       margin-top: 10px;
+    }
+    div.dry-run {
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    div.main-output {
+      color: #0A0;
+      font-size: 15px;
     }
   }
 }

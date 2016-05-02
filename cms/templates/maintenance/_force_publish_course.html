@@ -1,3 +1,78 @@
-<div class="wrap-instructor-info studio-view">
-    Force Publish Course : Not yet Implemented
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import Text, HTML
+%>
+<div class="wrap-instructor-info studio-view command-form">
+    <form class="form-create" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+        <div class="wrapper-form">
+            <fieldset>
+                <ol class="list-input">
+                    <li class="field text required" id="field-course-name">
+                        <label for="course-id">${_("Course ID")}</label>
+                        <input id="course-id" type="text" name="course-id" aria-required="true" value="${form_data['course_id']}"
+                               placeholder="${_('e.g. edX+DemoX+Demo_Course')}"/>
+                        % if error:
+                        <div class="error">${msg}</div>
+                        % endif
+                    </li>
+                    <li class="field-radio">
+                        <div>
+                            <label for="dry-run" class="label" data-tooltip="${_('Trial or practice run the task')}">${_("Dry Run")}</label>
+                            % if form_data['is_dry_run']:
+                            <% is_checked = "checked" %>
+                            % else :
+                            <% is_checked = "" %>
+                            % endif
+                            <input type="checkbox" id="dry-run" name="dry-run" ${is_checked}/>
+                        </div>
+                    </li>
+                </ol>
+            </fieldset>
+        </div>
+        <div class="actions">
+            <button type="submit" class="action action-primary" aria-disabled="true">${_("Force Publish Course")}
+            </button>
+            <a href="${command['url']}" class="action action-secondary action-cancel" data-tooltip="${_('Reset values')}">${_("Reset")}</a>
+        </div>
+    </form>
+    % if current_versions:
+    <div class="result">
+        % if form_data['is_dry_run']:
+        <article>
+            <div class="dry-run">
+                ${Text(_("You have {strong_start}dry run{strong_end} the course. Following course versions would be changed :")).format(
+                    strong_start=HTML('<strong>'),
+                    strong_end=HTML('</strong>'),
+                )}
+            </div>
+            <div class="main-output">
+                ${_("Published branch version {published} changed to draft branch version {draft}").format(
+                published=current_versions['published-branch'], draft=current_versions['draft-branch']
+                )}
+            </div>
+        </article>
+        % elif updated_versions:
+        <article>
+            <div class="main-output">
+            ${Text(_("({strong_start}Success!{strong_end}) Published the course {course_id} forcefully.")).format(
+            course_id=form_data['course_id'],
+            strong_start=HTML('<strong>'),
+                strong_end=HTML('</strong>'),
+            )}</br>
+            ${_("Now published and draft branch have same version : {version}").format(
+            version=updated_versions['published-branch']
+            )}
+            </div>
+        </article>
+        % endif
+    </div>
+    % elif not error:
+    <div class="wrapper-error">
+        <div class="error" role="alert">${msg}</div>
+    </div>
+    % endif
 </div>

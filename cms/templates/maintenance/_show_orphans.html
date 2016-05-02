@@ -12,21 +12,32 @@ from django.utils.translation import ugettext as _
                 <ol class="list-input">
                     <li class="field text required" id="field-course-name">
                         <label for="course-id">${_("Course ID")}</label>
-                        <input id="course-id" type="text" name="course-id" aria-required="true" value=""
+                        <input id="course-id" type="text" name="course-id" aria-required="true" value="${form_data['course_id']}"
                                placeholder="${_('e.g. edX+DemoX+Demo_Course')}"/>
                         % if error:
                         <div class="error">${msg}</div>
                         % endif
                     </li>
                     <li class="field-radio">
-                        <div>
+                        % if form_data['branch'] == 'published':
+                        <%
+                        published_checked = "checked"
+                        draft_checked = ""
+                        %>
+                        % else :
+                        <%
+                        published_checked = ""
+                        draft_checked = "checked"
+                        %>
+                        % endif
+                        <div data-tooltip="${_('Draft branch version')}">
                             <input type="radio" id="draft-branch" name="draft-published-branch"
-                                   class="input input-radio" checked="checked" value="draft"/>
+                                   class="input input-radio" value="draft" ${draft_checked}/>
                             <label for="draft-branch" class="label">${_("Draft")}</label>
                         </div>
-                        <div>
+                        <div data-tooltip="${_('Published branch version')}">
                             <input type="radio" id="published-branch" name="draft-published-branch"
-                                   class="input input-radio" value="published"/>
+                                   class="input input-radio" value="published" ${published_checked}/>
                             <label for="published-branch" class="label">${_("Published")}</label>
                         </div>
 
@@ -37,7 +48,7 @@ from django.utils.translation import ugettext as _
 
         <div class="actions">
             <button type="submit" class="action action-primary" aria-disabled="true">${_("View Orphans")}</button>
-            <a href="${command['url']}" class="action action-secondary action-cancel">${_("Reset")}</a>
+            <a href="${command['url']}" class="action action-secondary action-cancel" data-tooltip="${_('Reset values')}">${_("Reset")}</a>
         </div>
     </form>
     % if orphans:
@@ -52,7 +63,7 @@ from django.utils.translation import ugettext as _
             </ul>
         </article>
     </div>
-    % elif success:
+    % elif not error:
     <div class="wrapper-error">
         <div class="error" role="alert">${msg}</div>
     </div>
