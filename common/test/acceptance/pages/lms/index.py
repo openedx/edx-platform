@@ -29,7 +29,7 @@ class IndexPage(PageObject):
         Returns a browser query object representing the video modal element
         """
         element = self.q(css=BANNER_SELECTOR)
-        return element.visible and element.text[0] == "Welcome to Open edX!"
+        return element.visible and element.text[0] == "Welcome to the Open edX platform!"
 
     @property
     def banner_element(self):
