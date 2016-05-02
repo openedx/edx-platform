@@ -1,11 +1,8 @@
 """
 Allow Unicode in Admin and LMS.
 """
-from django.contrib.auth.admin import UserAdmin
 from django import forms
-from ratelimitbackend import admin
 import re
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -21,19 +18,6 @@ unicode_username_field = forms.RegexField(label=_("Username"),
                                               'invalid': _("This value may contain only letters, numbers and"
                                                            " @/./+/-/_ characters.")
                                           })
-
-
-class UnicodeUserCreationForm(UserCreationForm):
-    username = unicode_username_field
-
-
-class UnicodeUserChangeForm(UserChangeForm):
-    username = unicode_username_field
-
-
-class UnicodeUserAdmin(UserAdmin):
-    form = UnicodeUserChangeForm
-    add_form = UnicodeUserCreationForm
 
 
 validate_username = RegexValidator(
