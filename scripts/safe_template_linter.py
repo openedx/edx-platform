@@ -567,10 +567,7 @@ class ExpressionRuleViolation(RuleViolation):
             else:
                 column = 1
                 rule_id = " " * (len(self.rule.rule_id) + 1)
-            try:
-                line = self.lines[line_number - self.start_line].encode(encoding='utf-8')
-            except (TypeError, IndexError):
-                line = "Error printing line with line_number={} and start_line={}.".format(line_number, self.start_line)
+            line = self.lines[line_number - self.start_line].encode(encoding='utf-8')
             print("{}: {}:{}: {} {}".format(
                 self.full_path,
                 line_number,
@@ -784,6 +781,9 @@ class BaseLinter(object):
     BaseLinter provides some helper functions that are used by multiple linters.
 
     """
+
+    LINE_COMMENT_DELIM = None
+
     def __init__(self):
         """
         Init method.
@@ -799,7 +799,6 @@ class BaseLinter(object):
             'vendor',
             'perf_tests'
         )
-        self.line_comment_delim = None
 
     def _is_skip_dir(self, skip_dirs, directory):
         """
@@ -970,9 +969,9 @@ class BaseLinter(object):
             Otherwise, returns the start_index of the first line that is
             uncommented, if there is one. Otherwise, returns None.
         """
-        if self.line_comment_delim is not None:
+        if self.LINE_COMMENT_DELIM is not None:
             line_start_index = StringLines(template).index_to_line_start_index(start_index)
-            uncommented_line_start_index_regex = re.compile("^(?!\s*{})".format(self.line_comment_delim), re.MULTILINE)
+            uncommented_line_start_index_regex = re.compile("^(?!\s*{})".format(self.LINE_COMMENT_DELIM), re.MULTILINE)
             # Finds the line start index of the first uncommented line, including the current line.
             match = uncommented_line_start_index_regex.search(template, line_start_index)
             if match is None:
@@ -1105,7 +1104,8 @@ class JavaScriptLinter(BaseLinter):
     """
     The linter for JavaScript and CoffeeScript files.
     """
-    underscore_linter = UnderscoreTemplateLinter()
+
+    LINE_COMMENT_DELIM = "//"
 
     def __init__(self):
         """
@@ -1114,7 +1114,7 @@ class JavaScriptLinter(BaseLinter):
         super(JavaScriptLinter, self).__init__()
         self._skip_javascript_dirs = self._skip_dirs + ('i18n', 'static/coffee')
         self._skip_coffeescript_dirs = self._skip_dirs
-        self.line_comment_delim = "//"
+        self.underscore_linter = UnderscoreTemplateLinter()
 
     def process_file(self, directory, file_name):
         """
@@ -1182,7 +1182,7 @@ class JavaScriptLinter(BaseLinter):
         self._check_javascript_escape(file_contents, results)
         self._check_concat_with_html(file_contents, Rules.javascript_concat_html, results)
         self.underscore_linter.check_underscore_file_is_safe(file_contents, results)
-        results.prepare_results(file_contents, line_comment_delim=self.line_comment_delim)
+        results.prepare_results(file_contents, line_comment_delim=self.LINE_COMMENT_DELIM)
 
     def _get_expression_for_function(self, file_contents, function_start_match):
         """
@@ -1495,14 +1495,14 @@ class BaseVisitor(ast.NodeVisitor):
             # Triple quotes give col_offset of -1 on the last line of the string.
             if node.col_offset == -1:
                 triple_quote_regex = re.compile("""['"]{3}""")
-                open_quote_match = None
-                for open_quote_match in triple_quote_regex.finditer(self.file_contents, 0, line_start_index):
-                    # Find the last open quote.
-                    pass
-                # If an open quote wasn't found on previous lines, search the final line.
-                if open_quote_match is None:
-                    open_quote_match = re.search(self.file_contents, line_start_index)
-                start_index = open_quote_match.start()
+                end_triple_quote_match = triple_quote_regex.search(self.file_contents, line_start_index)
+                open_quote_index = self.file_contents.rfind(end_triple_quote_match.group(), 0, end_triple_quote_match.start())
+                if open_quote_index > 0:
+                    start_index = open_quote_index
+                else:
+                    # If we can't find a starting quote, let's assume that what
+                    # we considered the end quote is really the start quote.
+                    start_index = end_triple_quote_match.start()
             string = ParseString(self.file_contents, start_index, len(self.file_contents))
             return Expression(string.start_index, string.end_index)
         else:
@@ -1597,12 +1597,12 @@ class HtmlStringVisitor(BaseVisitor):
             self.generic_visit(node)
 
 
-class CloseBeforeFormatVisitor(BaseVisitor):
+class ContainsFormatVisitor(BaseVisitor):
     """
-    HTML() and Text() should not have a format() anywhere in its argument. This
-    visitor can used to ensure there was no call to format().
+    Checks if there are any nested format() calls.
 
-    This visitor is meant to be called on HTML() and Text() ast.Call nodes.
+    This visitor is meant to be called on HTML() and Text() ast.Call nodes to
+    search for any illegal nested format() calls.
 
     """
     def __init__(self, file_contents, results):
@@ -1614,7 +1614,7 @@ class CloseBeforeFormatVisitor(BaseVisitor):
             results: A file results objects to which violations will be added.
 
         """
-        super(CloseBeforeFormatVisitor, self).__init__(file_contents, results)
+        super(ContainsFormatVisitor, self).__init__(file_contents, results)
         self.contains_format_call = False
 
     def visit_Attribute(self, node):
@@ -1729,6 +1729,20 @@ class AllNodeVisitor(BaseVisitor):
     This visitor is meant to be used once from the root.
 
     """
+
+    def visit_Attribute(self, node):
+        """
+        Checks for uses of deprecated `display_name_with_default_escaped`.
+
+        Arguments:
+             node: An AST node.
+        """
+        if node.attr == 'display_name_with_default_escaped':
+            self.results.violations.append(ExpressionRuleViolation(
+                Rules.python_deprecated_display_name, self.node_to_expression(node)
+            ))
+        self.generic_visit(node)
+
     def visit_Call(self, node):
         """
         Checks for a variety of violations:
@@ -1739,15 +1753,16 @@ class AllNodeVisitor(BaseVisitor):
 
         Arguments:
              node: An AST node.
+
         """
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'format':
             visitor = FormatInterpolateVisitor(self.file_contents, self.results)
             visitor.visit(node)
             if visitor.interpolates_text_or_html:
                 format_caller = node.func.value
-                is_caller_html_or_text = isinstance(format_caller, ast.Call)
-                is_caller_html_or_text = is_caller_html_or_text and isinstance(format_caller.func, ast.Name)
-                is_caller_html_or_text = is_caller_html_or_text and format_caller.func.id in ['Text', 'HTML']
+                is_caller_html_or_text = isinstance(format_caller, ast.Call) and \
+                    isinstance(format_caller.func, ast.Name) and \
+                    format_caller.func.id in ['Text', 'HTML']
                 # If format call has nested Text() or HTML(), then the caller,
                 # or left-hand-side of the format() call, must be a call to
                 # Text() or HTML().
@@ -1755,13 +1770,14 @@ class AllNodeVisitor(BaseVisitor):
                     self.results.violations.append(ExpressionRuleViolation(
                         Rules.python_requires_html_or_text, self.node_to_expression(node.func)
                     ))
-        if isinstance(node.func, ast.Name) and node.func.id in ['HTML', 'Text']:
-            visitor = CloseBeforeFormatVisitor(self.file_contents, self.results)
+        elif isinstance(node.func, ast.Name) and node.func.id in ['HTML', 'Text']:
+            visitor = ContainsFormatVisitor(self.file_contents, self.results)
             visitor.visit(node)
             if visitor.contains_format_call:
                 self.results.violations.append(ExpressionRuleViolation(
                     Rules.python_close_before_format, self.node_to_expression(node.func)
                 ))
+
         self.generic_visit(node)
 
     def visit_BinOp(self, node):
@@ -1779,6 +1795,7 @@ class AllNodeVisitor(BaseVisitor):
             visitor = HtmlStringVisitor(self.file_contents, self.results)
             visitor.visit(node.left)
             has_illegal_html_string = len(visitor.unsafe_html_string_nodes) > 0
+            # Create new visitor to clear state.
             visitor = HtmlStringVisitor(self.file_contents, self.results)
             visitor.visit(node.right)
             has_illegal_html_string = has_illegal_html_string or len(visitor.unsafe_html_string_nodes) > 0
@@ -1799,13 +1816,14 @@ class PythonLinter(BaseLinter):
     Skipping docstrings is an enhancement that could be added.
     """
 
+    LINE_COMMENT_DELIM = "#"
+
     def __init__(self):
         """
         Init method.
         """
         super(PythonLinter, self).__init__()
         self._skip_python_dirs = self._skip_dirs + ('tests', 'test/acceptance')
-        self.line_comment_delim = "#"
 
     def process_file(self, directory, file_name):
         """
@@ -1861,7 +1879,7 @@ class PythonLinter(BaseLinter):
             # check format() rules that can be run on outer-most format() calls
             visitor = OuterFormatVisitor(file_contents, results)
             visitor.visit(root_node)
-        results.prepare_results(file_contents, line_comment_delim=self.line_comment_delim)
+        results.prepare_results(file_contents, line_comment_delim=self.LINE_COMMENT_DELIM)
 
     def check_python_code_is_safe(self, python_code, root_node, results):
         """
@@ -1879,7 +1897,6 @@ class PythonLinter(BaseLinter):
             visitor = AllNodeVisitor(python_code, results)
             visitor.visit(root_node)
         # check rules parse with regex
-        self._check_deprecated_display_name(python_code, results)
         self._check_custom_escape(python_code, results)
 
     def parse_python_code(self, python_code, results):
@@ -1937,22 +1954,6 @@ class PythonLinter(BaseLinter):
             file_contents = file_contents.replace(encoding_match.group(), '#', 1)
         return file_contents
 
-    def _check_deprecated_display_name(self, file_contents, results):
-        """
-        Checks that the deprecated display_name_with_default_escaped is not
-        used. Adds violation to results if there is a problem.
-
-        Arguments:
-            file_contents: The contents of the Python file
-            results: A list of results into which violations will be added.
-
-        """
-        for match in re.finditer(r'\.display_name_with_default_escaped', file_contents):
-            expression = Expression(match.start(), match.end())
-            results.violations.append(ExpressionRuleViolation(
-                Rules.python_deprecated_display_name, expression
-            ))
-
     def _check_custom_escape(self, file_contents, results):
         """
         Checks for custom escaping calls, rather than using a standard escaping
@@ -1974,15 +1975,15 @@ class MakoTemplateLinter(BaseLinter):
     """
     The linter for Mako template files.
     """
-    javascript_linter = JavaScriptLinter()
-    python_linter = PythonLinter()
+    LINE_COMMENT_DELIM = "##"
 
     def __init__(self):
         """
         Init method.
         """
         super(MakoTemplateLinter, self).__init__()
-        self.line_comment_delim = "##"
+        self.javascript_linter = JavaScriptLinter()
+        self.python_linter = PythonLinter()
 
     def process_file(self, directory, file_name):
         """
@@ -2053,7 +2054,7 @@ class MakoTemplateLinter(BaseLinter):
             return
         has_page_default = self._has_page_default(mako_template, results)
         self._check_mako_expressions(mako_template, has_page_default, results)
-        results.prepare_results(mako_template, line_comment_delim=self.line_comment_delim)
+        results.prepare_results(mako_template, line_comment_delim=self.LINE_COMMENT_DELIM)
 
     def _is_django_template(self, mako_template):
         """
@@ -2233,7 +2234,7 @@ class MakoTemplateLinter(BaseLinter):
                     python_results.violations.append(ExpressionRuleViolation(
                         Rules.mako_html_entities, visitor.node_to_expression(over_escaped_entity_string_node)
                     ))
-        python_results.prepare_results(python_code, self.line_comment_delim)
+        python_results.prepare_results(python_code, line_comment_delim=self.LINE_COMMENT_DELIM)
         self._shift_and_add_violations(python_results, start_offset, results)
 
     def _shift_and_add_violations(self, other_linter_results, start_offset, results):

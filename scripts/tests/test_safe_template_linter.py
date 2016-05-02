@@ -1333,17 +1333,6 @@ class TestPythonLinter(TestLinter):
             'python': "msg = HTML('<span></span>'",
             'rule': Rules.python_parse_error
         },
-        {
-            'python':
-                textwrap.dedent("""
-                    response_str = textwrap.dedent('''
-                        <div>
-                            <h3 class="result">{response}</h3>
-                        </div>
-                    ''').format(response=response_text)
-                """),
-            'rule': Rules.python_wrap_html
-        },
     )
     def test_check_python_with_text_and_html(self, data):
         """
@@ -1388,3 +1377,77 @@ class TestPythonLinter(TestLinter):
         self.assertEqual(results.violations[2].rule, Rules.python_close_before_format)
         self.assertEqual(results.violations[3].rule, Rules.python_wrap_html)
         self.assertEqual(results.violations[4].rule, Rules.python_interpolate_html)
+
+    @data(
+        {
+            'python':
+                """
+                    response_str = textwrap.dedent('''
+                        <div>
+                            <h3 class="result">{response}</h3>
+                        </div>
+                    ''').format(response=response_text)
+                """,
+            'rule': Rules.python_wrap_html,
+            'start_line': 2,
+        },
+        {
+            'python':
+                """
+                def function(self):
+                    '''
+                    Function comment.
+                    '''
+                    response_str = textwrap.dedent('''
+                        <div>
+                            <h3 class="result">{response}</h3>
+                        </div>
+                    ''').format(response=response_text)
+                """,
+            'rule': Rules.python_wrap_html,
+            'start_line': 6,
+        },
+        {
+            'python':
+                """
+                def function(self):
+                    '''
+                    Function comment.
+                    '''
+                    response_str = '''<h3 class="result">{response}</h3>'''.format(response=response_text)
+                """,
+            'rule': Rules.python_wrap_html,
+            'start_line': 6,
+        },
+        {
+            'python':
+                """
+                def function(self):
+                    '''
+                    Function comment.
+                    '''
+                    response_str = textwrap.dedent('''
+                        <div>
+                            \"\"\" Do we care about a nested triple quote? \"\"\"
+                            <h3 class="result">{response}</h3>
+                        </div>
+                    ''').format(response=response_text)
+                """,
+            'rule': Rules.python_wrap_html,
+            'start_line': 6,
+        },
+    )
+    def test_check_python_with_triple_quotes(self, data):
+        """
+        Test _check_python_file_is_safe with triple quotes.
+
+        """
+        linter = PythonLinter()
+        results = FileResults('')
+
+        file_content = textwrap.dedent(data['python'])
+
+        linter.check_python_file_is_safe(file_content, results)
+
+        self._validate_data_rules(data, results)
+        self.assertEqual(results.violations[0].start_line, data['start_line'])
