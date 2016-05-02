@@ -26,9 +26,9 @@ def HTML(html):                                 # pylint: disable=invalid-name
         from openedx.core.djangolib.markup import Text, HTML
         %>
         ${Text(_("Write & send {start}email{end}")).format(
-            start=HTML("<a href='mailto:{}'>".format(user.email),
+            start=HTML("<a href='mailto:{}'>").format(user.email),
             end=HTML("</a>"),
-           )}
+        )}
 
     """
     return markupsafe.Markup(html)
