@@ -32,24 +32,24 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from survey.utils import must_answer_survey
 
-from .access import has_access, _adjust_start_date_for_beta_testers
-from .access_utils import in_preview_mode
-from .courses import get_studio_url, get_course_with_access
-from .entrance_exams import (
+from ..access import has_access, _adjust_start_date_for_beta_testers
+from ..access_utils import in_preview_mode
+from ..courses import get_studio_url, get_course_with_access
+from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
     get_entrance_exam_score,
     user_has_passed_entrance_exam,
     user_must_complete_entrance_exam,
 )
-from .exceptions import Redirect
-from .masquerade import setup_masquerade
-from .model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor
+from ..exceptions import Redirect
+from ..masquerade import setup_masquerade
+from ..model_data import FieldDataCache
+from ..module_render import toc_for_course, get_module_for_descriptor
 from .views import get_current_child, registered_for_course
 
 
-log = logging.getLogger("edx.courseware.index")
+log = logging.getLogger("edx.courseware.views.index")
 TEMPLATE_IMPORTS = {'urllib': urllib}
 CONTENT_DEPTH = 2
 
@@ -187,8 +187,8 @@ class CoursewareIndex(View):
         Verifies that the user can enter the course.
         """
         self._redirect_if_needed_to_pay_for_course()
-        self._redirect_if_needed_to_register_for_course()
-        self._redirect_if_needed_for_course_prerequisites()
+        self._redirect_if_needed_to_register()
+        self._redirect_if_needed_for_prereqs()
         self._redirect_if_needed_for_course_survey()
 
     def _redirect_if_needed_to_pay_for_course(self):
@@ -211,7 +211,7 @@ class CoursewareIndex(View):
             )
             raise Redirect(reverse('dashboard'))
 
-    def _redirect_if_needed_to_register_for_course(self):
+    def _redirect_if_needed_to_register(self):
         """
         Verify that the user is registered in the course.
         """
@@ -223,7 +223,7 @@ class CoursewareIndex(View):
             )
             raise Redirect(reverse('about_course', args=[unicode(self.course.id)]))
 
-    def _redirect_if_needed_for_course_prerequisites(self):
+    def _redirect_if_needed_for_prereqs(self):
         """
         See if all pre-requisites (as per the milestones app feature) have been
         fulfilled. Note that if the pre-requisite feature flag has been turned off

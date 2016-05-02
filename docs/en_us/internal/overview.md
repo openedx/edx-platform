@@ -91,7 +91,7 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
     - `lms/djangoapps/courseware/models.py`
 
 - Core rendering path:
-  - `lms/urls.py` points to `courseware.views.index`, which gets module info from the course xml file, pulls list of `StudentModule` objects for this user (to avoid multiple db hits).
+  - `lms/urls.py` points to `courseware.views.views.index`, which gets module info from the course xml file, pulls list of `StudentModule` objects for this user (to avoid multiple db hits).
 
   - Calls `render_accordion` to render the "accordion"--the display of the course structure.
 

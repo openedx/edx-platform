@@ -26,7 +26,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 from xblock.fragment import Fragment
 
-import courseware.views as views
+import courseware.views.views as views
 import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
@@ -34,13 +34,13 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.index import render_accordion, CoursewareIndex
 from courseware.model_data import set_score
 from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from courseware.views.index import render_accordion, CoursewareIndex
 from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -256,7 +256,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
     def test_index_nonexistent_chapter_masquerade(self):
-        with patch('courseware.index.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
@@ -265,7 +265,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, section_name='non-existent')
 
     def test_index_nonexistent_section_masquerade(self):
-        with patch('courseware.index.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, section_name='non-existent')
@@ -1315,7 +1315,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # status valid code
         # mocking xqueue and analytics
 
-        analytics_patcher = patch('courseware.views.analytics')
+        analytics_patcher = patch('courseware.views.views.analytics')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -1439,7 +1439,7 @@ class ViewCheckerBlock(XBlock):
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """
-    Tests of the courseware.index view.
+    Tests of the courseware.views.index view.
     """
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')

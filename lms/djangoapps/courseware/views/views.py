@@ -68,7 +68,6 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course
 )
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
@@ -83,8 +82,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from .entrance_exams import user_must_complete_entrance_exam
-from .module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
+from ..entrance_exams import user_must_complete_entrance_exam
+from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
 
 
 log = logging.getLogger("edx.courseware")
@@ -107,13 +106,13 @@ def user_groups(user):
     cache_expiration = 60 * 60  # one hour
 
     # Kill caching on dev machines -- we switch groups a lot
-    group_names = cache.get(key)
+    group_names = cache.get(key)  # pylint: disable=no-member
     if settings.DEBUG:
         group_names = None
 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
-        cache.set(key, group_names, cache_expiration)
+        cache.set(key, group_names, cache_expiration)  # pylint: disable=no-member
 
     return group_names
 
