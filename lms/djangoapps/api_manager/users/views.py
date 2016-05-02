@@ -187,10 +187,11 @@ def _manage_role(course_descriptor, user, role, action):
                         pass
 
 
-def _recalculate_grade(request, student, course_descriptor):
+def _recalculate_grade(request, student, course_id):
     """
     Helper method for recalculating gradebook data
     """
+    course_descriptor, course_key, course_content = get_course(request, student, course_id, depth=None)  # pylint: disable=W0612
     progress_summary = grades.progress_summary(student, request, course_descriptor, locators_as_strings=True)  # pylint: disable=unused-variable
     grade_summary = grades.grade(student, request, course_descriptor)
     grading_policy = course_descriptor.grading_policy
@@ -209,14 +210,19 @@ class UsersList(SecureListAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
-    - GET: Provides paginated list of users, it supports email, username, has_organizations and id filters
+    - GET: Provides paginated list of users, it supports email, username, name, organizations, courses enrolled,
+           has_organizations and id filters
         Possible use cases
         GET /api/users?ids=23
         GET /api/users?ids=11,12,13&page=2
+        GET /api/users?organizations=1,2,3
+        GET /api/users?courses={course_id},{course_id2}
         GET /api/users?email={john@example.com}
+        GET /api/users?name={john doe}
         GET /api/users?username={john}
             * email: string, filters user set by email address
             * username: string, filters user set by username
+            * name: string, filters user set by full name
         GET /api/users?has_organizations={true}
             * has_organizations: boolean, filters user set with organization association
         GET /api/users?has_organizations={false}
@@ -269,18 +275,36 @@ class UsersList(SecureListAPIView):
     filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend, HasOrgsFilterBackend)
     filter_fields = ('email', 'username', )
 
+    def get_queryset(self):
+        """
+        Optionally filter users by organizations and course enrollments
+        """
+        queryset = self.queryset
+        org_ids = self.request.QUERY_PARAMS.get('organizations', None)
+        if org_ids is not None:
+            org_ids = map(int, org_ids.split(','))
+            queryset = queryset.filter(organizations__id__in=org_ids).distinct()
+
+        course_ids = self.request.QUERY_PARAMS.get('courses', None)
+        if course_ids is not None:
+            course_ids = map(CourseKey.from_string, course_ids.split(','))
+            queryset = queryset.filter(courseenrollment__course_id__in=course_ids).distinct()
+
+        name = self.request.QUERY_PARAMS.get('name', None)
+        if name is not None:
+            queryset = queryset.filter(profile__name=name)
+
+        queryset = queryset.prefetch_related('organizations')\
+            .select_related('courseenrollment_set', 'profile')\
+            .annotate(courses_enrolled=Count('courseenrollment'))
+
+        return queryset
+
     def get(self, request, *args, **kwargs):
         """
         GET /api/users?ids=11,12,13.....&page=2
         """
-        email = request.QUERY_PARAMS.get('email', None)
-        username = request.QUERY_PARAMS.get('username', None)
-        ids = request.QUERY_PARAMS.get('ids', None)
-        has_orgs = request.QUERY_PARAMS.get('has_organizations', None)
-        if email or username or ids or has_orgs:
-            return self.list(request, *args, **kwargs)
-        else:
-            return Response({'message': _('Unfiltered request is not allowed.')}, status=status.HTTP_400_BAD_REQUEST)
+        return self.list(request, *args, **kwargs)
 
     def post(self, request):
         """
@@ -1023,14 +1047,14 @@ class UsersCoursesGradesDetail(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        # @TODO: Add authorization check here once we get caller identity
-        # Only student can get his/her own information *or* course staff
-        # can get everyone's grades
-        # get the full course tree with depth=None which reduces the number of
-        # round trips to the database
-        course_descriptor, course_key, course_content = get_course(request, student, course_id, depth=None)  # pylint: disable=W0612
-        if not course_descriptor:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        course_key = get_course_key(course_id)
+
+        if not CourseEnrollment.is_enrolled(student, course_key):
+            return Response(
+                {
+                    'message': _("Student not enrolled in given course")
+                }, status=status.HTTP_404_NOT_FOUND
+            )
 
         queryset = StudentGradebook.objects.filter(
             user=student,
@@ -1048,7 +1072,7 @@ class UsersCoursesGradesDetail(SecureAPIView):
                 grade_summary = json.loads(gradebook_entry.grade_summary)
                 grading_policy = json.loads(gradebook_entry.grading_policy)
             else:
-                gradebook_values = _recalculate_grade(request, student, course_descriptor)
+                gradebook_values = _recalculate_grade(request, student, course_id)
                 current_grade = gradebook_values["current_grade"]
                 proforma_grade = gradebook_values["proforma_grade"]
                 progress_summary = gradebook_values["progress_summary"]
@@ -1061,7 +1085,7 @@ class UsersCoursesGradesDetail(SecureAPIView):
                 gradebook_entry.grading_policy = json.dumps(grading_policy, cls=EdxJSONEncoder)
                 gradebook_entry.save()
         else:
-            gradebook_values = _recalculate_grade(request, student, course_descriptor)
+            gradebook_values = _recalculate_grade(request, student, course_id)
             current_grade = gradebook_values["current_grade"]
             proforma_grade = gradebook_values["proforma_grade"]
             progress_summary = gradebook_values["progress_summary"]

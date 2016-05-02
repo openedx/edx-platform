@@ -2,10 +2,10 @@
 Django database models supporting the gradebook app
 """
 from django.utils import timezone
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Avg, Max, Min, Count
+from django.db.models import Avg, Max, Min, Count, F
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
@@ -39,7 +39,7 @@ class StudentGradebook(models.Model):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
-    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=None):
+    def generate_leaderboard(cls, course_key, user_id=None, group_ids=None, count=3, exclude_users=None):
         """
         Assembles a data set representing the Top N users, by grade, for a given course.
         Optionally provide a user_id to include user-specific info.  For example, you
@@ -81,6 +81,7 @@ class StudentGradebook(models.Model):
                 .filter(course_id__exact=course_key, user__is_active=True, user__courseenrollment__is_active=True,
                         user__courseenrollment__course_id__exact=course_key,
                         user__in=enrolled_users_not_excluded)
+
             gradebook_user_count = len(queryset)
 
             if gradebook_user_count:
@@ -95,6 +96,9 @@ class StudentGradebook(models.Model):
                     data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
                     data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
                     data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
+
+                if group_ids:
+                    queryset = queryset.filter(user__groups__in=group_ids).distinct()
 
                 # Construct the leaderboard as a queryset
                 data['queryset'] = queryset.values(
@@ -156,6 +160,27 @@ class StudentGradebook(models.Model):
         data['user_grade'] = user_grade
 
         return data
+
+    @classmethod
+    def get_num_users_completed(cls, course_key, exclude_users=None, org_ids=None, group_ids=None):
+        """
+        Returns count of users those who completed given course.
+        """
+        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+        queryset = cls.objects.filter(
+            course_id__exact=course_key,
+            user__is_active=True,
+            user__courseenrollment__is_active=True,
+            user__courseenrollment__course_id__exact=course_key,
+            proforma_grade__lte=F('grade') + grade_complete_match_range,
+            proforma_grade__gt=0
+        ).exclude(user__id__in=exclude_users)
+        if org_ids:
+            queryset = queryset.filter(user__organizations__in=org_ids)
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids)
+
+        return queryset.distinct().count()
 
 
 class StudentGradebookHistory(TimeStampedModel):

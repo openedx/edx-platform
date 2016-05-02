@@ -24,13 +24,15 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
+from api_manager.models import GroupProfile
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
+from organizations.models import Organization
 from projects.models import Project, Workgroup
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import anonymous_id_for_user
 
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -75,7 +77,6 @@ class SecureClient(Client):
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
-@override_settings(API_PAGE_SIZE=10)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class UsersApiTests(ModuleStoreTestCase):
     """ Test suite for Users API views """
@@ -262,7 +263,14 @@ class UsersApiTests(ModuleStoreTestCase):
 
         # fetch data without any filters applied
         response = self.do_get('{}?page=1'.format(test_uri))
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
+
+        # test default page size
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 20)
+        self.assertEqual(response.data['num_pages'], 2)
+
         # fetch users data with page outside range
         response = self.do_get('{}?ids={}&page=5'.format(test_uri, '2,3,7,11,6,21,34'))
         self.assertEqual(response.status_code, 404)
@@ -274,6 +282,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
         self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
+        self.assertIsNotNone(response.data['results'][0]['last_login'])
         self.assertIsNotNone(response.data['results'][0]['created'])
         # fetch user data by multiple ids
         response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
@@ -306,7 +315,57 @@ class UsersApiTests(ModuleStoreTestCase):
         if 'id' in response.data['results'][0]:
             self.fail("Dynamic field filtering error in UserSerializer")
 
-    def test_user_list_get_with_org_filter(self):
+    def test_user_list_get_courses_enrolled(self):
+        test_uri = self.users_base_uri
+        # create a 2 new users
+        users = UserFactory.create_batch(2)
+
+        # create course enrollments
+        CourseEnrollmentFactory.create(user=users[1], course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=users[1], course_id=self.course2.id)
+
+        # fetch user 1
+        response = self.do_get('{}?ids={}'.format(test_uri, users[0].id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 0)
+
+        # fetch user 2
+        response = self.do_get('{}?ids={}'.format(test_uri, users[1].id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['courses_enrolled'], 2)
+
+    def test_user_list_get_roles(self):
+        test_uri = self.users_base_uri
+        # create a 3 new users
+        users = UserFactory.create_batch(3)
+        groups = GroupFactory.create_batch(3)
+
+        group_profile1 = GroupProfile.objects.create(group=groups[0], name='role1', group_type='permission')
+        group_profile2 = GroupProfile.objects.create(group=groups[1], name='role2', group_type='permission')
+        GroupProfile.objects.create(group=groups[2], name='role3', group_type='test')
+
+        users[0].groups.add(*groups)
+        users[1].groups.add(groups[0])
+        users[2].groups.add(groups[2])
+
+        # fetch users
+        user_ids = ','.join([str(user.id) for user in users])
+        response = self.do_get('{}?ids={}'.format(test_uri, user_ids))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)
+        self.assertEqual(len(response.data['results'][0]['roles']), 2)
+        self.assertEqual(response.data['results'][0]['roles'][0]['id'], group_profile1.id)
+        self.assertEqual(response.data['results'][0]['roles'][0]['name'], 'role1')
+        self.assertEqual(response.data['results'][0]['roles'][1]['id'], group_profile2.id)
+        self.assertEqual(response.data['results'][0]['roles'][1]['name'], 'role2')
+        self.assertEqual(len(response.data['results'][1]['roles']), 1)
+        self.assertEqual(response.data['results'][1]['roles'][0]['id'], group_profile1.id)
+        self.assertEqual(response.data['results'][1]['roles'][0]['name'], 'role1')
+        self.assertEqual(len(response.data['results'][2]['roles']), 0)
+
+    def test_user_list_get_with_has_organization_filter(self):
         test_uri = self.users_base_uri
         users = []
         # create a 7 new users
@@ -343,6 +402,73 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get('{}?has_organizations=false'.format(test_uri))
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data['results']), 4)
+
+    def test_user_list_get_with_organizations_filter(self):
+        test_uri = self.users_base_uri
+        # create a 8 new users
+        users = UserFactory.create_batch(8)
+
+        # create organization and add 4 users to it
+        organizations = []
+        for i in xrange(2):
+            organization = Organization.objects.create(
+                name='Test Organization{}'.format(i),
+                display_name='Test Org Display Name{}'.format(i),
+            )
+            organizations.append(organization)
+
+        organizations[0].users.add(*users)
+        organizations[1].users.add(*users[:4])
+
+        # fetch users for organization 1
+        response = self.do_get('{}?organizations={}'.format(test_uri, organizations[1].id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+        # fetch users in multiple organization
+        organization_ids = ','.join([str(organization.id) for organization in organizations])
+        response = self.do_get('{}?organizations={}'.format(test_uri, organization_ids))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 8)
+        self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+    def test_user_list_get_with_course_enrollment_filter(self):
+        test_uri = self.users_base_uri
+        # create a 8 new users
+        users = UserFactory.create_batch(8)
+
+        # create course enrollments
+        for user in users[:4]:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course2.id)
+
+        # fetch users enrolled in course 1
+        response = self.do_get('{}?courses={}'.format(test_uri, self.course.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+        # fetch users enrolled in course 1 and 2
+        response = self.do_get('{}?courses={},{}'.format(test_uri, self.course.id, self.course2.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 8)
+        self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+    def test_user_list_get_with_name_filter(self):
+        test_uri = self.users_base_uri
+        # create a 8 new users
+        users = UserFactory.create_batch(2)
+        users.append(UserFactory.create_batch(2, first_name="John", last_name="Doe"))
+
+        # fetch users by name
+        response = self.do_get('{}?name=John Doe'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['first_name'], 'John')
+        self.assertEqual(response.data['results'][0]['last_name'], 'Doe')
 
     def test_user_list_post(self):
         test_uri = self.users_base_uri
@@ -1230,6 +1356,22 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_user_course_grades_user_not_enrolled(self):
+        course = CourseFactory.create(org='TUCGUNF', run='TUCGUNF1')
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, self.user.id, course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # now enroll user
+        post_uri = '{}/{}/courses'.format(self.users_base_uri, self.user.id)
+        data = {'course_id': unicode(course.id)}
+        response = self.do_post(post_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # get user grades after enrollment
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
     def test_user_preferences_user_list_get_not_found(self):
         test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
         response = self.do_get(test_uri)
@@ -1329,6 +1471,7 @@ class UsersApiTests(ModuleStoreTestCase):
         user_id = self.user.id
 
         course = CourseFactory.create(org='TUCGLG', run='TUCGLG1', display_name="Robot Super Course")
+        CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -1500,32 +1643,36 @@ class UsersApiTests(ModuleStoreTestCase):
         grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
         module.system.publish(module, 'grade', grade_dict)
 
-        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
+        with mock.patch('api_manager.users.views._recalculate_grade') as recalculate_grade:
+            test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            # grades should be calculate in score_changed signal handler of gradebook app
+            # make sure grades are not recalculated when calling user grades API
+            self.assertFalse(recalculate_grade.called)
 
-        courseware_summary = response.data['courseware_summary']
-        self.assertEqual(len(courseware_summary), 2)
-        self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
-        self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
+            courseware_summary = response.data['courseware_summary']
+            self.assertEqual(len(courseware_summary), 2)
+            self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
+            self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
 
-        sections = courseware_summary[0]['sections']
-        self.assertEqual(len(sections), 1)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 1')
-        self.assertEqual(sections[0]['graded'], False)
+            sections = courseware_summary[0]['sections']
+            self.assertEqual(len(sections), 1)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 1')
+            self.assertEqual(sections[0]['graded'], False)
 
-        sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 12)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 2')
-        self.assertEqual(sections[0]['graded'], False)
+            sections = courseware_summary[1]['sections']
+            self.assertEqual(len(sections), 12)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 2')
+            self.assertEqual(sections[0]['graded'], False)
 
-        grade_summary = response.data['grade_summary']
-        self.assertGreater(len(grade_summary['section_breakdown']), 0)
-        grading_policy = response.data['grading_policy']
-        self.assertGreater(len(grading_policy['GRADER']), 0)
-        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
-        self.assertAlmostEqual(response.data['current_grade'], 0.74, 1)
-        self.assertAlmostEqual(response.data['proforma_grade'], 0.9375, 1)
+            grade_summary = response.data['grade_summary']
+            self.assertGreater(len(grade_summary['section_breakdown']), 0)
+            grading_policy = response.data['grading_policy']
+            self.assertGreater(len(grading_policy['GRADER']), 0)
+            self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+            self.assertAlmostEqual(response.data['current_grade'], 0.74, 1)
+            self.assertAlmostEqual(response.data['proforma_grade'], 0.9375, 1)
 
         test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
 
@@ -1657,6 +1804,17 @@ class UsersApiTests(ModuleStoreTestCase):
             due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
 
+        # getting grades without user being enrolled in the course should raise 404
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # enroll user in the course
+        test_uri = '{}/{}/courses'.format(self.users_base_uri, user_id)
+        response = self.do_post(test_uri, {'course_id': unicode(course.id)})
+        self.assertEqual(response.status_code, 201)
+
+        # now we should be able to fetch grades of user
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)

@@ -1,5 +1,6 @@
 """ API implementation for course-oriented interactions. """
 
+import sys
 from collections import OrderedDict
 import logging
 import itertools
@@ -50,10 +51,9 @@ from api_manager.models import (
 from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
-from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
+from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime, get_ids_from_list_param
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
-from .tasks import cache_static_tab_contents
 from progress.serializers import CourseModuleCompletionSerializer
 
 
@@ -383,9 +383,20 @@ def _get_static_tab_contents(request, course, tab):
     contents = cache.get(cache_key)
     if contents is None:
         contents = get_static_tab_contents(request, course, tab, wrap_xmodule_display=False)
-        cache_static_tab_contents.delay(cache_key, contents)
+        _cache_static_tab_contents(cache_key, contents)
 
     return contents
+
+
+def _cache_static_tab_contents(cache_key, contents):
+    """
+    Caches course static tab contents.
+    """
+    cache_expiration = getattr(settings, 'STATIC_TAB_CONTENTS_CACHE_TTL', 60 * 5)
+    contents_max_size_limit = getattr(settings, 'STATIC_TAB_CONTENTS_CACHE_MAX_SIZE_LIMIT', 4000)
+
+    if not sys.getsizeof(contents) > contents_max_size_limit:
+        cache.set(cache_key, contents, cache_expiration)
 
 
 class CourseContentList(SecureAPIView):
@@ -1070,8 +1081,6 @@ class CoursesUsersList(SecureAPIView):
         """
         GET /api/courses/{course_id}/users
         """
-        orgs = request.QUERY_PARAMS.get('organizations')
-        groups = request.QUERY_PARAMS.get('groups', None)
         exclude_groups = request.QUERY_PARAMS.get('exclude_groups', None)
         response_data = OrderedDict()
         base_uri = generate_base_uri(request)
@@ -1081,24 +1090,29 @@ class CoursesUsersList(SecureAPIView):
         course_key = get_course_key(course_id)
         # Get a list of all enrolled students
         users = CourseEnrollment.objects.users_enrolled_in(course_key)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+
+        orgs = get_ids_from_list_param(self.request, 'organizations')
         if orgs:
-            orgs = orgs.split(",")[:upper_bound]
             users = users.filter(organizations__in=orgs)
+
+        groups = get_ids_from_list_param(self.request, 'groups')
         if groups:
-            groups = groups.split(",")[:upper_bound]
-            users = users.filter(groups__in=groups)
+            users = users.filter(groups__in=groups).distinct()
+
+        workgroups = get_ids_from_list_param(self.request, 'workgroups')
+        if workgroups:
+            users = users.filter(workgroups__in=workgroups).distinct()
+
+        exclude_groups = get_ids_from_list_param(self.request, 'exclude_groups')
         if exclude_groups:
-            exclude_groups = exclude_groups.split(",")[:upper_bound]
             users = users.exclude(groups__in=exclude_groups)
 
-        response_data['enrollments'] = []
-        for user in users:
-            user_data = OrderedDict()
-            user_data['id'] = user.id
-            user_data['email'] = user.email
-            user_data['username'] = user.username
-            response_data['enrollments'].append(user_data)
+        users = users.prefetch_related('organizations')\
+            .select_related('courseenrollment_set', 'profile')\
+            .annotate(courses_enrolled=Count('courseenrollment'))
+
+        serializer = UserSerializer(users, many=True)
+        response_data['enrollments'] = serializer.data
 
         # Then list all enrollments which are pending. These are enrollments for students that have not yet
         # created an account
@@ -1389,7 +1403,6 @@ class CourseModuleCompletionList(SecureListAPIView):
         """
         GET /api/courses/{course_id}/completions/
         """
-        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
         stage = self.request.QUERY_PARAMS.get('stage', None)
         course_id = self.kwargs['course_id']
@@ -1397,9 +1410,8 @@ class CourseModuleCompletionList(SecureListAPIView):
             raise Http404
         course_key = get_course_key(course_id)
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        user_ids = get_ids_from_list_param(self.request, 'user_id')
         if user_ids:
-            user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
         if content_id:
@@ -1464,27 +1476,32 @@ class CoursesMetricsGradesList(SecureListAPIView):
                                                    user__courseenrollment__is_active=True,
                                                    user__courseenrollment__course_id__exact=course_key)\
             .exclude(user__in=exclude_users)
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
-        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
+        user_ids = get_ids_from_list_param(self.request, 'user_id')
         if user_ids:
-            user_ids = map(int, user_ids.split(','))[:upper_bound]
             queryset = queryset.filter(user__in=user_ids)
 
-        queryset_grade_avg = queryset.aggregate(Avg('grade'))
+        group_ids = get_ids_from_list_param(self.request, 'groups')
+        if group_ids:
+            queryset = queryset.filter(user__groups__in=group_ids).distinct()
+
+        sum_of_grades = sum([gradebook.grade for gradebook in queryset])
+        queryset_grade_avg = sum_of_grades / len(queryset) if len(queryset) > 0 else 0
+        queryset_grade_count = len(queryset)
         queryset_grade_max = queryset.aggregate(Max('grade'))
         queryset_grade_min = queryset.aggregate(Min('grade'))
-        queryset_grade_count = queryset.aggregate(Count('grade'))
 
-        course_metrics = StudentGradebook.generate_leaderboard(course_key, exclude_users=exclude_users)
+        course_metrics = StudentGradebook.generate_leaderboard(course_key,
+                                                               group_ids=group_ids,
+                                                               exclude_users=exclude_users)
 
         response_data = {}
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
 
-        response_data['grade_average'] = queryset_grade_avg['grade__avg']
+        response_data['grade_average'] = queryset_grade_avg
+        response_data['grade_count'] = queryset_grade_count
         response_data['grade_maximum'] = queryset_grade_max['grade__max']
         response_data['grade_minimum'] = queryset_grade_min['grade__min']
-        response_data['grade_count'] = queryset_grade_count['grade__count']
 
         response_data['course_grade_average'] = course_metrics['course_avg']
         response_data['course_grade_maximum'] = course_metrics['course_max']
@@ -1539,22 +1556,28 @@ class CoursesMetrics(SecureAPIView):
             users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
             org_ids = [organization]
 
-        group_ids = self.request.QUERY_PARAMS.get('groups', None)
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         if group_ids:
-            try:
-                group_ids = map(int, group_ids.split(','))
-            except ValueError:
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
             users_enrolled_qs = users_enrolled_qs.filter(groups__in=group_ids)
 
         users_started = StudentProgress.get_num_users_started(course_key,
                                                               exclude_users=exclude_users,
                                                               org_ids=org_ids,
                                                               group_ids=group_ids)
+        users_enrolled = users_enrolled_qs.distinct().count()
+        modules_completed = StudentProgress.get_total_completions(
+            course_key, exclude_users=exclude_users, org_ids=org_ids, group_ids=group_ids
+        )
+        users_completed = StudentGradebook.get_num_users_completed(
+            course_key, exclude_users=exclude_users, org_ids=org_ids, group_ids=group_ids
+        )
+
         data = {
-            'users_enrolled': users_enrolled_qs.distinct().count(),
+            'users_enrolled': users_enrolled,
             'users_started': users_started,
+            'users_not_started': users_enrolled - users_started,
+            'modules_completed': modules_completed,
+            'users_completed': users_completed,
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
 
@@ -1643,28 +1666,36 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
             modules_completed_qs = modules_completed_qs.filter(user__organizations=organization)
             active_users_qs = active_users_qs.filter(student__organizations=organization)
 
+        group_ids = get_ids_from_list_param(self.request, 'groups')
+        if group_ids:
+            enrolled_qs = enrolled_qs.filter(user__groups__in=group_ids).distinct()
+            grades_complete_qs = grades_complete_qs.filter(user__groups__in=group_ids).distinct()
+            users_started_qs = users_started_qs.filter(user__groups__in=group_ids).distinct()
+            modules_completed_qs = modules_completed_qs.filter(user__groups__in=group_ids).distinct()
+            active_users_qs = active_users_qs.filter(student__groups__in=group_ids).distinct()
+
         total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
         total_started_count = users_started_qs.filter(created__lt=start_dt).aggregate(Count('user', distinct=True))
         total_started = total_started_count['user__count'] or 0
         enrolled_series = get_time_series_data(
             enrolled_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=CourseEnrollment,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
         started_series = get_time_series_data(
             users_started_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=StudentProgress,
-            aggregate=Count('user')
+            aggregate=Count('user', distinct=True)
         )
         completed_series = get_time_series_data(
             grades_complete_qs, start_dt, end_dt, interval=interval,
             date_field='modified', date_field_model=StudentGradebook,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
         modules_completed_series = get_time_series_data(
             modules_completed_qs, start_dt, end_dt, interval=interval,
             date_field='created', date_field_model=CourseModuleCompletion,
-            aggregate=Count('id')
+            aggregate=Count('id', distinct=True)
         )
 
         # active users are those who accessed course in last 24 hours
@@ -1713,6 +1744,7 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         GET /api/courses/{course_id}/grades/leaders/
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        group_ids = get_ids_from_list_param(self.request, 'groups')
         count = self.request.QUERY_PARAMS.get('count', 3)
         data = {}
         course_avg = 0
@@ -1721,7 +1753,12 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         course_key = get_course_key(course_id)
         # Users having certain roles (such as an Observer) are excluded from aggregations
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        leaderboard_data = StudentGradebook.generate_leaderboard(course_key, user_id=user_id, count=count, exclude_users=exclude_users)
+        leaderboard_data = StudentGradebook.generate_leaderboard(course_key,
+                                                                 user_id=user_id,
+                                                                 group_ids=group_ids,
+                                                                 count=count,
+                                                                 exclude_users=exclude_users)
+
         serializer = CourseLeadersSerializer(leaderboard_data['queryset'], many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
         data['course_avg'] = leaderboard_data['course_avg']
@@ -1770,13 +1807,11 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         course_metadata = CourseAggregatedMetaData.get_from_id(course_key)
         total_possible_completions = float(course_metadata.total_assessments)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
-        if orgs_filter:
-            upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
-            orgs_filter = orgs_filter.split(",")[:upper_bound]
+        orgs_filter = get_ids_from_list_param(self.request, 'organizations')
+        group_ids = get_ids_from_list_param(self.request, 'groups')
 
         total_actual_completions = StudentProgress.get_total_completions(course_key, exclude_users=exclude_users,
-                                                                         org_ids=orgs_filter)
+                                                                         org_ids=orgs_filter, group_ids=group_ids)
         if user_id:
             user_data = StudentProgress.get_user_position(course_key, user_id, exclude_users=exclude_users)
             data['position'] = user_data['position']
@@ -1789,6 +1824,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         total_users_qs = CourseEnrollment.objects.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if orgs_filter:
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
+        if group_ids:
+            total_users_qs = total_users_qs.filter(groups__in=group_ids).distinct()
         total_users = total_users_qs.count()
         if total_users and total_actual_completions and total_possible_completions:
             course_avg = total_actual_completions / float(total_users)
@@ -1797,7 +1834,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
 
         if not skipleaders:
             queryset = StudentProgress.generate_leaderboard(course_key, count=count, exclude_users=exclude_users,
-                                                            org_ids=orgs_filter)
+                                                            org_ids=orgs_filter, group_ids=group_ids)
             serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
                                                             context={'total_completions': total_possible_completions})
             data['leaders'] = serializer.data  # pylint: disable=E1101
