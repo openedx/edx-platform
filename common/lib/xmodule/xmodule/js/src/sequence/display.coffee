@@ -1,6 +1,5 @@
 class @Sequence
   constructor: (element) ->
-    @updatedProblems = {}
     @requestToken = $(element).data('request-token')
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
@@ -40,33 +39,6 @@ class @Sequence
     position_link = @link_for(@position)
     if position_link and position_link.data('page-title')
         document.title = position_link.data('page-title') + @base_page_title
-
-  hookUpContentStateChangeEvent: ->
-    $('.problems-wrapper').bind(
-      'contentChanged',
-      (event, problem_id, new_content_state) =>
-        @addToUpdatedProblems problem_id, new_content_state
-    )
-
-  addToUpdatedProblems: (problem_id, new_content_state) =>
-    # Used to keep updated problem's state temporarily.
-    # params:
-    #   'problem_id' is problem id.
-    #   'new_content_state' is updated problem's state.
-
-    # initialize for the current sequence if there isn't any updated problem
-    # for this position.
-    if not @anyUpdatedProblems @position
-      @updatedProblems[@position] = {}
-
-    # Now, put problem content against problem id for current active sequence.
-    @updatedProblems[@position][problem_id] = new_content_state
-
-  anyUpdatedProblems:(position) ->
-    # check for the updated problems for given sequence position.
-    # params:
-    #   'position' can be any sequence position.
-    return @updatedProblems[position] != undefined
 
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
@@ -132,26 +104,14 @@ class @Sequence
     @$('.sequence-nav-button').unbind('click')
 
     # previous button
-    is_first_tab = @position == 1
+    first_tab = @position == 1
     previous_button_class = '.sequence-nav-button.button-previous'
-    @updateButtonState(
-      previous_button_class,  # bound element
-      @selectPrevious,  # action
-      'Previous',  # label prefix
-      is_first_tab,  # is boundary?
-      @prevUrl  # boundary_url
-    )
+    @updateButtonState(previous_button_class, @previous, 'Previous', first_tab, @prevUrl)
 
     # next button
-    is_last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
+    last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
     next_button_class = '.sequence-nav-button.button-next'
-    @updateButtonState(
-      next_button_class,  # bound element
-      @selectNext,  # action
-      'Next',  # label prefix
-      is_last_tab,  # is boundary?
-      @nextUrl  # boundary_url
-    )
+    @updateButtonState(next_button_class, @next, 'Next', last_tab, @nextUrl)
 
   render: (new_position) ->
     if @position != new_position
@@ -169,21 +129,12 @@ class @Sequence
 
       bookmarked = if @el.find('.active .bookmark-icon').hasClass('bookmarked') then true else false
       @content_container.html(current_tab.text()).attr("aria-labelledby", current_tab.attr("aria-labelledby")).data('bookmarked', bookmarked)
-
-      # update the data-attributes with latest contents only for updated problems.
-      if @anyUpdatedProblems new_position
-        $.each @updatedProblems[new_position], (problem_id, latest_content) =>
-          @content_container
-          .find("[data-problem-id='#{ problem_id }']")
-          .data('content', latest_content)
-
       XBlock.initializeBlocks(@content_container, @requestToken)
 
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
       @toggleArrows()
-      @hookUpContentStateChangeEvent()
       @hookUpProgressEvent()
       @updatePageTitle()
 
@@ -192,7 +143,7 @@ class @Sequence
 
       @el.find('.path').text(@el.find('.nav-item.active').data('path'))
 
-      @sr_container.focus()
+      @sr_container.focus();
 
   goto: (event) =>
     event.preventDefault()
@@ -202,17 +153,7 @@ class @Sequence
       new_position = $(event.currentTarget).data('element')
 
     if (1 <= new_position) and (new_position <= @num_contents)
-      is_bottom_nav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0
-      if is_bottom_nav
-        widget_placement = 'bottom'
-      else
-        widget_placement = 'top'
-      Logger.log "edx.ui.lms.sequence.tab_selected",  # Formerly known as seq_goto
-        current_tab: @position
-        target_tab: new_position
-        tab_count: @num_contents
-        id: @id
-        widget_placement: widget_placement
+      Logger.log "seq_goto", old: @position, new: new_position, id: @id
 
       # On Sequence change, destroy any existing polling thread
       # for queued submissions, see ../capa/display.coffee
@@ -226,43 +167,32 @@ class @Sequence
       alert_text = interpolate(alert_template, {tab_name: new_position}, true)
       alert alert_text
 
-  selectNext: (event) => @_change_sequential 'next', event
+  next: (event) => @_change_sequential 'seq_next', event
+  previous: (event) => @_change_sequential 'seq_prev', event
 
-  selectPrevious: (event) => @_change_sequential 'previous', event
-
-  # `direction` can be 'previous' or 'next'
+  # `direction` can be 'seq_prev' or 'seq_next'
   _change_sequential: (direction, event) =>
     # silently abort if direction is invalid.
-    return unless direction in ['previous', 'next']
+    return unless direction in ['seq_prev', 'seq_next']
 
     event.preventDefault()
-
-    analytics_event_name = "edx.ui.lms.sequence.#{direction}_selected"
-    is_bottom_nav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0
-
-    if is_bottom_nav
-      widget_placement = 'bottom'
-    else
-      widget_placement = 'top'
-
-    Logger.log analytics_event_name,  # Formerly known as seq_next and seq_prev
+    offset =
+      seq_next: 1
+      seq_prev: -1
+    new_position = @position + offset[direction]
+    Logger.log direction,
+      old: @position
+      new: new_position
       id: @id
-      current_tab: @position
-      tab_count: @num_contents
-      widget_placement: widget_placement
 
-    if (direction == 'next') and (@position >= @contents.length)
+    if (direction == "seq_next") and (@position == @contents.length)
       window.location.href = @nextUrl
-    else if (direction == 'previous') and (@position == 1)
+    else if (direction == "seq_prev") and (@position == 1)
       window.location.href = @prevUrl
     else
       # If the bottom nav is used, scroll to the top of the page on change.
-      if is_bottom_nav 
+      if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
         $.scrollTo 0, 150
-      offset =
-        next: 1
-        previous: -1
-      new_position = @position + offset[direction]
       @render new_position
 
   link_for: (position) ->

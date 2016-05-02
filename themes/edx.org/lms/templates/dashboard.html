@@ -10,7 +10,6 @@ from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <%
@@ -21,6 +20,7 @@ from openedx.core.djangolib.markup import Text, HTML
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
+<%block name="nav_skip">#my-courses</%block>
 
 <%block name="header_extras">
 % for template_name in ["donation"]:
@@ -65,20 +65,19 @@ from openedx.core.djangolib.markup import Text, HTML
 <div class="dashboard-notifications" tabindex="-1">
     %if message:
         <section class="dashboard-banner">
-            ${message | n, unicode}
+            ${message}
         </section>
     %endif
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message | n, unicode}
+            ${enrollment_message}
         </section>
     %endif
 </div>
 
 <section class="container dashboard" id="dashboard-main">
-<main id="main" aria-label="Content" tabindex="-1">
-  <section class="my-courses" id="my-courses">
+  <section class="my-courses" id="my-courses" role="main" aria-label="Content" tabindex="-1">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
@@ -106,11 +105,11 @@ from openedx.core.djangolib.markup import Text, HTML
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        <p>${_("You are not enrolled in any courses yet.")}</p>
+        <p>${_("Looks like you haven't enrolled in any courses yet.")}</p>
 
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <a href="${marketing_link('COURSES')}">
-            ${_("Explore courses")}
+            ${_("Find courses now!")}
           </a>
         %endif
       </section>
@@ -133,7 +132,6 @@ from openedx.core.djangolib.markup import Text, HTML
       </div>
     % endif
   </section>
-</main>
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
@@ -211,7 +209,7 @@ from openedx.core.djangolib.markup import Text, HTML
 
     <header>
       <h2 id="email-settings-title">
-        ${Text(_("Email Settings for {course_number}")).format(course_number=HTML('<span id="email_settings_course_number"></span>'))}
+        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>')}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}

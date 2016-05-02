@@ -151,9 +151,6 @@ MOCK_MODULES = [
     'xmodule.assetstore.assetmgr.AssetManager',
     'xmodule.contentstore.django',
     'piexif',
-    'provider',
-    'provider.oauth2',
-    'oauth2_provider',
 ]
 
 for mod_name in MOCK_MODULES:

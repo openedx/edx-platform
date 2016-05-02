@@ -22,41 +22,51 @@ define([
             }).render();
         };
 
-        var uploadImage = function( view, fileType ) {
-            var deferred = $.Deferred();
+        var uploadImage = function( view, fileType, callback ) {
+            var imageCapturedEvent = false,
+                errorEvent = false;
 
             // Since image upload is an asynchronous process,
             // we need to wait for the upload to complete
             // before checking the outcome.
-            var fakeFile,
-                fakeEvent = { target: { files: [] } };
+            runs(function() {
+                var fakeFile,
+                    fakeEvent = { target: { files: [] } };
 
-            // If no file type is specified, don't add any files.
-            // This simulates what happens when the user clicks
-            // "cancel" after clicking the input.
-            if ( fileType !== null) {
-                fakeFile = new Blob(
-                    [ IMAGE_DATA ],
-                    { type: 'image/' + fileType }
-                );
-                fakeEvent.target.files = [ fakeFile ];
-            }
+                // If no file type is specified, don't add any files.
+                // This simulates what happens when the user clicks
+                // "cancel" after clicking the input.
+                if ( fileType !== null) {
+                    fakeFile = new Blob(
+                        [ IMAGE_DATA ],
+                        { type: 'image/' + fileType }
+                    );
+                    fakeEvent.target.files = [ fakeFile ];
+                }
 
-            // Wait for either a successful upload or an error
-            view.on( 'imageCaptured', function() {
-                deferred.resolve();
+                // Wait for either a successful upload or an error
+                view.on( 'imageCaptured', function() {
+                    imageCapturedEvent = true;
+                });
+                view.on( 'error', function() {
+                    errorEvent = true;
+                });
+
+                // Trigger the file input change
+                // It's impossible to trigger this directly due
+                // to browser security restrictions, so we call
+                // the handler instead.
+                view.handleInputChange( fakeEvent );
             });
-            view.on( 'error', function() {
-                deferred.resolve();
+
+            // Check that the image upload has completed,
+            // either successfully or with an error.
+            waitsFor(function() {
+                return ( imageCapturedEvent || errorEvent );
             });
 
-            // Trigger the file input change
-            // It's impossible to trigger this directly due
-            // to browser security restrictions, so we call
-            // the handler instead.
-            view.handleInputChange( fakeEvent );
-
-            return deferred.promise();
+            // Execute the callback to check expectations.
+            runs( callback );
         };
 
         var expectPreview = function( view, fileType ) {
@@ -102,45 +112,45 @@ define([
             expectSubmitEnabled( false );
         });
 
-        it( 'uploads a png image', function(done) {
+        it( 'uploads a png image', function() {
             var view = createView();
 
-            uploadImage( view, 'png').then(function() {
+            uploadImage( view, 'png', function() {
                 expectPreview( view, 'png' );
                 expectSubmitEnabled( true );
                 expectImageData( view, 'png' );
-            }).always(done);
+            });
         });
 
-        it( 'uploads a jpeg image', function(done) {
+        it( 'uploads a jpeg image', function() {
             var view = createView();
 
-            uploadImage( view, 'jpeg').then(function() {
+            uploadImage( view, 'jpeg', function() {
                 expectPreview( view, 'jpeg' );
                 expectSubmitEnabled( true );
                 expectImageData( view, 'jpeg' );
-            }).always(done);
+            } );
         });
 
-        it( 'hides the preview when the user cancels the upload', function(done) {
+        it( 'hides the preview when the user cancels the upload', function() {
             var view = createView();
 
-            uploadImage( view, null).then(function() {
+            uploadImage( view, null, function() {
                 expectPreview( view, null );
                 expectSubmitEnabled( false );
                 expectImageData( view, null );
-            }).always(done);
+            } );
         });
 
-        it( 'shows an error if the file type is not supported', function(done) {
+        it( 'shows an error if the file type is not supported', function() {
             var view = createView();
 
-            uploadImage( view, 'txt').then(function() {
+            uploadImage( view, 'txt', function() {
                 expectPreview( view, null );
                 expectError( view );
                 expectSubmitEnabled( false );
                 expectImageData( view, null );
-            }).always(done);
+            } );
         });
     });
 });

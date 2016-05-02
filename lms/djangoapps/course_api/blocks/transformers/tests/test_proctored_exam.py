@@ -2,7 +2,6 @@
 Tests for ProctoredExamTransformer.
 """
 from mock import patch
-from nose.plugins.attrib import attr
 
 import ddt
 from edx_proctoring.api import (
@@ -20,7 +19,6 @@ from ..proctored_exam import ProctoredExamTransformer
 from ...api import get_course_blocks
 
 
-@attr('shard_3')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
 class ProctoredExamTransformerTestCase(CourseStructureTestCase):

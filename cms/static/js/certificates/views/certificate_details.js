@@ -9,11 +9,9 @@ define([ // jshint ignore:line
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_details',
     'common/js/components/utils/view_utils',
-    'jquery.smoothScroll',
-    'text!templates/certificate-details.underscore'
+    'jquery.smoothScroll'
 ],
-function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils, smoothScroll,
-         certificateDetailsTemplate) {
+function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, ViewUtils) {
     'use strict';
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
@@ -33,6 +31,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
         initialize: function() {
             // Set up the initial state of the attributes set for this model instance
             this.showDetails = true;
+            this.template = this.loadTemplate('certificate-details');
             this.listenTo(this.model, 'change', this.render);
         },
 
@@ -62,7 +61,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
                 index: this.model.collection.indexOf(this.model),
                 showDetails: this.showDetails || showDetails || false
             });
-            this.$el.html(_.template(certificateDetailsTemplate)(attrs));
+            this.$el.html(this.template(attrs));
             if(this.showDetails || showDetails) {
                 var self = this;
                 this.model.get("signatories").each(function (modelSignatory) {

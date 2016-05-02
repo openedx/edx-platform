@@ -15,7 +15,6 @@
                 model: CertificateExceptionModel,
 
                 initialize: function(attrs, options){
-                    this.url = options.url;
                     this.generate_certificates_url = options.generate_certificates_url;
                 },
 

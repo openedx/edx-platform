@@ -178,15 +178,11 @@ var edx = edx || {};
             this.$passwordResetStatus
                 .removeClass('error')
                 .text("");
-        }
+        },
     });
 
-    try {
-        new edx.student.account.AccountView({
-            el: $('#account-container')
-        }).render();
-    } catch (e) {
-        // TODO: handle exception
-    }
+    return new edx.student.account.AccountView({
+        el: $('#account-container')
+    }).render();
 
 })(jQuery, _, Backbone, gettext);

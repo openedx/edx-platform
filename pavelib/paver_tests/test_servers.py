@@ -17,7 +17,6 @@ EXPECTED_COMMON_SASS_DIRECTORIES = [
 ]
 EXPECTED_LMS_SASS_DIRECTORIES = [
     u"lms/static/sass",
-    u"lms/static/themed_sass",
     u"lms/static/certificates/sass",
 ]
 EXPECTED_CMS_SASS_DIRECTORIES = [
@@ -155,8 +154,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack")
         call_task("pavelib.servers.update_db", options=options)
-        # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
+        db_command = "python manage.py {server} --settings={settings} migrate --traceback --pythonpath=."
         self.assertEquals(
             self.task_messages,
             [

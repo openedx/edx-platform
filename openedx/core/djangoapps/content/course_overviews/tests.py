@@ -7,7 +7,6 @@ import ddt
 import itertools
 import math
 import mock
-from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -37,7 +36,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 
 
-@attr('shard_3')
 @ddt.ddt
 class CourseOverviewTestCase(ModuleStoreTestCase):
     """
@@ -518,7 +516,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             )
 
 
-@attr('shard_3')
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """

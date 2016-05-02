@@ -1,11 +1,5 @@
-define(["js/views/validation",
-        "jquery",
-        "underscore",
-        "gettext",
-        "codemirror",
-        "js/views/modals/validation_error_modal",
-        'edx-ui-toolkit/js/utils/html-utils'],
-    function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUtils) {
+define(["js/views/validation", "jquery", "underscore", "gettext", "codemirror", "js/views/modals/validation_error_modal"],
+    function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal) {
 
 var AdvancedView = ValidatingView.extend({
     error_saving : "error_saving",
@@ -19,9 +13,7 @@ var AdvancedView = ValidatingView.extend({
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
     initialize : function() {
-        this.template = HtmlUtils.template(
-            $("#advanced_entry-tpl").text()
-        );
+        this.template = _.template($("#advanced_entry-tpl").text());
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.render();
     },
@@ -41,7 +33,7 @@ var AdvancedView = ValidatingView.extend({
         _.each(_.sortBy(_.keys(this.model.attributes), function(key) { return self.model.get(key).display_name; }),
             function(key) {
                 if (self.render_deprecated || !self.model.get(key).deprecated) {
-                    HtmlUtils.append(listEle$, self.renderTemplate(key, self.model.get(key)));
+                    listEle$.append(self.renderTemplate(key, self.model.get(key)));
                 }
             });
 

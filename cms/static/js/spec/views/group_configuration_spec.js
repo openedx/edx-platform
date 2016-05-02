@@ -125,7 +125,7 @@ define([
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
         expect($(listItemView)).toExist();
     };
-    var assertCannotDeleteUsed = function (that, toolTipText, warningText) {
+    var assertCannotDeleteUsed = function (that, toolTipText, warningText){
         setUsageInfo(that.model);
         that.view.render();
         expect(that.view.$(SELECTORS.note)).toHaveAttr(
@@ -153,69 +153,36 @@ define([
             revision: 'course_rev'
         });
 
-        jasmine.addMatchers({
-            toContainText: function() {
-                return {
-                    compare: function (actual, text) {
-                        var trimmedText = $.trim(actual.text()),
-                            passed;
+        this.addMatchers({
+            toContainText: function(text) {
+                var trimmedText = $.trim(this.actual.text());
 
-                        if (text && $.isFunction(text.test)) {
-                            passed = text.test(trimmedText);
-                        } else {
-                            passed = trimmedText.indexOf(text) !== -1;
-                        }
-
-                        return {
-                            pass: passed
-                        };
-                    }
-                };
+                if (text && $.isFunction(text.test)) {
+                    return text.test(trimmedText);
+                } else {
+                    return trimmedText.indexOf(text) !== -1;
+                }
             },
-            toBeCorrectValuesInInputs: function () {
-                return {
-                    compare: function (actual, values) {
-                        var expected = {
-                            name: actual.$(SELECTORS.inputName).val(),
-                            description: actual
-                                .$(SELECTORS.inputDescription).val()
-                        };
-
-                        var passed =  _.isEqual(values, expected);
-
-                        return {
-                            pass: passed
-                        };
-                    }
+            toBeCorrectValuesInInputs: function (values) {
+                var expected = {
+                    name: this.actual.$(SELECTORS.inputName).val(),
+                    description: this.actual
+                        .$(SELECTORS.inputDescription).val()
                 };
+
+                return _.isEqual(values, expected);
             },
-            toBeCorrectValuesInModel: function () {
-                return {
-                    compare: function (actual, values) {
-                        var passed = _.every(values, function (value, key) {
-                            return actual.get(key) === value;
-                        }.bind(this));
-
-                        return {
-                            pass: passed
-                        };
-                    }
-                };
+            toBeCorrectValuesInModel: function (values) {
+                return _.every(values, function (value, key) {
+                    return this.actual.get(key) === value;
+                }.bind(this));
             },
-            toHaveDefaultNames: function () {
-                return {
-                    compare: function (actual, values) {
-                        var actualValues = $.map(actual, function (item) {
-                            return $(item).val();
-                        });
+            toHaveDefaultNames: function (values) {
+                var actualValues = $.map(this.actual, function (item) {
+                    return $(item).val();
+                });
 
-                        var passed = _.isEqual(actualValues, values);
-
-                        return {
-                            pass: passed
-                        };
-                    }
-                };
+                return _.isEqual(actualValues, values);
             }
         });
     });
@@ -422,7 +389,7 @@ define([
             groups = this.model.get('groups');
             expect(groups.length).toBe(3);
             expect(groups.at(2).get('name')).toBe('Group C');
-            expect(this.view.$el).not.toBeInDOM();
+            expect(this.view.$el).not.toExist();
         });
 
         it('does not hide saving message if failure', function() {
@@ -454,7 +421,7 @@ define([
         });
 
         it('should be removed on cancel if it is a new item', function() {
-            spyOn(this.model, 'isNew').and.returnValue(true);
+            spyOn(this.model, 'isNew').andReturn(true);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'
@@ -487,23 +454,18 @@ define([
                 name: 'New Configuration'
             });
             // Error message disappear
-            expect(this.view.$(SELECTORS.errorMessage)).not.toBeInDOM();
+            expect(this.view.$(SELECTORS.errorMessage)).not.toExist();
             AjaxHelpers.expectNoRequests(requests);
         });
 
-        it('should have appropriate class names on focus/blur', function (done) {
+        it('should have appropriate class names on focus/blur', function () {
             var groupInput = this.view.$(SELECTORS.inputGroupName).first(),
                 groupFields = this.view.$(SELECTORS.groupFields);
 
             groupInput.focus();
-            jasmine.waitUntil(function() {
-                return groupFields.hasClass('is-focused');
-            }).then(function () {
-                groupInput.blur();
-                jasmine.waitUntil(function() {
-                    return !groupFields.hasClass('is-focused');
-                }).then(done);
-            });
+            expect(groupFields).toHaveClass('is-focused');
+            groupInput.blur();
+            expect(groupFields).not.toHaveClass('is-focused');
         });
 
         describe('removes all newly created groups on cancel', function () {
@@ -995,13 +957,13 @@ define([
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Content Group'
             });
-            expect(this.view.$el).not.toBeInDOM();
+            expect(this.view.$el).not.toExist();
         });
 
         it('does not hide saving message if failure', function() {
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
-            this.view.$(SELECTORS.inputName).val('New Content Group');
+            this.view.$(SELECTORS.inputName).val('New Content Group')
 
             ViewHelpers.submitAndVerifyFormError(this.view, requests, notificationSpy)
         });

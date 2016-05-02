@@ -1,4 +1,3 @@
-<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "pages" %></%def>
 <%namespace name='static' file='static_content.html'/>
@@ -6,7 +5,7 @@
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
   from xmodule.tabs import StaticTab
-  from openedx.core.djangolib.js_utils import js_escaped_string
+  from django.template.defaultfilters import escapejs
 %>
 <%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
@@ -21,7 +20,7 @@
 
 <%block name="requirejs">
     require(["js/factories/edit_tabs"], function (EditTabsFactory) {
-        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
+        EditTabsFactory("${context_course.location | escapejs}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
     });
 </%block>
 
@@ -31,7 +30,7 @@
     <h1 class="page-header">
       <small class="subtitle">${_("Content")}</small>
       ## Translators: Pages refer to the tabs that appear in the top navigation of each course.
-      <span class="sr"> > </span>${_("Pages")}
+      <span class="sr">&gt; </span>${_("Pages")}
     </h1>
 
     <nav class="nav-actions" aria-label="${_('Page Actions')}">
@@ -73,7 +72,7 @@
                 %>
 
                 % if isinstance(tab, StaticTab):
-                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component ${css_class}" data-locator="${tab.locator | h}" data-tab-id="${tab.tab_id | h}"></li>
 
                 % else:
                     <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">

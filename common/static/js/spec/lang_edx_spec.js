@@ -19,34 +19,34 @@
         });
 
         it("should make an AJAX request to the correct URL", function () {
-            spyOn($, 'ajax').and.returnValue(deferred);
+            spyOn($, 'ajax').andReturn(deferred);
             Language.init();
             lang_selector.trigger('change');
-            expect($.ajax.calls.mostRecent().args[0].url).toEqual("/api/user/v1/preferences/test1/");
+            expect($.ajax.mostRecentCall.args[0].url).toEqual("/api/user/v1/preferences/test1/");
         });
 
         it("should make an AJAX request with correct type", function () {
-            spyOn($, 'ajax').and.returnValue(deferred);
+            spyOn($, 'ajax').andReturn(deferred);
             Language.init();
             lang_selector.trigger('change');
-            expect($.ajax.calls.mostRecent().args[0].type).toEqual("PATCH");
+            expect($.ajax.mostRecentCall.args[0].type).toEqual("PATCH");
         });
 
         it("should make an AJAX request with correct data", function () {
-            spyOn($, 'ajax').and.returnValue(deferred);
+            spyOn($, 'ajax').andReturn(deferred);
             Language.init();
             lang_selector.val('ar');
             lang_selector.trigger('change');
-            expect($.ajax.calls.mostRecent().args[0].data).toEqual('{"pref-lang":"ar"}');
+            expect($.ajax.mostRecentCall.args[0].data).toEqual('{"pref-lang":"ar"}');
 
             // change to 'en' from 'ar'
             lang_selector.val('en');
             lang_selector.trigger('change');
-            expect($.ajax.calls.mostRecent().args[0].data).toEqual('{"pref-lang":"en"}');
+            expect($.ajax.mostRecentCall.args[0].data).toEqual('{"pref-lang":"en"}');
         });
 
         it("should call refresh on ajax failure", function () {
-            spyOn($, 'ajax').and.callFake(function () {
+            spyOn($, 'ajax').andCallFake(function () {
                 var d = $.Deferred();
                 d.reject();
                 return d.promise();

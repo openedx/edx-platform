@@ -4,7 +4,6 @@ import json
 import httpretty
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests import factories
 
 
 class ProgramsApiConfigMixin(object):
@@ -33,10 +32,7 @@ class ProgramsApiConfigMixin(object):
 
 
 class ProgramsDataMixin(object):
-    """Mixin mocking Programs API URLs and providing fake data for testing.
-
-    NOTE: This mixin is DEPRECATED. Tests should create and manage their own data.
-    """
+    """Mixin mocking Programs API URLs and providing fake data for testing."""
     PROGRAM_NAMES = [
         'Test Program A',
         'Test Program B',
@@ -54,48 +50,176 @@ class ProgramsDataMixin(object):
         'organization-b/course-d/winter',
     ]
 
+    # TODO: Use factory-boy.
     PROGRAMS_API_RESPONSE = {
         'results': [
-            factories.Program(
-                id=1,
-                name=PROGRAM_NAMES[0],
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=COURSE_KEYS[0]),
-                        factories.RunMode(course_key=COURSE_KEYS[1]),
-                    ]),
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=COURSE_KEYS[2]),
-                        factories.RunMode(course_key=COURSE_KEYS[3]),
-                    ]),
-                ]
-            ),
-            factories.Program(
-                id=2,
-                name=PROGRAM_NAMES[1],
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=COURSE_KEYS[4]),
-                        factories.RunMode(course_key=COURSE_KEYS[5]),
-                    ]),
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=COURSE_KEYS[6]),
-                        factories.RunMode(course_key=COURSE_KEYS[7]),
-                    ]),
-                ]
-            ),
-            factories.Program(
-                id=3,
-                name=PROGRAM_NAMES[2],
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=COURSE_KEYS[7]),
-                    ]),
-                ]
-            ),
+            {
+                'id': 1,
+                'name': PROGRAM_NAMES[0],
+                'subtitle': 'A program used for testing purposes',
+                'category': 'xseries',
+                'status': 'unpublished',
+                'marketing_slug': '{}_test_url'.format(PROGRAM_NAMES[0].replace(' ', '_')),
+                'organizations': [
+                    {
+                        'display_name': 'Test Organization A',
+                        'key': 'organization-a'
+                    }
+                ],
+                'course_codes': [
+                    {
+                        'display_name': 'Test Course A',
+                        'key': 'course-a',
+                        'organization': {
+                            'display_name': 'Test Organization A',
+                            'key': 'organization-a'
+                        },
+                        'run_modes': [
+                            {
+                                'course_key': COURSE_KEYS[0],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'fall'
+                            },
+                            {
+                                'course_key': COURSE_KEYS[1],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'winter'
+                            }
+                        ]
+                    },
+                    {
+                        'display_name': 'Test Course B',
+                        'key': 'course-b',
+                        'organization': {
+                            'display_name': 'Test Organization A',
+                            'key': 'organization-a'
+                        },
+                        'run_modes': [
+                            {
+                                'course_key': COURSE_KEYS[2],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'fall'
+                            },
+                            {
+                                'course_key': COURSE_KEYS[3],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'winter'
+                            }
+                        ]
+                    }
+                ],
+                'created': '2015-10-26T17:52:32.861000Z',
+                'modified': '2015-11-18T22:21:30.826365Z'
+            },
+            {
+                'id': 2,
+                'name': PROGRAM_NAMES[1],
+                'subtitle': 'Another program used for testing purposes',
+                'category': 'xseries',
+                'status': 'unpublished',
+                'marketing_slug': '{}_test_url'.format(PROGRAM_NAMES[1].replace(' ', '_')),
+                'organizations': [
+                    {
+                        'display_name': 'Test Organization B',
+                        'key': 'organization-b'
+                    }
+                ],
+                'course_codes': [
+                    {
+                        'display_name': 'Test Course C',
+                        'key': 'course-c',
+                        'organization': {
+                            'display_name': 'Test Organization B',
+                            'key': 'organization-b'
+                        },
+                        'run_modes': [
+                            {
+                                'course_key': COURSE_KEYS[4],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'fall'
+                            },
+                            {
+                                'course_key': COURSE_KEYS[5],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'winter'
+                            }
+                        ]
+                    },
+                    {
+                        'display_name': 'Test Course D',
+                        'key': 'course-d',
+                        'organization': {
+                            'display_name': 'Test Organization B',
+                            'key': 'organization-b'
+                        },
+                        'run_modes': [
+                            {
+                                'course_key': COURSE_KEYS[6],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'fall'
+                            },
+                            {
+                                'course_key': COURSE_KEYS[7],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'winter'
+                            }
+                        ]
+                    }
+                ],
+                'created': '2015-10-26T19:59:03.064000Z',
+                'modified': '2015-10-26T19:59:18.536000Z'
+            },
+            {
+                'id': 3,
+                'name': PROGRAM_NAMES[2],
+                'subtitle': 'A third program used for testing purposes',
+                'category': 'xseries',
+                'status': 'unpublished',
+                'marketing_slug': '{}_test_url'.format(PROGRAM_NAMES[2].replace(' ', '_')),
+                'organizations': [
+                    {
+                        'display_name': 'Test Organization B',
+                        'key': 'organization-b'
+                    }
+                ],
+                'course_codes': [
+                    {
+                        'display_name': 'Test Course D',
+                        'key': 'course-d',
+                        'organization': {
+                            'display_name': 'Test Organization B',
+                            'key': 'organization-b'
+                        },
+                        'run_modes': [
+                            {
+                                'course_key': COURSE_KEYS[7],
+                                'mode_slug': 'verified',
+                                'sku': '',
+                                'start_date': '2015-11-05T07:39:02.791741Z',
+                                'run_key': 'winter'
+                            }
+                        ]
+                    }
+                ],
+                'created': '2015-10-26T19:59:03.064000Z',
+                'modified': '2015-10-26T19:59:18.536000Z'
+            }
         ]
     }
 

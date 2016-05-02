@@ -1,17 +1,13 @@
 define([
     'jquery', 'js/models/settings/course_details', 'js/views/settings/main',
-    'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
-], function($, CourseDetailsModel, MainView, AjaxHelpers, TemplateHelpers) {
+    'common/js/spec_helpers/ajax_helpers'
+], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
 
     var SELECTORS = {
         entrance_exam_min_score: '#entrance-exam-minimum-score-pct',
         entrance_exam_enabled_field: '#entrance-exam-enabled',
-        grade_requirement_div: '.div-grade-requirements div',
-        add_course_learning_info: '.add-course-learning-info',
-        delete_course_learning_info: '.delete-course-learning-info',
-        add_course_instructor_info: '.add-course-instructor-info',
-        remove_instructor_data: '.remove-instructor-data'
+        grade_requirement_div: '.div-grade-requirements div'
     };
 
     describe('Settings/Main', function () {
@@ -25,50 +21,24 @@ define([
                 course_id : '',
                 run : '',
                 syllabus : null,
-                title: '',
-                subtitle: '',
-                duration: '',
-                description: '',
                 short_description : '',
                 overview : '',
                 intro_video : null,
                 effort : null,
                 course_image_name : '',
                 course_image_asset_path : '',
-                banner_image_name : '',
-                banner_image_asset_path : '',
-                video_thumbnail_image_name : '',
-                video_thumbnail_image_asset_path : '',
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50',
                 license: null,
-                language: '',
-                learning_info: [''],
-                instructor_info: {
-                    'instructors': [{"name": "","title": "","organization": "","image": "","bio": ""}]
-                }
+                language: ''
             },
-
-            mockSettingsPage = readFixtures('mock/mock-settings-page.underscore'),
-            learningInfoTpl = readFixtures('course-settings-learning-fields.underscore'),
-            instructorInfoTpl = readFixtures('course-instructor-details.underscore');
+            mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
         beforeEach(function () {
-            TemplateHelpers.installTemplates(['course-settings-learning-fields', 'course-instructor-details'], true);
-            appendSetFixtures(mockSettingsPage);
-            appendSetFixtures(
-                $("<script>", { id: "basic-learning-info-tpl", type: "text/template" }).text(learningInfoTpl)
-            );
-            appendSetFixtures(
-                $("<script>", { id: "basic-instructor-info-tpl", type: "text/template" }).text(instructorInfoTpl)
-            );
+            setFixtures(mockSettingsPage);
 
-
-            this.model = new CourseDetailsModel($.extend(true, {}, modelData, {
-                instructor_info: {
-                    'instructors': [{"name": "","title": "","organization": "","image": "","bio": ""}]
-                }}), {parse: true});
+            this.model = new CourseDetailsModel(modelData, {parse: true});
             this.model.urlRoot = urlRoot;
             this.view = new MainView({
                 el: $('.settings-details'),
@@ -208,149 +178,5 @@ define([
             AjaxHelpers.expectJsonRequest(requests, 'POST', urlRoot, modelData);
         });
 
-        it('should save title', function(){
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    title: 'course title'
-                });
-
-            // Input some value.
-            this.view.$("#course-title").val('course title');
-            this.view.$("#course-title").trigger('change');
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-        });
-
-        it('should save subtitle', function(){
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    subtitle: 'course subtitle'
-                });
-
-            // Input some value.
-            this.view.$("#course-subtitle").val('course subtitle');
-            this.view.$("#course-subtitle").trigger('change');
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-        });
-
-        it('should save duration', function(){
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    duration: '8 weeks'
-                });
-
-            // Input some value.
-            this.view.$("#course-duration").val('8 weeks');
-            this.view.$("#course-duration").trigger('change');
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-        });
-
-        it('should save description', function(){
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    description: 'course description'
-                });
-
-            // Input some value.
-            this.view.$("#course-description").val('course description');
-            this.view.$("#course-description").trigger('change');
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-        });
-
-        it('can add learning information', function () {
-            this.view.$(SELECTORS.add_course_learning_info).click();
-            expect('click').not.toHaveBeenPreventedOn(SELECTORS.add_course_learning_info);
-            expect(this.model.get('learning_info').length).toEqual(2);
-            this.view.$(SELECTORS.add_course_learning_info).click();
-            expect(this.model.get('learning_info').length).toEqual(3);
-        });
-
-        it('can delete learning information', function () {
-            for (var i = 0 ; i < 2; i++) {
-                this.view.$(SELECTORS.add_course_learning_info).click();
-            }
-            expect(this.model.get('learning_info').length).toEqual(3);
-            expect(this.view.$(SELECTORS.delete_course_learning_info)).toExist();
-            this.view.$(SELECTORS.delete_course_learning_info).click();
-            expect(this.model.get('learning_info').length).toEqual(2);
-        });
-
-        it('can save learning information', function () {
-            expect(this.model.get('learning_info').length).toEqual(1);
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    learning_info: ['testing info']
-                });
-
-            // Input some value.
-            this.view.$("#course-learning-info-0").val('testing info');
-            this.view.$("#course-learning-info-0").trigger('change');
-
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-        });
-
-        it('can add instructor information', function () {
-            this.view.$(SELECTORS.add_course_instructor_info).click();
-            expect(this.model.get('instructor_info').instructors.length).toEqual(2);
-            this.view.$(SELECTORS.add_course_instructor_info).click();
-            expect(this.model.get('instructor_info').instructors.length).toEqual(3);
-
-        });
-
-        it('can delete instructor information', function () {
-            this.view.$(SELECTORS.add_course_instructor_info).click();
-            expect(this.model.get('instructor_info').instructors.length).toEqual(2);
-            expect(this.view.$(SELECTORS.remove_instructor_data)).toExist();
-            this.view.$(SELECTORS.remove_instructor_data).click();
-            expect(this.model.get('instructor_info').instructors.length).toEqual(1);
-        });
-
-        it('can save instructor information', function () {
-            var requests = AjaxHelpers.requests(this),
-                expectedJson = $.extend(true, {}, modelData, {
-                    instructor_info: {
-                        instructors:
-                            [{
-                            "name": "test_name",
-                            "title": "test_title",
-                            "organization": "test_org",
-                            "image": "",
-                            "bio": "test_bio"
-                        }]
-                    }
-                });
-
-            // Input some value.
-            this.view.$("#course-instructor-name-0").val('test_name').trigger('change');
-            this.view.$("#course-instructor-title-0").val('test_title').trigger('change');
-            this.view.$("#course-instructor-organization-0").val('test_org').trigger('change');
-            this.view.$("#course-instructor-bio-0").val('test_bio').trigger('change');
-
-            this.view.saveView();
-            AjaxHelpers.expectJsonRequest(
-                requests, 'POST', urlRoot, expectedJson
-            );
-            AjaxHelpers.respondWithJson(requests, expectedJson);
-
-        });
     });
 });

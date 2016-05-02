@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').and.returnValue(null);
+                .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer();
             spyOn(state.videoCommands, 'execute');
             spyOn(state.videoSaveStatePlugin, 'saveState');

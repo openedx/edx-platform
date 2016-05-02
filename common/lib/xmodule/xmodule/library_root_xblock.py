@@ -22,8 +22,6 @@ class LibraryRoot(XBlock):
     the library are its children. It contains metadata such as the library's
     display_name.
     """
-    resources_dir = None
-
     display_name = String(
         help=_("Enter the name of the library as it should appear in Studio."),
         default="Library",

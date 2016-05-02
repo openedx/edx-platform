@@ -1,7 +1,6 @@
 """
 Unit test tasks
 """
-import re
 import os
 import sys
 from paver.easy import sh, task, cmdopts, needs, call_task
@@ -251,7 +250,7 @@ def diff_coverage(options):
     xml_reports = []
 
     for filepath in Env.REPORT_DIR.walk():
-        if bool(re.match(r'^coverage.*\.xml$', filepath.basename())):
+        if filepath.basename() == 'coverage.xml':
             xml_reports.append(filepath)
 
     if not xml_reports:

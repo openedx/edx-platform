@@ -98,7 +98,7 @@ class HtmlModuleMixin(HtmlBlock, XModule):
         'js': [
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
-            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
         ]
     }
     js_module_name = "HTMLModule"
@@ -118,7 +118,6 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
     """
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
-    resources_dir = None
     filename_extension = "xml"
     template_dir_name = "html"
     show_in_read_only_mode = True

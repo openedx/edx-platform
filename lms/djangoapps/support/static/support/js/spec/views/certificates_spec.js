@@ -91,7 +91,6 @@ define([
         };
 
         beforeEach(function () {
-            spyOn(window.history, 'pushState');
             setFixtures('<div class="certificates-content"></div>');
             view = new CertificatesView({
                 el: $('.certificates-content')

@@ -28,12 +28,10 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * Get a reference to the mocked server, and respond
      * to all requests with the specified statusCode.
      */
-    fakeServer = function (response) {
+    fakeServer = function (that, response) {
         var server = sinon.fakeServer.create();
-        afterEach(function() {
-            if (server) {
-                server.restore();
-            }
+        that.after(function() {
+            server.restore();
         });
         server.respondWith(response);
         return server;
@@ -44,19 +42,16 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
      * return a reference to the Array. This allows tests
      * to respond for individual requests.
      */
-    fakeRequests = function () {
+    fakeRequests = function (that) {
         var requests = [],
-          xhr = sinon.useFakeXMLHttpRequest();
-
+            xhr = sinon.useFakeXMLHttpRequest();
         requests.currentIndex = 0;
         xhr.onCreate = function(request) {
             requests.push(request);
         };
 
-        afterEach(function() {
-            if (xhr && xhr.hasOwnProperty('restore')) {
-                xhr.restore();
-            }
+        that.after(function() {
+            xhr.restore();
         });
         return requests;
     };
@@ -93,12 +88,11 @@ define(['sinon', 'underscore', 'URI'], function(sinon, _, URI) {
     };
 
     expectJsonRequest = function(requests, method, url, jsonRequest) {
-        jsonRequest = jsonRequest || null;
         var request = currentRequest(requests);
         expect(request.readyState).toEqual(XML_HTTP_READY_STATES.OPENED);
         expect(request.url).toEqual(url);
         expect(request.method).toEqual(method);
-        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest === undefined ? null : jsonRequest);
+        expect(JSON.parse(request.requestBody)).toEqual(jsonRequest);
     };
 
     /**

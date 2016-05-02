@@ -5,16 +5,11 @@ django-oauth-toolkit as appropriate.
 
 from __future__ import unicode_literals
 
-import json
-from time import time
-
-import jwt
-from auth_exchange import views as auth_exchange_views
-from django.conf import settings
-from django.utils.functional import cached_property
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
+
+from auth_exchange import views as auth_exchange_views
 
 from . import adapters
 
@@ -29,15 +24,6 @@ class _DispatchingView(View):
 
     dot_adapter = adapters.DOTAdapter()
     dop_adapter = adapters.DOPAdapter()
-
-    def get_adapter(self, request):
-        """
-        Returns the appropriate adapter based on the OAuth client linked to the request.
-        """
-        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
-            return self.dot_adapter
-        else:
-            return self.dop_adapter
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -55,7 +41,11 @@ class _DispatchingView(View):
         otherwise use the django-oauth2-provider (DOP) adapter, and allow the
         calls to fail normally if the client does not exist.
         """
-        return self.get_adapter(request).backend
+
+        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
+            return self.dot_adapter.backend
+        else:
+            return self.dop_adapter.backend
 
     def get_view_for_backend(self, backend):
         """
@@ -81,77 +71,6 @@ class AccessTokenView(_DispatchingView):
     """
     dot_view = dot_views.TokenView
     dop_view = dop_views.AccessTokenView
-
-    @cached_property
-    def claim_handlers(self):
-        """ Returns a dictionary mapping scopes to methods that will add claims to the JWT payload. """
-
-        return {
-            'email': self._attach_email_claim,
-            'profile': self._attach_profile_claim
-        }
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
-
-        if response.status_code == 200 and request.POST.get('token_type', '').lower() == 'jwt':
-            expires_in, scopes, user = self._decompose_access_token_response(request, response)
-
-            content = {
-                'access_token': self._generate_jwt(user, scopes, expires_in),
-                'expires_in': expires_in,
-                'token_type': 'JWT',
-                'scope': ' '.join(scopes),
-            }
-            response.content = json.dumps(content)
-
-        return response
-
-    def _decompose_access_token_response(self, request, response):
-        """ Decomposes the access token in the request to an expiration date, scopes, and User. """
-        content = json.loads(response.content)
-        access_token = content['access_token']
-        scope = content['scope']
-        access_token_obj = self.get_adapter(request).get_access_token(access_token)
-        user = access_token_obj.user
-        scopes = scope.split(' ')
-        expires_in = content['expires_in']
-        return expires_in, scopes, user
-
-    def _generate_jwt(self, user, scopes, expires_in):
-        """ Returns a JWT access token. """
-        now = int(time())
-
-        payload = {
-            'iss': settings.JWT_AUTH['JWT_ISSUER'],
-            'aud': settings.JWT_AUTH['JWT_AUDIENCE'],
-            'exp': now + expires_in,
-            'iat': now,
-            'preferred_username': user.username,
-        }
-
-        for scope in scopes:
-            handler = self.claim_handlers.get(scope)
-
-            if handler:
-                handler(payload, user)
-
-        secret = settings.JWT_AUTH['JWT_SECRET_KEY']
-        token = jwt.encode(payload, secret, algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
-
-        return token
-
-    def _attach_email_claim(self, payload, user):
-        """ Add the email claim details to the JWT payload. """
-        payload['email'] = user.email
-
-    def _attach_profile_claim(self, payload, user):
-        """ Add the profile claim details to the JWT payload. """
-        payload.update({
-            'family_name': user.last_name,
-            'name': user.get_full_name(),
-            'given_name': user.first_name,
-        })
 
 
 class AuthorizationView(_DispatchingView):

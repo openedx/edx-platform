@@ -16,8 +16,8 @@ import urllib
 import ddt
 from freezegun import freeze_time
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 import tempfile
+import json
 from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
@@ -34,7 +34,11 @@ from django.conf import settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from pytz import UTC
 
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions import Group, UserPartition
+
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -667,7 +671,6 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
-@attr('shard_3')
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
@@ -730,71 +733,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 ]
             ))
         ])
-
-    def test_problem_grade_report_valid_columns_order(self):
-        """
-        Test that in the CSV grade report columns are placed in the proper order
-        """
-        grader_num = 7
-
-        self.course = CourseFactory.create(
-            grading_policy={
-                "GRADER": [{
-                    "type": "Homework %d" % i,
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "short_label": "HW %d" % i,
-                    "weight": 1.0
-                } for i in xrange(1, grader_num)]
-            }
-        )
-
-        # Create users
-        self.student_a = UserFactory.create(username='student_a', email='student_a@example.com')
-        CourseEnrollmentFactory.create(user=self.student_a, course_id=self.course.id)
-        self.student_b = UserFactory.create(username='student_b', email='student_b@example.com')
-        CourseEnrollmentFactory.create(user=self.student_b, course_id=self.course.id)
-
-        problem_vertical_list = []
-
-        for i in xrange(1, grader_num):
-            chapter_name = 'Chapter %d' % i
-            problem_section_name = 'Problem section %d' % i
-            problem_section_format = 'Homework %d' % i
-            problem_vertical_name = 'Problem Unit %d' % i
-
-            chapter = ItemFactory.create(parent_location=self.course.location,
-                                         display_name=chapter_name)
-
-            # Add a sequence to the course to which the problems can be added
-            problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                 category='sequential',
-                                                 metadata={'graded': True,
-                                                           'format': problem_section_format},
-                                                 display_name=problem_section_name)
-
-            # Create a vertical
-            problem_vertical = ItemFactory.create(
-                parent_location=problem_section.location,
-                category='vertical',
-                display_name=problem_vertical_name
-            )
-            problem_vertical_list.append(problem_vertical)
-
-        problem_names = []
-        for i in xrange(1, grader_num):
-            problem_url = 'test_problem_%d' % i
-            self.define_option_problem(problem_url, parent=problem_vertical_list[i - 1])
-            title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
-            problem_names.append(title)
-
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
-        for problem in problem_names:
-            header_row += [problem + ' (Earned)', problem + ' (Possible)']
-
-        with patch('instructor_task.tasks_helper._get_current_task'):
-            upload_problem_grade_report(None, None, self.course.id, None, 'graded')
-        self.assertEquals(self.get_csv_row_with_headers(), header_row)
 
 
 class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, InstructorTaskModuleTestCase):
@@ -1676,8 +1614,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
-@attr('shard_3')
-@ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
@@ -1720,70 +1656,65 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         with self.assertNumQueries(214):
             self.assertCertificatesGenerated(task_input, expected_results)
 
-    @ddt.data(
-        CertificateStatuses.downloadable,
-        CertificateStatuses.generating,
-        CertificateStatuses.notpassing,
-        CertificateStatuses.audit_passing,
-    )
-    def test_certificate_generation_all_whitelisted(self, status):
+    def test_certificate_generation_all_whitelisted(self):
         """
-        Verify that certificates are generated for all white-listed students,
-        whether or not they already had certs generated for them.
+        Verify that certificates generated for all white-listed students when using semantic task_input as
+        `all_whitelisted`.
         """
+        # create 5 students
         students = self._create_students(5)
 
-        # whitelist 3
-        for student in students[:3]:
-            CertificateWhitelistFactory.create(
-                user=student, course_id=self.course.id, whitelist=True
-            )
-
-        # generate certs for 2
-        for student in students[:2]:
-            GeneratedCertificateFactory.create(
-                user=student,
-                course_id=self.course.id,
-                status=status,
-            )
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
         task_input = {'student_set': 'all_whitelisted'}
-        # only certificates for the 3 whitelisted students should have been run
         expected_results = {
             'action_name': 'certificates generated',
-            'total': 3,
-            'attempted': 3,
-            'succeeded': 3,
+            'total': 5,
+            'attempted': 5,
+            'succeeded': 5,
             'failed': 0,
             'skipped': 0
         }
         self.assertCertificatesGenerated(task_input, expected_results)
 
-        # the first 3 students (who were whitelisted) have passing
-        # certificate statuses
-        for student in students[:3]:
-            self.assertIn(
-                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
-                CertificateStatuses.PASSED_STATUSES
-            )
-
-        # The last 2 students still don't have certs
-        for student in students[3:]:
-            self.assertIsNone(
-                GeneratedCertificate.certificate_for_student(student, self.course.id)
-            )
-
-    @ddt.data(
-        (CertificateStatuses.downloadable, 2),
-        (CertificateStatuses.generating, 2),
-        (CertificateStatuses.notpassing, 4),
-        (CertificateStatuses.audit_passing, 4),
-    )
-    @ddt.unpack
-    def test_certificate_generation_whitelisted_not_generated(self, status, expected_certs):
+    def test_certificate_generation_whitelist_already_generated(self):
         """
-        Verify that certificates are generated only for those students
-        who do not have `downloadable` or `generating` certificates.
+        Verify that certificates generated for all white-listed students having certifcates already when using
+        semantic task_input as `all_whitelisted`.
+        """
+        # create 5 students
+        students = self._create_students(5)
+
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+
+        # mark 5 students to have certificates generated already
+        for student in students:
+            GeneratedCertificateFactory.create(
+                user=student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
+            )
+
+        task_input = {'student_set': 'all_whitelisted'}
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 5,
+            'attempted': 5,
+            'succeeded': 5,
+            'failed': 0,
+            'skipped': 0
+        }
+        self.assertCertificatesGenerated(task_input, expected_results)
+
+    def test_certificate_generation_whitelisted_not_generated(self):
+        """
+        Verify that certificates only generated for those students which does not have certificates yet when
+        using semantic task_input as `whitelisted_not_generated`.
         """
         # create 5 students
         students = self._create_students(5)
@@ -1793,43 +1724,27 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
-                status=status,
+                status=CertificateStatuses.downloadable,
+                mode='honor'
             )
 
-        # white-list 4 students
-        for student in students[:4]:
-            CertificateWhitelistFactory.create(
-                user=student, course_id=self.course.id, whitelist=True
-            )
+        # white-list 5 students
+        for student in students:
+            CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
         task_input = {'student_set': 'whitelisted_not_generated'}
 
-        # certificates should only be generated for the whitelisted students
-        # who do not yet have passing certificates.
         expected_results = {
             'action_name': 'certificates generated',
-            'total': expected_certs,
-            'attempted': expected_certs,
-            'succeeded': expected_certs,
+            'total': 3,
+            'attempted': 3,
+            'succeeded': 3,
             'failed': 0,
             'skipped': 0
         }
         self.assertCertificatesGenerated(
             task_input,
             expected_results
-        )
-
-        # the first 4 students have passing certificate statuses since
-        # they either were whitelisted or had one before
-        for student in students[:4]:
-            self.assertIn(
-                GeneratedCertificate.certificate_for_student(student, self.course.id).status,
-                CertificateStatuses.PASSED_STATUSES
-            )
-
-        # The last student still doesn't have a cert
-        self.assertIsNone(
-            GeneratedCertificate.certificate_for_student(students[4], self.course.id)
         )
 
     def test_certificate_generation_specific_student(self):

@@ -3,7 +3,6 @@ Acceptance tests for Studio.
 """
 
 from bok_choy.web_app_test import WebAppTest
-from flaky import flaky
 
 from ...pages.studio.asset_index import AssetIndexPage
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -95,7 +94,6 @@ class CoursePagesTest(StudioCourseTest):
         self.dashboard_page.visit()
         self.assertEqual(self.browser.current_url.strip('/').rsplit('/')[-1], 'home')
 
-    @flaky  # TODO: FEDX-88
     def test_page_existence(self):
         """
         Make sure that all these pages are accessible once you have a course.

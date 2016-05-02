@@ -94,7 +94,7 @@ define([
                 var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
-                spyOn( view.backend, 'snapshot' ).and.callThrough();
+                spyOn( view.backend, 'snapshot' ).andCallThrough();
 
                 // Initially, only the snapshot button is shown
                 expectButtonShown({
@@ -125,7 +125,7 @@ define([
                 var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
-                spyOn( view.backend, 'reset' ).and.callThrough();
+                spyOn( view.backend, 'reset' ).andCallThrough();
 
                 // Take the snapshot, then reset
                 takeSnapshot();

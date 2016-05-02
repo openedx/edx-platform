@@ -1,10 +1,11 @@
 define([
     'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'common/js/spec_helpers/ajax_helpers',
-    'js/spec/edxnotes/helpers'
-], function(Annotator, NotesFactory, AjaxHelpers, Helpers) {
+    'js/spec/edxnotes/helpers', 'js/spec/edxnotes/custom_matchers'
+], function(Annotator, NotesFactory, AjaxHelpers, Helpers, customMatchers) {
     'use strict';
     describe('EdxNotes NotesFactory', function() {
         beforeEach(function() {
+            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.wrapper = document.getElementById('edx-notes-wrapper-123');
         });

@@ -6,7 +6,6 @@ import datetime
 import json
 import pytz
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
@@ -32,7 +31,6 @@ from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
-@attr('shard_3')
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 

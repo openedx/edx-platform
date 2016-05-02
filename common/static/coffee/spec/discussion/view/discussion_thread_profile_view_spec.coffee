@@ -27,7 +27,7 @@ describe "DiscussionThreadProfileView", ->
       return thread
 
     spyConvertMath = (view) ->
-      spyOn(view, "convertMath").and.callFake( ->
+      spyOn(view, "convertMath").andCallFake( ->
           @model.set('markdownBody', @model.get('body'))
         )
 

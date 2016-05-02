@@ -47,7 +47,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
     def get(self, key):
         if key.block_family == XBlockAside.entry_point:
-            if key.scope not in self.VALID_SCOPES:
+            if key.scope not in [Scope.settings, Scope.content]:
                 raise InvalidScopeError(key, self.VALID_SCOPES)
 
             if key.block_scope_id.block_type not in self.aside_fields:
@@ -139,9 +139,6 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         Is the given field explicitly set in this kvs (not inherited nor default)
         """
         # handle any special cases
-        if key.scope not in self.VALID_SCOPES:
-            return False
-
         if key.scope == Scope.content:
             self._load_definition()
         elif key.scope == Scope.parent:

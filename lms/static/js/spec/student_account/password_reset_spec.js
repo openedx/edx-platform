@@ -58,7 +58,7 @@
                 // spying on `view.validate` twice
                 if ( !_.isUndefined(validationSuccess) ) {
                     // Force validation to return as expected
-                    spyOn(view, 'validate').and.returnValue({
+                    spyOn(view, 'validate').andReturn({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
                     });

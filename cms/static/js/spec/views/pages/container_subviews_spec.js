@@ -1,10 +1,9 @@
 define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "common/js/components/views/feedback_prompt", "js/views/pages/container",
-        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils",
-        'js/models/course'],
+        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
-              XBlockInfo, XBlockUtils, Course) {
+              XBlockInfo, XBlockUtils) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
         describe("Container Subviews", function() {
@@ -15,26 +14,12 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
             beforeEach(function () {
-                window.course = new Course({
-                    id: '5',
-                    name: 'Course Name',
-                    url_name: 'course_name',
-                    org: 'course_org',
-                    num: 'course_num',
-                    revision: 'course_rev'
-                });
-
                 TemplateHelpers.installTemplate('xblock-string-field-editor');
                 TemplateHelpers.installTemplate('publish-xblock');
                 TemplateHelpers.installTemplate('publish-history');
                 TemplateHelpers.installTemplate('unit-outline');
                 TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
-                requests = AjaxHelpers.requests(this);
-            });
-
-            afterEach(function() {
-                delete window.course;
             });
 
             defaultXBlockInfo = {
@@ -54,6 +39,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
             };
 
             createContainerPage = function (test, options) {
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,
@@ -149,7 +135,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Confirm the discard.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
+                    promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
 
                     AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
@@ -166,8 +152,8 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 };
 
                 beforeEach(function() {
-                    promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
-                    promptSpies.show.and.returnValue(this.promptSpies);
+                    promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
+                    promptSpies.show.andReturn(this.promptSpies);
                 });
 
                 it('renders correctly with private content', function () {
@@ -282,7 +268,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
                     notificationSpy = EditHelpers.createNotificationSpy();
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
 
                     sendDiscardChangesToServer();
                     numRequests = requests.length;
@@ -301,7 +287,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 it('does not fetch if discard changes fails', function () {
                     var renderPageSpy, numRequests;
                     createContainerPage(this);
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
 
                     sendDiscardChangesToServer();
 
@@ -323,7 +309,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Click cancel to confirmation.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.calls.mostRecent().args[0].actions.secondary.click(promptSpies);
+                    promptSpies.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpies);
                     AjaxHelpers.expectNoRequests(requests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                 });

@@ -22,7 +22,6 @@ from pytz import UTC
 from freezegun import freeze_time
 from datetime import datetime, timedelta
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 import ddt
 
 from common.test.utils import XssTestMixin
@@ -65,14 +64,9 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-@attr('shard_3')
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
-    """
-    Test shopping cart view under various states
-    """
-
     @classmethod
     def setUpClass(cls):
         super(ShoppingCartViewsTests, cls).setUpClass()

@@ -16,7 +16,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 appendSetFixtures(uploadModalTpl);
                 appendSetFixtures(sandbox({ id: "asset_table_body" }));
 
-                spyOn($.fn, "fileupload").and.returnValue("");
+                spyOn($.fn, "fileupload").andReturn("");
 
                 var collection = new AssetCollection();
                 collection.url = "assets-url";
@@ -181,7 +181,7 @@ define([ "jquery", "common/js/spec_helpers/ajax_helpers", "URI", "js/views/asset
                 it('uploads file properly', function () {
                     var requests = setup.call(this);
                     expect(assetsView).toBeDefined();
-                    spyOn(assetsView, "addAsset").and.callFake(function () {
+                    spyOn(assetsView, "addAsset").andCallFake(function () {
                         assetsView.collection.add(mockAssetUploadResponse.asset);
                         assetsView.pagingView.renderPageItems();
                         assetsView.pagingView.setPage(0);

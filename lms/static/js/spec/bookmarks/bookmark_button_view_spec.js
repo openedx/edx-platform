@@ -18,11 +18,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 );
 
                 timerCallback = jasmine.createSpy('timerCallback');
-                jasmine.clock().install();
-            });
-
-            afterEach(function() {
-                jasmine.clock().uninstall();
+                jasmine.Clock.useMock();
             });
 
             var createBookmarkButtonView = function(isBookmarked) {
@@ -84,7 +80,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     var bookmarkButtonView = createBookmarkButtonView(firstActionData.bookmarked);
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
 
-                    spyOn(bookmarkButtonView, firstActionData.handler).and.callThrough();
+                    spyOn(bookmarkButtonView, firstActionData.handler).andCallThrough();
                     spyOnEvent(bookmarkButtonView.$el, firstActionData.event);
 
                     bookmarkButtonView.$el.click();
@@ -100,12 +96,12 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     expect(bookmarkButtonView[firstActionData.handler]).toHaveBeenCalled();
                     AjaxHelpers.respondWithJson(requests, {});
                     expect(firstActionData.event).toHaveBeenTriggeredOn(bookmarkButtonView.$el);
-                    bookmarkButtonView[firstActionData.handler].calls.reset();
+                    bookmarkButtonView[firstActionData.handler].reset();
 
                     expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                     verifyBookmarkButtonState(bookmarkButtonView, secondActionData.bookmarked);
 
-                    spyOn(bookmarkButtonView, secondActionData.handler).and.callThrough();
+                    spyOn(bookmarkButtonView, secondActionData.handler).andCallThrough();
                     spyOnEvent(bookmarkButtonView.$el, secondActionData.event);
 
                     bookmarkButtonView.$el.click();
@@ -158,7 +154,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
 
-                jasmine.clock().tick(5001);
+                jasmine.Clock.tick(5001);
                 expect($messageBanner.text().trim()).toBe('');
             });
         });

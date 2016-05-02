@@ -154,7 +154,6 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Video annotation descriptor '''
     module_class = VideoAnnotationModule
-    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

@@ -15,7 +15,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
             chapterMenu = accordion.children('.chapter-content-container').children('.chapter-menu');
 
             this.KEY = $.ui.keyCode;
-            spyOn($.fn, 'focus').and.callThrough();
+            spyOn($.fn, 'focus').andCallThrough();
             edx.util.navigation.init();
         });
 

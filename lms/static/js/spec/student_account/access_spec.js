@@ -78,11 +78,11 @@
                 view = new AccessView(_.extend(options, {el: $logistrationElement}));
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).and.callFake( function() {} );
+                spyOn( view, 'redirect' ).andCallFake( function() {} );
 
                 // Mock the enrollment and shopping cart interfaces
-                spyOn( EnrollmentInterface, 'enroll' ).and.callFake( function() {} );
-                spyOn( ShoppingCartInterface, 'addCourseToCart' ).and.callFake( function() {} );
+                spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
+                spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
             };
 
             var assertForms = function(visibleType, hiddenType) {
@@ -101,7 +101,6 @@
             };
 
             beforeEach(function() {
-                spyOn(window.history, 'pushState');
                 setFixtures('<div id="login-and-registration-container" class="login-register" />');
                 TemplateHelpers.installTemplate('templates/student_account/access');
                 TemplateHelpers.installTemplate('templates/student_account/login');
@@ -139,6 +138,9 @@
 
             it('toggles between the login and registration forms', function() {
                 ajaxSpyAndInitialize(this, 'login');
+
+                // Prevent URL from updating
+                spyOn(history, 'pushState').andCallFake( function() {} );
 
                 // Simulate selection of the registration form
                 selectForm('register');

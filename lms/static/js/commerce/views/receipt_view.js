@@ -47,8 +47,6 @@ var edx = edx || {};
 
             this.trackLinks();
 
-            this.trackPurchase(data);
-
             this.renderCourseNamePlaceholder(this.courseKey);
 
             providerId = this.getCreditProviderId(data);
@@ -77,14 +75,6 @@ var edx = edx || {};
         renderError: function () {
             // Display an error
             $('#error-container').removeClass('hidden');
-        },
-
-        trackPurchase: function (order) {
-            window.analytics.track("Completed Order", {
-                orderId: order.number,
-                total: order.total_excl_tax,
-                currency: order.currency
-            });
         },
 
         render: function () {

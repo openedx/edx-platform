@@ -184,8 +184,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
     module_class = ConditionalModule
 
-    resources_dir = None
-
     filename_extension = "xml"
 
     has_score = False

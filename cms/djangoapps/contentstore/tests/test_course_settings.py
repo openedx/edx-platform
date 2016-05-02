@@ -52,18 +52,6 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
         self.assertIsNone(jsondetails['language'], "language somehow initialized")
 
-    def test_pre_1900_date(self):
-        """
-        Tests that the encoder can handle a pre-1900 date, since strftime
-        doesn't work for these dates.
-        """
-        details = CourseDetails.fetch(self.course.id)
-        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
-        details.enrollment_start = pre_1900
-        dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
-        loaded_jsondetails = json.loads(dumped_jsondetails)
-        self.assertEqual(loaded_jsondetails['enrollment_start'], pre_1900.isoformat())
-
     def test_ooc_encoder(self):
         """
         Test the encoder out of its original constrained purpose to see if it functions for general use
@@ -255,17 +243,11 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Card Image")
+            self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
-            self.assertNotContains(response, "Course Title")
-            self.assertNotContains(response, "Course Subtitle")
-            self.assertNotContains(response, "Course Duration")
-            self.assertNotContains(response, "Course Description")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
-            self.assertNotContains(response, "Course Banner Image")
-            self.assertNotContains(response, "Course Video Thumbnail Image")
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
@@ -373,8 +355,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False,
-                                                               'ENABLE_EXTENDED_COURSE_DETAILS': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
@@ -387,17 +368,11 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Card Image")
-            self.assertContains(response, "Course Title")
-            self.assertContains(response, "Course Subtitle")
-            self.assertContains(response, "Course Duration")
-            self.assertContains(response, "Course Description")
+            self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
-            self.assertContains(response, "Course Banner Image")
-            self.assertContains(response, "Course Video Thumbnail Image")
 
 
 @ddt.ddt

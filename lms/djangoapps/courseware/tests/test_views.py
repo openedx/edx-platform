@@ -35,7 +35,6 @@ from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
-from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.url_helpers import get_redirect_url
@@ -52,7 +51,7 @@ from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
@@ -64,7 +63,7 @@ class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TestJumpTo, self).setUp()
@@ -184,7 +183,7 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_2')
+@attr('shard_1')
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
@@ -199,27 +198,16 @@ class ViewsTestCase(ModuleStoreTestCase):
             parent_location=self.chapter.location,
             due=datetime(2013, 9, 18, 11, 30, 00),
         )
-        self.vertical = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section.location,
-            display_name='Vertical 1'
-        )
-        self.problem = ItemFactory.create(
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
+        self.component = ItemFactory.create(
             category='problem',
             parent_location=self.vertical.location,
             display_name='Problem 1',
         )
 
-        self.section2 = ItemFactory.create(
-            category='sequential',
-            parent_location=self.chapter.location
-        )
-        self.vertical2 = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section2.location,
-            display_name='Vertical 2'
-        )
-        self.problem2 = ItemFactory.create(
+        self.section2 = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical2 = ItemFactory.create(category='vertical', parent_location=self.section2.location)
+        ItemFactory.create(
             category='problem',
             parent_location=self.vertical2.location,
             display_name='Problem 2',
@@ -241,15 +229,15 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def test_index_success(self):
         response = self._verify_index_response()
-        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
+        self.assertIn('Problem 2', response.content)
 
         # re-access to the main course page redirects to last accessed view.
         url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response.url)  # pylint: disable=no-member
-        self.assertNotIn(unicode(self.problem.location), response.content.decode("utf-8"))
-        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
+        self.assertNotIn('Problem 1', response.content)
+        self.assertIn('Problem 2', response.content)
 
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
@@ -416,6 +404,16 @@ class ViewsTestCase(ModuleStoreTestCase):
             get_redirect_url(self.course_key, self.section.location),
         )
 
+        self.assertIn(
+            'child=first',
+            get_redirect_url(self.course_key, self.section.location, child='first'),
+        )
+
+        self.assertIn(
+            'child=last',
+            get_redirect_url(self.course_key, self.section.location, child='last'),
+        )
+
     def test_redirect_to_course_position(self):
         mock_module = MagicMock()
         mock_module.descriptor.id = 'Underwater Basketweaving'
@@ -542,7 +540,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': unicode(self.course_key),
             'student_username': 'dummy',
-            'location': unicode(self.problem.location),
+            'location': unicode(self.component.location),
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
@@ -651,13 +649,9 @@ class ViewsTestCase(ModuleStoreTestCase):
             (verified_course_deadline_passed, CourseMode.AUDIT, datetime.now(UTC) - timedelta(days=1))
         )
         for course, mode, expiration in enrollments:
-            CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
+            CourseModeFactory(mode_slug=CourseMode.AUDIT, course_id=course)
             if course != non_verified_course:
-                CourseModeFactory.create(
-                    mode_slug=CourseMode.VERIFIED,
-                    course_id=course,
-                    expiration_datetime=expiration
-                )
+                CourseModeFactory(mode_slug=CourseMode.VERIFIED, course_id=course, expiration_datetime=expiration)
             CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
 
         self.client.login(username=self.user.username, password=self.password)
@@ -917,10 +911,10 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the accordion """
-        table_of_contents, __, __ = toc_for_course(
-            self.request.user, self.request, course, unicode(course.get_children()[0].scope_ids.usage_id), None, None
+        return views.render_accordion(
+            self.request.user, self.request, course,
+            unicode(course.get_children()[0].scope_ids.usage_id), None, None
         )
-        return views.render_accordion(self.request, course, table_of_contents)
 
 
 @attr('shard_1')

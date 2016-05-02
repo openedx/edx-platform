@@ -3,7 +3,8 @@ define(
         "jquery", "backbone", "underscore",
         "js/views/video/transcripts/utils", "js/views/video/transcripts/editor",
         "js/views/metadata", "js/models/metadata", "js/collections/metadata",
-        "underscore.string", "xmodule", "js/views/video/transcripts/metadata_videolist"
+        "underscore.string", "xmodule", "js/views/video/transcripts/metadata_videolist",
+        "jasmine-jquery"
     ],
 function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
     describe('Transcripts.Editor', function () {
@@ -42,13 +43,6 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             },
             transcripts, container;
 
-        var waitsForDisplayName = function (collection) {
-            return jasmine.waitUntil(function () {
-                var displayNameValue = collection[0].getValue();
-                return displayNameValue !== '' && displayNameValue !== 'video_id';
-            });
-        };
-
         beforeEach(function () {
             var tpl = sandbox({
                     'class': 'wrapper-comp-settings basic_metadata_edit',
@@ -66,6 +60,7 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
         });
 
         describe('Test initialization', function () {
+
             beforeEach(function () {
                 spyOn(MetadataView, 'Editor');
 
@@ -163,23 +158,27 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             });
 
             describe('Test Advanced to Basic synchronization', function () {
-                it('Correct data', function (done) {
+                it('Correct data', function () {
                     transcripts.syncBasicTab(metadataCollection, metadataView);
+
                     var collection = transcripts.collection.models;
 
-                    waitsForDisplayName(collection)
-                        .then(function () {
-                            var displayNameValue = collection[0].getValue(),
-                                videoUrlValue = collection[1].getValue();
+                    waitsFor(function() {
+                        var displayNameValue = collection[0].getValue();
+                        return (displayNameValue !== "" && displayNameValue != "video_id");
+                    }, "Defaults never loaded", 1000);
 
-                            expect(displayNameValue).toEqual('default');
-                            expect(videoUrlValue).toEqual([
-                                'http://youtu.be/OEoXaMPEzfM',
-                                'default.mp4',
-                                'default.webm'
-                            ]);
-                        })
-                        .always(done);
+                    runs(function() {
+                        var displayNameValue = collection[0].getValue(),
+                            videoUrlValue = collection[1].getValue();
+
+                        expect(displayNameValue).toEqual('default');
+                        expect(videoUrlValue).toEqual([
+                            'http://youtu.be/OEoXaMPEzfM',
+                            'default.mp4',
+                            'default.webm'
+                        ]);
+                    });
                 });
 
                 it('If metadataCollection is not defined', function () {
@@ -220,26 +219,31 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
             });
 
             describe('Test Basic to Advanced synchronization', function () {
-                it('Correct data', function (done) {
+                it('Correct data', function () {
                     transcripts.syncAdvancedTab(metadataCollection);
 
                     var collection = metadataCollection.models;
-                    waitsForDisplayName(collection)
-                        .then(function () {
-                            var displayNameValue = collection[0].getValue();
-                            var subValue = collection[1].getValue();
-                            var html5SourcesValue = collection[2].getValue();
-                            var youtubeValue = collection[3].getValue();
 
-                            expect(displayNameValue).toEqual('display value');
-                            expect(subValue).toEqual('default');
-                            expect(html5SourcesValue).toEqual([
-                                'video.mp4',
-                                'video.webm'
-                            ]);
-                            expect(youtubeValue).toEqual('12345678901');
-                        })
-                        .always(done);
+                    waitsFor(function() {
+                        var displayNameValue = collection[0].getValue();
+                        return (displayNameValue !== "" && displayNameValue != "video_id");
+                    }, "Defaults never loaded", 1000);
+
+                    runs(function() {
+
+                        var displayNameValue = collection[0].getValue();
+                        var subValue = collection[1].getValue();
+                        var html5SourcesValue = collection[2].getValue();
+                        var youtubeValue = collection[3].getValue();
+
+                        expect(displayNameValue).toEqual('display value');
+                        expect(subValue).toEqual('default');
+                        expect(html5SourcesValue).toEqual([
+                            'video.mp4',
+                            'video.webm'
+                        ]);
+                        expect(youtubeValue).toEqual('12345678901');
+                    });
                 });
 
                 it('metadataCollection is not defined', function () {
@@ -303,7 +307,8 @@ function ($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCo
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
                     transcripts.syncAdvancedTab(metadataCollection);
-                    expect(subModel.setValue.calls.count()).toEqual(1);
+
+                    expect(subModel.setValue.calls.length).toEqual(1);
                 });
 
             });

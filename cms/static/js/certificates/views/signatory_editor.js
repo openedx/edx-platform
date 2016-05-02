@@ -10,12 +10,10 @@ define([ // jshint ignore:line
     'common/js/components/views/feedback_prompt',
     'common/js/components/views/feedback_notification',
     'js/models/uploads',
-    'js/views/uploads',
-    'text!templates/signatory-editor.underscore'
+    'js/views/uploads'
 ],
 function ($, _, Backbone, gettext,
-          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
-          signatoryEditorTemplate) {
+          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -43,6 +41,7 @@ function ($, _, Backbone, gettext,
             this.model.bind('change', this.render);
             this.eventAgg = options.eventAgg;
             this.isEditingAllCollections = options.isEditingAllCollections;
+            this.template = this.loadTemplate('signatory-editor');
         },
 
         getModelIndex: function(givenModel) {
@@ -78,7 +77,7 @@ function ($, _, Backbone, gettext,
                 is_editing_all_collections: this.isEditingAllCollections,
                 total_saved_signatories: this.getTotalSignatoriesOnServer()
             });
-            return $(this.el).html(_.template(signatoryEditorTemplate)(attributes));
+            return $(this.el).html(this.template(attributes));
         },
 
         setSignatoryName: function(event) {

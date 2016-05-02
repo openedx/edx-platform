@@ -28,12 +28,10 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
             choose: '#transcripts-choose'
         },
 
-        initialize: function (options) {
+        initialize: function () {
             _.bindAll(this,
                 'importHandler', 'replaceHandler', 'chooseHandler', 'useExistingHandler', 'showError', 'hideError'
             );
-
-            this.options = _.extend({}, options);
 
             this.component_locator = this.$el.closest('[data-locator]').data('locator');
 

@@ -52,7 +52,7 @@ define(['backbone', 'jquery', 'underscore',
                 expect(view.createModal).toHaveBeenCalled();
             });
 
-            it("click on share button calls shows the dialog", function (done) {
+            it("click on share button calls shows the dialog", function () {
                 view = createView(true);
                 expect(view.context.ownProfile).toBeTruthy();
                 var shareButton = view.$el.find('button.share-button');
@@ -63,9 +63,9 @@ define(['backbone', 'jquery', 'underscore',
                 shareButton.click();
                 // Note: this element should have appeared in the dom during: shareButton.click();
                 modalElement = $('.badges-modal');
-                jasmine.waitUntil(function () {
+                waitsFor(function () {
                     return modalElement.is(":visible");
-                }).always(done);
+                }, '', 1000);
             });
 
             var testBadgeNameIsDisplayed = function (ownProfile) {

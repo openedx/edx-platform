@@ -124,6 +124,15 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                 'OPTIONS': modulestore_options
             },
+            {
+                'NAME': 'xml',
+                'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+                'OPTIONS': {
+                    'data_dir': DATA_DIR,
+                    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    'xblock_mixins': modulestore_options['xblock_mixins'],
+                }
+            },
         ],
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
@@ -479,8 +488,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         verified_mode = CourseMode(
             course_id=unicode(self.course.id),
             mode_slug=CourseMode.VERIFIED,
-            mode_display_name=CourseMode.VERIFIED,
-            min_price=1
+            mode_display_name=CourseMode.VERIFIED
         )
         verified_mode.save()
         self.reindex_course(store)

@@ -20,7 +20,6 @@ from external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from mock import patch
-from nose.plugins.attrib import attr
 from urllib import urlencode
 
 from student.views import create_account, change_enrollment
@@ -73,7 +72,6 @@ def gen_all_identities():
                     yield _build_identity_dict(mail, display_name, given_name, surname)
 
 
-@attr('shard_3')
 @ddt
 @override_settings(SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(SharedModuleStoreTestCase):

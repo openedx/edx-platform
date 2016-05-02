@@ -25,10 +25,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             'youtube': 'http://youtube.com/'
         },
 
-        initialize: function (options) {
+        initialize: function () {
             // Initialize MessageManager that is responsible for
             // status messages and errors.
-            this.options = _.extend({}, options);
             var Messenger = this.options.MessageManager || MessageManager;
 
             this.messenger = new Messenger({

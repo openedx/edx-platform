@@ -10,7 +10,6 @@ import re
 
 import ddt
 from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from course_modes.models import CourseMode
@@ -41,7 +40,6 @@ class SupportViewTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Could not log in")
 
 
-@attr('shard_3')
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
     """

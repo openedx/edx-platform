@@ -162,4 +162,3 @@ class AnnotatableModule(AnnotatableFields, XModule):
 class AnnotatableDescriptor(AnnotatableFields, RawDescriptor):
     module_class = AnnotatableModule
     mako_template = "widgets/raw-edit.html"
-    resources_dir = None

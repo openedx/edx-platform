@@ -9,8 +9,7 @@
 
         var LearnerProfileView = Backbone.View.extend({
 
-            initialize: function (options) {
-                this.options = _.extend({}, options);
+            initialize: function () {
                 _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
                 this.listenTo(this.options.preferencesModel, "change:" + 'account_privacy', this.render);
                 var Router = Backbone.Router.extend({

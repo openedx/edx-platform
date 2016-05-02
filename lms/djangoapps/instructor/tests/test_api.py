@@ -403,7 +403,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         # Create a course with mode 'audit'
         cls.audit_course = CourseFactory.create()
-        CourseModeFactory.create(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
 
         cls.url = reverse(
             'register_and_enroll_students', kwargs={'course_id': unicode(cls.course.id)}
@@ -417,7 +417,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         # Create a course with mode 'honor' and with price
         self.white_label_course = CourseFactory.create()
-        self.white_label_course_mode = CourseModeFactory.create(
+        self.white_label_course_mode = CourseModeFactory(
             course_id=self.white_label_course.id,
             mode_slug=CourseMode.HONOR,
             min_price=10,

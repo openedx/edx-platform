@@ -6,7 +6,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from opaque_keys.edx import locator
 from pytz import UTC
-from nose.plugins.attrib import attr
 import unittest
 import ddt
 from shoppingcart.models import DonationConfiguration
@@ -20,7 +19,6 @@ from student.views import get_course_enrollments, _get_recently_enrolled_courses
 from common.test.utils import XssTestMixin
 
 
-@attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
@@ -184,7 +182,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Create the course mode(s)
         for mode, min_price in course_modes:
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         self.enrollment.mode = enrollment_mode
         self.enrollment.save()
@@ -205,7 +203,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # Create a white-label course mode
         # (honor mode with a price set)
-        CourseModeFactory.create(mode_slug="honor", course_id=self.course.id, min_price=100)
+        CourseModeFactory(mode_slug="honor", course_id=self.course.id, min_price=100)
 
         # Check that the donate button is NOT displayed
         self.client.login(username=self.student.username, password=self.PASSWORD)

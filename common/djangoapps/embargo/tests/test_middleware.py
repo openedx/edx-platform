@@ -4,7 +4,6 @@ Tests for EmbargoMiddleware with CountryAccessRules
 
 import unittest
 from mock import patch
-from nose.plugins.attrib import attr
 import ddt
 
 from django.core.urlresolvers import reverse
@@ -21,7 +20,6 @@ from embargo.models import RestrictedCourse, IPFilter
 from embargo.test_utils import restrict_course
 
 
-@attr('shard_3')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):

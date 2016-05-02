@@ -9,7 +9,6 @@ import datetime
 import ddt
 from django.core.cache import cache
 from mock import patch
-from nose.plugins.attrib import attr
 from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
@@ -126,7 +125,6 @@ class EnrollmentTestMixin(object):
         self.assertEqual(actual_mode, expected_mode)
 
 
-@attr('shard_3')
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

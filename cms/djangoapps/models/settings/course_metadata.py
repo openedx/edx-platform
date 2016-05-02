@@ -50,7 +50,6 @@ class CourseMetadata(object):
         'is_time_limited',
         'is_practice_exam',
         'exam_review_rules',
-        'hide_after_due',
         'self_paced',
         'chrome',
         'default_tab',

@@ -30,104 +30,61 @@ function ($, _, Squire) {
 
         var createPromptSpy = function (name) {
             var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
-            spy.constructor.and.returnValue(spy);
-            spy.show.and.returnValue(spy);
-            spy.extend = jasmine.createSpy().and.returnValue(spy.constructor);
+            spy.constructor.andReturn(spy);
+            spy.show.andReturn(spy);
+            spy.extend = jasmine.createSpy().andReturn(spy.constructor);
 
             return spy;
         };
 
-        beforeEach(function (done) {
+        beforeEach(function () {
             self = this;
 
-            jasmine.addMatchers({
-                assertValueInView: function() {
-                    return {
-                        compare: function (actual, expected) {
-                            var value = actual.getValueFromEditor(),
-                            passed = _.isEqual(value, expected);
-
-                            return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
-                            };
-                        }
-                    };
+            this.addMatchers({
+                assertValueInView: function(expected) {
+                    var value = this.actual.getValueFromEditor();
+                    return this.env.equals_(value, expected);
                 },
-                assertCanUpdateView: function () {
-                    return {
-                        compare: function (actual, expected) {
-                            var view = actual,
-                                value,
-                                passed;
+                assertCanUpdateView: function (expected) {
+                    var view = this.actual,
+                        value;
 
-                            view.setValueInEditor(expected);
-                            value = view.getValueFromEditor();
+                    view.setValueInEditor(expected);
+                    value = view.getValueFromEditor();
 
-                            passed = _.isEqual(value, expected);
-
-                            return {
-                                pass: passed,
-                                message: 'Expected ' + actual + (passed ? '' : ' not') + ' to equal ' + expected
-                            };
-                        }
-                    };
+                    return this.env.equals_(value, expected);
                 },
-                assertClear: function () {
-                    return {
-                        compare: function (actual, modelValue) {
-                            var view = actual,
-                                model = view.model,
-                                passed;
+                assertClear: function (modelValue) {
+                    var env = this.env,
+                        view = this.actual,
+                        model = view.model;
 
-                            passed = model.getValue() === null &&
-                                _.isEqual(model.getDisplayValue(), modelValue) &&
-                                _.isEqual(view.getValueFromEditor(), modelValue);
-
-                            return {
-                                pass: passed
-                            };
-                        }
-                    };
+                    return model.getValue() === null &&
+                           env.equals_(model.getDisplayValue(), modelValue) &&
+                           env.equals_(view.getValueFromEditor(), modelValue);
                 },
-                assertUpdateModel: function () {
-                    return {
-                        compare: function (actual, originalValue, newValue) {
-                            var view = actual,
-                                model = view.model,
-                                expectOriginal,
-                                passed;
+                assertUpdateModel: function (originalValue, newValue) {
+                    var env = this.env,
+                        view = this.actual,
+                        model = view.model,
+                        expectOriginal;
 
-                            view.setValueInEditor(newValue);
-                            expectOriginal = _.isEqual(model.getValue(), originalValue);
-                            view.updateModel();
+                    view.setValueInEditor(newValue);
+                    expectOriginal = env.equals_(model.getValue(), originalValue);
+                    view.updateModel();
 
-                            passed = expectOriginal &&
-                                _.isEqual(model.getValue(), newValue);
-
-                            return {
-                                pass: passed
-                            };
-                        }
-                    };
+                    return expectOriginal &&
+                           env.equals_(model.getValue(), newValue);
                 },
-                verifyButtons: function () {
-                    return {
-                        compare: function (actual, upload, download) {
-                            var view = actual,
-                                uploadBtn = view.$('.upload-setting'),
-                                downloadBtn = view.$('.download-setting'),
-                                passed;
+                verifyButtons: function (upload, download, index) {
+                    var view = this.actual,
+                        uploadBtn = view.$('.upload-setting'),
+                        downloadBtn = view.$('.download-setting');
 
-                            upload = upload ? uploadBtn.length : !uploadBtn.length;
-                            download = download ? downloadBtn.length : !downloadBtn.length;
-                            passed = upload && download;
+                    upload = upload ? uploadBtn.length : !uploadBtn.length;
+                    download = download ? downloadBtn.length : !downloadBtn.length;
 
-                            return {
-                                pass: passed
-                            };
-                        }
-                    };
+                    return upload && download;
                 }
             });
 
@@ -150,18 +107,22 @@ function ($, _, Squire) {
             injector.mock('js/views/video/transcripts/metadata_videolist');
             injector.mock('js/views/video/translations_editor');
 
-            injector.require([
+            runs(function() {
+                injector.require([
                     'js/models/metadata', 'js/views/metadata'
                 ],
-                function (MetadataModel, MetadataView) {
+                function(MetadataModel, MetadataView) {
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new MetadataView.FileUploader({
                         model: model,
                         locator: locator
                     });
-
-                    done();
                 });
+            });
+
+            waitsFor(function() {
+                return self.view;
+            }, 'FileUploader was not created', 2000);
         });
 
         afterEach(function () {
@@ -189,7 +150,7 @@ function ($, _, Squire) {
             expect(this.uploadSpies.constructor).toHaveBeenCalled();
             expect(this.uploadSpies.show).toHaveBeenCalled();
 
-            options = this.uploadSpies.constructor.calls.mostRecent().args[0];
+            options = this.uploadSpies.constructor.mostRecentCall.args[0];
             options.onSuccess({
                 'asset': {
                     'url': 'http://example.org/test_3'

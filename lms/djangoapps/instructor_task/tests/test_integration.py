@@ -8,7 +8,6 @@ paths actually work.
 import json
 import logging
 from mock import patch
-from nose.plugins.attrib import attr
 import textwrap
 
 from celery.states import SUCCESS, FAILURE
@@ -64,7 +63,6 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(status['message'], expected_message)
 
 
-@attr('shard_3')
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.

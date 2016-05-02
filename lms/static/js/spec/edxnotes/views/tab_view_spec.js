@@ -1,8 +1,9 @@
 define([
     'jquery', 'backbone', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list', 'js/edxnotes/views/tab_view'
+    'js/edxnotes/views/tabs_list', 'js/edxnotes/views/tab_view',
+    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
-    $, Backbone, TemplateHelpers, TabsCollection, TabsListView, TabView
+    $, Backbone, TemplateHelpers, TabsCollection, TabsListView, TabView, customMatchers
 ) {
     'use strict';
     describe('EdxNotes TabView', function() {
@@ -40,6 +41,7 @@ define([
         };
 
         beforeEach(function () {
+            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'

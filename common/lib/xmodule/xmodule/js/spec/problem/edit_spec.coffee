@@ -24,7 +24,7 @@ describe 'MarkdownEditingDescriptor', ->
     it 'click on advanced editor should work', ->
       loadFixtures 'problem-with-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
-      spyOn(@descriptor, 'confirmConversionToXml').and.returnValue(true)
+      spyOn(@descriptor, 'confirmConversionToXml').andReturn(true)
       expect(@descriptor.confirmConversionToXml).not.toHaveBeenCalled()
       e = jasmine.createSpyObj('e', [ 'preventDefault' ])
       @descriptor.onShowXMLButton(e)

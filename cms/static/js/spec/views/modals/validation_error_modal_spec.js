@@ -51,7 +51,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ValidationHelpers.checkErrorContents(modal, errorObjects);
             });
 
-            it('run callback when undo changes button is clicked', function (done) {
+            it('run callback when undo changes button is clicked', function () {
                 var errorObjects = [
                     {
                         model: {display_name: 'test_attribute1'},
@@ -64,7 +64,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ];
 
                 var callback = function() {
-                    done();
+                    return true;
                 };
 
                 // Show Modal and click undo changes
@@ -72,8 +72,15 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
                 ValidationHelpers.undoChanges(modal);
 
+                // Wait for the callback to be fired
+                waitsFor(function () {
+                    return callback();
+                }, 'the callback to be called', 5000);
+
                 // After checking callback fire, check modal hide
-                expect(ValidationHelpers.isShowingModal(modal)).toBe(false);
+                runs(function () {
+                    expect(ValidationHelpers.isShowingModal(modal)).toBe(false);
+                });
             });
         });
     });

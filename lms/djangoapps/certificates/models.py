@@ -83,6 +83,7 @@ class CertificateStatuses(object):
     error = 'error'
     generating = 'generating'
     notpassing = 'notpassing'
+    regenerating = 'regenerating'
     restricted = 'restricted'
     unavailable = 'unavailable'
     auditing = 'auditing'
@@ -95,7 +96,7 @@ class CertificateStatuses(object):
         error: "error states"
     }
 
-    PASSED_STATUSES = (downloadable, generating)
+    PASSED_STATUSES = (downloadable, generating, regenerating)
 
     @classmethod
     def is_passing_status(cls, status):
@@ -349,31 +350,24 @@ class CertificateGenerationHistory(TimeStampedModel):
             students.
         """
         task_input = self.instructor_task.task_input
-        if not task_input.strip():
+        try:
+            task_input_json = json.loads(task_input)
+        except ValueError:
             # if task input is empty, it means certificates were generated for all learners
             # Translators: This string represents task was executed for all learners.
             return _("All learners")
 
-        task_input_json = json.loads(task_input)
-
         # get statuses_to_regenerate from task_input convert statuses to human readable strings and return
         statuses = task_input_json.get('statuses_to_regenerate', None)
         if statuses:
-            readable_statuses = [
-                CertificateStatuses.readable_statuses.get(status) for status in statuses
-                if CertificateStatuses.readable_statuses.get(status) is not None
-            ]
-            return ", ".join(readable_statuses)
+            return ", ".join(
+                [CertificateStatuses.readable_statuses.get(status, "") for status in statuses]
+            )
 
-        # If "student_set" is present in task_input, then this task only
-        # generates certificates for white listed students. Note that
-        # this key used to be "students", so we include that in this conditional
-        # for backwards compatibility.
-        if 'student_set' in task_input_json or 'students' in task_input_json:
-            # Translators: This string represents task was executed for students having exceptions.
-            return _("For exceptions")
-        else:
-            return _("All learners")
+        # If students is present in task_input then, certificate generation task was run to
+        # generate certificates for white listed students otherwise it is for all students.
+        # Translators: This string represents task was executed for students having exceptions.
+        return _("For exceptions") if 'students' in task_input_json else _("All learners")
 
     class Meta(object):
         app_label = "certificates"

@@ -12,10 +12,6 @@ var CourseDetails = Backbone.Model.extend({
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
-        title: "",
-        subtitle: "",
-        duration: "",
-        description: "",
         short_description: "",
         overview: "",
         intro_video: null,
@@ -23,15 +19,9 @@ var CourseDetails = Backbone.Model.extend({
         license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-        banner_image_name: '',
-        banner_image_asset_path: '',
-        video_thumbnail_image_name: '',
-        video_thumbnail_image_asset_path: '',
         pre_requisite_courses: [],
         entrance_exam_enabled : '',
-        entrance_exam_minimum_score_pct: '50',
-        learning_info: [],
-        instructor_info: {}
+        entrance_exam_minimum_score_pct: '50'
     },
 
     validate: function(newattrs) {
@@ -42,30 +32,9 @@ var CourseDetails = Backbone.Model.extend({
             newattrs, ["start_date", "end_date", "enrollment_start", "enrollment_end"]
         );
 
-        if (newattrs.title.length > 50) {
-            errors.title = gettext("The title field must be limited to 50 characters.");
-        }
-
-        if (newattrs.subtitle.length > 150) {
-            errors.subtitle = gettext("The subtitle field must be limited to 150 characters.");
-        }
-
-        if (newattrs.duration.length > 50) {
-            errors.duration = gettext("The duration field must be limited to 50 characters.");
-        }
-
-        if (newattrs.short_description.length > 150) {
-            errors.short_description = gettext("The short description field must be limited to 150 characters.");
-        }
-
-        if (newattrs.description.length > 1000) {
-            errors.description = gettext("The description field must be limited to 1000 characters.");
-        }
-
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
-
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
             errors.end_date = gettext("The course end date must be later than the course start date.");
         }

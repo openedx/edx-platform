@@ -2,27 +2,26 @@
     describe('Video', function () {
         var oldOTBD, state;
 
+        beforeEach(function () {
+            jasmine.stubRequests();
+        });
+
         afterEach(function () {
             $('source').remove();
             window.VideoState = {};
             window.VideoState.id = {};
-            window.YT = jasmine.YT;
         });
 
         describe('constructor', function () {
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
-                    $.cookie.and.returnValue('0.50');
+                    $.cookie.andReturn('0.50');
+                    this.state = jasmine.initializePlayerYouTube('video_html5.html');
                 });
 
                 describe('by default', function () {
-                    beforeEach(function () {
-                        this.state = jasmine.initializePlayerYouTube('video_html5.html');
-                    });
-
                     afterEach(function () {
-                        this.state.storage.clear();
                         this.state.videoPlayer.destroy();
                     });
 
@@ -31,7 +30,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(this.state.el).toEqual($('#video_id'));
+                        expect(this.state.el).toBe('#video_id');
                     });
 
                     it('parse the videos', function () {
@@ -56,13 +55,13 @@
                 var state;
 
                 beforeEach(function () {
-                    $.cookie.and.returnValue('0.75');
+                    $.cookie.andReturn('0.75');
                     state = jasmine.initializePlayer('video_html5.html');
                 });
 
                 afterEach(function () {
-                    state.storage.clear();
                     state.videoPlayer.destroy();
+                    state = undefined;
                 });
 
                 describe('by default', function () {
@@ -71,7 +70,7 @@
                     });
 
                     it('set the elements', function () {
-                        expect(state.el).toEqual($('#video_id'));
+                        expect(state.el).toBe('#video_id');
                     });
 
                     it('doesn\'t have `videos` dictionary', function () {
@@ -102,34 +101,35 @@
         });
 
         describe('YouTube API is not loaded', function () {
-            var state;
             beforeEach(function () {
                 window.YT = undefined;
                 state = jasmine.initializePlayerYouTube();
-            });
+            })
 
             afterEach(function () {
-                state.storage.clear();
                 state.videoPlayer.destroy();
             });
 
-            it('callback, to be called after YouTube API loads, exists and is called', function (done) {
+            it('callback, to be called after YouTube API loads, exists and is called', function () {
+                waitsFor(function () {
+                    return state.youtubeApiAvailable === true;
+                }, 'YouTube API is loaded', 3000);
+
                 window.YT = jasmine.YT;
+
                 // Call the callback that must be called when YouTube API is
                 // loaded. By specification.
                 window.onYouTubeIframeAPIReady();
-                jasmine.waitUntil(function () {
-                    return state.youtubeApiAvailable === true;
-                }).done(function(){
+
+                runs(function () {
                     // If YouTube API is not loaded, then the code will should create
                     // a global callback that will be called by API once it is loaded.
                     expect(window.onYouTubeIframeAPIReady).not.toBeUndefined();
-                }).always(done);
+                });
             });
         });
 
         describe('checking start and end times', function () {
-            var state;
             var miniTestSuite = [
                 {
                     itDescription: 'both times are proper',
@@ -159,7 +159,6 @@
             ];
 
             afterEach(function () {
-                state.storage.clear();
                 state.videoPlayer.destroy();
             });
 

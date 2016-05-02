@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .and.returnValue(null);
+                .andReturn(null);
         });
 
         afterEach(function () {
@@ -26,8 +26,8 @@
                     var secondaryControls = $('.secondary-controls'),
                         li = secondaryControls.find('.video-speeds li');
 
-                    expect(secondaryControls).toContainElement('.speeds');
-                    expect(secondaryControls).toContainElement('.video-speeds');
+                    expect(secondaryControls).toContain('.speeds');
+                    expect(secondaryControls).toContain('.video-speeds');
                     expect(secondaryControls.find('.value').text())
                         .toBe('1.50x');
                     expect(li.filter('.is-active')).toHaveData(
@@ -36,7 +36,9 @@
                     expect(li.length).toBe(state.speeds.length);
 
                     $.each(li.toArray().reverse(), function (index, link) {
-                        expect($(link).attr('data-speed')).toEqual(state.speeds[index]);
+                        expect($(link)).toHaveData(
+                            'speed', state.speeds[index]
+                        );
                         expect($(link).find('.speed-option').text()).toBe(
                             state.speeds[index] + 'x'
                         );
@@ -47,7 +49,7 @@
             describe('when running on touch based device', function () {
                 $.each(['iPad', 'Android'], function (index, device) {
                     it('is not rendered on' + device, function () {
-                        window.onTouchBasedDevice.and.returnValue([device]);
+                        window.onTouchBasedDevice.andReturn([device]);
                         state = jasmine.initializePlayer();
 
                         expect(state.el.find('.speeds')).not.toExist();

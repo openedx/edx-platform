@@ -71,7 +71,7 @@ $white: rgb(255,255,255);
       &:before {
         position: relative;
         top: -1px;
-        @include margin(0, 5px, 0, 0);
+        margin: 0 5px 0 0;
         content: "➤";
         font-size: 11px;
       }
@@ -90,7 +90,7 @@ $white: rgb(255,255,255);
     @include clearfix();
 
     header {
-      @include margin(0, 0, ($baseline*1.5), 0);
+      margin: 0 0 ($baseline*1.5) 0;
 
       h2 {
         margin: 0;
@@ -108,8 +108,8 @@ $white: rgb(255,255,255);
     article {
       @include box-sizing(border-box);
       width: 500px;
-      @include margin-right($baseline);
-      @include float(left);
+      margin-right: $baseline;
+      float: left;
     }
 
     aside {
@@ -117,7 +117,7 @@ $white: rgb(255,255,255);
       @include box-sizing(border-box);
       box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
-      @include float(left);
+      float: left;
       border: 3px solid tint(rgb(96, 155, 216), 35%);
       background: tint(rgb(96, 155, 216), 35%);
 
@@ -208,12 +208,12 @@ $white: rgb(255,255,255);
       li {
         @include box-sizing(border-box);
         overflow-y: auto;
-        @include float(left);
+        float: left;
         width: 350px;
-        @include margin(0, 0, $baseline, 0);
+        margin: 0 0 $baseline 0;
 
         &:nth-child(odd) {
-          @include margin-right($baseline*3.5);
+          margin-right: ($baseline*3.5);
         }
       }
 
@@ -236,7 +236,7 @@ $white: rgb(255,255,255);
         img {
           display: block;
           border: 2px solid tint($light-gray,80%);
-          margin: 0 auto ($baseline*0.75);
+          margin: 0 auto ($baseline*0.75) auto;
         }
 
         figcaption {

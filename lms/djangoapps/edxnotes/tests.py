@@ -6,7 +6,6 @@ import ddt
 import json
 import jwt
 from mock import patch, MagicMock
-from nose.plugins.attrib import attr
 from unittest import skipUnless
 from datetime import datetime
 import urlparse
@@ -87,7 +86,6 @@ class TestProblem(object):
         return "original_get_html"
 
 
-@attr('shard_3')
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
@@ -171,7 +169,6 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.assertEqual("original_get_html", self.problem.get_html())
 
 
-@attr('shard_3')
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
@@ -944,7 +941,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         verify_url(previous_url, previous_api_url)
 
 
-@attr('shard_3')
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesViewsTest(ModuleStoreTestCase):
@@ -1140,7 +1136,6 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@attr('shard_3')
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesPluginTest(ModuleStoreTestCase):

@@ -1,10 +1,11 @@
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
-    'js/edxnotes/views/tabs_list'
-], function($, TemplateHelpers, TabsCollection, TabsListView) {
+    'js/edxnotes/views/tabs_list', 'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+], function($, TemplateHelpers, TabsCollection, TabsListView, customMatchers) {
     'use strict';
     describe('EdxNotes TabsListView', function() {
         beforeEach(function () {
+            customMatchers(this);
             TemplateHelpers.installTemplate('templates/edxnotes/tab-item');
             this.collection = new TabsCollection([
                 {identifier: 'first-item'},

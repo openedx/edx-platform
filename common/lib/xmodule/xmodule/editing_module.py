@@ -20,8 +20,6 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
 
     This class is intended to be used as a mixin.
     """
-    resources_dir = None
-
     mako_template = "widgets/raw-edit.html"
 
     @property

@@ -33,9 +33,8 @@ from xmodule.modulestore.django import _get_modulestore_branch_setting, modulest
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import (
-    CourseFactory, ItemFactory, check_mongo_calls
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
@@ -302,6 +301,30 @@ class CoursesRenderTest(ModuleStoreTestCase):
             )
             course_about = get_course_about_section(self.request, self.course, 'short_description')
             self.assertIn("this module is temporarily unavailable", course_about)
+
+
+@attr('shard_1')
+class XmlCoursesRenderTest(ModuleStoreTestCase):
+    """Test methods related to rendering courses content for an XML course."""
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
+    toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+
+    def test_get_course_info_section_render(self):
+        course = get_course_by_id(self.toy_course_key)
+        request = get_request_for_user(UserFactory.create())
+
+        # Test render works okay. Note the href is different in XML courses.
+        course_info = get_course_info_section(request, request.user, course, 'handouts')
+        self.assertEqual(course_info, "<a href='/static/toy/handouts/sample_handout.txt'>Sample</a>")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_info = get_course_info_section(request, request.user, course, 'handouts')
+            self.assertIn("this module is temporarily unavailable", course_info)
 
 
 @attr('shard_1')

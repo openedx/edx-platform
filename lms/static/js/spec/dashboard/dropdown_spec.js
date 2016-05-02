@@ -14,10 +14,15 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
             verifyDropdownNotVisible = function() {
                 expect($(dropdownSelector)).not.toBeVisible();
             },
-            waitForElementToBeFocused = function(element, done) {
-                jasmine.waitUntil(function () {
-                    return element === document.activeElement;
-                }).always(done);
+            waitForElementToBeFocused = function(element, desc) {
+                // This is being used instead of toBeFocused which is flaky
+                waitsFor(
+                    function () {
+                        return element === document.activeElement;
+                    },
+                    desc + ' element to have focus',
+                    500
+                );
             },
             openDropDownMenu = function() {
                 verifyDropdownNotVisible();
@@ -42,39 +47,39 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
                 clickToggleButton();
                 verifyDropdownNotVisible();
             });
-            it("ESCAPE will close dropdown and return focus to the button", function(done) {
+            it("ESCAPE will close dropdown and return focus to the button", function() {
                 openDropDownMenu();
                 keydown({ keyCode: keys.ESCAPE });
                 verifyDropdownNotVisible();
-                waitForElementToBeFocused($(toggleButtonSelector)[0], done);
+                waitForElementToBeFocused($(toggleButtonSelector)[0], "button");
             });
-            it("SPACE will close dropdown and return focus to the button", function(done) {
+            it("SPACE will close dropdown and return focus to the button", function() {
                 openDropDownMenu();
                 keydown({ keyCode: keys.SPACE });
                 verifyDropdownNotVisible();
-                waitForElementToBeFocused($(toggleButtonSelector)[0], done);
+                waitForElementToBeFocused($(toggleButtonSelector)[0], "button");
             });
 
             describe("Focus is trapped when navigating with", function() {
-                it("TAB key", function(done) {
+                it("TAB key", function() {
                     openDropDownMenu();
                     keydown({ keyCode: keys.TAB });
-                    waitForElementToBeFocused($(dropdownItemSelector)[0], done);
+                    waitForElementToBeFocused($(dropdownItemSelector)[0], "first");
                 });
-                it("DOWN key", function(done) {
+                it("DOWN key", function() {
                     openDropDownMenu();
                     keydown({ keyCode: keys.DOWN });
-                    waitForElementToBeFocused($(dropdownItemSelector)[0], done);
+                    waitForElementToBeFocused($(dropdownItemSelector)[0], "first");
                 });
-                it("TAB key + SHIFT key", function(done) {
+                it("TAB key + SHIFT key", function() {
                     openDropDownMenu();
                     keydown({ keyCode: keys.TAB, shiftKey: true });
-                    waitForElementToBeFocused($(dropdownItemSelector)[1], done);
+                    waitForElementToBeFocused($(dropdownItemSelector)[1], "last");
                 });
-                it("UP key", function(done) {
+                it("UP key", function() {
                     openDropDownMenu();
                     keydown({ keyCode: keys.UP });
-                    waitForElementToBeFocused($(dropdownItemSelector)[1], done);
+                    waitForElementToBeFocused($(dropdownItemSelector)[1], "last");
                 });
             });
         });

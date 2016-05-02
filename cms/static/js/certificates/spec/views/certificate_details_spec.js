@@ -47,6 +47,27 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
+    beforeEach(function() {
+        window.course = new Course({
+            id: '5',
+            name: 'Course Name',
+            url_name: 'course_name',
+            org: 'course_org',
+            num: 'course_num',
+            revision: 'course_rev'
+        });
+        window.certWebPreview = new CertificatePreview({
+            course_modes: ['honor', 'test'],
+            certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+        });
+        window.CMS.User = {isGlobalStaff: true};
+    });
+
+    afterEach(function() {
+        delete window.course;
+        delete window.CMS.User;
+    });
+
     describe('Certificate Details Spec:', function() {
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
@@ -59,20 +80,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor', 'signatory-actions'], true);
-
-            window.course = new Course({
-                id: '5',
-                name: 'Course Name',
-                url_name: 'course_name',
-                org: 'course_org',
-                num: 'course_num',
-                revision: 'course_rev'
-            });
-            window.certWebPreview = new CertificatePreview({
-                course_modes: ['honor', 'test'],
-                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
-            });
-            window.CMS.User = {isGlobalStaff: true};
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
@@ -90,13 +97,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(); // jshint ignore:line
-        });
-
-        afterEach(function() {
-            delete window.course;
-            delete window.certWebPreview;
-            delete window.CMS.User;
+            CustomMatchers(this); // jshint ignore:line
         });
 
         describe('The Certificate Details view', function() {

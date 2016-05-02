@@ -65,21 +65,3 @@ class CourseImageTestCase(ModuleStoreTestCase):
             'static/test.png',
             course_image_url(course),
         )
-
-    def test_get_banner_image_url(self):
-        """Test banner image URL formatting."""
-        banner_image = u'banner_image.jpg'
-        course = CourseFactory.create(banner_image=banner_image)
-        self.verify_url(
-            unicode(course.id.make_asset_key('asset', banner_image)),
-            course_image_url(course, 'banner_image')
-        )
-
-    def test_get_video_thumbnail_image_url(self):
-        """Test video thumbnail image URL formatting."""
-        thumbnail_image = u'thumbnail_image.jpg'
-        course = CourseFactory.create(video_thumbnail_image=thumbnail_image)
-        self.verify_url(
-            unicode(course.id.make_asset_key('asset', thumbnail_image)),
-            course_image_url(course, 'video_thumbnail_image')
-        )

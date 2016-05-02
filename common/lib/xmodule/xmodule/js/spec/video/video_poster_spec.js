@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').and.returnValue(null);
+                .createSpy('onTouchBasedDevice').andReturn(null);
             state = jasmine.initializePlayer('video_with_bumper.html');
         });
 
@@ -27,11 +27,11 @@
             expect($('.btn-play')).toExist();
         });
 
-        it('can start playing the video on click', function (done) {
+        it('can start playing the video on click', function () {
             $('.btn-play').click();
-            jasmine.waitUntil(function() {
+            waitsFor(function () {
                 return state.el.hasClass('is-playing');
-            }).done(done);
+            }, 'Player is not playing.', WAIT_TIMEOUT);
         });
 
         it('destroy itself on "play" event', function () {

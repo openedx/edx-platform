@@ -12,12 +12,7 @@ class DOTAdapter(object):
 
     backend = object()
 
-    def create_confidential_client(self,
-                                   name,
-                                   user,
-                                   redirect_uri,
-                                   client_id=None,
-                                   authorization_grant_type=models.Application.GRANT_AUTHORIZATION_CODE):
+    def create_confidential_client(self, name, user, redirect_uri, client_id=None):
         """
         Create an oauth client application that is confidential.
         """
@@ -26,7 +21,7 @@ class DOTAdapter(object):
             user=user,
             client_id=client_id,
             client_type=models.Application.CLIENT_CONFIDENTIAL,
-            authorization_grant_type=authorization_grant_type,
+            authorization_grant_type=models.Application.GRANT_AUTHORIZATION_CODE,
             redirect_uris=redirect_uri,
         )
 

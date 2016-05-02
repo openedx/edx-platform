@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 import ddt
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework.test import APIRequestFactory
@@ -21,7 +20,6 @@ from ..serializers import CourseSerializer, CourseDetailSerializer
 from .mixins import CourseApiFactoryMixin
 
 
-@attr('shard_3')
 @ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """

@@ -37,25 +37,19 @@ describe 'Calculator', ->
       $('form#calculator').submit()
 
   describe 'toggle', ->
-    it 'focuses the input when toggled', (done)->
+    it 'focuses the input when toggled', ->
 
-      self = this
-      focus = ()->
-        deferred = $.Deferred()
+      # Since the focus is called asynchronously, we need to
+      # wait until focus() is called.
+      didFocus = false
+      runs ->
+          spyOn($.fn, 'focus').andCallFake (elementName) -> didFocus = true
+          @calculator.toggle(jQuery.Event("click"))
 
-        # Since the focus is called asynchronously, we need to
-        # wait until focus() is called.
-        spyOn($.fn, 'focus').and.callFake (elementName) ->
-          deferred.resolve()
+      waitsFor (-> didFocus), "focus() should have been called on the input", 1000
 
-        self.calculator.toggle(jQuery.Event("click"))
-
-      	 deferred.promise()
-
-      focus().then(
-        ->
-        	expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
-      ).always(done)
+      runs ->
+          expect($('#calculator_wrapper #calculator_input').focus).toHaveBeenCalled()
 
     it 'toggle the close button on the calculator button', ->
       @calculator.toggle(jQuery.Event("click"))
@@ -311,10 +305,10 @@ describe 'Calculator', ->
             'prevHint': calc
 
       $.each(cases, (key, data) ->
-        calc.hideHint.calls.reset()
-        calc.prevHint.calls.reset()
-        calc.nextHint.calls.reset()
-        $.fn.focus.calls.reset()
+        calc.hideHint.reset()
+        calc.prevHint.reset()
+        calc.nextHint.reset()
+        $.fn.focus.reset()
 
         e = jQuery.Event('keydown', data.event or {});
         value = calc.handleKeyDownOnHint(e)
@@ -340,7 +334,7 @@ describe 'Calculator', ->
   describe 'calculate', ->
     beforeEach ->
       $('#calculator_input').val '1+2'
-      spyOn($, 'getWithPrefix').and.callFake (url, data, callback) ->
+      spyOn($, 'getWithPrefix').andCallFake (url, data, callback) ->
         callback({ result: 3 })
       @calculator.calculate()
 

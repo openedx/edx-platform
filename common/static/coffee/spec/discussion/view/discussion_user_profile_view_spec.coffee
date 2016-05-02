@@ -193,11 +193,10 @@ describe "DiscussionUserProfileView", ->
     describe "pagination interaction", ->
         beforeEach ->
             @view = makeView(makeThreads(3), 1, 2)
-            deferred = $.Deferred();
-            spyOn($, "ajax").and.returnValue(deferred);
+            spyOn($, "ajax")
 
         it "causes updated rendering", ->
-            $.ajax.and.callFake(
+            $.ajax.andCallFake(
                 (params) =>
                     params.success(
                         discussion_data: [{id: "on_page_42", body: "dummy body"}]
@@ -212,7 +211,7 @@ describe "DiscussionUserProfileView", ->
 
         it "handles AJAX errors", ->
             spyOn(DiscussionUtil, "discussionAlert")
-            $.ajax.and.callFake(
+            $.ajax.andCallFake(
                 (params) =>
                     params.error()
                     {always: ->}

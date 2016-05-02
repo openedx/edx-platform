@@ -60,8 +60,6 @@ def process_includes(fn):
 
 
 class SemanticSectionDescriptor(XModuleDescriptor):
-    resources_dir = None
-
     @classmethod
     @process_includes
     def from_xml(cls, xml_data, system, id_generator):
@@ -84,8 +82,6 @@ class SemanticSectionDescriptor(XModuleDescriptor):
 
 
 class TranslateCustomTagDescriptor(XModuleDescriptor):
-    resources_dir = None
-
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """

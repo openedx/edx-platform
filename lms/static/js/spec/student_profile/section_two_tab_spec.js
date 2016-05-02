@@ -50,7 +50,7 @@ define(['backbone', 'jquery', 'underscore',
             it("profile field parts are actually rendered for public profile", function () {
                 var view = createSectionTwoView(false, true);
                 _.each(view.options.viewList, function (fieldView) {
-                    spyOn(fieldView, "render").and.callThrough();
+                    spyOn(fieldView, "render").andCallThrough();
                 });
                 view.render();
                 _.each(view.options.viewList, function (fieldView) {

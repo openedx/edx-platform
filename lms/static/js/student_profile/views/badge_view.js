@@ -7,7 +7,6 @@
 
             var BadgeView = Backbone.View.extend({
                 initialize: function(options) {
-                    this.options = _.extend({}, options);
                     this.context = _.extend(this.options.model.toJSON(), {
                         'created': new Moment(this.options.model.toJSON().created),
                         'ownProfile': options.ownProfile,

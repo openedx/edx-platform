@@ -749,12 +749,14 @@ div.problem {
 // ====================
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
+    display: inline-block;
 
     input {
       @include box-sizing(border-box);
       border: 2px solid $gray-l4;
       border-radius: 3px;
       min-width: 160px;
+      width: calc(100% - 45px);
       height: 46px;
     }
 
@@ -811,14 +813,6 @@ div.problem {
       .status {
         @include status-icon($gray-l4, "\f128");
       }
-    }
-  }
-
-  .inputtype.formulaequationinput {
-    display: inline-block;
-
-    input {
-      width: calc(100% - 45px);
     }
   }
 }
