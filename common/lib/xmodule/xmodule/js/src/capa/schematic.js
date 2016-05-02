@@ -2147,7 +2147,7 @@ schematic = (function() {
 	    this.bg_image.height = this.height;
 
 	    if (!this.diagram_only) {
-		this.canvas.tabIndex = 1; // so we get keystrokes
+        this.canvas.tabIndex = 0; // so we get keystrokes
 		this.canvas.style.borderStyle = 'solid';
 		this.canvas.style.borderWidth = '1px';
 		this.canvas.style.borderColor = grid_style;
