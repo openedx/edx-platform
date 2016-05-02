@@ -110,6 +110,26 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
                 jsondetails.language
             )
+            jsondetails.learning_info = ["test", "test"]
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).learning_info,
+                jsondetails.learning_info
+            )
+            jsondetails.instructor_info = {
+                "instructors": [
+                    {
+                        "name": "test",
+                        "title": "test",
+                        "organization": "test",
+                        "image": "test",
+                        "bio": "test"
+                    }
+                ]
+            }
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).instructor_info,
+                jsondetails.instructor_info
+            )
 
     def test_toggle_pacing_during_course_run(self):
         SelfPacedConfiguration(enabled=True).save()
