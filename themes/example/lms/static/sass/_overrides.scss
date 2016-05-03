@@ -906,7 +906,7 @@ header.header-main {
   }
   .footer-main{
     .footer-logo{
-      text-align: center;
+      text-align: left;
     }
   }
   .hero-main {
@@ -970,13 +970,17 @@ header.header-main {
 }
 
 @media screen and (min-width: 64em){ /* 980px */
-  .footer-logo{
-    text-align: left;
+  .footer-main {
+    .footer-logo {
+      text-align: left;
+    }
   }
 }
 
 @media screen and (min-width: 80em){
-  .footer-logo{
-    text-align: left;
+  .footer-main {
+    .footer-logo {
+      text-align: left;
+    }
   }
 }
