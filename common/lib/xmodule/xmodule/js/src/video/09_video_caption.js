@@ -759,7 +759,7 @@
                     self.subtitlesEl.find('.transcript-end')
                         .text(gettext('End of transcript. Skip to the start.'));
 
-                    self.container.find('.menu-container .control')
+                    self.container.find('.menu-container .language-menu')
                         .attr('aria-label', gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
 
                     self.container.find('.menu-container .control .control-text')
