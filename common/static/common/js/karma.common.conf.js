@@ -295,10 +295,14 @@ var configure = function(data) {
     var baseConfig = getBaseConfig(data.config, data.useRequireJs);
 
     var files = _.flatten(
-      _.map(
-            ['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runAndConfigFiles'],
-            function(item) { return data.files[item]; }
+        _.map(
+            ['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
+            function(item) { return data.files[item] || []; }
         )
+    );
+
+    files.unshift(
+        {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true}
     );
 
     files = setDefaults(files);
@@ -309,7 +313,7 @@ var configure = function(data) {
     setNocache(files, !data.config.coverage);
 
     var filesForCoverage = _.flatten(
-      _.map(
+        _.map(
             ['sourceFiles', 'specFiles'],
             function(item) { return data.files[item]; }
         )
