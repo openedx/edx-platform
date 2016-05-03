@@ -1,4 +1,26 @@
-// Common configuration for Karma
+// Common settings and helpers for setting up Karma config.
+//
+// To run all the tests in a suite and print results to the console:
+//
+//   karma start <karma_config_for_suite_path>
+//   E.g. karma start lms/static/karma_lms.conf.js
+//
+//
+// To run the tests for debugging: Debugging can be done in any browser
+// but Chrome's developer console debugging experience is best.
+//
+//   karma start <karma_config_for_suite_path> --browsers=BROWSER --single-run=false
+//
+//
+// To run the tests with coverage and junit reports:
+//
+//   karma start <karma_config_for_suite_path> --browsers=BROWSER
+// --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
+//
+// where `BROWSER` could be Chrome or Firefox.
+//
+
+
 /* jshint node: true */
 /*jshint -W079 */
 'use strict';

@@ -1,23 +1,5 @@
-// Xmodule Tests
-//
-// To run all the tests and print results to the console:
-//
-//   karma start common/lib/xmodule/xmodule/js/karma_xmodule.conf.js
-//
-//
-// To run the tests for debugging: Debugging can be done in any browser
-// Chrome's developer console debugging experience is the best though
-//
-//   karma start common/lib/xmodule/xmodule/js/karma-xmodule.conf.js --browsers=BROWSER --single-run=false
-//
-//
-// To run the tests with coverage and junit reports:
-//
-//   karma start common/lib/xmodule/xmodule/js/karma-xmodule.conf.js
-//  --browsers=BROWSER --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
-//
-// where `BROWSER` could be Chrome or Firefox.
-//
+// Karma config for xmodule suite.
+// Docs in common/static/common/js/karma.common.conf.js
 
 /* jshint node: true */
 /*jshint -W079 */

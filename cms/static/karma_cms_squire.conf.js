@@ -1,23 +1,5 @@
-// Common JavaScript tests, using RequireJS.
-//
-// To run all the tests and print results to the console:
-//
-//   karma start cms/static/karma_cms_squire.conf.js
-//
-//
-// To run the tests for debugging: Debugging can be done in any browser
-// but Chrome's developer console debugging experience is best.
-//
-//   karma start cms/static/karma_cms_squire.conf.js --browsers=BROWSER --single-run=false
-//
-//
-// To run the tests with coverage and junit reports:
-//
-//   karma start cms/static/karma_cms_squire.conf.js --browsers=BROWSER --coverage
-// --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
-//
-// where `BROWSER` could be Chrome or Firefox.
-//
+// Karma config for cms-squire suite.
+// Docs in common/static/common/js/karma.common.conf.js
 
 /* jshint node: true */
 /*jshint -W079 */
