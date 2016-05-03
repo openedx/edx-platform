@@ -3,7 +3,7 @@
         <p class="message-copy">
             <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any Big Data University account."), context ) %>
             <%- _.sprintf( gettext("To try again with another %(currentProvider)s account or another social login button, please clear the cookies in this browser, or try again from another browser. Refer to our"), context ) %>
-            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs" style="text-decoration: none; color: #27AAE1;">FAQ page</a>
+            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page</a>
             <%- _.sprintf( gettext("for more information."), context ) %>
         </p>
     <% } %>
@@ -13,7 +13,7 @@
 <div class="status already-authenticated-msg">
 
         <p class="message-copy">
-           Have an account before and haven't updated your details? <a href="/reset_details" style="text-decoration: none; color: #27AAE1;">Click here</a> to
+           Have an account before and haven't updated your details? <a href="/reset_details">Click here</a> to
            update your username and password
         </p>
 </div>
