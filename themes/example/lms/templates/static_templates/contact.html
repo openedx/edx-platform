@@ -1,5 +1,11 @@
 <%page expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import Text, HTML
+from datetime import datetime
+import pytz
+from django.conf import settings
+%>
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_("Contact Us")}</%block>
@@ -11,46 +17,51 @@
 <section class="static-content">
   <div class="grid-manual grid-container">
     <div class="inner-container">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id suscipit dolor rutrum id. Morbi facilisis porta volutpat. Fusce adipiscing, mauris quis congue tincidunt, sapien purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci mattis fringilla. Praesent eu ipsum in sapien tincidunt molestie sed ut magna.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras tincidunt pellentesque lorem, id suscipit dolor rutrum id. Morbi facilisis porta
+        volutpat. Fusce adipiscing, mauris quis congue tincidunt, sapien purus suscipit odio, quis dictum odio tortor in sem. Ut sit amet libero nec orci
+        mattis fringilla. Praesent eu ipsum in sapien tincidunt molestie sed ut magna.</p>
       <div class="row">
         <div class="col col-12 sm-col-10 md-col-8 lg-col-6 xl-col-6 col-centered">
-          <form action="" class="form-block">
+          <form id="contact_form" class="form-block">
             <div class="input-group">
               <label for="">Email*</label>
-              <input type="email" class="input-lg" placeholder="">
+              <input type="text" class="input-lg" id="email">
             </div>
             <div class="input-group">
               <label for="">Full Name*</label>
-              <input type="text" class="input-lg has-error" placeholder="">
-              <div class="has-error field-message">
-                <span class="field-message-content">Lorem Ipsum</span>
-              </div>
+              <input type="text" class="input-lg" id="name">
             </div>
             <div class="input-group">
               <label for="">I am a</label>
               <div class="custom-select">
-                <select name="" id="" placeholder="" class="input-lg">
-                  <option value="">None</option>
-                  <option value="">None</option>
-                  <option value="">None</option>
+                <select name="user_type" id="user_type" class="input-lg">
+                  <option value="">Select</option>
+                  <option value="learner">Learner</option>
+                  <option value="teacher">Teacher</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
             </div>
             <div class="input-group">
               <label for="">Inquiry Type*</label>
               <div class="custom-select">
-                <select name="" id="" placeholder="Select" class="input-lg">
-                  <option value="">None</option>
-                  <option value="">None</option>
-                  <option value="">None</option>
+                <select id="subject" class="input-lg">
+                  <option value="">Select</option>
+                  <option value="payments">Payments</option>
+                  <option value="certificates">Certificates</option>
+                  <option value="assessments">Assessments</option>
+                  <option value="videos">Videos</option>
+                  <option value="discussion-forums">Discussion Forums</option>
+                  <option value="mobile-application">Mobile Application</option>
                 </select>
               </div>
             </div>
             <div class="input-group">
-              <label for="">Message</label>
-              <textarea name="" id="" rows="10"></textarea>
+              <label for="">Message*</label>
+              <textarea id="details" rows="10"></textarea>
             </div>
-            <button class="btn-brand btn-client btn-lg">Submit</button>
+            <input type="text" name="issue_type" id="issue_type" value="contact" class="hidden">
+            <button class="btn-brand btn-client btn-lg" id="submit_btn">Submit</button>
             <div class="input-group">
               <label for="" class="text-light">* Required Fields</label>
             </div>
@@ -60,3 +71,71 @@
     </div>
   </div>
 </section>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+
+    var errorMessages = {
+        "name": "Please provide your name.",
+        "email": "Please provide a valid e-mail.",
+        "details": "Please provide message.",
+        "subject": "Please provide a inquiry type."
+      }
+
+    function submitForm(data){
+      $.post( "/submit_feedback", data, function(data, status) {
+        alert( "need to add modal box for thank you" );
+      }).fail(function(xhr, status, error) {
+            responseData = jQuery.parseJSON(xhr.responseText);
+            addErrorDiv(responseData.field);
+        });
+    }
+
+    function addErrorDiv(id){
+      var error_div = "<div class='has-error field-message'><span class='field-message-content'>"+errorMessages[id]+"</span></div>";
+      $("#"+id).addClass("has-error");
+      $("#"+id).parent().append(error_div);
+    }
+
+    function removeErrorDiv(id){
+      $("#"+id).removeClass("has-error");
+      $($("#"+id).next()).remove();
+    }
+
+    function validateForm() {
+      var optional_fields = ["user_type"];      //Optional fields array
+
+      var form_values = $("#contact_form").find(":input"), i = 0, data = new Object(),
+        response = {"is_form_validate": true, data: {"issue_type": "contact"}};
+
+      for (i = 0; i < form_values.length - 2; i++) {
+        var value = $(form_values[i]).val(), id = $(form_values[i]).attr("id");
+        removeErrorDiv(id);
+
+        if (value && value !== "") {
+          data[id] = value;
+        } else {
+          if ($.inArray(id, optional_fields) == -1) {
+            response.is_form_validate = false;
+            addErrorDiv(id);
+          }
+        }
+
+      }
+      response.data = data;
+      return response;
+    }
+
+    $(function() {
+      $("#submit_btn").click(function(e){
+        e.preventDefault();
+        var validate_form= validateForm();
+        if (validate_form.is_form_validate){
+          submitForm(validate_form.data);
+        }
+      });
+
+    });
+  </script>
+
+</%block>
