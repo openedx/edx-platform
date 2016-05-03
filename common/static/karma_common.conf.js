@@ -31,7 +31,7 @@ var libraryFiles = [
     // override fixture path and other config.
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
-    {pattern: 'js/vendor/jquery.min.js', included: true},
+    {pattern: 'common/js/vendor/jquery.js', included: true},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
     {pattern: 'js/libs/jasmine-waituntil.js', included: true},
     {pattern: 'js/libs/jasmine-extensions.js', included: true},

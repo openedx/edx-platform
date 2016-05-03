@@ -30,7 +30,7 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
     {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: false},

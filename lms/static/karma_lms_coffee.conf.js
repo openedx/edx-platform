@@ -32,7 +32,7 @@ var libraryFiles = [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
     // vendor files
-    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: true},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: true},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},
     {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},

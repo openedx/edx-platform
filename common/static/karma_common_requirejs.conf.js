@@ -28,7 +28,7 @@ var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var libraryFiles = [
-    {pattern: 'js/vendor/jquery.min.js', included: false},
+    {pattern: 'common/js/vendor/jquery.js', included: false},
     {pattern: 'js/vendor/jasmine-imagediff.js', included: false},
     {pattern: 'js/libs/jasmine-stealth.js', included: false},
     {pattern: 'js/libs/jasmine-waituntil.js', included: false},

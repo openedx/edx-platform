@@ -33,7 +33,7 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: false},
     {pattern: 'js/RequireJS-namespace-undefine.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
-    {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: true},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
