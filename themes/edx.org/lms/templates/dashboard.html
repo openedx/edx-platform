@@ -157,10 +157,19 @@ from openedx.core.djangolib.markup import Text, HTML
   % endif
 
   % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-    <div class="wrapper-find-courses">
-      <p class="copy">${_("Check out our recently launched courses and what's new in your favorite subjects")}</p>
-      <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
-    </div>
+      <div class="wrapper-find-courses">
+          <div class="course-advertise">
+              <div class="advertise-message">
+                  ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
+              </div>
+              <div class="ad-link">
+                  <a class="btn-find-courses" href="${marketing_link('COURSES')}">
+                      <span class="icon fa fa-search" aria-hidden="true"></span>
+                      ${_("Explore New Courses")}
+                  </a>
+              </div>
+          </div>
+      </div>
   % endif
 
   <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
