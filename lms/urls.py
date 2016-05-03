@@ -611,7 +611,13 @@ urlpatterns += (
         'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
         name='cohort_discussion_topics',
     ),
-
+    url(
+        r'^courses/{}/verified_track_content/settings'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'verified_track_content.views.cohorting_settings',
+        name='verified_track_cohorting',
+    ),
     url(
         r'^courses/{}/notes$'.format(
             settings.COURSE_ID_PATTERN,
