@@ -52,6 +52,8 @@ from class_dashboard.dashboard_data import get_section_display_name, get_array_s
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from openedx.core.djangolib.markup import Text, HTML
+
 log = logging.getLogger(__name__)
 
 
@@ -111,13 +113,13 @@ def instructor_dashboard_2(request, course_id):
     if settings.ANALYTICS_DASHBOARD_URL:
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+        link_start = HTML("<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             "To gain insights into student enrollment and participation {link_start}"
             "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
         )
-        analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_message = Text(analytics_dashboard_message).format(
+            link_start=link_start, link_end=HTML("</a>"), analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
 
         # Temporarily show the "Analytics" section until we have a better way of linking to Insights
         sections.append(_section_analytics(course, access))
@@ -629,8 +631,9 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-    link = u"<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
-                                                               settings.ANALYTICS_DASHBOARD_NAME)
+    link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
+        analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
+    )
     return link
 
 
