@@ -28,7 +28,7 @@ from courseware.tests.factories import (
     StaffFactory,
     UserFactory,
 )
-import courseware.views as views
+import courseware.views.views as views
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.tests import mako_middleware_process_request
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

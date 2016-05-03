@@ -39,7 +39,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                 request=self.context['request'],
             ),
             'student_view_url': reverse(
-                'courseware.views.render_xblock',
+                'courseware.views.views.render_xblock',
                 kwargs={'usage_key_string': unicode(block_key)},
                 request=self.context['request'],
             ),

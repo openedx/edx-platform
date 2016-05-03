@@ -15,7 +15,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
-import courseware.views
+import courseware.views.views
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
@@ -97,7 +97,7 @@ def courses(request):
     """
     Render the "find courses" page. If the marketing site is enabled, redirect
     to that. Otherwise, if subdomain branding is on, this is the university
-    profile page. Otherwise, it's the edX courseware.views.courses page
+    profile page. Otherwise, it's the edX courseware.views.views.courses page
     """
     enable_mktg_site = microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -112,7 +112,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return courseware.views.courses(request)
+    return courseware.views.views.courses(request)
 
 
 def _footer_static_url(request, name):

@@ -26,7 +26,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 from xblock.fragment import Fragment
 
-import courseware.views as views
+import courseware.views.views as views
 import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
@@ -40,6 +40,7 @@ from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from courseware.views.index import render_accordion, CoursewareIndex
 from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -255,7 +256,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
     def test_index_nonexistent_chapter_masquerade(self):
-        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
@@ -264,7 +265,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, section_name='non-existent')
 
     def test_index_nonexistent_section_masquerade(self):
-        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, section_name='non-existent')
@@ -416,14 +417,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             get_redirect_url(self.course_key, self.section.location),
         )
 
-    def test_redirect_to_course_position(self):
-        mock_module = MagicMock()
-        mock_module.descriptor.id = 'Underwater Basketweaving'
-        mock_module.position = 3
-        mock_module.get_display_items.return_value = []
-        self.assertRaises(Http404, views.redirect_to_course_position,
-                          mock_module, views.CONTENT_DEPTH)
-
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
         self.assertEqual(response.status_code, 404)
@@ -461,15 +454,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             request_url = '/'.join(url_parts_copy)
             response = self.client.get(request_url)
             self.assertEqual(response.status_code, 404)
-
-    def test_registered_for_course(self):
-        self.assertFalse(views.registered_for_course('Basketweaving', None))
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertFalse(views.registered_for_course('dummy', mock_user))
-        mock_course = MagicMock()
-        mock_course.id = self.course_key
-        self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
     def test_get_cosmetic_display_price(self):
@@ -917,10 +901,10 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the accordion """
-        table_of_contents, __, __ = toc_for_course(
+        table_of_contents = toc_for_course(
             self.request.user, self.request, course, unicode(course.get_children()[0].scope_ids.usage_id), None, None
         )
-        return views.render_accordion(self.request, course, table_of_contents)
+        return render_accordion(self.request, course, table_of_contents['chapters'])
 
 
 @attr('shard_1')
@@ -1331,7 +1315,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # status valid code
         # mocking xqueue and analytics
 
-        analytics_patcher = patch('courseware.views.analytics')
+        analytics_patcher = patch('courseware.views.views.analytics')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -1455,7 +1439,7 @@ class ViewCheckerBlock(XBlock):
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """
-    Tests of the courseware.index view.
+    Tests of the courseware.views.index view.
     """
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
@@ -1497,7 +1481,9 @@ class TestIndexView(ModuleStoreTestCase):
         mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        response = CoursewareIndex.as_view()(
+            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
+        )
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
@@ -1525,7 +1511,9 @@ class TestIndexView(ModuleStoreTestCase):
         request.user = user
         mako_middleware_process_request(request)
 
-        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        response = CoursewareIndex.as_view()(
+            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
+        )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
 
@@ -1546,7 +1534,9 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.store.update_item(self.course, 0)
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
+        ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
         self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
+        ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
         gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
 
@@ -1570,7 +1560,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         mako_middleware_process_request(request)
 
         with self.assertRaises(Http404):
-            __ = views.index(
+            CoursewareIndex.as_view()(
                 request,
                 unicode(self.course.id),
                 chapter=self.chapter.url_name,
