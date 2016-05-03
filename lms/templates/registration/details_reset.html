@@ -4,7 +4,8 @@
 {% block title %}
 <title>
   {% blocktrans with platform_name=platform_name %}
-      Reset Your {{ platform_name }} Details
+      Access your Beta Big Data University account
+
   {% endblocktrans %}
 </title>
 {% endblock %}
@@ -41,7 +42,7 @@
       <h1 class="title">
         <span class="title-super">
           {% blocktrans with platform_name=platform_name %}
-          Reset Your {{ platform_name }} Details
+          Access your Beta Big Data University account
           {% endblocktrans %}
         </span>
       </h1>
@@ -90,14 +91,15 @@
         </div>
 
         <p class="instructions">
-        {% trans 'Please enter your email so that we can send a mail to you on how to reset your details' %}
-        <br />
-        </p>
+            <p class="reset-instruction first-reset-instruction">{% trans 'A new Beta Big Data University account has been created based on your existing Big Data University (BDU) a    ccount.  Soon after the beta period is over, this account will display the history of courses completed, badges earned, and completion certificates obtained.' %}</p>
+            <p class="reset-instruction">{% trans 'To access your new account, enter the email address associated to your Big Data University. If you were using a Social Med    ia button to log in to BDU, use the email associated with that social media account. ' %} </p>
+            <p>{% trans 'An email will be sent to you with a password to access your account.' %} </p>
+         </p>
 
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="sr">{% trans "Required Information" %}</legend>
           <ol class="list-input">
-            <li class="field required password" id="field-new_password2">
+            <li class="field password" id="field-new_password2">
               <label for="new_password2">{% trans "Your BDU Email" %}</label>
               <input id="new_password2" type="email" name="email" placeholder="email" />
             </li>
