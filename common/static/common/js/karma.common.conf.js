@@ -124,26 +124,60 @@ function junitSettings(config) {
     };
 }
 
-var getPreprocessorObject = function (files) {
-    var preprocessFiles = {};
+var normalizePathsForCoverage = function(files, normalize_func) {
+    var filesForCoverage = {};
 
     files.forEach(function (file) {
+        if (_.isObject(file) && file.ignoreCoverage) { return; }
+
         var pattern = _.isObject(file) ? file.pattern : file;
-
-        if (pattern.match(/^common\/js/)) {
-            pattern = path.join(appRoot, '/common/static/' + pattern);
-        } else if (pattern.match(/^xmodule_js\/common_static/)) {
-            pattern = path.join(appRoot, '/common/static/' +
-                pattern.replace(/^xmodule_js\/common_static\//, ''));
+        if (normalize_func) {
+            pattern = normalize_func(appRoot, pattern);
+        } else {
+            if (pattern.match(/^common\/js/)) {
+                pattern = path.join(appRoot, '/common/static/' + pattern);
+            } else if (pattern.match(/^xmodule_js\/common_static/)) {
+                pattern = path.join(appRoot, '/common/static/' +
+                  pattern.replace(/^xmodule_js\/common_static\//, ''));
+            }
         }
-
-        preprocessFiles[pattern] = ['coverage'];
+        filesForCoverage[pattern] = ['coverage'];
     });
 
-    return preprocessFiles;
+    return filesForCoverage;
 };
 
-var getConfig = function (config, useRequireJs) {
+/**
+ * Sets nocache on each file in the list.
+ * @param {Object} files
+ * @param {Bool} enable
+ * @return {Object}
+ */
+var setNocache = function (files, enable) {
+    files.forEach(function (f) {
+        if (_.isObject(f)) {
+            f.nocache = enable;
+        }
+    });
+    return files;
+};
+
+/**
+ * Sets defaults for each file pattern.
+ * @param {Object} files
+ * @return {Object}
+ */
+var setDefaults = function (files) {
+    return files.map(function (f) {
+        var file = _.isObject(f) ? f : {pattern: f};
+        if (!file.included) {
+            f.included = false;
+        }
+        return file;
+    });
+};
+
+var getBaseConfig = function (config, useRequireJs) {
     useRequireJs = useRequireJs === undefined ? true : useRequireJs;
 
     var getFrameworkFiles = function () {
@@ -257,8 +291,43 @@ var getConfig = function (config, useRequireJs) {
     };
 };
 
+var configure = function(data) {
+    var baseConfig = getBaseConfig(data.config, data.useRequireJs);
+
+    var files = _.flatten(
+      _.map(
+            ['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runAndConfigFiles'],
+            function(item) { return data.files[item]; }
+        )
+    );
+
+    files = setDefaults(files);
+
+    // With nocache=true, Karma always serves the latest files from disk.
+    // However, that prevents coverage tracking from working.
+    // So we only set it if coverage tracking is off.
+    setNocache(files, !data.config.coverage);
+
+    var filesForCoverage = _.flatten(
+      _.map(
+            ['sourceFiles', 'specFiles'],
+            function(item) { return data.files[item]; }
+        )
+    );
+
+    var preprocessors = _.extend(
+      {},
+      data.preprocessors,
+      normalizePathsForCoverage(filesForCoverage, data.normalizePathsForCoverageFunc)
+    );
+
+    data.config.set(_.extend(baseConfig, {
+        files: files,
+        preprocessors: preprocessors
+    }));
+};
+
 module.exports = {
-    getConfig: getConfig,
-    getPreprocessorObject: getPreprocessorObject,
+    configure: configure,
     appRoot: appRoot
 };

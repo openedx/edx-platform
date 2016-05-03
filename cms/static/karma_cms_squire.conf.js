@@ -5,10 +5,10 @@
 /*jshint -W079 */
 'use strict';
 var path = require('path');
-var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var libraryFiles = [
+var files = {
+    libraryFiles: [
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: false},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
@@ -52,59 +52,37 @@ var libraryFiles = [
     },
     {pattern: 'xmodule_js/common_static/js/vendor/requirejs/text.js', included: false},
     {pattern: 'common/js/utils/require-serial.js', included: true}
-];
+    ],
 
-// Paths to source JavaScript files
-var sourceFiles = [
+    sourceFiles: [
     {pattern: 'coffee/src/**/*.js', included: false},
     {pattern: 'js/collections/**/*.js', included: false},
     {pattern: 'js/models/**/*.js', included: false},
     {pattern: 'js/utils/**/*.js', included: false},
     {pattern: 'js/views/**/*.js', included: false},
     {pattern: 'common/js/**/*.js', included: false}
-];
+    ],
 
-// Paths to spec (test) JavaScript files
-var specFiles = [
+    specFiles: [
     {pattern: 'coffee/spec/**/*.js', included: false},
     {pattern: 'js/spec/**/*.js', included: false}
-];
+    ],
 
-// Paths to fixture files
-var fixtureFiles = [
+    fixtureFiles: [
     {pattern: 'coffee/fixtures/**/*.*', included: false},
     {pattern: 'templates/**/*.*', included: false},
     {pattern: 'common/templates/**/*.*', included: false}
-];
+    ],
 
-// override fixture path and other config.
-var runAndConfigFiles = [
+    runAndConfigFiles: [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'coffee/spec/main_squire.js'
-];
-
-// do not include tests or libraries
-// (these files will be instrumented by Istanbul)
-var preprocessors = configModule.getPreprocessorObject(_.flatten([sourceFiles, specFiles]));
+    ]
+};
 
 module.exports = function (config) {
-    var commonConfig = configModule.getConfig(config),
-        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
-        localConfig;
-
-    // add nocache in files if coverage is not set
-    if (!config.coverage) {
-        files.forEach(function (f) {
-            if (_.isObject(f)) {
-                f.nocache = true;
-            }
-        });
-    }
-
-    localConfig = {
-        files: files,
-        preprocessors: preprocessors
-    };
-
-    config.set(_.extend(commonConfig, localConfig));
+    configModule.configure({
+        config: config,
+        files: files
+    });
 };

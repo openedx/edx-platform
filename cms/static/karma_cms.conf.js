@@ -5,10 +5,10 @@
 /*jshint -W079 */
 'use strict';
 var path = require('path');
-var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var libraryFiles = [
+var files = {
+    libraryFiles: [
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: false},
@@ -67,58 +67,36 @@ var libraryFiles = [
     {pattern: 'edx-ui-toolkit/js/**/*.js', included: false},
 
     {pattern: 'common/js/utils/require-serial.js', included: true}
-];
+    ],
 
-// Paths to source JavaScript files
-var sourceFiles = [
+    sourceFiles: [
     {pattern: 'coffee/src/**/!(*spec).js', included: false},
     {pattern: 'js/**/!(*spec).js', included: false},
     {pattern: 'common/js/**/!(*spec).js', included: false}
-];
+    ],
 
-// Paths to spec (test) JavaScript files
-var specFiles = [
+    specFiles: [
     {pattern: 'coffee/spec/**/*spec.js', included: false},
     {pattern: 'js/spec/**/*spec.js', included: false},
     {pattern: 'js/certificates/spec/**/*spec.js', included: false}
-];
+    ],
 
-// Paths to fixture files
-var fixtureFiles = [
+    fixtureFiles: [
     {pattern: 'coffee/fixtures/**/*.underscore', included: false},
     {pattern: 'templates/**/*.underscore', included: false},
     {pattern: 'common/templates/**/*.underscore', included: false}
-];
+    ],
 
-// override fixture path and other config.
-var runAndConfigFiles = [
+    runAndConfigFiles: [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
     'coffee/spec/main.js'
-];
-
-// do not include tests or libraries
-// (these files will be instrumented by Istanbul)
-var preprocessors = configModule.getPreprocessorObject(_.flatten([sourceFiles, specFiles]));
+    ]
+};
 
 module.exports = function (config) {
-    var commonConfig = configModule.getConfig(config),
-        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles, runAndConfigFiles]),
-        localConfig;
-
-    // add nocache in files if coverage is not set
-    if (!config.coverage) {
-        files.forEach(function (f) {
-            if (_.isObject(f)) {
-                f.nocache = true;
-            }
-        });
-    }
-
-    localConfig = {
-        files: files,
-        preprocessors: preprocessors
-    };
-
-    config.set(_.extend(commonConfig, localConfig));
+    configModule.configure({
+        config: config,
+        files: files
+    });
 };
 

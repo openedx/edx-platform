@@ -6,14 +6,12 @@
 
 'use strict';
 var path = require('path');
-var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var libraryFiles = [
-    // override fixture path and other config.
+var files = {
+    libraryFiles: [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
-    // vendor files
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.min.js', included: true},
     {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: true},
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},
@@ -43,45 +41,28 @@ var libraryFiles = [
     {pattern: 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom.js', included: false},
     {pattern: 'xmodule_js/common_static/edx-pattern-library/js/afontgarde.js', included: false},
     {pattern: 'xmodule_js/common_static/edx-pattern-library/js/edx-icons.js', included: false}
-];
+    ],
 
-// source files
-var sourceFiles = [
+    sourceFiles: [
     {pattern: 'coffee/src/**/*.js', included: true}
-];
+    ],
 
-// spec files
-var specFiles = [
+    specFiles: [
     {pattern: 'coffee/spec/**/*.js', included: true}
-];
+    ],
 
-// Fixtures
-var fixtureFiles = [
+    fixtureFiles: [
     {pattern: 'coffee/fixtures/**/*.*', included: true}
-];
+    ],
 
-// do not include tests or libraries
-// (these files will be instrumented by Istanbul)
-var preprocessors = configModule.getPreprocessorObject(_.flatten([sourceFiles, specFiles]));
+    runAndConfigFiles: [
+    ]
+};
 
 module.exports = function (config) {
-    var commonConfig = configModule.getConfig(config, false),
-        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles]),
-        localConfig;
-
-    // add nocache in files if coverage is not set
-    if (!config.coverage) {
-        files.forEach(function (f) {
-            if (_.isObject(f)) {
-                f.nocache = true;
-            }
-        });
-    }
-
-    localConfig = {
+    configModule.configure({
+        config: config,
         files: files,
-        preprocessors: preprocessors
-    };
-
-    config.set(_.extend(commonConfig, localConfig));
+        useRequireJs: false
+    });
 };

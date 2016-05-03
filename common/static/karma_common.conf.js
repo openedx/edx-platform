@@ -5,12 +5,10 @@
 /*jshint -W079 */
 'use strict';
 var path = require('path');
-var _ = require('underscore');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-// Files to load by Karma
-var libraryFiles = [
-    // override fixture path and other config.
+var files = {
+    libraryFiles: [
     {pattern: path.join(configModule.appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true},
 
     {pattern: 'js/vendor/jquery.min.js', included: true},
@@ -34,62 +32,40 @@ var libraryFiles = [
     {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: true},
     {pattern: 'edx-pattern-library/js/afontgarde.js', included: true},
     {pattern: 'edx-pattern-library/js/edx-icons.js', included: true}
-];
+    ],
 
-// Paths to source JavaScript files
-var sourceFiles = [
+    sourceFiles: [
     {pattern: 'js/xblock/**/*.js', included: true},
     {pattern: 'coffee/src/**/*.js', included: true},
     {pattern: 'js/src/**/*.js', included: true},
     {pattern: 'js/capa/src/**/*.js', included: true}
-];
+    ],
 
-// Paths to spec (test) JavaScript files
-var specFiles = [
+    specFiles: [
     {pattern: 'coffee/spec/**/*.js', included: true},
     {pattern: 'js/spec/**/*.js', included: true},
     {pattern: 'js/capa/spec/**/*.js', included: true}
-];
+    ],
 
-// Paths to fixture files
-var fixtureFiles = [
+    fixtureFiles: [
     {pattern: 'js/fixtures/**/*.html', included: false},
     {pattern: 'js/capa/fixtures/**/*.html', included: false},
     {pattern: 'common/templates/**/*.underscore', included: false}
-];
+    ],
 
-// do not include tests or libraries
-// (these files will be instrumented by Istanbul)
-var preprocessors = (function () {
-    var preprocessFiles = {};
+    runAndConfigFiles: [
+    ]
+};
 
-    _.flatten([sourceFiles, specFiles]).forEach(function (file) {
-        var pattern = _.isObject(file) ? file.pattern : file;
-        pattern = path.join(configModule.appRoot, '/common/static/' + pattern);
-        preprocessFiles[pattern] = ['coverage'];
-    });
-
-    return preprocessFiles;
-}());
+var normalizePathsForCoverageFunc = function (appRoot, pattern) {
+    return path.join(appRoot, '/common/static/' + pattern);
+};
 
 module.exports = function (config) {
-    var commonConfig = configModule.getConfig(config, false),
-        files = _.flatten([libraryFiles, sourceFiles, specFiles, fixtureFiles]),
-        localConfig;
-
-    // add nocache in files if coverage is not set
-    if (!config.coverage) {
-        files.forEach(function (f) {
-            if (_.isObject(f)) {
-                f.nocache = true;
-            }
-        });
-    }
-
-    localConfig = {
+    configModule.configure({
+        config: config,
         files: files,
-        preprocessors: preprocessors
-    };
-
-    config.set(_.extend(commonConfig, localConfig));
+        normalizePathsForCoverageFunc: normalizePathsForCoverageFunc,
+        useRequireJs: false
+    });
 };
