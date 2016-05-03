@@ -42,27 +42,23 @@ def get_redirect_url(course_key, usage_key):
         # Here we use the navigation_index from the position returned from
         # path_to_location - we can only navigate to the topmost vertical at the
         # moment
-
         redirect_url = reverse(
             'courseware_position',
             args=(unicode(course_key), chapter, section, navigation_index(position))
         )
-
     redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
     return redirect_url
 
 
-def get_redirect_url_for_global_staff(course_key, location):
+def get_redirect_url_for_global_staff(course_key, _next):
     """
-    Returns the redirect url
+    Returns the redirect url for staff enrollment
 
     Args:
         course_key(str): Course key string
-        location(str): The location id of course component
+        _next(str): Redirect url of course component
     """
-
-    _next = get_redirect_url(course_key, location)
-    redirect_url = "{url}?next={redirect}".format(
+    redirect_url = ("{url}?next={redirect}".format(
         url=reverse('enroll_staff', args=[unicode(course_key)]),
-        redirect=_next)
+        redirect=_next))
     return redirect_url

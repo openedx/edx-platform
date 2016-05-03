@@ -286,21 +286,3 @@ class CoursewareSequentialTabPage(CoursePage):
         return the body of the sequential currently selected
         """
         return self.q(css='#seq_content .xblock').text[0]
-
-
-class AboutPage(CoursePage):
-    """
-    Course about page.
-    """
-
-    url_path = "about/"
-
-    def is_browser_on_page(self):
-        return self.q(css='.intro').present
-
-    @property
-    def is_register_button_present(self):
-        """
-        Returns True if the Enrollment button is visible on the about page.
-        """
-        return self.q(css=".register").is_present()

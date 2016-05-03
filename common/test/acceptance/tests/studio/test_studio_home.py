@@ -1,14 +1,9 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
-import os
-import uuid
-
 from bok_choy.web_app_test import WebAppTest
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.courseware import AboutPage, CoursewarePage
 from flaky import flaky
-from opaque_keys.edx.locator import LibraryLocator, CourseLocator
+from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
 
 from ...fixtures import PROGRAMS_STUB_URL
@@ -178,78 +173,3 @@ class StudioLanguageTest(WebAppTest):
             get_selected_option_text(language_selector),
             u'Dummy Language (Esperanto)'
         )
-
-
-class CourseNotEnrollTest(WebAppTest):
-    """
-    Test that we can create a new content library on the studio home page.
-    """
-
-    def setUp(self):
-        """
-        Load the helper for the home page (dashboard page)
-        """
-        super(CourseNotEnrollTest, self).setUp()
-
-        self.auth_page = AutoAuthPage(self.browser, staff=True)
-        self.dashboard_page = DashboardPage(self.browser)
-        self.course_name = "New Course Name"
-        self.course_org = "orgX"
-        self.course_number = str(uuid.uuid4().get_hex().upper()[0:6])
-        self.course_run = "2015_T2"
-
-    def course_id(self):
-        """
-        Returns the serialized course_key for the test
-        """
-        # TODO - is there a better way to make this agnostic to the underlying default module store?
-        default_store = os.environ.get('DEFAULT_STORE', 'split')
-        course_key = CourseLocator(
-            self.course_org,
-            self.course_number,
-            self.course_run,
-            deprecated=(default_store == 'split')
-        )
-        return unicode(course_key)
-
-    def test_unenroll_course(self):
-        """
-        From the home page:
-            Click "New Course" ,Fill out the form
-            Submit the form
-            Return to the home page and logout
-            Login with the staff user which is not enrolled in the course
-            click the view live button of the course
-            Here are two scenario:
-                -First click the Don't Enroll button
-                -Second click the Enroll button and see the response.
-        """
-        self.auth_page.visit()
-        self.dashboard_page.visit()
-        self.assertTrue(self.dashboard_page.new_course_button.present)
-
-        self.dashboard_page.click_new_course_button()
-        self.assertTrue(self.dashboard_page.is_new_course_form_visible())
-        self.dashboard_page.fill_new_course_form(
-            self.course_name, self.course_org, self.course_number, self.course_run
-        )
-        self.assertTrue(self.dashboard_page.is_new_course_form_valid())
-        self.dashboard_page.submit_new_course_form()
-
-        self.dashboard_page.visit()
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=None, staff=True).visit()
-
-        self.dashboard_page.visit()
-        self.dashboard_page.view_live('input[name= "dont_enroll"]')
-
-        about_page = AboutPage(self.browser, self.course_id)
-        about_page.wait_for_page()
-        self.assertTrue(about_page.is_browser_on_page())
-        self.assertTrue(about_page.is_register_button_present)
-
-        self.dashboard_page.visit()
-        self.dashboard_page.view_live('input[name= "enroll"]')
-        course_ware = CoursewarePage(self.browser, self.course_id)
-        course_ware.wait_for_page()
-        self.assertTrue(course_ware.is_browser_on_page())

@@ -10,7 +10,7 @@ from django.conf.urls.static import static
 
 from microsite_configuration import microsite
 import auth_exchange.views
-from courseware.views import EnrollStaffView
+from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
