@@ -9,31 +9,22 @@ var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var files = {
+    libraryFilesToInclude: [
+        {pattern: 'js/libs/jasmine-extensions.js', included: true}
+    ],
+
     libraryFiles: [
-        {pattern: 'js/vendor/jquery.min.js'},
-        {pattern: 'js/vendor/jasmine-imagediff.js'},
-        {pattern: 'js/libs/jasmine-stealth.js'},
-        {pattern: 'js/libs/jasmine-waituntil.js'},
-        {pattern: 'js/libs/jasmine-extensions.js'},
-        {pattern: 'js/vendor/jquery.simulate.js'},
-        {pattern: 'js/vendor/jquery.truncate.js'},
-        {pattern: 'common/js/vendor/underscore.js'},
-        {pattern: 'common/js/vendor/underscore.string.js'},
-        {pattern: 'common/js/vendor/backbone.js'},
-        {pattern: 'js/vendor/backbone.paginator.min.js'},
-        {pattern: 'js/vendor/jquery.timeago.js'},
-        {pattern: 'js/vendor/URI.min.js'},
-        {pattern: 'coffee/src/ajax_prefix.js'},
-        {pattern: 'js/test/add_ajax_prefix.js'},
-        {pattern: 'js/test/i18n.js'},
-        {pattern: 'coffee/src/jquery.immediateDescendents.js'},
-        {pattern: 'js/vendor/requirejs/text.js'},
-        {pattern: 'js/vendor/sinon-1.17.0.js'},
-        {pattern: 'common/js/utils/require-serial.js', included: true}
+        {pattern: 'coffee/src/**/*.js'},
+        {pattern: 'common/js/spec_helpers/**/*.js'},
+        {pattern: 'common/js/vendor/**/*.js'},
+        {pattern: 'js/libs/**/*.js'},
+        {pattern: 'js/test/**/*.js'},
+        {pattern: 'js/vendor/**/*.js'}
     ],
 
     sourceFiles: [
-        {pattern: 'common/js/**/!(*spec).js'}
+        {pattern: 'common/js/components/**/!(*spec).js'},
+        {pattern: 'common/js/utils/**/!(*spec).js'}
     ],
 
     specFiles: [

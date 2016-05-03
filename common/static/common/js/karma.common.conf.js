@@ -178,7 +178,6 @@ var setDefaults = function (files) {
 };
 
 var getBaseConfig = function (config, useRequireJs) {
-    useRequireJs = useRequireJs === undefined ? true : useRequireJs;
 
     var getFrameworkFiles = function () {
         var files = [
@@ -292,11 +291,12 @@ var getBaseConfig = function (config, useRequireJs) {
 };
 
 var configure = function(data) {
-    var baseConfig = getBaseConfig(data.config, data.useRequireJs);
+    var useRequireJs = data.useRequireJs === undefined ? true : useRequireJs,
+        baseConfig = getBaseConfig(data.config, useRequireJs);
 
     var files = _.flatten(
         _.map(
-            ['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
+            ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
             function(item) { return data.files[item] || []; }
         )
     );
@@ -304,6 +304,10 @@ var configure = function(data) {
     files.unshift(
         {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true}
     );
+
+    if (useRequireJs) {
+      files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
+    }
 
     files = setDefaults(files);
 
