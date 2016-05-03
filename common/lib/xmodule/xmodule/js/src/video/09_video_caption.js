@@ -108,7 +108,7 @@
                 var template = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
-                        '<ol id="transcript-captions" class="subtitles-menu"></ol>',
+                        '<ol id="transcript-captions" class="subtitles-menu" lang="' + this.state.lang + '"></ol>',
                     '</div>'
                 ].join('');
 
@@ -682,6 +682,12 @@
 
                         state.el.trigger('language_menu:change', [langCode]);
                         self.fetchCaption();
+                        
+                        // update the closed-captions lang attribute
+                        self.captionDisplayEl.attr('lang', langCode);
+                        
+                        // update the transcript lang attribute
+                        self.subtitlesMenuEl.attr('lang', langCode);
                     }
                 });
             },
@@ -754,10 +760,12 @@
                         .text(gettext('Video transcript'));
 
                     self.subtitlesEl.find('.transcript-start')
-                        .text(gettext('Start of transcript. Skip to the end.'));
+                        .text(gettext('Start of transcript. Skip to the end.'))
+                        .attr('lang', $('html').attr('lang'));
 
                     self.subtitlesEl.find('.transcript-end')
-                        .text(gettext('End of transcript. Skip to the start.'));
+                        .text(gettext('End of transcript. Skip to the start.'))
+                        .attr('lang', $('html').attr('lang'));
 
                     self.container.find('.menu-container .language-menu')
                         .attr('aria-label', gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
@@ -1111,7 +1119,8 @@
 
                 this.captionDisplayEl
                     .show()
-                    .addClass('is-visible');
+                    .addClass('is-visible')
+                    .attr('lang', this.state.lang);
 
                 this.captionControlEl
                     .addClass('is-active')
