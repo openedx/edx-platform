@@ -345,6 +345,10 @@ header.header-main {
   &.hero-video{
     background: $white;
     .grid-container{
+      &.hero-course-container{
+        position: absolute;
+        top: -3px;
+      }
       .row{
         height: auto;
         .description{
