@@ -28,7 +28,7 @@
 <div class="status submission-error hidden" aria-live="polite">
     <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
     <ul class="message-copy"></ul>
-    <ul class="error-message-copy">
+    <ul class="beta-error-message">
         <li>
             <%- gettext("If you have an account in bigdatauniversity.com and this is the first time you access beta.bigdatauniversity.com, please") %>
             <a href="https://courses.bigdatauniversity.com/access_new_account">click here</a>
