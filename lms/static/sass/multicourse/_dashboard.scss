@@ -23,12 +23,42 @@
     border-top: 3px solid $blue;
     padding: $baseline 0;
 
-    .copy {
-      @extend %t-copy-sub1;
-    }
-
-    .btn-find-courses {
-      @extend %btn-pl-elevated-alt;
+    .course-advertise {
+      @include clearfix();
+      box-sizing: border-box;
+      padding: $baseline;
+      background-color: $body-bg;
+      border: 1px solid $border-color-l3;
+      .advertise-message {
+        @include font-size(12);
+        color: $gray-d4;
+        margin-bottom: $baseline;
+      }
+      .ad-link {
+        @include text-align(center);
+        .btn-find-courses {
+          padding-bottom: 12px;
+          padding-top: 12px;
+        }
+        a {
+          @include font-size(16);
+          @include line-height(1.2);
+          padding: $baseline * 0.5;
+          border: 1px solid $blue;
+          color: $blue;
+          text-decoration: none;
+          display: block;
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
+            background-color: $blue;
+          }
+          span {
+            @include margin-left($baseline*0.25);
+          }
+        }
+      }
     }
   }
 
