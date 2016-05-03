@@ -37,16 +37,20 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
+    enable_mktg_urls = settings.FEATURES.get('ENABLE_MKTG_URLS', False)
     enable_mktg_site = microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
 
-    if enable_mktg_site and name in settings.MKTG_URLS:
-        # special case for when we only want the root marketing URL
-        if name == 'ROOT':
-            return settings.MKTG_URLS.get('ROOT')
-        return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
+    if name in settings.MKTG_URLS:
+        if enable_mktg_site:
+            # special case for when we only want the root marketing URL
+            if name == 'ROOT':
+                return settings.MKTG_URLS.get('ROOT')
+            return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
+        elif enable_mktg_urls and name in settings.MKTG_URLS:
+            return settings.MKTG_URLS.get(name)
     # only link to the old pages when the marketing site isn't on
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
