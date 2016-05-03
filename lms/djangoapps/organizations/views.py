@@ -11,7 +11,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api_manager.courseware_access import get_course_key
+from api_manager.courseware_access import get_course_key, get_course_descriptor
+from api_manager.courses.serializers import OrganizationCourseSerializer
 from organizations.models import Organization
 from api_manager.users.serializers import SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
@@ -226,3 +227,29 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             organization.groups.add(group)
             organization.save()
             return Response({}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['get', ])
+    def courses(self, request, pk):  # pylint: disable=W0613
+        """
+        Returns list of courses in an organization
+        """
+        organization = self.get_object()
+        course_ids = Group.objects.filter(organizations=organization)\
+            .values_list('coursegrouprelationship__course_id', flat=True).distinct()
+        course_keys = map(get_course_key, course_ids)
+        enrollment_qs = CourseEnrollment.objects.filter(is_active=True, course_id__in=course_keys)\
+            .values_list('course_id', 'user_id')
+
+        enrollments = {}
+        for (course_id, user_id) in enrollment_qs:
+            enrollments.setdefault(course_id, []).append(user_id)
+
+        response_data = []
+        for course_key in course_keys:
+            course_descriptor = get_course_descriptor(course_key, 0)
+            enrolled_users = enrollments.get(unicode(course_key), [])
+            setattr(course_descriptor, 'enrolled_users', enrolled_users)
+            response_data.append(course_descriptor)
+
+        serializer = OrganizationCourseSerializer(response_data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
