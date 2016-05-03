@@ -12,6 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 
 """
 import logging
+import markupsafe
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -176,7 +177,7 @@ class CourseEmailTemplate(models.Model):
         which is rendered using format() with the provided `context` dict.
 
         Any keywords encoded in the form %%KEYWORD%% found in the message
-        body are subtituted with user data before the body is inserted into
+        body are substituted with user data before the body is inserted into
         the template.
 
         Output is returned as a unicode string.  It is not encoded as utf-8.
@@ -215,6 +216,10 @@ class CourseEmailTemplate(models.Model):
         Convert HTML text body (`htmltext`) into HTML email message using the
         stored HTML template and the provided `context` dict.
         """
+        # HTML-escape string values in the context (used for keyword substitution).
+        for key, value in context.iteritems():
+            if isinstance(value, basestring):
+                context[key] = markupsafe.escape(value)
         return CourseEmailTemplate._render(self.html_template, htmltext, context)
 
 

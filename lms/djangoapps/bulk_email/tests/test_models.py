@@ -97,6 +97,15 @@ class CourseEmailTemplateTest(TestCase):
         context['course_image_url'] = "/location/of/course/image/url"
         return context
 
+    def _add_xss_fields(self, context):
+        """ Add fields to the context for XSS testing. """
+        context['course_title'] = "<script>alert('Course Title!');</alert>"
+        context['name'] = "<script>alert('Profile Name!');</alert>"
+        # Must have user_id and course_id present in order to do keyword substitution
+        context['user_id'] = 12345
+        context['course_id'] = "course-v1:edx+100+1"
+        return context
+
     def test_get_template(self):
         # Get the default template, which has name=None
         template = CourseEmailTemplate.get_template()
@@ -134,10 +143,30 @@ class CourseEmailTemplateTest(TestCase):
         context = self._get_sample_html_context()
         template.render_htmltext("My new html text.", context)
 
+    def test_render_html_xss(self):
+        template = CourseEmailTemplate.get_template()
+        context = self._add_xss_fields(self._get_sample_html_context())
+        message = template.render_htmltext(
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+        )
+        self.assertNotIn("<script>", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Profile Name!&#39;);&lt;/alert&gt;", message)
+
     def test_render_plain(self):
         template = CourseEmailTemplate.get_template()
         context = self._get_sample_plain_context()
         template.render_plaintext("My new plain text.", context)
+
+    def test_render_plain_no_escaping(self):
+        template = CourseEmailTemplate.get_template()
+        context = self._add_xss_fields(self._get_sample_plain_context())
+        message = template.render_plaintext(
+            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+        )
+        self.assertNotIn("&lt;script&gt;", message)
+        self.assertIn(context['course_title'], message)
+        self.assertIn(context['name'], message)
 
 
 @attr('shard_1')
