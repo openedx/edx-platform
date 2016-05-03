@@ -10,7 +10,7 @@
 <div class="status already-authenticated-msg">
 
         <p class="message-copy">
-           Have an account before and haven't updated your details? <a href="/reset_details" style="text-decoration: none; color: #27AAE1;">Click here</a> to
+           Have an account before and haven't updated your details? <a href="/reset_details">Click here</a> to
            update your username and password
         </p>
 </div>
