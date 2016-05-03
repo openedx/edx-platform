@@ -94,27 +94,33 @@ class CourseDetails(object):
         Fetch the course details for the given course from persistence
         and return a CourseDetails model.
         """
-        descriptor = modulestore().get_course(course_key)
-        course_details = cls(course_key.org, course_key.course, course_key.run)
+        return cls.populate(modulestore().get_course(course_key))
 
-        course_details.start_date = descriptor.start
-        course_details.end_date = descriptor.end
-        course_details.enrollment_start = descriptor.enrollment_start
-        course_details.enrollment_end = descriptor.enrollment_end
-        course_details.pre_requisite_courses = descriptor.pre_requisite_courses
-        course_details.course_image_name = descriptor.course_image
-        course_details.course_image_asset_path = course_image_url(descriptor, 'course_image')
-        course_details.banner_image_name = descriptor.banner_image
-        course_details.banner_image_asset_path = course_image_url(descriptor, 'banner_image')
-        course_details.video_thumbnail_image_name = descriptor.video_thumbnail_image
-        course_details.video_thumbnail_image_asset_path = course_image_url(descriptor, 'video_thumbnail_image')
-        course_details.language = descriptor.language
-        course_details.self_paced = descriptor.self_paced
-        course_details.learning_info = descriptor.learning_info
-        course_details.instructor_info = descriptor.instructor_info
+    @classmethod
+    def populate(cls, course_descriptor):
+        """
+        Returns a fully populated CourseDetails model given the course descriptor
+        """
+        course_key = course_descriptor.id
+        course_details = cls(course_key.org, course_key.course, course_key.run)
+        course_details.start_date = course_descriptor.start
+        course_details.end_date = course_descriptor.end
+        course_details.enrollment_start = course_descriptor.enrollment_start
+        course_details.enrollment_end = course_descriptor.enrollment_end
+        course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
+        course_details.course_image_name = course_descriptor.course_image
+        course_details.course_image_asset_path = course_image_url(course_descriptor, 'course_image')
+        course_details.banner_image_name = course_descriptor.banner_image
+        course_details.banner_image_asset_path = course_image_url(course_descriptor, 'banner_image')
+        course_details.video_thumbnail_image_name = course_descriptor.video_thumbnail_image
+        course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
+        course_details.language = course_descriptor.language
+        course_details.self_paced = course_descriptor.self_paced
+        course_details.learning_info = course_descriptor.learning_info
+        course_details.instructor_info = course_descriptor.instructor_info
 
         # Default course license is "All Rights Reserved"
-        course_details.license = getattr(descriptor, "license", "all-rights-reserved")
+        course_details.license = getattr(course_descriptor, "license", "all-rights-reserved")
 
         course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
