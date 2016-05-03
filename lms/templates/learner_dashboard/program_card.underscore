@@ -1,9 +1,9 @@
 
 <div class="text-section">
-    <h3 id="program-<%- id %>" class="title"><%- gettext(name) %></h3>
-    <div class="meta-info">
-        <div class="organization"><%- orgList %></div>
-        <div class="category">
+    <h3 id="program-<%- id %>" class="title hd-3"><%- gettext(name) %></h3>
+    <div class="meta-info grid-container">
+        <div class="organization col"><%- orgList %></div>
+        <div class="category col col-last">
             <span class="category-text"><%- gettext(type) %></span>
             <span class="xseries-icon" aria-hidden="true"></span>
         </div>

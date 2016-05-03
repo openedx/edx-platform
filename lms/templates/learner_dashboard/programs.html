@@ -1,3 +1,6 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-learner-dashboard" %>
+
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
@@ -23,9 +26,9 @@ ProgramListFactory({
 <%block name="pagetitle">${_("Programs")}</%block>
 
 <main id="main" aria-label="Content" tabindex="-1">
-    <div class="program-list-wrapper">
-        <h2 class="sr">${_("Your Programs")}</h2>
-        <div class="program-cards-container"></div>
-        <div class="sidebar"></div>
+    <div class="program-list-wrapper grid-container">
+        <h2 class="sr-only">${_("Your Programs")}</h2>
+        <div class="program-cards-container col"></div>
+        <div class="sidebar col col-last"></div>
     </div>
 </main>
