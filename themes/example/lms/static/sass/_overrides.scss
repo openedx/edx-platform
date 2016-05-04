@@ -743,6 +743,10 @@ header.header-main {
     margin-bottom: 2rem;
     color: $dark;
     line-height: 1.5rem;
+    .brand-link {
+      display: inline;
+      margin: 0;
+    }
   }
   .mission-statement{
     margin-top: 1rem;
@@ -782,6 +786,9 @@ header.header-main {
         word-break: break-word;
       }
     }
+  }
+  .list-divided {
+    text-transform: capitalize;
   }
 }
 
