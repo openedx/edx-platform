@@ -152,7 +152,6 @@ generate_merge:
         - django-studio.po
         - mako.po
         - mako-studio.po
-        - messages.po
         - wiki.po
     djangojs.po:
         - djangojs-partial.po
