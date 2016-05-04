@@ -277,8 +277,8 @@ class DetailsResetFormNoActive(PasswordResetForm):
     def save(
             self,
             domain_override=None,
-            text_template_name='registration/details_reset_email.txt',
-            html_template_name='registration/details_reset_email.html',
+            text_template='registration/details_reset_email.txt',
+            html_template='registration/details_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -308,12 +308,11 @@ class DetailsResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            text_content = loader.render_to_string(text_template_name, context)
             subject = "Beta Big Data University Account Information"
-            template = loader.get_template(html_template_name)
-            email = template.render(context)
+            text_content = loader.render_to_string(text_template, context)
+            html_content = loader.get_template(html_template).render(context)
             msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
-            msg.attach_alternative(email, "text/html")
+            msg.attach_alternative(html_content, "text/html")
             msg.send()
 
             # update, well this user should exist already,
