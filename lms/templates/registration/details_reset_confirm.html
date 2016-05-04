@@ -33,13 +33,15 @@
 {% block bodyclass %}view-passwordreset{% endblock %}
 
 {% block body %}
+<div class="reset-details-content-wrapper">
   <section class="introduction">
     <header>
-      <h1 class="title">
+      <h1 class="title title-info-update">
         <span class="title-super">
-          {% blocktrans with platform_name=platform_name %}
-          Reset Your {{ platform_name }} details
-          {% endblocktrans %}
+          {% trans BETA BIG DATA UNIVERSITY %}
+        </span>
+        <span class="title-super">
+          {% trans ACCOUNT INFORMATION AND UPDATE %}
         </span>
       </h1>
     </header>
@@ -88,35 +90,44 @@
         </div>
 
         <p class="instructions">
-        {% trans 'Please enter your username and new password twice so we can verify you typed it in correctly.' %}
-        <br />
-        {% blocktrans with bold_start='<strong class="indicator">' bold_end='</strong>' %}
-        Required fields are noted by {{bold_start}}bold text and an asterisk (*){{bold_end}}.
-        {% endblocktrans %}
-        Your email is {{ user.email }}
+          {% trans 'Complete the information below to update your Beta Big Data University account.' %}
+          <br>
+          {% trans 'All fields are required.' %}
+          <br><br>
+          {% trans 'Once the information has been updated, you can use it to' %}
+           <a href="/login">{% trans 'log in' %}</a>
         </p>
 
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="sr">{% trans "Required Information" %}</legend>
 
           <ol class="list-input">
+            <li class="field password" id="field-new_password1">
+              <label for="email">{% trans "Email" %}</label>
+              <input id="email" type="email" name="email" placeholder="email" value="{{ user.email }}" disabled>
+            </li>
             <li class="field required password" id="field-new_password1">
               <label for="new_username">{% trans "Username" %}</label>
               <input id="new_username" type="text" name="username" placeholder="New Username" value="{{ user.username}}" />
+              <span class="tip-input">
+                {% trans Feel free to edit. This is the public name that will identify you in your courses - %}
+                <strong>{% trans (cannot be changed later) %}</strong>
+              </span>
             </li>
             <li class="field required password" id="field-new_password1">
-              <label for="new_password1">{% trans "New Password" %}</label>
+              <label for="new_password1">{% trans "Password" %}</label>
               <input id="new_password1" type="password" name="new_password1" placeholder="*****" />
+              <span class="tip-input">{% trans Password must be at least 2 characters %}</span>
             </li>
             <li class="field required password" id="field-new_password2">
-              <label for="new_password2">{% trans "Confirm Password" %}</label>
+              <label for="new_password2">{% trans "Retype Password" %}</label>
               <input id="new_password2" type="password" name="new_password2" placeholder="******" />
             </li>
           </ol>
         </fieldset>
 
         <div class="form-actions">
-          <button name="submit" type="submit" id="submit" class="action action-primary action-update">{% trans "Update My Details" %}</button>
+          <button name="submit" type="submit" id="submit" class="action action-primary action-update">{% trans "Submit" %}</button>
         </div>
       </form>
 
@@ -138,20 +149,6 @@
 
 
     </section>
-
-    <aside role="complementary">
-      <header>
-      <h3 class="sr">{% trans "Password Reset Help" %}</h3>
-      </header>
-
-      <div class="cta cta-help">
-        <h3>{% trans "Need Help?" %}</h3>
-        <p>
-          {% blocktrans with start_link='<a href="{{MKTG_URL_FAQ}}">' end_link='</a>' %}
-              View our {{ start_link }}help section for contact information and answers to commonly asked questions{{ end_link }}
-          {% endblocktrans %}
-        </p>
-      </div>
-    </aside>
   </section>
+</div>
 {% endblock %}
