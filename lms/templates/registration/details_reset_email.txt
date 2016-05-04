@@ -1,0 +1,17 @@
+{% load i18n %}{% load url from future %}{% autoescape off %}
+{% blocktrans %}You are receiving this email because you requested details about your account information at beta.bigdatauniversity.com.{% endblocktrans %}
+
+{% trans "Click the link below to see and update your account information or copy and paste the link into your browser" %}
+
+  {% block reset_link %}
+    {{ protocol }}://{{ site_name }}{% url 'student.views.details_reset_confirm_wrapper' uidb36=uid token=token %}
+  {% endblock %}
+
+{% trans "Happy learning!" %}
+
+{% blocktrans %}The {{ platform_name }} Team{% endblocktrans %}
+
+{% blocktrans %}Didn’t make this request? {% endblocktrans %}
+{% trans "If you didn’t make this request, please ignore this email." %}
+
+{% endautoescape %}
