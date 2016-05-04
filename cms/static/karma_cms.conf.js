@@ -29,7 +29,7 @@ var configModule = require(path.join(__dirname, '../../common/static/common/js/k
 var libraryFiles = [
     {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: false},
     {pattern: 'xmodule_js/common_static/js/src/utility.js', included: false},
-    {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: false},
+    {pattern: 'xmodule_js/common_static/common/js/vendor/jquery.js', included: true},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.cookie.js', included: false},
     {pattern: 'xmodule_js/common_static/js/vendor/jquery.simulate.js', included: false},
