@@ -349,8 +349,8 @@ To debug these tests on devstack in a local browser:
 
 Note: the port is also output to the console that you ran the tests from if you find that easier.
 
-These paver commands call through to a custom test runner. For more
-info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.
+These paver commands call through to Karma. For more
+info, see `karma-runner.github.io <https://karma-runner.github.io/>`__.
 
 Running Bok Choy Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
