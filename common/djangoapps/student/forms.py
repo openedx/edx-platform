@@ -310,7 +310,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
             }
             text_content = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
-            subject = text_content.replace('\n', '')
+            subject = "Beta Big Data University Account Information"
             template = loader.get_template(email_template_name)
             email = template.render(context)
             msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
