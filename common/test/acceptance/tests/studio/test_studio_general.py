@@ -3,7 +3,6 @@ Acceptance tests for Studio.
 """
 
 from bok_choy.web_app_test import WebAppTest
-from flaky import flaky
 
 from ...pages.studio.asset_index import AssetIndexPage
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -80,7 +79,8 @@ class CoursePagesTest(StudioCourseTest):
         self.pages = [
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
-                AssetIndexPage, CourseUpdatesPage,
+                # AssetIndexPage, # TODO: Skip testing this page due to FEDX-88
+                CourseUpdatesPage,
                 PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
                 AdvancedSettingsPage, GradingPage, TextbooksPage
             ]
@@ -95,7 +95,6 @@ class CoursePagesTest(StudioCourseTest):
         self.dashboard_page.visit()
         self.assertEqual(self.browser.current_url.strip('/').rsplit('/')[-1], 'home')
 
-    @flaky  # TODO: FEDX-88
     def test_page_existence(self):
         """
         Make sure that all these pages are accessible once you have a course.
