@@ -983,10 +983,10 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(data['HW 03'], '0.25')
         self.assertEqual(data['HW Avg'], '0.5')
 
-    @patch('courseware.views.render_to_response', intercept_renderer)
+    @patch('courseware.views.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
         self.course.enable_ccx = True
-        patch_context = patch('courseware.views.get_course_with_access')
+        patch_context = patch('courseware.views.views.get_course_with_access')
         get_course = patch_context.start()
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)

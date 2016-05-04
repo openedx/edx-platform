@@ -12,6 +12,7 @@ from microsite_configuration import microsite
 import auth_exchange.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
+from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
@@ -270,14 +271,14 @@ urlpatterns += (
         r'^courses/{}/jump_to/(?P<location>.*)$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.jump_to',
+        'courseware.views.views.jump_to',
         name='jump_to',
     ),
     url(
         r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.jump_to_id',
+        'courseware.views.views.jump_to_id',
         name='jump_to_id',
     ),
 
@@ -317,7 +318,7 @@ urlpatterns += (
     # Note: This is not an API. Compare this with the xblock_view API above.
     url(
         r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
-        'courseware.views.render_xblock',
+        'courseware.views.views.render_xblock',
         name='render_xblock',
     ),
 
@@ -361,7 +362,7 @@ urlpatterns += (
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.course_about',
+        'courseware.views.views.course_about',
         name='about_course',
     ),
 
@@ -370,14 +371,14 @@ urlpatterns += (
         r'^courses/{}/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.course_info',
+        'courseware.views.views.course_info',
         name='course_root',
     ),
     url(
         r'^courses/{}/info$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.course_info',
+        'courseware.views.views.course_info',
         name='info',
     ),
     # TODO arjun remove when custom tabs in place, see courseware/courses.py
@@ -385,7 +386,7 @@ urlpatterns += (
         r'^courses/{}/syllabus$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.syllabus',
+        'courseware.views.views.syllabus',
         name='syllabus',
     ),
 
@@ -394,7 +395,7 @@ urlpatterns += (
         r'^courses/{}/survey$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.course_survey',
+        'courseware.views.views.course_survey',
         name='course_survey',
     ),
 
@@ -462,28 +463,28 @@ urlpatterns += (
         r'^courses/{}/courseware/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_chapter',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_section',
     ),
     url(
         r'^courses/{}/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.index',
+        CoursewareIndex.as_view(),
         name='courseware_position',
     ),
 
@@ -491,7 +492,7 @@ urlpatterns += (
         r'^courses/{}/progress$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.progress',
+        'courseware.views.views.progress',
         name='progress',
     ),
     # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -499,7 +500,7 @@ urlpatterns += (
         r'^courses/{}/progress/(?P<student_id>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.progress',
+        'courseware.views.views.progress',
         name='student_progress',
     ),
 
@@ -611,7 +612,13 @@ urlpatterns += (
         'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
         name='cohort_discussion_topics',
     ),
-
+    url(
+        r'^courses/{}/verified_track_content/settings'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'verified_track_content.views.cohorting_settings',
+        name='verified_track_cohorting',
+    ),
     url(
         r'^courses/{}/notes$'.format(
             settings.COURSE_ID_PATTERN,
@@ -631,7 +638,7 @@ urlpatterns += (
         r'^courses/{}/lti_rest_endpoints/'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.get_course_lti_endpoints',
+        'courseware.views.views.get_course_lti_endpoints',
         name='lti_rest_endpoints',
     ),
 
@@ -696,7 +703,7 @@ urlpatterns += (
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.generate_user_cert',
+        'courseware.views.views.generate_user_cert',
         name='generate_user_cert',
     ),
 )
@@ -749,7 +756,7 @@ urlpatterns += (
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.static_tab',
+        'courseware.views.views.static_tab',
         name='static_tab',
     ),
 )
@@ -760,7 +767,7 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
             r'^courses/{}/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$'.format(
                 settings.COURSE_ID_PATTERN
             ),
-            'courseware.views.submission_history',
+            'courseware.views.views.submission_history',
             name='submission_history',
         ),
     )
@@ -993,17 +1000,17 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
     urlpatterns += (
         url(
             r'^financial-assistance/$',
-            'courseware.views.financial_assistance',
+            'courseware.views.views.financial_assistance',
             name='financial_assistance'
         ),
         url(
             r'^financial-assistance/apply/$',
-            'courseware.views.financial_assistance_form',
+            'courseware.views.views.financial_assistance_form',
             name='financial_assistance_form'
         ),
         url(
             r'^financial-assistance/submit/$',
-            'courseware.views.financial_assistance_request',
+            'courseware.views.views.financial_assistance_request',
             name='submit_financial_assistance_request'
         )
     )

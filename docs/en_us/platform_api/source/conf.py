@@ -44,7 +44,7 @@ MOCK_MODULES = [
     'courseware.access',
     'courseware.model_data',
     'courseware.module_render',
-    'courseware.views',
+    'courseware.views.views',
     'util.request',
     'eventtracking',
     'xmodule',

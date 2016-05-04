@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
@@ -15,7 +14,7 @@ from courseware.tabs import (
 )
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.views import get_static_tab_contents, static_tab
+from courseware.views.views import get_static_tab_contents, static_tab
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
@@ -272,7 +271,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
-        with patch('courseware.views.get_module') as mock_module_render:
+        with patch('courseware.views.views.get_module') as mock_module_render:
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
