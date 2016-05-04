@@ -31,7 +31,7 @@ var files = {
 
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
-        {pattern: 'js/**/!(*spec).js'},
+        {pattern: 'js/**/!(*spec|djangojs).js'},
         {pattern: 'support/js/**/!(*spec).js'},
         {pattern: 'teams/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/coffee/**/!(*spec).js'},

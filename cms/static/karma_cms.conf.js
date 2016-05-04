@@ -27,7 +27,7 @@ var files = {
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'common/js/**/!(*spec).js'},
-        {pattern: 'js/**/!(*spec).js'}
+        {pattern: 'js/**/!(*spec|djangojs).js'}
     ],
 
     specFiles: [
