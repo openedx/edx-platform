@@ -9,7 +9,7 @@ from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <div id="api-access-wrapper">
-  <h1 id="api-access-request-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>
+  <h1 id="api-header">${_("{platform_name} API Access Request").format(platform_name=settings.PLATFORM_NAME)}</h1>
   <div class="request-status request-${status}">
     <p id="api-access-status">
       % if status == ApiAccessRequest.PENDING:
@@ -41,11 +41,15 @@ from openedx.core.djangolib.markup import Text, HTML
       <p>${_('If you would like to regenerate your API client information, please use the form below.')}</p>
       
       % endif
-      <form id="api-form-fields" method="post" class="api-management-form">
-        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-        ${form.as_p() | n}
-        <input id="api-access-submit" type="submit" value="${_('Generate API client credentials')}"/>
-      </form>
+      <div class="catalog-body">
+        <div class="api-form-container">
+          <form id="api-form-fields" method="post" class="api-form">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            ${form.as_p() | n}
+            <input id="api-access-submit" type="submit" value="${_('Generate API client credentials')}"/>
+          </form>
+        </div>
+      </div>
       % endif
     </p>
 

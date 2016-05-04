@@ -2,14 +2,11 @@
 import logging
 
 from django.conf import settings
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.template import RequestContext
+from django.http.response import JsonResponse
+from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.decorators.cache import never_cache
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
@@ -18,11 +15,10 @@ from oauth2_provider.models import get_application_model
 from oauth2_provider.views import ApplicationRegistration
 
 from edxmako.shortcuts import render_to_response
-from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.api_admin.decorators import require_api_access
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.lib.token_utils import get_asymmetric_token
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
+from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
 
 log = logging.getLogger(__name__)
 
@@ -123,72 +119,110 @@ class ApiTosView(TemplateView):
     template_name = 'api_admin/terms_of_service.html'
 
 
-@never_cache
-@staff_member_required
-def catalog_changelist(request):
-    # TODO: get catalogs
-    catalogs = [
-        {
-            'id': '1',
-            'name': 'test1',
-            'query': '*'
-        }
-    ]
-    return render(
-        RequestContext(request),
-        'api_admin/catalog_changelist.html',
-        {
+class CatalogSearchView(View):
+    """View to search for catalogs belonging to a user."""
+
+    def get(self, request):
+        """Display a form to search for catalogs belonging to a user."""
+        return render_to_response('api_admin/catalogs/search.html')
+
+    def post(self, request):
+        """Redirect to the list view for the given user."""
+        username = request.POST.get('username')
+        # If no username is provided, bounce back to this page.
+        if not username:
+            return redirect(reverse('api_admin:catalog-search'))
+        return redirect(reverse('api_admin:catalog-list', kwargs={'username': username}))
+
+
+class CatalogListView(View):
+    """View to list existing catalogs and create new ones."""
+
+    template = 'api_admin/catalogs/list.html'
+
+    def get(self, request, username):
+        """Display a list of a user's catalogs."""
+        client = course_discovery_api_client(request.user)
+        response = client.api.v1.catalogs.get(username=username)
+        catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
+        return render_to_response(self.template, {
+            'username': username,
             'catalogs': catalogs,
-        }
-    )
+            'form': CatalogForm(initial={'viewers': [username]}),
+            'preview_url': reverse('api_admin:catalog-preview'),
+            'catalog_api_url': client.api.v1.courses.url(),
+        })
 
-
-@never_cache
-@staff_member_required
-def catalog_changeform(request, id=None):
-    # import pdb; pdb.set_trace()
-    if request.method == 'POST':
+    def post(self, request, username):
+        """Create a new catalog for a user."""
         form = CatalogForm(request.POST)
-        change = False
-        if form.is_valid():
-            if id is None:
-                log.info("CREATE NEW CATALOGUE")  # create new catalog
-            else:
-                change = True
-                log.info("UPDATE CATALOGUE")  # update catalog
-            return HttpResponseRedirect('..')
-    else:
-        if id is None:  # Create new catalog
-            change = False
-            form = CatalogForm()
-        else:  # Update existing catalog
-            change = True
-            catalog = {
-                'id': '2',
-                'name': 'test2',
-                'query': 'test*'
-            }  # Get catalogs
+        client = course_discovery_api_client(request.user)
 
-            form = CatalogForm(catalog)
-            # del form.fields['hidden_field']
-    return render(
-        request,
-        'api_admin/catalog_changeform.html',
-        {
-            'change': change,
+        if not form.is_valid():
+            response = client.api.v1.catalogs.get(username=username)
+            catalogs = [Catalog(attributes=catalog) for catalog in response['results']]
+            return render_to_response(self.template, {
+                'form': form,
+                'catalogs': catalogs,
+                'username': username,
+                'preview_url': reverse('api_admin:catalog-preview'),
+                'catalog_api_url': client.api.v1.courses.url(),
+            }, status=400)
+
+        attrs = form.instance.attributes
+        catalog = client.api.v1.catalogs.post(attrs)
+        return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
+
+
+class CatalogEditView(View):
+    """View to edit an individual catalog."""
+
+    def get(self, request, catalog_id):
+        """Display a form to edit this catalog."""
+        client = course_discovery_api_client(request.user)
+        response = client.api.v1.catalogs(catalog_id).get()
+        catalog = Catalog(attributes=response)
+        form = CatalogForm(instance=catalog)
+        return render_to_response('api_admin/catalogs/edit.html', {
+            'catalog': catalog,
             'form': form,
-        }
-    )
+            'preview_url': reverse('api_admin:catalog-preview'),
+            'catalog_api_url': client.api.v1.courses.url(),
+        })
+
+    def post(self, request, catalog_id):
+        """Update or delete this catalog."""
+        client = course_discovery_api_client(request.user)
+        if request.POST.get('delete-catalog') == 'on':
+            client.api.v1.catalogs(catalog_id).delete()
+            return redirect(reverse('api_admin:catalog-search'))
+        form = CatalogForm(request.POST)
+        if not form.is_valid():
+            response = client.api.v1.catalogs(catalog_id).get()
+            catalog = Catalog(attributes=response)
+            return render_to_response('api_admin/catalogs/edit.html', {
+                'catalog': catalog,
+                'form': form,
+                'preview_url': reverse('api_admin:catalog-preview'),
+                'catalog_api_url': client.api.v1.courses.url(),
+            }, status=400)
+        catalog = client.api.v1.catalogs(catalog_id).patch(form.instance.attributes)
+        return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
 
-def catalog_client(user):
-    token = get_asymmetric_token(user, 'course-discovery')
-    return EdxRestApiClient(
-        "http://18.111.106.34:8008/api/v1/",
-        jwt=token
-    )
+class CatalogPreviewView(View):
+    """Endpoint to preview courses for a query."""
 
-# from openedx.core.djangoapps.api_admin.views import catalog_client
-# from django.contrib.auth.models import User
-# user = User.objects.all()[1]
-# c = catalog_client(user)
+    def get(self, request):
+        """
+        Return the results of a query against the course catalog API. If no
+        query parameter is given, returns an empty result set.
+        """
+        client = course_discovery_api_client(request.user)
+        # Just pass along the request params including limit/offset pagination
+        if 'q' in request.GET:
+            results = client.api.v1.courses.get(**request.GET)
+        # Ensure that we don't just return all the courses if no query is given
+        else:
+            results = {'count': 0, 'results': [], 'next': None, 'prev': None}
+        return JsonResponse(results)

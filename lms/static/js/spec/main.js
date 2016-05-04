@@ -769,7 +769,8 @@
         'js/spec/learner_dashboard/sidebar_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/certificate_view_spec.js',
-        'js/spec/commerce/receipt_spec.js'
+        'js/spec/commerce/receipt_spec.js',
+        'js/spec/api_admin/catalog_preview_spec.js',
     ];
 
     for (var i = 0; i < testFiles.length; i++) {
