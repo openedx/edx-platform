@@ -36,7 +36,7 @@ var files = {
         {pattern: 'xmodule_js/src/xmodule.js', included: true},
 
         {pattern: 'xmodule_js/common_static/js/vendor/jasmine-imagediff.js', included: true},
-        {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true}
+        {pattern: 'common/js/spec_helpers/jasmine-extensions.js', included: true}
     ],
 
     libraryFiles: [

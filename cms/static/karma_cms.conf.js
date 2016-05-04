@@ -8,10 +8,6 @@ var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var files = {
-    libraryFilesToInclude: [
-        {pattern: 'xmodule_js/common_static/js/libs/jasmine-extensions.js', included: true}
-    ],
-
     libraryFiles: [
         {pattern: 'edx-pattern-library/js/**/*.js'},
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
@@ -19,9 +15,6 @@ var files = {
         {pattern: 'xmodule_js/common_static/common/js/vendor/**/*.js'},
         {pattern: 'xmodule_js/common_static/js/**/*.js'},
         {pattern: 'xmodule_js/src/xmodule.js'},
-
-        {pattern: 'xmodule_js/common_static/js/libs/jasmine-stealth.js'},
-        {pattern: 'xmodule_js/common_static/js/libs/jasmine-waituntil.js'}
     ],
 
     sourceFiles: [

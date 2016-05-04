@@ -34,10 +34,7 @@
             'modernizr': 'edx-pattern-library/js/modernizr-custom',
             'afontgarde': 'edx-pattern-library/js/afontgarde',
             'edxicons': 'edx-pattern-library/js/edx-icons',
-            'draggabilly': 'js/vendor/draggabilly',
-            'jasmine-stealth': 'js/libs/jasmine-stealth',
-            'jasmine-waituntil': 'js/libs/jasmine-waituntil',
-            'jasmine-extensions': 'js/libs/jasmine-extensions'
+            'draggabilly': 'js/vendor/draggabilly'
         },
         shim: {
             'gettext': {
@@ -140,13 +137,13 @@
                 exports: 'URI'
             },
             'jasmine-imagediff': {},
-            'jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
-            },
-            'jasmine-waituntil': {
+            'common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'jasmine-extensions': {
+            'common/js/spec_helpers/jasmine-stealth': {
+                deps: ['underscore', 'underscore.string']
+            },
+            'common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             "sinon": {
@@ -178,7 +175,13 @@
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    window.requireSerial(testFiles, function () {
+    var specHelpers = [
+        'common/js/spec_helpers/jasmine-extensions',
+        'common/js/spec_helpers/jasmine-stealth',
+        'common/js/spec_helpers/jasmine-waituntil'
+    ];
+
+    window.requireSerial(specHelpers.concat(testFiles), function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });

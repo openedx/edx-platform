@@ -9,10 +9,6 @@ var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var files = {
-    libraryFilesToInclude: [
-        {pattern: 'js/libs/jasmine-extensions.js', included: true}
-    ],
-
     libraryFiles: [
         {pattern: 'coffee/src/**/*.js'},
         {pattern: 'common/js/spec_helpers/**/*.js'},

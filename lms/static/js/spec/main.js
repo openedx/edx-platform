@@ -46,9 +46,6 @@
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
-            'jasmine-waituntil': 'xmodule_js/common_static/js/libs/jasmine-waituntil',
-            'jasmine-extensions': 'xmodule_js/common_static/js/libs/jasmine-extensions',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
@@ -260,13 +257,13 @@
                 exports: 'sinon'
             },
             'jasmine-imagediff': {},
-            'jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
-            },
-            'jasmine-waituntil': {
+            'common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'jasmine-extensions': {
+            'common/js/spec_helpers/jasmine-stealth': {
+                deps: ['underscore', 'underscore.string']
+            },
+            'common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             'xblock/core': {
@@ -777,11 +774,16 @@
         testFiles[i] = '/base/' + testFiles[i];
     }
 
+    var specHelpers = [
+        'common/js/spec_helpers/jasmine-extensions',
+        'common/js/spec_helpers/jasmine-stealth',
+        'common/js/spec_helpers/jasmine-waituntil'
+    ];
+
     // Jasmine has a global stack for creating a tree of specs. We need to load
     // spec files one by one, otherwise some end up getting nested under others.
-    window.requireSerial(testFiles, function () {
+    window.requireSerial(specHelpers.concat(testFiles), function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });
-
 }).call(this, requirejs, define);

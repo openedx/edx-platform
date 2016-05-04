@@ -39,8 +39,8 @@ var files = {
         {pattern: 'src/word_cloud/d3.min.js', included: true},
 
         {pattern: 'common_static/js/vendor/jasmine-imagediff.js', included: true},
-        {pattern: 'common_static/js/libs/jasmine-waituntil.js', included: true},
-        {pattern: 'common_static/js/libs/jasmine-extensions.js', included: true},
+        {pattern: 'common_static/common/js/spec_helpers/jasmine-waituntil.js', included: true},
+        {pattern: 'common_static/common/js/spec_helpers/jasmine-extensions.js', included: true},
         {pattern: 'common_static/js/vendor/sinon-1.17.0.js', included: true}
     ],
 

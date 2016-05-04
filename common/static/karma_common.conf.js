@@ -31,8 +31,8 @@ var files = {
         {pattern: 'edx-pattern-library/js/edx-icons.js', included: true},
 
         {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
-        {pattern: 'js/libs/jasmine-waituntil.js', included: true},
-        {pattern: 'js/libs/jasmine-extensions.js', included: true}
+        {pattern: 'common/js/spec_helpers/jasmine-extensions.js', included: true},
+        {pattern: 'common/js/spec_helpers/jasmine-waituntil.js', included: true}
     ],
 
     libraryFiles: [
