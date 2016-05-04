@@ -71,7 +71,7 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
         },
 
         handleValidationError : function(model, error) {
-            var ele = this.$el.find('#course-update-list li[name=\"'+model.cid+'\"');
+            var ele = this.$el.find('#course-update-list li[name=\"'+model.cid+'\"]');
             $(ele).find('.message-error').remove();
             for (var field in error) {
                 if (error.hasOwnProperty(field)) {
@@ -86,7 +86,7 @@ define(["js/views/validation", "codemirror", "js/models/course_update",
 
         validateModel: function(model) {
             if (model.isValid()) {
-                var ele = this.$el.find('#course-update-list li[name=\"' + model.cid + '\"');
+                var ele = this.$el.find('#course-update-list li[name=\"' + model.cid + '\"]');
                 $(ele).find('.message-error').remove();
                 $(ele).find('.save-button').removeClass('is-disabled');
             }

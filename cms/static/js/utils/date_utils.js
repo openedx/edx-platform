@@ -15,21 +15,13 @@ function($, date, TriggerChangeEventOnEnter) {
         var timefield = $(div).find("input.time");
         var cacheview = view;
         var setfield = function (event) {
-            var newVal = getDate(datefield, timefield),
-                oldTime = new Date(cacheModel.get(fieldName)).getTime();
-            if (newVal) {
-                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
-                    cacheview.clearValidationErrors();
-                    cacheview.setAndValidate(fieldName, newVal, event);
-                }
-            }
-            else {
-                // Clear date (note that this clears the time as well, as date and time are linked).
-                // Note also that the validation logic prevents us from clearing the start date
-                // (start date is required by the back end).
-                cacheview.clearValidationErrors();
-                cacheview.setAndValidate(fieldName, null, event);
-            }
+            var newVal = getDate(datefield, timefield);
+
+            // Setting to null clears the time as well, as date and time are linked.
+            // Note also that the validation logic prevents us from clearing the start date
+            // (start date is required by the back end).
+            cacheview.clearValidationErrors();
+            cacheview.setAndValidate(fieldName, (newVal || null), event);
         };
 
         // instrument as date and time pickers

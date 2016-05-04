@@ -98,15 +98,9 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     @courseInfoEdit.onNew(@event)
                     expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
                     @courseInfoEdit.$el.find('input.date').val(value).trigger("change")
-                    courseInfoEdit = @courseInfoEdit
-                    jasmine.waitUntil(->
-                        courseInfoEdit.$el.find('.save-button').hasClass('is-disabled') == true
-                    ).then ->
-                        courseInfoEdit.$el.find('input.date').val('01/01/16').trigger 'change'
-                        jasmine.waitUntil(->
-                            courseInfoEdit.$el.find('.save-button').hasClass('is-disabled') == false
-                        ).always done
-                    return
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+                    @courseInfoEdit.$el.find('input.date').val("01/01/16").trigger("change")
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
 
                 cancelEditingUpdate = (update, modalCover, useCancelButton) ->
                     if useCancelButton
