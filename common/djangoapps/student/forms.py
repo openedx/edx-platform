@@ -98,6 +98,7 @@ class TrueCheckbox(widgets.CheckboxInput):
     """
     A checkbox widget that only accepts "true" (case-insensitive) as true.
     """
+
     def value_from_datadict(self, data, files, name):
         value = data.get(name, '')
         return value.lower() == 'true'
@@ -260,7 +261,7 @@ class AccountCreationForm(forms.Form):
             records = dns.resolver.query(domain, 'MX')
             mx_record = records[0].exchange
             mx_record = str(mx_record)
-        except BaseException:
+        except (BaseException, StandardError):
             raise ValidationError(
                 u"Email domain '{domain}' doesn't exist".format(domain=domain)
             )
@@ -271,6 +272,7 @@ class AccountCreationForm(forms.Form):
             # SMTP lib setup (use debug level for full output)
             server = smtplib.SMTP()
             server.set_debuglevel(0)
+            server.timeout = 10
 
             # SMTP Conversation
             server.connect(mx_record)
@@ -283,7 +285,7 @@ class AccountCreationForm(forms.Form):
                 raise ValidationError(
                     u"Email '{email}' doesn't exist".format(email=email)
                 )
-        except BaseException:
+        except (BaseException, StandardError):
             pass
 
     def clean_email(self):
