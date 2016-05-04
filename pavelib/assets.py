@@ -47,7 +47,8 @@ SASS_LOAD_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'underscore/underscore.js',
     'underscore.string/dist/underscore.string.js',
-    'picturefill/dist/picturefill.min.js'
+    'picturefill/dist/picturefill.js',
+    'backbone/backbone.js',
 ]
 
 # Directory to install static vendor files

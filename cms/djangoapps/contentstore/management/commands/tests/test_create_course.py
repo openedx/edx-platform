@@ -29,10 +29,6 @@ class TestArgParsing(unittest.TestCase):
         with self.assertRaises(CommandError):
             self.command.handle("foo", "user@foo.org", "org", "course", "run")
 
-    def test_xml_store(self):
-        with self.assertRaises(CommandError):
-            self.command.handle(ModuleStoreEnum.Type.xml, "user@foo.org", "org", "course", "run")
-
     def test_nonexistent_user_id(self):
         errstring = "No user 99 found"
         with self.assertRaisesRegexp(CommandError, errstring):

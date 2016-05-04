@@ -787,6 +787,15 @@
         &:empty {
           margin-bottom: 0;
         }
+        
+        &.spacing:last-of-type {
+            position: relative;
+            
+            .transcript-end {
+                position: absolute;
+                bottom: 0;
+            }
+        }
       }
     }
   }

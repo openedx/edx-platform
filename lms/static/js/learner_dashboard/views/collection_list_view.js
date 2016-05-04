@@ -13,6 +13,7 @@
                   gettext,
                   emptyProgramsListTpl) {
             return Backbone.View.extend({
+
                 initialize: function(data) {
                     this.childView = data.childView;
                     this.context = data.context;
@@ -29,10 +30,15 @@
                         }
                     } else {
                         childList = [];
-                        this.collection.each(function (program) {
-                            var child = new this.childView({model: program});
+
+                        this.collection.each(function(model) {
+                            var child = new this.childView({
+                                model: model,
+                                context: this.context
+                            });
                             childList.push(child.el);
                         }, this);
+
                         this.$el.html(childList);
                     }
                 }

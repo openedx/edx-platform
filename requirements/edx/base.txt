@@ -67,7 +67,7 @@ oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
 piexif==1.0.2
-Pillow==2.7.0
+Pillow==3.1.1
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
@@ -119,7 +119,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.56.0.42
+newrelic==2.64.0.48
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -140,7 +140,7 @@ django_debug_toolbar==1.3.2
 
 # Used for testing
 before_after==0.1.3
-bok-choy==0.5.1
+bok-choy==0.5.2
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
@@ -163,7 +163,7 @@ python-subunit==0.0.16
 pyquery==1.2.9
 radon==1.2
 rednose==0.4.3
-selenium==2.42.1
+selenium==2.53.1
 splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0

@@ -8508,7 +8508,6 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Mot de passe"
@@ -9102,11 +9101,7 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "Format incorrect pour le champ  '{name}'. {detailed_message}"
 
-#: cms/lib/xblock/tagging.py
-msgid "Difficulty"
-msgstr ""
-
-#: cms/lib/xblock/tagging.py
+#: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr ""
 
@@ -9183,28 +9178,10 @@ msgstr "Cours"
 msgid "Programs"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "Se Connecter"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -9216,14 +9193,13 @@ msgstr "E-mail"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "exemple : jean.dupont@domaine.com"
 
 #: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "Mot de passe oublié ?"
 
@@ -9449,12 +9425,13 @@ msgid "My Courses"
 msgstr "Mes Cours"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "Apparemment, vous n'êtes inscrit à aucun cours."
+msgid "You are not enrolled in any courses yet."
+msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr "Découvrir nos cours"
+#: lms/templates/dashboard.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Explore courses"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -10033,8 +10010,7 @@ msgstr ""
 msgid "How it Works"
 msgstr "Comment ça marche"
 
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "Trouver un cours"
@@ -18632,6 +18608,22 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "En savoir plus à propos des bibliothèques de contenu"
+
+#: cms/templates/login.html cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"

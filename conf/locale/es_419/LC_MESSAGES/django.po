@@ -119,7 +119,7 @@
 # Ned Batchelder <ned@edx.org>, 2016
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
-# paul ochoa <palichis@solid-ec.org>, 2015
+# palichis <palichis@solid-ec.org>, 2015
 # Etna Pretelín Ricárdez, 2014
 # Rubén Torres <r.torres@usal.es>, 2015
 # Santiago Salkin <salkin.santiago@gmail.com>, 2014
@@ -159,7 +159,7 @@
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
-# paul ochoa <palichis@solid-ec.org>, 2015
+# palichis <palichis@solid-ec.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
@@ -9640,7 +9640,6 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Contraseña"
@@ -10246,11 +10245,7 @@ msgstr ""
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "Formato incorrecto para el campo '{name}'. {detailed_message}"
 
-#: cms/lib/xblock/tagging.py
-msgid "Difficulty"
-msgstr "Dificultad"
-
-#: cms/lib/xblock/tagging.py
+#: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "Diccionario con etiquetas disponibles"
 
@@ -10327,28 +10322,10 @@ msgstr "Cursos"
 msgid "Programs"
 msgstr "Programas"
 
-#: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
-msgid "Sign In"
-msgstr "Iniciar sesión"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "Iniciar sesión en {studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "¿No tiene una cuenta de {studio_name} aún? Regístrese!"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "Información requerida para iniciar sesión en {studio_name}"
-
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -10360,14 +10337,13 @@ msgstr "Correo electrónico"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "ejemplo: usuario@dominio.com"
 
 #: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "¿Olvidó su contraseña?"
 
@@ -10592,12 +10568,13 @@ msgid "My Courses"
 msgstr "Mis cursos"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Looks like you haven't enrolled in any courses yet."
-msgstr "Parece que aún no se ha registrado en un curso."
+msgid "You are not enrolled in any courses yet."
+msgstr "No se encuentra inscrito en ningún curso aún."
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "Find courses now!"
-msgstr "¡Busca cursos ahora!"
+#: lms/templates/dashboard.html lms/templates/navigation.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Explore courses"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -11184,8 +11161,7 @@ msgstr "{platform_name} Página de inicio"
 msgid "How it Works"
 msgstr "Cómo funciona"
 
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Find Courses"
 msgstr "Buscar Cursos"
@@ -11972,7 +11948,7 @@ msgstr "Número total de palabras:"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
-msgstr ""
+msgstr "Solicitud de acceso a la API"
 
 #: lms/templates/api_admin/api_access_request_form.html
 #: lms/templates/api_admin/status.html
@@ -12023,7 +11999,7 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
-msgstr ""
+msgstr "Acceso a la API"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -20324,6 +20300,22 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "Aprender más acerca de los contenidos de las bibliotecas"
+
+#: cms/templates/login.html cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr ""
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"

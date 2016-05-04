@@ -7,13 +7,12 @@ from xmodule.modulestore.django import modulestore
 from django.core.urlresolvers import reverse
 
 
-def get_redirect_url(course_key, usage_key, child=None):
+def get_redirect_url(course_key, usage_key):
     """ Returns the redirect url back to courseware
 
     Args:
         course_id(str): Course Id string
         location(str): The location id of course component
-        child(str): Optional child parameter to pass to the URL
 
     Raises:
         ItemNotFoundError if no data at the location or NoPathToItem if location not in any class
@@ -50,8 +49,4 @@ def get_redirect_url(course_key, usage_key, child=None):
         )
 
     redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
-
-    if child:
-        redirect_url += "&child={}".format(child)
-
     return redirect_url

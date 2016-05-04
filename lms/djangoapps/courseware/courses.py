@@ -453,10 +453,8 @@ def get_studio_url(course, page):
     Args:
         course (CourseDescriptor)
     """
-    is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml
     studio_link = None
-    if is_studio_course and is_mongo_course:
+    if course.course_edit_method == "Studio":
         studio_link = get_cms_course_link(course, page)
     return studio_link
 

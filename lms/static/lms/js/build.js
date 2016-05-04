@@ -23,6 +23,7 @@
             'js/edxnotes/views/page_factory',
             'js/financial-assistance/financial_assistance_form_factory',
             'js/groups/views/cohorts_dashboard_factory',
+            'js/header_factory',
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',
             'js/student_account/logistration_factory',

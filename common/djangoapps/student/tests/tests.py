@@ -11,6 +11,7 @@ from urlparse import urljoin
 import pytz
 from markupsafe import escape
 from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery as pq
 
@@ -888,6 +889,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 
 
 # TODO: Clean up these tests so that they use the ProgramsDataMixin.
+@attr('shard_3')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
@@ -925,7 +927,6 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             programs[unicode(course)] = [{
                 'id': _id,
                 'category': self.category,
-                'display_category': self.display_category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
                 'status': program_status,
@@ -968,7 +969,6 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 u'edx/demox/Run_1': [{
                     'id': 0,
                     'category': self.category,
-                    'display_category': self.display_category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
                     'status': program_status,

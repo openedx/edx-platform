@@ -1713,6 +1713,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 )
             )
 
+    def test_country_overrides(self):
+        """Test that overridden countries are available in country list."""
+        # Retrieve the registration form description
+        with override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"}):
+            response = self.client.get(self.url)
+            self.assertHttpOK(response)
+
+        self.assertContains(response, 'Kosovo')
+
 
 @httpretty.activate
 @ddt.ddt

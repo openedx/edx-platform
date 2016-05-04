@@ -29,7 +29,7 @@ requirejs.config({
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
         "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
         "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
-        "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
+        "backbone": "xmodule_js/common_static/common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
@@ -283,6 +283,8 @@ while i < testFiles.length
     testFiles[i] = '/base/' + testFiles[i] + '.js'
     i++
 
-require testFiles, ->
+# Jasmine has a global stack for creating a tree of specs. We need to load
+# spec files one by one, otherwise some end up getting nested under others.
+requireSerial testFiles, ->
 # start test run, once Require.js is done
     window.__karma__.start()

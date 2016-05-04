@@ -59,7 +59,7 @@
             "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
             "text": "js/vendor/requirejs/text",
             "logger": "js/src/logger",
-            "backbone": "js/vendor/backbone-min",
+            "backbone": "common/js/vendor/backbone",
             "backbone-super": "js/vendor/backbone-super",
             "backbone.paginator": "js/vendor/backbone.paginator.min",
             "underscore": "common/js/vendor/underscore",
@@ -100,7 +100,7 @@
             "handlebars": "js/vendor/ova/catch/js/handlebars-1.1.2",
             "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
             "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
-            "picturefill": "common/js/vendor/picturefill.min"
+            "picturefill": "common/js/vendor/picturefill"
             // end of files needed by OVA
         },
         shim: {

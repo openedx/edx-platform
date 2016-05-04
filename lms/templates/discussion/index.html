@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 
 <%block name="bodyclass">discussion</%block>
 <%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
-<%block name="nav_skip">#discussion-container</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -39,13 +38,14 @@ from django.core.urlresolvers import reverse
          data-sort-preference="${sort_preference | h}"
          data-flag-moderator="${flag_moderator | h}"
          data-user-cohort-id="${user_cohort | h}"
-         data-course-settings="${course_settings | h}"
-         tabindex="-1">
+         data-course-settings="${course_settings | h}">
     <div class="discussion-body">
         <div class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}"></div>
-        <div class="discussion-column" role="main" aria-label="Discussion" id="discussion-column">
-          <article class="new-post-article" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
-          <div class="forum-content"></div>
+        <div class="discussion-column" id="discussion-column">
+            <main id="main" aria-label="Content" tabindex="-1">
+                <article class="new-post-article" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
+                <div class="forum-content"></div>
+            </main>
         </div>
     </div>
 </section>

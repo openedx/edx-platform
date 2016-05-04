@@ -2,10 +2,14 @@
 """
 End-to-end tests for the LMS.
 """
-from nose.plugins.attrib import attr
 
-from ..helpers import UniqueCourseTest
+import json
+from nose.plugins.attrib import attr
+from datetime import datetime, timedelta
+import ddt
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from ..helpers import UniqueCourseTest, EventsTestMixin
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -66,7 +70,7 @@ class CoursewareTest(UniqueCourseTest):
         Open problem page with assertion.
         """
         self.courseware_page.visit()
-        self.problem_page = ProblemPage(self.browser)
+        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
     def _create_breadcrumb(self, index):
@@ -96,7 +100,7 @@ class CoursewareTest(UniqueCourseTest):
         self.course_outline.visit()
 
         # Set release date for subsection in future.
-        self.course_outline.change_problem_release_date_in_studio()
+        self.course_outline.change_problem_release_date()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -125,6 +129,7 @@ class CoursewareTest(UniqueCourseTest):
             self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
+@ddt.ddt
 class ProctoredExamTest(UniqueCourseTest):
     """
     Test courseware.
@@ -244,7 +249,8 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
 
-    def test_timed_exam_flow(self):
+    @ddt.data(True, False)
+    def test_timed_exam_flow(self, hide_after_due):
         """
         Given that I am a staff member on the exam settings section
         select advanced settings tab
@@ -253,6 +259,12 @@ class ProctoredExamTest(UniqueCourseTest):
         And visit the courseware as a verified student.
         And I start the timed exam
         Then I am taken to the exam with a timer bar showing
+        When I finish the exam
+        Then I see the exam submitted dialog in place of the exam
+        When I log back into studio as a staff member
+        And change the problem's due date to be in the past
+        And log back in as the original verified student
+        Then I see the exam or message in accordance with the hide_after_due setting
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -260,7 +272,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.course_outline.open_subsection_settings_dialog()
 
         self.course_outline.select_advanced_tab()
-        self.course_outline.make_exam_timed()
+        self.course_outline.make_exam_timed(hide_after_due=hide_after_due)
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
@@ -269,14 +281,32 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.start_timed_exam()
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
-    def test_time_allotted_field_is_not_visible_with_none_exam(self):
+        self.courseware_page.stop_timed_exam()
+        self.assertTrue(self.courseware_page.has_submitted_exam_message())
+
+        LogoutPage(self.browser).visit()
+        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
+        self.course_outline.visit()
+        last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
+        self.course_outline.change_problem_due_date(last_week)
+
+        LogoutPage(self.browser).visit()
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_page.visit()
+        self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
+
+    def test_field_visiblity_with_all_exam_types(self):
         """
         Given that I am a staff member
         And I have visited the course outline page in studio.
         And the subsection edit dialog is open
         select advanced settings tab
-        When I select the 'None' exams radio button
-        Then the time allotted text field becomes invisible
+        For each of None, Timed, Proctored, and Practice exam types
+        The time allotted, review rules, and hide after due fields have proper visibility
+        None: False, False, False
+        Timed: True, False, True
+        Proctored: True, True, False
+        Practice: True, False, False
         """
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
@@ -287,114 +317,26 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.course_outline.select_none_exam()
         self.assertFalse(self.course_outline.time_allotted_field_visible())
-
-    def test_time_allotted_field_is_visible_with_timed_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the timed exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_timed_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
-
-    def test_time_allotted_field_is_visible_with_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the proctored exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertTrue(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
-
-    def test_exam_review_rules_field_is_visible_with_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the proctored exams radio button
-        Then the review rules textarea field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
-
-        self.course_outline.select_proctored_exam()
         self.assertTrue(self.course_outline.exam_review_rules_field_visible())
-
-    def test_exam_review_rules_field_is_not_visible_with_other_than_proctored_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the timed exams radio button
-        Then the review rules textarea field is not visible
-        When I select the none exam radio button
-        Then the review rules textarea field is not visible
-        When I select the practice exam radio button
-        Then the review rules textarea field is not visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
-
-        self.course_outline.select_timed_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-        self.course_outline.select_none_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-        self.course_outline.select_practice_exam()
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
-
-    def test_time_allotted_field_is_visible_with_practice_exam(self):
-        """
-        Given that I am a staff member
-        And I have visited the course outline page in studio.
-        And the subsection edit dialog is open
-        select advanced settings tab
-        When I select the practice exams radio button
-        Then the time allotted text field becomes visible
-        """
-        LogoutPage(self.browser).visit()
-        self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
-
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
         self.course_outline.select_practice_exam()
         self.assertTrue(self.course_outline.time_allotted_field_visible())
+        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.assertFalse(self.course_outline.hide_after_due_field_visible())
 
 
-class CoursewareMultipleVerticalsTest(UniqueCourseTest):
+class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
     """
     Test courseware with multiple verticals
     """
@@ -430,11 +372,19 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
                 XBlockFixtureDesc('sequential', 'Test Subsection 1,2').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 3', data='<problem>problem 3 dummy body</problem>'),
                 ),
+                XBlockFixtureDesc(
+                    'sequential', 'Test HIDDEN Subsection', metadata={'visible_to_staff_only': True}
+                ).add_children(
+                    XBlockFixtureDesc('problem', 'Test HIDDEN Problem', data='<problem>hidden problem</problem>'),
+                ),
             ),
             XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 2,1').add_children(
                     XBlockFixtureDesc('problem', 'Test Problem 4', data='<problem>problem 4 dummy body</problem>'),
                 ),
+            ),
+            XBlockFixtureDesc('chapter', 'Test HIDDEN Section', metadata={'visible_to_staff_only': True}).add_children(
+                XBlockFixtureDesc('sequential', 'Test HIDDEN Subsection'),
             ),
         ).install()
 
@@ -475,6 +425,87 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest):
         # previous takes us to previous tab in sequential
         self.courseware_page.click_previous_button_on_bottom()
         self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 2, next_enabled=True, prev_enabled=True)
+
+        # test UI events emitted by navigation
+        filter_sequence_ui_event = lambda event: event.get('name', '').startswith('edx.ui.lms.sequence.')
+
+        sequence_ui_events = self.wait_for_events(event_filter=filter_sequence_ui_event, timeout=2)
+        legacy_events = [ev for ev in sequence_ui_events if ev['event_type'] in {'seq_next', 'seq_prev', 'seq_goto'}]
+        nonlegacy_events = [ev for ev in sequence_ui_events if ev not in legacy_events]
+
+        self.assertTrue(all('old' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertTrue(all('new' in json.loads(ev['event']) for ev in legacy_events))
+        self.assertFalse(any('old' in json.loads(ev['event']) for ev in nonlegacy_events))
+        self.assertFalse(any('new' in json.loads(ev['event']) for ev in nonlegacy_events))
+
+        self.assert_events_match(
+            [
+                {
+                    'event_type': 'seq_next',
+                    'event': {
+                        'old': 1,
+                        'new': 2,
+                        'current_tab': 1,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'seq_goto',
+                    'event': {
+                        'old': 2,
+                        'new': 4,
+                        'current_tab': 2,
+                        'target_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.next_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'top',
+                    }
+                },
+                {
+                    'event_type': 'edx.ui.lms.sequence.previous_selected',
+                    'event': {
+                        'current_tab': 1,
+                        'tab_count': 1,
+                        'widget_placement': 'bottom',
+                    }
+                },
+                {
+                    'event_type': 'seq_prev',
+                    'event': {
+                        'old': 4,
+                        'new': 3,
+                        'current_tab': 4,
+                        'tab_count': 4,
+                        'widget_placement': 'bottom',
+                    }
+                },
+            ],
+            sequence_ui_events
+        )
 
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled

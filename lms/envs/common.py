@@ -458,7 +458,13 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
 OAUTH2_PROVIDER = {
-    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator'
+    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'email': 'Email scope',
+        'profile': 'Profile scope',
+    }
 }
 
 ################################## TEMPLATE CONFIGURATION #####################################
@@ -625,7 +631,7 @@ EVENT_TRACKING_BACKENDS = {
             },
             'processors': [
                 {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.VideoEventProcessor'}
+                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -738,14 +744,6 @@ MODULESTORE = {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
                         'render_template': 'edxmako.shortcuts.render_to_string',
-                    }
-                },
-                {
-                    'NAME': 'xml',
-                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                    'OPTIONS': {
-                        'data_dir': DATA_DIR,
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                     }
                 }
             ]
@@ -1251,8 +1249,7 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
-    'js/vendor/underscore.string.min.js',
-    'common/js/vendor/picturefill.min.js',
+    'common/js/vendor/picturefill.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -1263,7 +1260,7 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'js/vendor/backbone-min.js',
+    'common/js/vendor/backbone.js',
     'edx-pattern-library/js/modernizr-custom.js',
 ]
 
@@ -2587,6 +2584,7 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     # Taiwan is specifically not translated to avoid it being translated as "Taiwan (Province of China)"
     "TW": "Taiwan",
+    'XK': _('Kosovo'),
 }
 
 # which access.py permission name to check in order to determine if a course is visible in

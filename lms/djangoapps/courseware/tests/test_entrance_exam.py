@@ -38,7 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr('shard_1')
+@attr('shard_2')
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
@@ -583,7 +583,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.request.user,
             self.entrance_exam
         )
-        return toc_for_course(
+        toc, __, __ = toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -591,6 +591,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             self.exam_1.url_name,
             self.field_data_cache
         )
+        return toc
 
 
 def answer_entrance_exam_problem(course, request, problem, user=None):
