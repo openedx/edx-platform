@@ -278,7 +278,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
             self,
             domain_override=None,
             text_template_name='registration/details_reset_email.txt',
-            email_template_name='registration/details_reset_email.html',
+            html_template_name='registration/details_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -310,7 +310,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
             }
             text_content = loader.render_to_string(text_template_name, context)
             subject = "Beta Big Data University Account Information"
-            template = loader.get_template(email_template_name)
+            template = loader.get_template(html_template_name)
             email = template.render(context)
             msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
             msg.attach_alternative(email, "text/html")
