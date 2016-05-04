@@ -178,12 +178,13 @@ from openedx.core.lib.courses import course_image_url
 
 <section class="course-info" xmlns="http://www.w3.org/1999/html">
   <header class="hero-main grid-manual hero-video">
-    <div class="grid-container">
+    <img src="${static.url(course_details.banner_image_asset_path)}" alt="${course_details.banner_image_name}" />
+    <div class="grid-container hero-course-container">
       <div class="row">
         <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
           <div class="video-data">
-            <a href="#">
-              <img src="${static.url('images/vid-img.jpg')}" alt="">
+            <a href="#video-modal" class="media" rel="leanModal">
+              <img src="${static.url(course_details.video_thumbnail_image_asset_path)}" alt="${course_details.video_thumbnail_image_name}">
               <span class="play-btn">
 
               </span>
@@ -192,8 +193,8 @@ from openedx.core.lib.courses import course_image_url
         </div>
         <div class="col col-12 sm-col-12 md-col-8 lg-col-8 xl-col-8 description">
           <div class="data">
-            <h1>Enterpreneural Negotitiaons: <span>The Ours Way</span></h1>
-            <p>Learn negeotiation techniques to help you join community of succesful enterpreneurs.</p>
+            <h1>${course_details.title}</h1>
+            <p>${course_details.subtitle}</p>
           </div>
         </div>
       </div>
@@ -205,12 +206,12 @@ from openedx.core.lib.courses import course_image_url
         <div class="row">
           <div class="col col-12 sm-col-12 md-col-4">
             Duration:
-            <span>Jan.12, 2016 - Feb.23, 2016</span>
+            <span>${course_details.duration}</span>
           </div>
 
           <div class="col col-12 sm-col-12 md-col-4">
             Price:
-            <span>$495 USD</span>
+            <span>${course_price}</span>
           </div>
           <%
             btn_text = 'Enroll Now'
@@ -360,49 +361,27 @@ from openedx.core.lib.courses import course_image_url
 
             <h2> Course Description</h2>
             <div class="course-description">
-              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
-
-              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
-
-              <p>Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
-                Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum</p>
+              <p>${course_details.description}</p>
             </div>
 
             <h2> What you'll learn</h2>
             <div class="course-learning">
               <ul class="list-bulleted">
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
-                <li>Lorem Ipsum</li>
+                % for item in course_details.learning_info:
+                  <li>${item}</li>
+                %endfor
               </ul>
             </div>
           </div>
         </div>
+        <div class="col col-12"><h2>Instructors</h2></div>
         <div class="row instructors">
-          <div class="col col-12"><h2>Instructors</h2></div>
-          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
-            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
-            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
-          </div>
-          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
-            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
-            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
-          </div>
-          <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
-            <div class="thumbnail"><img src="${static.url('images/user-thumbnail.png')}" alt="Instructor Image"></div>
-            <p>Lorem Ipsem <span>Lorem Ipsem</span></p>
-          </div>
+          % for instructor in course_details.instructor_info['instructors']:
+            <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
+              <div class="thumbnail"><img src="${static.url(instructor['image'])}" alt="${instructor['name']}"></div>
+              <p>${instructor['name']} <span>${instructor['title']} ${instructor['organization']}</span></p>
+            </div>
+          %endfor
         </div>
       </div>
     </div>
@@ -538,3 +517,13 @@ from openedx.core.lib.courses import course_image_url
     </form>
   </div>
 %endif
+
+
+
+<section id="video-modal" class="modal home-page-video-modal video-modal">
+  <div class="inner-wrapper">
+    <iframe title="YouTube Video" width="640" height="360"
+            src="//www.youtube.com/embed/${course_details.intro_video}?showinfo=0"
+            frameborder="0" allowfullscreen></iframe>
+  </div>
+</section>
