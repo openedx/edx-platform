@@ -166,6 +166,14 @@ h1, h2, h3, h4, h5, h6{
   }
 }
 
+.list-bulleted{
+    li{
+      margin-bottom: 0.8rem !important;
+      padding-left: 0.5rem !important;
+    }
+}
+
+
 //Modals
 .modal {
   border-radius: 0px !important;
@@ -394,6 +402,12 @@ header.header-main {
           }
         }
       }
+    }
+  }
+  &.hero-small {
+    min-height: 15.625rem;
+    .tint-dark{
+      min-height: 15.625rem;
     }
   }
 }
