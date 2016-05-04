@@ -290,7 +290,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
         """
         # This import is here because we are copying and modifying the .save from Django 1.4.5's
         # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
-        from django.core.mail import send_mail
+        from django.core.mail import send_mail, EmailMultiAlternatives
         for user in self.users_cache:
             if not domain_override:
                 site_name = microsite.get_value(
