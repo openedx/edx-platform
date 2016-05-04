@@ -277,7 +277,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
     def save(
             self,
             domain_override=None,
-            subject_template_name='registration/details_reset_body.txt',
+            text_template_name='registration/details_reset_email.txt',
             email_template_name='registration/details_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
@@ -308,7 +308,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            text_content = loader.render_to_string(subject_template_name, context)
+            text_content = loader.render_to_string(text_template_name, context)
             subject = "Beta Big Data University Account Information"
             template = loader.get_template(email_template_name)
             email = template.render(context)
