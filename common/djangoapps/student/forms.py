@@ -308,11 +308,15 @@ class DetailsResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            subject = loader.render_to_string(subject_template_name, context)
+            text_content = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
-            subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
-            send_mail(subject, email, from_email, [user.email])
+            subject = text_content.replace('\n', '')
+            template = loader.get_template(email_template_name)
+            email = template.render(context)
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
+            msg.attach_alternative(email, "text/html")
+            msg.send()
+
             # update, well this user should exist already,
             try:
                 user_to_mail = MdlToEdx.objects.get(user_id=user.id)
