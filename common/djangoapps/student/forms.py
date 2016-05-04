@@ -277,7 +277,7 @@ class DetailsResetFormNoActive(PasswordResetForm):
     def save(
             self,
             domain_override=None,
-            subject_template_name='registration/details_reset_body.txt', # figure out how to fix this
+            subject_template_name='registration/details_reset_body.txt',
             email_template_name='registration/details_reset_email.html',
             use_https=False,
             token_generator=default_token_generator,
