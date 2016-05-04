@@ -38,10 +38,10 @@ codekit-config.json
 !django.mo
 !djangojs.po
 !djangojs.mo
-conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
+# this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
 
 ### Testing artifacts
