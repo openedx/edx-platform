@@ -20,7 +20,6 @@ from django.views.decorators.http import require_http_methods
 
 from lang_pref.api import released_languages, all_languages
 from edxmako.shortcuts import render_to_response
-from microsite_configuration import microsite
 
 from external_auth.login_and_register import (
     login as external_auth_login,
@@ -37,6 +36,7 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_value as get_themed_value
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 
@@ -67,11 +67,12 @@ def login_and_registration_form(request, initial_mode="login"):
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
 
-    # If this is a microsite, revert to the old login/registration pages.
+    # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
-    # Microsites can use the new logistration page by setting
-    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their microsites configuration file.
-    if microsite.is_request_in_microsite() and not microsite.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
+    # Themed sites can use the new logistration page by setting
+    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their theme/microsite
+    # configuration settings.
+    if is_request_in_themed_site() and not get_themed_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
         if initial_mode == "login":
             return old_login_view(request)
         elif initial_mode == "register":
@@ -102,7 +103,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'initial_mode': initial_mode,
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
-            'platform_name': settings.PLATFORM_NAME,
+            'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
@@ -389,7 +390,7 @@ def account_settings_context(request):
                 'options': all_languages(),
             }
         },
-        'platform_name': settings.PLATFORM_NAME,
+        'platform_name': get_themed_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,
