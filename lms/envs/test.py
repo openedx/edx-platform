@@ -99,6 +99,10 @@ NOSE_ARGS = [
     '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
+NOSE_PLUGINS = [
+    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
+]
+
 # Local Directories
 TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
@@ -181,12 +185,10 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'student_module_history.db'
     },
 }
 

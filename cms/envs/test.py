@@ -57,6 +57,10 @@ NOSE_ARGS = [
     '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
+NOSE_PLUGINS = [
+    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
+]
+
 TEST_ROOT = path('test_root')
 
 # Want static files in the same dir for running on jenkins.
