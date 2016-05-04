@@ -183,7 +183,7 @@ from openedx.core.lib.courses import course_image_url
       <div class="row">
         <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
           <div class="video-data">
-            <a href="#">
+            <a href="#video-modal" class="media" rel="leanModal">
               <img src="${static.url(course_details.video_thumbnail_image_asset_path)}" alt="${course_details.video_thumbnail_image_name}">
               <span class="play-btn">
 
@@ -517,3 +517,13 @@ from openedx.core.lib.courses import course_image_url
     </form>
   </div>
 %endif
+
+
+
+<section id="video-modal" class="modal home-page-video-modal video-modal">
+  <div class="inner-wrapper">
+    <iframe title="YouTube Video" width="640" height="360"
+            src="//www.youtube.com/embed/${course_details.intro_video}?showinfo=0"
+            frameborder="0" allowfullscreen></iframe>
+  </div>
+</section>
