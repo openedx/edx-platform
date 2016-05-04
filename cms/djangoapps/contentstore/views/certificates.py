@@ -55,6 +55,9 @@ def _get_course_and_check_access(course_key, user, depth=0):
     Internal method used to calculate and return the locator and
     course module for the view functions in this file.
     """
+    # Reject access to certificate management to all users except FUN staff
+    if not user.is_superuser and not user.is_staff:
+        raise PermissionDenied()
     if not has_studio_write_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
