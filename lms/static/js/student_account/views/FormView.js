@@ -94,9 +94,10 @@
 
             getUsernameFromEmail: function() {
                 var email = $('#register-email');
-                email.keyup(function() {
-                    if (email.val().indexOf('@') === -1) {
-                        $('#register-username').val(email.val().replace(".", ""));
+                email.change(function() {
+                    var username = $('#register-username');
+                    if (username.val() === "") {
+                        username.val(email.val().split("@")[0].replace(".", ""));
                     }
                 });
             },
