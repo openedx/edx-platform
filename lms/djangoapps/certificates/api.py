@@ -77,7 +77,7 @@ def get_certificates_for_user(username):
                 else None
             ),
         }
-        for cert in GeneratedCertificate.objects.filter(user__username=username).order_by("course_id")
+        for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id")
     ]
 
 
@@ -108,11 +108,14 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     if insecure:
         xqueue.use_https = False
     generate_pdf = not has_html_certificates_enabled(course_key, course)
-    status, cert = xqueue.add_cert(student, course_key,
-                                   course=course,
-                                   generate_pdf=generate_pdf,
-                                   forced_grade=forced_grade)
-    if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+    cert = xqueue.add_cert(
+        student,
+        course_key,
+        course=course,
+        generate_pdf=generate_pdf,
+        forced_grade=forced_grade
+    )
+    if cert.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': unicode(course_key),
@@ -120,7 +123,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
             'enrollment_mode': cert.mode,
             'generation_mode': generation_mode
         })
-    return status
+    return cert.status
 
 
 def regenerate_user_certificates(student, course_key, course=None,
@@ -384,7 +387,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None):
                 )
                 return url
         try:
-            user_certificate = GeneratedCertificate.objects.get(
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
                 user=user_id,
                 course_id=course_id
             )

@@ -159,7 +159,9 @@ class CourseMode(models.Model):
     @expiration_datetime.setter
     def expiration_datetime(self, new_datetime):
         """ Saves datetime to _expiration_datetime and sets the explicit flag. """
-        self.expiration_datetime_is_explicit = True
+        # Only set explicit flag if we are setting an actual date.
+        if new_datetime is not None:
+            self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
 
     @classmethod
@@ -589,6 +591,18 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
+
+    @classmethod
+    def is_eligible_for_certificate(cls, mode_slug):
+        """
+        Returns whether or not the given mode_slug is eligible for a
+        certificate. Currently all modes other than 'audit' grant a
+        certificate. Note that audit enrollments which existed prior
+        to December 2015 *were* given certificates, so there will be
+        GeneratedCertificate records with mode='audit' which are
+        eligible.
+        """
+        return mode_slug != cls.AUDIT
 
     def to_tuple(self):
         """

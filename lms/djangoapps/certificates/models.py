@@ -86,6 +86,8 @@ class CertificateStatuses(object):
     restricted = 'restricted'
     unavailable = 'unavailable'
     auditing = 'auditing'
+    audit_passing = 'audit_passing'
+    audit_notpassing = 'audit_notpassing'
 
     readable_statuses = {
         downloadable: "already received",
@@ -143,7 +145,7 @@ class CertificateWhitelist(models.Model):
         if student:
             white_list = white_list.filter(user=student)
         result = []
-        generated_certificates = GeneratedCertificate.objects.filter(
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
             course_id=course_id,
             user__in=[exception.user for exception in white_list],
             status=CertificateStatuses.downloadable
@@ -168,10 +170,41 @@ class CertificateWhitelist(models.Model):
         return result
 
 
+class EligibleCertificateManager(models.Manager):
+    """
+    A manager for `GeneratedCertificate` models that automatically
+    filters out ineligible certs.
+
+    The idea is to prevent accidentally granting certificates to
+    students who have not enrolled in a cert-granting mode. The
+    alternative is to filter by eligible_for_certificate=True every
+    time certs are searched for, which is verbose and likely to be
+    forgotten.
+    """
+
+    def get_queryset(self):
+        """
+        Return a queryset for `GeneratedCertificate` models, filtering out
+        ineligible certificates.
+        """
+        return super(EligibleCertificateManager, self).get_queryset().exclude(
+            status__in=(CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)
+        )
+
+
 class GeneratedCertificate(models.Model):
     """
     Base model for generated certificates
     """
+
+    # Only returns eligible certificates. This should be used in
+    # preference to the default `objects` manager in most cases.
+    eligible_certificates = EligibleCertificateManager()
+
+    # Normal object manager, which should only be used when ineligible
+    # certificates (i.e. new audit certs) should be included in the
+    # results. Django requires us to explicitly declare this.
+    objects = models.Manager()
 
     MODES = Choices('verified', 'honor', 'audit', 'professional', 'no-id-professional')
 
@@ -348,7 +381,7 @@ def certificate_status_for_student(student, course_id):
     '''
 
     try:
-        generated_certificate = GeneratedCertificate.objects.get(
+        generated_certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
             user=student, course_id=course_id)
         cert_status = {
             'status': generated_certificate.status,
