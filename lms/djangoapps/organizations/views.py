@@ -5,17 +5,20 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, F, Count
+from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ParseError
 
 from api_manager.courseware_access import get_course_key, get_course_descriptor
 from api_manager.courses.serializers import OrganizationCourseSerializer
-from organizations.models import Organization
+from organizations.models import Organization, OrganizationGroupUser
 from api_manager.users.serializers import SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
+from api_manager.permissions import SecureListAPIView
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
@@ -253,3 +256,117 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
 
         serializer = OrganizationCourseSerializer(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class OrganizationsGroupsUsersList(SecureListAPIView):
+    """
+    OrganizationsGroupsUsersList returns a collection of users for a organization group.
+
+    **Example Request**
+
+        GET /api/organizations/{organization_id}/groups/{group_id}/users
+
+        POST /api/organizations/{organization_id}/groups/{group_id}/users
+
+        DELETE /api/organizations/{organization_id}/groups/{group_id}/users
+
+    ### The OrganizationsGroupsUsersList view allows clients to retrieve a list of users for a given organization group
+    - URI: ```/api/organizations/{organization_id}/groups/{group_id}/users```
+    - GET: Returns a JSON representation (array) of the set of User entities
+    - POST: Creates a new relationship between the provided User, Group and Organization
+        * users: __required__, The identifier for the User with which we're establishing relationship
+    - POST Example:
+
+            {
+                "users" : 1,2,3,4,5
+            }
+
+    - DELETE: Deletes a relationship between the provided User, Group and Organization
+        * users: __required__, The identifier for the User for which we're removing relationship
+    - DELETE Example:
+
+            {
+                "users" : 1,2,3,4,5
+            }
+    """
+
+    model = OrganizationGroupUser
+
+    def get(self, request, organization_id, group_id):  # pylint: disable=W0221
+        """
+        GET /api/organizations/{organization_id}/groups/{group_id}/users
+        """
+        queryset = User.objects.filter(organizationgroupuser__group_id=group_id,
+                                       organizationgroupuser__organization_id=organization_id)
+
+        serializer = SimpleUserSerializer(queryset, many=True)
+
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    def post(self, request, organization_id, group_id):
+        """
+        GET /api/organizations/{organization_id}/groups/{group_id}/users
+        """
+        user_ids = request.DATA.get('users')
+        try:
+            user_ids = map(int, filter(None, user_ids.split(',')))
+        except Exception:
+            raise ParseError("Invalid user id value")
+
+        try:
+            group = Group.objects.get(id=group_id, organizations=organization_id)
+        except ObjectDoesNotExist:
+            return Response({
+                "detail": 'Group {} does not belong to organization {}'.format(group_id, organization_id)
+            }, status.HTTP_404_NOT_FOUND)
+
+        users_added = []
+        for user_id in user_ids:
+            try:
+                user = User.objects.get(id=user_id)
+                OrganizationGroupUser.objects.create(organization_id=organization_id, group=group, user=user)
+            except (ObjectDoesNotExist, IntegrityError):
+                continue
+
+            users_added.append(str(user_id))
+
+        if len(users_added) > 0:
+            return Response({
+                "detail": "user id(s) {users_added} added to organization {org_id}'s group {group_id}"
+                          .format(users_added=', '.join(users_added), org_id=organization_id, group_id=group_id)
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def delete(self, request, organization_id, group_id):
+        """
+        DELETE /api/organizations/{organization_id}/groups/{group_id}/users
+        """
+        user_ids = request.DATA.get('users')
+        try:
+            user_ids = map(int, filter(None, user_ids.split(',')))
+        except Exception:
+            raise ParseError("Invalid user id value")
+
+        try:
+            group = Group.objects.get(id=group_id, organizations=organization_id)
+        except ObjectDoesNotExist:
+            return Response({
+                "detail": 'Group {} does not belong to organization {}'.format(group_id, organization_id)
+            }, status.HTTP_404_NOT_FOUND)
+
+        organization_group_users_to_delete = OrganizationGroupUser.objects.filter(organization_id=organization_id,
+                                                                                  user_id__in=user_ids,
+                                                                                  group=group)
+        org_group_user_ids = [str(org_group_user.user_id) for org_group_user in organization_group_users_to_delete]
+        organization_group_users_to_delete.delete()
+
+        if len(org_group_user_ids) > 0:
+            org_group_user_ids = ', '.join(org_group_user_ids)
+            message = "user id(s) {org_group_user_ids} removed from organization {org_id}'s group {group_id}"\
+                      .format(org_group_user_ids=org_group_user_ids, org_id=organization_id, group_id=group_id)
+            return Response({
+                "detail": message
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
