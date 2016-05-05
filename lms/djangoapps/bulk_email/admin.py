@@ -3,7 +3,9 @@ Django admin page for bulk email models
 """
 from django.contrib import admin
 
-from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization
+from config_models.admin import ConfigurationModelAdmin
+
+from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization, BulkEmailFlag
 from bulk_email.forms import CourseEmailTemplateForm, CourseAuthorizationAdminForm
 
 
@@ -80,3 +82,4 @@ admin.site.register(CourseEmail, CourseEmailAdmin)
 admin.site.register(Optout, OptoutAdmin)
 admin.site.register(CourseEmailTemplate, CourseEmailTemplateAdmin)
 admin.site.register(CourseAuthorization, CourseAuthorizationAdmin)
+admin.site.register(BulkEmailFlag, ConfigurationModelAdmin)

@@ -127,10 +127,7 @@ THIRD_PARTY_AUTH = {
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
-# Enable email on the instructor dash
-FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
-FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
-
+# Enable special exams
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Don't actually send any requests to Software Secure for student identity

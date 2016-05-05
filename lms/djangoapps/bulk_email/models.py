@@ -20,6 +20,8 @@ from django.db import models
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 
+from config_models.models import ConfigurationModel
+
 from xmodule_django.models import CourseKeyField
 from util.keyword_substitution import substitute_keywords_with_data
 
@@ -240,14 +242,7 @@ class CourseAuthorization(models.Model):
     def instructor_email_enabled(cls, course_id):
         """
         Returns whether or not email is enabled for the given course id.
-
-        If email has not been explicitly enabled, returns False.
         """
-        # If settings.FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] is
-        # set to False, then we enable email for every course.
-        if not settings.FEATURES['REQUIRE_COURSE_EMAIL_AUTH']:
-            return True
-
         try:
             record = cls.objects.get(course_id=course_id)
             return record.email_enabled
@@ -260,3 +255,47 @@ class CourseAuthorization(models.Model):
             not_en = ""
         # pylint: disable=no-member
         return u"Course '{}': Instructor Email {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+
+
+class BulkEmailFlag(ConfigurationModel):
+    """
+    Enables site-wide configuration for the bulk_email feature.
+
+    Staff can only send bulk email for a course if all the following conditions are true:
+    1. BulkEmailFlag is enabled.
+    2. Course-specific authorization not required, or course authorized to use bulk email.
+    """
+    # boolean field 'enabled' inherited from parent ConfigurationModel
+    require_course_email_auth = models.BooleanField(default=True)
+
+    @classmethod
+    def feature_enabled(cls, course_id=None):
+        """
+        Looks at the currently active configuration model to determine whether the bulk email feature is available.
+
+        If the flag is not enabled, the feature is not available.
+        If the flag is enabled, course-specific authorization is required, and the course_id is either not provided
+            or not authorixed, the feature is not available.
+        If the flag is enabled, course-specific authorization is required, and the provided course_id is authorized,
+            the feature is available.
+        If the flag is enabled and course-specific authorization is not required, the feature is available.
+        """
+        if not BulkEmailFlag.is_enabled():
+            return False
+        elif BulkEmailFlag.current().require_course_email_auth:
+            if course_id is None:
+                return False
+            else:
+                return CourseAuthorization.instructor_email_enabled(course_id)
+        else:  # implies enabled == True and require_course_email == False, so email is globally enabled
+            return True
+
+    class Meta(object):
+        app_label = "bulk_email"
+
+    def __unicode__(self):
+        current_model = BulkEmailFlag.current()
+        return u"<BulkEmailFlag: enabled {}, require_course_email_auth: {}>".format(
+            current_model.is_enabled(),
+            current_model.require_course_email_auth
+        )

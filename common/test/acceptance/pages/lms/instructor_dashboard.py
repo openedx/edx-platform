@@ -75,6 +75,15 @@ class InstructorDashboardPage(CoursePage):
         timed_exam_section.wait_for_page()
         return timed_exam_section
 
+    def select_bulk_email(self):
+        """
+        Selects the email tab and returns the bulk email section
+        """
+        self.q(css='a[data-section=send_email]').first.click()
+        email_section = BulkEmailPage(self.browser)
+        email_section.wait_for_page()
+        return email_section
+
     @staticmethod
     def get_asset_path(file_name):
         """
@@ -96,6 +105,62 @@ class InstructorDashboardPage(CoursePage):
 
         # Return the joined path of the required asset.
         return os.sep.join(folders_list_in_path)
+
+
+class BulkEmailPage(PageObject):
+    """
+    Bulk email section of the instructor dashboard.
+    This feature is controlled by an admin panel feature flag, which is turned on via database fixture for testing.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='a[data-section=send_email].active-section').present
+
+    def _bounded_selector(self, selector):
+        """
+        Return `selector`, but limited to the bulk-email context.
+        """
+        return '.send-email {}'.format(selector)
+
+    def _select_recipient(self, recipient):
+        """
+        Selects the specified recipient from the selector. Assumes that recipient is not None.
+        """
+        recipient_selector_css = "select[name='send_to']"
+        select_option_by_text(
+            self.q(css=self._bounded_selector(recipient_selector_css)), recipient
+        )
+
+    def send_message(self, recipient):
+        """
+        Send a test message to the specified recipient.
+        """
+        send_css = "input[name='send']"
+        test_subject = "Hello"
+        test_body = "This is a test email"
+
+        self._select_recipient(recipient)
+        self.q(css=self._bounded_selector("input[name='subject']")).fill(test_subject)
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].click()
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].send_keys(test_body)
+
+        with self.handle_alert(confirm=True):
+            self.q(css=self._bounded_selector(send_css)).click()
+
+    def verify_message_queued_successfully(self):
+        """
+        Verifies that the "you email was queued" message appears.
+
+        Note that this does NOT ensure the message gets sent successfully, that functionality
+        is covered by the bulk_email unit tests.
+        """
+        confirmation_selector = self._bounded_selector(".msg-confirm")
+        expected_text = u"Your email was successfully queued for sending."
+        EmptyPromise(
+            lambda: expected_text in self.q(css=confirmation_selector)[0].text,
+            "Message Queued Confirmation"
+        ).fulfill()
 
 
 class MembershipPage(PageObject):
