@@ -11,7 +11,7 @@ var files = {
     libraryFilesToInclude: [
         {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
-        {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
+        {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true}
     ],
 
     libraryFiles: [
@@ -20,7 +20,6 @@ var files = {
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
         {pattern: 'js/RequireJS-namespace-undefine.js'},
         {pattern: 'xmodule_js/common_static/coffee/src/**/*.js'},
-        {pattern: 'xmodule_js/common_static/common/js/**/*.js'},
         {pattern: 'xmodule_js/common_static/js/**/*.js'},
         {pattern: 'xmodule_js/src/capa/*.js'},
         {pattern: 'xmodule_js/src/video/*.js'},
@@ -32,7 +31,7 @@ var files = {
         {pattern: 'js/**/!(*spec|djangojs).js'},
         {pattern: 'support/js/**/!(*spec).js'},
         {pattern: 'teams/js/**/!(*spec).js'},
-        {pattern: 'xmodule_js/common_static/coffee/**/!(*spec).js'},
+        {pattern: 'xmodule_js/common_static/coffee/**/!(*spec).js'}
     ],
 
     specFiles: [

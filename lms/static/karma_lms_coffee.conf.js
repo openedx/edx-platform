@@ -15,8 +15,8 @@ var files = {
 
         {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
         {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},
-        {pattern: 'xmodule_js/common_static/common/js/vendor/underscore.js', included: true},
-        {pattern: 'xmodule_js/common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
+        {pattern: 'common/js/vendor/underscore.js', included: true},
+        {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: true},
         {pattern: 'xmodule_js/common_static/js/src/logger.js', included: true},
         {pattern: 'xmodule_js/common_static/js/test/i18n.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js', included: true},

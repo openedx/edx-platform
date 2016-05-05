@@ -9,12 +9,12 @@ var configModule = require(path.join(__dirname, '../../common/static/common/js/k
 
 var files = {
     libraryFiles: [
+        {pattern: 'common/js/vendor/**/*.js'},
         {pattern: 'edx-pattern-library/js/**/*.js'},
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
         {pattern: 'xmodule_js/common_static/coffee/src/**/*.js'},
-        {pattern: 'xmodule_js/common_static/common/js/vendor/**/*.js'},
         {pattern: 'xmodule_js/common_static/js/**/*.js'},
-        {pattern: 'xmodule_js/src/**/*.js'},
+        {pattern: 'xmodule_js/src/**/*.js'}
     ],
 
     sourceFiles: [

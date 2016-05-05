@@ -33,7 +33,7 @@
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
-            'backbone': 'xmodule_js/common_static/common/js/vendor/backbone',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
@@ -66,9 +66,9 @@
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
-            'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
-            'edxicons': 'xmodule_js/common_static/edx-pattern-library/js/edx-icons',
+            'modernizr': 'edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'edx-pattern-library/js/afontgarde',
+            'edxicons': 'edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -101,7 +101,7 @@
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
 
             // Common edx utils
-            'common/js/utils/edx.utils.validate': 'xmodule_js/common_static/common/js/utils/edx.utils.validate',
+            'common/js/utils/edx.utils.validate': 'common/js/utils/edx.utils.validate',
             'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
             'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
         },
