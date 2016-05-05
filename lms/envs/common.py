@@ -2784,6 +2784,10 @@ LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 JWT_EXPIRATION = 30
 JWT_ISSUER = None
 
+# For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
+PUBLIC_RSA_KEY = None
+PRIVATE_RSA_KEY = None
+
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"

@@ -179,3 +179,45 @@ def _send_decision_email(instance):
         instance.contacted = True
     except SMTPException:
         log.exception('Error sending API user notification email for request [%s].', instance.id)
+
+
+class Catalog(models.Model):
+    """A (non-Django-managed) model for Catalogs in the course discovery service."""
+
+    id = models.IntegerField(primary_key=True)  # pylint: disable=invalid-name
+    name = models.CharField(max_length=255, null=False, blank=False)
+    query = models.TextField(null=False, blank=False)
+    viewers = models.TextField()
+
+    class Meta(object):
+        # Catalogs live in course discovery, so we do not create any
+        # tables in LMS. Instead we override the save method to not
+        # touch the database, and use our API client to communicate
+        # with discovery.
+        managed = False
+
+    def __init__(self, *args, **kwargs):
+        attributes = kwargs.get('attributes')
+        if attributes:
+            self.id = attributes['id']  # pylint: disable=invalid-name
+            self.name = attributes['name']
+            self.query = attributes['query']
+            self.viewers = attributes['viewers']
+        else:
+            super(Catalog, self).__init__(*args, **kwargs)
+
+    def save(self, **kwargs):  # pylint: disable=unused-argument
+        return None
+
+    @property
+    def attributes(self):
+        """Return a dictionary representation of this catalog."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'query': self.query,
+            'viewers': self.viewers,
+        }
+
+    def __unicode__(self):
+        return u'Catalog {name} [{query}]'.format(name=self.name, query=self.query)
