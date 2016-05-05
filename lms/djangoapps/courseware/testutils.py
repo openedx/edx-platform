@@ -28,7 +28,6 @@ class RenderXBlockTestMixin(object):
     COURSEWARE_CHROME_HTML_ELEMENTS = [
         '<ol class="course-tabs"',
         '<footer id="footer-openedx"',
-        '<div class="window-wrap"',
         '<div class="preview-menu"',
         '<div class="container"'
     ]

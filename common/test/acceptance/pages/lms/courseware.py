@@ -245,7 +245,7 @@ class CoursewarePage(CoursePage):
     @property
     def breadcrumb(self):
         """ Return the course tree breadcrumb shown above the sequential bar """
-        return [part.strip() for part in self.q(css='.path').text[0].split('>')]
+        return [part.strip() for part in self.q(css='.breadcrumb-label').text[0].split('>')]
 
     def bookmark_button_visible(self):
         """ Check if bookmark button is visible """
