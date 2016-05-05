@@ -166,12 +166,15 @@ from openedx.core.lib.courses import course_image_url
     } else {
         $(".about-container").html($("#about-content").html());
     }
+
+    $(".instructor-image").leanModal({closeButton: ".modal_close"});
   }
 
   </script>
 
   <script src="${static.url('js/course_info.js')}"></script>
   <script src="${static.url('js/slick.min.js')}"></script>
+  <script src="${static.url('js/jquery.leanModal.min.js')}"></script>
 </%block>
 
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
@@ -374,12 +377,35 @@ from openedx.core.lib.courses import course_image_url
             </div>
           </div>
         </div>
+
         <div class="col col-12"><h2>Instructors</h2></div>
         <div class="row instructors">
-          % for instructor in course_details.instructor_info['instructors']:
+          % for index, instructor in enumerate(course_details.instructor_info['instructors']):
             <div class="col col-12 sm-col-12 md-col-6 lg-col-4">
-              <div class="thumbnail"><img src="${static.url(instructor['image'])}" alt="${instructor['name']}"></div>
+              <div class="thumbnail">
+                  <a href="#instructor-details-${index}" class="instructor-image"><img src="${static.url(instructor['image'])}" alt="${instructor['name']}"></a>
+              </div>
               <p>${instructor['name']} <span>${instructor['title']} ${instructor['organization']}</span></p>
+
+              <div class="modal-custom" id="instructor-details-${index}">
+                <div class="btn-close modal_close"><i class="fa fa-close"></i></div>
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <div class="instructor-data">
+                            <div class="thumbnail">
+                                <img src="${instructor['image']}" alt="${instructor['name']}">
+                            </div>
+                            <h3> ${instructor['name']} <span>${instructor['title']} at ${instructor['organization']}</span></h3>
+                        </div>
+                    </div>
+                    <div class="instructor-bio">${instructor['bio']}</div>
+                    <div class="links">
+                        <a href="#" class="brand-link">Lipsum</a>
+                        <a href="#" class="brand-link">Lorem Ipsum</a>
+                    </div>
+                </div>
+              </div>
+
             </div>
           %endfor
         </div>
