@@ -26,6 +26,7 @@ from openedx.core.lib.courses import course_image_url
   <script type="text/javascript">
   (function() {
 
+    $(".instructor-image").leanModal({closeButton: ".modal_close"});
     // Third party code for conversion of tabs
     $('.tabcordion ul').children('li').first().children('a').addClass('active').next().addClass('is-open').show();
     $('.tabcordion ul').on('click', 'li > a', function () {
@@ -166,8 +167,6 @@ from openedx.core.lib.courses import course_image_url
     } else {
         $(".about-container").html($("#about-content").html());
     }
-
-    $(".instructor-image").leanModal({closeButton: ".modal_close"});
   }
 
   </script>
