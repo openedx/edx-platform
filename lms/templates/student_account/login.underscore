@@ -21,7 +21,7 @@
     <ul class="beta-error-message">
         <li>
             <%- gettext("If you have an account in bigdatauniversity.com and this is the first time you access beta.bigdatauniversity.com, please") %>
-            <a href="https://courses.bigdatauniversity.com/access_new_account">click here</a>
+            <a href="/access_new_account">click here</a>
             <%- gettext("and review the") %>
             <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page.</a>
         </li>
