@@ -9,11 +9,13 @@
 
 // +Container - Account Settings
 .wrapper-account-settings {
-    @extend .container;
-    padding-top: ($baseline*2);
+    background: $white;
+    width: 100%;
 
     .account-settings-container {
-        padding: 0;
+        max-width: grid-width(12);
+        padding: 10px;
+        margin: 0 auto;
     }
 
     .ui-loading-indicator,
@@ -36,45 +38,254 @@
 .wrapper-account-settings {
 
     .wrapper-header {
+        max-width: grid-width(12);
+        height: 139px;
+        border-bottom: 4px solid $m-gray-l4;
 
         .header-title {
             @extend %t-title4;
             margin-bottom: ($baseline/2);
+            padding-top: ($baseline*2);
         }
 
         .header-subtitle {
             color: $gray-l2;
+        }
+
+        .account-nav {
+            @include float(left);
+            margin: ($baseline/2) 0;
+            padding: 0;
+            list-style: none;
+
+            .account-nav-item {
+                @include float(left);
+                display: flex;
+                margin: 0;
+                text-transform: none;
+                justify-content: center;
+
+                .account-nav-link{
+                    font-size: em(16);
+                    color: $dark-gray;
+                    padding: 5px 25px 23px;
+                    display: inline-block;
+                    border-radius: 0;
+                }
+                .active{
+                    border-bottom: 4px solid $courseware-border-bottom-color !important;
+                }
+            }
+            li, div {
+                display: inline-block;
+                margin: 0 $baseline+1 0 0;
+                font-size: em(14);
+                font-weight: $font-semibold;
+                text-transform: uppercase;
+                letter-spacing: 0 !important;
+
+                &:last-child {
+                    margin-right: 0;
+                }
+
+                button {
+                    @extend %ui-clear-button;
+                    @extend %btn-no-style;
+                    @include appearance(none);
+                    display:block;
+                    padding: ($baseline/4);
+                    color: $link-color;
+                    font-weight: $font-semibold;
+
+                    &:hover, &:focus, &:active {
+                        text-decoration: none;
+                        color: $link-color;
+                        outline: none;
+                    }
+                }
+            }
         }
     }
 }
 
 // +Settings Section
 .account-settings-sections {
+    padding-bottom: ($baseline*5);
 
     .section-header {
         @extend %t-title6;
         @extend %t-strong;
-        padding-bottom: ($baseline/2);
-        border-bottom: 1px solid $gray-l4;
+        padding-top: ($baseline/2)*3;
+        color: $lighter-base-font-color;
     }
 
     .section {
         background-color: $white;
-        padding: $baseline;
         margin-top: $baseline;
-        border: 1px solid $gray-l4;
-        box-shadow: 0 0 1px 1px $shadow-l2;
-        border-radius: 5px;
-    }
+        border-bottom: 4px solid $m-gray-l4;
 
-    a span {
-        color: $link-color;
-    }
+        .account-settings-header-subtitle {
+            font-size: em(18);
+            color: $dark-gray;
+            padding-top: 20px;
+            padding-bottom: 10px;
+        }
 
-    a span {
-        &:hover, &:focus {
-            color: $pink;
-            text-decoration: none !important;
+        .account-settings-section-body {
+
+            .u-field {
+                border-bottom: 2px solid $m-gray-l4;
+
+                .field {
+                    width: 30%;
+                    vertical-align: top;
+                    display: inline-block;
+                    position: relative;
+
+                    select {
+                        @include appearance(none);
+                        padding: 14px 30px 14px 15px;
+                        border: 1px solid $light-gray;
+                        background-color: transparent;
+                        border-radius: 2px;
+                        position: relative;
+                        z-index: 10;
+                        &::-ms-expand{
+                            display: none;
+                        }
+                        ~ .icon-caret-down{
+                            &:after{
+                                content: "";
+                                border-left: 6px solid transparent;
+                                border-right: 6px solid transparent;
+                                border-top: 7px solid $blue;
+                                position: absolute;
+                                right: 10px;
+                                bottom: 20px;
+                                z-index: 0;
+                            }
+                        }
+                    }
+                    .field-label {
+                        display: block;
+                        width: auto;
+                        margin-bottom: 0.625rem;
+                        font-size: 1rem;
+                        line-height: 1;
+                        color: $dark-gray;
+                    }
+
+                    .field-input {
+                        @include transition(all 0.125s ease-in-out 0s);
+                        display: inline-block;
+                        padding: 0.625rem;
+                        border: 1px solid $gray-l5;
+                        border-radius: 2px;
+                        background: $white;
+                        font-size: $body-font-size;
+                        color: $dark-gray;
+                        width: 100%;
+                        height: 48px;
+                        box-shadow: none;
+                    }
+
+                    .u-field-link {
+                        @extend %ui-clear-button;
+
+                        // set styles
+                        @extend %btn-pl-default-base;
+                        @include font-size(18);
+                        width: 100%;
+                        border: 1px solid $blue;
+                        color: $blue;
+                        padding: 11px 14px;
+                        line-height: normal;
+                    }
+
+                    #u-field-value-username {
+                        padding-top: ($baseline/2);
+                    }
+                }
+
+                .social-field-linked {
+                    background: $m-gray-l4;
+                    box-shadow: 0 1px 2px 1px $shadow-l2;
+                    padding: 1.25rem;
+                    box-sizing: border-box;
+                    margin: 10px;
+                    width: 100%;
+
+                    .field-label {
+                        @include font-size(24);
+                    }
+
+                    .u-field-social-help {
+                        display: inline-block;
+                        padding: 20px 0 6px;
+                    }
+
+                    .u-field-link {
+                        @include font-size(14);
+                        @include text-align(left);
+                        border: none;
+                        margin-top: $baseline;
+                        font-weight: $font-semibold;
+                        padding: 0;
+
+                        &:focus, &:hover, &:active {
+                            background-color: transparent;
+                            color: $m-blue-d3;
+                            border: none;
+                        }
+                    }
+                }
+
+                .social-field-unlinked {
+                    background: $m-gray-l4;
+                    box-shadow: 0 1px 2px 1px $shadow-l2;
+                    padding: 1.25rem;
+                    box-sizing: border-box;
+                    text-align: center;
+                    margin: 10px;
+                    width: 100%;
+
+                    .field-label {
+                        @include font-size(24);
+                        text-align: center;
+                    }
+
+                    .u-field-link {
+                        @include font-size(14);
+                        margin-top: $baseline;
+                        font-weight: $font-semibold;
+                    }
+                }
+                
+                .u-field-message {
+                    padding: 24px 0 0 ($baseline*5);
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+
+            .u-field-social {
+                border-bottom: none;
+                margin-right: 20px;
+                width: 30%;
+                display: inline-block;
+                vertical-align: top;
+
+                .u-field-social-help {
+                    @include font-size(12);
+                    color: $m-gray-d1;
+                }
+            }
+        }
+
+        &:last-child {
+            border-bottom: none;
         }
     }
 }
