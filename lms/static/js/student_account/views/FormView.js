@@ -72,6 +72,20 @@
                 this.setUserCityAndCountry();
                 this.showPassword();
                 this.getUsernameFromEmail();
+                this.styleShowPassword();
+            },
+
+            styleShowPassword: function() {
+                $('input#register-show_password').css('display', 'none');
+                $('div.form-field.checkbox-show_password label').css({
+                  'font-size': '0.8rem',
+                  'color': '#27aae1',
+                  'float': 'right'
+                });
+                $('.form-field.checkbox-show_password').css({
+                  'margin-top': '-20px',
+                  'top': '-50px'
+                });
             },
 
             setUserCityAndCountry: function() {
