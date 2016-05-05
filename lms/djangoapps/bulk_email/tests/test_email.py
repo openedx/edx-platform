@@ -17,7 +17,7 @@ from django.test.utils import override_settings
 
 from bulk_email.models import Optout
 from bulk_email.tasks import _get_source_address
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment

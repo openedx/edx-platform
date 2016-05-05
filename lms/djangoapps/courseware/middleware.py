@@ -5,7 +5,7 @@ Middleware for the courseware app
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 
-from courseware.courses import UserNotEnrolled
+from .courses import UserNotEnrolled
 
 
 class RedirectUnenrolledMiddleware(object):
@@ -18,7 +18,7 @@ class RedirectUnenrolledMiddleware(object):
             course_key = exception.course_key
             return redirect(
                 reverse(
-                    'courseware.views.views.course_about',
+                    'lms.djangoapps.courseware.views.views.course_about',
                     args=[course_key.to_deprecated_string()]
                 )
             )

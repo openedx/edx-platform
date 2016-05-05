@@ -14,8 +14,8 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 
 from course_structure_api.v0 import serializers
-from courseware import courses
-from courseware.access import has_access
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.roles import CourseInstructorRole, CourseStaffRole

@@ -26,8 +26,9 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 
 
 NOTSET = object()
-ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'
-ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = u'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
+ENABLED_OVERRIDE_PROVIDERS_KEY = u'lms.djangoapps.courseware.field_overrides.enabled_providers.{course_id}'
+ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = \
+    u'lms.djangoapps.courseware.modulestore_field_overrides.enabled_providers.{course_id}'
 
 
 def resolve_dotted(name):

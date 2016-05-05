@@ -4,7 +4,7 @@ Management command which fixes ungraded certificates for students
 
 
 from certificates.models import GeneratedCertificate
-from courseware import grades, courses
+from lms.djangoapps.courseware import grades, courses
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand
 from optparse import make_option

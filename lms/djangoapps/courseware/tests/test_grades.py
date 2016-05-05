@@ -10,7 +10,13 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from courseware.grades import (
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from ..grades import (
     field_data_cache_for_grading,
     grade,
     iterate_grades_for,
@@ -18,17 +24,12 @@ from courseware.grades import (
     ProgressSummary,
     get_module_score
 )
-from courseware.module_render import get_module
-from courseware.model_data import FieldDataCache, set_score
-from courseware.tests.helpers import (
+from ..module_render import get_module
+from ..model_data import FieldDataCache, set_score
+from .helpers import (
     LoginEnrollmentTestCase,
     get_request_for_user
 )
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 def _grade_with_errors(student, request, course, keep_raw_scores=False):
@@ -97,7 +98,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             self.assertIsNone(gradeset['grade'])
             self.assertEqual(gradeset['percent'], 0.0)
 
-    @patch('courseware.grades.grade', _grade_with_errors)
+    @patch('lms.djangoapps.courseware.grades.grade', _grade_with_errors)
     def test_grading_exception(self):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading

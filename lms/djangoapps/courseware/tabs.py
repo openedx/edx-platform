@@ -5,11 +5,12 @@ perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_noop
 
-from courseware.access import has_access
-from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
+
+from .access import has_access
+from .entrance_exams import user_must_complete_entrance_exam
 
 
 class EnrolledTab(CourseTab):

@@ -4,7 +4,7 @@ Tests of student.roles
 import ddt
 from django.test import TestCase
 
-from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory
 
 from student.roles import (

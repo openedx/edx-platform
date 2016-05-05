@@ -9,8 +9,9 @@ from unittest import skip
 from django.test import TestCase
 
 from edx_user_state_client.tests import UserStateClientTestBase
-from courseware.user_state_client import DjangoXBlockUserStateClient
-from courseware.tests.factories import UserFactory
+
+from ..user_state_client import DjangoXBlockUserStateClient
+from .factories import UserFactory
 
 
 class TestDjangoUserStateClient(UserStateClientTestBase, TestCase):

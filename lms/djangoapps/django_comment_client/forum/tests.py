@@ -31,7 +31,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
-from courseware.courses import UserNotEnrolled
+from lms.djangoapps.courseware.courses import UserNotEnrolled
 from nose.tools import assert_true
 from mock import patch, Mock, ANY, call
 

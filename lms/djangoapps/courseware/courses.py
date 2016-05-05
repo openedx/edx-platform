@@ -21,17 +21,17 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from microsite_configuration import microsite
 
-from courseware.access import has_access
-from courseware.date_summary import (
+from .access import has_access
+from .date_summary import (
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate,
 )
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from .model_data import FieldDataCache
+from .module_render import get_module
+from .courseware_access_exception import CoursewareAccessException
 from student.models import CourseEnrollment
 import branding
 

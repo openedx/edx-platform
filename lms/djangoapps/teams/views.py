@@ -32,7 +32,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course_with_access, has_access
+from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges

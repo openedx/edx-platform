@@ -12,16 +12,6 @@ from django.test import TestCase
 from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.masquerade import (
-    CourseMasquerade,
-    MasqueradingKeyValueStore,
-    handle_ajax,
-    setup_masquerade,
-    get_masquerading_group_info
-)
-from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -29,6 +19,17 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+
+from ..masquerade import (
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    handle_ajax,
+    setup_masquerade,
+    get_masquerading_group_info
+)
+from .factories import StaffFactory
+from .helpers import LoginEnrollmentTestCase, get_request_for_user
+from .test_submitting_problems import ProblemSubmissionTestMixin
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

@@ -38,27 +38,6 @@ from certificates import api as certs_api
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
-from courseware import grades
-from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
-from courseware.access_response import StartDateError
-from courseware.access_utils import in_preview_mode
-from courseware.courses import (
-    get_courses,
-    get_course,
-    get_course_by_id,
-    get_permission_for_course_about,
-    get_studio_url,
-    get_course_overview_with_access,
-    get_course_with_access,
-    sort_by_announcement,
-    sort_by_start_date,
-    UserNotEnrolled
-)
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache, ScoresClient
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -83,8 +62,30 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+
+from .. import grades
+from ..access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
+from ..access_response import StartDateError
+from ..access_utils import in_preview_mode
+from ..courses import (
+    get_courses,
+    get_course,
+    get_course_by_id,
+    get_permission_for_course_about,
+    get_studio_url,
+    get_course_overview_with_access,
+    get_course_with_access,
+    sort_by_announcement,
+    sort_by_start_date,
+    UserNotEnrolled
+)
 from ..entrance_exams import user_must_complete_entrance_exam
+from ..masquerade import setup_masquerade
+from ..model_data import FieldDataCache, ScoresClient
+from ..models import StudentModule, BaseStudentModuleHistory
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
+from ..url_helpers import get_redirect_url
+from ..user_state_client import DjangoXBlockUserStateClient
 
 
 log = logging.getLogger("edx.courseware")

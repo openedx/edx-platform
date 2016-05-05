@@ -28,7 +28,7 @@ from provider.oauth2.models import (
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from ccx_keys.locator import CCXLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -424,7 +424,7 @@ class CcxListTest(CcxRestApiTest):
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
         # case with deprecated  master_course_id
-        with mock.patch('courseware.courses.get_course_by_id', autospec=True) as mocked:
+        with mock.patch('lms.djangoapps.courseware.courses.get_course_by_id', autospec=True) as mocked:
             mocked.return_value.id.deprecated = True
             resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
         self.expect_error(status.HTTP_400_BAD_REQUEST, 'deprecated_master_course_id', resp)

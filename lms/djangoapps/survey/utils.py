@@ -3,7 +3,7 @@ Helper methods for Surveys
 """
 
 from survey.models import SurveyForm, SurveyAnswer
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 
 
 def is_survey_required_for_course(course_descriptor):

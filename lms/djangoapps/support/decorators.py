@@ -6,7 +6,7 @@ from functools import wraps
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 
 
 def require_support_permission(func):

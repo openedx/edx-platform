@@ -18,8 +18,8 @@ from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.model_data import StudentModule
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

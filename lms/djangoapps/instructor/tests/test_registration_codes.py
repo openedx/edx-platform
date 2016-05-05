@@ -2,7 +2,7 @@
 Test for the registration code status information.
 """
 from course_modes.models import CourseMode
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.utils.translation import ugettext as _
 from shoppingcart.models import (

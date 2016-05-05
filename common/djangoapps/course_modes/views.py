@@ -21,7 +21,7 @@ from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from embargo import api as embargo_api
 from student.models import CourseEnrollment

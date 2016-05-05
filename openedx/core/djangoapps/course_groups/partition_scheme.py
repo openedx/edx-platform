@@ -3,7 +3,7 @@ Provides a UserPartition driver for cohorts.
 """
 import logging
 
-from courseware.masquerade import (  # pylint: disable=import-error
+from lms.djangoapps.courseware.masquerade import (  # pylint: disable=import-error
     get_course_masquerade,
     get_masquerading_group_info,
     is_masquerading_as_specific_student,

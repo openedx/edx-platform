@@ -11,8 +11,15 @@ import pytz
 from commerce.models import CommerceConfiguration
 from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
-from courseware.courses import _get_course_date_summary_blocks
-from courseware.date_summary import (
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..courses import _get_course_date_summary_blocks
+from ..date_summary import (
     CourseEndDate,
     CourseStartDate,
     DateSummary,
@@ -20,12 +27,6 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate,
 )
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr('shard_1')

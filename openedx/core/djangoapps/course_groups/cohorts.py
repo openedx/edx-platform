@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from eventtracking import tracker
 from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email

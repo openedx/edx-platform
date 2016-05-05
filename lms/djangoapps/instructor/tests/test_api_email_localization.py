@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

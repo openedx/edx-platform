@@ -12,9 +12,9 @@ from django.conf import settings
 from unittest import skipUnless
 from nose.plugins.attrib import attr
 
-from courseware.models import BaseStudentModuleHistory, StudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModuleHistory, StudentModule
 
-from courseware.tests.factories import StudentModuleFactory, location, course_id
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, location, course_id
 
 
 @attr('shard_1')

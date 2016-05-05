@@ -30,7 +30,7 @@ from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import Path as path
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
 from student.roles import CourseStaffRole, CourseInstructorRole

@@ -14,7 +14,7 @@ from django.utils.translation import override as override_language
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lang_pref import LANGUAGE_KEY
 

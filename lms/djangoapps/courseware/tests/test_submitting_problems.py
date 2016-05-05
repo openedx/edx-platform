@@ -18,9 +18,6 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
     CodeResponseXMLFactory,
 )
-from courseware import grades
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
@@ -32,6 +29,10 @@ from openedx.core.djangoapps.credit.api import (
 )
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+
+from .. import grades
+from ..models import StudentModule, BaseStudentModuleHistory
+from .helpers import LoginEnrollmentTestCase
 
 
 class ProblemSubmissionTestMixin(TestCase):
@@ -140,7 +141,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         self.student_user = User.objects.get(email=self.student)
         self.factory = RequestFactory()
         # Disable the score change signal to prevent other components from being pulled into tests.
-        signal_patch = patch('courseware.module_render.SCORE_CHANGED.send')
+        signal_patch = patch('lms.djangoapps.courseware.module_render.SCORE_CHANGED.send')
         signal_patch.start()
         self.addCleanup(signal_patch.stop)
 
@@ -748,7 +749,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
+        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)

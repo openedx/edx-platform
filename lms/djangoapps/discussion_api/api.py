@@ -14,7 +14,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 
 from discussion_api.exceptions import ThreadNotFoundError, CommentNotFoundError, DiscussionDisabledError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm

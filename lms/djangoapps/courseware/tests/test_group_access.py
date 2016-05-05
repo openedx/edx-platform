@@ -12,8 +12,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
 from xmodule.modulestore.django import modulestore
 
-import courseware.access as access
-from courseware.tests.factories import StaffFactory, UserFactory
+from .. import access as access
+from .factories import StaffFactory, UserFactory
 
 
 class MemoryUserPartitionScheme(object):

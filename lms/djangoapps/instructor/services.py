@@ -6,7 +6,7 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
 import instructor.enrollment as enrollment

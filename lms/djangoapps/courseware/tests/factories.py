@@ -9,8 +9,6 @@ from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory  # Imported to re-export
 
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
-from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -21,6 +19,8 @@ from student.roles import (
 )
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from ..models import StudentModule, XModuleUserStateSummaryField, XModuleStudentInfoField, XModuleStudentPrefsField
 
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)

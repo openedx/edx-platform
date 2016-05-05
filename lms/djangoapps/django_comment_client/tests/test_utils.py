@@ -15,8 +15,8 @@ from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 import django_comment_client.utils as utils
 
-from courseware.tests.factories import InstructorFactory
-from courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id

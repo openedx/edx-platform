@@ -15,7 +15,7 @@ import json
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tabs import get_course_tab_list, CourseTab
+from lms.djangoapps.courseware.tabs import get_course_tab_list, CourseTab
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from notes import utils, api, models
 

@@ -5,7 +5,7 @@ Tests for the score change signals defined in the courseware models module.
 from django.test import TestCase
 from mock import patch, MagicMock
 
-from courseware.models import submissions_score_set_handler, submissions_score_reset_handler
+from ..models import submissions_score_set_handler, submissions_score_reset_handler
 
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
@@ -35,10 +35,10 @@ class SubmissionSignalRelayTest(TestCase):
         Configure mocks for all the dependencies of the render method
         """
         super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('courseware.models.SCORE_CHANGED.send', None)
+        self.signal_mock = self.setup_patch('lms.djangoapps.courseware.models.SCORE_CHANGED.send', None)
         self.user_mock = MagicMock()
         self.user_mock.id = 42
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', self.user_mock)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.courseware.models.user_by_anonymous_id', self.user_mock)
 
     def setup_patch(self, function_name, return_value):
         """
@@ -103,7 +103,7 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.courseware.models.user_by_anonymous_id', None)
         submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
         self.signal_mock.assert_not_called()
 
@@ -152,6 +152,6 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('courseware.models.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.courseware.models.user_by_anonymous_id', None)
         submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
         self.signal_mock.assert_not_called()

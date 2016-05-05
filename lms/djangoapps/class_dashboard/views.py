@@ -8,8 +8,8 @@ import json
 from django.http import HttpResponse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.courses import get_course_overview_with_access
-from courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.access import has_access
 from class_dashboard import dashboard_data
 
 

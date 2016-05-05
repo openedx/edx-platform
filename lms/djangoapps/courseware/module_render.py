@@ -33,20 +33,6 @@ from xblock.reference.plugins import FSService
 
 import static_replace
 from openedx.core.lib.gating import api as gating_api
-from courseware.access import has_access, get_user_role
-from courseware.entrance_exams import (
-    get_entrance_exam_score,
-    user_must_complete_entrance_exam,
-    user_has_passed_entrance_exam
-)
-from courseware.masquerade import (
-    MasqueradingKeyValueStore,
-    filter_displayed_blocks,
-    is_masquerading_as_specific_student,
-    setup_masquerade,
-)
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
-from courseware.models import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -78,7 +64,22 @@ from xmodule.mixin import wrap_with_license
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
+
+from .access import has_access, get_user_role
+from .entrance_exams import (
+    get_entrance_exam_score,
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
+)
 from .field_overrides import OverrideFieldData
+from .masquerade import (
+    MasqueradingKeyValueStore,
+    filter_displayed_blocks,
+    is_masquerading_as_specific_student,
+    setup_masquerade,
+)
+from .model_data import DjangoKeyValueStore, FieldDataCache, set_score
+from .models import SCORE_CHANGED
 
 log = logging.getLogger(__name__)
 

@@ -10,12 +10,13 @@ import urllib
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from courseware.tests import BaseTestXmodule
-from courseware.views.views import get_course_lti_endpoints
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
+
+from . import BaseTestXmodule
+from ..views.views import get_course_lti_endpoints
 
 
 @attr('shard_1')
@@ -176,7 +177,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
     def expected_handler_url(self, handler):
         """convenience method to get the reversed handler urls"""
         return "https://{}{}".format(settings.SITE_NAME, reverse(
-            'courseware.module_render.handle_xblock_callback_noauth',
+            'lms.djangoapps.courseware.module_render.handle_xblock_callback_noauth',
             args=[
                 self.course.id.to_deprecated_string(),
                 quote_slashes(unicode(self.lti_published.scope_ids.usage_id.to_deprecated_string()).encode('utf-8')),

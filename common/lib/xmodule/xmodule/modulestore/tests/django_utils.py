@@ -15,7 +15,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from request_cache.middleware import RequestCache
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 from xmodule.contentstore.django import _CONTENTSTORE

@@ -13,7 +13,7 @@ import mock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.courses import (
+from ..courses import (
     get_cms_block_link,
     get_cms_course_link,
     get_courses,
@@ -23,10 +23,10 @@ from courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
 )
-from courseware.module_render import get_module_for_descriptor
-from courseware.tests.helpers import get_request_for_user
-from courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from ..module_render import get_module_for_descriptor
+from ..tests.helpers import get_request_for_user
+from ..model_data import FieldDataCache
+from ..courseware_access_exception import CoursewareAccessException
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
@@ -282,7 +282,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         self.assertEqual(course_info, u"<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>")
 
         # Test when render raises an exception
-        with mock.patch('courseware.courses.get_module') as mock_module_render:
+        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
@@ -296,7 +296,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         self.assertEqual(course_about, "A course about toys.")
 
         # Test when render raises an exception
-        with mock.patch('courseware.courses.get_module') as mock_module_render:
+        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )

@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from requests.auth import HTTPBasicAuth
 
-from courseware import grades
+from lms.djangoapps.courseware import grades
 from xmodule.modulestore.django import modulestore
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey

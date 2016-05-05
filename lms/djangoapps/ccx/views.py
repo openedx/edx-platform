@@ -26,11 +26,11 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
 
-from courseware.field_overrides import disable_overrides
-from courseware.grades import iterate_grades_for
+from lms.djangoapps.courseware.field_overrides import disable_overrides
+from lms.djangoapps.courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator

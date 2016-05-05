@@ -5,9 +5,14 @@ from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from courseware.access import has_access
-from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
-from courseware.tests.factories import (
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
+
+from ..access import has_access
+from .helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from .factories import (
     BetaTesterFactory,
     StaffFactory,
     GlobalStaffFactory,
@@ -15,10 +20,6 @@ from courseware.tests.factories import (
     OrgStaffFactory,
     OrgInstructorFactory,
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 @attr('shard_1')
@@ -282,7 +283,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             self.assert_request_status_code(200, url)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
@@ -309,7 +310,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
@@ -332,7 +333,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_dark(self.test_course)
         self._check_staff(self.course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_global_staff(self):
         """
         Make sure that before course start staff can access
@@ -354,7 +355,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_staff(self.course)
         self._check_staff(self.test_course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):
         """
         Check that enrollment periods work.
@@ -407,7 +408,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         self.normal_student = UserFactory()
         self.beta_tester = BetaTesterFactory(course_key=self.course.id)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):
         """
         Check that beta-test access works for courses.
@@ -416,7 +417,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         self.assertCannotAccessCourse(self.normal_student, 'load', self.course)
         self.assertCanAccessCourse(self.beta_tester, 'load', self.course)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
         """
         Check that beta-test access works for content.

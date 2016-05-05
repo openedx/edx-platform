@@ -20,7 +20,7 @@ from rest_framework.exceptions import PermissionDenied
 from opaque_keys.edx.locator import CourseLocator
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api import api
 from discussion_api.api import (
     create_comment,

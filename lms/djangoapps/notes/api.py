@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 
 import json
 import logging

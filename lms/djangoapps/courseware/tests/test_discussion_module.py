@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """Test for Discussion Xmodule functional logic."""
+
 import ddt
 from mock import Mock
-from . import BaseTestXmodule
-from courseware.module_render import get_module_for_descriptor_internal
+
 from xmodule.discussion_module import DiscussionModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from student.tests.factories import UserFactory
+
+from . import BaseTestXmodule
+from ..module_render import get_module_for_descriptor_internal
 
 
 @ddt.ddt

@@ -15,7 +15,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
-import courseware.views.views
+import lms.djangoapps.courseware.views.views
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
@@ -112,7 +112,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return courseware.views.views.courses(request)
+    return lms.djangoapps.courseware.views.views.courses(request)
 
 
 def _footer_static_url(request, name):

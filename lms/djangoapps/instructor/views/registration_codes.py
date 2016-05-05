@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_GET, require_POST
 from instructor.enrollment import get_email_params, send_mail_to_student
 from django.utils.translation import ugettext as _
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from instructor.views.api import require_level
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse

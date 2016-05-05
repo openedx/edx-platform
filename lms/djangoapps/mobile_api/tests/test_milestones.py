@@ -3,9 +3,9 @@ Milestone related tests for the mobile_api
 """
 from mock import patch
 
-from courseware.access_response import MilestoneError
-from courseware.tests.helpers import get_request_for_user
-from courseware.tests.test_entrance_exam import answer_entrance_exam_problem, add_entrance_exam_milestone
+from lms.djangoapps.courseware.access_response import MilestoneError
+from lms.djangoapps.courseware.tests.helpers import get_request_for_user
+from lms.djangoapps.courseware.tests.test_entrance_exam import answer_entrance_exam_problem, add_entrance_exam_milestone
 from util.milestones_helpers import (
     add_prerequisite_course,
     fulfill_course_milestone,

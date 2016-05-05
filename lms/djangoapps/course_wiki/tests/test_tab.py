@@ -5,7 +5,7 @@ Tests for wiki views.
 from django.conf import settings
 from django.test.client import RequestFactory
 
-from courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

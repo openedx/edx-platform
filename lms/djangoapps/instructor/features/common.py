@@ -11,7 +11,7 @@ from lettuce import world, step
 from mock import patch
 from nose.tools import assert_in
 
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory, InstructorFactory
 
 
 @step(u'Given I am "([^"]*)" for a very large course')
@@ -19,7 +19,7 @@ def make_staff_or_instructor_for_large_course(step, role):
     make_large_course(step, role)
 
 
-@patch.dict('courseware.access.settings.FEATURES', {"MAX_ENROLLMENT_INSTR_BUTTONS": 0})
+@patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {"MAX_ENROLLMENT_INSTR_BUTTONS": 0})
 def make_large_course(step, role):
     i_am_staff_or_instructor(step, role)
 

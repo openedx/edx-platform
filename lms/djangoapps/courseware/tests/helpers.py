@@ -5,9 +5,10 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
+
+from ..access import has_access
 
 
 def get_request_for_user(user):

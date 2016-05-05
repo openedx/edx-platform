@@ -10,11 +10,12 @@ from selenium.common.exceptions import NoAlertPresentException
 from nose.tools import assert_true, assert_equal, assert_in, assert_is_none
 from lettuce import world, step
 
-from courseware.tests.factories import InstructorFactory, BetaTesterFactory
-from courseware.access import has_access
 from student.tests.factories import UserFactory
 
 from common import visit_scenario_item
+
+from ..access import has_access
+from ..tests.factories import InstructorFactory, BetaTesterFactory
 
 TEST_COURSE_NAME = "test_course_a"
 
@@ -232,7 +233,7 @@ def create_course_for_lti(course, metadata):
         metadata={'graded': True, 'format': 'Homework'})
 
 
-@patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+@patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
 def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
     # Create user
     if user == 'BetaTester':

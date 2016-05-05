@@ -4,7 +4,7 @@ Computes the data to display on the Instructor Dashboard
 from util.json_request import JsonResponse
 import json
 
-from courseware import models
+from lms.djangoapps.courseware import models
 from django.db.models import Count
 from django.utils.translation import ugettext as _
 

@@ -26,7 +26,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 from xblock.fragment import Fragment
 
-import courseware.views.views as views
+from ..views import views as views
 import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
@@ -34,13 +34,13 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.model_data import set_score
-from courseware.module_render import toc_for_course
-from courseware.testutils import RenderXBlockTestMixin
-from courseware.tests.factories import StudentModuleFactory
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
-from courseware.views.index import render_accordion, CoursewareIndex
+from ..model_data import set_score
+from ..module_render import toc_for_course
+from ..testutils import RenderXBlockTestMixin
+from ..tests.factories import StudentModuleFactory
+from ..url_helpers import get_redirect_url
+from ..user_state_client import DjangoXBlockUserStateClient
+from ..views.index import render_accordion, CoursewareIndex
 from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -256,7 +256,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
     def test_index_nonexistent_chapter_masquerade(self):
-        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
+        with patch('lms.djangoapps.courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
@@ -265,7 +265,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, section_name='non-existent')
 
     def test_index_nonexistent_section_masquerade(self):
-        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
+        with patch('lms.djangoapps.courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, section_name='non-existent')
@@ -1096,8 +1096,15 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertNotContains(resp, 'Request Certificate')
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.courseware.grades.grade',
+        Mock(return_value={
+            'grade': 'Pass',
+            'percent': 0.75,
+            'section_breakdown': [],
+            'grade_breakdown': [],
+        })
+    )
     def test_view_certificate_link(self):
         """
         If certificate web view is enabled then certificate web view button should appear for user who certificate is
@@ -1152,8 +1159,15 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"We're creating your certificate.")
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
-                                                         'grade_breakdown': []}))
+    @patch(
+        'lms.djangoapps.courseware.grades.grade',
+        Mock(return_value={
+            'grade': 'Pass',
+            'percent': 0.75,
+            'section_breakdown': [],
+            'grade_breakdown': [],
+        })
+    )
     def test_view_certificate_link_hidden(self):
         """
         If certificate web view is disabled then certificate web view button should not appear for user who certificate
@@ -1188,7 +1202,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             resp = views.progress(self.request, course_id=unicode(self.course.id))
         self.assertEqual(resp.status_code, 200)
 
-    @patch('courseware.grades.grade', Mock(return_value={
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={
         'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []
     }))
     @ddt.data(
@@ -1261,19 +1275,19 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         # If user has not grade then false will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.9}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'percent': 0.9}))
     def test_user_pass_if_percent_appears_above_passing_point(self):
         # Mocking the grades.grade
         # If user has above passing marks then True will return
         self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.2}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'percent': 0.2}))
     def test_user_fail_if_percent_appears_below_passing_point(self):
         # Mocking the grades.grade
         # If user has below passing marks then False will return
         self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
 
-    @patch('courseware.grades.grade', Mock(return_value={'percent': SUCCESS_CUTOFF}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'percent': SUCCESS_CUTOFF}))
     def test_user_with_passing_marks_and_achieved_marks_equal(self):
         # Mocking the grades.grade
         # If user's achieved passing marks are equal to the required passing
@@ -1308,14 +1322,14 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
         # mocking xqueue and analytics
 
-        analytics_patcher = patch('courseware.views.views.analytics')
+        analytics_patcher = patch('lms.djangoapps.courseware.views.views.analytics')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -1341,7 +1355,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             )
             mock_tracker.reset_mock()
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
         # then json will return cert generating message with bad request code
@@ -1355,7 +1369,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Certificate is being created.", resp.content)
 
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @patch('lms.djangoapps.courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
         # If user has already downloadable certificate
