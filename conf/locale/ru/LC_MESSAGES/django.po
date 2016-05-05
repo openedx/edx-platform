@@ -194,7 +194,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-04-15 11:05+0000\n"
+"POT-Creation-Date: 2016-04-28 21:19+0000\n"
 "PO-Revision-Date: 2016-02-29 15:22+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -270,7 +270,12 @@ msgstr "Идентификатор видео"
 msgid "Status"
 msgstr "Состояние"
 
-#: cms/templates/index.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Pending"
 msgstr "Ожидание"
@@ -805,7 +810,7 @@ msgstr "Курс, который вы ищете, начнётся {date}."
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for is closed for enrollment as of {date}."
-msgstr ""
+msgstr "Регистрация на курс, который вы ищете, закрылась {date}."
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -2288,8 +2293,9 @@ msgstr ""
 "формате: \"id:client_key:client_secret\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "List of pairs of (title, url) for textbooks used in this course"
-msgstr "Список пар (заголовок, url) для учебников, используемых в этом курсе."
+msgid ""
+"List of Textbook objects with (title, url) for textbooks used in this course"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Slug that points to the wiki for this course"
@@ -2551,6 +2557,9 @@ msgid ""
 "name of the tab (usually the title of the book) as well as the URLs and "
 "titles of each chapter in the book."
 msgstr ""
+"Для HTML учебников, которые появляются в виде отдельных вкладок в курсе, "
+"введите название вкладки (как правило, название книги), а также URL-адреса и"
+" названия всех глав в книги."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Remote Gradebook"
@@ -2662,6 +2671,8 @@ msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
 msgstr ""
+"Если ввести значение true, часовые пояса будут показаны рядом с датами "
+"курсов. При наличии due_date_display_format этот параметр не используется."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2855,6 +2866,10 @@ msgid ""
 "course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
+"Введите название организации, которое должно появиться в описании и "
+"содержании курса. Данное значение замещает название организации, введённое "
+"при создании курса. Для использования названия, заданного при создании "
+"курса, введите null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2867,6 +2882,9 @@ msgid ""
 " use the course number that you entered when you created the course, enter "
 "null."
 msgstr ""
+"Введите номер курса, который должен появиться в описании и содержании курса."
+" Данное значение переопределяет номер курса, введённый при созданни курса. "
+"Для использования номера, заданного при создании курса, введите null."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -3100,13 +3118,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Bypass Course Home"
-msgstr ""
+msgstr "Пропускать домашнюю страницу курса"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Bypass the course home tab when students arrive from the dashboard, sending "
 "them directly to course content."
 msgstr ""
+"При переходе слушателя из панели управления не показывать домашнюю страницу "
+"курса, а перенаправлять сразу на содержимое курса."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
@@ -4695,6 +4715,8 @@ msgid ""
 "A CCX can only be created on this course through an external service. "
 "Contact a course admin to give you access."
 msgstr ""
+"CCX в этом курсе может быть создан только через внешний сервис. Для "
+"получения доступа свяжитесь с администратором курса."
 
 #: lms/djangoapps/ccx/utils.py
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
@@ -5794,11 +5816,11 @@ msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Invalid JSON response received from notes api."
-msgstr ""
+msgstr "Ошибка в формате данных JSON, полученных от notes API."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Incorrect data received from notes api."
-msgstr ""
+msgstr "Notes API вернул неверные данные."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
@@ -6034,6 +6056,8 @@ msgid ""
 "The enrolled learner profile report is being created. To view the status of "
 "the report, see Pending Tasks below."
 msgstr ""
+"Отчёт по личным данным записанных слушателей на стадии подготовки. Чтобы "
+"просмотреть статус отчёта, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6041,6 +6065,9 @@ msgid ""
 " report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"Отчёт о записи на курс на стадии подготовки. Чтобы просмотреть статус "
+"отчёта, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда он "
+"будет завершён."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6048,6 +6075,9 @@ msgid ""
 "about learners who can enroll in the course. To view the status of the "
 "report, see Pending Tasks below."
 msgstr ""
+"Отчёт о записи на курс на стадии подготовки. Данный отчёт содержит "
+"информацию о слушателях, которые могут записаться на курс. Чтобы просмотреть"
+" статус отчёта, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6110,6 +6140,8 @@ msgid ""
 "The detailed enrollment report is being created. To view the status of the "
 "report, see Pending Tasks below."
 msgstr ""
+"Подробный отчёт о записи на курс на стадии подготовки. Чтобы просмотреть "
+"статус отчёта, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6117,12 +6149,17 @@ msgid ""
 "report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"Подробный отчёт о записи на курс на стадии подготовки. Чтобы просмотреть "
+"статус отчёта, см. ниже «Текущие задачи». Вы сможете загрузить отчет, когда "
+"он будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The executive summary report is being created. To view the status of the "
 "report, see Pending Tasks below."
 msgstr ""
+"Административный итоговый отчёт на стадии подготовки. Чтобы просмотреть "
+"статус отчета, см. ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6130,12 +6167,17 @@ msgid ""
 "of the report, see Pending Tasks below. You will be able to download the "
 "report when it is complete."
 msgstr ""
+"Административный итоговый отчёт в настоящее время на стадии подготовки. "
+"Чтобы просмотреть статус отчёта, см. ниже «Текущие задачи». Вы сможете "
+"загрузить отчёт, когда он будет завершён."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The survey report is being created. To view the status of the report, see "
 "Pending Tasks below."
 msgstr ""
+"Отчёт по опросу на стадии подготовки. Чтобы просмотреть статус отчёта, см. "
+"ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6143,12 +6185,17 @@ msgid ""
 "report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"Отчёт по опросу в настоящее время на стадии подготовки. Чтобы просмотреть "
+"статус отчёта, см. ниже «Текущие задачи». Вы сможете загрузить отчёт, когда "
+"он будет завершён."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The proctored exam results report is being created. To view the status of "
 "the report, see Pending Tasks below."
 msgstr ""
+"Отчёт о результатах наблюдаемого задания на стадии подготовки. Статус "
+"создания отчёта отображается ниже, в списке «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6156,6 +6203,9 @@ msgid ""
 "status of the report, see Pending Tasks below. You will be able to download "
 "the report when it is complete."
 msgstr ""
+"Отчёт о результатах наблюдаемого задания в настоящий момент на стадии "
+"подготовки. Статус создания отчёта отображается ниже, в списке «Текущие "
+"задачи». Вы сможете загрузить отчёт, когда он будет завершён."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not parse amount as a decimal"
@@ -6213,7 +6263,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The ORA data report is being generated."
-msgstr ""
+msgstr "Отчёт по заданиям с ответами в свободной форме на стадии подготовки."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6221,12 +6271,17 @@ msgid ""
 "'Pending Tasks' table for the status of the task. When completed, the report"
 " will be available for download in the table below."
 msgstr ""
+"Отчёт по заданиям с ответами в свободной форме уже составляется. Его статус "
+"можно посмотреть в разделе «Текущие задачи». Когда отчёт будет готов, вы "
+"сможете скачать его в таблице ниже."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The grade report is being created. To view the status of the report, see "
 "Pending Tasks below."
 msgstr ""
+"Оценочный лист на стадии подготовки. Состояние отчёта отображается ниже, в "
+"списке «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6234,12 +6289,17 @@ msgid ""
 "report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"Оценочный лист в настоящее время на стадии подготовки. Состояние отчёта "
+"отображается ниже, в списке «Текущие задачи». Вы сможете загрузить отчёт, "
+"когда он будет завершен."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "The problem grade report is being created. To view the status of the report,"
 " see Pending Tasks below."
 msgstr ""
+"Подробный оценочный лист на стадии подготовки. Состояние отчёта отображается"
+" ниже, в списке «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6247,6 +6307,9 @@ msgid ""
 " report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"Подробный оценочный лист на стадии подготовки. Состояние отчёта отображается"
+" ниже, в списке «Текущие задачи». Вы сможете загрузить отчёт, когда он будет"
+" завершён."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -8497,117 +8560,14 @@ msgstr "Youtube"
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "Подпишитесь на канал {platform_name} на YouTube"
 
+#: lms/envs/common.py
+msgid "Kosovo"
+msgstr ""
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
 msgstr "Перейти к основному содержимому"
-
-#: lms/templates/provider/authorize.html
-#, python-format
-msgid ""
-"\n"
-"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
-"  "
-msgstr ""
-"\n"
-"    Приложение <strong>%(application_name)s</strong> запрашивает доступ к вашим данным с правом на нижеследующие операции:\n"
-"  "
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Чтение вашего идентификатора"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Чтение вашего профиля"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "Чтение вашего электронного адреса"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Чтение списка курсов, сотрудником которых вы являетесь."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Чтение списка курсов, которые вы преподаете."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Проверить, что вы включены в команды всех курсов"
-
-#: lms/templates/provider/authorize.html
-#, python-format
-msgid "Manage your data: %(permission)s"
-msgstr "Управление вашими данными: %(permission)s"
-
-#: lms/templates/registration/password_reset_complete.html
-msgid "Your Password Reset is Complete"
-msgstr "Сброс пароля выполнен"
-
-#: lms/templates/registration/password_reset_complete.html
-msgid "Password Reset Complete"
-msgstr ""
-
-#: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
-"                "
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"    Reset Your %(platform_name)s Password\n"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Новый пароль"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr ""
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "Сбросить пароль"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Invalid Password Reset Link"
-msgstr ""
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
-"                "
-msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -8638,46 +8598,6 @@ msgstr "Спасибо за использование нашего сайта!"
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "Команда %(platform_name)s"
-
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "Чтобы вернуть это заказ:"
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "Номер заказа:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "Зачисление:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "зачислено"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "отчислено"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "Стоимость:"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "Статус сертификата:"
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "Статус заказа:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "Время выполнения:"
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "Время запроса о возврате средств:"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -9143,19 +9063,19 @@ msgstr "Отказано"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Approved"
-msgstr ""
+msgstr "Разрешено"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Status of this API access request"
-msgstr ""
+msgstr "Статус этого запроса API"
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "The URL of the website associated with this API user."
-msgstr ""
+msgstr "URL-адрес веб-сайта, связанного с этим пользователем API."
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "The reason this user wants to access the API."
-msgstr ""
+msgstr "Основание для доступа к API данного пользователя."
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "API access request from {company}"
@@ -9163,10 +9083,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "API access request"
-msgstr ""
-
-#: openedx/core/djangoapps/api_admin/views.py
-msgid "TODO"
 msgstr ""
 
 #. Translators: link_start and link_end are HTML tags for a link to the terms
@@ -9235,6 +9151,9 @@ msgid ""
 "Generally, it is the domain name for your platform. For example, if your "
 "platform is http://edx.org, the platform key is \"edx\"."
 msgstr ""
+"Ключ платформы связывает виджет CourseTalk с вашей платформой. Чаще всего "
+"это доменное имя вашей платформы. Например, если вы работаете с "
+"http://edx.org, ключом платформы будет «edx»."
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/programs/models.py
@@ -9258,11 +9177,13 @@ msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable Authoring of Credential in Studio"
-msgstr ""
+msgstr "Включите проверку на авторстово удостоверения в Студио"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Enable authoring of Credential Service credentials in Studio."
 msgstr ""
+"Включите проверку на авторство данных логина и пароля для Сервиса "
+"Удостоверения в Студио."
 
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
@@ -9285,19 +9206,19 @@ msgstr "Условия получения зачёта на курсе"
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "You are eligible for credit from {providers_string}"
-msgstr ""
+msgstr "Вы имеете право получить зачёт от {providers_string}"
 
 #. Translators: The join of two university names (e.g., Harvard and MIT).
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "{first_provider} and {second_provider}"
-msgstr ""
+msgstr "{first_provider} и {second_provider}"
 
 #. Translators: The join of three or more university names. The first of these
 #. formatting strings
 #. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "{first_providers}, and {last_provider}"
-msgstr ""
+msgstr "{first_providers} и {last_provider}"
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9453,6 +9374,8 @@ msgstr "Путь к JS-коду приложения авторизации"
 msgid ""
 "This value is required in order to enable the Studio authoring interface."
 msgstr ""
+"Требуется заполнить это значение для включения интерфейса авторизации "
+"Studio."
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's CSS"
@@ -9464,7 +9387,7 @@ msgstr "Разрешить панель управления обучающег�
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Studio Authoring Interface"
-msgstr ""
+msgstr "Разрешить интерфейс авторизации Studio"
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "Enable Program Certificate Generation"
@@ -9661,7 +9584,7 @@ msgstr "Расскажите нам, почему вы заинтересова�
 #. live.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "State/Province/Region"
-msgstr ""
+msgstr "Штат/регион/область"
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Please select your Country."
@@ -10235,7 +10158,7 @@ msgstr "Курсы"
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Programs"
-msgstr ""
+msgstr "Программы"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
@@ -10326,8 +10249,7 @@ msgstr ""
 msgid "Choose Language"
 msgstr "Выберите язык"
 
-#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 msgid "Account"
 msgstr "Учётная запись"
 
@@ -10336,8 +10258,7 @@ msgstr "Учётная запись"
 msgid "Help"
 msgstr "Помощь"
 
-#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Выйти"
@@ -10473,9 +10394,8 @@ msgstr "Начало"
 msgid "View all Courses"
 msgstr "Посмотреть все курсы"
 
-#: lms/templates/dashboard.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/dashboard.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Панель управления"
 
@@ -10641,6 +10561,11 @@ msgstr "Ваш адрес электронной почты"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "Адрес электронной почты, использованный при регистрации в {platform}"
+
+#: lms/templates/forgot_password_modal.html
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset My Password"
+msgstr "Сбросить пароль"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -11067,85 +10992,55 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Необработанные данные:"
 
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "{platform_name} Home Page"
-msgstr "{platform_name} Главная страница"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "How it Works"
-msgstr "Как это работает"
-
-#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Find Courses"
-msgstr "Найти курсы"
-
-#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
-msgid "Schools & Partners"
-msgstr "Учебные заведения и партнеры"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Dashboard for:"
-msgstr "Панель управления для:"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "Profile image for {username}"
-msgstr "Фото {username}"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Меню с дополнительными опциями"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Profile"
-msgstr "Профиль"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Shopping Cart"
-msgstr "Корзина"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Sign in"
-msgstr "Вход"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Регистрация"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid ""
-"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
-"strongly recommend using {chrome_link} or {ff_link}."
-msgstr ""
-
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Глобально"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "{platform_name} Home Page"
+msgstr "{platform_name} Главная страница"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "Сисадмин"
 
+#: lms/templates/navigation.html lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Shopping Cart"
+msgstr "Корзина"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "How it Works"
+msgstr "Как это работает"
+
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr "Организации"
+
+#: lms/templates/navigation.html
+msgid "Explore Courses"
+msgstr ""
+
+#: lms/templates/navigation.html lms/templates/register-form.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Регистрация"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Sign in"
+msgstr "Вход"
+
+#: lms/templates/navigation.html
+msgid ""
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
+msgstr ""
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -11795,6 +11690,30 @@ msgstr ""
 "отказались от подписки случайно, {undo_link_start}Вы можете подписаться "
 "снова{link_end}."
 
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "Dashboard for:"
+msgstr "Панель управления для:"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu dropdown"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Profile"
+msgstr "Профиль"
+
+#: lms/templates/user_dropdown.html
+msgid "Profile image for {username}"
+msgstr "Фото {username}"
+
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Меню с дополнительными опциями"
+
 #: lms/templates/using.html
 msgid "Using the system"
 msgstr "Использование системы"
@@ -11859,15 +11778,65 @@ msgstr "Общее количество слов:"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
-msgstr ""
+msgstr "Запрос доступа к API"
 
 #: lms/templates/api_admin/api_access_request_form.html
 #: lms/templates/api_admin/status.html
 msgid "{platform_name} API Access Request"
-msgstr ""
+msgstr "Запрос доступа к {platform_name} API"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "Request API Access"
+msgstr ""
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API is being "
+"processed. You will receive a message at the email address in your profile "
+"when processing is complete. You can also return to this page to see the "
+"status of your API access request."
+msgstr ""
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#. "api_support_email_link" is HTML for a link to email the API support staff.
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API has been "
+"denied. If you think this is an error, or for other questions about using "
+"this API, contact {api_support_email_link}."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API has been "
+"approved."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Application Name"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "API Client ID"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "API Client Secret"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Redirect URLs"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid ""
+"If you would like to regenerate your API client information, please use the "
+"form below."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Generate API client credentials"
 msgstr ""
 
 #. Translators: "platform_name" is the name of this Open edX installation.
@@ -11876,18 +11845,14 @@ msgstr ""
 #. support staff.
 #: lms/templates/api_admin/status.html
 msgid ""
-"Your request to access the {platform_name} Course Catalog API is being "
-"processed. You will receive a message at the email address in your profile "
-"when processing is complete. You can also return to this page to see the "
-"status of your API access request. To learn more about the {platform_name} "
-"Course Catalog API, visit {link_start}our API documentation page{link_end}. "
-"For questions about using this API, visit our FAQ page or contact "
-"{api_support_email_link}."
+"To learn more about the {platform_name} Course Catalog API, visit "
+"{link_start}our API documentation page{link_end}. For questions about using "
+"this API, contact {api_support_email_link}."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Terms of Service for {platform_name} APIs"
-msgstr ""
+msgstr "Условия предоставления услуг для {platform_name} APIs"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Effective Date: April 12th, 2016"
@@ -11910,7 +11875,7 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
-msgstr ""
+msgstr "Доступ к API"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -11969,6 +11934,8 @@ msgid ""
 "collecting or storing the names, passwords, or other credentials of "
 "{platform_name} users;"
 msgstr ""
+"сбор или хранение имён, паролей или других учётных данных пользователей "
+"{platform_name};"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -12507,7 +12474,7 @@ msgstr "Дайте название своему CCX"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Create a new Custom Course for edX"
-msgstr ""
+msgstr "Создать новый индивидуальный курс "
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Schedule"
@@ -12520,7 +12487,7 @@ msgstr "Правила оценивания"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Please enter a valid CCX name."
-msgstr ""
+msgstr "Пожалуйста, введите корректное название для индивидуального курса."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -13503,6 +13470,9 @@ msgid ""
 "for successfully completing your {platform_name} course! {link_start}Get "
 "your credit now.{link_end}"
 msgstr ""
+"Поздравляем! Вы имеете право получить зачёт от {providers} за успешное "
+"окончание курса на {platform_name}! {link_start}Для получения зачёта "
+"перейдите по ссылке.{link_end}"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -13712,7 +13682,7 @@ msgstr "Я учусь на {platform_name}:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
-msgstr ""
+msgstr "Настройки для курса"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Available Actions"
@@ -13862,7 +13832,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "You are now eligible for credit from {provider}. Congratulations!"
-msgstr ""
+msgstr "Теперь у вас есть право получить зачёт от {provider}. Поздравляем!"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
@@ -15435,7 +15405,7 @@ msgstr "Создать оценочный лист с подробными оц�
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
-msgstr ""
+msgstr "Создать отчёт по заданиям с ответами в свободной форме"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"
@@ -16063,6 +16033,8 @@ msgid ""
 "For analytics about your course, go to "
 "{link_start}{analytics_dashboard_name}{link_end}."
 msgstr ""
+"Чтобы ознакомиться с аналитическими данными по курсу, перейдите в "
+"{link_start}{analytics_dashboard_name}{link_end}."
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
@@ -16726,6 +16698,10 @@ msgstr ""
 msgid "Show Background Task History for Problem"
 msgstr "Показать историю фоновых задач"
 
+#: lms/templates/learner_dashboard/programs.html
+msgid "Your Programs"
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Изменить Языковые Предпочтения"
@@ -16941,6 +16917,40 @@ msgstr "Оставить отметку"
 msgid "Go Back"
 msgstr "Вернуться"
 
+#: lms/templates/provider/authorize.html
+msgid ""
+"{start_strong}{application_name}{end_strong} would like to access your data "
+"with the following permissions:"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr "Чтение вашего идентификатора"
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr "Чтение вашего профиля"
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr "Чтение вашего электронного адреса"
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr "Чтение списка курсов, сотрудником которых вы являетесь."
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr "Чтение списка курсов, которые вы преподаете."
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr "Проверить, что вы включены в команды всех курсов"
+
+#: lms/templates/provider/authorize.html
+msgid "Manage your data: {permission}"
+msgstr ""
+
 #: lms/templates/registration/activate_account_notice.html
 msgid "Thanks for Registering!"
 msgstr "Спасибо за регистрацию!"
@@ -16984,6 +16994,55 @@ msgstr ""
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
 msgstr "Или вернуться на {link_start}домашнюю страницу{link_end}."
+
+#: lms/templates/registration/password_reset_complete.html
+msgid "Your Password Reset is Complete"
+msgstr "Сброс пароля выполнен"
+
+#: lms/templates/registration/password_reset_complete.html
+msgid "Password Reset Complete"
+msgstr "Сброс пароля выполнен"
+
+#: lms/templates/registration/password_reset_complete.html
+msgid ""
+"Your password has been reset. {start_link}Sign-in to your account.{end_link}"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your {platform_name} Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Error Resetting Password"
+msgstr "Ошибка при сбросе пароля"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "You must enter and confirm your new password."
+msgstr "Вам необходимо ввести и подтвердить новый пароль."
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The text in both password fields must match."
+msgstr "Пароли в обоих полях должны совпадать."
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your Password"
+msgstr "Сбросить пароль"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Enter and confirm your new password."
+msgstr "Введите и подтвердите новый пароль."
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "New Password"
+msgstr "Новый пароль"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Confirm Password"
+msgstr "Подтвердить пароль"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
+msgstr "Неверная ссылка для сброса пароля"
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -17602,6 +17661,46 @@ msgstr "Поддержка слушателей: сертификаты"
 msgid "Student Support: Enrollment"
 msgstr "Поддержка слушателей: Зачисление"
 
+#: lms/templates/support/refund.html
+msgid "About to refund this order:"
+msgstr "Чтобы вернуть это заказ:"
+
+#: lms/templates/support/refund.html
+msgid "Order Id:"
+msgstr "Номер заказа:"
+
+#: lms/templates/support/refund.html
+msgid "Enrollment:"
+msgstr "Зачисление:"
+
+#: lms/templates/support/refund.html
+msgid "enrolled"
+msgstr "зачислено"
+
+#: lms/templates/support/refund.html
+msgid "unenrolled"
+msgstr "отчислено"
+
+#: lms/templates/support/refund.html
+msgid "Cost:"
+msgstr "Стоимость:"
+
+#: lms/templates/support/refund.html
+msgid "CertificateItem Status:"
+msgstr "Статус сертификата:"
+
+#: lms/templates/support/refund.html
+msgid "Order Status:"
+msgstr "Статус заказа:"
+
+#: lms/templates/support/refund.html
+msgid "Fulfilled Time:"
+msgstr "Время выполнения:"
+
+#: lms/templates/support/refund.html
+msgid "Refund Request Time:"
+msgstr "Время запроса о возврате средств:"
+
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "Опрос пользователей"
@@ -17807,6 +17906,15 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
+msgid "Find Courses"
+msgstr "Найти курсы"
+
+#: themes/edx.org/lms/templates/header.html
+msgid "Schools & Partners"
+msgstr "Учебные заведения и партнеры"
+
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -17914,7 +18022,7 @@ msgstr "{studio_name} Ошибка сервера"
 
 #: cms/templates/500.html
 msgid "The {em_start}{studio_name}{em_end} servers encountered an error"
-msgstr ""
+msgstr "На серверах {em_start}{studio_name}{em_end} произошла ошибка"
 
 #: cms/templates/500.html
 msgid ""
@@ -17996,7 +18104,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Files & Uploads"
-msgstr ""
+msgstr "Файлы и загрузки"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -18011,9 +18119,6 @@ msgstr "Содержание"
 #: cms/templates/index.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/textbooks.html cms/templates/videos_index.html
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/outline.html
 msgid "Page Actions"
 msgstr "Действия на странице"
 
@@ -19813,6 +19918,9 @@ msgid ""
 "part of your library URL, so no spaces or special characters are "
 "allowed.{strong_end} This cannot be changed."
 msgstr ""
+"Уникальный идентификационный код библиотеки. {strong_start}Примечание: это "
+"часть URL вашей библиотеки, поэтому не разрешается использовать пробелы и "
+"специальные символы.{strong_end} Код нельзя будет изменить впоследствии."
 
 #: cms/templates/index.html
 msgid "Courses Being Processed"
@@ -20148,19 +20256,19 @@ msgstr "Доп. информация о библиотеках материал�
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr ""
+msgstr "Вход"
 
 #: cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr ""
+msgstr "Вход в {studio_name}"
 
 #: cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
+msgstr "Нет учетной записи {studio_name}? Зарегистрируйтесь!"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
+msgstr "Информация, необходимая для входа в {studio_name}"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -20368,7 +20476,7 @@ msgstr "Ваше местонахождение"
 
 #: cms/templates/register.html
 msgid "Preferred Language"
-msgstr ""
+msgstr "Предпочтительный язык"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -20622,6 +20730,44 @@ msgstr "Ознакомление с вашим курсом"
 #: cms/templates/settings.html
 msgid "Information for prospective students"
 msgstr "Информация для абитуриентов"
+
+#: cms/templates/settings.html
+msgid "Course Title"
+msgstr "Название курса"
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed as hero image overlay on the course details page. Limit to 50 "
+"characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Subtitle"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed as hero image overlay on the course details page below the Course "
+"Title in a smaller font. Limit to 150 characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Duration"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed on the course details page below the hero image. Limit to 50 "
+"characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Description"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Displayed on the course details page. Limit to 1000 characters."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
