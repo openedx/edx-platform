@@ -97,7 +97,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         to_option = SEND_TO_ALL
         course_id = course_id or self.course.id
         course_email = CourseEmail.create(
-            course_id, self.instructor, to_option, "Test Subject", "<p>This is a test message</p>"
+            course_id, self.instructor, [to_option], "Test Subject", "<p>This is a test message</p>"
         )
         task_input = {'email_id': course_email.id}
         task_id = str(uuid4())

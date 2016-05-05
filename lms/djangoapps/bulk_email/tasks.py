@@ -35,11 +35,10 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from bulk_email.models import (
-    CourseEmail, Optout,
-    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
-    SEND_TO_STAFF,
+    CourseEmail, Optout, Target
 )
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
@@ -96,54 +95,6 @@ BULK_EMAIL_FAILURE_ERRORS = (
     SESDailyQuotaExceededError,  # 24-hour allotment of outbound email has been exceeded.
     SMTPException,
 )
-
-
-def _get_recipient_querysets(user_id, to_option, course_id):
-    """
-    Returns a list of query sets of email recipients corresponding to the
-    requested `to_option` category.
-
-    `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
-
-    Recipients who are in more than one category (e.g. enrolled in the course
-    and are staff or self) will be properly deduped.
-    """
-    if to_option not in TO_OPTIONS:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
-
-    if to_option == SEND_TO_MYSELF:
-        user = User.objects.filter(id=user_id)
-        return [use_read_replica_if_available(user)]
-    else:
-        staff_qset = CourseStaffRole(course_id).users_with_role()
-        instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        staff_instructor_qset = (staff_qset | instructor_qset).distinct()
-        if to_option == SEND_TO_STAFF:
-            return [use_read_replica_if_available(staff_instructor_qset)]
-
-        if to_option == SEND_TO_ALL:
-            # We also require students to have activated their accounts to
-            # provide verification that the provided email address is valid.
-            enrollment_qset = User.objects.filter(
-                is_active=True,
-                courseenrollment__course_id=course_id,
-                courseenrollment__is_active=True
-            )
-
-            # to avoid duplicates, we only want to email unenrolled course staff
-            # members here
-            unenrolled_staff_qset = staff_instructor_qset.exclude(
-                courseenrollment__course_id=course_id, courseenrollment__is_active=True
-            )
-
-            # use read_replica if available
-            recipient_qsets = [
-                use_read_replica_if_available(unenrolled_staff_qset),
-                use_read_replica_if_available(enrollment_qset),
-            ]
-            return recipient_qsets
-
 
 def _get_course_email_context(course):
     """
@@ -219,16 +170,24 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     course = get_course(course_id)
 
     # Get arguments that will be passed to every subtask.
-    to_option = email_obj.to_option
+    targets = email_obj.targets.all()
     global_email_context = _get_course_email_context(course)
 
-    recipient_qsets = _get_recipient_querysets(user_id, to_option, course_id)
+    recipient_qsets = [
+        target.get_users(course_id, user_id)
+        for target in targets
+    ]
+    combined_qset = User.objects.none()
+    for qset in recipient_qsets:
+        combined_qset = combined_qset | qset
+    print combined_qset
+    combined_qset = qset.distinct()
     recipient_fields = ['profile__name', 'email']
 
-    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
-             task_id, course_id, email_id, to_option)
+    log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s",
+             task_id, course_id, email_id)
 
-    total_recipients = sum([recipient_queryset.count() for recipient_queryset in recipient_qsets])
+    total_recipients = combined_qset.count()
 
     routing_key = settings.BULK_EMAIL_ROUTING_KEY
     # if there are few enough emails, send them through a different queue
@@ -256,7 +215,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         entry,
         action_name,
         _create_send_email_subtask,
-        recipient_qsets,
+        [combined_qset],
         recipient_fields,
         settings.BULK_EMAIL_EMAILS_PER_TASK,
         total_recipients,

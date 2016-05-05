@@ -2493,7 +2493,7 @@ def send_email(request, course_id):
     if not BulkEmailFlag.feature_enabled(course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
 
-    send_to = request.POST.get("send_to")
+    targets = json.loads(request.POST.get("send_to"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
@@ -2511,7 +2511,7 @@ def send_email(request, course_id):
     email = CourseEmail.create(
         course_id,
         request.user,
-        send_to,
+        targets,
         subject, message,
         template_name=template_name,
         from_addr=from_addr

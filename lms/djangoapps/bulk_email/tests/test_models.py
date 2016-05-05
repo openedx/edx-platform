@@ -25,9 +25,9 @@ class CourseEmailTest(TestCase):
         to_option = SEND_TO_STAFF
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
-        email = CourseEmail.create(course_id, sender, to_option, subject, html_message)
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
         self.assertEquals(email.course_id, course_id)
-        self.assertEquals(email.to_option, SEND_TO_STAFF)
+        self.assertEquals(email.targets.all()[0].target_type, SEND_TO_STAFF)
         self.assertEquals(email.subject, subject)
         self.assertEquals(email.html_message, html_message)
         self.assertEquals(email.sender, sender)
@@ -41,10 +41,10 @@ class CourseEmailTest(TestCase):
         template_name = "branded_template"
         from_addr = "branded@branding.com"
         email = CourseEmail.create(
-            course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr
+            course_id, sender, [to_option], subject, html_message, template_name=template_name, from_addr=from_addr
         )
         self.assertEquals(email.course_id, course_id)
-        self.assertEquals(email.to_option, SEND_TO_STAFF)
+        self.assertEquals(email.targets.all()[0].target_type, SEND_TO_STAFF)
         self.assertEquals(email.subject, subject)
         self.assertEquals(email.html_message, html_message)
         self.assertEquals(email.sender, sender)
