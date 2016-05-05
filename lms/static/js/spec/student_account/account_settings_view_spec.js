@@ -15,7 +15,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var model = new UserAccountModel();
                 model.set(Helpers.createAccountSettingsData());
 
-                var sectionsData = [
+                var aboutSectionsData = [
                     {
                         title: "Basic Account Information",
                         fields: [
@@ -53,7 +53,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var accountSettingsView = new AccountSettingsView({
                     el: $('.wrapper-account-settings'),
                     model: model,
-                    sectionsData : sectionsData
+                    tabSections: {
+                        aboutTabSections: aboutSectionsData
+                    }
                 });
 
                 return accountSettingsView;

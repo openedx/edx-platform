@@ -141,7 +141,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 
-                var sectionsData = accountSettingsView.options.sectionsData;
+                var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
                 expect(sectionsData[0].fields.length).toBe(6);
 
@@ -180,14 +180,6 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         defaultValue: null
                     }, requests);
                 });
-
-                var section2Fields = sectionsData[2].fields;
-                expect(section2Fields.length).toBe(2);
-                for (var i = 0; i < section2Fields.length; i++) {
-
-                    var view = section2Fields[i].view;
-                    AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, view.options, requests);
-                }
             });
         });
     });

@@ -3,7 +3,6 @@
 
 .wrapper-footer {
   @extend %ui-print-excluded;
-  margin-top: ($baseline*2) + px;
   box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid tint(palette(grayscale, light), 50%);
   padding: 25px ($baseline/2 + px) ($baseline*1.5 + px) ($baseline/2 + px);

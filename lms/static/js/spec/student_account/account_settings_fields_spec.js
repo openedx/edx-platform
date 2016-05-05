@@ -32,7 +32,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 });
 
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
-                view.$('.u-field-value > a').click();
+                view.$('.u-field-value > button').click();
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', "email=legolas%40woodland.middlearth");
                 AjaxHelpers.respondWithJson(requests, {"success": "true"});
                 FieldViewsSpecHelpers.expectMessageContains(
