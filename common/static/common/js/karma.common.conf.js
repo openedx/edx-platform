@@ -124,24 +124,24 @@ function junitSettings(config) {
     };
 }
 
-var normalizePathsForCoverage = function(files, normalize_func) {
-    var filesForCoverage = {};
+var defaultNormalizeFunc = function (appRoot, pattern) {
+    if (pattern.match(/^common\/js/)) {
+        pattern = path.join(appRoot, '/common/static/' + pattern);
+    } else if (pattern.match(/^xmodule_js\/common_static/)) {
+        pattern = path.join(appRoot, '/common/static/' +
+          pattern.replace(/^xmodule_js\/common_static\//, ''));
+    }
+    return pattern;
+};
+
+var normalizePathsForCoverage = function(files, normalizeFunc) {
+    var normalizeFn = normalizeFunc || defaultNormalizeFunc,
+        filesForCoverage = {};
 
     files.forEach(function (file) {
-        if (_.isObject(file) && file.ignoreCoverage) { return; }
-
-        var pattern = _.isObject(file) ? file.pattern : file;
-        if (normalize_func) {
-            pattern = normalize_func(appRoot, pattern);
-        } else {
-            if (pattern.match(/^common\/js/)) {
-                pattern = path.join(appRoot, '/common/static/' + pattern);
-            } else if (pattern.match(/^xmodule_js\/common_static/)) {
-                pattern = path.join(appRoot, '/common/static/' +
-                  pattern.replace(/^xmodule_js\/common_static\//, ''));
-            }
+        if (!file.ignoreCoverage) {
+          filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
         }
-        filesForCoverage[pattern] = ['coverage'];
     });
 
     return filesForCoverage;
