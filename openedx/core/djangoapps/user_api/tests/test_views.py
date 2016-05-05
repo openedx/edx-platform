@@ -628,7 +628,6 @@ class LoginSessionViewTest(UserAPITestCase):
         response = self.client.post(self.url, {
             "email": self.EMAIL,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
         })
         self.assertHttpOK(response)
 
@@ -672,8 +671,7 @@ class LoginSessionViewTest(UserAPITestCase):
         # Invalid password
         response = self.client.post(self.url, {
             "email": self.EMAIL,
-            "password": "invalid",
-            "password_copy": "invalid"
+            "password": "invalid"
         })
         self.assertHttpForbidden(response)
 
@@ -681,7 +679,6 @@ class LoginSessionViewTest(UserAPITestCase):
         response = self.client.post(self.url, {
             "email": "invalid@example.com",
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
         })
         self.assertHttpForbidden(response)
 
@@ -698,7 +695,6 @@ class LoginSessionViewTest(UserAPITestCase):
         # Missing email
         response = self.client.post(self.url, {
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
         })
         self.assertHttpBadRequest(response)
 
@@ -868,21 +864,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-        self._assert_reg_field(
-            no_extra_fields_setting,
-            {
-                u"placeholder": "",
-                u"name": u"password_copy",
-                u"type": u"password",
-                u"required": True,
-                u"label": u"Retype password",
-                u"restrictions": {
-                    'min_length': PASSWORD_MIN_LENGTH,
-                    'max_length': PASSWORD_MAX_LENGTH
-                },
-            }
-        )
-
     @override_settings(REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm')
     def test_extension_form_fields(self):
         no_extra_fields_setting = {}
@@ -953,15 +934,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 no_extra_fields_setting,
                 {
                     "name": "password",
-                    "type": "hidden",
-                    "required": False,
-                }
-            )
-
-            self._assert_reg_field(
-                no_extra_fields_setting,
-                {
-                    "name": "password_copy",
                     "type": "hidden",
                     "required": False,
                 }
@@ -1362,7 +1334,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name",
             "username",
             "password",
-            "password_copy",
             "favorite_movie",
             "favorite_editor",
             "city",
@@ -1383,7 +1354,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
@@ -1420,7 +1390,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "level_of_education": self.EDUCATION,
             "mailing_address": self.ADDRESS,
             "year_of_birth": self.YEAR_OF_BIRTH,
@@ -1457,7 +1426,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
             "favorite_movie": "Inception",
             "favorite_editor": "cat",
@@ -1491,7 +1459,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
@@ -1513,7 +1480,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         {"username": ""},
         {"username": "a"},
         {"password": ""},
-        {"password_copy": ""},
     )
     def test_register_invalid_input(self, invalid_fields):
         # Initially, the field values are all valid
@@ -1522,7 +1488,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
         }
 
         # Override the valid fields, making the input invalid
@@ -1533,14 +1498,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertHttpBadRequest(response)
 
     @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
-    @ddt.data("email", "name", "username", "password", "password_copy", "country")
+    @ddt.data("email", "name", "username", "password", "country")
     def test_register_missing_required_field(self, missing_field):
         data = {
             "email": self.EMAIL,
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "country": self.COUNTRY,
         }
 
@@ -1557,7 +1521,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
@@ -1568,7 +1531,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": "Someone Else",
             "username": "someone_else",
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
@@ -1594,7 +1556,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
@@ -1605,7 +1566,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": "Someone Else",
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
@@ -1631,7 +1591,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
@@ -1642,7 +1601,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": "Someone Else",
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
@@ -1676,7 +1634,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-            "password_copy": self.PASSWORD,
         })
         self.assertHttpOK(response)
 
@@ -1696,7 +1653,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{"user_message": "Username must be minimum of two characters long"}],
                 "password": [{"user_message": "A valid password is required"}],
-                "password_copy": [{"user_message": "This field is required."}],
             }
         )
 
