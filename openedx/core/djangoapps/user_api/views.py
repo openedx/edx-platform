@@ -157,7 +157,7 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password", "password_copy"]
+    DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
         "city",
@@ -466,31 +466,6 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "password",
             label=password_label,
-            field_type="password",
-            restrictions={
-                "min_length": PASSWORD_MIN_LENGTH,
-                "max_length": PASSWORD_MAX_LENGTH,
-            },
-            required=required
-        )
-
-    def _add_password_copy_field(self, form_desc, required=True):
-        """Add a password copy field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
-
-        """
-        # Translators: This label appears above a field on the registration form
-        # meant to hold the user's password copy.
-        password_copy_label = _(u"Retype password")
-
-        form_desc.add_field(
-            "password_copy",
-            label=password_copy_label,
             field_type="password",
             restrictions={
                 "min_length": PASSWORD_MIN_LENGTH,
@@ -817,16 +792,6 @@ class RegistrationView(APIView):
                     # Hide the password field
                     form_desc.override_field_properties(
                         "password",
-                        default="",
-                        field_type="hidden",
-                        required=False,
-                        label="",
-                        instructions="",
-                        restrictions={}
-                    )
-
-                    form_desc.override_field_properties(
-                        "password_copy",
                         default="",
                         field_type="hidden",
                         required=False,
