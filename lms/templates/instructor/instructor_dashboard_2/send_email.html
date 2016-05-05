@@ -9,38 +9,52 @@ from openedx.core.djangolib.markup import HTML
   <div class="request-response msg msg-confirm copy" id="request-response"></div>
   <ul class="list-fields">
     <li class="field">
-      <label for="id_to">${_("Send to:")}</label><br/>
-      <select id="id_to" name="send_to">
-        <option value="myself">${_("Myself")}</option>
-        %if to_option == "staff":
-        <option value="staff" selected="selected">${_("Staff and admins")}</option>
-        %else:
-        <option value="staff">${_("Staff and admins")}</option>
-          %endif
-          %if to_option == "all":
-            <option value="all" selected="selected">${_("All (students, staff, and admins)")}</option>
-          %else:
-      <option value="all">${_("All (students, staff, and admins)")}</option>
-      %endif
-      </select>
+        ${_("Send to:")}
+        <ul role="group" aria-label="${_('Send to:')}">
+            <li>
+                <label>
+                    <input type="checkbox" name="send_to" value="myself">
+                        ${_("Myself")}
+                    </input>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" name="send_to" value="staff">
+                        ${_("Staff and Admin")}
+                    </input>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" name="send_to" value="learners">
+                        ${_("All Learners")}
+                    </input>
+                </label>
+            </li>
+        </ul>
     </li>
-  <br/>
-  <li class="field">
-    <label for="id_subject">${_("Subject: ")}</label><br/>
-     %if subject:
-      <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
-     %else:
-      <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
-     %endif
-     <span class="tip">${_("(Max 128 characters)")}</span>
-  </li>
-  <li class="field">
-    <label>${_("Message:")}</label>
-      <div class="email-editor">
-      ${ HTML(section_data['editor']) }
-      </div>
-    <input type="hidden" name="message" value="">
-  </li>
+    <li class="field">
+        <label>
+            ${_("Subject: ")}
+            <br/>
+            %if subject:
+                <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
+            %else:
+                <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
+            %endif
+            <span class="tip">${_("(Max 128 characters)")}</span>
+        </label>
+    </li>
+    <li>
+        <label>
+            ${_("Message:")}
+            <div class="email-editor">
+                ${ HTML(section_data['editor']) }
+            </div>
+            <input type="hidden" name="message" value="">
+        </label>
+    </li>
   </ul>
  <div class="submit-email-action">
   <p class="copy">${_("Please try not to email students more than once per week. Before sending your email, consider:")}</p>

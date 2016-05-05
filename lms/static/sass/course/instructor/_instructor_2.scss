@@ -140,7 +140,6 @@
 // ====================
 .instructor-dashboard-content-2 {
   @extend .content;
-  display: block; // override the table-cell display set in .content
   width: 100%;
   padding: 40px;
 
@@ -412,6 +411,14 @@
       margin-bottom: $baseline;
       padding: 0;
 
+      .label {
+        display: block;
+      }
+
+      ul {
+        list-style-type: none;
+      }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -419,7 +426,7 @@
         display: block;
         margin-top: ($baseline/4);
         @include font-size(12);
-        color: tint(rgb(127,127,127),50%);
+        color: $gray-d1;
       }
     }
   }

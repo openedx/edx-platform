@@ -15,13 +15,13 @@ create_email_content_table = -> window.InstructorDashboard.util.create_email_con
 create_email_message_views = -> window.InstructorDashboard.util.create_email_message_views.apply this, arguments
 KeywordValidator = -> window.InstructorDashboard.util.KeywordValidator
 
-class SendEmail
+class @SendEmail
   constructor: (@$container) ->
     # gather elements
-    @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-    @$send_to = @$container.find("select[name='send_to']'")
-    @$subject = @$container.find("input[name='subject']'")
-    @$btn_send = @$container.find("input[name='send']'")
+    @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'))
+    @$send_to = @$container.find("input[name='send_to']")
+    @$subject = @$container.find("input[name='subject']")
+    @$btn_send = @$container.find("input[name='send']")
     @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
     @$content_request_response_error = @$container.find(".content-request-response-error")
@@ -36,41 +36,48 @@ class SendEmail
     # attach click handlers
 
     @$btn_send.click =>
-      if @$subject.val() == ""
+      subject = @$subject.val()
+      body = @$emailEditor.save()['data']
+      targets = []
+      @$send_to.filter(':checked').each ->
+        targets.push(this.value)
+
+      if subject == ""
         alert gettext("Your message must have a subject.")
 
-      else if @$emailEditor.save()['data'] == ""
+      else if body == ""
         alert gettext("Your message cannot be blank.")
+
+      else if targets.length == 0
+        alert gettext("Your message must have at least one target.")
 
       else
         # Validation for keyword substitution
-        validation = KeywordValidator().validate_string @$emailEditor.save()['data']
+        validation = KeywordValidator().validate_string body
         if not validation.is_valid
           message = gettext("There are invalid keywords in your email. Please check the following keywords and try again:")
           message += "\n" + validation.invalid_keywords.join('\n')
           alert message
           return
 
-        success_message = gettext("Your email was successfully queued for sending.")
-        send_to = @$send_to.val().toLowerCase()
-        if send_to == "myself"
-          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to yourself. Is this OK?")
-        else if send_to == "staff"
-          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to everyone who is staff or instructor on this course. Is this OK?")
-        else
-          confirm_message = gettext("You are about to send an email titled '<%= subject %>' to ALL (everyone who is enrolled in this course as student, staff, or instructor). Is this OK?")
-          success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
-
-        subject = @$subject.val()
+        target_map = {
+            "myself": gettext("Yourself"),
+            "staff": gettext("Everyone who is staff or instructor on this course"),
+            "learners": gettext("All learners enrolled in this course"),
+        }
+        success_message = gettext("Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.")
+        confirm_message = gettext("You are about to send an email titled '<%= subject %>' to the following targets. Is this OK?")
+        for target in targets
+            confirm_message += "\n\t-" + target_map[target]
         full_confirm_message = _.template(confirm_message)({subject: subject})
 
         if confirm full_confirm_message
 
           send_data =
             action: 'send'
-            send_to: @$send_to.val()
-            subject: @$subject.val()
-            message: @$emailEditor.save()['data']
+            send_to: JSON.stringify(targets)
+            subject: subject
+            message: body
 
           $.ajax
             type: 'POST'
@@ -84,7 +91,7 @@ class SendEmail
               @fail_with_error gettext('Error sending email.')
 
         else
-          @$task_response.empty()
+          @task_response.empty()
           @$request_response_error.empty()
 
     # list task history for email
