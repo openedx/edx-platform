@@ -21,7 +21,6 @@
   django.catalog = {
     "#Replies": "\u56de\u590d", 
     "%(display_name)s Settings": "%(display_name)s\u8bbe\u7f6e", 
-    "%(hours)s:%(minutes)s (current UTC time)": "%(hours)s:%(minutes)s (\u5f53\u524d UTC \u65f6\u95f4)", 
     "%(numResponses)s other response": [
       "\u5176\u4ed6\u56de\u590d\u6570%(numResponses)s"
     ], 

@@ -28,7 +28,6 @@
     "%(display_name)s Settings": "%(display_name)s Param\u00e8tres", 
     "%(field)s can only contain up to %(count)d characters.": "Les %(field)s ne peuvent pas d\u00e9passer %(count)d caract\u00e8res.", 
     "%(field)s must have at least %(count)d characters.": "Les %(field)s doivent avoir au moins %(count)d caract\u00e8res.", 
-    "%(hours)s:%(minutes)s (current UTC time)": "%(hours)s:%(minutes)s (Heure actuelle UTC )", 
     "%(memberCount)s / %(maxMemberCount)s Member": [
       "%(memberCount)s / %(maxMemberCount)s membre", 
       "%(memberCount)s / %(maxMemberCount)s membres"
@@ -652,6 +651,8 @@
     "OpenAssessment Save Error": "Erreur de la sauvegarde d'OpenAssessment", 
     "Order No.": "Commande N\u00b0", 
     "Organization": "Organisation", 
+    "Organization ": "Organisation", 
+    "Organization of the signatory": "Organisation du signataire", 
     "Other": "Autre", 
     "Page break": "Saut de page", 
     "Paragraph": "Paragraphe", 
@@ -962,7 +963,6 @@
     "This team is full.": "Cette \u00e9quipe est pleine.", 
     "Time Sent": "Heure d'envoi", 
     "Time Sent:": "Heure d'envoi :", 
-    "Timed Exam": "Examen minut\u00e9", 
     "Title": "Titre", 
     "To take a successful photo, make sure that:": "Pour prendre une bonne photo, assurez-vous que: ", 
     "Tools": "Outils", 
