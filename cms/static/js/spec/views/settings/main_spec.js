@@ -144,7 +144,7 @@ define([
 
             // select the entrance-exam-enabled checkbox. grade requirement section should be visible.
             entrance_exam_enabled_field
-                .attr('checked', 'true')
+                .prop('checked', true)
                 .trigger('change');
 
             this.view.render();
@@ -152,7 +152,7 @@ define([
 
             // deselect the entrance-exam-enabled checkbox. grade requirement section should be hidden.
             entrance_exam_enabled_field
-                .removeAttr('checked')
+                .prop('checked', false)
                 .trigger('change');
 
             expect(this.view.$(SELECTORS.grade_requirement_div)).toBeHidden();
@@ -173,7 +173,7 @@ define([
 
             // select the entrance-exam-enabled checkbox.
             entrance_exam_enabled_field
-                .attr('checked', 'true')
+                .prop('checked', true)
                 .trigger('change');
 
             // input a valid value for entrance exam minimum score.
