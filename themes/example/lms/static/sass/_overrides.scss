@@ -175,6 +175,8 @@ h1, h2, h3, h4, h5, h6{
 
 
 //Modals
+
+
 .modal {
   border-radius: 0px !important;
   background: #FFFFFF !important;
@@ -792,6 +794,72 @@ header.header-main {
   }
 }
 
+.modal-custom{
+  width: 320px;
+  background-color: $white;
+  padding: 55px 20px;
+  position: absolute;
+  top: 10%;
+  left: calc(50% - 160px);
+  z-index: 999;
+  .btn-close{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    cursor: pointer;
+    .fa{
+      font-size: 1.75em;
+      color: $x-dark;
+    }
+  }
+  .modal-body{
+    .modal-header{
+      display: table;
+      width: 100%;
+      margin-bottom: 2rem;
+      .instructor-data{
+        display: table-row;
+        .thumbnail{
+          display: block;
+          width: 100%;
+          padding-bottom: 0;
+          img{
+            border-radius: 50%;
+            border: 5px solid $light;
+            margin-bottom: 1rem;
+          }
+        }
+        h3{
+          display: block;
+          width: 100%;
+          vertical-align: middle;
+          font-size: 1.5em;
+          line-height: normal;
+          color:$black;
+          margin-bottom: 0;
+          span{
+            display: block;
+            font-size: 1rem;
+            color: $x-dark;
+          }
+        }
+      }
+    }
+    .instructor-bio{
+      line-height: 1.5rem;
+      margin-bottom: 2rem;
+      color: $x-dark;
+    }
+    .links{
+      a{
+        margin-right: 0;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
 //Footer
 
 .footer-main{
@@ -992,6 +1060,49 @@ header.header-main {
     .description-container{
       .expandable{
         max-height: 224px;
+      }
+    }
+  }
+
+
+  .modal-custom{
+    display:none;
+    width: 540px;
+    padding: 40px 50px;
+    left: calc(50% - 270px);
+    .btn-close{
+      right: -35px;
+      top: -35px;
+      .fa{
+        color: $white;
+      }
+    }
+    .modal-body{
+      .modal-header{
+        display: table;
+        width: 100%;
+        .instructor-data{
+          display: table-row;
+          .thumbnail{
+            display: table-cell;
+            width: 35%;
+            img{
+              margin-bottom: 0;
+            }
+          }
+          h3{
+            display: table-cell;
+            width: 65%;
+          }
+        }
+      }
+
+      .links{
+        a{
+          margin-right: 1.5rem;
+          display: inline-block;
+          margin-bottom: 0;
+        }
       }
     }
   }
