@@ -6,13 +6,13 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from util.testing import UrlResetMixin
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from student.tests.factories import UserFactory
-
 from student_profile.views import learner_profile_context
+from util.testing import UrlResetMixin
 
 
-class LearnerProfileViewTest(UrlResetMixin, TestCase):
+class LearnerProfileViewTest(UrlResetMixin, TestCase, ProgramsApiConfigMixin):
     """ Tests for the student profile view. """
 
     USERNAME = "username"
@@ -101,3 +101,23 @@ class LearnerProfileViewTest(UrlResetMixin, TestCase):
         profile_path = reverse('learner_profile', kwargs={'username': "no_such_user"})
         response = self.client.get(path=profile_path)
         self.assertEqual(404, response.status_code)
+
+    def test_header_with_programs_listing_enabled(self):
+        """
+        Verify that tabs header will be shown while program listing is enabled.
+        """
+        self.create_programs_config(program_listing_enabled=True)
+        profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        response = self.client.get(path=profile_path)
+
+        self.assertContains(response, '<li class="tab-nav-item">')
+
+    def test_header_with_programs_listing_disabled(self):
+        """
+        Verify that nav header will be shown while program listing is disabled.
+        """
+        self.create_programs_config(program_listing_enabled=False)
+        profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        response = self.client.get(path=profile_path)
+
+        self.assertContains(response, '<li class="item nav-global-01">')
