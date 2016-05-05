@@ -25,6 +25,7 @@ urlpatterns = patterns(
     url(r'^groups/*', include('api_manager.groups.urls')),
     url(r'^sessions/*', include('api_manager.sessions.urls')),
     url(r'^courses/*', include('api_manager.courses.urls')),
+    url(r'^organizations/*', include('organizations.urls')),
 )
 
 server_api_router = SimpleRouter()
