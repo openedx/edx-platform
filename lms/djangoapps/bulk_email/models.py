@@ -15,8 +15,10 @@ import logging
 import markupsafe
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 
@@ -27,12 +29,15 @@ from util.keyword_substitution import substitute_keywords_with_data
 
 log = logging.getLogger(__name__)
 
-# Bulk email to_options - the send to options that users can
+# Bulk email targets - the send to options that users can
 # select from when they send email.
 SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
+SEND_TO_LEARNERS = 'learners'
+SEND_TO_COHORT = 'cohort'
 SEND_TO_ALL = 'all'
-TO_OPTIONS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL]
+EMAIL_TARGETS = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_ALL]
+EMAIL_TARGET_DESCRIPTIONS = ['Myself', 'Staff and instructors', 'All students', 'Send to a specific cohort', 'All']
 
 
 class Email(models.Model):
@@ -52,6 +57,127 @@ class Email(models.Model):
         abstract = True
 
 
+class Target(models.Model):
+    """
+    A way to refer to a particular group (within a course) as a "Send to:" target.
+    """
+    # choices for target field below
+    EMAIL_TARGET_CHOICES = zip(EMAIL_TARGETS, EMAIL_TARGET_DESCRIPTIONS)
+
+    target_type = models.CharField(max_length=64, choices=EMAIL_TARGET_CHOICES)
+
+    class Meta(object):
+        app_label = "bulk_email"
+
+    def __unicode__(self):
+        return "CourseEmail BaseTarget: {}".format(self.target_type)
+
+
+class MyselfTarget(Target):
+    """
+    Subclass of Target containing logic specific to myself.
+    """
+    class Meta:
+        proxy = True  # use the base Target table, this class only changes python functionality
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_MYSELF
+        super(MyselfTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return "CourseEmail MyselfTarget"
+
+
+class StaffTarget(Target):
+    """
+    Subclass of Target containing logic specific to staff recipients.
+    """
+    class Meta:
+        proxy = True  # use the base Target table, this class only changes python functionality
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_STAFF
+        super(StaffTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return "CourseEmail StaffTarget"
+
+
+class LearnersTarget(Target):
+    """
+    Subclass of Target containing logic specific to learner recipients.
+    """
+    class Meta:
+        proxy = True  # use the base Target table, this class only changes python functionality
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_LEARNERS
+        super(LearnersTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return "CourseEmail LearnersTarget"
+
+
+class CohortTarget(Target):
+    """
+    Subclass of Target, specifically referring to a cohort.
+    """
+    cohort = models.ForeignKey('course_groups.CourseUserGroup')
+
+    class Meta:
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_COHORT
+        super(CohortTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return "CourseEmail CohortTarget: {}".format(self.cohort.id)
+
+    @classmethod
+    def ensure_valid_cohort(cls, cohort_name, course_id):
+        """
+        Ensures cohort_name is a valid cohort for course_id.
+
+        Returns the cohort if valid, raises an error otherwise.
+        """
+        if cohort_name is None:
+            raise ValueError("Cannot create a CohortTarget without specifying a cohort_name.")
+        try:
+            cohort = CourseUserGroup.get(name=cohort_name, course_id=course_id)
+        except CourseUserGroup.DoesNotExist:
+            raise ValueError(
+                "Cohort {cohort} does not exist in course {course_id}".format(
+                    cohort=cohort_name,
+                    course_id=course_id
+                )
+            )
+        return cohort
+
+
+class AllTarget(Target):
+    """
+    Subclass of Target containing logic specific to all recipients.
+    """
+    class Meta:
+        proxy = True  # use the base Target table, this class only changes python functionality
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_ALL
+        super(AllTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return "CourseEmail AllTarget"
+
+
+EMAIL_TARGET_CLASSES = [MyselfTarget, StaffTarget, LearnersTarget, CohortTarget, AllTarget]
+EMAIL_TARGET_CLASS_MAP = dict(zip(EMAIL_TARGETS, EMAIL_TARGET_CLASSES))
+
+
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
@@ -59,22 +185,8 @@ class CourseEmail(Email):
     class Meta(object):
         app_label = "bulk_email"
 
-    # Three options for sending that we provide from the instructor dashboard:
-    # * Myself: This sends an email to the staff member that is composing the email.
-    #
-    # * Staff and instructors: This sends an email to anyone in the staff group and
-    #   anyone in the instructor group
-    #
-    # * All: This sends an email to anyone enrolled in the course, with any role
-    #   (student, staff, or instructor)
-    #
-    TO_OPTION_CHOICES = (
-        (SEND_TO_MYSELF, 'Myself'),
-        (SEND_TO_STAFF, 'Staff and instructors'),
-        (SEND_TO_ALL, 'All')
-    )
     course_id = CourseKeyField(max_length=255, db_index=True)
-    to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
+    targets = models.ManyToManyField(Target)
     template_name = models.CharField(null=True, max_length=255)
     from_addr = models.CharField(null=True, max_length=255)
 
@@ -83,8 +195,8 @@ class CourseEmail(Email):
 
     @classmethod
     def create(
-            cls, course_id, sender, to_option, subject, html_message,
-            text_message=None, template_name=None, from_addr=None):
+            cls, course_id, sender, targets, subject, html_message,
+            text_message=None, template_name=None, from_addr=None, cohort_name=None):
         """
         Create an instance of CourseEmail.
         """
@@ -92,23 +204,34 @@ class CourseEmail(Email):
         if text_message is None:
             text_message = html_to_text(html_message)
 
-        # perform some validation here:
-        if to_option not in TO_OPTIONS:
-            fmt = 'Course email being sent to unrecognized to_option: "{to_option}" for "{course}", subject "{subject}"'
-            msg = fmt.format(to_option=to_option, course=course_id, subject=subject)
-            raise ValueError(msg)
+        #from nose.tools import set_trace; set_trace()
+        new_targets = []
+        for target in targets:
+            # Ensure our desired target exists
+            desired_target_class = EMAIL_TARGET_CLASS_MAP.get(target, None)
+            if desired_target_class is None:
+                fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
+                msg = fmt.format(target=target, course=course_id, subject=subject)
+                raise ValueError(msg)
+            elif desired_target_class is CohortTarget:
+                cohort = CohortTarget.ensure_valid_cohort(cohort_name, course_id)
+                new_target, _ = CohortTarget.objects.get_or_create(target_type=target, cohort=cohort)
+            else:
+                new_target, _ = desired_target_class.objects.get_or_create(target_type=target)
+            new_targets.append(new_target)
 
         # create the task, then save it immediately:
         course_email = cls(
             course_id=course_id,
             sender=sender,
-            to_option=to_option,
             subject=subject,
             html_message=html_message,
             text_message=text_message,
             template_name=template_name,
             from_addr=from_addr,
         )
+        course_email.save()  # Must exist in db before setting M2M relationship values
+        course_email.targets.add(*new_targets)
         course_email.save()
 
         return course_email
