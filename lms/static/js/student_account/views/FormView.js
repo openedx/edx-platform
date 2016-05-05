@@ -69,8 +69,6 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
-                $('.text-city').hide();
-                $('.select-country').hide();
                 this.setUserCityAndCountry();
                 this.showPassword();
                 this.getUsernameFromEmail();
@@ -81,7 +79,6 @@
                    '/geo',
                    function(response) {
                       if(typeof response.country !== "undefined") {
-                          $('#register-city').val(response.city);
                           $('#register-country').val(response.country);
                       }
                    }
