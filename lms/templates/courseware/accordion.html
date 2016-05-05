@@ -1,4 +1,5 @@
 <%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
 <%!
     from django.core.urlresolvers import reverse
     from util.date_utils import get_time_display
@@ -26,8 +27,8 @@ else:
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
-            <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-                <p>${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
+            <a class="accordion-nav" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
+                <p class="accordion-display-name">${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
                         span_start=HTML('<span class="sr">'),
                         span_end=HTML('</span>'),
                     ) if 'active' in section and section['active'] else ''}</p>
@@ -40,7 +41,7 @@ else:
                 %>
 
                 ## There is behavior differences between
-                ## rending of sections which have proctoring/timed examinations
+                ## rendering of sections which have proctoring/timed examinations
                 ## and those that do not.
                 ##
                 ## Proctoring exposes a exam status message field as well as
@@ -80,3 +81,10 @@ else:
 % for chapter in toc:
     ${make_chapter(chapter)}
 % endfor
+
+
+% if toc:
+    <%static:require_module module_name="js/courseware/accordion_events" class_name="AccordionEvents">
+        AccordionEvents();
+    </%static:require_module>
+% endif

@@ -1664,6 +1664,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'moment': 'js/vendor/moment.min.js',
     'jquery.url': 'js/vendor/url.min.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
+    'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
