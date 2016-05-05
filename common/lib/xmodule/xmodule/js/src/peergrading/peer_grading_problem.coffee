@@ -328,13 +328,11 @@ class @PeerGradingProblem
 
 
   submit_calibration_essay: ()=>
-    @submit_button.attr('disabled', true)
     data = @construct_data()
     @submit_button.hide()
     @backend.post('save_calibration_essay', data, @calibration_callback)
 
   submit_grade: () =>
-    @submit_button.attr('disabled', true)
     data = @construct_data()
     @submit_button.hide()
     @backend.post('save_grade', data, @submission_callback)
@@ -396,22 +394,12 @@ class @PeerGradingProblem
   submission_callback: (response) =>
     if response.success
       @is_calibrated_check()
-      required = @grading_wrapper.data('required')
-      graded = @grading_wrapper.data('graded')+1
-      @grading_wrapper.data('graded', graded)
-      @grading_wrapper.attr('data-graded', graded) #just in case someone wants to read the DOM
-      message = "<p>Successfully saved your feedback. Fetching the next essay.</p>"
-      if graded >= required
-        message = "<p>Successfully saved your feedback. Fetching the next essay.</p>
-          <p><strong>You have completed the required number of peer evaluations, but may
-          choose to continue grading if you'd like.</strong></p>"
       @grading_message.fadeIn()
       message = "<p>Successfully saved your feedback. Fetching the next essay."
       if response.required_done
         message = message + " You have done the required number of peer assessments but may continue grading if you like."
       message = message + "</p>"
       @grading_message.html(message)
-      $.scrollTo(@grading_message)
     else
       if response.error
         @render_error(response.error)
@@ -544,7 +532,6 @@ class @PeerGradingProblem
 
     @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
-
     @rubric_selection_container.html(response.rubric)
     @submission_key_input.val(response.submission_key)
     @essay_id_input.val(response.submission_id)
@@ -573,10 +560,8 @@ class @PeerGradingProblem
 
     if response.actual_rubric != undefined
       calibration_wrapper.append("<div>Instructor Scored Rubric: #{response.actual_rubric}</div>")
-    if response.actual_feedback!=undefined
-      actual_feedback = JSON.parse(response.actual_feedback).feedback
-      calibration_wrapper.append("<div class='instructor_feedback'></div>")
-      calibration_wrapper.find('.instructor_feedback').text('Instructor Feedback: ' + actual_feedback)
+    if response.actual_feedback.feedback!=undefined
+      calibration_wrapper.append("<div>Instructor Feedback: #{response.actual_feedback}</div>")
 
     # disable score selection and submission from the grading interface
     @$("input[name='score-selection']").attr('disabled', true)
@@ -611,7 +596,6 @@ class @PeerGradingProblem
   gentle_alert: (msg) =>
     @grading_message.fadeIn()
     @grading_message.html("<p>" + msg + "</p>")
-    $.scrollTo(@grading_message)
 
   collapse_question: (event) =>
     @prompt_container.slideToggle()

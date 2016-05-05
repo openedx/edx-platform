@@ -2,7 +2,6 @@
 Test CRUD for authorization.
 """
 import copy
-import mock
 
 from django.contrib.auth.models import User
 
@@ -38,7 +37,7 @@ class TestCourseAccess(ModuleStoreTestCase):
                 'number': self.course_key.course,
                 'display_name': 'My favorite course',
                 'run': self.course_key.run,
-            }
+            },
         )
 
         self.users = self._create_users()
