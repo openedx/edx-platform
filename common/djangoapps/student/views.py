@@ -2496,6 +2496,7 @@ def details_reset_confirm(request):
 
             context = {
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
             }
             return TemplateResponse(request, 'registration/details_reset_done.html', context)
         else:
