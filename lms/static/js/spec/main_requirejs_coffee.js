@@ -4,9 +4,9 @@
         baseUrl: '/base/',
         paths: {
             "moment": "xmodule_js/common_static/js/vendor/moment.min",
-            "modernizr": "xmodule_js/common_static/edx-pattern-library/js/modernizr-custom",
-            "afontgarde": "xmodule_js/common_static/edx-pattern-library/js/afontgarde",
-            "edxicons": "xmodule_js/common_static/edx-pattern-library/js/edx-icons",
+            "modernizr": "edx-pattern-library/js/modernizr-custom",
+            "afontgarde": "edx-pattern-library/js/afontgarde",
+            "edxicons": "edx-pattern-library/js/edx-icons",
             "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly"
         },
         "moment": {

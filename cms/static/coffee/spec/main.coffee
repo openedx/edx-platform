@@ -27,9 +27,9 @@ requirejs.config({
         "moment": "xmodule_js/common_static/js/vendor/moment.min",
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
-        "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
-        "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
-        "backbone": "xmodule_js/common_static/common/js/vendor/backbone",
+        "underscore": "common/js/vendor/underscore",
+        "underscore.string": "common/js/vendor/underscore.string",
+        "backbone": "common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
@@ -44,15 +44,13 @@ requirejs.config({
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
-        "jasmine-stealth": "xmodule_js/common_static/js/libs/jasmine-stealth",
-        "jasmine-waituntil": "xmodule_js/common_static/js/libs/jasmine-waituntil",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
         "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
-        "modernizr": "xmodule_js/common_static/edx-pattern-library/js/modernizr-custom",
-        "afontgarde": "xmodule_js/common_static/edx-pattern-library/js/afontgarde",
-        "edxicons": "xmodule_js/common_static/edx-pattern-library/js/edx-icons",
+        "modernizr": "edx-pattern-library/js/modernizr-custom",
+        "afontgarde": "edx-pattern-library/js/afontgarde",
+        "edxicons": "edx-pattern-library/js/edx-icons",
 
         "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
@@ -180,10 +178,13 @@ requirejs.config({
             exports: "sinon"
         },
         "jasmine-imagediff": {},
-        "jasmine-stealth": {
+        "common/js/spec_helpers/jasmine-extensions": {
+            deps: ["jquery"]
+        },
+        "common/js/spec_helpers/jasmine-stealth": {
             deps: ["underscore", "underscore.string"]
         },
-        "jasmine-waituntil": {
+        "common/js/spec_helpers/jasmine-waituntil": {
             deps: ["jquery"]
         },
         "xblock/core": {
@@ -283,8 +284,14 @@ while i < testFiles.length
     testFiles[i] = '/base/' + testFiles[i] + '.js'
     i++
 
+specHelpers = [
+  'common/js/spec_helpers/jasmine-extensions',
+  'common/js/spec_helpers/jasmine-stealth',
+  'common/js/spec_helpers/jasmine-waituntil'
+]
+
 # Jasmine has a global stack for creating a tree of specs. We need to load
 # spec files one by one, otherwise some end up getting nested under others.
-requireSerial testFiles, ->
+requireSerial specHelpers.concat(testFiles), ->
 # start test run, once Require.js is done
     window.__karma__.start()
