@@ -745,7 +745,7 @@ class RegistrationView(APIView):
                     )
 
     def _add_show_password_field(self, form_desc, required=True):
-        """Add a terms of service field to a form description.
+        """Add a show password field to a form description.
 
           Arguments:
               form_desc: A form description
