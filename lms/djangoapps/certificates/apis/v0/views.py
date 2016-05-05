@@ -3,14 +3,16 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from lms.djangoapps.certificates.api import get_certificate_for_user
-from openedx.core.lib.api import permissions
+from openedx.core.lib.api import (
+    authentication,
+    permissions,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -64,8 +66,14 @@ class CertificatesDetailView(GenericAPIView):
             }
     """
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated, permissions.IsUserInUrlOrStaff)
+    authentication_classes = (
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsUserInUrlOrStaff
+    )
 
     def get(self, request, username, course_id):
         """
