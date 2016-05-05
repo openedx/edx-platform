@@ -2486,6 +2486,11 @@ def details_reset_confirm(request):
     form_class = DetailsResetFormNoActive
     template_name = 'registration/details_reset.html'
 
+    context = {
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
+             }
+
     if request.method == 'POST':
         form = DetailsResetFormNoActive(request.POST)
         if form.is_valid():
@@ -2500,4 +2505,4 @@ def details_reset_confirm(request):
             context = {'err_msg': err_msg}
             return TemplateResponse(request, 'registration/details_reset.html', context)
 
-    return TemplateResponse(request, 'registration/details_reset.html')
+    return TemplateResponse(request, 'registration/details_reset.html', context)
