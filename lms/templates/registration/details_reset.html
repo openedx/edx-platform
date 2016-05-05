@@ -4,7 +4,7 @@
 {% block title %}
 <title>
   {% blocktrans with platform_name=platform_name %}
-      Access your Beta Big Data University account
+      Access your Beta {{ platform_name }}
 
   {% endblocktrans %}
 </title>
@@ -42,7 +42,7 @@
       <h1 class="title">
         <span class="title-super">
           {% blocktrans with platform_name=platform_name %}
-          Access your Beta Big Data University account
+          Access your Beta {{ platform_name }}
           {% endblocktrans %}
         </span>
       </h1>
@@ -90,12 +90,6 @@
           </p>
         </div>
 
-        <p class="instructions">
-            <p class="reset-instruction first-reset-instruction">{% trans 'A new Beta Big Data University account has been created based on your existing Big Data University (BDU) a    ccount.  Soon after the beta period is over, this account will display the history of courses completed, badges earned, and completion certificates obtained.' %}</p>
-            <p class="reset-instruction">{% trans 'To access your new account, enter the email address associated to your Big Data University. If you were using a Social Med    ia button to log in to BDU, use the email associated with that social media account. ' %} </p>
-            <p>{% trans 'An email will be sent to you with a password to access your account.' %} </p>
-         </p>
-
          <p class="instructions">
              <p class="reset-instruction first-reset-instruction">
                {% blocktrans %}
@@ -103,7 +97,7 @@
                {% endblocktrans %}
                <p>
                {% blocktrans %}
-                  To access your new account, enter the email address associated to your Big Data University. If you were using a Social Media button to log in to BDU, use the email associated with that social media account.
+                  To access your new account, enter the email address associated to your {{ platform_name }}. If you were using a Social Media button to log in to BDU, use the email associated with that social media account.
                {% endblocktrans %}
                </p>
              <p>{% trans 'An email will be sent to you with a password to access your account.' %} </p>
