@@ -74,13 +74,7 @@
 
             cleanUsername: function() {
                 var username = $('#register-username');
-                username.val(username.val().replace(".",""));
-                username.keypress( function(e) {
-                    var chr = String.fromCharCode(e.which);
-                    if ("@.".indexOf(chr) >= 0 ) {
-                        return false;
-                    }
-                });
+                username.val(username.val().replace(/[^a-zA-Z0-9-_]/g, ""));
             },
 
             buildForm: function( data ) {
@@ -226,7 +220,7 @@
             },
 
             /* Allows extended views to add non-form attributes
-             * to the data before saving it to model 
+             * to the data before saving it to model
              */
             setExtraData: function( data ) {
                 return data;
