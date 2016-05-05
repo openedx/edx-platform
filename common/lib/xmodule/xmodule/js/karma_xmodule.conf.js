@@ -8,7 +8,14 @@
 var path = require('path');
 var configModule = require(path.join(__dirname, 'common_static/common/js/karma.common.conf.js'));
 
-var files = {
+var options = {
+
+    useRequireJs: false,
+
+    normalizePathsForCoverageFunc: function(appRoot, pattern) {
+        return pattern;
+    },
+
     libraryFilesToInclude: [
         {pattern: 'common_static/js/vendor/requirejs/require.js', included: true},
         {pattern: 'RequireJS-namespace-undefine.js', included: true},
@@ -68,10 +75,5 @@ var files = {
 };
 
 module.exports = function (config) {
-    configModule.configure({
-        config: config,
-        files: files,
-        normalizePathsForCoverageFunc: function(appRoot, pattern) { return pattern; },
-        useRequireJs: false
-    });
+    configModule.configure(config, options);
 };

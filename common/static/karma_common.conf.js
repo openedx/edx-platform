@@ -7,7 +7,14 @@
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = {
+var options = {
+
+    useRequireJs: false,
+
+    normalizePathsForCoverageFunc: function (appRoot, pattern) {
+        return path.join(appRoot, '/common/static/' + pattern);
+    },
+
     libraryFilesToInclude: [
         {pattern: 'coffee/src/ajax_prefix.js', included: true},
         {pattern: 'js/vendor/draggabilly.js', included: true},
@@ -58,15 +65,6 @@ var files = {
     ]
 };
 
-var normalizePathsForCoverageFunc = function (appRoot, pattern) {
-    return path.join(appRoot, '/common/static/' + pattern);
-};
-
 module.exports = function (config) {
-    configModule.configure({
-        config: config,
-        files: files,
-        normalizePathsForCoverageFunc: normalizePathsForCoverageFunc,
-        useRequireJs: false
-    });
+    configModule.configure(config, options);
 };

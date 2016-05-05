@@ -7,19 +7,14 @@
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = {
-    libraryFiles: [
-        {pattern: 'common/js/vendor/**/*.js'},
-        {pattern: 'edx-pattern-library/js/**/*.js'},
-        {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/coffee/src/**/*.js'},
-        {pattern: 'xmodule_js/common_static/js/**/*.js'},
-        {pattern: 'xmodule_js/src/**/*.js'}
-    ],
+var options = {
+
+    includeCommonFiles: true,
+
+    libraryFiles: [],
 
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
-        {pattern: 'common/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'}
     ],
 
@@ -30,7 +25,6 @@ var files = {
 
     fixtureFiles: [
         {pattern: 'coffee/fixtures/**/*.*'},
-        {pattern: 'common/templates/**/*.*'},
         {pattern: 'templates/**/*.*'}
     ],
 
@@ -40,8 +34,5 @@ var files = {
 };
 
 module.exports = function (config) {
-    configModule.configure({
-        config: config,
-        files: files
-    });
+    configModule.configure(config, options);
 };

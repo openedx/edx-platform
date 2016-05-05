@@ -29,6 +29,30 @@ var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
 
+var commonFiles = {
+    libraryFiles: [
+        {pattern: 'common/js/vendor/**/*.js'},
+        {pattern: 'edx-pattern-library/js/**/*.js'},
+        {pattern: 'edx-ui-toolkit/js/**/*.js'},
+        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
+        {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
+        {pattern: 'xmodule_js/src/**/*.js'}
+    ],
+
+    sourceFiles: [
+        {pattern: 'common/js/components/**/*.js'},
+        {pattern: 'common/js/utils/**/*.js'}
+    ],
+
+    specFiles: [
+        {pattern: 'common/js/spec_helpers/**/*.js'}
+    ],
+
+    fixtureFiles: [
+        {pattern: 'common/templates/**/*.underscore'}
+    ]
+};
+
 /**
  * Customize the name attribute in xml testcase element
  * @param {Object} browser
@@ -290,14 +314,20 @@ var getBaseConfig = function (config, useRequireJs) {
     };
 };
 
-var configure = function(data) {
-    var useRequireJs = data.useRequireJs === undefined ? true : useRequireJs,
-        baseConfig = getBaseConfig(data.config, useRequireJs);
+var configure = function(config, options) {
+    var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
+        baseConfig = getBaseConfig(config, useRequireJs);
+
+    if (options.includeCommonFiles) {
+        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function (collectionName) {
+            options[collectionName] = _.flatten([commonFiles[collectionName], options[collectionName]]);
+        });
+    }
 
     var files = _.flatten(
         _.map(
             ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
-            function(item) { return data.files[item] || []; }
+            function(collectionName) { return options[collectionName] || []; }
         )
     );
 
@@ -314,22 +344,22 @@ var configure = function(data) {
     // With nocache=true, Karma always serves the latest files from disk.
     // However, that prevents coverage tracking from working.
     // So we only set it if coverage tracking is off.
-    setNocache(files, !data.config.coverage);
+    setNocache(files, !config.coverage);
 
     var filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
-            function(item) { return data.files[item]; }
+            function(collectionName) { return options[collectionName]; }
         )
     );
 
     var preprocessors = _.extend(
       {},
-      data.preprocessors,
-      normalizePathsForCoverage(filesForCoverage, data.normalizePathsForCoverageFunc)
+      options.preprocessors,
+      normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
     );
 
-    data.config.set(_.extend(baseConfig, {
+    config.set(_.extend(baseConfig, {
         files: files,
         preprocessors: preprocessors
     }));

@@ -8,7 +8,11 @@
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = {
+var options = {
+
+    useRequireJs: false,
+    includeCommonFiles: true,
+
     libraryFilesToInclude: [
         {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
         {pattern: 'js/spec/main_requirejs_coffee.js', included: true},
@@ -40,13 +44,11 @@ var files = {
     ],
 
     libraryFiles: [
-        {pattern: 'edx-pattern-library/js/**/*.js'},
-        {pattern: 'edx-ui-toolkit/js/**/*.js'},
         {pattern: 'xmodule_js/common_static/js/vendor/**/*.js'}
     ],
 
     sourceFiles: [
-        {pattern: 'coffee/src/**/*.js', included: true},
+        {pattern: 'coffee/src/**/*.js', included: true}
     ],
 
     specFiles: [
@@ -59,9 +61,5 @@ var files = {
 };
 
 module.exports = function (config) {
-    configModule.configure({
-        config: config,
-        files: files,
-        useRequireJs: false
-    });
+    configModule.configure(config, options);
 };

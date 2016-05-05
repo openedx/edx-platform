@@ -8,20 +8,22 @@
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
-var files = {
+var options = {
+
+    includeCommonFiles: true,
+
+    normalizePathsForCoverageFunc: function (appRoot, pattern) {
+        return path.join(appRoot, '/common/static/' + pattern);
+    },
+
     libraryFiles: [
         {pattern: 'coffee/src/**/*.js'},
-        {pattern: 'common/js/spec_helpers/**/*.js'},
-        {pattern: 'common/js/vendor/**/*.js'},
         {pattern: 'js/libs/**/*.js'},
         {pattern: 'js/test/**/*.js'},
         {pattern: 'js/vendor/**/*.js'}
     ],
 
-    sourceFiles: [
-        {pattern: 'common/js/components/**/!(*spec).js'},
-        {pattern: 'common/js/utils/**/!(*spec).js'}
-    ],
+    sourceFiles: [],
 
     specFiles: [
         {pattern: 'common/js/spec/**/*spec.js'}
@@ -36,14 +38,6 @@ var files = {
     ]
 };
 
-var normalizePathsForCoverageFunc = function (appRoot, pattern) {
-    return path.join(appRoot, '/common/static/' + pattern);
-};
-
 module.exports = function (config) {
-    configModule.configure({
-        config: config,
-        files: files,
-        normalizePathsForCoverageFunc: normalizePathsForCoverageFunc
-    });
+    configModule.configure(config, options);
 };
