@@ -62,7 +62,7 @@ def rewrite_video_url(cdn_base_url, original_video_url, whitelist):
     # being returned as an empty string.
     if not parsed.netloc:
         return None
-    
+
     # Only re-write URLs if the original netloc is in the whitelist, otherwise
     # no guarantees can be made that the re-write target can service the request.
     try:
@@ -71,7 +71,7 @@ def rewrite_video_url(cdn_base_url, original_video_url, whitelist):
     except TypeError:
         log.exception("message")
         return None
-        
+
     # Contruction of the rewrite url is intentionally very flexible of input.
     # For example, https://www.edx.org/ + /foo.html will be rewritten to
     # https://www.edx.org/foo.html.

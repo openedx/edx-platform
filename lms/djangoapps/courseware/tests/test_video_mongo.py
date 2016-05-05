@@ -832,7 +832,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
             cdn_response_video_url
         )
 
-    @override_settings(VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS=["www.originalvideo.com","someother.com"])
+    @override_settings(VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS=["www.originalvideo.com", "someother.com"])
     @override_settings(VIDEO_CDN_URL={"CN": "https://chinacdn.cn/"})
     def test_rewrite_url_extended_whitelist_success(self):
         """
@@ -847,7 +847,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
             cdn_response_video_url
         )
 
-    @override_settings(VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS=["someother.com","algumaoutra.pt"])
+    @override_settings(VIDEO_CDN_REWRITABLE_SOURCE_DOMAINS=["someother.com", "algumaoutra.pt"])
     @override_settings(VIDEO_CDN_URL={"CN": "https://chinacdn.cn/"})
     def test_rewrite_url_extended_whitelist_failure(self):
         """
