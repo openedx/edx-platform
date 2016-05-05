@@ -1,5 +1,5 @@
 // Karma config for lms-coffee suite.
-// Docs in common/static/common/js/karma.common.conf.js
+// Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
 /* jshint node: true */
 /*jshint -W079 */
@@ -13,6 +13,7 @@ var options = {
     useRequireJs: false,
     includeCommonFiles: true,
 
+    // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
         {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
         {pattern: 'js/spec/main_requirejs_coffee.js', included: true},
@@ -47,6 +48,8 @@ var options = {
         {pattern: 'xmodule_js/common_static/js/vendor/**/*.js'}
     ],
 
+    // Make sure the patterns in sourceFiles and specFiles do not match the same file.
+    // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'coffee/src/**/*.js', included: true}
     ],

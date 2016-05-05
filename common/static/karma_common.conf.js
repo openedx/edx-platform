@@ -1,5 +1,5 @@
 // Karma config for common suite.
-// Docs in common/static/common/js/karma.common.conf.js
+// Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
 /* jshint node: true */
 /*jshint -W079 */
@@ -15,6 +15,7 @@ var options = {
         return path.join(appRoot, '/common/static/' + pattern);
     },
 
+    // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
         {pattern: 'coffee/src/ajax_prefix.js', included: true},
         {pattern: 'js/vendor/draggabilly.js', included: true},
@@ -45,6 +46,8 @@ var options = {
     libraryFiles: [
     ],
 
+    // Make sure the patterns in sourceFiles and specFiles do not match the same file.
+    // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'js/xblock/**/*.js', included: true},
         {pattern: 'coffee/src/**/*.js', included: true},

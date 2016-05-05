@@ -19,6 +19,19 @@
 //
 // where `BROWSER` could be Chrome or Firefox.
 //
+//
+// Troubleshooting tips:
+//
+// If you get an error like: "TypeError: __cov_KBCc7ZI4xZm8W2BC5NQLDg.s is undefined",
+// that means the patterns in sourceFiles and specFiles are matching the same file.
+// This causes Istanbul, which is used for tracking coverage to instrument the file
+// multiple times.
+//
+//
+// If you see the error: "EMFILE, too many open files" that means the files pattern
+// that has been added is matching too many files. The glob library used by Karma
+// does not use graceful-fs and tries to read files simultaneously.
+//
 
 
 /* jshint node: true */
@@ -29,6 +42,7 @@ var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
 
+// Files which are needed by all lms/cms suites.
 var commonFiles = {
     libraryFiles: [
         {pattern: 'common/js/vendor/**/*.js'},
@@ -148,6 +162,12 @@ function junitSettings(config) {
     };
 }
 
+/**
+ * Return absolute path for files in common and xmodule_js symlink dirs.
+ * @param {String} appRoot
+ * @param {String} pattern
+ * @return {String}
+ */
 var defaultNormalizeFunc = function (appRoot, pattern) {
     if (pattern.match(/^common\/js/)) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
@@ -339,6 +359,8 @@ var configure = function(config, options) {
       files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
     }
 
+    // Karma sets included=true by default.
+    // We set it to false by default because RequireJS should be used instead.
     files = setDefaults(files);
 
     // With nocache=true, Karma always serves the latest files from disk.
@@ -353,6 +375,8 @@ var configure = function(config, options) {
         )
     );
 
+    // If we give symlink paths to Istanbul, coverage for each path gets tracked
+    // separately. So we pass absolute paths to the karma-coverage preprocessor.
     var preprocessors = _.extend(
       {},
       options.preprocessors,

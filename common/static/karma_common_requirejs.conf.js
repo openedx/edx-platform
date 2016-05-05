@@ -1,5 +1,5 @@
 // Karma config for common-requirejs suite.
-// Docs in common/static/common/js/karma.common.conf.js
+// Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
 /* jshint node: true */
 /*jshint -W079 */
@@ -23,6 +23,8 @@ var options = {
         {pattern: 'js/vendor/**/*.js'}
     ],
 
+    // Make sure the patterns in sourceFiles and specFiles do not match the same file.
+    // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [],
 
     specFiles: [
