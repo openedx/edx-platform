@@ -5,7 +5,7 @@ Tests for the InstructorService
 import json
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from instructor.access import allow_access
 from instructor.services import InstructorService
 from instructor.tests.test_tools import msk_from_problem_urlname

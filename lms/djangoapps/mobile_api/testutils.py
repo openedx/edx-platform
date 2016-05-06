@@ -21,12 +21,12 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
     MobileAvailabilityError,
     StartDateError,
     VisibilityError
 )
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin

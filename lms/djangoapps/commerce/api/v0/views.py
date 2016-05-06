@@ -14,7 +14,7 @@ from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
 from commerce.utils import audit_log
 from course_modes.models import CourseMode
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from embargo import api as embargo_api
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth

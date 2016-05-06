@@ -39,7 +39,7 @@ from shoppingcart.models import (
     DonationConfiguration,
     CouponRedemption)
 from student.tests.factories import UserFactory, AdminFactory, CourseModeFactory
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response

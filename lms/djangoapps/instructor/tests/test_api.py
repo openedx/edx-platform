@@ -32,9 +32,11 @@ from opaque_keys.edx.locator import UsageKey
 from xmodule.modulestore import ModuleStoreEnum
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
-from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import (
+    StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory,
+)
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 from microsite_configuration import microsite
@@ -55,7 +57,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
-from courseware.models import StudentFieldOverride
+from lms.djangoapps.courseware.models import StudentFieldOverride
 
 import instructor_task.api
 import instructor.views.api

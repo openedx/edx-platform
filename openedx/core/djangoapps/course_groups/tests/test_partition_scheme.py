@@ -10,8 +10,8 @@ from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipUnless
 
-from courseware.masquerade import handle_ajax, setup_masquerade
-from courseware.tests.test_masquerade import StaffMasqueradeTestCase
+from lms.djangoapps.courseware.masquerade import handle_ajax, setup_masquerade
+from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore

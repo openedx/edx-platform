@@ -43,7 +43,8 @@ from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
 from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
-from courseware.user_state_client import DjangoXBlockUserStateClient
+
+from .user_state_client import DjangoXBlockUserStateClient
 
 
 log = logging.getLogger(__name__)

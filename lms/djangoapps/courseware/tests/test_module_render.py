@@ -19,7 +19,6 @@ from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -28,15 +27,6 @@ from xblock.fragment import Fragment
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
-from courseware import module_render as render
-from courseware.courses import get_course_with_access, get_course_info_section
-from courseware.field_overrides import OverrideFieldData
-from courseware.model_data import FieldDataCache
-from courseware.module_render import hash_resource, get_module_for_descriptor
-from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
-from courseware.tests.tests import LoginEnrollmentTestCase
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.courses import course_image_url
@@ -68,6 +58,16 @@ from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
 
 from milestones.tests.utils import MilestonesTestCaseMixin
+
+from .. import module_render as render
+from ..courses import get_course_with_access, get_course_info_section
+from ..field_overrides import OverrideFieldData
+from ..model_data import FieldDataCache
+from ..module_render import hash_resource, get_module_for_descriptor
+from ..models import StudentModule
+from .factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
+from .tests import LoginEnrollmentTestCase
+from .test_submitting_problems import TestSubmittingProblems
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -206,7 +206,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
         # Patch getmodule to return our mock module
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('lms.djangoapps.courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
             render.xqueue_callback(
@@ -227,7 +227,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             'xqueue_body': 'hello world',
         }
 
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('lms.djangoapps.courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
@@ -1441,7 +1441,7 @@ class DetachedXBlock(XBlock):
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
-@patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+@patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
@@ -1603,7 +1603,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         super(TestAnonymousStudentId, self).setUp()
         self.user = UserFactory()
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+    @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
     def _get_anonymous_id(self, course_id, xblock_class):
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         descriptor = Mock(
@@ -1801,7 +1801,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @patch('courseware.module_render.SCORE_CHANGED.send')
+    @patch('lms.djangoapps.courseware.module_render.SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
@@ -2042,7 +2042,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         self.users = {number: UserFactory() for number in USER_NUMBERS}
 
         self._old_has_access = render.has_access
-        patcher = patch('courseware.module_render.has_access', self._has_access)
+        patcher = patch('lms.djangoapps.courseware.module_render.has_access', self._has_access)
         patcher.start()
         self.addCleanup(patcher.stop)
 

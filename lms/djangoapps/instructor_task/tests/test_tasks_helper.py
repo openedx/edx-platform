@@ -27,7 +27,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from django.conf import settings
@@ -869,7 +869,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         expected_grades = [self._format_user_grade(header_row, **user_grade) for user_grade in user_grades]
         self.verify_rows_in_csv(expected_grades)
 
-    @patch('courseware.grades.MaxScoresCache.get', Mock(return_value=1))
+    @patch('lms.djangoapps.courseware.grades.MaxScoresCache.get', Mock(return_value=1))
     def test_cohort_content_with_maxcache(self):
         """
         Tests the cohoted course grading to test the scenario in which `max_scores_cache` is set for the course

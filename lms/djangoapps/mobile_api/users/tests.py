@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from certificates.api import generate_user_certificates
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
     MilestoneError,
     StartDateError,
     VisibilityError,
@@ -247,7 +247,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.course.cert_html_view_enabled = True
         self.store.update_item(self.course, self.user.id)
 
-        with patch('courseware.grades.grade') as mock_grade:
+        with patch('lms.djangoapps.courseware.grades.grade') as mock_grade:
             mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
             generate_user_certificates(self.user, self.course.id)
 

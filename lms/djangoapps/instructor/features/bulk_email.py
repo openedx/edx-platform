@@ -11,7 +11,7 @@ from nose.tools import assert_in, assert_equal
 from django.core.management import call_command
 from django.conf import settings
 
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory, InstructorFactory
 
 
 @step(u'Given there is a course with a staff, instructor and student')

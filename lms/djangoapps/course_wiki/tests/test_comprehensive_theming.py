@@ -10,8 +10,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 
-from courseware.tests.factories import InstructorFactory
-from course_wiki.views import get_or_create_root
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
+from ..views import get_or_create_root
 
 
 @attr('shard_1')

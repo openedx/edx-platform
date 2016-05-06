@@ -23,7 +23,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from student.models import User, CourseEnrollment
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from util.json_request import JsonResponse
 from certificates import api
 from instructor_task.api import generate_certificates_for_students

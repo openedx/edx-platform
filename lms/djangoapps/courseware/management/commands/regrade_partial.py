@@ -10,7 +10,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
-from courseware.models import StudentModule
+from ...models import StudentModule
 from capa.correctmap import CorrectMap
 
 LOG = logging.getLogger(__name__)

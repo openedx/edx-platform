@@ -39,8 +39,6 @@ from instructor.views.instructor_task_helpers import extract_email_features, ext
 
 from microsite_configuration import microsite
 
-from courseware.access import has_access
-from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import (
@@ -50,7 +48,9 @@ from django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
 )
 from edxmako.shortcuts import render_to_string
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access, get_course_by_id
+from lms.djangoapps.courseware.models import StudentModule
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,

@@ -258,7 +258,6 @@ class UngenerateCertificatesTest(CertificateManagementTest):
     @contextmanager
     def _mock_passing_grade(self):
         """Mock the grading function to always return a passing grade. """
-        symbol = 'courseware.grades.grade'
-        with patch(symbol) as mock_grade:
+        with patch('lms.djangoapps.courseware.grades.grade') as mock_grade:
             mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
             yield

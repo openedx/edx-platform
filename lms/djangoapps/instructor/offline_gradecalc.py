@@ -10,8 +10,8 @@ import json
 import time
 
 from json import JSONEncoder
-from courseware import grades, models
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware import grades, models
+from lms.djangoapps.courseware.courses import get_course_by_id
 from django.contrib.auth.models import User
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import UsageKey

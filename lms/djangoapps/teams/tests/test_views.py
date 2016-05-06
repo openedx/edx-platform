@@ -19,7 +19,7 @@ from rest_framework.test import APITestCase, APIClient
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from common.test.utils import skip_signal
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment

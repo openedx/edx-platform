@@ -10,9 +10,9 @@ from django.http import HttpResponseBadRequest
 from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
 
-from courseware.models import StudentFieldOverride
-from courseware.field_overrides import disable_overrides
-from courseware.student_field_overrides import (
+from lms.djangoapps.courseware.models import StudentFieldOverride
+from lms.djangoapps.courseware.field_overrides import disable_overrides
+from lms.djangoapps.courseware.student_field_overrides import (
     clear_override_for_user,
     get_override_for_user,
     override_field_for_user,

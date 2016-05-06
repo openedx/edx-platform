@@ -8,20 +8,6 @@ from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module, handle_xblock_callback
-from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-    get_request_for_user
-)
-from courseware.entrance_exams import (
-    course_has_entrance_exam,
-    get_entrance_exam_content,
-    get_entrance_exam_score,
-    user_can_skip_entrance_exam,
-    user_has_passed_entrance_exam,
-)
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, AnonymousUserFactory
 from util.milestones_helpers import (
@@ -36,6 +22,21 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from ..model_data import FieldDataCache
+from ..module_render import toc_for_course, get_module, handle_xblock_callback
+from ..tests.factories import UserFactory, InstructorFactory, StaffFactory
+from ..tests.helpers import (
+    LoginEnrollmentTestCase,
+    get_request_for_user
+)
+from ..entrance_exams import (
+    course_has_entrance_exam,
+    get_entrance_exam_content,
+    get_entrance_exam_score,
+    user_can_skip_entrance_exam,
+    user_has_passed_entrance_exam,
+)
 
 
 @attr('shard_2')
@@ -447,7 +448,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         for toc_section in self.expected_unlocked_toc:
             self.assertIn(toc_section, unlocked_toc)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
+    @patch('lms.djangoapps.courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseware_page_access_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam
@@ -465,7 +466,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                })
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
+    @patch('lms.djangoapps.courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseinfo_page_access_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam
@@ -478,7 +479,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         exam_url = response.get('Location')
         self.assertRedirects(response, exam_url)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=True))
+    @patch('lms.djangoapps.courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=True))
     def test_courseware_page_access_after_passing_entrance_exam(self):
         """
         Test courseware access page after passing entrance exam

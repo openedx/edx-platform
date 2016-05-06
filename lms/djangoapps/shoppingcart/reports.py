@@ -5,7 +5,7 @@ import unicodecsv
 
 from django.utils.translation import ugettext as _
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment

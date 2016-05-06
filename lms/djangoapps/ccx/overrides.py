@@ -9,7 +9,7 @@ from django.db import transaction
 
 import request_cache
 
-from courseware.field_overrides import FieldOverrideProvider
+from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 

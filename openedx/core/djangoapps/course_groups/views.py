@@ -19,7 +19,7 @@ import re
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
 from . import cohorts

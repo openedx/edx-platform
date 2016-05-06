@@ -6,20 +6,19 @@ from mock import Mock, patch
 from nose.plugins.attrib import attr
 from functools import partial
 
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
-from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-
 from student.tests.factories import UserFactory
-from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory, location, course_id
-from courseware.tests.factories import UserStateSummaryFactory
-from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
 from xblock.fields import Scope, BlockScope, ScopeIds
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.core import XBlock
 from django.test import TestCase
 from django.db import DatabaseError
+
+from ..model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
+from ..models import StudentModule, XModuleUserStateSummaryField
+from ..models import XModuleStudentInfoField, XModuleStudentPrefsField
+from .factories import StudentModuleFactory as cmfStudentModuleFactory, location, course_id
+from .factories import UserStateSummaryFactory, StudentPrefsFactory, StudentInfoFactory
 
 
 def mock_field(scope, name):

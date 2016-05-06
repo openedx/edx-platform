@@ -32,7 +32,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from commerce.utils import audit_log, EcommerceService
 from course_modes.models import CourseMode
-from courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from embargo import api as embargo_api

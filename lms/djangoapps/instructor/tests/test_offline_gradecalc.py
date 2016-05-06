@@ -4,7 +4,7 @@ Tests for offline_gradecalc.py
 import json
 from mock import patch
 
-from courseware.models import OfflineComputedGrade
+from lms.djangoapps.courseware.models import OfflineComputedGrade
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.graders import Score
@@ -57,7 +57,7 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
-        patcher = patch('courseware.grades.grade', new=mock_grade)
+        patcher = patch('lms.djangoapps.courseware.grades.grade', new=mock_grade)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -102,6 +102,6 @@ class TestOfflineGradeCalc(ModuleStoreTestCase):
     def test_student_grades(self):
         """ Test that the data returned by student_grades() and grades.grade() match """
         offline_grade_calculation(self.course.id)
-        with patch('courseware.grades.grade', side_effect=AssertionError('Should not re-grade')):
+        with patch('lms.djangoapps.courseware.grades.grade', side_effect=AssertionError('Should not re-grade')):
             result = student_grades(self.user, None, self.course, use_offline=True)
         self.assertEqual(result, mock_grade(self.user, None, self.course))

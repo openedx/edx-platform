@@ -6,12 +6,13 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from course_modes.models import CourseMode
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
+from .helpers import LoginEnrollmentTestCase
 
 
 @attr('shard_1')

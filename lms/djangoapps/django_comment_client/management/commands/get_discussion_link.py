@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course
+from lms.djangoapps.courseware.courses import get_course
 
 
 class Command(BaseCommand):

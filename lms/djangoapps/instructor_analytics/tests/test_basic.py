@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 from course_modes.models import CourseMode
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import (
     StudentModule, sale_record_features, sale_order_record_features, enrolled_students_features,
     course_registration_features, coupon_codes_features, get_proctored_exam_results, list_may_enroll,

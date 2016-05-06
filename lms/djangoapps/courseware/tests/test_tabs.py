@@ -7,14 +7,6 @@ from django.http import Http404
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 
-from courseware.courses import get_course_by_id
-from courseware.tabs import (
-    get_course_tab_list, CoursewareTab, CourseInfoTab, ProgressTab,
-    ExternalDiscussionCourseTab, ExternalLinkCourseTab
-)
-from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
-from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.views.views import get_static_tab_contents, static_tab
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
@@ -33,6 +25,15 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from ..courses import get_course_by_id
+from ..tabs import (
+    get_course_tab_list, CoursewareTab, CourseInfoTab, ProgressTab,
+    ExternalDiscussionCourseTab, ExternalLinkCourseTab
+)
+from ..views.views import get_static_tab_contents, static_tab
+from .helpers import get_request_for_user, LoginEnrollmentTestCase
+from .factories import InstructorFactory, StaffFactory
 
 
 class TabTestCase(SharedModuleStoreTestCase):
@@ -271,7 +272,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
-        with patch('courseware.views.views.get_module') as mock_module_render:
+        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )

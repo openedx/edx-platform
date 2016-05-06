@@ -172,7 +172,7 @@ FEATURES = {
 
     # Enable instructor to assign individual due dates
     # Note: In order for this feature to work, you must also add
-    # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+    # 'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider' to
     # the setting FIELD_OVERRIDE_PROVIDERS, in addition to setting this flag to
     # True.
     'INDIVIDUAL_DUE_DATES': False,
@@ -966,7 +966,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
-from course_wiki import settings as course_wiki_settings
+from lms.djangoapps.course_wiki import settings as course_wiki_settings
 
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
@@ -1159,9 +1159,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.RedirectUnenrolledMiddleware',
+    'lms.djangoapps.courseware.middleware.RedirectUnenrolledMiddleware',
 
-    'course_wiki.middleware.WikiAccessMiddleware',
+    'lms.djangoapps.course_wiki.middleware.WikiAccessMiddleware',
 
     # This must be last
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
@@ -2699,7 +2699,7 @@ CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 
 # For the fields override feature
 # If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
-# 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+# 'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider' to
 # this setting.
 FIELD_OVERRIDE_PROVIDERS = ()
 

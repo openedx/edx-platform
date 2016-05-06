@@ -33,7 +33,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT

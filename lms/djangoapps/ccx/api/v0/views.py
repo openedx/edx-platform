@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework_oauth.authentication import OAuth2Authentication
 
 from ccx_keys.locator import CCXLocator
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from instructor.enrollment import (
     enroll_email,

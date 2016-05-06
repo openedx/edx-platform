@@ -8,7 +8,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 
 
 USER_COUNT = 11

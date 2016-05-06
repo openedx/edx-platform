@@ -8,9 +8,10 @@ from django.conf import settings
 from django.utils.timezone import UTC
 from logging import getLogger
 from student.roles import CourseBetaTesterRole
-from courseware.masquerade import is_masquerading_as_student
-from courseware.access_response import AccessResponse, StartDateError
 from xmodule.util.django import get_current_request_hostname
+
+from .access_response import AccessResponse, StartDateError
+from .masquerade import is_masquerading_as_student
 
 
 DEBUG_ACCESS = False

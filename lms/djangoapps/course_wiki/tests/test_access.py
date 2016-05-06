@@ -8,12 +8,12 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from courseware.tests.factories import InstructorFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 
 from wiki.models import URLPath
-from course_wiki.views import get_or_create_root
-from course_wiki.utils import user_is_article_course_staff, course_wiki_slug
-from course_wiki import settings
+from ..views import get_or_create_root
+from ..utils import user_is_article_course_staff, course_wiki_slug
+from .. import settings
 
 
 class TestWikiAccessBase(ModuleStoreTestCase):

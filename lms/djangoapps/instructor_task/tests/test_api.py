@@ -4,7 +4,7 @@ Test for LMS instructor background task queue management
 from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from bulk_email.models import CourseEmail, SEND_TO_ALL
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from instructor_task.api import (

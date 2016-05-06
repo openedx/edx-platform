@@ -13,9 +13,9 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import UserFactory, StudentModuleFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin

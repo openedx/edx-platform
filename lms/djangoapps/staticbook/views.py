@@ -9,8 +9,8 @@ from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.annotator_token import retrieve_token
 
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from notes.utils import notes_enabled_for_course
 from static_replace import replace_static_urls
 

@@ -895,7 +895,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         request_certificate_url = reverse('certificates.views.request_certificate')
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
-            with patch('courseware.grades.grade') as mock_grade:
+            with patch('lms.djangoapps.courseware.grades.grade') as mock_grade:
                 mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
                 response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
                 self.assertEqual(response.status_code, 200)

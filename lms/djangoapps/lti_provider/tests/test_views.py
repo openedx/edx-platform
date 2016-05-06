@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
-from courseware.testutils import RenderXBlockTestMixin
+from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
 from lti_provider.signature_validator import SignatureValidator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator

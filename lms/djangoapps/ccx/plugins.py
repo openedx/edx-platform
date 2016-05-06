@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_noop
 
 from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 
 
 class CcxCourseTab(CourseTab):

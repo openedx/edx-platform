@@ -14,8 +14,8 @@ from util.db import outer_atomic
 from celery.result import AsyncResult
 from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 
-from courseware.module_render import get_xqueue_callback_url_prefix
-from courseware.courses import get_problems_in_section
+from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.courseware.courses import get_problems_in_section
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey

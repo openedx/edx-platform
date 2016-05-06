@@ -46,7 +46,7 @@ class TestOverrideProvider(FieldOverrideProvider):
 
 @attr('shard_1')
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'courseware.tests.test_field_overrides.TestOverrideProvider',))
+    'lms.djangoapps.courseware.tests.test_field_overrides.TestOverrideProvider',))
 class OverrideFieldDataTests(SharedModuleStoreTestCase):
     """
     Tests for `OverrideFieldData`.
@@ -126,7 +126,7 @@ class OverrideFieldDataTests(SharedModuleStoreTestCase):
 
 @attr('shard_1')
 @override_settings(
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.tests.test_field_overrides.TestOverrideProvider']
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['lms.djangoapps.courseware.tests.test_field_overrides.TestOverrideProvider']
 )
 class OverrideModulestoreFieldDataTests(OverrideFieldDataTests):
     def setUp(self):
@@ -157,7 +157,7 @@ class ResolveDottedTests(unittest.TestCase):
 
     def test_bad_sub_import(self):
         with self.assertRaises(ImportError):
-            resolve_dotted('courseware.tests.test_foo')
+            resolve_dotted('lms.djangoapps.courseware.tests.test_foo')
 
     def test_bad_import(self):
         with self.assertRaises(ImportError):
@@ -165,7 +165,7 @@ class ResolveDottedTests(unittest.TestCase):
 
     def test_import_something_that_isnt_already_loaded(self):
         self.assertEqual(
-            resolve_dotted('courseware.tests.animport.SOMENAME'),
+            resolve_dotted('lms.djangoapps.courseware.tests.animport.SOMENAME'),
             'bar'
         )
 

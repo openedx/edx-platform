@@ -14,8 +14,8 @@ from django.utils.translation import ugettext as _
 from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
-from courseware.courses import get_course_by_id
-from course_wiki.utils import course_wiki_slug
+from lms.djangoapps.courseware.courses import get_course_by_id
+from .utils import course_wiki_slug
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)

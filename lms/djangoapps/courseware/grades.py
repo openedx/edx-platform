@@ -16,9 +16,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
 from openedx.core.lib.gating import api as gating_api
-from courseware import courses
-from courseware.access import has_access
-from courseware.model_data import FieldDataCache, ScoresClient
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from student.models import anonymous_id_for_user
 from util.db import outer_atomic
@@ -27,6 +24,10 @@ from xmodule import graders
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from . import courses
+from .access import has_access
+from .model_data import FieldDataCache, ScoresClient
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
 

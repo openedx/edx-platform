@@ -7,8 +7,8 @@ import itertools
 import mock
 from nose.plugins.skip import SkipTest
 
-from courseware.views.views import progress
-from courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.views.views import progress
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
 from django.core.cache import caches

@@ -12,7 +12,7 @@ from microsite_configuration import microsite
 import auth_exchange.views
 
 from config_models.views import ConfigurationModelCurrentAPIView
-from courseware.views.index import CoursewareIndex
+from lms.djangoapps.courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
@@ -271,14 +271,14 @@ urlpatterns += (
         r'^courses/{}/jump_to/(?P<location>.*)$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.jump_to',
+        'lms.djangoapps.courseware.views.views.jump_to',
         name='jump_to',
     ),
     url(
         r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.jump_to_id',
+        'lms.djangoapps.courseware.views.views.jump_to_id',
         name='jump_to_id',
     ),
 
@@ -288,7 +288,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        'courseware.module_render.handle_xblock_callback',
+        'lms.djangoapps.courseware.module_render.handle_xblock_callback',
         name='xblock_handler',
     ),
     url(
@@ -296,7 +296,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        'courseware.module_render.handle_xblock_callback_noauth',
+        'lms.djangoapps.courseware.module_render.handle_xblock_callback_noauth',
         name='xblock_handler_noauth',
     ),
 
@@ -308,7 +308,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        'courseware.module_render.xblock_view',
+        'lms.djangoapps.courseware.module_render.xblock_view',
         name='xblock_view',
     ),
 
@@ -318,7 +318,7 @@ urlpatterns += (
     # Note: This is not an API. Compare this with the xblock_view API above.
     url(
         r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
-        'courseware.views.views.render_xblock',
+        'lms.djangoapps.courseware.views.views.render_xblock',
         name='render_xblock',
     ),
 
@@ -333,7 +333,7 @@ urlpatterns += (
         r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.module_render.xqueue_callback',
+        'lms.djangoapps.courseware.module_render.xqueue_callback',
         name='xqueue_callback',
     ),
     url(
@@ -362,7 +362,7 @@ urlpatterns += (
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_about',
+        'lms.djangoapps.courseware.views.views.course_about',
         name='about_course',
     ),
 
@@ -371,14 +371,14 @@ urlpatterns += (
         r'^courses/{}/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_info',
+        'lms.djangoapps.courseware.views.views.course_info',
         name='course_root',
     ),
     url(
         r'^courses/{}/info$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_info',
+        'lms.djangoapps.courseware.views.views.course_info',
         name='info',
     ),
     # TODO arjun remove when custom tabs in place, see courseware/courses.py
@@ -386,7 +386,7 @@ urlpatterns += (
         r'^courses/{}/syllabus$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.syllabus',
+        'lms.djangoapps.courseware.views.views.syllabus',
         name='syllabus',
     ),
 
@@ -395,7 +395,7 @@ urlpatterns += (
         r'^courses/{}/survey$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_survey',
+        'lms.djangoapps.courseware.views.views.course_survey',
         name='course_survey',
     ),
 
@@ -492,7 +492,7 @@ urlpatterns += (
         r'^courses/{}/progress$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.progress',
+        'lms.djangoapps.courseware.views.views.progress',
         name='progress',
     ),
     # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -500,7 +500,7 @@ urlpatterns += (
         r'^courses/{}/progress/(?P<student_id>[^/]*)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.progress',
+        'lms.djangoapps.courseware.views.views.progress',
         name='student_progress',
     ),
 
@@ -638,7 +638,7 @@ urlpatterns += (
         r'^courses/{}/lti_rest_endpoints/'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.get_course_lti_endpoints',
+        'lms.djangoapps.courseware.views.views.get_course_lti_endpoints',
         name='lti_rest_endpoints',
     ),
 
@@ -693,7 +693,7 @@ if settings.FEATURES.get('ENABLE_MASQUERADE'):
             r'^courses/{}/masquerade$'.format(
                 settings.COURSE_KEY_PATTERN,
             ),
-            'courseware.masquerade.handle_ajax',
+            'lms.djangoapps.courseware.masquerade.handle_ajax',
             name='masquerade_update',
         ),
     )
@@ -703,7 +703,7 @@ urlpatterns += (
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.generate_user_cert',
+        'lms.djangoapps.courseware.views.views.generate_user_cert',
         name='generate_user_cert',
     ),
 )
@@ -756,7 +756,7 @@ urlpatterns += (
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.static_tab',
+        'lms.djangoapps.courseware.views.views.static_tab',
         name='static_tab',
     ),
 )
@@ -767,7 +767,7 @@ if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
             r'^courses/{}/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$'.format(
                 settings.COURSE_ID_PATTERN
             ),
-            'courseware.views.views.submission_history',
+            'lms.djangoapps.courseware.views.views.submission_history',
             name='submission_history',
         ),
     )
@@ -1000,17 +1000,17 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
     urlpatterns += (
         url(
             r'^financial-assistance/$',
-            'courseware.views.views.financial_assistance',
+            'lms.djangoapps.courseware.views.views.financial_assistance',
             name='financial_assistance'
         ),
         url(
             r'^financial-assistance/apply/$',
-            'courseware.views.views.financial_assistance_form',
+            'lms.djangoapps.courseware.views.views.financial_assistance_form',
             name='financial_assistance_form'
         ),
         url(
             r'^financial-assistance/submit/$',
-            'courseware.views.views.financial_assistance_request',
+            'lms.djangoapps.courseware.views.views.financial_assistance_request',
             name='submit_financial_assistance_request'
         )
     )

@@ -11,7 +11,7 @@ from django.utils.timezone import utc
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
@@ -186,7 +186,7 @@ class TestTitleOrUrl(unittest.TestCase):
 @attr('shard_1')
 @override_settings(
     FIELD_OVERRIDE_PROVIDERS=(
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',),
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',),
 )
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """

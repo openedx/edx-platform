@@ -29,8 +29,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment

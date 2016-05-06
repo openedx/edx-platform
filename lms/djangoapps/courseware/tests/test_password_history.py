@@ -18,7 +18,7 @@ from django.utils.http import int_to_base36
 from freezegun import freeze_time
 
 from student.models import PasswordHistory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from .helpers import LoginEnrollmentTestCase
 
 
 @attr('shard_1')

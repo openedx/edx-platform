@@ -9,8 +9,8 @@ from wiki.models import URLPath
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.tests.factories import InstructorFactory
-from course_wiki.views import get_or_create_root
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
+from ..views import get_or_create_root
 
 
 @attr('shard_1')

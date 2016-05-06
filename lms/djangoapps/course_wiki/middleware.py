@@ -6,8 +6,8 @@ from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 from wiki.models import reverse
 
-from courseware.courses import get_course_with_access, get_course_overview_with_access
-from courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access, get_course_overview_with_access
+from lms.djangoapps.courseware.access import has_access
 from student.models import CourseEnrollment
 from util.request import course_id_from_url
 

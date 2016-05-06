@@ -33,7 +33,6 @@ from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 from external_auth.models import ExternalAuthMap
-from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
 from student.models import CourseEnrollmentAllowed
@@ -54,15 +53,16 @@ from util.milestones_helpers import (
 )
 from ccx_keys.locator import CCXLocator
 
-from courseware.access_response import (
+from .access_response import (
     MilestoneError,
     MobileAvailabilityError,
     VisibilityError,
 )
-from courseware.access_utils import (
+from .access_utils import (
     adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
     in_preview_mode
 )
+from .masquerade import get_masquerade_role, is_masquerading_as_student
 
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX

@@ -2,11 +2,11 @@
 Defines concrete class for cybersource  Enrollment Report.
 
 """
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 import collections
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
 from microsite_configuration import microsite
 from shoppingcart.models import RegistrationCodeRedemption, PaidCourseRegistration, CouponRedemption, OrderItem, \

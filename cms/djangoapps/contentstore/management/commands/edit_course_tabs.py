@@ -10,7 +10,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from .prompt import query_yes_no
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 from contentstore.views import tabs
 from opaque_keys import InvalidKeyError

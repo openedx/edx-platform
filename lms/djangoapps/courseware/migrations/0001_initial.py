@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(null=True, blank=True)),
                 ('max_grade', models.FloatField(null=True, blank=True)),
-                ('student_module', models.ForeignKey(to='courseware.StudentModule')),
+                ('student_module', models.ForeignKey(to='lms.djangoapps.courseware.StudentModule')),
             ],
             options={
                 'get_latest_by': 'created',

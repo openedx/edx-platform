@@ -4,8 +4,8 @@ Helpers for instructor app.
 
 from xmodule.modulestore.django import modulestore
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 
 
 class DummyRequest(object):

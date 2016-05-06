@@ -33,7 +33,7 @@ from django.core.mail.message import EmailMessage
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string

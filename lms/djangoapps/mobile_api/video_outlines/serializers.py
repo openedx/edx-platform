@@ -5,10 +5,10 @@ from rest_framework.reverse import reverse
 
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
 from xmodule.modulestore.django import modulestore
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
 
 from edxval.api import (

@@ -8,8 +8,8 @@ from django.http import Http404
 from mock import patch
 from nose.plugins.attrib import attr
 
-import courseware.courses as courses
-from courseware.middleware import RedirectUnenrolledMiddleware
+from .. import courses as courses
+from ..middleware import RedirectUnenrolledMiddleware
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

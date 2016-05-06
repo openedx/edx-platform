@@ -18,18 +18,18 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from ccx.tests.factories import CcxFactory
-import courseware.access as access
-import courseware.access_response as access_response
-from courseware.masquerade import CourseMasquerade
-from courseware.tests.factories import (
+from .. import access as access
+from .. import access_response as access_response
+from ..masquerade import CourseMasquerade
+from ..tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory,
 )
-import courseware.views.views as views
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from ..views import views as views
+from ..tests.helpers import LoginEnrollmentTestCase
 from edxmako.tests import mako_middleware_process_request
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
@@ -246,12 +246,12 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             overview,
             chapter,
         ]
-        with patch('courseware.access.in_preview_mode') as mock_preview:
+        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
             mock_preview.return_value = False
             for obj in modules:
                 self.assertTrue(bool(access.has_access(self.student, 'load', obj, course_key=self.course.id)))
 
-        with patch('courseware.access.in_preview_mode') as mock_preview:
+        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
             mock_preview.return_value = True
             for obj in modules:
                 self.assertFalse(bool(access.has_access(self.student, 'load', obj, course_key=self.course.id)))
@@ -265,7 +265,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.course_instructor, obj='global')))
         self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.student, obj='global')))
 
-    @patch('courseware.access.in_preview_mode', Mock(return_value=True))
+    @patch('lms.djangoapps.courseware.access.in_preview_mode', Mock(return_value=True))
     def test_has_access_with_preview_mode(self):
         """
         Tests particular user's can access content via has_access in preview mode.
@@ -279,7 +279,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertFalse(bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id)))
 
         # User should be able to preview when masquerade.
-        with patch('courseware.access.is_masquerading_as_student') as mock_masquerade:
+        with patch('lms.djangoapps.courseware.access.is_masquerading_as_student') as mock_masquerade:
             mock_masquerade.return_value = True
             self.assertTrue(
                 bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id))
@@ -412,7 +412,10 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     @ddt.data(None, YESTERDAY, TOMORROW)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='preview.localhost'))
+    @patch(
+        'lms.djangoapps.courseware.access_utils.get_current_request_hostname',
+        Mock(return_value='preview.localhost')
+    )
     def test__has_access_descriptor_in_preview_mode(self, start):
         """
         Tests that descriptor has access in preview mode.
@@ -430,7 +433,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
+    @patch('lms.djangoapps.courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
     def test__has_access_descriptor_when_not_in_preview_mode(self, start, expected_error_type):
         """
         Tests that descriptor has no access when start date in future & without preview.

@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 import logging
 
-from courseware.grades import get_weighted_scores
-from courseware.models import SCORE_CHANGED
+from lms.djangoapps.courseware.grades import get_weighted_scores
+from lms.djangoapps.courseware.models import SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
 import lti_provider.outcomes as outcomes

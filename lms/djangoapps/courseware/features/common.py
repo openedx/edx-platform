@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import
 
+from logging import getLogger
 import time
 
 from lettuce import world, step
@@ -12,9 +13,10 @@ from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
-from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_block
-from logging import getLogger
+
+from ..courses import get_course_by_id
+
 logger = getLogger(__name__)
 
 

@@ -4,7 +4,7 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from student.models import CourseEnrollment, User
 from certificates.api import certificate_downloadable_status
 
