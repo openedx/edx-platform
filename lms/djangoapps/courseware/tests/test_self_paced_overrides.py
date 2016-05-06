@@ -26,6 +26,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        self.reset_setting_cache_variables()
         super(SelfPacedDateOverrideTest, self).setUp()
 
         SelfPacedConfiguration(enabled=True).save()
@@ -35,8 +36,15 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         self.future = self.now + datetime.timedelta(days=30)
 
     def tearDown(self):
+        self.reset_setting_cache_variables()
         super(SelfPacedDateOverrideTest, self).tearDown()
 
+    def reset_setting_cache_variables(self):
+        """
+        The overridden settings for this class get cached on class variables.
+        Reset those to None before and after running the test to ensure clean
+        behavior.
+        """
         OverrideFieldData.provider_classes = None
         OverrideModulestoreFieldData.provider_classes = None
 
