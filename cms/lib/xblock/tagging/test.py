@@ -32,7 +32,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         Preparation for the test execution
         """
-        self.user_password = super(StructuredTagsAsideTestCase, self).setUp()
+        super(StructuredTagsAsideTestCase, self).setUp()
         self.aside_name = 'tagging_aside'
         self.aside_tag_dif = 'difficulty'
         self.aside_tag_dif_value = 'Hard'

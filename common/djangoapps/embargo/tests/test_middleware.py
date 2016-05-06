@@ -35,9 +35,11 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'fred'
     PASSWORD = 'secret'
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMiddlewareAccessTests, self).setUp('embargo')
+        super(EmbargoMiddlewareAccessTests, self).setUp()
         self.user = UserFactory(username=self.USERNAME, password=self.PASSWORD)
         self.course = CourseFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

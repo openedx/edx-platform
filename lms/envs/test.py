@@ -203,9 +203,7 @@ CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_loc_mem_cache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -215,20 +213,13 @@ CACHES = {
     # push process.
     'general': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'KEY_PREFIX': 'general',
-        'VERSION': 4,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
     'mongo_metadata_inheritance': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
-        'TIMEOUT': 300,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
     'loc_cache': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_mem_cache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',

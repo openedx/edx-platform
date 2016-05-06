@@ -40,6 +40,8 @@ class BookmarksTestsBase(ModuleStoreTestCase):
     STORE_TYPE = ModuleStoreEnum.Type.mongo
     TEST_PASSWORD = 'test'
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(BookmarksTestsBase, self).setUp()
 

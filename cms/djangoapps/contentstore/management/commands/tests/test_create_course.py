@@ -46,9 +46,6 @@ class TestCreateCourse(ModuleStoreTestCase):
     Unit tests for creating a course in either old mongo or split mongo via command line
     """
 
-    def setUp(self):
-        super(TestCreateCourse, self).setUp(create_user=True)
-
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_all_stores_user_email(self, store):
         call_command(

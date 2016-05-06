@@ -81,7 +81,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         afterwards.
         """
 
-        self.user_password = super(CourseTestCase, self).setUp()
+        super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)

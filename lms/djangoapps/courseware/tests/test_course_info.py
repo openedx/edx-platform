@@ -36,6 +36,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
     """
+
     @classmethod
     def setUpClass(cls):
         super(CourseInfoTestCase, cls).setUpClass()
@@ -263,6 +264,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
     """
     Tests for the info page of self-paced courses.
     """
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     @classmethod
     def setUpClass(cls):

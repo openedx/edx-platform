@@ -17,6 +17,7 @@ from mock import patch
 from social.apps.django_app.default.models import UserSocialAuth
 
 from external_auth.models import ExternalAuthMap
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import login_oauth_token
 from third_party_auth.tests.utils import (
@@ -28,10 +29,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class LoginTest(TestCase):
+class LoginTest(CacheIsolationTestCase):
     '''
     Test student.views.login_user() view
     '''
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(LoginTest, self).setUp()

@@ -19,6 +19,7 @@ from django.utils.http import urlsafe_base64_encode, base36_to_int, int_to_base3
 from mock import Mock, patch
 import ddt
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import password_reset, password_reset_confirm_wrapper, SETTING_CHANGE_INITIATED
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
@@ -28,10 +29,12 @@ from .test_microsite import fake_microsite_get_value
 
 
 @ddt.ddt
-class ResetPasswordTests(EventTestMixin, TestCase):
+class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     """ Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(ResetPasswordTests, self).setUp('student.views.tracker')

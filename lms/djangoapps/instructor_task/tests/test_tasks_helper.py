@@ -1683,6 +1683,9 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(TestCertificateGeneration, self).setUp()
         self.initialize_course()

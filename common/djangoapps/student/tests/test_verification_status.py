@@ -35,9 +35,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
+    URLCONF_MODULES = ['verify_student.urls']
+
     def setUp(self):
         # Invoke UrlResetMixin
-        super(TestCourseVerificationStatus, self).setUp('verify_student.urls')
+        super(TestCourseVerificationStatus, self).setUp()
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
