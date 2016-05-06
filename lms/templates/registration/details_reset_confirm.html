@@ -4,7 +4,7 @@
 {% block title %}
 <title>
   {% blocktrans with platform_name=platform_name %}
-      Update Your {{ platform_name }} Details
+    Update Your {{ platform_name }} Details
   {% endblocktrans %}
 </title>
 {% endblock %}
@@ -38,10 +38,12 @@
     <header>
       <h1 class="title title-info-update">
         <span class="title-super">
-          {% trans BETA BIG DATA UNIVERSITY %}
+          {% blocktrans with platform_name=platform_name %}
+            BETA {{ platform_name|upper }}
+          {% endblocktrans %}
         </span>
         <span class="title-super">
-          {% trans ACCOUNT INFORMATION AND UPDATE %}
+          {% trans "ACCOUNT INFORMATION AND UPDATE" %}
         </span>
       </h1>
     </header>
@@ -51,7 +53,7 @@
     <section role="main" class="content">
       {% if validlink %}
       <header>
-      <h2 class="sr">{% trans "Details Update Form" %}</h2>
+        <h2 class="sr">{% trans "Details Update Form" %}</h2>
       </header>
 
       <form role="form" id="passwordreset-form" method="post" action="">{% csrf_token %}
@@ -110,14 +112,14 @@
               <label for="new_username">{% trans "Username" %}</label>
               <input id="new_username" type="text" name="username" placeholder="New Username" value="{{ user.username}}" />
               <span class="tip-input">
-                {% trans Feel free to edit. This is the public name that will identify you in your courses - %}
-                <strong>{% trans (cannot be changed later) %}</strong>
+                {% trans "Feel free to edit. This is the public name that will identify you in your courses -" %}
+                <strong>{% trans "(cannot be changed later)" %}</strong>
               </span>
             </li>
             <li class="field required password" id="field-new_password1">
               <label for="new_password1">{% trans "Password" %}</label>
               <input id="new_password1" type="password" name="new_password1" placeholder="*****" />
-              <span class="tip-input">{% trans Password must be at least 2 characters %}</span>
+              <span class="tip-input">{% trans "Password must be at least 2 characters" %}</span>
             </li>
             <li class="field required password" id="field-new_password2">
               <label for="new_password2">{% trans "Retype Password" %}</label>
