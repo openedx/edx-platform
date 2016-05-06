@@ -39,10 +39,13 @@ function() {
 
         template: [
             '<div class="volume" role="application">',
-                '<button class="control" aria-disabled="false" aria-label="',
-                    gettext('Volume: Click on this button to mute or unmute this video or press UP or ' +
-                        'DOWN buttons to increase or decrease volume level.'),
-                    '" aria-expanded="false">',
+                '<p class="sr instructions" id="volume-instructions">',
+                    gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // jshint ignore: line
+                '</p>',
+                '<button class="control" aria-disabled="false" aria-describedby="volume-instructions"',
+                    '" aria-expanded="false" title="',
+                        gettext('Adjust video volume'),
+                    '">',
                     '<span class="icon-fallback-img">',
                         '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
                         '<span class="sr control-text">',

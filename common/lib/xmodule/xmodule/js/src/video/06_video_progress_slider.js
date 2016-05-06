@@ -89,7 +89,7 @@ function () {
             'aria-valuemax': state.videoPlayer.duration(),
             'aria-valuemin': '0',
             'aria-valuenow': state.videoPlayer.currentTime,
-            'tabindex': '0'
+            'tabindex': '0',
             'aria-label': gettext('Video position')
         });
 
