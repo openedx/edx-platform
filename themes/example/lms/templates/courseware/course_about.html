@@ -1,3 +1,4 @@
+## mako
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -46,26 +47,14 @@ from openedx.core.lib.courses import course_image_url
     addSlider();
 
     // Truncating the Course Description
-    var description_content = $(".course-description").html();        //replace course description from the context
-    if (description_content.length > 500){
-      $(".course-description").html(description_content.substring(0, description_content.indexOf(" ", 500)) + '... <a id="description_show" href="#" class="brand-link">See More</a>');
-    }
-    $("#description_show").click(function(event){
-      $(".course-description").html(description_content);
-      event.preventDefault();
-    });
+    var description_content = $(".course-description").html();
+    truncateDescription(description_content);
+    descriptionClickListeners(description_content);
 
     // Truncating the Course learning points
-    var learning_content = $(".course-learning .list-bulleted").html(),
-        learning_points_count = $(".course-learning .list-bulleted").children().length;
-    if (learning_points_count > 6){
-      $(".course-learning .list-bulleted").children().slice((6 - learning_points_count)).remove();
-      $(".course-learning .list-bulleted").append('<a id="learning_show" href="#" class="brand-link">See More</a>');
-    }
-    $("#learning_show").click(function(event){
-      $(".course-learning .list-bulleted").html(learning_content);
-      event.preventDefault();
-    });
+    var learning_content = $(".course-learning .list-bulleted").html();
+    truncateLearningPoints(learning_content);
+    learningPointsClickListeners(learning_content);
 
 
     $(".register").click(function(event) {
@@ -169,8 +158,49 @@ from openedx.core.lib.courses import course_image_url
     }
   }
 
-  </script>
+  function descriptionClickListeners(description_content){
+    $("#description_show").click(function(event){
+      event.preventDefault();
+      $(".course-description").html(description_content+'<a id="description_less" href="#" class="brand-link">Less</a>');
 
+      $("#description_less").click(function(event){
+        event.preventDefault();
+        truncateDescription(description_content);
+      });
+    });
+  }
+
+  function truncateDescription(description_content){
+    if (description_content.length > 500){
+      $(".course-description").html(description_content.substring(0, description_content.indexOf(" ", 500)) + '... <a id="description_show" href="#" class="brand-link">See More</a>');
+    }
+    descriptionClickListeners(description_content);
+  }
+
+  function learningPointsClickListeners(learning_content){
+    $("#learning_show").click(function(event){
+      event.preventDefault();
+      $(".course-learning .list-bulleted").html(learning_content+'<a id="learning_less" href="#" class="brand-link learning-points-btn">Less</a>');
+      $("#learning_less").click(function(event){
+        event.preventDefault();
+        truncateLearningPoints(learning_content);
+      });
+    });
+
+  }
+
+  function truncateLearningPoints(learning_content){
+    var learning_points_count = $(".course-learning .list-bulleted").children().length;
+    if (learning_points_count > 6){
+      $(".course-learning .list-bulleted").children().slice((6 - learning_points_count)).remove();
+      $(".course-learning .list-bulleted").append('<a id="learning_show" href="#" class="brand-link learning-points-btn">See More</a>');
+    }
+    learningPointsClickListeners(learning_content);
+  }
+
+
+  </script>
+  <%include file="../about_site.html" />
   <script src="${static.url('js/course_info.js')}"></script>
   <script src="${static.url('js/slick.min.js')}"></script>
 </%block>
@@ -179,8 +209,9 @@ from openedx.core.lib.courses import course_image_url
 
 <section class="course-info" xmlns="http://www.w3.org/1999/html">
   <header class="hero-main grid-manual hero-video">
-    <img src="${static.url(course_details.banner_image_asset_path)}" alt="${course_details.banner_image_name}" />
-    <div class="grid-container hero-course-container">
+    <div class="course-banner" style="background-image: url('${static.url(course_details.banner_image_asset_path)}');">
+    </div>
+    <div class="grid-container">
       <div class="row">
         <div class="col col-12 sm-col-12 md-col-4 lg-col-4 xl-col-4 video">
           <div class="video-data">
@@ -205,12 +236,16 @@ from openedx.core.lib.courses import course_image_url
     <div class="grid-manual grid-container">
       <div class="inner-container">
         <div class="row">
-          <div class="col col-12 sm-col-12 md-col-4">
+          <div class="col col-12 sm-col-12 md-col-3">
+            Start Date:
+            <span>${course_details.start_date.strftime('%b %-d, %Y')}</span>
+          </div>
+          <div class="col col-12 sm-col-12 md-col-3">
             Duration:
             <span>${course_details.duration}</span>
           </div>
 
-          <div class="col col-12 sm-col-12 md-col-4">
+          <div class="col col-12 sm-col-12 md-col-2">
             Price:
             <span>${course_price}</span>
           </div>
@@ -306,7 +341,7 @@ from openedx.core.lib.courses import course_image_url
           <div class="col col-12 sm-col-12 md-col-4 pull-right extras">
             <h3>Sponsored by:</h3>
             <div class="sponsored-logo"><img src="http://placehold.it/190x60" alt="Home Page"/></div>
-            <!-- <h3>Share this course:</h3>
+            <h3>Share this course:</h3>
             <ul class="social-icons">
               <li>
                 <div class="icon">
@@ -356,7 +391,7 @@ from openedx.core.lib.courses import course_image_url
                 <div class="col col-6">Price:</div>
                 <div class="col col-6">$495 USD</div>
               </div>
-            </div> -->
+            </div>
           </div>
           <div class="col col-12 sm-col-12 md-col-8">
 
@@ -383,27 +418,25 @@ from openedx.core.lib.courses import course_image_url
               <div class="thumbnail">
                   <a href="#instructor-details-${index}" class="instructor-image"><img src="${static.url(instructor['image'])}" alt="${instructor['name']}"></a>
               </div>
-              <p>${instructor['name']} <span>${instructor['title']} ${instructor['organization']}</span></p>
-
+              <p>${instructor['name']} <span>${instructor['title']}</span><span class="organization">${instructor['organization']}</span></p>
               <div class="modal-custom" id="instructor-details-${index}">
-                <div class="btn-close modal_close"><i class="fa fa-close"></i></div>
-                <div class="modal-body">
-                    <div class="modal-header">
-                        <div class="instructor-data">
-                            <div class="thumbnail">
-                                <img src="${instructor['image']}" alt="${instructor['name']}">
-                            </div>
-                            <h3> ${instructor['name']} <span>${instructor['title']} at ${instructor['organization']}</span></h3>
-                        </div>
-                    </div>
-                    <div class="instructor-bio">${instructor['bio']}</div>
-                    <div class="links">
-                        <a href="#" class="brand-link">Lipsum</a>
-                        <a href="#" class="brand-link">Lorem Ipsum</a>
-                    </div>
-                </div>
-              </div>
-
+                 <div class="btn-close modal_close"><i class="fa fa-close"></i></div>
+                 <div class="modal-body">
+                     <div class="modal-header">
+                         <div class="instructor-data">
+                             <div class="thumbnail">
+                                 <img src="${instructor['image']}" alt="${instructor['name']}">
+                             </div>
+                             <h3> ${instructor['name']} <span>${instructor['title']} at ${instructor['organization']}</span></h3>
+                         </div>
+                     </div>
+                     <div class="instructor-bio">${instructor['bio']}</div>
+                     <div class="links">
+                         <a href="#" class="brand-link">Lipsum</a>
+                         <a href="#" class="brand-link">Lorem Ipsum</a>
+                     </div>
+                 </div>
+               </div>
             </div>
           %endfor
         </div>
@@ -415,7 +448,7 @@ from openedx.core.lib.courses import course_image_url
       <div class="inner-container">
         <div class="row">
           <div class="col col-12">
-            <h2>Still want to know more?</h2>
+            ${course_details.overview}
           </div>
         </div>
         <div class="row">
@@ -479,7 +512,7 @@ from openedx.core.lib.courses import course_image_url
 </section>
 
 <section class="about-section">
-  <div class="about-container"> </div>
+  <div class="about-container"></div>
 </section>
 
 
