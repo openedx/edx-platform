@@ -69,49 +69,49 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
-                this.setUserCityAndCountry();
-                this.showPassword();
-                this.getUsernameFromEmail();
-                this.styleShowPassword();
+                this.setUserCountry(this.$form);
+                this.togglePasswordVisibility(this.$form);
+                this.getUsernameFromEmail(this.$form);
+                this.stylePasswordToggle(this.$form);
             },
 
-            styleShowPassword: function() {
-                $('input#register-show_password').css('display', 'none');
-                $('div.form-field.checkbox-show_password label').css({
-                  'font-size': '0.8rem',
-                  'color': '#27aae1',
-                  'float': 'right'
-                });
-                $('.form-field.checkbox-show_password').css({
-                  'margin-top': '-20px',
-                  'top': '-50px'
-                });
+            stylePasswordToggle: function(form) {
+                form.find('input#register-show_password').hide();
+                form.find('div.form-field.checkbox-show_password label').addClass('checkbox-show_password-label');
+                form.find('.form-field.checkbox-show_password').addClass('checkbox-show_password-div');
             },
 
-            setUserCityAndCountry: function() {
+            setUserCountry: function(form) {
                 $.get(
                    '/geo',
                    function(response) {
                       if(typeof response.country !== "undefined") {
-                          $('#register-country').val(response.country);
+                          form.find('#register-country').val(response.country);
                       }
                    }
                 );
             },
 
-            showPassword: function() {
-                var password = $('#register-show_password');
-                password.click(function() {
-                    $('#register-password').get(0).type = (this.checked) ? 'text' : 'password';
+            togglePasswordVisibility: function(form) {
+                var show_password = form.find('#register-show_password');
+                show_password.click(function() {
+                    var password = form.find('#register-password');
+                    if (this.checked) {
+                        password.get(0).type = 'text';
+                        form.find('div.form-field.checkbox-show_password label').text('Hide password');
+                    } else {
+                        password.get(0).type = 'password';
+                        form.find('div.form-field.checkbox-show_password label').text('Show password');
+                    }
                 });
             },
 
-            getUsernameFromEmail: function() {
-                var email = $('#register-email');
+            getUsernameFromEmail: function(form) {
+                var email = form.find('#register-email');
                 email.change(function() {
-                    var username = $('#register-username');
+                    var username = form.find('#register-username');
                     if (username.val() === "") {
-                        username.val(email.val().split("@")[0].replace(".", ""));
+                        username.val(email.val().split("@")[0].replace(/[^a-zA-Z0-9-_]/g, ""));
                     }
                 });
             },
