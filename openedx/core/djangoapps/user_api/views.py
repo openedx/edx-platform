@@ -401,7 +401,7 @@ class RegistrationView(APIView):
                 return u"Email '{email}' doesn't exist.".format(email=email)
         except (BaseException, StandardError):
             pass
-        return None # Success
+        return None  # Success
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
