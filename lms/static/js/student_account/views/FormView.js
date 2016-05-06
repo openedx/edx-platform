@@ -69,12 +69,55 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
+
                 this.cleanUsername();
+                this.setUserCountry();
+                this.togglePasswordVisibility();
+                this.getUsernameFromEmail();
+            },
+
+            setUserCountry: function() {
+                var self = this;
+
+                $.get('/geo', function(response) {
+                    if(response.country) {
+                        self.$form.find('#register-country').val(response.country);
+                    }
+                });
+            },
+
+            togglePasswordVisibility: function() {
+                var $password = this.$form.find('#register-password');
+                var $showPassword = this.$form.find('#register-show_password');
+
+                $showPassword.click(function() {
+                    var $showPasswordLabel = $(this).siblings('label');
+
+                    $password.prop('type', this.checked ? 'text' : 'password');
+                    $showPasswordLabel.text(this.checked ? 'Hide password' : 'Show password');
+                });
+            },
+
+            getUsernameFromEmail: function() {
+                var self = this;
+                var $email = this.$form.find('#register-email');
+                var $username = this.$form.find('#register-username');
+
+                $email.change(function() {
+                    if ($username.val() === '') {
+                        var newUsername = $email.val().split("@")[0];
+                        $username.val(newUsername);
+
+                        self.cleanUsername();
+                    }
+                });
             },
 
             cleanUsername: function() {
-                var username = $('#register-username');
-                username.val(username.val().replace(/[^a-zA-Z0-9-_]/g, ""));
+                var $username = this.$form.find('#register-username');
+                var newUsername = $username.val().replace(/[^a-zA-Z0-9\-_]/g, '');
+
+                $username.val(newUsername);
             },
 
             buildForm: function( data ) {

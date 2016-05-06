@@ -155,7 +155,7 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    DEFAULT_FIELDS = ["email", "username", "name", "password", "show_password"]
 
     EXTRA_FIELDS = [
         "city",
@@ -743,6 +743,35 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
+
+                    form_desc.override_field_properties(
+                        "show_password",
+                        default=False,
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
+
+    def _add_show_password_field(self, form_desc, required=True):
+        """Add a show password field to a form description.
+
+          Arguments:
+              form_desc: A form description
+
+          Keyword Arguments:
+              required (bool): Whether this field is required; defaults to True
+        """
+
+        label = _(u"Show password")
+        form_desc.add_field(
+            "show_password",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=False
+        )
 
 
 class PasswordResetView(APIView):
