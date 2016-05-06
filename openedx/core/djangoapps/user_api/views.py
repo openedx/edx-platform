@@ -160,6 +160,7 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "password_copy",
         "city",
         "state",
         "country",
@@ -345,9 +346,62 @@ class RegistrationView(APIView):
             }
             return JsonResponse(errors, status=400)
 
+        password = data.get("password")
+        password_copy = data.get("password_copy")
+        if password and password_copy and password != password_copy:
+            errors = {
+                'password_copy': [{"user_message": "Passwords don't match."}]
+            }
+            return JsonResponse(errors, status=400)
+
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
+
+        if settings.REGISTRATION_EMAIL_FULL_VERIFICATION is not None:
+            email = data.get("email")
+            error = self._verify_email_really_exists(email)
+            if error:
+                errors = {
+                    'email': [{"user_message": error}]
+                }
+                return JsonResponse(errors, status=400)
+
         return response
+
+    def _verify_email_really_exists(self, email):
+        """Check if a email really exists,
+        returns None if success, otherwise an error message
+        """
+        mx_record = None
+        try:
+            domain = email.rsplit('@', 1)[-1]
+            records = dns.resolver.query(domain, 'MX')
+            mx_record = records[0].exchange
+            mx_record = str(mx_record)
+        except (BaseException, StandardError):
+            return u"Email domain '{domain}' doesn't exist.".format(domain=domain)
+
+        try:
+            # Get local server hostname
+            host = socket.gethostname()
+
+            # SMTP lib setup (use debug level for full output)
+            server = smtplib.SMTP()
+            server.set_debuglevel(0)
+            server.timeout = 10
+
+            # SMTP Conversation
+            server.connect(mx_record)
+            server.helo(host)
+            server.mail(email)
+            code = server.rcpt(str(email))
+            server.quit()
+
+            if code != 250:
+                return u"Email '{email}' doesn't exist.".format(email=email)
+        except (BaseException, StandardError):
+            pass
+        return None # Success
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
@@ -470,6 +524,36 @@ class RegistrationView(APIView):
             restrictions={
                 "min_length": PASSWORD_MIN_LENGTH,
                 "max_length": PASSWORD_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_password_copy_field(self, form_desc, required=True):
+        """Add a password copy field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's retyped password.
+        password_copy_label = _(u"Retype password")
+
+        error_msg = _(u"Please retype password.")
+
+        form_desc.add_field(
+            "password_copy",
+            label=password_copy_label,
+            field_type="password",
+            restrictions={
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
+            },
+            error_messages={
+                "required": error_msg
             },
             required=required
         )
