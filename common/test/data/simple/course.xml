@@ -24,6 +24,7 @@
         <html url_name='test_html'>
           Foobar
         </html>
+        <discussion url_name="custom_id" discussion_id="custom"></discussion>
       </vertical>
     </sequential>
   </chapter>
