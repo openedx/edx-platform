@@ -2499,7 +2499,11 @@ def details_reset_confirm(request):
                   request=request,
                   domain_override=request.get_host())
 
-            return TemplateResponse(request, 'registration/details_reset_done.html')
+            context = {
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                'contact_email': microsite.get_value('contact_email', settings.CONTACT_EMAIL)
+            }
+            return TemplateResponse(request, 'registration/details_reset_done.html', context)
         else:
             err_msg = "No user with the provided email address exists"
             context = {'err_msg': err_msg}

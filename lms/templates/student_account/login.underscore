@@ -1,20 +1,18 @@
 <div class="status already-authenticated-msg hidden">
     <% if (context.currentProvider) { %>
         <p class="message-copy">
-            <%- _.sprintf( gettext("You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, Login now using your %(platformName)s password."), context ) %>
+            <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any %(platformName)s account. To link your accounts, login now using your %(platformName)s password."), context ) %>
+        </p>
+        <p class="message-copy">
+            <%- _.sprintf( gettext("To try again with another %(currentProvider)s account or another social login button, please clear the cookies in this browser, or try again from another browser."), context) %>
+        </p>
+        <p class="message-copy">
+            <%- _.sprintf( gettext("Refer to our")) %>
+            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page</a>
+            <%- _.sprintf( gettext("for more information.")) %>
         </p>
     <% } %>
 </div>
-
-<% if (!context.currentProvider) { %>
-<div class="status already-authenticated-msg">
-
-        <p class="message-copy">
-           Have an account before and haven't updated your details? <a href="/reset_details" style="text-decoration: none; color: #27AAE1;">Click here</a> to
-           update your username and password
-        </p>
-</div>
-<% } %>
 
 <div class="js-reset-success status submission-success hidden">
     <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
@@ -28,6 +26,14 @@
 <div class="status submission-error hidden" aria-live="polite">
     <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
     <ul class="message-copy"></ul>
+    <ul class="beta-error-message">
+        <li>
+            <%- gettext("If you have an account in bigdatauniversity.com and this is the first time you access beta.bigdatauniversity.com, please") %>
+            <a href="/access_new_account">click here</a>
+            <%- gettext("and review the") %>
+            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page.</a>
+        </li>
+    </ul>
 </div>
 
 <% if (context.errorMessage) { %>

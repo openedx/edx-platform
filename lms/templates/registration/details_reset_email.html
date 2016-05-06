@@ -1,15 +1,17 @@
 {% load i18n %}{% load url from future %}{% autoescape off %}
-{% blocktrans %}You're receiving this e-mail because you requested a detail reset for your user account at {{ site_name }}.{% endblocktrans %}
+<p>{% blocktrans %}You are receiving this email because you requested details about your account information at beta.bigdatauniversity.com.{% endblocktrans %}</p>
 
-{% trans "Please go to the following page and update your details:" %}
-{% block reset_link %}
-{{ protocol }}://{{ site_name }}{% url 'student.views.details_reset_confirm_wrapper' uidb36=uid token=token %}
-{% endblock %}
+<p>{% trans "Click the link below to see and update your account information" %}</p>
+<p>
+  {% block reset_link %}
+    {{ protocol }}://{{ site_name }}{% url 'student.views.details_reset_confirm_wrapper' uidb36=uid token=token %}
+  {% endblock %}
+</p>
+{% trans "Happy learning!" %}
 
-{% trans "If you didn't request this change, you can disregard this email - we have not yet reset your details." %}
+<p>{% blocktrans %}The {{ platform_name }} Team{% endblocktrans %}</p>
 
-{% trans "Thanks for using our site!" %}
-
-{% blocktrans %}The {{ platform_name }} Team{% endblocktrans %}
+<p><strong>{% blocktrans %}Didn’t make this request? {% endblocktrans %}</strong></p>
+{% trans "If you didn’t make this request, please ignore this email." %}
 
 {% endautoescape %}
