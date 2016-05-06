@@ -37,9 +37,10 @@
 {% block bodyclass %}view-passwordreset{% endblock %}
 
 {% block body %}
-  <section class="introduction">
-    <header>
-      <h1 class="title">
+<div class="reset-details-content-wrapper">
+  <section class="introduction details-reset-introduction">
+    <header class="details-reset-header">
+      <h1 class="title details-reset-title">
         <span class="title-super">
           {% blocktrans with platform_name=platform_name %}
           Access your Beta {{ platform_name }}
@@ -49,8 +50,8 @@
     </header>
   </section>
 
-  <section class="passwordreset container">
-        <section role="main" class="content">
+  <section class="passwordreset container details-reset-container reset-form-container">
+    <section role="main" class="content reset-form-content">
       <header>
       <h2 class="sr">{% trans "Details Reset Form" %}</h2>
       </header>
@@ -109,7 +110,7 @@
           <ol class="list-input">
             <li class="field password" id="field-new_password2">
               <label for="email">{% trans "Email" %}</label>
-              <input id="email" type="email" name="email" placeholder="email" />
+              <input id="email" type="email" name="email" placeholder="Email Address" />
             </li>
           </ol>
         </fieldset>
@@ -123,4 +124,6 @@
     </section>
 
   </section>
+
+</div>
 {% endblock %}
