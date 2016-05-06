@@ -294,6 +294,9 @@ class CreditRequirement(TimeStampedModel):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
+    def __unicode__(self):
+        return self.display_name
+
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
         """
