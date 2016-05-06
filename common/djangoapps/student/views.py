@@ -2381,7 +2381,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         validlink = True
         title = _('Update your details')
         update_user(user.id)
-
     else:
         validlink = False
         form = None
@@ -2391,6 +2390,7 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         'title': title,
         'validlink': validlink,
         'user': user,
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
     }
 
     err_msg = None
@@ -2440,7 +2440,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
                 validate_password_length(password)
                 validate_password_complexity(password)
                 validate_password_dictionary(password)
-
             except ValidationError, err:
                 err_msg = _('Password: ') + '; '.join(err.messages)
 
@@ -2457,15 +2456,10 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
         return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
     else:
-        # we also want to pass settings.PLATFORM_NAME in as extra_context
-        extra_context = {"platform_name": microsite.get_value('platform_name', settings.PLATFORM_NAME)}
-
         # Support old password reset URLs that used base36 encoded user IDs.
         # https://github.com/django/django/commit/1184d077893ff1bc947e45b00a4d565f3df81776#diff-c571286052438b2e3190f8db8331a92bR231
         try:
-
             uidb64 = force_text(urlsafe_base64_encode(force_bytes(base36_to_int(uidb36))))
-
         except ValueError:
             uidb64 = '1'    # dummy invalid ID (incorrect padding for base64)
 
@@ -2478,7 +2472,6 @@ def details_reset_confirm_wrapper(request, uidb36=None, token=None,):
             user.save()
 
             return TemplateResponse(request, 'registration/details_reset_complete.html', context)
-
         else:
             return TemplateResponse(request, 'registration/details_reset_confirm.html', context)
 
