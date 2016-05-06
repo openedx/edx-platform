@@ -1003,6 +1003,7 @@ class CapaMixin(CapaFields):
           {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
            'contents' : html}
         """
+        from nose.tools import set_trace; set_trace()
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.to_deprecated_string()

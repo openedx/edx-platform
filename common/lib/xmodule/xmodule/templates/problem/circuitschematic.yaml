@@ -61,7 +61,17 @@ data: |
         correct = ['incorrect']
       </answer>
       </schematicresponse>
-    
+
+      <choiceresponse>
+      </choiceresponse>
+
+      <question>
+      </question>
+      <question>
+      </question>
+      <question>
+      </question>
+
       <solution>
           <div class="detailed-solution">
               <p>Explanation</p>

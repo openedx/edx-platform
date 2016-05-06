@@ -15,6 +15,7 @@ from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.validation import StudioValidationMessage, StudioValidation
 
 log = logging.getLogger("edx.courseware")
 
@@ -49,6 +50,20 @@ class CapaModule(CapaMixin, XModule):
         """
         super(CapaModule, self).__init__(*args, **kwargs)
 
+    def validate(self, *args, **kwargs):
+        # from nose.tools import set_trace; set_trace()
+        validation = super(CapaModule, self).validate()
+        validation = StudioValidation.copy(validation)
+        validation.set_summary(
+            StudioValidationMessage(
+                StudioValidationMessage.NOT_CONFIGURED,
+                u'Incorrect problem format detected!',
+                action_label=u"Please see docs.",
+                action_runtime_event='<a href="http://docs.edx.org/"></a>'
+            )
+        )
+        return validation
+
     def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -71,6 +86,9 @@ class CapaModule(CapaMixin, XModule):
             'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
         }
+
+
+        # raise ProcessingError('Incorrect question format')
 
         _ = self.runtime.service(self, "i18n").ugettext
 
@@ -120,6 +138,10 @@ class CapaModule(CapaMixin, XModule):
             'progress_detail': Progress.to_js_detail_str(after),
         })
 
+        result.update({
+            'validation_error': 'incorrect format'
+        })
+
         return json.dumps(result, cls=ComplexEncoder)
 
 
@@ -150,8 +172,13 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    # def editor_saved(self, user, old_metadata, old_content):
+    #     from nose.tools import set_trace; set_trace()
+    #     abc = old_metadata
+
     @classmethod
     def filter_templates(cls, template, course):
+        # from nose.tools import set_trace; set_trace()
         """
         Filter template that contains 'latex' from templates.
 
@@ -161,6 +188,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         return 'latex' not in template['template_id'] or course.use_latex_compiler
 
     def get_context(self):
+        # from nose.tools import set_trace; set_trace()
         _context = RawDescriptor.get_context(self)
         _context.update({
             'markdown': self.markdown,
@@ -174,6 +202,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
+        # from nose.tools import set_trace; set_trace()
         dog_stats_api.increment(
             DEPRECATION_VSCOMPAT_EVENT,
             tags=["location:capa_descriptor_backcompat_paths"]
@@ -185,6 +214,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
+        # from nose.tools import set_trace; set_trace()
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
             CapaDescriptor.due,
@@ -198,12 +228,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     @property
     def problem_types(self):
+        # from nose.tools import set_trace; set_trace()
         """ Low-level problem type introspection for content libraries filtering by problem type """
         tree = etree.XML(self.data)
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
     def index_dictionary(self):
+        # from nose.tools import set_trace; set_trace()
         """
         Return dictionary prepared with module content and type for indexing.
         """
@@ -236,6 +268,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         return xblock_body
 
     def has_support(self, view, functionality):
+        # from nose.tools import set_trace; set_trace()
         """
         Override the XBlock.has_support method to return appropriate
         value for the multi-device functionality.
