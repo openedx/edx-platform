@@ -69,58 +69,55 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
-                this.cleanUsername(this.$form);
-                this.setUserCountry(this.$form);
-                this.togglePasswordVisibility(this.$form);
-                this.getUsernameFromEmail(this.$form);
-                this.stylePasswordToggle(this.$form);
+
+                this.cleanUsername();
+                this.setUserCountry();
+                this.togglePasswordVisibility();
+                this.getUsernameFromEmail();
             },
 
-            stylePasswordToggle: function(form) {
-                form.find('input#register-show_password').hide();
-                form.find('div.form-field.checkbox-show_password label').addClass('checkbox-show_password-label');
-                form.find('.form-field.checkbox-show_password').addClass('checkbox-show_password-div');
-            },
+            setUserCountry: function() {
+                var self = this;
 
-            setUserCountry: function(form) {
-                $.get(
-                   '/geo',
-                   function(response) {
-                      if(typeof response.country !== "undefined") {
-                          form.find('#register-country').val(response.country);
-                      }
-                   }
-                );
-            },
-
-            togglePasswordVisibility: function(form) {
-                var show_password = form.find('#register-show_password');
-                show_password.click(function() {
-                    var password = form.find('#register-password');
-                    var show_password_label = form.find('div.form-field.checkbox-show_password label');
-                    if (this.checked) {
-                        password.prop('type', 'text');
-                        show_password_label.text('Hide password');
-                    } else {
-                        password.prop('type', 'password');
-                        show_password_label.text('Show password');
+                $.get('/geo', function(response) {
+                    if(response.country) {
+                        self.$form.find('#register-country').val(response.country);
                     }
                 });
             },
 
-            getUsernameFromEmail: function(form) {
-                var email = form.find('#register-email');
-                email.change(function() {
-                    var username = form.find('#register-username');
-                    if (username.val() === "") {
-                        username.val(email.val().split("@")[0].replace(/[^a-zA-Z0-9-_]/g, ""));
+            togglePasswordVisibility: function() {
+                var $password = this.$form.find('#register-password');
+                var $showPassword = this.$form.find('#register-show_password');
+
+                $showPassword.click(function() {
+                    var $showPasswordLabel = $(this).siblings('label');
+
+                    $password.prop('type', this.checked ? 'text' : 'password');
+                    $showPasswordLabel.text(this.checked ? 'Hide password' : 'Show password');
+                });
+            },
+
+            getUsernameFromEmail: function() {
+                var self = this;
+                var $email = this.$form.find('#register-email');
+                var $username = this.$form.find('#register-username');
+
+                $email.change(function() {
+                    if ($username.val() === '') {
+                        var newUsername = $email.val().split("@")[0];
+                        $username.val(newUsername);
+
+                        self.cleanUsername();
                     }
                 });
             },
 
-            cleanUsername: function(form) {
-                var username = form.find('#register-username');
-                username.val(username.val().replace(/[^a-zA-Z0-9-_]/g, ""));
+            cleanUsername: function() {
+                var $username = this.$form.find('#register-username');
+                var newUsername = $username.val().replace(/[^a-zA-Z0-9\-_]/g, '');
+
+                $username.val(newUsername);
             },
 
             buildForm: function( data ) {

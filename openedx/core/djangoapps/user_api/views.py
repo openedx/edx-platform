@@ -744,6 +744,16 @@ class RegistrationView(APIView):
                         restrictions={}
                     )
 
+                    form_desc.override_field_properties(
+                        "show_password",
+                        default=False,
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
+
     def _add_show_password_field(self, form_desc, required=True):
         """Add a show password field to a form description.
 
