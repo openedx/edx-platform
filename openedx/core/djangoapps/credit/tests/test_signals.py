@@ -70,19 +70,31 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
         """ Verify the user's credit requirement status is as expected after simulating a grading calculation. """
         listen_for_grade_calculation(None, self.user.username, {'percent': grade}, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
+
         self.assertEqual(req_status[0]['status'], expected_status)
+
+        if expected_status == 'satisfied':
+            expected_reason = {'final_grade': grade}
+            self.assertEqual(req_status[0]['reason'], expected_reason)
 
     @ddt.data(
         (0.6, VALID_DUE_DATE),
-        (0.52, VALID_DUE_DATE),
-        (0.70, EXPIRED_DUE_DATE),
+        (0.52, None),
     )
     @ddt.unpack
     def test_min_grade_requirement_with_valid_grade(self, grade, due_date):
-        """Test with valid grades. Deadline date does not effect in case
-        of valid grade.
-        """
+        """Test with valid grades submitted before deadline"""
         self.assert_requirement_status(grade, due_date, 'satisfied')
+
+    def test_grade_changed(self):
+        """ Verify successive calls to update a satisfied grade requirement are recorded. """
+        self.assert_requirement_status(0.6, self.VALID_DUE_DATE, 'satisfied')
+        self.assert_requirement_status(0.75, self.VALID_DUE_DATE, 'satisfied')
+        self.assert_requirement_status(0.70, self.VALID_DUE_DATE, 'satisfied')
+
+    def test_min_grade_requirement_with_valid_grade_and_expired_deadline(self):
+        """ Verify the status is set to failure if a passing grade is received past the submission deadline. """
+        self.assert_requirement_status(0.70, self.EXPIRED_DUE_DATE, 'failed')
 
     @ddt.data(
         (0.50, None),
