@@ -2,31 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-<title>{% trans "Your Password Reset is Complete" %}</title>
-{% endblock %}
-
-{% block bodyextra %}
-  <script type="text/javascript">
-    $(function() {
-
-      // adding js class for styling with accessibility in mind
-      $('body').addClass('js');
-
-      // new window/tab opening
-      $('a[rel="external"], a[class="new-vp"]')
-      .click( function() {
-      window.open( $(this).attr('href') );
-      return false;
-      });
-
-      // form field label styling on focus
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").parent().addClass("is-focused");
-      }).blur(function() {
-        $("label").parent().removeClass("is-focused");
-      });
-    });
-  </script>
+<title>{% trans "Your Account information email has been sent" %}</title>
 {% endblock %}
 
 {% block bodyclass %}view-passwordreset{% endblock %}
@@ -36,7 +12,7 @@
     <header>
       <h1 class="title">
         <span class="title-super">
-          {% trans "Email sent" %}
+          {% trans "Email sent!" %}
         </span>
       </h1>
     </header>
@@ -45,8 +21,8 @@
   <section class="passwordreset container">
     {% block content %}
     <section role="main" class="content">
-      {% blocktrans with link_start='<a href="/login">' link_end='</a>' %}
-          We've e-mailed you instructions for updating your details to the e-mail address you submitted. You should be receiving it shortly.
+      {% blocktrans %}
+          Watch your inbox for an email from {{ platform_name }} ({{ contact_email }}).
       {% endblocktrans %}
     </section>
     {% endblock %}
