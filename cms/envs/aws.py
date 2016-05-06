@@ -209,7 +209,6 @@ LOGGING = get_logger_config(LOG_DIR,
 
 #theming start:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
-ACCOUNT_NAME = ENV_TOKENS.get('ACCOUNT_NAME', 'Your Account Name Here')
 STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
 STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME', 'Studio')
 
