@@ -61,7 +61,7 @@
         <div role="alert" class="status message">
           <h3 class="message-title">
             {% blocktrans %}
-                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.
+              We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.
             {% endblocktrans %}
           </h3>
         </div>
@@ -86,18 +86,20 @@
           <h3 class="message-title">{% trans "We're sorry, our systems seem to be having trouble processing your password reset" %}</h3>
           <p class="message-copy">
             {% blocktrans with start_link='<a href="{{MKTG_URL_CONTACT}}">' end_link='</a>' %}
-                Someone has been made aware of this issue. Please try again shortly. Please {{ start_link }}contact us{{ end_link }} about any concerns you have.
+              Someone has been made aware of this issue. Please try again shortly. Please {{ start_link }}contact us{{ end_link }} about any concerns you have.
             {% endblocktrans %}
           </p>
         </div>
 
         <p class="instructions">
-          {% trans 'Complete the information below to update your Beta Big Data University account.' %}
+          {% blocktrans with platform_name=platform_name %}
+            Complete the information below to update your Beta {{ platform_name }}.
+          {% endblocktrans %}
           <br>
           {% trans 'All fields are required.' %}
           <br><br>
           {% trans 'Once the information has been updated, you can use it to' %}
-           <a href="/login">{% trans 'log in' %}</a>
+          <a href="/login">{% trans 'log in' %}</a>
         </p>
 
         <fieldset class="group group-form group-form-requiredinformation">
@@ -142,7 +144,7 @@
       </header>
       <p>
         {% blocktrans with start_link='<a href="/login">' end_link='</a>' %}
-            The details reset link was invalid, possibly because the link has already been used.  Please contact admin@bigdatauniversity.com to resend your details.
+          The details reset link was invalid, possibly because the link has already been used.  Please contact admin@bigdatauniversity.com to resend your details.
         {% endblocktrans %}
       </p>
 
