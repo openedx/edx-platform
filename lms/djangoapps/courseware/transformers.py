@@ -4,8 +4,8 @@ Grades Transformer
 from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
 
-from lms.djangoapps.courseware import module_render
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from . import module_render
 
 
 class GradesBlockTransformer(BlockStructureTransformer):
@@ -46,30 +46,16 @@ class GradesBlockTransformer(BlockStructureTransformer):
         transformer's transform method.
         """
         block_structure.request_xblock_fields(*cls.FIELDS_TO_COLLECT)
-        cls.collect_max_scores(block_structure)
+        cls._collect_max_scores(block_structure)
 
-    @staticmethod
-    def _iter_xmodules(block_structure):
+    def transform(self, block_structure, usage_context):
         """
-        Loop through all the blocks locators in the block structure, and retrieve
-        the module (XModule or XBlock) associated with that locator.
-
-        For implementation reasons, we need to pull the max_score from the
-        XModule, even though the data is not user specific.  Here we bind the
-        data to an AnonymousUser.
+        Perform no transformations.
         """
-        request = RequestFactory().get('/dummy-collect-max-grades')
-        request.user = AnonymousUser()
-        request.user.known = False
-        request.session = {}
-        for block_locator in block_structure.topological_traversal():
-            course_id = unicode(block_locator.course_key)
-            usage_id = unicode(block_locator)
-            module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
-            yield module
+        pass
 
     @classmethod
-    def collect_max_scores(cls, block_structure):
+    def _collect_max_scores(cls, block_structure):
         """
         Collect the `max_score` for every block in the provided `block_structure`.
         """
@@ -85,8 +71,22 @@ class GradesBlockTransformer(BlockStructureTransformer):
         score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
 
-    def transform(self, block_structure, usage_context):
+    @staticmethod
+    def _iter_xmodules(block_structure):
         """
-        Perform no transformations.
+        Loop through all the blocks locators in the block structure, and retrieve
+        the module (XModule or XBlock) associated with that locator.
+
+        For implementation reasons, we need to pull the max_score from the
+        XModule, even though the data is not user specific.  Here we bind the
+        data to an AnonymousUser.
         """
-        pass
+        request = RequestFactory().get('/dummy-collect-max-grades')
+        request.user = AnonymousUser()
+        request.user.known = False
+        request.session = {}
+        for block_locator in block_structure.post_order_traversal():
+            course_id = unicode(block_locator.course_key)
+            usage_id = unicode(block_locator)  # pylint: disable=protected-access
+            module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
+            yield module
