@@ -1700,7 +1700,8 @@ def create_account_with_params(request, params):
         subject = render_to_string('emails/activation_email_subject.txt', context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', context)
+        message_txt = render_to_string('emails/activation_email.txt', context)
+        message_html = render_to_string('emails/activation_email.html', context)
 
         from_address = microsite.get_value(
             'email_from_address',
@@ -1713,7 +1714,10 @@ def create_account_with_params(request, params):
                            '-' * 80 + '\n\n' + message)
                 mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
             else:
-                user.email_user(subject, message, from_address)
+                # add alternative message
+                activation_email = mail.EmailMultiAlternatives(subject, message_txt, from_address, [user.email])
+                activation_email.attach_alternative(message_html, "text/html")
+                activation_email.send()
         except Exception:  # pylint: disable=broad-except
             log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
     else:
