@@ -41,6 +41,9 @@ from .accounts import (
 from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
 
+import socket
+import smtplib
+import dns.resolver
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
