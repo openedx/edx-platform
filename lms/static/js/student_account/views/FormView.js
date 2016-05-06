@@ -69,6 +69,12 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
+                this.cleanUsername();
+            },
+
+            cleanUsername: function() {
+                var username = $('#register-username');
+                username.val(username.val().replace(/[^a-zA-Z0-9-_]/g, ""));
             },
 
             buildForm: function( data ) {
@@ -214,7 +220,7 @@
             },
 
             /* Allows extended views to add non-form attributes
-             * to the data before saving it to model 
+             * to the data before saving it to model
              */
             setExtraData: function( data ) {
                 return data;
