@@ -218,6 +218,21 @@ $sm-btn-linkedin: #0077b5;
             width: calc( 50% - 10px );
         }
 
+        &.checkbox-show_password {
+            margin-top: -20px;
+            top: -50px;
+
+            #register-show_password {
+                display: none;
+            }
+
+            label {
+                @extend %t-copy-sub2;
+                color: $m-blue-d5;
+                float: right;
+            }
+        }
+
         /** FROM _accounts.scss - start **/
         label,
         input,
