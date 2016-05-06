@@ -69,6 +69,7 @@
                 this.$form = $container.find('form');
                 this.$errors = $container.find('.submission-error');
                 this.$submitButton = $container.find(this.submitButton);
+                this.cleanUsername(this.$form);
                 this.setUserCountry(this.$form);
                 this.togglePasswordVisibility(this.$form);
                 this.getUsernameFromEmail(this.$form);
@@ -115,6 +116,11 @@
                         username.val(email.val().split("@")[0].replace(/[^a-zA-Z0-9-_]/g, ""));
                     }
                 });
+            },
+
+            cleanUsername: function(form) {
+                var username = form.find('#register-username');
+                username.val(username.val().replace(/[^a-zA-Z0-9-_]/g, ""));
             },
 
             buildForm: function( data ) {
