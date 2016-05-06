@@ -195,6 +195,13 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
+                elif field_name == "password_copy":
+                    if field_value == "required" and data.get("password"):
+                        self.fields[field_name] = forms.CharField(
+                            error_messages={
+                                "required": _("Please retype password.")
+                            }
+                        )
                 else:
                     required = field_value == "required"
                     min_length = 1 if field_name in ("gender", "level_of_education") else 2
@@ -232,6 +239,18 @@ class AccountCreationForm(forms.Form):
             except ValidationError, err:
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
+
+    def clean_password_copy(self):
+        """Enforce password policies (if applicable)"""
+        password_copy = self.cleaned_data["password_copy"]
+
+        if (
+                "password" in self.cleaned_data and
+                self.cleaned_data["password"] != password_copy
+        ):
+            raise ValidationError(_("Passwords don't match"))
+
+        return password_copy
 
     def _verify_email_really_exists(self, email):
         """Check if a email really exists"""
