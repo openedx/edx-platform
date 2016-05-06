@@ -46,7 +46,8 @@ from courseware.courses import (
     get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
-    UserNotEnrolled
+    UserNotEnrolled,
+    get_courses_by_custom_grouping
 )
 from courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.credit.api import (
@@ -135,10 +136,14 @@ def courses(request):
     """
     courses_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
-    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+
+    # WE ARE ENABLING COURSE DISCOVERY overall, but it's not used on CMC microsite
+    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY') or microsite.get_value("ENABLE_COURSE_SORTING_BY_CUSTOM_GROUP", False):
         courses_list = get_courses(request.user, request.META.get('HTTP_HOST'))
 
-        if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+        if microsite.get_value("ENABLE_COURSE_SORTING_BY_CUSTOM_GROUP", False):
+            courses_list = get_courses_by_custom_grouping(request.user, request.META.get('HTTP_HOST'))
+        elif microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
             courses_list = sort_by_start_date(courses_list)
         else:
