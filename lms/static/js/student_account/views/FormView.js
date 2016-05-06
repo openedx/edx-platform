@@ -96,12 +96,13 @@
                 var show_password = form.find('#register-show_password');
                 show_password.click(function() {
                     var password = form.find('#register-password');
+                    var show_password_label = form.find('div.form-field.checkbox-show_password label');
                     if (this.checked) {
-                        password.get(0).type = 'text';
-                        form.find('div.form-field.checkbox-show_password label').text('Hide password');
+                        password.prop('type', 'text');
+                        show_password_label.text('Hide password');
                     } else {
-                        password.get(0).type = 'password';
-                        form.find('div.form-field.checkbox-show_password label').text('Show password');
+                        password.prop('type', 'password');
+                        show_password_label.text('Show password');
                     }
                 });
             },
