@@ -22,3 +22,19 @@ class Organization(TimeStampedModel):
     workgroups = models.ManyToManyField(Workgroup, related_name="organizations")
     users = models.ManyToManyField(User, related_name="organizations")
     groups = models.ManyToManyField(Group, related_name="organizations")
+
+
+class OrganizationGroupUser(TimeStampedModel):
+    """
+    The OrganizationGroupUser model contains information describing the
+    link between a particular user, group and an organization.
+    """
+    organization = models.ForeignKey(Organization)
+    group = models.ForeignKey(Group)
+    user = models.ForeignKey(User)
+
+    class Meta(object):
+        """
+        Meta class for setting model meta options
+        """
+        unique_together = ("organization", "group", "user")
