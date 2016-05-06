@@ -47,7 +47,6 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
-ACCOUNT_NAME = "Your Account Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
 COPYRIGHT_YEAR = "2015"
