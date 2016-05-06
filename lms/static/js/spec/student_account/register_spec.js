@@ -94,6 +94,16 @@
                         },
                         {
                             placeholder: '',
+                            name: 'password_copy',
+                            label: 'Retype password',
+                            defaultValue: '',
+                            type: 'password',
+                            required: false,
+                            instructions: 'Please retype password.',
+                            restrictions: {}
+                        },
+                        {
+                            placeholder: '',
                             name: 'level_of_education',
                             label: 'Highest Level of Education Completed',
                             defaultValue: '',
@@ -207,6 +217,7 @@
                 $('#register-name').val(USER_DATA.name);
                 $('#register-username').val(USER_DATA.username);
                 $('#register-password').val(USER_DATA.password);
+                $('#register-password_copy').val(USER_DATA.password_copy);
                 $('#register-level_of_education').val(USER_DATA.level_of_education);
                 $('#register-gender').val(USER_DATA.gender);
                 $('#register-year_of_birth').val(USER_DATA.year_of_birth);
