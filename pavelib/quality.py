@@ -5,6 +5,8 @@ from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import os
 import re
 
+from openedx.core.djangolib.markup import HTML
+
 from .utils.envs import Env
 
 ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
@@ -428,9 +430,9 @@ def run_quality(options):
             sep = '-------------<br/>\n'
             title = "<h1>Quality Report: pep8</h1>\n"
             violations_bullets = ''.join(
-                ['<li>{violation}</li><br/>\n'.format(violation=violation) for violation in violations_list]
+                [HTML('<li>{violation}</li><br/>\n').format(violation=violation) for violation in violations_list]
             )
-            violations_str = '<ul>\n{bullets}</ul>\n'.format(bullets=violations_bullets)
+            violations_str = HTML('<ul>\n{bullets}</ul>\n').format(bullets=HTML(violations_bullets))
             violations_count_str = "<b>Violations</b>: {count}<br/>\n"
             fail_line = "<b>FAILURE</b>: pep8 count should be 0<br/>\n"
         else:
