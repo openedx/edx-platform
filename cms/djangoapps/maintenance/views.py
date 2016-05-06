@@ -17,9 +17,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.management.commands.utils import get_course_versions
 from util.views import require_global_staff
 
-# TODO-LIST
-# Tests
-# remove old code
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +36,20 @@ MAINTENANCE_COMMANDS = {
 }
 
 
+COURSE_KEY_ERROR_MESSAGES = {
+    'empty_course_key': _('Please provide course id.'),
+    'invalid_course_key': _('Invalid course key.'),
+    'course_key_not_found': _('No matching course found.')
+}
+
+
+def get_maintenace_urls():
+    url_list = []
+    for key, val in MAINTENANCE_COMMANDS.items():
+        url_list.append(val['url'])
+    return url_list 
+
+
 class MaintenanceIndexView(View):
     """
     View for maintenance dashboard, used by the escalation team.
@@ -56,12 +67,13 @@ class MaintenanceBaseView(View):
 
     template = 'maintenance/container.html'
 
-    context = {
-        'command': '',
-        'form_data': {},
-        'error': False,
-        'msg': ''
-    }
+    def __init__(self, command=None):
+        self.context = {
+            'command': command if command else '',
+            'form_data': {},
+            'error': False,
+            'msg': ''
+        }
 
     def render_response(self):
         return render_to_response(self.template, self.context)
@@ -76,7 +88,7 @@ class MaintenanceBaseView(View):
         course_usage_key = None
         if not course_key:
             self.context['error'] = True
-            self.context['msg'] = _("Please provide course id.")
+            self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['empty_course_key']
             return course_usage_key
         try:
             if branch == "published":
@@ -92,10 +104,10 @@ class MaintenanceBaseView(View):
             })
         except InvalidKeyError:
             self.context['error'] = True
-            self.context['msg'] = _("Invalid course key.")
+            self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['invalid_course_key']
         except ItemNotFoundError:
             self.context['error'] = True
-            self.context['msg'] = _("No matching course found.")
+            self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['course_key_not_found']
         return course_usage_key
 
 
@@ -105,8 +117,8 @@ class ForcePublishCourseView(MaintenanceBaseView):
     """
 
     def __init__(self):
+        super(ForcePublishCourseView, self).__init__(MAINTENANCE_COMMANDS['force_publish_course'])
         self.context.update({
-            'command': MAINTENANCE_COMMANDS['force_publish_course'],
             'current_versions': [],
             'updated_versions': [],
             'form_data': {
@@ -178,7 +190,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
             course_usage_key, request.user, commit=True
         )
         if not updated_versions:
-            msg = "Could not publish course"
+            msg = "Could not publish course."
             self.context['msg'] = _(msg)
             logging.info(
                 "%s %s attempted to force publish the course %s.",
@@ -200,7 +212,6 @@ class ForcePublishCourseView(MaintenanceBaseView):
             course_id,
             exc_info=True
         )
-
         return self.render_response()
 
 
@@ -210,8 +221,8 @@ class ShowOrphansView(MaintenanceBaseView):
     """
 
     def __init__(self):
+        super(ShowOrphansView, self).__init__(MAINTENANCE_COMMANDS['show_orphans'])
         self.context.update({
-            'command': MAINTENANCE_COMMANDS['show_orphans'],
             'orphans': [],
             'form_data': {
                 'course_id': '',
@@ -222,7 +233,6 @@ class ShowOrphansView(MaintenanceBaseView):
     @method_decorator(require_global_staff)
     def post(self, request):
         """Process and return course orphans."""
-
         course_id = request.POST.get('course-id')
         branch = request.POST.get('draft-published-branch', 'draft')
 
@@ -260,5 +270,4 @@ class ShowOrphansView(MaintenanceBaseView):
             course_id,
             exc_info=True
         )
-
         return self.render_response()

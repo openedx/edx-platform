@@ -56,7 +56,7 @@ from django.utils.translation import ugettext as _
         <p>Total orphans found for <strong>${form_data['course_id']}</strong> in <strong>${form_data['branch']}</strong>
             branch : <strong>${len(orphans)}</strong></p>
         <article>
-            <ul class="orphan-list">
+            <ul class="result-list">
                 % for orphan in orphans:
                 <li>${orphan}</li>
                 % endfor

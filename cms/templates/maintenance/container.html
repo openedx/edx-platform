@@ -10,10 +10,8 @@ from django.core.urlresolvers import reverse
   <span>${command['name']}</span>
 </h3>
 </%block>
-<%block name="content">
-<div class="wrapper-content wrapper">
+<%block name="subcontent">
     <section class="container command-list">
         <%include file="_${command['slug']}.html" />
     </section>
-</div>
 </%block>

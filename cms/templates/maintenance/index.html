@@ -5,8 +5,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
 <%block name="title">${_("Maintenance Dashboard")}</%block>
-<%block name="content">
-<div class="wrapper-content wrapper">
+<%block name="subcontent">
     <section class="container command-list">
         <ul>
         % for item in commands:
@@ -14,5 +13,4 @@ from django.core.urlresolvers import reverse
         % endfor
         </ul>
     </section>
-</div>
 </%block>

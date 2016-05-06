@@ -1,3 +1,11 @@
+.maintenance-header {
+    text-align: center;
+    margin-top: 50px;
+
+    h2 {
+      margin-bottom: 10px;
+    }
+}
 .command-list {
   padding: 3rem 0;
   ul {
@@ -19,7 +27,7 @@
   .command-form {
     width: 60%;
     margin: auto;
-    ul.orphan-list {
+    .result-list {
       height: calc(100vh - 200px);
       overflow: auto;
     }
