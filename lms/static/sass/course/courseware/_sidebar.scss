@@ -1,4 +1,9 @@
 .course-index {
+    position: absolute;
+    left: 0px;
+    top: 25px;
+    z-index: 1;
+
     @include transition( all .2s $ease-in-out-quad 0s);
     @include border-right(1px solid $border-color-2);
     @include border-radius(3px, 0, 0, 3px);

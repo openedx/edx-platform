@@ -382,6 +382,7 @@ class CoursewareIndex(View):
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
             'disable_optimizely': True,
+            'disable_window_wrap': True,
         }
         table_of_contents = toc_for_course(
             self.effective_user,

@@ -92,6 +92,7 @@ def when_i_navigate_to_a_section(step):
     world.disable_jquery_animations()
 
     # Open the 2nd section
+    world.css_click(css_selector='.content-menu-button')
     world.css_click(css_selector='.chapter', index=1)
     subsection_css = 'a[href*="Test_Subsection_2/"]'
 
@@ -102,6 +103,7 @@ def when_i_navigate_to_a_section(step):
 @step(u'I navigate to a subsection')
 def when_i_navigate_to_a_subsection(step):
     # Click on the 2nd subsection to see the content
+    world.css_click(css_selector='.content-menu-button')
     subsection_css = 'a[href*="Test_Subsection_2/"]'
     world.css_click(subsection_css)
 
