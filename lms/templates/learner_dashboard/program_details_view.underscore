@@ -1,0 +1,9 @@
+<header class="program-header">
+	<div>
+		<h2 class="hd-2">Program Title</h2>
+		<p>Program Subtitle</p>
+	</div>
+</header>
+<div class="js-program-progress-view"></div>
+<div class="js-course-list"></div>
+<aside class="js-course-sidebar"></aside>

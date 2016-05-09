@@ -45,3 +45,20 @@ def view_programs(request):
     }
 
     return render_to_response('learner_dashboard/programs.html', context)
+
+
+@login_required
+@require_GET
+def program_details(request, program_uuid):  # pylint: disable=unused-argument
+    """View programs in which the user is engaged."""
+    show_program_details = ProgramsApiConfig.current().show_program_details
+    if not show_program_details:
+        raise Http404
+
+    context = {
+        'nav_hidden': True,
+        'disable_courseware_js': True,
+        'uses_pattern_library': True
+    }
+
+    return render_to_response('learner_dashboard/program_details.html', context)

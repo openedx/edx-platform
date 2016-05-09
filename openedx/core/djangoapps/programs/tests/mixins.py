@@ -22,6 +22,7 @@ class ProgramsApiConfigMixin(object):
         'enable_studio_tab': True,
         'enable_certification': True,
         'xseries_ad_enabled': True,
+        'program_details_enabled': True,
     }
 
     def create_programs_config(self, **kwargs):
