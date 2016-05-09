@@ -3,17 +3,26 @@
   @extend %ui-depth5;
   position: absolute;
   opacity: 0.0;
-  line-height: 26px !important;
+  line-height: 24px !important;
 
   > .tooltip-content {
     @extend %t-regular;
     line-height: inherit;
     font-size: 12px;
     max-width: 800px;
-    padding: 0 10px;
+    padding: 2px 5px;
     border-radius: 3px;
     background: rgba(0, 0, 0, 0.85);
     color: $white;
+
+    a {
+      color: #66aed0 !important;
+    }
+
+    ol, ul {
+      margin: 5px 0 0 5px;
+      color: $white;
+    }
   }
 
   > .tooltip-arrow {
