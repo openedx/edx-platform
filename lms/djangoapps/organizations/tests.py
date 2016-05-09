@@ -339,6 +339,16 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
         self.assertEqual(len(response.data[1]['enrolled_users']), 0)
 
+    def test_organizations_courses_get_organization_group_with_no_course(self):
+        organization = self.setup_test_organization()
+        group = GroupFactory.create()
+        group.organizations.add(organization['id'])
+
+        courses_uri = '{}{}/courses/'.format(self.base_organizations_uri, organization['id'])
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
     def test_organizations_courses_get_enrolled_users(self):
         organization = self.setup_test_organization()
         courses = CourseFactory.create_batch(2)
