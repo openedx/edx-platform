@@ -1,6 +1,11 @@
 // LMS base styles
 
 .content-wrapper {
-    margin: 0 auto;
-    padding: 10px;
+  width: span(12);
+  margin: 0 auto;
+  background: palette(grayscale, white-t);
+
+  @media print {
+    padding-bottom: 0;
+  }
 }

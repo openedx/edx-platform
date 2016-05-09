@@ -38,14 +38,14 @@ define([
             });
 
             it('should load the certificates based on passed in certificates list', function() {
-                var $certificates = view.$el.find('.certificate-box');
+                var $certificates = view.$el.find('.certificate-link');
                 expect($certificates.length).toBe(2);
 
                 $certificates.each(function(index, el){
                     expect($(el).html().trim()).toEqual(data.context.certificatesData[index].display_name);
                     expect($(el).attr('href')).toEqual(data.context.certificatesData[index].credential_url);
                 });
-                expect(view.$el.find('.title').html().trim()).toEqual('XSeries Program Certificates:');
+                expect(view.$el.find('.hd-6').html().trim()).toEqual('XSeries Program Certificates:');
                 expect(view.$el.find('img').attr('src')).toEqual('/images/testing.png');
             });
 
@@ -57,7 +57,7 @@ define([
                     context: {certificatesData: []}
                 });
                 view.render();
-                $certificate = view.$el.find('.certificate-box');
+                $certificate = view.$el.find('.certificate-link');
                 expect($certificate.length).toBe(0);
             });
         });
