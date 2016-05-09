@@ -115,6 +115,9 @@
         // Underscore.js globals
         "_",
 
+        // Backbone.js globals
+        "Backbone",
+
         // RequireJS globals
         "define",
         "require",

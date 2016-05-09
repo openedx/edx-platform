@@ -1,4 +1,4 @@
-require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+(function() {
     'use strict';
 
     var Tooltip = Backbone.View.extend({
@@ -238,4 +238,4 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     $(document).ready(function() {
         window.globalTooltipManager = new TooltipManager({el: document.body});
     });
-});
+}());
