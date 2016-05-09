@@ -9,7 +9,6 @@ from unittest import skip
 from nose.plugins.attrib import attr
 import pytz
 import urllib
-from ..helpers import skip_if_browser
 
 from bok_choy.promise import EmptyPromise
 from ..helpers import (
