@@ -2,8 +2,10 @@
 Django admin page for credit eligibility
 """
 from ratelimitbackend import admin
+
 from openedx.core.djangoapps.credit.models import (
-    CreditConfig, CreditCourse, CreditProvider, CreditEligibility, CreditRequest
+    CreditConfig, CreditCourse, CreditProvider, CreditEligibility, CreditRequest, CreditRequirement,
+    CreditRequirementStatus
 )
 
 
@@ -47,8 +49,26 @@ class CreditRequestAdmin(admin.ModelAdmin):
         model = CreditRequest
 
 
+class CreditRequirementAdmin(admin.ModelAdmin):
+    """ Admin for CreditRequirement. """
+    list_display = ('course', 'namespace', 'name', 'display_name', 'active',)
+
+    class Meta(object):
+        model = CreditRequirement
+
+
+class CreditRequirementStatusAdmin(admin.ModelAdmin):
+    """ Admin for CreditRequirementStatus. """
+    list_display = ('username', 'requirement', 'status',)
+
+    class Meta(object):
+        model = CreditRequirementStatus
+
+
 admin.site.register(CreditCourse, CreditCourseAdmin)
 admin.site.register(CreditProvider, CreditProviderAdmin)
 admin.site.register(CreditEligibility, CreditEligibilityAdmin)
 admin.site.register(CreditRequest, CreditRequestAdmin)
 admin.site.register(CreditConfig)
+admin.site.register(CreditRequirement, CreditRequirementAdmin)
+admin.site.register(CreditRequirementStatus, CreditRequirementStatusAdmin)

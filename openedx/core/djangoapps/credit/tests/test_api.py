@@ -33,7 +33,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditProvider,
     CreditRequirement,
     CreditRequirementStatus,
-    CreditEligibility
+    CreditEligibility,
+    CreditRequest
 )
 from student.tests.factories import UserFactory
 from util.date_utils import from_timestamp
@@ -371,8 +372,16 @@ class CreditRequirementApiTests(CreditApiTestBase):
         eligibilities = api.get_eligibilities_for_user("staff")
         self.assertEqual(eligibilities, [])
 
+    def assert_grade_requirement_status(self, expected_status, expected_order):
+        """ Assert the status and order of the grade requirement. """
+        req_status = api.get_credit_requirement_status(self.course_key, 'staff', namespace="grade", name="grade")
+        self.assertEqual(req_status[0]["status"], expected_status)
+        self.assertEqual(req_status[0]["order"], expected_order)
+        return req_status
+
     def test_set_credit_requirement_status(self):
-        self.add_credit_course()
+        username = "staff"
+        credit_course = self.add_credit_course()
         requirements = [
             {
                 "namespace": "grade",
@@ -395,40 +404,44 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(len(course_requirements), 2)
 
         # Initially, the status should be None
-        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
-        self.assertEqual(req_status[0]["status"], None)
-        self.assertEqual(req_status[0]["order"], 0)
+        self.assert_grade_requirement_status(None, 0)
+
+        # Requirement statuses cannot be changed if a CreditRequest exists
+        credit_request = CreditRequest.objects.create(
+            course=credit_course,
+            provider=CreditProvider.objects.first(),
+            username=username,
+        )
+        api.set_credit_requirement_status(username, self.course_key, "grade", "grade")
+        self.assert_grade_requirement_status(None, 0)
+        credit_request.delete()
 
         # Set the requirement to "satisfied" and check that it's actually set
-        api.set_credit_requirement_status("staff", self.course_key, "grade", "grade")
-        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
-        self.assertEqual(req_status[0]["status"], "satisfied")
-        self.assertEqual(req_status[0]["order"], 0)
+        api.set_credit_requirement_status(username, self.course_key, "grade", "grade")
+        self.assert_grade_requirement_status('satisfied', 0)
 
         # Set the requirement to "failed" and check that it's actually set
-        api.set_credit_requirement_status("staff", self.course_key, "grade", "grade", status="failed")
-        req_status = api.get_credit_requirement_status(self.course_key, "staff", namespace="grade", name="grade")
-        self.assertEqual(req_status[0]["status"], "failed")
-        self.assertEqual(req_status[0]["order"], 0)
+        api.set_credit_requirement_status(username, self.course_key, "grade", "grade", status="failed")
+        self.assert_grade_requirement_status('failed', 0)
 
         req_status = api.get_credit_requirement_status(self.course_key, "staff")
         self.assertEqual(req_status[0]["status"], "failed")
         self.assertEqual(req_status[0]["order"], 0)
 
-        # make sure the 'order' on the 2nd requiemtn is set correctly (aka 1)
+        # make sure the 'order' on the 2nd requirement is set correctly (aka 1)
         self.assertEqual(req_status[1]["status"], None)
         self.assertEqual(req_status[1]["order"], 1)
 
         # Set the requirement to "declined" and check that it's actually set
         api.set_credit_requirement_status(
-            "staff", self.course_key,
+            username, self.course_key,
             "reverification",
             "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
             status="declined"
         )
         req_status = api.get_credit_requirement_status(
             self.course_key,
-            "staff",
+            username,
             namespace="reverification",
             name="i4x://edX/DemoX/edx-reverification-block/assessment_uuid"
         )
@@ -530,7 +543,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         user = UserFactory.create(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(12):
             api.set_credit_requirement_status(
                 user.username,
                 self.course_key,
@@ -542,7 +555,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(19):
+        with self.assertNumQueries(20):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -596,7 +609,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(15):
+        with self.assertNumQueries(16):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
