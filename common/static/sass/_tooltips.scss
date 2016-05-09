@@ -1,0 +1,29 @@
+.tooltip {
+  @include transition(opacity 0.125s ease-out 0s);
+  @extend %ui-depth5;
+  position: absolute;
+  opacity: 0.0;
+  line-height: 26px !important;
+  transform: translateY(-100%);
+
+  > .tooltip-content {
+    @extend %t-regular;
+    line-height: inherit;
+    font-size: 12px;
+    max-width: 800px;
+    padding: 0 10px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.85);
+    color: $white;
+  }
+
+  > .tooltip-arrow {
+    position: absolute;
+    line-height: inherit;
+    font-size: 20px;
+    bottom: -12px;
+    left: 50%;
+    margin-left: -7px;
+    color: rgba(0, 0, 0, 0.85);
+  }
+}
