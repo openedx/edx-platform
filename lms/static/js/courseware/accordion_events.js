@@ -7,8 +7,6 @@
                 Logger.log(
                     "edx.ui.lms.outline.selected",
                     {
-                        name: "edx.ui.lms.outline.selected",
-                        event_type: "edx.ui.lms.outline.selected",
                         current_url: window.location.href,
                         target_url: event.currentTarget.href,
                         target_name: $(this).find("p.accordion-display-name").text(),
