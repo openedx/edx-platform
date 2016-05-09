@@ -239,7 +239,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         organization = self.get_object()
         course_ids = Group.objects.filter(organizations=organization)\
             .values_list('coursegrouprelationship__course_id', flat=True).distinct()
-        course_keys = map(get_course_key, course_ids)
+        course_keys = map(get_course_key, filter(None, course_ids))
         enrollment_qs = CourseEnrollment.objects.filter(is_active=True, course_id__in=course_keys)\
             .values_list('course_id', 'user_id')
 
@@ -250,9 +250,10 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         response_data = []
         for course_key in course_keys:
             course_descriptor = get_course_descriptor(course_key, 0)
-            enrolled_users = enrollments.get(unicode(course_key), [])
-            setattr(course_descriptor, 'enrolled_users', enrolled_users)
-            response_data.append(course_descriptor)
+            if course_descriptor is not None:
+                enrolled_users = enrollments.get(unicode(course_key), [])
+                setattr(course_descriptor, 'enrolled_users', enrolled_users)
+                response_data.append(course_descriptor)
 
         serializer = OrganizationCourseSerializer(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
