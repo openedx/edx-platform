@@ -205,21 +205,23 @@
         getRelativeCoords: function(parent, width, x, y) {
             var coords = this.getCoords(width, x, y),
                 offset = parent.offset(),
-                parentWidth = parent.outerWidth();
+                parentWidth = parent.outerWidth(),
+                parentHeight = parent.outerHeight();
             coords.left -= offset.left;
             coords.right -= this.$el.outerWidth() - offset.left - parentWidth;
-            coords.top -= offset.top;
+            coords.bottom -= this.$el.outerHeight() - offset.top - parentHeight;
             return coords;
         },
 
         // Return the coordinates for a tooltip of the given width, such that
         // the tooltip does not go outside of the container element.
         getCoords: function(width, x, y) {
-            var containerWidth = this.$el.outerWidth();
+            var containerWidth = this.$el.outerWidth(),
+                containerHeight = this.$el.outerHeight();
             return {
                 left: Math.min(Math.max(0, x - width / 2), containerWidth - width),
                 right: Math.max(0, containerWidth - x - width / 2),
-                top: y - 15
+                bottom: containerHeight - y + 15
             };
         },
 
