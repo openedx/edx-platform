@@ -183,6 +183,58 @@ if submission[0] == '':
     """)
 
 
+SINGLE_QUESTION_XML = """
+    <problem>
+    <question>
+    <p>That is the question</p>
+    <multiplechoiceresponse>
+      <choicegroup type="MultipleChoice">
+        <choice correct="false">Alpha <choicehint>A hint</choicehint>
+        </choice>
+        <choice correct="true">Beta</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    <demandhint>
+      <hint>question 1 hint 1</hint>
+      <hint>question 1 hint 2</hint>
+    </demandhint>
+    </question>
+    </problem>"""
+
+MULTIPLE_QUESTIONS_XML = """
+    <problem>
+    <question>
+    <p>That is first question</p>
+    <multiplechoiceresponse>
+      <choicegroup type="MultipleChoice">
+        <choice correct="false">Alpha <choicehint>A hint</choicehint>
+        </choice>
+        <choice correct="true">Beta</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    <demandhint>
+      <hint>question 1 hint 1</hint>
+      <hint>question 1 hint 2</hint>
+    </demandhint>
+    </question>
+
+    <question>
+    <p>That is second question</p>
+    <multiplechoiceresponse>
+      <choicegroup type="MultipleChoice">
+        <choice correct="false">Alpha <choicehint>A hint</choicehint>
+        </choice>
+        <choice correct="true">Beta</choice>
+      </choicegroup>
+    </multiplechoiceresponse>
+    <demandhint>
+      <hint>question 2 hint 1</hint>
+      <hint>question 2 hint 2</hint>
+    </demandhint>
+    </question>
+    </problem>"""
+
+
 @ddt.ddt
 class CapaModuleTest(unittest.TestCase):
 
@@ -1278,50 +1330,39 @@ class CapaModuleTest(unittest.TestCase):
         # Assert that the encapsulated html contains the original html
         self.assertIn(html, html_encapsulated)
 
-    demand_xml = """
-        <problem>
-        <p>That is the question</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice">
-            <choice correct="false">Alpha <choicehint>A hint</choicehint>
-            </choice>
-            <choice correct="true">Beta</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-        <demandhint>
-          <hint>Demand 1</hint>
-          <hint>Demand 2</hint>
-        </demandhint>
-        </problem>"""
-
-    def test_demand_hint(self):
-        # HTML generation is mocked out to be meaningless here, so instead we check
-        # the context dict passed into HTML generation.
-        module = CapaFactory.create(xml=self.demand_xml)
+    @ddt.unpack
+    @ddt.data(
+        {'xml': SINGLE_QUESTION_XML, 'num_questions': 1},
+        {'xml': MULTIPLE_QUESTIONS_XML, 'num_questions': 2}
+    )
+    def test_demand_hint(self, xml, num_questions):
+        """
+        Verifies that demandhint works as expected for problem with single and multiple questions.
+        """
+        module = CapaFactory.create(xml=xml)
         module.get_problem_html()  # ignoring html result
-        context = module.system.render_template.call_args[0][1]
-        self.assertEqual(context['demand_hint_possible'], True)
 
-        # Check the AJAX call that gets the hint by index
-        result = module.get_demand_hint(0)
-        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
-        self.assertEqual(result['hint_index'], 0)
-        result = module.get_demand_hint(1)
-        self.assertEqual(result['contents'], u'Hint (2 of 2): Demand 2')
-        self.assertEqual(result['hint_index'], 1)
-        result = module.get_demand_hint(2)  # here the server wraps around to index 0
-        self.assertEqual(result['contents'], u'Hint (1 of 2): Demand 1')
-        self.assertEqual(result['hint_index'], 0)
+        # Check the AJAX call that gets the hint by question     id and hint index
+        for question_id in range(num_questions):
+            for hint_index in (0, 1, 2):
+                result = module.get_demand_hint(question_id, hint_index)
+                hint_num = hint_index % 2
+                self.assertEqual(
+                    result['contents'], u'Hint ({} of 2): question {} hint {}'.format(
+                        hint_num + 1, question_id + 1, hint_num + 1
+                    )
+                )
+                self.assertEqual(result['hint_index'], hint_num)
 
     def test_demand_hint_logging(self):
-        module = CapaFactory.create(xml=self.demand_xml)
+        module = CapaFactory.create(xml=SINGLE_QUESTION_XML)
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
         module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
 
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()
-            module.get_demand_hint(0)
+            module.get_demand_hint(0, 0)
             mock_track_function.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
                 {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',

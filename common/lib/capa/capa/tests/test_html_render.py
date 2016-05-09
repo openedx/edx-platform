@@ -273,7 +273,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s+</div>")
+        self.assertRegexpMatches(the_html, r"<div class=\"question\" id=\"question-0\">\s+</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")
@@ -281,3 +281,31 @@ class CapaHtmlRenderTest(unittest.TestCase):
         test_fp.close()
 
         self.addCleanup(lambda: os.remove(test_fp.name))
+
+    def test_existing_xml_compatibility(self):
+        """
+        Verifies that existing problem's XML is converted to new format.
+
+        In new format single are multiple questions should be come inside <question></question>
+        """
+        xml_str = textwrap.dedent("""\
+            <problem>
+            <p>That is the question</p>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice">
+                <choice correct="false">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>question 1 hint 1</hint>
+              <hint>question 1 hint 2</hint>
+            </demandhint>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = new_loncapa_problem(xml_str)
+        childs = [child.tag for child in problem.tree.getchildren()] # pylint: disable=no-member
+        self.assertEqual(set(childs), set(['question']))

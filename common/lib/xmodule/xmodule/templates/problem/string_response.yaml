@@ -20,6 +20,7 @@ metadata:
 
 data: |
     <problem>
+    <question>
     <p>In text input problems, also known as "fill-in-the-blank" problems, 
     learners enter text into a response field. The text that the learner enters 
     must match your specified answer text exactly. You can specify more than 
@@ -40,4 +41,5 @@ data: |
         <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
       </div>
     </solution>
+    </question>
     </problem>

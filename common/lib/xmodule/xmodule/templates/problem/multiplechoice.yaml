@@ -24,6 +24,7 @@ metadata:
 
 data: |
    <problem>
+   <question>
    <p>Multiple choice problems allow learners to select only one option.
        Learners can see all the options along with the problem text.</p>
    <p>When you add the problem, be sure to select <strong>Settings</strong> 
@@ -50,4 +51,5 @@ data: |
         <p>The population of Germany is approximately 81 million.</p>
       </div>
     </solution>
+   </question>
     </problem>

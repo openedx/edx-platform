@@ -25,7 +25,7 @@ metadata:
         [explanation]
 data: |
     <problem>
-
+    <question>
     <p>In a numerical input problem, learners enter numbers or a specific and
     relatively simple mathematical expression. Learners enter the response in
     plain text, and the system then converts the text to a symbolic expression
@@ -44,6 +44,15 @@ data: |
         <formulaequationinput label="How many million miles are between Earth and the sun? Use scientific notation to answer." />
       </numericalresponse>
 
+      <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
+      </div>
+    </solution>
+    </question>
+
+    <question>
       <p>The square of what number is -100?</p>
       <numericalresponse answer="10*i">
         <formulaequationinput label="The square of what number is -100?" />
@@ -51,8 +60,8 @@ data: |
     <solution>
       <div class="detailed-solution">
         <p>Explanation</p>
-        <p>The sun is 93,000,000, or 9.3*10^7, miles away from Earth.</p>
         <p>-100 is the square of 10 times the imaginary number, i.</p>
       </div>
     </solution>
+    </question>
     </problem>

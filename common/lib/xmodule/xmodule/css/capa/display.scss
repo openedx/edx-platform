@@ -57,6 +57,7 @@ h2 {
 
   &.problem-header {
     display: inline-block;
+    margin-bottom: 0;
     section.staff {
       margin-top: ($baseline*1.5);
       font-size: 80%;
@@ -123,6 +124,7 @@ div.problem-progress {
   @include padding-left($baseline/4);
   @extend %t-ultralight;
   display: inline-block;
+  margin-bottom: $baseline;
   color: $gray-d1;
   font-weight: 100;
   font-size: em(16);
@@ -147,6 +149,10 @@ div.problem {
     + p {
       margin-top: $baseline;
     }
+  }
+
+  div.question:not(:last-child) {
+    margin-bottom: $baseline;
   }
 }
 

@@ -4,6 +4,7 @@ metadata:
     markdown: !!null
 data: |
   <problem>
+  <question>
   <p>
   In math expression input problems, learners enter text that represents a
   mathematical expression into a field, and text is converted to a symbolic
@@ -40,7 +41,9 @@ data: |
   <script type="loncapa/python">
   VoVi = "(R_1*R_2)/R_3"
   </script>
+  </question>
 
+  <question>
   <p>Let \( x\) be a variable, and let \( n\) be an arbitrary constant.
   What is the derivative of \( x^n\)?</p>
 
@@ -52,5 +55,6 @@ data: |
     <responseparam type="tolerance" default="0.00001"/>
     <formulaequationinput size="40"  label="Enter the equation"/>
   </formularesponse>
+  </question>
 
   </problem>

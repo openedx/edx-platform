@@ -26,7 +26,7 @@ metadata:
 hinted: true
 data: |
   <problem>
-
+    <question>
     <p>You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.</p>
 
     <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.</p>
@@ -50,5 +50,5 @@ data: |
       <hint>Consider the square miles, not population.</hint>
       <hint>Consider all 50 states, not just the continental United States.</hint>
     </demandhint>
-
+    </question>
   </problem>

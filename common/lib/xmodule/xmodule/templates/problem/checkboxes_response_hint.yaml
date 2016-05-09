@@ -30,7 +30,7 @@ metadata:
 hinted: true
 data: |
       <problem>
-      
+      <question>
       <p>You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.</p>
 
       <p>You can also provide compound feedback for a specific combination of answers. For example, if you have three possible answers in the problem, you can configure specific feedback for when a learner selects each combination of possible answers.</p>
@@ -66,4 +66,5 @@ data: |
         <hint>A fruit is the fertilized ovary from a flower.</hint>
         <hint>A fruit contains seeds of the plant.</hint>
       </demandhint>
+      </question>
       </problem>

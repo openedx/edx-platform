@@ -23,6 +23,7 @@ metadata:
 
 data: |
       <problem>
+        <question>
         <p>Checkbox problems allow learners to select multiple options. Learners can see all the options along with the problem text.</p>
         <p>When you add the component, be sure to select <strong>Settings</strong> 
         to specify a <strong>Display Name</strong> and other values that apply.</p>
@@ -44,4 +45,5 @@ data: |
              <p>Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.</p> 
           </div>
         </solution>
+        </question>
       </problem>

@@ -5,6 +5,7 @@ metadata:
     showanswer: never
 data: |
       <problem>
+      <question>
       <p>
       In these problems (also called custom JavaScript problems or JS Input
       problems), you add a problem or tool that uses JavaScript in Studio.
@@ -65,4 +66,5 @@ data: |
           html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
           sop="false"/>
       </customresponse>
+      </question>
       </problem>

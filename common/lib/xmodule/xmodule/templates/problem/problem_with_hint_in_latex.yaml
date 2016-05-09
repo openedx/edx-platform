@@ -49,6 +49,7 @@ metadata:
     markdown: !!null
 data: |
     <problem>
+    <question>
       <text>
         <p>
           <h4>Problem With Adaptive Hint</h4>
@@ -89,4 +90,5 @@ data: |
           </customresponse>
         </label>
       </text>
+    </question>
     </problem>

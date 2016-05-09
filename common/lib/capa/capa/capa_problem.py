@@ -41,6 +41,7 @@ response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {
     'problem': {'tag': 'div'},
+    'question': {'tag': 'div'},
     'text': {'tag': 'span'},
     'math': {'tag': 'span'},
 }
@@ -164,7 +165,7 @@ class LoncapaProblem(object):
         # parse problem XML file into an element tree
         self.tree = etree.XML(problem_text)
 
-        self.make_xml_compatible(self.tree)
+        self.tree = self.make_xml_compatible(self.tree)
 
         # handle any <include file="foo"> tags
         self._process_includes()
@@ -215,6 +216,15 @@ class LoncapaProblem(object):
         This translation takes in the new format and synthesizes the old option= attribute
         so all downstream logic works unchanged with the new <option> tag format.
         """
+        # Convert the existing problem's XML to new format
+        # <problem>...</problem> to <problem><question>...</question></problem>
+        questions = tree.xpath('//problem/question')
+        if not questions:
+            tree.tag = 'question'
+            problem = etree.Element('problem')
+            problem.insert(0, tree)
+            tree = problem
+
         additionals = tree.xpath('//stringresponse/additional_answer')
         for additional in additionals:
             answer = additional.get('answer')
@@ -237,6 +247,8 @@ class LoncapaProblem(object):
                 optioninput.attrib.update({'options': options_string})
                 if correct_option:
                     optioninput.attrib.update({'correct': correct_option})
+
+        return tree
 
     def do_reset(self):
         """
@@ -479,7 +491,7 @@ class LoncapaProblem(object):
 
     def do_targeted_feedback(self, tree):
         """
-        Implements targeted-feedback in-place on  <multiplechoiceresponse> --
+        For each question, Implement targeted-feedback in-place on  <multiplechoiceresponse> --
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
@@ -488,67 +500,69 @@ class LoncapaProblem(object):
             return
         self.has_targeted = True  # pylint: disable=attribute-defined-outside-init
 
-        for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
-            show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
+        questions = tree.xpath('//problem/question')
+        for question in questions:
+            for mult_choice_response in question.xpath('//multiplechoiceresponse[@targeted-feedback]'):
+                show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
 
-            # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
-            choicegroup = mult_choice_response.xpath('./choicegroup[@type="MultipleChoice"]')[0]
-            choices_list = list(choicegroup.iter('choice'))
+                # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
+                choicegroup = mult_choice_response.xpath('./choicegroup[@type="MultipleChoice"]')[0]
+                choices_list = list(choicegroup.iter('choice'))
 
-            # Find the student answer key that matches our <choicegroup> id
-            student_answer = self.student_answers.get(choicegroup.get('id'))
-            expl_id_for_student_answer = None
+                # Find the student answer key that matches our <choicegroup> id
+                student_answer = self.student_answers.get(choicegroup.get('id'))
+                expl_id_for_student_answer = None
 
-            # Keep track of the explanation-id that corresponds to the student's answer
-            # Also, keep track of the solution-id
-            solution_id = None
-            for choice in choices_list:
-                if choice.get('name') == student_answer:
-                    expl_id_for_student_answer = choice.get('explanation-id')
-                if choice.get('correct') == 'true':
-                    solution_id = choice.get('explanation-id')
+                # Keep track of the explanation-id that corresponds to the student's answer
+                # Also, keep track of the solution-id
+                solution_id = None
+                for choice in choices_list:
+                    if choice.get('name') == student_answer:
+                        expl_id_for_student_answer = choice.get('explanation-id')
+                    if choice.get('correct') == 'true':
+                        solution_id = choice.get('explanation-id')
 
-            # Filter out targetedfeedback that doesn't correspond to the answer the student selected
-            # Note: following-sibling will grab all following siblings, so we just want the first in the list
-            targetedfeedbackset = mult_choice_response.xpath('./following-sibling::targetedfeedbackset')
-            if len(targetedfeedbackset) != 0:
-                targetedfeedbackset = targetedfeedbackset[0]
-                targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
-                for targetedfeedback in targetedfeedbacks:
-                    # Don't show targeted feedback if the student hasn't answer the problem
-                    # or if the target feedback doesn't match the student's (incorrect) answer
-                    if not self.done or targetedfeedback.get('explanation-id') != expl_id_for_student_answer:
-                        targetedfeedbackset.remove(targetedfeedback)
+                # Filter out targetedfeedback that doesn't correspond to the answer the student selected
+                # Note: following-sibling will grab all following siblings, so we just want the first in the list
+                targetedfeedbackset = mult_choice_response.xpath('./following-sibling::targetedfeedbackset')
+                if len(targetedfeedbackset) != 0:
+                    targetedfeedbackset = targetedfeedbackset[0]
+                    targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
+                    for targetedfeedback in targetedfeedbacks:
+                        # Don't show targeted feedback if the student hasn't answer the problem
+                        # or if the target feedback doesn't match the student's (incorrect) answer
+                        if not self.done or targetedfeedback.get('explanation-id') != expl_id_for_student_answer:
+                            targetedfeedbackset.remove(targetedfeedback)
 
-            # Do not displace the solution under these circumstances
-            if not show_explanation or not self.done:
-                continue
+                # Do not displace the solution under these circumstances
+                if not show_explanation or not self.done:
+                    continue
 
-            # The next element should either be <solution> or <solutionset>
-            next_element = targetedfeedbackset.getnext()
-            parent_element = tree
-            solution_element = None
-            if next_element is not None and next_element.tag == 'solution':
-                solution_element = next_element
-            elif next_element is not None and next_element.tag == 'solutionset':
-                solutions = next_element.xpath('./solution')
-                for solution in solutions:
-                    if solution.get('explanation-id') == solution_id:
-                        parent_element = next_element
-                        solution_element = solution
+                # The next element should either be <solution> or <solutionset>
+                next_element = targetedfeedbackset.getnext()
+                parent_element = question
+                solution_element = None
+                if next_element is not None and next_element.tag == 'solution':
+                    solution_element = next_element
+                elif next_element is not None and next_element.tag == 'solutionset':
+                    solutions = next_element.xpath('./solution')
+                    for solution in solutions:
+                        if solution.get('explanation-id') == solution_id:
+                            parent_element = next_element
+                            solution_element = solution
 
-            # If could not find the solution element, then skip the remaining steps below
-            if solution_element is None:
-                continue
+                # If could not find the solution element, then skip the remaining steps below
+                if solution_element is None:
+                    continue
 
-            # Change our correct-choice explanation from a "solution explanation" to within
-            # the set of targeted feedback, which means the explanation will render on the page
-            # without the student clicking "Show Answer" or seeing a checkmark next to the correct choice
-            parent_element.remove(solution_element)
+                # Change our correct-choice explanation from a "solution explanation" to within
+                # the set of targeted feedback, which means the explanation will render on the page
+                # without the student clicking "Show Answer" or seeing a checkmark next to the correct choice
+                parent_element.remove(solution_element)
 
-            # Add our solution instead to the targetedfeedbackset and change its tag name
-            solution_element.tag = 'targetedfeedback'
-            targetedfeedbackset.append(solution_element)
+                # Add our solution instead to the targetedfeedbackset and change its tag name
+                solution_element.tag = 'targetedfeedback'
+                targetedfeedbackset.append(solution_element)
 
     def get_html(self):
         """
@@ -723,7 +737,7 @@ class LoncapaProblem(object):
         context['extra_files'] = extra_files or None
         return context
 
-    def _extract_html(self, problemtree):  # private
+    def _extract_html(self, problemtree, question_id=0):  # private
         """
         Main (private) function which converts Problem XML tree to HTML.
         Calls itself recursively.
@@ -808,7 +822,13 @@ class LoncapaProblem(object):
         # otherwise, render children recursively, and copy over attributes
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            item_xhtml = self._extract_html(item)
+            item_xhtml = self._extract_html(item, question_id)
+
+            if item.tag == 'question':
+                item_xhtml.set('class', 'question')
+                item_xhtml.set('id', 'question-{}'.format(question_id))
+                question_id += 1
+
             if item_xhtml is not None:
                 tree.append(item_xhtml)
 

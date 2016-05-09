@@ -4,6 +4,7 @@ metadata:
     markdown: !!null
 data: |
       <problem>
+      <question>
       <p>
       In custom Python-evaluated input (also called "write-your-own-grader"
       problems), the grader uses a Python script that you create and embed in
@@ -50,6 +51,15 @@ data: |
           <textline size="40" correct_answer="3" label="Integer #1"/><br/>
           <textline size="40" correct_answer="7" label="Integer #2"/>
         </customresponse>
+        <solution>
+        <div class="detailed-solution">
+          <p>Explanation</p>
+          <p>Any set of integers on the line \(y = 10 - x\) satisfy these constraints.</p>
+        </div>
+      </solution>
+      </question>
+
+      <question>
         <p>Enter two integers that sum to 20.</p>
         <customresponse cfn="test_add" expect="20">
           <textline size="40" correct_answer="11" label="Integer #1"/><br/>
@@ -58,7 +68,7 @@ data: |
       <solution>
         <div class="detailed-solution">
           <p>Explanation</p>
-          <p>Any set of integers on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
+          <p>Any set of integers on the line \(y = 20 - x\) satisfy these constraints.</p>
           <p>To add an image to the solution, use an HTML "img" tag. Make sure to include alt text.</p>
           <img src="/static/images/placeholder-image.png" width="400"
           alt="Description of image, with a primary goal of explaining its
@@ -66,4 +76,6 @@ data: |
           who is unable to see the image."/>
         </div>
       </solution>
+      <question>
+
       </problem>

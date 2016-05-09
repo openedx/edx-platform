@@ -89,8 +89,9 @@ metadata:
 data: |
     <?xml version="1.0"?>
     <problem showanswer="closed" rerandomize="never" weight="10" display_name="lec1_Q2">
+      <question>
       <p>If you have a problem that is already written in LaTeX, you can use this problem type to
-      easily convert your code into XML. After you paste your code into the LaTeX editor,
+      easily convert your code into XML. After you paste your code into the LaTeX editor, 
       you only need to make a few minor adjustments.</p>
       <p>For more information, see
       <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
@@ -108,7 +109,10 @@ data: |
             <p>India became an independent nation on August 15, 1947.</p>
           </div>
         </solution>
+        </question>
+
         <br/>
+        <question>
         <p><strong>Example Multiple Choice Problem</strong></p>
           <p>Which of the following countries has the largest population?</p>
           <multiplechoiceresponse>
@@ -129,13 +133,18 @@ data: |
             <p>The population of Germany is approximately 81 million.</p>
           </div>
         </solution>
+        </question>
+
         <br/>
+        <question>
         <p><strong>Example Math Expression Problem</strong></p>
           <p>What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]?</p>
           <symbolicresponse expect="m*c^2">
             <textline size="90" correct_answer="m*c^2" math="1"/>
           </symbolicresponse>
+        </question>
         <br/>
+        <question>
         <p><strong>Example Numerical Problem</strong></p>
           <p>Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low-flow shower heads.</p>
           <p style="display:inline">Energy saved = </p>
@@ -145,7 +154,9 @@ data: |
             </textline>
             <p style="display:inline">&#xA0;EJ/year</p>
           </numericalresponse>
+        </question>
         <br/>
+        <question>
         <p><strong>Example Fill-in-the-Blank Problem</strong></p>
           <p>What was the first post-secondary school in China to allow both male and female students?</p>
           <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
@@ -159,7 +170,9 @@ data: |
             <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
           </div>
         </solution>
+        </question>
        <br/>
+       <question>
        <p><strong>Example Custom Python-Evaluated Input Problem</strong></p>
         <script type="loncapa/python">
     def test_add(expect, ans):
@@ -191,7 +204,9 @@ data: |
           <img src="/static/images/placeholder-image.png" width="400" alt="Description of image"/>
         </div>
       </solution>
+      </question>
       <br/>
+      <question>
       <p><strong>Example Image Mapped Input Problem</strong></p>
           <p>What country is home to the Great Pyramid of Giza as well as the cities
           of Cairo and Memphis? Click the country on the map below.</p>
@@ -207,7 +222,9 @@ data: |
             the Sphinx and the ancient Royal Library of Alexandria.</p>
           </div>
         </solution>
+        </question>
         <br/>
+        <question>
         <p><strong>Example Hidden Explanation</strong></p>
         <p>You can provide additional information that only appears at certain times by including a "showhide" flag. </p>
         <p>
@@ -225,4 +242,5 @@ data: |
             </tbody>
           </table>
         </p>
+        </question>
     </problem>

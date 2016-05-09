@@ -573,9 +573,18 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
       }
 
-      // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      // treat this as a single question
+      xml = '<question>\n' + xml + demandhints + '\n</question>';
 
       return xml;
     }`
-    return toXml markdown
+
+    questionsXML = []
+    # TODO! Should we change it to markdown.split('\n---\n'). What is the right choice?
+    questionsMarkdown = markdown.split('---')
+    _.each questionsMarkdown, (questionMarkdown, index) ->
+      if questionMarkdown.trim().length > 0
+        questionsXML.push toXml(questionMarkdown)
+
+    # make all questions descendants of a single problem element
+    return '<problem>\n' + questionsXML.join('\n\n') + '\n</problem>'

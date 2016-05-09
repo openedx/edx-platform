@@ -100,6 +100,28 @@ registry.register(SolutionRenderer)
 #-----------------------------------------------------------------------------
 
 
+class DemandhintRenderer(object):
+    """
+    Render demand demandhint HTML.
+    """
+    tags = ['demandhint']
+
+    def __init__(self, system, xml):  # pylint: disable=unused-variable
+        self.system = system
+
+    def get_html(self):
+        """
+        Return HTML for demandhint tag.
+        """
+        html = self.system.render_template("demandhint.html", {})
+        return etree.XML(html)
+
+registry.register(DemandhintRenderer)
+
+
+#-----------------------------------------------------------------------------
+
+
 class TargetedFeedbackRenderer(object):
     """
     A targeted feedback is just a <span>...</span> that is used for displaying an

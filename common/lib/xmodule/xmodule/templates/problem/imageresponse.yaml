@@ -4,6 +4,7 @@ metadata:
     markdown: !!null
 data: |
   <problem>
+  <question>
   <p>
   In an image mapped input problem, also known as a "pointing on a picture"
   problem, students click inside a defined region in an image. You define this
@@ -31,5 +32,6 @@ data: |
       the Sphinx and the ancient Royal Library of Alexandria.</p>
     </div>
   </solution>
+  </question>
   </problem>
 

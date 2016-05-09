@@ -27,7 +27,7 @@ metadata:
 hinted: true
 data: |
     <problem>
-    
+    <question>
     <p>You can provide feedback for correct answers in numerical input problems. You cannot provide feedback for incorrect answers.</p>
 
     <p>Use feedback for the correct answer to reinforce the process for arriving at the numerical value.</p>
@@ -51,4 +51,5 @@ data: |
       <hint>The mean is calculated by summing the set of numbers and dividing by n.</hint>
       <hint>n is the count of items in the set.</hint>
     </demandhint>
+    <question>
     </problem>

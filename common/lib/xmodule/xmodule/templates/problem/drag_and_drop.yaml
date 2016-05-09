@@ -5,6 +5,7 @@ metadata:
     showanswer: never
 data: |
     <problem>
+    <question>
       <p>
       In drag and drop problems, students respond to a question by dragging text or objects to a specific location on an image.
       </p>
@@ -51,6 +52,10 @@ data: |
         correct = ['incorrect']
         </answer>
     </customresponse>
+
+    </question>
+
+    <question>
         <customresponse>
           <h3>Drag and Drop with Outline</h3>
           <p>Label the hydrogen atoms connected with the left carbon atom.</p>
@@ -81,4 +86,5 @@ data: |
         correct = ['incorrect']
             </answer>
         </customresponse>
+    </question>
     </problem>

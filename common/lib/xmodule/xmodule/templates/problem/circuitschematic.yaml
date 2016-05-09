@@ -4,6 +4,7 @@ metadata:
     markdown: !!null
 data: |
       <problem>
+      <question>
         <p>
         Circuit schematic problems allow students to create virtual circuits by
         arranging elements such as voltage sources, capacitors, resistors, and
@@ -39,6 +40,20 @@ data: |
         correct = ['incorrect']
       </answer>
       </schematicresponse>
+      <solution>
+          <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>
+              You can form a voltage divider that evenly divides the input
+              voltage with two identically valued resistors, with the sampled
+              voltage taken in between the two.
+              </p>
+              <p><img src="/static/images/voltage_divider.png" alt=""/></p>
+          </div>
+      </solution>
+      </question>
+
+      <question>
       <p>Make a high-pass filter.</p>
       <schematicresponse>
       <center>
@@ -66,12 +81,6 @@ data: |
           <div class="detailed-solution">
               <p>Explanation</p>
               <p>
-              You can form a voltage divider that evenly divides the input
-              voltage with two identically valued resistors, with the sampled
-              voltage taken in between the two.
-              </p>
-              <p><img src="/static/images/voltage_divider.png" alt=""/></p>
-              <p>
               You can form a simple high-pass filter without any further
               constraints by simply putting a resistor in series with a
               capacitor. The actual values of the components do not really
@@ -80,4 +89,5 @@ data: |
               <p><img src="/static/images/high_pass_filter.png" alt=""/></p>
           </div>
       </solution>
+      </question>
       </problem>

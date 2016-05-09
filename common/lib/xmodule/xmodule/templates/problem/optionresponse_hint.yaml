@@ -26,7 +26,7 @@ metadata:
 hinted: true
 data: |
     <problem>
-
+    <question>
     <p>You can provide feedback for each available option in a dropdown problem.</p>
 
     <p>You can also add hints for learners.</p>
@@ -48,4 +48,5 @@ data: |
       <hint>A fruit is the fertilized ovary from a flower.</hint>
       <hint>A fruit contains seeds of the plant.</hint>
     </demandhint>
+    </question>
     </problem>

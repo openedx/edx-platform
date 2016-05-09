@@ -12,8 +12,23 @@ class ProblemPage(PageObject):
     url = None
     CSS_PROBLEM_HEADER = '.problem-header'
 
+    # There can be multiple questions in a problem, so we need to make query selector specific to question
+    question_id = 0
+
     def is_browser_on_page(self):
         return self.q(css='.xblock-student_view').present
+
+    def construct_query_selector(self, selector):
+        """
+        Construct query selector specific to a question.
+
+        Arguments:
+            selector (str): css selector.
+
+        Returns:
+            str: Element selector specific to a question.
+        """
+        return 'div.problem #question-{}.question {}'.format(self.question_id, selector)
 
     @property
     def problem_name(self):
@@ -27,7 +42,7 @@ class ProblemPage(PageObject):
         """
         Return the text of the question of the problem.
         """
-        return self.q(css="div.problem p").text
+        return self.q(css=self.construct_query_selector("p")).text
 
     @property
     def problem_content(self):
@@ -41,21 +56,21 @@ class ProblemPage(PageObject):
         """
         Return the "message" text of the question of the problem.
         """
-        return self.q(css="div.problem span.message").text[0]
+        return self.q(css=self.construct_query_selector("span.message")).text[0]
 
     @property
     def extract_hint_text_from_html(self):
         """
         Return the "hint" text of the problem from html
         """
-        return self.q(css="div.problem div.problem-hint").html[0].split(' <', 1)[0]
+        return self.q(css=self.construct_query_selector("div.problem-hint")).html[0].split(' <', 1)[0]
 
     @property
     def hint_text(self):
         """
         Return the "hint" text of the problem from its div.
         """
-        return self.q(css="div.problem div.problem-hint").text[0]
+        return self.q(css=self.construct_query_selector("div.problem-hint")).text[0]
 
     def verify_mathjax_rendered_in_problem(self):
         """
@@ -63,7 +78,7 @@ class ProblemPage(PageObject):
         """
         def mathjax_present():
             """ Returns True if MathJax css is present in the problem body """
-            mathjax_container = self.q(css="div.problem p .MathJax_SVG")
+            mathjax_container = self.q(css=self.construct_query_selector("p .MathJax_SVG"))
             return mathjax_container.visible and mathjax_container.present
 
         self.wait_for(
@@ -77,7 +92,7 @@ class ProblemPage(PageObject):
         """
         def mathjax_present():
             """ Returns True if MathJax css is present in the problem body """
-            mathjax_container = self.q(css="div.problem div.problem-hint .MathJax_SVG")
+            mathjax_container = self.q(css=self.construct_query_selector("div.problem-hint .MathJax_SVG"))
             return mathjax_container.visible and mathjax_container.present
 
         self.wait_for(
@@ -96,7 +111,7 @@ class ProblemPage(PageObject):
             input_num: If provided, fills only the input_numth field. Else, all
                 input fields will be filled.
         """
-        fields = self.q(css='div.problem div.capa_inputtype.textline input')
+        fields = self.q(css=self.construct_query_selector('div.capa_inputtype.textline input'))
         fields = fields.nth(input_num) if input_num is not None else fields
         fields.fill(text)
 
@@ -104,7 +119,7 @@ class ProblemPage(PageObject):
         """
         Fill in the answer to a numerical problem.
         """
-        self.q(css='div.problem section.inputtype input').fill(text)
+        self.q(css=self.construct_query_selector('section.inputtype input')).fill(text)
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
@@ -150,39 +165,47 @@ class ProblemPage(PageObject):
         """
         Click the Hint button.
         """
-        self.q(css='div.problem button.hint-button').click()
+        self.q(css=self.construct_query_selector('button.hint-button')).click()
         self.wait_for_ajax()
 
     def click_choice(self, choice_value):
         """
         Click the choice input(radio, checkbox or option) where value matches `choice_value` in choice group.
         """
-        self.q(css='div.problem .choicegroup input[value="' + choice_value + '"]').click()
+        self.q(css=self.construct_query_selector('.choicegroup input[value="' + choice_value + '"]')).click()
         self.wait_for_ajax()
 
     def is_correct(self):
         """
         Is there a "correct" status showing?
         """
-        return self.q(css="div.problem div.capa_inputtype.textline div.correct span.status").is_present()
+        return self.q(
+            css=self.construct_query_selector("div.capa_inputtype.textline div.correct span.status")
+        ).is_present()
 
     def simpleprob_is_correct(self):
         """
         Is there a "correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.correct span.status").is_present()
+        return self.q(
+            css=self.construct_query_selector("section.inputtype div.correct span.status")
+        ).is_present()
 
     def simpleprob_is_partially_correct(self):
         """
         Is there a "partially correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.partially-correct span.status").is_present()
+        return self.q(
+            css=self.construct_query_selector("section.inputtype div.partially-correct span.status")
+        ).is_present()
 
     def simpleprob_is_incorrect(self):
         """
         Is there an "incorrect" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.incorrect span.status").is_present()
+        return self.q(
+            css=self.construct_query_selector("section.inputtype div.incorrect span.status")
+        ).is_present()
 
     def click_clarification(self, index=0):
         """
@@ -190,7 +213,9 @@ class ProblemPage(PageObject):
 
         Problem <clarification>clarification text hidden by an icon in rendering</clarification> Text
         """
-        self.q(css='div.problem .clarification:nth-child({index}) i[data-tooltip]'.format(index=index + 1)).click()
+        self.q(css=self.construct_query_selector(
+            '.clarification:nth-child({index}) i[data-tooltip]'.format(index=index + 1)
+        )).click()
 
     @property
     def visible_tooltip_text(self):
