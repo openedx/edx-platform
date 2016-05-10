@@ -121,7 +121,7 @@ class SystemTestSuite(NoseTestSuite):
         cmd = (
             './manage.py {system} test --verbosity={verbosity} '
             '{test_id} {test_opts} --settings=test {extra} '
-            '--with-xunit --xunit-file={xunit_report}'.format(
+            '--with-xunitmp --xunitmp-file={xunit_report}'.format(
                 system=self.root,
                 verbosity=self.verbosity,
                 test_id=self.test_id,

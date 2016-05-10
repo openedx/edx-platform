@@ -96,7 +96,6 @@ _NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
     '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
 NOSE_PLUGINS = [
