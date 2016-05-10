@@ -31,6 +31,7 @@ class ReverificationPartitionTest(ModuleStoreTestCase):
     SUBMITTED = "submitted"
     APPROVED = "approved"
     DENIED = "denied"
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         super(ReverificationPartitionTest, self).setUp()

@@ -1155,5 +1155,5 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.assertContains(response, 'XSeries Program Course', count)
         self.assertContains(response, 'XSeries Program: Interested in more courses in this subject?', count)
         self.assertContains(response, 'This course is 1 of 3 courses in the', count)
-        self.assertContains(response, self.program_name, count)
+        self.assertContains(response, self.program_name, count * 2)
         self.assertContains(response, 'View XSeries Details', count)

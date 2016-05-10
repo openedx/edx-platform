@@ -127,6 +127,8 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(TestSubmittingProblems, self).setUp()
 

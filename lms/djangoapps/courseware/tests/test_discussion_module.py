@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 """Test for Discussion Xmodule functional logic."""
 import ddt
+from django.core.urlresolvers import reverse
 from mock import Mock
 from . import BaseTestXmodule
+from course_api.blocks.tests.helpers import deserialize_usage_key
+from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from courseware.module_render import get_module_for_descriptor_internal
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.discussion_module import DiscussionModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory, ItemFactory
 
 
 @ddt.ddt
-class DiscussionModuleTest(BaseTestXmodule):
+class DiscussionModuleTest(BaseTestXmodule, EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """Logic tests for Discussion Xmodule."""
     CATEGORY = "discussion"
 
@@ -90,3 +95,38 @@ class DiscussionModuleTest(BaseTestXmodule):
             block = block.get_parent()
 
         return block
+
+    def test_discussion_student_view_data(self):
+        """
+        Tests that course block api returns student_view_data for discussion module
+        """
+        course_key = ToyCourseFactory.create().id
+        course_usage_key = self.store.make_course_usage_key(course_key)
+        user = UserFactory.create()
+        self.client.login(username=user.username, password='test')
+        CourseEnrollmentFactory.create(user=user, course_id=course_key)
+        discussion_id = "test_discussion_module_id"
+        ItemFactory.create(
+            parent_location=course_usage_key,
+            category='discussion',
+            discussion_id=discussion_id,
+            discussion_category='Category discussion',
+            discussion_target='Target Discussion',
+        )
+
+        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': unicode(course_usage_key)})
+        query_params = {
+            'depth': 'all',
+            'username': user.username,
+            'block_types_filter': 'discussion',
+            'student_view_data': 'discussion'
+        }
+        response = self.client.get(url, query_params)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.data['root'], unicode(course_usage_key))  # pylint: disable=no-member
+        for block_key_string, block_data in response.data['blocks'].iteritems():  # pylint: disable=no-member
+            block_key = deserialize_usage_key(block_key_string, course_key)
+            self.assertEquals(block_data['id'], block_key_string)
+            self.assertEquals(block_data['type'], block_key.block_type)
+            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['student_view_data'], {"topic_id": discussion_id})

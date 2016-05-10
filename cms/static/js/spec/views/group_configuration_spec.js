@@ -5,7 +5,7 @@ define([
     'js/views/group_configuration_item', 'js/views/experiment_group_edit', 'js/views/content_group_list',
     'js/views/content_group_details', 'js/views/content_group_editor', 'js/views/content_group_item',
     'common/js/components/views/feedback_notification', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/view_helpers', 'jasmine-stealth'
+    'common/js/spec_helpers/view_helpers'
 ], function(
     _, Course, GroupConfigurationModel, GroupModel, GroupConfigurationCollection, GroupCollection,
     GroupConfigurationDetailsView, GroupConfigurationsListView, GroupConfigurationEditorView,

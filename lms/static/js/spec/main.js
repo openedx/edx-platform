@@ -34,7 +34,7 @@
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
-            'backbone': 'xmodule_js/common_static/common/js/vendor/backbone',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
@@ -47,9 +47,6 @@
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
-            'jasmine-waituntil': 'xmodule_js/common_static/js/libs/jasmine-waituntil',
-            'jasmine-extensions': 'xmodule_js/common_static/js/libs/jasmine-extensions',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
@@ -70,9 +67,9 @@
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
-            'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
-            'edxicons': 'xmodule_js/common_static/edx-pattern-library/js/edx-icons',
+            'modernizr': 'edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'edx-pattern-library/js/afontgarde',
+            'edxicons': 'edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -99,13 +96,12 @@
             'js/bookmarks/views/bookmarks_list': 'js/bookmarks/views/bookmarks_list',
             'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button',
             'js/views/message_banner': 'js/views/message_banner',
-            'js/commerce/views/receipt_view': 'js/commerce/views/receipt_view',
 
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
 
             // Common edx utils
-            'common/js/utils/edx.utils.validate': 'xmodule_js/common_static/common/js/utils/edx.utils.validate',
+            'common/js/utils/edx.utils.validate': 'common/js/utils/edx.utils.validate',
             'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
             'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
         },
@@ -262,13 +258,13 @@
                 exports: 'sinon'
             },
             'jasmine-imagediff': {},
-            'jasmine-stealth': {
-                deps: ['underscore', 'underscore.string']
-            },
-            'jasmine-waituntil': {
+            'common/js/spec_helpers/jasmine-extensions': {
                 deps: ['jquery']
             },
-            'jasmine-extensions': {
+            'common/js/spec_helpers/jasmine-stealth': {
+                deps: ['underscore', 'underscore.string']
+            },
+            'common/js/spec_helpers/jasmine-waituntil': {
                 deps: ['jquery']
             },
             'xblock/core': {
@@ -323,10 +319,6 @@
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
-            },
-            'js/commerce/views/receipt_view': {
-                exports: 'edx.commerce.ReceiptView',
-                deps: ['jquery', 'backbone', 'underscore', 'string_utils']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -783,18 +775,23 @@
         'js/spec/learner_dashboard/sidebar_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/certificate_view_spec.js',
-        'js/spec/commerce/receipt_spec.js'
+        'js/spec/api_admin/catalog_preview_spec.js',
     ];
 
     for (var i = 0; i < testFiles.length; i++) {
         testFiles[i] = '/base/' + testFiles[i];
     }
 
+    var specHelpers = [
+        'common/js/spec_helpers/jasmine-extensions',
+        'common/js/spec_helpers/jasmine-stealth',
+        'common/js/spec_helpers/jasmine-waituntil'
+    ];
+
     // Jasmine has a global stack for creating a tree of specs. We need to load
     // spec files one by one, otherwise some end up getting nested under others.
-    window.requireSerial(testFiles, function () {
+    window.requireSerial(specHelpers.concat(testFiles), function () {
         // start test run, once Require.js is done
         window.__karma__.start();
     });
-
 }).call(this, requirejs, define);

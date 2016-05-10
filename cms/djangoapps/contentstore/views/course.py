@@ -412,12 +412,16 @@ def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
+    def filter_ccx(course_access):
+        """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
+        return not isinstance(course_access.course_id, CCXLocator)
+
     courses_list = {}
     in_process_course_actions = []
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = instructor_courses | staff_courses
+    all_courses = filter(filter_ccx, instructor_courses | staff_courses)
 
     for course_access in all_courses:
         course_key = course_access.course_id
@@ -440,9 +444,7 @@ def _accessible_courses_list_from_groups(request):
                 # If a user has access to a course that doesn't exist, don't do anything with that course
                 pass
 
-            # Custom Courses for edX (CCX) is an edX feature for re-using course content.
-            # CCXs cannot be edited in Studio (aka cms) and should not be shown in this dashboard.
-            if course is not None and not isinstance(course, ErrorDescriptor) and not isinstance(course.id, CCXLocator):
+            if course is not None and not isinstance(course, ErrorDescriptor):
                 # ignore deleted, errored or ccx courses
                 courses_list[course_key] = course
 

@@ -68,6 +68,8 @@ from lms.djangoapps.ccx.tests.utils import (
 from lms.djangoapps.ccx.utils import is_email
 from lms.djangoapps.ccx.views import get_date
 
+from xmodule.modulestore.django import modulestore
+
 
 def intercept_renderer(path, context):
     """
@@ -184,10 +186,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     Tests for Custom Courses views.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestCoachDashboard, cls).setUpClass()
-
     def setUp(self):
         """
         Set up tests
@@ -205,31 +203,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
         self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
-
-    def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
-        """
-        Helper function to count visible elements in the schedule
-        """
-        response = self.client.get(url)
-        # the schedule contains chapters
-        chapters = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
-        sequentials = flatten([chapter.get('children', []) for chapter in chapters])
-        verticals = flatten([sequential.get('children', []) for sequential in sequentials])
-        # check that the numbers of nodes at different level are the expected ones
-        self.assertEqual(n_chapters, len(chapters))
-        self.assertEqual(n_sequentials, len(sequentials))
-        self.assertEqual(n_verticals, len(verticals))
-        # extract the locations of all the nodes
-        all_elements = chapters + sequentials + verticals
-        return [elem['location'] for elem in all_elements if 'location' in elem]
-
-    def hide_node(self, node):
-        """
-        Helper function to set the node `visible_to_staff_only` property
-        to True and save the change
-        """
-        node.visible_to_staff_only = True
-        self.mstore.update_item(node, self.coach.id)
 
     def test_not_a_coach(self):
         """
@@ -351,43 +324,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                 for unit in subsection.get_children():
                     self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
                     self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
-
-    @SharedModuleStoreTestCase.modifies_courseware
-    @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('ccx.views.TODAY')
-    def test_get_ccx_schedule(self, today):
-        """
-        Gets CCX schedule and checks number of blocks in it.
-        Hides nodes at a different depth and checks that these nodes
-        are not in the schedule.
-        """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
-        self.make_coach()
-        ccx = self.make_ccx()
-        url = reverse(
-            'ccx_coach_dashboard',
-            kwargs={
-                'course_id': CCXLocator.from_course_locator(
-                    self.course.id, ccx.id)
-            }
-        )
-        # all the elements are visible
-        self.assert_elements_in_schedule(url)
-        # hide a vertical
-        vertical = self.verticals[0]
-        self.hide_node(vertical)
-        locations = self.assert_elements_in_schedule(url, n_verticals=7)
-        self.assertNotIn(unicode(vertical.location), locations)
-        # hide a sequential
-        sequential = self.sequentials[0]
-        self.hide_node(sequential)
-        locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
-        self.assertNotIn(unicode(sequential.location), locations)
-        # hide a chapter
-        chapter = self.chapters[0]
-        self.hide_node(chapter)
-        locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
-        self.assertNotIn(unicode(chapter.location), locations)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('ccx.views.TODAY')
@@ -840,6 +776,134 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                 course_id=course_key, email=identifier
             ).exists()
         )
+
+
+@attr('shard_1')
+class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CCX Coach Dashboard which need to modify the course content.
+    """
+
+    ENABLED_CACHES = ['default', 'mongo_inheritance_cache', 'loc_cache']
+
+    def setUp(self):
+        super(TestCoachDashboardSchedule, self).setUp()
+        self.course = course = CourseFactory.create()
+
+        # Create a course outline
+        self.mooc_start = start = datetime.datetime(
+            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+        )
+        self.mooc_due = due = datetime.datetime(
+            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+        )
+
+        self.chapters = [
+            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+        ]
+        self.sequentials = flatten([
+            [
+                ItemFactory.create(parent=chapter) for _ in xrange(2)
+            ] for chapter in self.chapters
+        ])
+        self.verticals = flatten([
+            [
+                ItemFactory.create(
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
+                ) for _ in xrange(2)
+            ] for sequential in self.sequentials
+        ])
+
+        # Trying to wrap the whole thing in a bulk operation fails because it
+        # doesn't find the parents. But we can at least wrap this part...
+        with self.store.bulk_operations(course.id, emit_signals=False):
+            blocks = flatten([  # pylint: disable=unused-variable
+                [
+                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                ] for vertical in self.verticals
+            ])
+
+        # Create instructor account
+        self.coach = UserFactory.create()
+        # create an instance of modulestore
+        self.mstore = modulestore()
+
+        # Login with the instructor account
+        self.client.login(username=self.coach.username, password="test")
+
+        # adding staff to master course.
+        staff = UserFactory()
+        allow_access(self.course, staff, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.id).has_user(staff))
+
+        # adding instructor to master course.
+        instructor = UserFactory()
+        allow_access(self.course, instructor, 'instructor')
+        self.assertTrue(CourseInstructorRole(self.course.id).has_user(instructor))
+
+        self.assertTrue(modulestore().has_course(self.course.id))
+
+    def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
+        """
+        Helper function to count visible elements in the schedule
+        """
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # the schedule contains chapters
+        chapters = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        sequentials = flatten([chapter.get('children', []) for chapter in chapters])
+        verticals = flatten([sequential.get('children', []) for sequential in sequentials])
+        # check that the numbers of nodes at different level are the expected ones
+        self.assertEqual(n_chapters, len(chapters))
+        self.assertEqual(n_sequentials, len(sequentials))
+        self.assertEqual(n_verticals, len(verticals))
+        # extract the locations of all the nodes
+        all_elements = chapters + sequentials + verticals
+        return [elem['location'] for elem in all_elements if 'location' in elem]
+
+    def hide_node(self, node):
+        """
+        Helper function to set the node `visible_to_staff_only` property
+        to True and save the change
+        """
+        node.visible_to_staff_only = True
+        self.mstore.update_item(node, self.coach.id)
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('ccx.views.TODAY')
+    def test_get_ccx_schedule(self, today):
+        """
+        Gets CCX schedule and checks number of blocks in it.
+        Hides nodes at a different depth and checks that these nodes
+        are not in the schedule.
+        """
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        self.make_coach()
+        ccx = self.make_ccx()
+        url = reverse(
+            'ccx_coach_dashboard',
+            kwargs={
+                'course_id': CCXLocator.from_course_locator(
+                    self.course.id, ccx.id)
+            }
+        )
+        # all the elements are visible
+        self.assert_elements_in_schedule(url)
+        # hide a vertical
+        vertical = self.verticals[0]
+        self.hide_node(vertical)
+        locations = self.assert_elements_in_schedule(url, n_verticals=7)
+        self.assertNotIn(unicode(vertical.location), locations)
+        # hide a sequential
+        sequential = self.sequentials[0]
+        self.hide_node(sequential)
+        locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
+        self.assertNotIn(unicode(sequential.location), locations)
+        # hide a chapter
+        chapter = self.chapters[0]
+        self.hide_node(chapter)
+        locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
+        self.assertNotIn(unicode(chapter.location), locations)
 
 
 GET_CHILDREN = XModuleMixin.get_children

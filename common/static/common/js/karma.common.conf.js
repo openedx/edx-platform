@@ -1,4 +1,39 @@
-// Common configuration for Karma
+// Common settings and helpers for setting up Karma config.
+//
+// To run all the tests in a suite and print results to the console:
+//
+//   karma start <karma_config_for_suite_path>
+//   E.g. karma start lms/static/karma_lms.conf.js
+//
+//
+// To run the tests for debugging: Debugging can be done in any browser
+// but Chrome's developer console debugging experience is best.
+//
+//   karma start <karma_config_for_suite_path> --browsers=BROWSER --single-run=false
+//
+//
+// To run the tests with coverage and junit reports:
+//
+//   karma start <karma_config_for_suite_path> --browsers=BROWSER
+// --coverage --junitreportpath=<xunit_report_path> --coveragereportpath=<report_path>
+//
+// where `BROWSER` could be Chrome or Firefox.
+//
+//
+// Troubleshooting tips:
+//
+// If you get an error like: "TypeError: __cov_KBCc7ZI4xZm8W2BC5NQLDg.s is undefined",
+// that means the patterns in sourceFiles and specFiles are matching the same file.
+// This causes Istanbul, which is used for tracking coverage to instrument the file
+// multiple times.
+//
+//
+// If you see the error: "EMFILE, too many open files" that means the files pattern
+// that has been added is matching too many files. The glob library used by Karma
+// does not use graceful-fs and tries to read files simultaneously.
+//
+
+
 /* jshint node: true */
 /*jshint -W079 */
 'use strict';
@@ -6,6 +41,31 @@
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
+
+// Files which are needed by all lms/cms suites.
+var commonFiles = {
+    libraryFiles: [
+        {pattern: 'common/js/vendor/**/*.js'},
+        {pattern: 'edx-pattern-library/js/**/*.js'},
+        {pattern: 'edx-ui-toolkit/js/**/*.js'},
+        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
+        {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
+        {pattern: 'xmodule_js/src/**/*.js'}
+    ],
+
+    sourceFiles: [
+        {pattern: 'common/js/components/**/*.js'},
+        {pattern: 'common/js/utils/**/*.js'}
+    ],
+
+    specFiles: [
+        {pattern: 'common/js/spec_helpers/**/*.js'}
+    ],
+
+    fixtureFiles: [
+        {pattern: 'common/templates/**/*.underscore'}
+    ]
+};
 
 /**
  * Customize the name attribute in xml testcase element
@@ -102,27 +162,66 @@ function junitSettings(config) {
     };
 }
 
-var getPreprocessorObject = function (files) {
-    var preprocessFiles = {};
-
-    files.forEach(function (file) {
-        var pattern = _.isObject(file) ? file.pattern : file;
-
-        if (pattern.match(/^common\/js/)) {
-            pattern = path.join(appRoot, '/common/static/' + pattern);
-        } else if (pattern.match(/^xmodule_js\/common_static/)) {
-            pattern = path.join(appRoot, '/common/static/' +
-                pattern.replace(/^xmodule_js\/common_static\//, ''));
-        }
-
-        preprocessFiles[pattern] = ['coverage'];
-    });
-
-    return preprocessFiles;
+/**
+ * Return absolute path for files in common and xmodule_js symlink dirs.
+ * @param {String} appRoot
+ * @param {String} pattern
+ * @return {String}
+ */
+var defaultNormalizeFunc = function (appRoot, pattern) {
+    if (pattern.match(/^common\/js/)) {
+        pattern = path.join(appRoot, '/common/static/' + pattern);
+    } else if (pattern.match(/^xmodule_js\/common_static/)) {
+        pattern = path.join(appRoot, '/common/static/' +
+          pattern.replace(/^xmodule_js\/common_static\//, ''));
+    }
+    return pattern;
 };
 
-var getConfig = function (config, useRequireJs) {
-    useRequireJs = useRequireJs === undefined ? true : useRequireJs;
+var normalizePathsForCoverage = function(files, normalizeFunc) {
+    var normalizeFn = normalizeFunc || defaultNormalizeFunc,
+        filesForCoverage = {};
+
+    files.forEach(function (file) {
+        if (!file.ignoreCoverage) {
+          filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
+        }
+    });
+
+    return filesForCoverage;
+};
+
+/**
+ * Sets nocache on each file in the list.
+ * @param {Object} files
+ * @param {Bool} enable
+ * @return {Object}
+ */
+var setNocache = function (files, enable) {
+    files.forEach(function (f) {
+        if (_.isObject(f)) {
+            f.nocache = enable;
+        }
+    });
+    return files;
+};
+
+/**
+ * Sets defaults for each file pattern.
+ * @param {Object} files
+ * @return {Object}
+ */
+var setDefaults = function (files) {
+    return files.map(function (f) {
+        var file = _.isObject(f) ? f : {pattern: f};
+        if (!file.included) {
+            f.included = false;
+        }
+        return file;
+    });
+};
+
+var getBaseConfig = function (config, useRequireJs) {
 
     var getFrameworkFiles = function () {
         var files = [
@@ -235,8 +334,62 @@ var getConfig = function (config, useRequireJs) {
     };
 };
 
+var configure = function(config, options) {
+    var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
+        baseConfig = getBaseConfig(config, useRequireJs);
+
+    if (options.includeCommonFiles) {
+        _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function (collectionName) {
+            options[collectionName] = _.flatten([commonFiles[collectionName], options[collectionName]]);
+        });
+    }
+
+    var files = _.flatten(
+        _.map(
+            ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
+            function(collectionName) { return options[collectionName] || []; }
+        )
+    );
+
+    files.unshift(
+        {pattern: path.join(appRoot, 'common/static/common/js/jasmine.common.conf.js'), included: true}
+    );
+
+    if (useRequireJs) {
+      files.unshift({pattern: 'common/js/utils/require-serial.js', included: true});
+    }
+
+    // Karma sets included=true by default.
+    // We set it to false by default because RequireJS should be used instead.
+    files = setDefaults(files);
+
+    // With nocache=true, Karma always serves the latest files from disk.
+    // However, that prevents coverage tracking from working.
+    // So we only set it if coverage tracking is off.
+    setNocache(files, !config.coverage);
+
+    var filesForCoverage = _.flatten(
+        _.map(
+            ['sourceFiles', 'specFiles'],
+            function(collectionName) { return options[collectionName]; }
+        )
+    );
+
+    // If we give symlink paths to Istanbul, coverage for each path gets tracked
+    // separately. So we pass absolute paths to the karma-coverage preprocessor.
+    var preprocessors = _.extend(
+      {},
+      options.preprocessors,
+      normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
+    );
+
+    config.set(_.extend(baseConfig, {
+        files: files,
+        preprocessors: preprocessors
+    }));
+};
+
 module.exports = {
-    getConfig: getConfig,
-    getPreprocessorObject: getPreprocessorObject,
+    configure: configure,
     appRoot: appRoot
 };

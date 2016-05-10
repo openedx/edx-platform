@@ -2,7 +2,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "common/js/components/views/feedback_prompt",
     "common/js/components/views/feedback_notification", "common/js/components/utils/view_utils","common/js/spec_helpers/ajax_helpers",
-    "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+    "js/spec_helpers/modal_helpers"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
 
     describe "ShowTextbook", ->

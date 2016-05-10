@@ -26,9 +26,11 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
     access_token = "test_access_token"
     client_id = "test_client_id"
 
-    def setUp(self, create_user=True):
+    CREATE_USER = True
+
+    def setUp(self):
         super(ThirdPartyOAuthTestMixin, self).setUp()
-        if create_user:
+        if self.CREATE_USER:
             self.user = UserFactory()
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
         self.oauth_client = self._create_client()

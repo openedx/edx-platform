@@ -46,6 +46,8 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     """Test the embargo API calls to determine whether a user has access. """
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(EmbargoCheckAccessApiTests, self).setUp()
         self.course = CourseFactory.create()
@@ -238,14 +240,13 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
+    URLCONF_MODULES = ['embargo']
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp('embargo')
+        super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
-
-    def tearDown(self):
-        super(EmbargoMessageUrlApiTests, self).tearDown()
-        cache.clear()
 
     @ddt.data(
         ('enrollment', '/embargo/blocked-message/enrollment/embargo/'),

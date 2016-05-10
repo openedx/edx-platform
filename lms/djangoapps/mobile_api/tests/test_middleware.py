@@ -10,18 +10,21 @@ import mock
 from pytz import UTC
 from mobile_api.middleware import AppVersionUpgrade
 from mobile_api.models import AppVersionConfig
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
-class TestAppVersionUpgradeMiddleware(TestCase):
+class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     """
     Tests for version based app upgrade middleware
     """
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestAppVersionUpgradeMiddleware, self).setUp()
         self.middleware = AppVersionUpgrade()
         self.set_app_version_config()
-        cache.clear()
 
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """

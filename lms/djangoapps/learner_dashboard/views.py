@@ -33,11 +33,15 @@ def view_programs(request):
             slug=program['marketing_slug']
         )
 
-    return render_to_response('learner_dashboard/programs.html', {
+    context = {
         'programs': programs,
         'progress': meter.progress,
         'xseries_url': marketing_root if ProgramsApiConfig.current().show_xseries_ad else None,
         'nav_hidden': True,
         'show_program_listing': show_program_listing,
-        'credentials': _get_xseries_credentials(request.user)
-    })
+        'credentials': _get_xseries_credentials(request.user),
+        'disable_courseware_js': True,
+        'uses_pattern_library': True
+    }
+
+    return render_to_response('learner_dashboard/programs.html', context)

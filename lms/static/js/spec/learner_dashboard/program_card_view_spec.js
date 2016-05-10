@@ -108,7 +108,7 @@ define([
                     completed = program.completed.length,
                     total = completed + program.in_progress.length + program.not_started.length;
 
-                expect(view.$('.certificate-status').html()).toEqual('You have earned certificates in ' + completed + ' of the ' + total + ' courses so far.');
+                expect(view.$('.certificate-status .status-text').not('.secondary').html()).toEqual('You have earned certificates in ' + completed + ' of the ' + total + ' courses so far.');
             });
 
             it('should render cards if there is no progressData', function() {

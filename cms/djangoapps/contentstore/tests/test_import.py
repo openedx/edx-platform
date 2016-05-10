@@ -34,10 +34,10 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-        password = super(ContentStoreImportTest, self).setUp()
+        super(ContentStoreImportTest, self).setUp()
 
         self.client = Client()
-        self.client.login(username=self.user.username, password=password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
     def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''

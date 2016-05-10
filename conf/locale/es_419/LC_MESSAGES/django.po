@@ -185,7 +185,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-04-15 11:05+0000\n"
+"POT-Creation-Date: 2016-04-28 21:19+0000\n"
 "PO-Revision-Date: 2016-01-19 20:04+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2287,9 +2287,9 @@ msgstr ""
 "\"id\":\"client_key:client_secret\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "List of pairs of (title, url) for textbooks used in this course"
+msgid ""
+"List of Textbook objects with (title, url) for textbooks used in this course"
 msgstr ""
-"Lista de pares (título, url) para los libros de texto usados en este curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Slug that points to the wiki for this course"
@@ -5333,7 +5333,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "After this date, course content will be archived."
-msgstr ""
+msgstr "Después de esta fecha, el contenido del curso será archivado."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -8226,7 +8226,7 @@ msgstr "No se especificó una dirección de correo electrónico."
 msgid "View and regenerate certificates."
 msgstr "Ver y regenerar certificados"
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
+#: lms/djangoapps/support/views/index.py
 msgid "Manual Refund"
 msgstr "Devolución manual"
 
@@ -8562,124 +8562,14 @@ msgstr "Youtube"
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "Suscríbase al canal YouTube de {platform_name}."
 
+#: lms/envs/common.py
+msgid "Kosovo"
+msgstr "Kosovo"
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to main content"
 msgstr "Ir al contenido principal"
-
-#: lms/templates/provider/authorize.html
-#, python-format
-msgid ""
-"\n"
-"    <strong>%(application_name)s</strong> would like to access your data with the following permissions:\n"
-"  "
-msgstr ""
-"\n"
-"     <strong>%(application_name)s</strong> quiere acceder a sus datos con los siguientes permisos:\n"
-"\n"
-"  "
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user ID"
-msgstr "Leer su ID de usuario"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your user profile"
-msgstr "Leer su perfil de usuario"
-
-#: lms/templates/provider/authorize.html
-msgid "Read your email address"
-msgstr "Leer su dirección de correo electrónico"
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are a staff member."
-msgstr "Leer la lista de cursos en los que usted es miembro del personal."
-
-#: lms/templates/provider/authorize.html
-msgid "Read the list of courses in which you are an instructor."
-msgstr "Leer la lista de cursos en los que usted es instructor."
-
-#: lms/templates/provider/authorize.html
-msgid "To see if you are a global staff user"
-msgstr "Para ver si usted es usuario global del personal"
-
-#: lms/templates/provider/authorize.html
-#, python-format
-msgid "Manage your data: %(permission)s"
-msgstr "Administrar sus datos: %(permission)s"
-
-#: lms/templates/registration/password_reset_complete.html
-msgid "Your Password Reset is Complete"
-msgstr "Tu reseteo de contraseña está completado"
-
-#: lms/templates/registration/password_reset_complete.html
-msgid "Password Reset Complete"
-msgstr "Restablecimiento de Contraseña Completado "
-
-#: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Su contraseña ha sido restablecida. %(link_start)sInicie sesión.%(link_end)s\n"
-"                "
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"    Reset Your %(platform_name)s Password\n"
-msgstr ""
-"\n"
-"    Restablecer su %(platform_name)s Contraseña\n"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "Error al Restablecer Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "Debe ingresar y confirmar su nueva contraseña."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "El texto en los dos campos de contraseña deben coincidir. "
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "Restablecer su Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "Ingrese y confirme su nueva contraseña."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Nueva Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "Confirmar Contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "Restablecer mi contraseña"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Invalid Password Reset Link"
-msgstr "Enlace de restablecimiento de contraseña inválido"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
-"                "
-msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -8711,46 +8601,6 @@ msgstr "Gracias por usar el sitio!"
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "El equpo de %(platform_name)s"
-
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "A punto de realizar la devolución de esta orden:"
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "Clave de identificación de la orden:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "Inscripción:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "inscritos"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "no inscritos"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "Costo"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "Estado del Item de cerfificado"
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "Estado de la orden:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "Tiempo completado:"
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "Tiempo transcurrido desde que se solicitó la devolución:"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -9239,11 +9089,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "API access request"
-msgstr ""
-
-#: openedx/core/djangoapps/api_admin/views.py
-msgid "TODO"
-msgstr ""
+msgstr "Solicitud de acceso a la API"
 
 #. Translators: link_start and link_end are HTML tags for a link to the terms
 #. of service.
@@ -9288,7 +9134,7 @@ msgstr "El marcador con usage_id {usage_id} no existe."
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
-msgstr ""
+msgstr "Grupo por defecto"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -10409,8 +10255,7 @@ msgstr "Visite su {link_start}Panel de control{link_end} para ver sus cursos."
 msgid "Choose Language"
 msgstr "Seleccionar idioma"
 
-#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 msgid "Account"
 msgstr "Cuenta"
 
@@ -10419,8 +10264,7 @@ msgstr "Cuenta"
 msgid "Help"
 msgstr "Ayuda"
 
-#: cms/templates/widgets/header.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Cerrar sesión"
@@ -10557,9 +10401,8 @@ msgstr "Empieza"
 msgid "View all Courses"
 msgstr "Ver todos los cursos"
 
-#: lms/templates/dashboard.html lms/templates/navigation-edx.html
-#: lms/templates/navigation.html themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/header.html
+#: lms/templates/dashboard.html lms/templates/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Panel de control"
 
@@ -10729,6 +10572,11 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
 "Esta es la dirección de correo electrónico que usó para registrarse con "
 "{platform} "
+
+#: lms/templates/forgot_password_modal.html
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset My Password"
+msgstr "Restablecer mi contraseña"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -11149,85 +10997,55 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Datos planos:"
 
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "{platform_name} Home Page"
-msgstr "{platform_name} Página de inicio"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "How it Works"
-msgstr "Cómo funciona"
-
-#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Find Courses"
-msgstr "Buscar Cursos"
-
-#: lms/templates/navigation-edx.html themes/edx.org/lms/templates/header.html
-msgid "Schools & Partners"
-msgstr "Escuelas y socios"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Dashboard for:"
-msgstr "Panel de Control para:"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "Profile image for {username}"
-msgstr "Foto de perfil para {username}"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Despliegue de más opciones"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-msgid "Profile"
-msgstr "Perfil"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Shopping Cart"
-msgstr "Carro de compras"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Sign in"
-msgstr "Iniciar sesión"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: lms/templates/register-form.html themes/edx.org/lms/templates/header.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Registrarse"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid ""
-"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
-"strongly recommend using {chrome_link} or {ff_link}."
-msgstr ""
-
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Global"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "{platform_name} Home Page"
+msgstr "{platform_name} Página de inicio"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Sysadmin"
 msgstr "Sysadmin"
 
+#: lms/templates/navigation.html lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Shopping Cart"
+msgstr "Carro de compras"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "How it Works"
+msgstr "Cómo funciona"
+
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Schools"
 msgstr "Instituciones"
+
+#: lms/templates/navigation.html
+msgid "Explore Courses"
+msgstr ""
+
+#: lms/templates/navigation.html lms/templates/register-form.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Registrarse"
+
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Sign in"
+msgstr "Iniciar sesión"
+
+#: lms/templates/navigation.html
+msgid ""
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
+msgstr ""
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -11881,6 +11699,30 @@ msgstr ""
 "regresar al panel de control. Si desea volver a suscriibirse a las "
 "notificaciones, haga clic {undo_link_start}aquí{link_end}."
 
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "Dashboard for:"
+msgstr "Panel de Control para:"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu dropdown"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Profile"
+msgstr "Perfil"
+
+#: lms/templates/user_dropdown.html
+msgid "Profile image for {username}"
+msgstr "Foto de perfil para {username}"
+
+#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Despliegue de más opciones"
+
 #: lms/templates/using.html
 msgid "Using the system"
 msgstr "Usando el sistema"
@@ -11960,18 +11802,64 @@ msgid "Request API Access"
 msgstr ""
 
 #. Translators: "platform_name" is the name of this Open edX installation.
-#. "link_start" and "link_end" are the HTML for a link to the API
-#. documentation. "api_support_email_link" is HTML for a link to email the API
-#. support staff.
 #: lms/templates/api_admin/status.html
 msgid ""
 "Your request to access the {platform_name} Course Catalog API is being "
 "processed. You will receive a message at the email address in your profile "
 "when processing is complete. You can also return to this page to see the "
-"status of your API access request. To learn more about the {platform_name} "
-"Course Catalog API, visit {link_start}our API documentation page{link_end}. "
-"For questions about using this API, visit our FAQ page or contact "
-"{api_support_email_link}."
+"status of your API access request."
+msgstr ""
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#. "api_support_email_link" is HTML for a link to email the API support staff.
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API has been "
+"denied. If you think this is an error, or for other questions about using "
+"this API, contact {api_support_email_link}."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API has been "
+"approved."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Application Name"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "API Client ID"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "API Client Secret"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Redirect URLs"
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid ""
+"If you would like to regenerate your API client information, please use the "
+"form below."
+msgstr ""
+
+#: lms/templates/api_admin/status.html
+msgid "Generate API client credentials"
+msgstr ""
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#. "link_start" and "link_end" are the HTML for a link to the API
+#. documentation. "api_support_email_link" is HTML for a link to email the API
+#. support staff.
+#: lms/templates/api_admin/status.html
+msgid ""
+"To learn more about the {platform_name} Course Catalog API, visit "
+"{link_start}our API documentation page{link_end}. For questions about using "
+"this API, contact {api_support_email_link}."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -16856,6 +16744,10 @@ msgstr ""
 msgid "Show Background Task History for Problem"
 msgstr "Mostrar la historia de la tarea en modo oculto para el problema"
 
+#: lms/templates/learner_dashboard/programs.html
+msgid "Your Programs"
+msgstr ""
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Cambiar preferencia de idioma"
@@ -17076,6 +16968,40 @@ msgstr "Mantener la marca"
 msgid "Go Back"
 msgstr "Volver Atrás"
 
+#: lms/templates/provider/authorize.html
+msgid ""
+"{start_strong}{application_name}{end_strong} would like to access your data "
+"with the following permissions:"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user ID"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your user profile"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read your email address"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are a staff member."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Read the list of courses in which you are an instructor."
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "To see if you are a global staff user"
+msgstr ""
+
+#: lms/templates/provider/authorize.html
+msgid "Manage your data: {permission}"
+msgstr ""
+
 #: lms/templates/registration/activate_account_notice.html
 msgid "Thanks for Registering!"
 msgstr "Gracias por Registrarte!"
@@ -17120,6 +17046,55 @@ msgstr ""
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
 msgstr "También puede volver a la {link_start}página de inicio{link_end}."
+
+#: lms/templates/registration/password_reset_complete.html
+msgid "Your Password Reset is Complete"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html
+msgid "Password Reset Complete"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html
+msgid ""
+"Your password has been reset. {start_link}Sign-in to your account.{end_link}"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your {platform_name} Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Error Resetting Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "You must enter and confirm your new password."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "The text in both password fields must match."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Reset Your Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "New Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Confirm Password"
+msgstr ""
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
+msgstr ""
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -17736,6 +17711,46 @@ msgstr "Soporte a estudiantes: Certificados"
 msgid "Student Support: Enrollment"
 msgstr "Soporte a estudiantes: Inscripciones"
 
+#: lms/templates/support/refund.html
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/support/refund.html
+msgid "Refund Request Time:"
+msgstr ""
+
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "Encuesta de usuario"
@@ -17943,6 +17958,15 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
+msgid "Find Courses"
+msgstr "Buscar Cursos"
+
+#: themes/edx.org/lms/templates/header.html
+msgid "Schools & Partners"
+msgstr "Escuelas y socios"
+
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -18127,7 +18151,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Files & Uploads"
-msgstr ""
+msgstr "Archivos y cargas"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -18142,9 +18166,6 @@ msgstr "Contenido"
 #: cms/templates/index.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/textbooks.html cms/templates/videos_index.html
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/outline.html
 msgid "Page Actions"
 msgstr "Acciones de página"
 
@@ -20303,19 +20324,19 @@ msgstr "Aprender más acerca de los contenidos de las bibliotecas"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr ""
+msgstr "Iniciar sesión en {studio_name}"
 
 #: cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
+msgstr "¿No tiene una cuenta de {studio_name} aún? Regístrese!"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
+msgstr "Información requerida para iniciar sesión en {studio_name}"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -20785,6 +20806,45 @@ msgstr "Introduciendo su curso"
 #: cms/templates/settings.html
 msgid "Information for prospective students"
 msgstr "Información para posibles estudiantes"
+
+#: cms/templates/settings.html
+msgid "Course Title"
+msgstr "Título del curso"
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed as hero image overlay on the course details page. Limit to 50 "
+"characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Subtitle"
+msgstr "Subtítulo del curso"
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed as hero image overlay on the course details page below the Course "
+"Title in a smaller font. Limit to 150 characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Duration"
+msgstr "Duración del curso"
+
+#: cms/templates/settings.html
+msgid ""
+"Displayed on the course details page below the hero image. Limit to 50 "
+"characters."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course Description"
+msgstr "Descripción del curso"
+
+#: cms/templates/settings.html
+msgid "Displayed on the course details page. Limit to 1000 characters."
+msgstr ""
+"Aparece en la página de detalles del curso. Límite de 1000 caracteres."
 
 #: cms/templates/settings.html
 msgid "Course Short Description"

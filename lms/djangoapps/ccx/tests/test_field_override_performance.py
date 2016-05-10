@@ -52,6 +52,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         """
         Create a test client, course, and user.

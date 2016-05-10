@@ -20,7 +20,6 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
 from django_countries import countries
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from microsite_configuration import microsite
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
@@ -29,6 +28,7 @@ from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
 from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.theming.helpers import get_value as get_themed_value
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
@@ -189,7 +189,7 @@ class RegistrationView(APIView):
 
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
-        self._extra_fields_setting = copy.deepcopy(microsite.get_value('REGISTRATION_EXTRA_FIELDS'))
+        self._extra_fields_setting = copy.deepcopy(get_themed_value('REGISTRATION_EXTRA_FIELDS'))
         if not self._extra_fields_setting:
             self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
@@ -687,14 +687,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -730,14 +730,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=get_themed_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 

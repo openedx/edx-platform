@@ -1707,6 +1707,9 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @classmethod
     def setUpClass(cls):
         super(RegistrationCodeRedemptionCourseEnrollment, cls).setUpClass()
@@ -1843,9 +1846,11 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'bob'
     PASSWORD = 'test'
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(RedeemCodeEmbargoTests, self).setUp('embargo')
+        super(RedeemCodeEmbargoTests, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.user.username, password=self.PASSWORD)

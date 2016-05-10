@@ -33,9 +33,11 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     """
     Course Mode View tests
     """
+    URLCONF_MODULES = ['course_modes.urls']
+
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
-        super(CourseModeViewTest, self).setUp('course_modes.urls')
+        super(CourseModeViewTest, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
@@ -392,9 +394,11 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TrackSelectionEmbargoTest, self).setUp('embargo')
+        super(TrackSelectionEmbargoTest, self).setUp()
 
         # Create a course and course modes
         self.course = CourseFactory.create()
