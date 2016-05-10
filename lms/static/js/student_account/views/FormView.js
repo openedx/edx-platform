@@ -115,9 +115,11 @@
 
             cleanUsername: function() {
                 var $username = this.$form.find('#register-username');
-                var newUsername = $username.val().replace(/[^a-zA-Z0-9\-_]/g, '');
+                if ($username.val()) {
+                    var newUsername = $username.val().replace(/[^a-zA-Z0-9\-_]/g, '');
 
-                $username.val(newUsername);
+                    $username.val(newUsername);
+                }
             },
 
             buildForm: function( data ) {
