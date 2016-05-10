@@ -25,6 +25,12 @@
 
                     if (certificatesData.length) {
                         this.$el.html(this.tpl(this.context));
+                    } else {
+                        /**
+                         *  If not rendering remove el because
+                         *  styles are applied to it
+                         */
+                        this.remove();
                     }
                 }
             });

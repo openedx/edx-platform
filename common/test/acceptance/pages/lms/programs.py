@@ -19,4 +19,4 @@ class ProgramListingPage(PageObject):
     @property
     def is_sidebar_present(self):
         """Check whether sidebar is present."""
-        return self.q(css='.sidebar').present and self.q(css='.certificates-list').present
+        return self.q(css='.sidebar').present
