@@ -94,16 +94,6 @@
                         },
                         {
                             placeholder: '',
-                            name: 'password_copy',
-                            label: 'Retype password',
-                            defaultValue: '',
-                            type: 'password',
-                            required: false,
-                            instructions: 'Please retype password.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
                             name: 'level_of_education',
                             label: 'Highest Level of Education Completed',
                             defaultValue: '',

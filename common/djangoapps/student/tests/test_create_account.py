@@ -284,6 +284,7 @@ class TestCreateAccountValidation(TestCase):
     """
     Test validation of various parameters in the create_account view
     """
+
     def setUp(self):
         super(TestCreateAccountValidation, self).setUp()
         self.url = reverse("create_account")
@@ -376,8 +377,8 @@ class TestCreateAccountValidation(TestCase):
         assert_email_error("A properly formatted e-mail is required")
 
     @override_settings(
-        REGISTRATION_EMAIL_FULL_VERIFICATION = True,
-        REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
+        REGISTRATION_EMAIL_FULL_VERIFICATION=True,
+        REGISTRATION_EMAIL_PATTERNS_ALLOWED=None
     )
     def test_email_really_exists(self):
         params = dict(self.minimal_params)
@@ -414,7 +415,7 @@ class TestCreateAccountValidation(TestCase):
             self.assert_success(params)
         else:
             self.assert_error(params, "email", "Unauthorized email address.")
-		
+
     def test_password(self):
         params = dict(self.minimal_params)
 
