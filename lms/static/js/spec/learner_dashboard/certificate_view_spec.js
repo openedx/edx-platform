@@ -50,15 +50,13 @@ define([
             });
 
              it('should display no certificate box if certificates list is empty', function() {
-                var $certificate;
                 view.remove();
                 setFixtures('<div class="certificates-list"></div>');
                 view = new CertificateView({
                     context: {certificatesData: []}
                 });
                 view.render();
-                $certificate = view.$el.find('.certificate-link');
-                expect($certificate.length).toBe(0);
+                expect(view.$('.certificates-list').length).toBe(0);
             });
         });
     }
