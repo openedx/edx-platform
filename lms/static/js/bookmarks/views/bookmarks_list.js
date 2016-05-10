@@ -17,7 +17,6 @@
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
             errorMessage: gettext('An error has occurred. Please try again.'),
-            loadingMessage: gettext('Loading'),
 
             defaultPage: 1,
 
@@ -27,7 +26,6 @@
 
             initialize: function (options) {
                 this.template = HtmlUtils.template(BookmarksListTemplate);
-                this.loadingMessageView = options.loadingMessageView;
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');
                 this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
@@ -107,14 +105,6 @@
                 this.$el.html('');
                 this.$el.show();
                 $(this.coursewareResultsWrapperEl).css('display', 'table-cell');
-            },
-
-            showLoadingMessage: function () {
-                this.loadingMessageView.showMessage(this.loadingMessage);
-            },
-
-            hideLoadingMessage: function () {
-                this.loadingMessageView.hideMessage();
             },
 
             showErrorMessage: function () {
