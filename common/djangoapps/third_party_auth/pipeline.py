@@ -232,6 +232,42 @@ def get_authenticated_user(auth_provider, username, uid):
     user.backend = auth_provider.get_authentication_backend()
     return user
 
+def get_authenticated_user_by_email(auth_provider, email):
+    try:
+        user = models.DjangoStorage.user.get_users_by_email(email)[0]
+        user.backend = auth_provider.get_authentication_backend()
+    except:
+        raise User.DoesNotExist
+
+    return user
+
+def get_authenticated_user_helper(auth_provider, running_pipeline):
+    try:
+        user = get_authenticated_user(
+            auth_provider,
+            running_pipeline['kwargs'].get('username'),
+            running_pipeline['kwargs']['uid']
+        )
+    except:
+        user = get_authenticated_user_by_email(auth_provider, running_pipeline['kwargs']['details']['email'])
+        update_user_social_account_link(user, running_pipeline)
+
+    return user
+
+def update_user_social_account_link(user, running_pipeline):
+    from social.apps.django_app.default.models import UserSocialAuth
+
+    uid = running_pipeline['kwargs']['uid']
+
+    if not UserSocialAuth.objects.filter(user_id=user.id, uid=uid).exists():
+        provider = running_pipeline['backend']
+        extra_data = {
+            'access_token': running_pipeline['kwargs']['response']['access_token'],
+            'expires': 'null',
+            'id': uid
+        }
+        UserSocialAuth.objects.create(provider=provider, uid=uid, extra_data=extra_data, user_id=user.id)
+        UserSocialAuth.objects.filter(provider=provider, user_id=user.id).exclude(uid=uid).delete()
 
 def _get_enabled_provider(provider_id):
     """Gets an enabled provider by its provider_id member or throws."""

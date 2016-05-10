@@ -57,6 +57,12 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "register".
 
     """
+
+    third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
+    trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    if third_party_auth_requested and not trumped_by_first_party_auth:
+        login_user(request)
+
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
 
