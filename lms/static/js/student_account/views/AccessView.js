@@ -190,7 +190,7 @@
             },
 
             passwordEmailSent: function() {
-                var $loginAnchorElement = $('#login-anchor');
+                var $loginAnchorElement = $('#login-form');
                 this.element.hide( $(this.el).find('#password-reset-anchor') );
                 this.element.show( $loginAnchorElement );
                 this.element.scrollTop( $loginAnchorElement );
