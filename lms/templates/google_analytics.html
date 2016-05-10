@@ -1,0 +1,25 @@
+% if settings.GOOGLE_ANALYTICS_ACCOUNT:
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '${settings.GOOGLE_ANALYTICS_ACCOUNT}']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        // Check for presence of tracking cookie acceptation
+        var ca = document.cookie.split(';');
+        for (var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') {
+                c = c.substring(1,c.length);
+            }
+            if (c.indexOf("acceptCookieFun=") === 0) {
+                // Insert google analytics script
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                return;
+            }
+        }
+    })();
+    </script>
+% endif
