@@ -360,7 +360,7 @@ class RegistrationView(APIView):
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
 
-        if settings.REGISTRATION_EMAIL_FULL_VERIFICATION is not None:
+        if getattr(settings, 'REGISTRATION_EMAIL_FULL_VERIFICATION', None) is not None:
             email = data.get("email")
             error = self._verify_email_really_exists(email)
             if error:

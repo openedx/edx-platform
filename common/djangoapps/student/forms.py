@@ -307,7 +307,7 @@ class AccountCreationForm(forms.Form):
                     "It looks like {email} belongs to an existing account. Try again with a different email address."
                 ).format(email=email)
             )
-        if settings.REGISTRATION_EMAIL_FULL_VERIFICATION is not None:
+        if getattr(settings, 'REGISTRATION_EMAIL_FULL_VERIFICATION', None) is not None:
             self._verify_email_really_exists(email)
         return email
 
