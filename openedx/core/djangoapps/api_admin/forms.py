@@ -1,8 +1,9 @@
 """Forms for API management."""
 from django import forms
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
 from openedx.core.djangoapps.api_admin.widgets import TermsOfServiceCheckboxInput
 
 
@@ -32,3 +33,50 @@ class ApiAccessRequestForm(forms.ModelForm):
         # Get rid of the colons at the end of the field labels.
         kwargs.setdefault('label_suffix', '')
         super(ApiAccessRequestForm, self).__init__(*args, **kwargs)
+
+
+class ViewersWidget(forms.widgets.TextInput):
+    """Form widget to display a comma-separated list of usernames."""
+
+    def render(self, name, value, attrs=None):
+        return super(ViewersWidget, self).render(name, ', '.join(value), attrs)
+
+
+class ViewersField(forms.Field):
+    """Custom form field for a comma-separated list of usernames."""
+
+    widget = ViewersWidget
+
+    default_error_messages = {
+        'invalid': 'Enter a comma-separated list of usernames.',
+    }
+
+    def to_python(self, value):
+        """Parse out a comma-separated list of usernames."""
+        return [username.strip() for username in value.split(',')]
+
+    def validate(self, value):
+        super(ViewersField, self).validate(value)
+        nonexistent_users = []
+        for username in value:
+            try:
+                User.objects.get(username=username)
+            except User.DoesNotExist:
+                nonexistent_users.append(username)
+        if nonexistent_users:
+            raise forms.ValidationError(
+                _('The following users do not exist: {usernames}.').format(usernames=nonexistent_users)
+            )
+
+
+class CatalogForm(forms.ModelForm):
+    """Form to create a catalog."""
+
+    viewers = ViewersField()
+
+    class Meta(object):
+        model = Catalog
+        fields = ('name', 'query', 'viewers')
+        help_texts = {
+            'viewers': _('Comma-separated list of usernames which will be able to view this catalog.'),
+        }

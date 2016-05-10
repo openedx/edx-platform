@@ -84,11 +84,11 @@
 
   // TYPE: confirm
   .msg-error {
-    border-top: 2px solid $error-color;
-    background: tint($error-color,95%);
+    border-top: 2px solid $red1;
+    background: tint($red1, 90%);
 
     .copy {
-      color: $error-color;
+      color: $red1;
     }
   }
 
@@ -248,11 +248,11 @@
 
   // type - error
   .message-error {
-    border-top: 2px solid $error-color;
-    background: tint($error-color,95%);
+    border-top: 2px solid $red1;
+    background: tint($red1, 90%);
 
     .message-title {
-      color: $error-color;
+      color: $red1;
     }
 
     .message-copy {
@@ -263,7 +263,7 @@
   // type - confirmation
   .message-confirmation {
     border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
+    background: tint($confirm-color, 95%);
 
     .message-title {
       color: $confirm-color;
@@ -672,6 +672,12 @@
         // needed to reset poor input styling
         input[type="text"] {
           height: auto;
+          &.readonly {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+          }
         }
 
         .input {

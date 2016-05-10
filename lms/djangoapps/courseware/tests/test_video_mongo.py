@@ -79,6 +79,7 @@ class TestVideoYouTube(TestVideo):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 "autohideHtml5": False,
+                "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
             'transcript_download_format': 'srt',
@@ -157,6 +158,7 @@ class TestVideoNonYouTube(TestVideo):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 "autohideHtml5": False,
+                "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
             'transcript_download_format': 'srt',
@@ -211,6 +213,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor, 'transcript', 'available_translations'
             ).rstrip('/?'),
             "autohideHtml5": False,
+            "recordedYoutubeIsAvailable": True,
         })
 
     def test_get_html_track(self):
@@ -1379,6 +1382,7 @@ class TestVideoWithBumper(TestVideo):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 "autohideHtml5": False,
+                "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
             'transcript_download_format': 'srt',

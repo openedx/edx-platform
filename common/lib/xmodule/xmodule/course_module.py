@@ -839,6 +839,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     """
     module_class = CourseModule
 
+    resources_dir = None
+
     def __init__(self, *args, **kwargs):
         """
         Expects the same arguments as XModuleDescriptor.__init__

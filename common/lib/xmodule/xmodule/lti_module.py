@@ -43,7 +43,7 @@ What is supported:
        (http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html)
         a.) Discovery of all such LTI http endpoints for a course.  External tools GET from this discovery
             endpoint and receive URLs for interacting with individual grading units.
-            (see lms/djangoapps/courseware/views.py:get_course_lti_endpoints)
+            (see lms/djangoapps/courseware/views/views.py:get_course_lti_endpoints)
         b.) GET, PUT and DELETE in LTI Result JSON binding
             (http://www.imsglobal.org/lti/ltiv2p0/mediatype/application/vnd/ims/lis/v2/result+json/index.html)
             for a provider to synchronize grades into edx-platform.  Reading, Setting, and Deleteing
@@ -899,6 +899,7 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     Descriptor for LTI Xmodule.
     """
     module_class = LTIModule
+    resources_dir = None
     grade_handler = module_attr('grade_handler')
     preview_handler = module_attr('preview_handler')
     lti_2_0_result_rest_handler = module_attr('lti_2_0_result_rest_handler')

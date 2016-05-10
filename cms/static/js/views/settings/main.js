@@ -1,10 +1,10 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils",
     "js/models/uploads", "js/views/uploads", "js/views/license", "js/models/license",
     "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext",
-    "js/views/learning_info", "js/views/instructor_info"],
+    "js/views/learning_info", "js/views/instructor_info", "edx-ui-toolkit/js/utils/string-utils"],
        function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 FileUploadDialog, LicenseView, LicenseModel, NotificationView,
-                timepicker, date, gettext, LearningInfoView, InstructorInfoView) {
+                timepicker, date, gettext, LearningInfoView, InstructorInfoView, StringUtils) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -28,7 +28,6 @@ var DetailsView = ValidatingView.extend({
 
     initialize : function(options) {
         options = options || {};
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-language").val(this.model.get('language'));
         this.$el.find("#course-organization").val(this.model.get('org'));
@@ -206,14 +205,16 @@ var DetailsView = ValidatingView.extend({
         var now = new Date(),
             hours = now.getUTCHours(),
             minutes = now.getUTCMinutes(),
-            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
+            currentTimeText = StringUtils.interpolate(
+                gettext('{hours}:{minutes} (current UTC time)'),
+                {
+                    'hours': hours,
+                    'minutes': minutes
+                }
+            );
 
-        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
-            'hours': hours,
-            'minutes': minutes
-        }, true));
+        $(e.currentTarget).attr('title', currentTimeText);
     },
-
     updateModel: function(event) {
         var value;
         var index = event.currentTarget.getAttribute('data-index');
@@ -437,8 +438,8 @@ var DetailsView = ValidatingView.extend({
     },
 
     handleLicenseChange: function() {
-        this.showNotificationBar()
-        this.model.set("license", this.licenseModel.toString())
+        this.showNotificationBar();
+        this.model.set("license", this.licenseModel.toString());
     }
 });
 

@@ -36,7 +36,6 @@
     "%(display_name)s Settings": "Configura\u00e7\u00f5es para %(display_name)s", 
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pode conter somente at\u00e9 %(count)d caracteres.", 
     "%(field)s must have at least %(count)d characters.": "%(field)s deve ter no m\u00ednimo %(count)d caracteres.", 
-    "%(hours)s:%(minutes)s (current UTC time)": "%(hours)s:%(minutes)s (UTC)", 
     "%(memberCount)s / %(maxMemberCount)s Member": [
       "%(memberCount)s / %(maxMemberCount)s membro", 
       "%(memberCount)s / %(maxMemberCount)s membros"
@@ -1354,7 +1353,6 @@
     "Time Sent": "Data de envio", 
     "Time Sent:": "Enviado em:", 
     "Timed": "Cronometrado", 
-    "Timed Exam": "Exame cronometrado", 
     "Timed Transcript Conflict": "Conflito de Transcri\u00e7\u00e3o Sincronizada", 
     "Timed Transcript Found": "Transcri\u00e7\u00e3o Sincronizada encontrada", 
     "Timed Transcript Uploaded Successfully": "Transcri\u00e7\u00e3o Sincronizada Enviada com Sucesso", 

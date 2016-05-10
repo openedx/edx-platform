@@ -298,7 +298,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch('courseware.views.log.warning')
+    @patch('courseware.views.index.log.warning')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 
@@ -349,7 +349,10 @@ class DashboardTest(ModuleStoreTestCase):
         # Direct link to course redirect to user dashboard
         self.client.get(reverse('courseware', kwargs={"course_id": self.course.id.to_deprecated_string()}))
         log_warning.assert_called_with(
-            u'User %s cannot access the course %s because payment has not yet been received', self.user, self.course.id.to_deprecated_string())
+            u'User %s cannot access the course %s because payment has not yet been received',
+            self.user,
+            unicode(self.course.id),
+        )
 
         # Now re-validating the invoice
         invoice = shoppingcart.models.Invoice.objects.get(id=sale_invoice_1.id)

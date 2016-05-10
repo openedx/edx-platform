@@ -9,13 +9,13 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
-from openedx.core.lib.xblock_utils import replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside,\
-    request_token
+from openedx.core.lib.xblock_utils import (
+    replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
+)
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
@@ -31,7 +31,6 @@ from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
-from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
@@ -115,7 +114,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         }) + '?' + query
 
     def local_resource_url(self, block, uri):
-        return local_resource_url(block, uri)
+        return xblock_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """
@@ -148,28 +147,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         result.add_content(frag.content)
         return result
-
-
-class StudioPermissionsService(object):
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentDescriptor (and library_tools.py).
-    """
-
-    def __init__(self, request):
-        super(StudioPermissionsService, self).__init__()
-        self._request = request
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._request.user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._request.user, course_key)
 
 
 def _preview_module_system(request, descriptor, field_data):
@@ -213,8 +190,6 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, wrap_with_license)
 
-    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
-
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -241,7 +216,6 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "field-data": field_data,
             "i18n": ModuleI18nService,
-            "library_tools": LibraryToolsService(modulestore()),
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
         },

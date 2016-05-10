@@ -53,10 +53,22 @@ class Badge(PageObject):
         """
         return BrowserQuery(self.full_view, css=".badges-modal").is_focused()
 
+    def bring_model_inside_window(self):
+        """
+        Execute javascript to bring the popup(.badges-model) inside the window.
+        """
+        script_to_execute = ("var popup = document.querySelectorAll('.badges-modal')[0];;"
+                             "popup.style.left = '20%';")
+        self.full_view.execute_script(script_to_execute)
+
     def close_modal(self):
         """
         Close the badges modal and check that it is no longer displayed.
         """
+        # In chrome, close button is not inside window
+        # which causes click failures. To avoid this, just change
+        # the position of the popup
+        self.bring_model_inside_window()
         BrowserQuery(self.full_view, css=".badges-modal .close").click()
         EmptyPromise(lambda: not self.modal_displayed(), "Share modal dismissed").fulfill()
 

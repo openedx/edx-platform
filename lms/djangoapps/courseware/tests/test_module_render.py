@@ -668,13 +668,13 @@ class TestTOC(ModuleStoreTestCase):
 
             course = self.store.get_course(self.toy_course.id, depth=2)
             with check_mongo_calls(toc_finds):
-                actual, prev_sequential, next_sequential = render.toc_for_course(
+                actual = render.toc_for_course(
                     self.request.user, self.request, course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
-            self.assertIn(toc_section, actual)
-        self.assertIsNone(prev_sequential)
-        self.assertIsNone(next_sequential)
+            self.assertIn(toc_section, actual['chapters'])
+        self.assertIsNone(actual['previous_of_active_section'])
+        self.assertIsNone(actual['next_of_active_section'])
 
     # Mongo makes 3 queries to load the course to depth 2:
     #     - 1 for the course
@@ -709,13 +709,13 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic', 'display_id': 'secretmagic'}])
 
             with check_mongo_calls(toc_finds):
-                actual, prev_sequential, next_sequential = render.toc_for_course(
+                actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache
                 )
             for toc_section in expected:
-                self.assertIn(toc_section, actual)
-            self.assertEquals(prev_sequential['url_name'], 'Toy_Videos')
-            self.assertEquals(next_sequential['url_name'], 'video_123456789012')
+                self.assertIn(toc_section, actual['chapters'])
+            self.assertEquals(actual['previous_of_active_section']['url_name'], 'Toy_Videos')
+            self.assertEquals(actual['next_of_active_section']['url_name'], 'video_123456789012')
 
 
 @attr('shard_1')
@@ -856,7 +856,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         """
         self._setup_test_data(enrollment_mode, is_practice_exam, attempt_status)
 
-        actual, prev_sequential, next_sequential = render.toc_for_course(
+        actual = render.toc_for_course(
             self.request.user,
             self.request,
             self.toy_course,
@@ -864,15 +864,15 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             'Toy_Videos',
             self.field_data_cache
         )
-        section_actual = self._find_section(actual, 'Overview', 'Toy_Videos')
+        section_actual = self._find_section(actual['chapters'], 'Overview', 'Toy_Videos')
 
         if expected:
             self.assertIn(expected, [section_actual['proctoring']])
         else:
             # we expect there not to be a 'proctoring' key in the dict
             self.assertNotIn('proctoring', section_actual)
-        self.assertIsNone(prev_sequential)
-        self.assertEquals(next_sequential['url_name'], u"Welcome")
+        self.assertIsNone(actual['previous_of_active_section'])
+        self.assertEquals(actual['next_of_active_section']['url_name'], u"Welcome")
 
     @ddt.data(
         (
@@ -1114,7 +1114,7 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         """
         Test generation of TOC for a course with a gated subsection
         """
-        actual, prev_sequential, next_sequential = render.toc_for_course(
+        actual = render.toc_for_course(
             self.request.user,
             self.request,
             self.course,
@@ -1122,11 +1122,11 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
             self.open_seq.display_name,
             self.field_data_cache
         )
-        self.assertIsNotNone(self._find_sequential(actual, 'Chapter', 'Open_Sequential'))
-        self.assertIsNone(self._find_sequential(actual, 'Chapter', 'Gated_Sequential'))
-        self.assertIsNone(self._find_sequential(actual, 'Non-existant_Chapter', 'Non-existant_Sequential'))
-        self.assertIsNone(prev_sequential)
-        self.assertIsNone(next_sequential)
+        self.assertIsNotNone(self._find_sequential(actual['chapters'], 'Chapter', 'Open_Sequential'))
+        self.assertIsNone(self._find_sequential(actual['chapters'], 'Chapter', 'Gated_Sequential'))
+        self.assertIsNone(self._find_sequential(actual['chapters'], 'Non-existent_Chapter', 'Non-existent_Sequential'))
+        self.assertIsNone(actual['previous_of_active_section'])
+        self.assertIsNone(actual['next_of_active_section'])
 
 
 @attr('shard_1')

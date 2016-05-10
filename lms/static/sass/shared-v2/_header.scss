@@ -2,7 +2,7 @@
 
 .header-global {
     @extend %ui-depth1;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     position: relative;
     width: 100%;
     border-bottom: 4px solid $courseware-border-bottom-color;
@@ -11,7 +11,7 @@
 
     .wrapper-header {
         @include clearfix();
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         height: 74px;
         margin: 0 auto;
         padding: 10px 10px 0;

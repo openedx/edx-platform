@@ -1,0 +1,18 @@
+## mako
+<%page expression_filter="h"/>
+<%inherit file="../../main.html"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="pagetitle">${catalog.name}</%block>
+
+<%block name="content">
+<div id="api-access-wrapper">
+  <h1 id="api-header">${catalog.name}</h1>
+  <p class="api-copy-body">${catalog.query}</p>
+  <p class="api-copy-body"><a href="${edit_link}">${_("Edit or delete this catalog.")}</a></p>
+  <p class="api-copy-body"><a href="${preview_link}">${_("See a preview of this catalog's contents.")}</a></p>
+</div>
+</%block>
