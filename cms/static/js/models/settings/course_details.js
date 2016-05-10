@@ -42,26 +42,6 @@ var CourseDetails = Backbone.Model.extend({
             newattrs, ["start_date", "end_date", "enrollment_start", "enrollment_end"]
         );
 
-        if (newattrs.title.length > 50) {
-            errors.title = gettext("The title field must be limited to 50 characters.");
-        }
-
-        if (newattrs.subtitle.length > 150) {
-            errors.subtitle = gettext("The subtitle field must be limited to 150 characters.");
-        }
-
-        if (newattrs.duration.length > 50) {
-            errors.duration = gettext("The duration field must be limited to 50 characters.");
-        }
-
-        if (newattrs.short_description.length > 150) {
-            errors.short_description = gettext("The short description field must be limited to 150 characters.");
-        }
-
-        if (newattrs.description.length > 1000) {
-            errors.description = gettext("The description field must be limited to 1000 characters.");
-        }
-
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
