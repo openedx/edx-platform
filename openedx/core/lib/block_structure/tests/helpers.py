@@ -78,13 +78,15 @@ class MockCache(object):
         # An in-memory map of cache keys to cache values.
         self.map = {}
         self.set_call_count = 0
+        self.timeout_from_last_call = 0
 
-    def set(self, key, val):
+    def set(self, key, val, timeout):
         """
         Associates the given key with the given value in the cache.
         """
         self.set_call_count += 1
         self.map[key] = val
+        self.timeout_from_last_call = timeout
 
     def get(self, key, default=None):
         """
