@@ -377,16 +377,6 @@ class TestCreateAccountValidation(TestCase):
         assert_email_error("A properly formatted e-mail is required")
 
     @override_settings(
-        REGISTRATION_EMAIL_FULL_VERIFICATION=True,
-        REGISTRATION_EMAIL_PATTERNS_ALLOWED=None
-    )
-    def test_email_really_exists(self):
-        params = dict(self.minimal_params)
-        field = "email"
-        params[field] = "abracadabra@abracadabra.com"
-        self.assert_error(params, field, "Email domain 'abracadabra.com' doesn't exist")
-
-    @override_settings(
         REGISTRATION_EMAIL_PATTERNS_ALLOWED=[
             r'.*@edx.org',  # Naive regex omitting '^', '$' and '\.' should still work.
             r'^.*@(.*\.)?example\.com$',
