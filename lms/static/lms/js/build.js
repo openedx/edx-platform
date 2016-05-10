@@ -34,7 +34,7 @@
             'teams/js/teams_tab_factory',
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
-            'js/bookmarks/bookmarks_factory',
+            'js/courseware/courseware_factory',
             'js/learner_dashboard/program_details_factory',
             'js/learner_dashboard/program_list_factory',
             'js/api_admin/catalog_preview_factory'

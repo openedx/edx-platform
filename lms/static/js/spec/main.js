@@ -92,7 +92,7 @@
 
             // Discussion classes loaded explicitly until they are converted to use RequireJS
             'DiscussionModuleView': 'xmodule_js/common_static/coffee/src/discussion/discussion_module_view',
-
+            
             'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
             'js/bookmarks/views/bookmarks_list_button': 'js/bookmarks/views/bookmarks_list_button',
@@ -655,13 +655,15 @@
 
     var testFiles = [
         'js/spec/api_admin/catalog_preview_spec.js',
-        'js/spec/bookmarks/bookmark_button_view_spec.js',
-        'js/spec/bookmarks/bookmarks_list_view_spec.js',
+        'js/spec/courseware/bookmark_button_view_spec.js',
+        'js/spec/courseware/bookmarks_list_view_spec.js',
         'js/spec/ccx/schedule_spec.js',
         'js/spec/commerce/receipt_view_spec.js',
         'js/spec/components/card/card_spec.js',
         'js/spec/components/header/header_spec.js',
-        'js/spec/courseware/updates_visibility.js',
+        'js/spec/courseware/course_home_events_spec.js',
+        'js/spec/courseware/link_clicked_events_spec.js',
+        'js/spec/courseware/updates_visibility_spec.js',
         'js/spec/dashboard/donation.js',
         'js/spec/dashboard/dropdown_spec.js',
         'js/spec/dashboard/track_events_spec.js',
