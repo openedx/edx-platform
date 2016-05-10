@@ -16,18 +16,28 @@ from django.test.client import Client
 from common.test.utils import XssTestMixin
 from xmodule.course_module import CourseSummary
 
-from contentstore.views.course import (_accessible_courses_list, _accessible_courses_list_from_groups,
-                                       AccessListFallback, get_courses_accessible_to_user,
-                                       _accessible_courses_summary_list)
+from contentstore.views.course import (
+    _accessible_courses_list,
+    _accessible_courses_list_from_groups,
+    AccessListFallback,
+    get_courses_accessible_to_user,
+    _accessible_courses_summary_list,
+)
 from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, OrgInstructorRole
+from student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgStaffRole,
+    OrgInstructorRole,
+    UserBasedRole,
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import CourseLocator
-from opaque_keys.edx.keys import CourseKey
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
 
@@ -65,12 +75,14 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
             run=course_location.run,
             default_store=store
         )
+        self._add_role_access_to_user(user, course.id)
+        return course
 
+    def _add_role_access_to_user(self, user, course_id):
+        """ Assign access roles to user in the course. """
         if user is not None:
             for role in [CourseInstructorRole, CourseStaffRole]:
-                role(course.id).add_users(user)
-
-        return course
+                role(course_id).add_users(user)
 
     def tearDown(self):
         """
@@ -133,36 +145,40 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         # check both course lists have same courses
         self.assertEqual(courses_list, courses_list_by_groups)
 
-    def test_get_course_list_when_ccx(self):
+    def test_courses_list_with_ccx_courses(self):
         """
-        Assert that courses with CCXLocator are filter in course listing.
+        Tests that CCX courses are filtered in course listing.
         """
+        # Create a course and assign access roles to user.
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
-        self._create_course_with_access_groups(course_location, self.user)
+        course = self._create_course_with_access_groups(course_location, self.user)
 
-        # get courses through iterating all courses
-        courses_list, __ = _accessible_courses_list(self.request)
+        # Create a ccx course key and add assign access roles to user.
+        ccx_course_key = CCXLocator.from_course_locator(course.id, '1')
+        self._add_role_access_to_user(self.user, ccx_course_key)
+
+        # Test that CCX courses are filtered out.
+        courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), 1)
+        self.assertNotIn(
+            ccx_course_key,
+            [course.id for course in courses_list]
+        )
 
-        # get courses by reversing group name formats
-        courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
-        self.assertEqual(len(courses_list_by_groups), 1)
+        # Get all courses which user has access.
+        instructor_courses = UserBasedRole(self.user, CourseInstructorRole.ROLE).courses_with_role()
+        staff_courses = UserBasedRole(self.user, CourseStaffRole.ROLE).courses_with_role()
+        all_courses = (instructor_courses | staff_courses)
 
-        # assert no course in listing with ccx id
-        ccx_course = Mock()
-        course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
-        ccx_course.id = CCXLocator.from_course_locator(course_key, u"1")
+        # Verify that CCX course exists in access but filtered by `_accessible_courses_list_from_groups`.
+        self.assertIn(
+            ccx_course_key,
+            [access.course_id for access in all_courses]
+        )
 
-        with patch(
-            'xmodule.modulestore.mixed.MixedModuleStore.get_course',
-            return_value=ccx_course
-        ), patch(
-            'xmodule.modulestore.mixed.MixedModuleStore.get_courses',
-            Mock(return_value=[ccx_course])
-        ):
-            courses_list, __ = _accessible_courses_list_from_groups(self.request)
-            self.assertEqual(len(courses_list), 0)
-
+        # Verify that CCX courses are filtered out while iterating over all courses
+        mocked_ccx_course = Mock(id=ccx_course_key)
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', return_value=[mocked_ccx_course]):
             courses_list, __ = _accessible_courses_list(self.request)
             self.assertEqual(len(courses_list), 0)
 
