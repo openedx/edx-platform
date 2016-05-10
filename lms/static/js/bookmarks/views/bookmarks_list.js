@@ -2,10 +2,11 @@
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment',
             'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
+            'edx-ui-toolkit/js/utils/html-utils',
             'text!templates/bookmarks/bookmarks-list.underscore'
         ],
         function (gettext, $, _, Backbone, Logger, _moment,
-                  PagingHeaderView, PagingFooterView, BookmarksListTemplate) {
+                  PagingHeaderView, PagingFooterView, HtmlUtils, BookmarksListTemplate) {
 
         var moment = _moment || window.moment;
 
@@ -15,11 +16,7 @@
             coursewareContentEl: '#course-content',
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
-            errorIcon: '<i class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></i>',
-            loadingIcon: '<i class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i>',
-
             errorMessage: gettext('An error has occurred. Please try again.'),
-            loadingMessage: gettext('Loading'),
 
             defaultPage: 1,
 
@@ -28,8 +25,7 @@
             },
 
             initialize: function (options) {
-                this.template = _.template(BookmarksListTemplate);
-                this.loadingMessageView = options.loadingMessageView;
+                this.template = HtmlUtils.template(BookmarksListTemplate);
                 this.errorMessageView = options.errorMessageView;
                 this.langCode = $(this.el).data('langCode');
                 this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
@@ -43,7 +39,10 @@
                     bookmarksCollection: this.collection,
                     humanFriendlyDate: this.humanFriendlyDate
                 };
-                this.$el.html(this.template(data));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template(data)
+                );
                 this.pagingHeaderView.setElement(this.$('.paging-header')).render();
                 this.pagingFooterView.setElement(this.$('.paging-footer')).render();
                 this.delegateEvents();
@@ -108,16 +107,8 @@
                 $(this.coursewareResultsWrapperEl).css('display', 'table-cell');
             },
 
-            showLoadingMessage: function () {
-                this.loadingMessageView.showMessage(this.loadingMessage, this.loadingIcon);
-            },
-
-            hideLoadingMessage: function () {
-                this.loadingMessageView.hideMessage();
-            },
-
             showErrorMessage: function () {
-                this.errorMessageView.showMessage(this.errorMessage, this.errorIcon);
+                this.errorMessageView.showMessage(this.errorMessage);
             },
 
             hideErrorMessage: function () {

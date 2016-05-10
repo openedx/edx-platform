@@ -8,7 +8,6 @@
 
             el: '.courseware-bookmarks-button',
 
-            loadingMessageElement: '#loading-message',
             errorMessageElement: '#error-message',
 
             events: {
@@ -26,7 +25,6 @@
                 this.bookmarksListView = new BookmarksListView(
                     {
                         collection: bookmarksCollection,
-                        loadingMessageView: new MessageBannerView({el: $(this.loadingMessageElement)}),
                         errorMessageView: new MessageBannerView({el: $(this.errorMessageElement)})
                     }
                 );

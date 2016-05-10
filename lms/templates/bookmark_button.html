@@ -1,5 +1,5 @@
+<%page args="bookmark_id, is_bookmarked" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
-<%page args="bookmark_id, is_bookmarked" />
 
 <div class="bookmark-button-wrapper">
   <button class="btn bookmark-button ${"bookmarked" if is_bookmarked else ""}"
