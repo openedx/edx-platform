@@ -12,7 +12,7 @@
     @extend %inner-wrapper;
   }
 
-  ol.course-tabs {
+  .course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
@@ -41,18 +41,19 @@
         display: block;
         text-align: center;
         text-decoration: none;
-        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
         &:hover,
         &:focus {
           color: $blue;
-          border-bottom: 3px solid $blue;
+          border-color: $blue;
         }
 
         &.active {
           border-bottom: 3px solid $gray-d4;
           background-color: transparent;
           color: $gray-d4;
+          font-weight: $font-bold;
+          font-size: em(18);
 
           &:hover,
           &:focus {
