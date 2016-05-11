@@ -40,7 +40,7 @@
                 });
 
                 it('add ARIA attributes to time control', function () {
-                    var timeControl = $('div.slider > a');
+                    var timeControl = $('div.slider > .progress-handle');
 
                     expect(timeControl).toHaveAttrs({
                         'role': 'slider',

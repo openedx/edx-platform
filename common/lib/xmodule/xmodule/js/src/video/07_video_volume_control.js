@@ -121,6 +121,9 @@ function() {
          */
         render: function() {
             var container = this.el.find('.volume-slider');
+            
+            container
+                .append('<div class="ui-slider-handle volume-handle"></div>');
 
             this.volumeSlider = container.slider({
                 orientation: 'vertical',
@@ -133,7 +136,7 @@ function() {
             // We provide an independent behavior to adjust volume level.
             // Therefore, we do not need redundant focusing on slider in TAB
             // order.
-            container.find('a').attr('tabindex', -1);
+            container.find('.volume-handle').attr('tabindex', -1);
             this.state.el.find('.secondary-controls').append(this.el);
         },
 
