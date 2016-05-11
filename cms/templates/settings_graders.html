@@ -113,6 +113,22 @@
         </section>
         <hr class="divide" />
 
+        <section class="group-settings grade-rules">
+          <header>
+            <h2 class="title-2">${_("Verified Certificate")}</h2>
+            <span class="tip">${_("Settings for verified certificate")}</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field text" id="field-course-minimum_grade_verified_certificate">
+              <label for="course-minimum_grade_verified_certificate">${_("Verified certificate minimum grade (leave empty if this course does not deliver a verified certificate):")}</label>
+              <input type="text" class="short" id="course-minimum_grade_verified_certificate" placeholder="e.g: 80" autocomplete="off" aria-describedby="minimum_grade_verified_certificate_description"/>
+              <span class="tip tip-inline" id="minimum_grade_verified_certificate_description">${_("Minimum passing grade in percent")}</span>
+            </li>
+          </ol>
+        </section>
+        <hr class="divide" />
+
         <section class="group-settings assignment-types">
           <header>
             <h2 class="title-2">${_("Assignment Types")}</h2>

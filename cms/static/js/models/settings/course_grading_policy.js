@@ -6,7 +6,8 @@ var CourseGradingPolicy = Backbone.Model.extend({
         graders : null,  // CourseGraderCollection
         grade_cutoffs : null,  // CourseGradeCutoff model
         grace_period : null, // either null or { hours: n, minutes: m, ...}
-        minimum_grade_credit : null // either null or percentage
+        minimum_grade_credit : null, // either null or percentage
+        minimum_grade_verified_certificate : null // either null or percentage
     },
     parse: function(attributes) {
         if (attributes['graders']) {
@@ -67,6 +68,15 @@ var CourseGradingPolicy = Backbone.Model.extend({
             return 0;
         }
         return parseInt(minimum_grade_credit);
+    },
+    parseMinimumGradeVerifiedCertificate : function(minimum_grade_verified_certificate) {
+        // get the value of minimum grade verified certificate value in percentage
+        var value = parseFloat(minimum_grade_verified_certificate);
+        if (isNaN(value)) {
+            return null;
+        } else {
+            return value / 100;
+        }
     },
     validate : function(attrs) {
         if(_.has(attrs, 'grace_period')) {

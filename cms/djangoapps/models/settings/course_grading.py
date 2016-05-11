@@ -1,6 +1,8 @@
 from datetime import timedelta
 from xmodule.modulestore.django import modulestore
 
+from courses.models import Course as FunCourse
+
 
 class CourseGradingModel(object):
     """
@@ -15,6 +17,9 @@ class CourseGradingModel(object):
         self.grade_cutoffs = course_descriptor.grade_cutoffs
         self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
         self.minimum_grade_credit = course_descriptor.minimum_grade_credit
+
+        fun_course = FunCourse.objects.filter(key=unicode(course_descriptor.id))[:]
+        self.minimum_grade_verified_certificate = fun_course[0].certificate_passing_grade if fun_course else None
 
     @classmethod
     def fetch(cls, course_key):
@@ -64,6 +69,10 @@ class CourseGradingModel(object):
         CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
 
         CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
+
+        CourseGradingModel.update_minimum_grade_verified_certificate_from_json(
+            course_key, jsondict['minimum_grade_verified_certificate']
+        )
 
         return CourseGradingModel.fetch(course_key)
 
@@ -139,6 +148,23 @@ class CourseGradingModel(object):
 
             descriptor.minimum_grade_credit = minimum_grade_credit
             modulestore().update_item(descriptor, user.id)
+
+    @staticmethod
+    def update_minimum_grade_verified_certificate_from_json(course_key, minimum_grade_verified_certificate):
+        """Update the course's default minimum grade requirement for verified certificate.
+
+        Args:
+            course_key(CourseKey): The course identifier
+            minimum_grade_json(Float): Minimum grade value. If None there will be no minimum grade.
+
+        """
+        try:
+            grade = float(minimum_grade_verified_certificate)
+        except TypeError:
+            grade = None
+        FunCourse.objects.filter(key=unicode(course_key)).update(
+            certificate_passing_grade=grade
+        )
 
     @staticmethod
     def delete_grader(course_key, index, user):

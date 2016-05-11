@@ -43,6 +43,7 @@ var GradingView = ValidatingView.extend({
 
         this.renderGracePeriod();
         this.renderMinimumGradeCredit();
+        this.renderMinimumGradeVerifiedCertificate();
 
         // Create and render the grading type subs
         var self = this;
@@ -88,7 +89,8 @@ var GradingView = ValidatingView.extend({
     },
     fieldToSelectorMap : {
         'grace_period' : 'course-grading-graceperiod',
-        'minimum_grade_credit' : 'course-minimum_grade_credit'
+        'minimum_grade_credit' : 'course-minimum_grade_credit',
+        'minimum_grade_verified_certificate' : 'course-minimum_grade_verified_certificate'
     },
     renderGracePeriod: function() {
         var format = function(time) {
@@ -105,6 +107,12 @@ var GradingView = ValidatingView.extend({
             Math.round(parseFloat(minimum_grade_credit) * 100)
         );
     },
+    renderMinimumGradeVerifiedCertificate: function() {
+        var minimum_grade_verified_certificate = this.model.get('minimum_grade_verified_certificate');
+        this.$el.find('#course-minimum_grade_verified_certificate').val(
+            minimum_grade_verified_certificate === null? "" : minimum_grade_verified_certificate * 100
+        );
+    },
     setGracePeriod : function(event) {
         this.clearValidationErrors();
         var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
@@ -116,6 +124,12 @@ var GradingView = ValidatingView.extend({
         var newVal = this.model.parseMinimumGradeCredit($(event.currentTarget).val()) / 100;
         this.model.set('minimum_grade_credit', newVal, {validate: true});
     },
+    setMinimumGradeVerifiedCertificate : function(event) {
+        this.clearValidationErrors();
+        // get field value in float
+        var newVal = this.model.parseMinimumGradeVerifiedCertificate($(event.currentTarget).val());
+        this.model.set('minimum_grade_verified_certificate', newVal, {validate: true});
+    },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
 
@@ -126,6 +140,10 @@ var GradingView = ValidatingView.extend({
 
         case 'minimum_grade_credit':
             this.setMinimumGradeCredit(event);
+            break;
+
+        case 'minimum_grade_verified_certificate':
+            this.setMinimumGradeVerifiedCertificate(event);
             break;
 
         default:

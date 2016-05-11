@@ -50,6 +50,7 @@ class CourseMetadata(object):
         'is_time_limited',
         'is_practice_exam',
         'self_paced'
+        'minimum_grade_verified_certificate',
     ]
 
     @classmethod
