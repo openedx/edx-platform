@@ -4,7 +4,6 @@ Tests for paver quality tasks
 import os
 from path import Path as path
 import tempfile
-import textwrap
 import unittest
 from mock import patch, MagicMock, mock_open
 from ddt import ddt, file_data
@@ -132,64 +131,6 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write("hello 5.777 good to see you")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "foo")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
-
-    def test_get_safelint_counts_happy(self):
-        report = textwrap.dedent("""
-            test.html: 30:53: javascript-jquery-append:  $('#test').append(print_tos);
-
-            javascript-concat-html: 310 violations
-            javascript-escape:      7 violations
-
-            2608 violations total
-        """)
-        with open(self.f.name, 'w') as f:
-            f.write(report)
-        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
-        self.assertDictEqual(counts, {
-            'rules': {
-                'javascript-concat-html': 310,
-                'javascript-escape': 7,
-            },
-            'total': 2608,
-        })
-
-    def test_get_safelint_counts_bad_counts(self):
-        report = textwrap.dedent("""
-            javascript-concat-html: violations
-        """)
-        with open(self.f.name, 'w') as f:
-            f.write(report)
-        counts = pavelib.quality._get_safelint_counts(self.f.name)  # pylint: disable=protected-access
-        self.assertDictEqual(counts, {
-            'rules': {},
-            'total': None,
-        })
-
-    def test_get_safecommit_count_happy(self):
-        report = textwrap.dedent("""
-            Linting lms/templates/navigation.html:
-
-            2 violations total
-
-            Linting scripts/tests/templates/test.underscore:
-
-            3 violations total
-        """)
-        with open(self.f.name, 'w') as f:
-            f.write(report)
-        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
-
-        self.assertEqual(count, 5)
-
-    def test_get_safecommit_count_bad_counts(self):
-        report = textwrap.dedent("""
-            Linting lms/templates/navigation.html:
-        """)
-        with open(self.f.name, 'w') as f:
-            f.write(report)
-        count = pavelib.quality._get_safecommit_count(self.f.name)  # pylint: disable=protected-access
-
-        self.assertIsNone(count)
 
 
 class TestPrepareReportDir(unittest.TestCase):
