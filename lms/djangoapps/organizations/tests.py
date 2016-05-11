@@ -173,6 +173,56 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_get(users_get_uri)
         self.assertEqual(len(response.data), len(users))
 
+    def test_organizations_list_get(self):
+        courses = CourseFactory.create_batch(5)
+        group = GroupFactory.create()
+
+        organizations = []
+        for i in xrange(30):
+            data = {
+                'name': 'Test Organization {}'.format(i),
+                'display_name': 'Test Name {}'.format(i),
+                'contact_name': 'Test Contact {}'.format(i),
+                'contact_email': 'test{}@test.com'.format(i),
+                'contact_phone': '12313{}'.format(i),
+            }
+            organizations.append(self.setup_test_organization(org_data=data))
+
+        group.organizations.add(organizations[0]['id'])
+
+        for course in courses:
+            CourseGroupRelationship.objects.create(course_id=course.id, group=group)
+
+        test_uri = '{}'.format(self.base_organizations_uri)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], len(organizations))
+        self.assertEqual(len(response.data['results']), 20)
+        self.assertEqual(response.data['num_pages'], 2)
+        for i, organization in enumerate(response.data['results']):
+            uri = '{}{}{}/'.format(self.test_server_prefix, self.base_organizations_uri, organizations[i]['id'])
+            self.assertEqual(organization['url'], uri)
+            self.assertEqual(organization['id'], organizations[i]['id'])
+            self.assertEqual(organization['name'], organizations[i]['name'])
+            self.assertEqual(organization['display_name'], organizations[i]['display_name'])
+            self.assertEqual(organization['contact_name'], organizations[i]['contact_name'])
+            self.assertEqual(organization['contact_email'], organizations[i]['contact_email'])
+            self.assertEqual(organization['contact_phone'], organizations[i]['contact_phone'])
+            self.assertEqual(organization['logo_url'], self.test_organization_logo_url)
+            number_of_courses = 0 if i else 5
+            self.assertEqual(organization['number_of_courses'], number_of_courses)
+            self.assertIsNotNone(organization['created'])
+            self.assertIsNotNone(organization['modified'])
+
+        # fetch organization data with page outside range
+        response = self.do_get('{}?page=5'.format(test_uri))
+        self.assertEqual(response.status_code, 404)
+
+        # test with page_size 0, should not paginate and return all results
+        response = self.do_get('{}?page_size=0'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), len(organizations))
+
     def test_organizations_detail_get(self):
         org = self.setup_test_organization()
         test_uri = '{}{}/'.format(self.base_organizations_uri, org['id'])
