@@ -9,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import Http404
 import itertools
+from enum import Enum
+from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -59,6 +61,14 @@ class DiscussionTopic(object):
         self.name = name
         self.thread_list_url = thread_list_url
         self.children = children or []  # children are of same type i.e. DiscussionTopic
+
+
+class DiscussionEntity(Enum):
+    """
+    Enum for different types of discussion related entities
+    """
+    thread = 'thread'
+    comment = 'comment'
 
 
 def _get_course(course_key, user):
@@ -318,6 +328,138 @@ def get_course_topics(request, course_key, topic_ids=None):
     }
 
 
+def _get_user_profile_dict(request, usernames):
+    """
+    Gets user profile details for a list of usernames and creates a dictionary with
+    profile details against username.
+
+    Parameters:
+
+        request: The django request object.
+        usernames: A string of comma separated usernames.
+
+    Returns:
+
+        A dict with username as key and user profile details as value.
+    """
+    request.GET = request.GET.copy()  # Make a mutable copy of the GET parameters.
+    request.GET['username'] = usernames
+    user_profile_details = AccountViewSet.as_view({'get': 'list'})(request).data
+
+    return {user['username']: user for user in user_profile_details}
+
+
+def _user_profile(user_profile):
+    """
+    Returns the user profile object. For now, this just comprises the
+    profile_image details.
+    """
+    return {
+        'profile': {
+            'image': user_profile['profile_image']
+        }
+    }
+
+
+def _get_users(discussion_entity_type, discussion_entity, username_profile_dict):
+    """
+    Returns users with profile details for given discussion thread/comment.
+
+    Parameters:
+
+        discussion_entity_type: DiscussionEntity Enum value for Thread or Comment.
+        discussion_entity: Serialized thread/comment.
+        username_profile_dict: A dict with user profile details against username.
+
+    Returns:
+
+        A dict of users with username as key and user profile details as value.
+    """
+    users = {discussion_entity['author']: _user_profile(username_profile_dict[discussion_entity['author']])}
+
+    if discussion_entity_type == DiscussionEntity.comment and discussion_entity['endorsed']:
+        users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
+    return users
+
+
+def _add_additional_response_fields(
+        request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
+):
+    """
+    Adds additional data to serialized discussion thread/comment.
+
+    Parameters:
+
+        request: The django request object.
+        serialized_discussion_entities: A list of serialized Thread/Comment.
+        usernames: A list of usernames involved in threads/comments (e.g. as author or as comment endorser).
+        discussion_entity_type: DiscussionEntity Enum value for Thread or Comment.
+        include_profile_image: (boolean) True if requested_fields has 'profile_image' else False.
+
+    Returns:
+
+        A list of serialized discussion thread/comment with additional data if requested.
+    """
+    if include_profile_image:
+        username_profile_dict = _get_user_profile_dict(request, usernames=','.join(usernames))
+        for discussion_entity in serialized_discussion_entities:
+            discussion_entity['users'] = _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
+
+    return serialized_discussion_entities
+
+
+def _include_profile_image(requested_fields):
+    """
+    Returns True if requested_fields list has 'profile_image' entity else False
+    """
+    return requested_fields and 'profile_image' in requested_fields
+
+
+def _serialize_discussion_entities(request, context, discussion_entities, requested_fields, discussion_entity_type):
+    """
+    It serializes Discussion Entity (Thread or Comment) and add additional data if requested.
+
+    For a given list of Thread/Comment; it serializes and add additional information to the
+    object as per requested_fields list (i.e. profile_image).
+
+    Parameters:
+
+        request: The django request object
+        context: The context appropriate for use with the thread or comment
+        discussion_entities: List of Thread or Comment objects
+        requested_fields: Indicates which additional fields to return
+            for each thread.
+        discussion_entity_type: DiscussionEntity Enum value for Thread or Comment
+
+    Returns:
+
+        A list of serialized discussion entities
+    """
+    results = []
+    usernames = []
+    include_profile_image = _include_profile_image(requested_fields)
+    for entity in discussion_entities:
+        if discussion_entity_type == DiscussionEntity.thread:
+            serialized_entity = ThreadSerializer(entity, context=context).data
+        elif discussion_entity_type == DiscussionEntity.comment:
+            serialized_entity = CommentSerializer(entity, context=context).data
+        results.append(serialized_entity)
+
+        if include_profile_image:
+            if serialized_entity['author'] not in usernames:
+                usernames.append(serialized_entity['author'])
+            if (
+                    'endorsed' in serialized_entity and serialized_entity['endorsed'] and
+                    'endorsed_by' in serialized_entity and serialized_entity['endorsed_by'] not in usernames
+            ):
+                usernames.append(serialized_entity['endorsed_by'])
+
+    results = _add_additional_response_fields(
+        request, results, usernames, discussion_entity_type, include_profile_image
+    )
+    return results
+
+
 def get_thread_list(
         request,
         course_key,
@@ -329,6 +471,7 @@ def get_thread_list(
         view=None,
         order_by="last_activity_at",
         order_direction="desc",
+        requested_fields=None,
 ):
     """
     Return the list of all discussion threads pertaining to the given course
@@ -348,6 +491,8 @@ def get_thread_list(
         "last_activity_at".
     order_direction: The direction in which to sort the threads by. The only
         values are "asc" or "desc". The default is "desc".
+    requested_fields: Indicates which additional fields to return
+        for each thread. (i.e. ['profile_image'])
 
     Note that topic_id_list, text_search, and following are mutually exclusive.
 
@@ -418,7 +563,9 @@ def get_thread_list(
     if paginated_results.page != page:
         raise PageNotFoundError("Page not found (No results on this page).")
 
-    results = [ThreadSerializer(thread, context=context).data for thread in paginated_results.collection]
+    results = _serialize_discussion_entities(
+        request, context, paginated_results.collection, requested_fields, DiscussionEntity.thread
+    )
 
     paginator = DiscussionAPIPagination(
         request,
@@ -432,7 +579,7 @@ def get_thread_list(
     })
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size):
+def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fields=None):
     """
     Return the list of comments in the given thread.
 
@@ -450,6 +597,9 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
         page: The page number (1-indexed) to retrieve
 
         page_size: The number of comments to retrieve per page
+
+        requested_fields: Indicates which additional fields to return for
+        each comment. (i.e. ['profile_image'])
 
     Returns:
 
@@ -497,7 +647,8 @@ def get_comment_list(request, thread_id, endorsed, page, page_size):
         raise PageNotFoundError("Page not found (No results on this page).")
     num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
 
-    results = [CommentSerializer(response, context=context).data for response in responses]
+    results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
+
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
     return paginator.get_paginated_response(results)
 
@@ -791,7 +942,7 @@ def update_comment(request, comment_id, update_data):
     return api_comment
 
 
-def get_thread(request, thread_id):
+def get_thread(request, thread_id, requested_fields=None):
     """
     Retrieve a thread.
 
@@ -802,17 +953,18 @@ def get_thread(request, thread_id):
 
         thread_id: The id for the thread to retrieve
 
+        requested_fields: Indicates which additional fields to return for
+        thread. (i.e. ['profile_image'])
     """
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
         retrieve_kwargs={"user_id": unicode(request.user.id)}
     )
-    serializer = ThreadSerializer(cc_thread, context=context)
-    return serializer.data
+    return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
 
-def get_response_comments(request, comment_id, page, page_size):
+def get_response_comments(request, comment_id, page, page_size, requested_fields=None):
     """
     Return the list of comments for the given thread response.
 
@@ -826,6 +978,9 @@ def get_response_comments(request, comment_id, page, page_size):
         page: The page number (1-indexed) to retrieve
 
         page_size: The number of comments to retrieve per page
+
+        requested_fields: Indicates which additional fields to return for
+        each child comment. (i.e. ['profile_image'])
 
     Returns:
 
@@ -856,7 +1011,9 @@ def get_response_comments(request, comment_id, page, page_size):
         if len(paged_response_comments) == 0 and page != 1:
             raise PageNotFoundError("Page not found (No results on this page).")
 
-        results = [CommentSerializer(comment, context=context).data for comment in paged_response_comments]
+        results = _serialize_discussion_entities(
+            request, context, paged_response_comments, requested_fields, DiscussionEntity.comment
+        )
 
         comments_count = len(response_comments)
         num_pages = (comments_count + page_size - 1) / page_size if comments_count else 1

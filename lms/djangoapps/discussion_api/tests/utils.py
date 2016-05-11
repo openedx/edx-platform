@@ -1,10 +1,19 @@
 """
 Discussion API test utilities
 """
+from contextlib import closing
+from datetime import datetime
 import json
 import re
 
+import hashlib
 import httpretty
+from pytz import UTC
+from PIL import Image
+
+from openedx.core.djangoapps.profile_images.images import create_profile_images
+from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 
 
 def _get_thread_callback(thread_data):
@@ -392,3 +401,56 @@ def make_paginated_api_response(results=None, count=0, num_pages=0, next_link=No
         },
         "results": results or []
     }
+
+
+class ProfileImageTestMixin(object):
+    """
+    Mixin with utility methods for user profile image
+    """
+
+    TEST_PROFILE_IMAGE_UPLOADED_AT = datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+
+    def create_profile_image(self, user, storage):
+        """
+        Creates profile image for user and checks that created image exists in storage
+        """
+        with make_image_file() as image_file:
+            create_profile_images(image_file, get_profile_image_names(user.username))
+            self.check_images(user, storage)
+            set_has_profile_image(user.username, True, self.TEST_PROFILE_IMAGE_UPLOADED_AT)
+
+    def check_images(self, user, storage, exist=True):
+        """
+        If exist is True, make sure the images physically exist in storage
+        with correct sizes and formats.
+
+        If exist is False, make sure none of the images exist.
+        """
+        for size, name in get_profile_image_names(user.username).items():
+            if exist:
+                self.assertTrue(storage.exists(name))
+                with closing(Image.open(storage.path(name))) as img:
+                    self.assertEqual(img.size, (size, size))
+                    self.assertEqual(img.format, 'JPEG')
+            else:
+                self.assertFalse(storage.exists(name))
+
+    def get_expected_user_profile(self, username):
+        """
+        Returns the expected user profile data for a given username
+        """
+        url = 'http://example-storage.com/profile-images/{filename}_{{size}}.jpg?v={timestamp}'.format(
+            filename=hashlib.md5('secret' + username).hexdigest(),
+            timestamp=self.TEST_PROFILE_IMAGE_UPLOADED_AT.strftime("%s")
+        )
+        return {
+            'profile': {
+                'image': {
+                    'has_image': True,
+                    'image_url_full': url.format(size=500),
+                    'image_url_large': url.format(size=120),
+                    'image_url_medium': url.format(size=50),
+                    'image_url_small': url.format(size=30),
+                }
+            }
+        }

@@ -40,7 +40,8 @@ from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response
+    make_paginated_api_response,
+    ProfileImageTestMixin,
 )
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -1148,7 +1149,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
     def test_basic_query_params(self):
         self.get_comment_list(
             self.make_minimal_cs_thread({
-                "children": [make_minimal_cs_comment()],
+                "children": [make_minimal_cs_comment({"username": self.user.username})],
                 "resp_total": 71
             }),
             page=6,
@@ -1254,8 +1255,10 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
     def test_question_content(self):
         thread = self.make_minimal_cs_thread({
             "thread_type": "question",
-            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment"})],
-            "non_endorsed_responses": [make_minimal_cs_comment({"id": "non_endorsed_comment"})],
+            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment", "username": self.user.username})],
+            "non_endorsed_responses": [make_minimal_cs_comment({
+                "id": "non_endorsed_comment", "username": self.user.username
+            })],
             "non_endorsed_resp_total": 1,
         })
 
@@ -1274,7 +1277,8 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             "anonymous": True,
             "children": [
                 make_minimal_cs_comment({
-                    "endorsement": {"user_id": str(self.author.id), "time": "2015-05-18T12:34:56Z"}
+                    "username": self.user.username,
+                    "endorsement": {"user_id": str(self.author.id), "time": "2015-05-18T12:34:56Z"},
                 })
             ]
         })
@@ -1301,7 +1305,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         # number of responses is unrealistic but convenient for this test
         thread = self.make_minimal_cs_thread({
             "thread_type": thread_type,
-            response_field: [make_minimal_cs_comment()],
+            response_field: [make_minimal_cs_comment({"username": self.user.username})],
             response_total_field: 5,
         })
 
@@ -1337,9 +1341,10 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
     def test_question_endorsed_pagination(self):
         thread = self.make_minimal_cs_thread({
             "thread_type": "question",
-            "endorsed_responses": [
-                make_minimal_cs_comment({"id": "comment_{}".format(i)}) for i in range(10)
-            ]
+            "endorsed_responses": [make_minimal_cs_comment({
+                "id": "comment_{}".format(i),
+                "username": self.user.username
+            }) for i in range(10)]
         })
 
         def assert_page_correct(page, page_size, expected_start, expected_stop, expected_next, expected_prev):
@@ -1553,7 +1558,7 @@ class CreateThreadTest(
             cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users = [self.user]
-        self.register_post_thread_response({})
+        self.register_post_thread_response({"username": self.user.username})
         data = self.minimal_data.copy()
         data["course_id"] = unicode(cohort_course.id)
         if data_group_state == "group_is_none":
@@ -1582,7 +1587,7 @@ class CreateThreadTest(
                 self.fail("Unexpected validation error: {}".format(ex))
 
     def test_following(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_subscription_response(self.user)
         data = self.minimal_data.copy()
         data["following"] = "True"
@@ -1600,7 +1605,7 @@ class CreateThreadTest(
         )
 
     def test_voted(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_votes_response("test_id")
         data = self.minimal_data.copy()
         data["voted"] = "True"
@@ -1616,7 +1621,7 @@ class CreateThreadTest(
         )
 
     def test_abuse_flagged(self):
-        self.register_post_thread_response({"id": "test_id"})
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_flag_response("test_id")
         data = self.minimal_data.copy()
         data["abuse_flagged"] = "True"
@@ -1802,7 +1807,7 @@ class CreateCommentTest(
                 "user_id": str(self.user.id) if is_thread_author else str(self.user.id + 1),
             })
         )
-        self.register_post_comment_response({}, "test_thread")
+        self.register_post_comment_response({"username": self.user.username}, "test_thread")
         data = self.minimal_data.copy()
         data["endorsed"] = True
         expected_error = (
@@ -1817,7 +1822,7 @@ class CreateCommentTest(
             self.assertTrue(expected_error)
 
     def test_voted(self):
-        self.register_post_comment_response({"id": "test_comment"}, "test_thread")
+        self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
         self.register_comment_votes_response("test_comment")
         data = self.minimal_data.copy()
         data["voted"] = "True"
@@ -1833,7 +1838,7 @@ class CreateCommentTest(
         )
 
     def test_abuse_flagged(self):
-        self.register_post_comment_response({"id": "test_comment"}, "test_thread")
+        self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
         self.register_comment_flag_response("test_comment")
         data = self.minimal_data.copy()
         data["abuse_flagged"] = "True"
@@ -1906,7 +1911,7 @@ class CreateCommentTest(
                 cohort.id + 1
             ),
         }))
-        self.register_post_comment_response({}, thread_id="cohort_thread")
+        self.register_post_comment_response({"username": self.user.username}, thread_id="cohort_thread")
         data = self.minimal_data.copy()
         data["thread_id"] = "cohort_thread"
         expected_error = (
