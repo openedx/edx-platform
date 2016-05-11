@@ -8,7 +8,7 @@ from django.db.models import Sum, F, Count
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
@@ -18,16 +18,16 @@ from api_manager.courses.serializers import OrganizationCourseSerializer
 from organizations.models import Organization, OrganizationGroupUser
 from api_manager.users.serializers import SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
-from api_manager.permissions import SecureListAPIView
+from api_manager.permissions import SecureListAPIView, APIModelViewSet
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
 from student.roles import get_aggregate_exclusion_user_ids
 
-from .serializers import OrganizationSerializer, BasicOrganizationSerializer
+from .serializers import OrganizationSerializer, BasicOrganizationSerializer, OrganizationWithCourseCountSerializer
 
 
-class OrganizationsViewSet(viewsets.ModelViewSet):
+class OrganizationsViewSet(APIModelViewSet):
     """
     Django Rest Framework ViewSet for the Organization model.
     """
@@ -35,7 +35,12 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
     model = Organization
 
     def list(self, request, *args, **kwargs):
-        self.serializer_class = BasicOrganizationSerializer
+        self.serializer_class = OrganizationWithCourseCountSerializer
+        queryset = self.get_queryset()
+        self.queryset = queryset.annotate(
+            number_of_courses=Count('groups__coursegrouprelationship__course_id', distinct=True)
+        )
+
         return super(OrganizationsViewSet, self).list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
