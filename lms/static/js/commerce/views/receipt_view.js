@@ -31,7 +31,8 @@ var edx = edx || {};
             var templateHtml = $("#receipt-tpl").html(),
                 context = {
                     platformName: this.$el.data('platform-name'),
-                    verified: this.$el.data('verified').toLowerCase() === 'true'
+                    verified: this.$el.data('verified').toLowerCase() === 'true',
+                    is_request_in_themed_site: this.$el.data('is-request-in-themed-site').toLowerCase() === 'true'
                 },
                 providerId;
 

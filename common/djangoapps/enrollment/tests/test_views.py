@@ -402,6 +402,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             mode_slug=CourseMode.HONOR,
             mode_display_name=CourseMode.HONOR,
             sku='123',
+            bulk_sku="BULK123"
         )
         resp = self.client.get(
             reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
@@ -413,6 +414,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.HONOR)
         self.assertEqual(mode['sku'], '123')
+        self.assertEqual(mode['bulk_sku'], 'BULK123')
         self.assertEqual(mode['name'], CourseMode.HONOR)
 
     def test_get_course_details_with_credit_course(self):
