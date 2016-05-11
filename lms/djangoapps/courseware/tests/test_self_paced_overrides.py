@@ -106,9 +106,9 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         beta_tester = BetaTesterFactory(course_key=self_paced_course.id)
 
         # Verify course is `self_paced` and course has start date but not section.
-        self.assertTrue(self_paced_course.self_paced, "Course is self_paced")
-        self.assertEqual(self_paced_course.start, one_month_from_now, "Course has start date")
-        self.assertIsNone(self_paced_section.start, "Section start date is None")
+        self.assertTrue(self_paced_course.self_paced)
+        self.assertEqual(self_paced_course.start, one_month_from_now)
+        self.assertIsNone(self_paced_section.start)
 
         # Verify that non-staff user do not have access to the course
         self.assertFalse(has_access(self.non_staff_user, 'load', self_paced_course))
