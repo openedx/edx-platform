@@ -70,7 +70,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertIsNotNone(credit_state)
         self.assertFalse(credit_state['is_credit_course'])
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False), 'This is contrived and does not work for CME')
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'This is contrived and does not work for CME')
     def test_no_profile_name(self):
         """
         Makes sure that get_credit_state returns None if the user does not
