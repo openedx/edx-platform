@@ -7,7 +7,7 @@ from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from provider.oauth2.models import Client
 
-from certificates.models import GeneratedCertificate  # pylint: disable=import-error
+from certificates.models import GeneratedCertificate, CertificateStatuses  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
 from openedx.core.djangoapps.programs.utils import get_programs
@@ -109,11 +109,13 @@ class Command(BaseCommand):
         This is done by finding users who have earned a certificate in at least one
         program course code's run mode.
         """
-        query = reduce(
+        status_query = Q(status__in=CertificateStatuses.PASSED_STATUSES)
+        run_mode_query = reduce(
             lambda x, y: x | y,
             [Q(course_id=r.course_key, mode=r.mode_slug) for r in self.run_modes]
         )
 
-        # TODO: Filter further, by passing status?
+        query = status_query & run_mode_query
+
         username_dicts = GeneratedCertificate.eligible_certificates.filter(query).values('user__username').distinct()
         self.usernames = [d['user__username'] for d in username_dicts]

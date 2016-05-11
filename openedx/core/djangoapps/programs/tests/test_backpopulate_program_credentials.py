@@ -11,6 +11,7 @@ import httpretty
 import mock
 from provider.constants import CONFIDENTIAL
 
+from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -38,7 +39,10 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
         self.oauth2_user = UserFactory()
         self.oauth2_client = ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
-        self.create_programs_config()
+        # Disable certification to prevent the task from being triggered when
+        # setting up test data (i.e., certificates with a passing status), thereby
+        # skewing mock call counts.
+        self.create_programs_config(enable_certification=False)
 
     def _link_oauth2_user(self):
         """Helper to link user and OAuth2 client."""
@@ -74,12 +78,14 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             user=self.alice,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         GeneratedCertificateFactory(
             user=self.bob,
             course_id=self.alternate_course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         call_command('backpopulate_program_credentials', commit=commit)
@@ -142,12 +148,14 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             user=self.alice,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         GeneratedCertificateFactory(
             user=self.bob,
             course_id=self.alternate_course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         call_command('backpopulate_program_credentials', commit=True)
@@ -178,12 +186,14 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             user=self.alice,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         GeneratedCertificateFactory(
             user=self.alice,
             course_id=self.alternate_course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         call_command('backpopulate_program_credentials', commit=True)
@@ -211,12 +221,56 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
         GeneratedCertificateFactory(
             user=self.alice,
             course_id=self.course_id,
+            status=CertificateStatuses.downloadable,
         )
 
         GeneratedCertificateFactory(
             user=self.bob,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
+        )
+
+        call_command('backpopulate_program_credentials', commit=True)
+
+        mock_task.assert_called_once_with(self.alice.username)
+
+    def test_handle_passing_status(self, mock_task):
+        """Verify that only certificates with a passing status are selected."""
+        data = [
+            factories.Program(
+                organizations=[factories.Organization()],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=self.course_id),
+                        factories.RunMode(course_key=self.alternate_course_id),
+                    ]),
+                ]
+            ),
+        ]
+        self._mock_programs_api(data)
+        self._link_oauth2_user()
+
+        passing_status = CertificateStatuses.downloadable
+        failing_status = CertificateStatuses.notpassing
+
+        self.assertIn(passing_status, CertificateStatuses.PASSED_STATUSES)
+        self.assertNotIn(failing_status, CertificateStatuses.PASSED_STATUSES)
+
+        GeneratedCertificateFactory(
+            user=self.alice,
+            course_id=self.course_id,
+            mode=MODES.verified,
+            status=passing_status,
+        )
+
+        # The alternate course is used here to verify that the status and run_mode
+        # queries are being ANDed together correctly.
+        GeneratedCertificateFactory(
+            user=self.bob,
+            course_id=self.alternate_course_id,
+            mode=MODES.verified,
+            status=failing_status,
         )
 
         call_command('backpopulate_program_credentials', commit=True)
@@ -241,6 +295,7 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             user=self.alice,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         with self.assertRaises(CommandError):
@@ -275,12 +330,14 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             user=self.alice,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         GeneratedCertificateFactory(
             user=self.bob,
             course_id=self.course_id,
             mode=MODES.verified,
+            status=CertificateStatuses.downloadable,
         )
 
         call_command('backpopulate_program_credentials', commit=True)
