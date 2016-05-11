@@ -54,8 +54,16 @@ fi
 merge_base=`git merge-base "$current_branch_hash" "$MAIN_COMMIT"`
 diff_files=`git diff --name-only "$current_branch_hash" "$merge_base"`
 
+num_files_linted=0
 for f in $diff_files; do
-    echo ""
+    num_files_linted+=1
+    if [ $num_files_linted -eq 1 ]; then
+        echo ""
+    fi
     echo "Linting $f:"
     ./scripts/safe_template_linter.py $f
 done
+
+if [ $num_files_linted -eq 0 ]; then
+    echo "No files linted."
+fi
