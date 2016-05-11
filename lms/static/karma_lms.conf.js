@@ -13,6 +13,8 @@ var options = {
 
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
+        {pattern: 'common/js/vendor/jquery.js', included: true},
+        {pattern: 'common/js/vendor/jquery-migrate.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true}
