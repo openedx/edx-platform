@@ -121,7 +121,7 @@ from openedx.core.djangolib.markup import Text, HTML
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location | h}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
                         <i class="icon fa fa-plus"></i>${_('New Section')}
                     </a>
                 </li>
