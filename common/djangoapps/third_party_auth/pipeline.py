@@ -280,9 +280,8 @@ def get_authenticated_user_helper(auth_provider, running_pipeline):
             running_pipeline['kwargs']['uid']
         )
     except:
-        if running_pipeline['kwargs']['details']['email']:
-            user = get_authenticated_user_by_email(auth_provider, get_email_from_pipeline(running_pipeline))
-            update_user_social_account_link(user, running_pipeline)
+        user = get_authenticated_user_by_email(auth_provider, get_email_from_pipeline(running_pipeline))
+        update_user_social_account_link(user, running_pipeline)
 
     return user
 
