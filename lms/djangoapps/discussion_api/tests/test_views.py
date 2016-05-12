@@ -151,7 +151,9 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
-    """Tests for CourseTopicsView"""
+    """
+    Tests for CourseTopicsView
+    """
     def setUp(self):
         super(CourseTopicsViewTest, self).setUp()
         self.url = reverse("course_topics", kwargs={"course_id": unicode(self.course.id)})
@@ -181,6 +183,19 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 publish_item=False,
             )
         return course_url
+
+    def make_discussion_module(self, topic_id, category, subcategory, **kwargs):
+        """
+        Build a discussion module in self.course
+        """
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id=topic_id,
+            discussion_category=category,
+            discussion_target=subcategory,
+            **kwargs
+        )
 
     def test_404(self):
         response = self.client.get(
@@ -224,6 +239,67 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):
                 self.client.get(course_url)
+
+    def test_discussion_topic_404(self):
+        """
+        Tests discussion topic does not exist for the given topic id.
+        """
+        topic_id = "courseware-topic-id"
+        self.make_discussion_module(topic_id, "test_category", "test_target")
+        url = "{}?topic_id=invalid_topic_id".format(self.url)
+        response = self.client.get(url)
+        self.assert_response_correct(
+            response,
+            404,
+            {"developer_message": "Discussion not found for 'invalid_topic_id'."}
+        )
+
+    def test_topic_id(self):
+        """
+        Tests discussion topic details against a requested topic id
+        """
+        topic_id_1 = "topic_id_1"
+        topic_id_2 = "topic_id_2"
+        self.make_discussion_module(topic_id_1, "test_category_1", "test_target_1")
+        self.make_discussion_module(topic_id_2, "test_category_2", "test_target_2")
+        url = "{}?topic_id=topic_id_1,topic_id_2".format(self.url)
+        response = self.client.get(url)
+        self.assert_response_correct(
+            response,
+            200,
+            {
+                "non_courseware_topics": [],
+                "courseware_topics": [
+                    {
+                        "children": [{
+                            "children": [],
+                            "id": "topic_id_1",
+                            "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                               "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
+                            "name": "test_target_1"
+                        }],
+                        "id": None,
+                        "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                           "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
+                        "name": "test_category_1"
+                    },
+                    {
+                        "children":
+                            [{
+                                "children": [],
+                                "id": "topic_id_2",
+                                "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                                   "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
+                                "name": "test_target_2"
+                            }],
+                        "id": None,
+                        "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                           "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
+                        "name": "test_category_2"
+                    }
+                ]
+            }
+        )
 
 
 @attr('shard_3')

@@ -75,11 +75,11 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
     **Example Requests**:
 
         GET /api/discussion/v1/course_topics/course-v1:ExampleX+Subject101+2015
+            ?topic_id={topic_id_1, topid_id_2}
 
     **Response Values**:
-
         * courseware_topics: The list of topic trees for courseware-linked
-          topics. Each item in the list includes:
+            topics. Each item in the list includes:
 
             * id: The id of the discussion topic (null for a topic that only
               has children but cannot contain threads itself).
@@ -92,10 +92,17 @@ class CourseTopicsView(DeveloperErrorViewMixin, APIView):
               courseware. Items are of the same format as in courseware_topics.
     """
     def get(self, request, course_id):
-        """Implements the GET method as described in the class docstring."""
+        """
+        Implements the GET method as described in the class docstring.
+        """
         course_key = CourseKey.from_string(course_id)
+        topic_ids = self.request.GET.get('topic_id')
         with modulestore().bulk_operations(course_key):
-            response = get_course_topics(request, course_key)
+            response = get_course_topics(
+                request,
+                course_key,
+                set(topic_ids.strip(',').split(',')) if topic_ids else None,
+            )
         return Response(response)
 
 

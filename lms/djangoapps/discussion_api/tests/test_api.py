@@ -483,6 +483,51 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         }
         self.assertEqual(staff_actual, staff_expected)
 
+    def test_discussion_topic(self):
+        """
+        Tests discussion topic details against a requested topic id
+        """
+        topic_id_1 = "topic_id_1"
+        topic_id_2 = "topic_id_2"
+        self.make_discussion_module(topic_id_1, "test_category_1", "test_target_1")
+        self.make_discussion_module(topic_id_2, "test_category_2", "test_target_2")
+        actual = get_course_topics(self.request, self.course.id, {"topic_id_1", "topic_id_2"})
+        self.assertEqual(
+            actual,
+            {
+                "non_courseware_topics": [],
+                "courseware_topics": [
+                    {
+                        "children": [{
+                            "children": [],
+                            "id": "topic_id_1",
+                            "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                               "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
+                            "name": "test_target_1"
+                        }],
+                        "id": None,
+                        "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                           "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
+                        "name": "test_category_1"
+                    },
+                    {
+                        "children":
+                            [{
+                                "children": [],
+                                "id": "topic_id_2",
+                                "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                                   "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
+                                "name": "test_target_2"
+                            }],
+                        "id": None,
+                        "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
+                                           "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
+                        "name": "test_category_2"
+                    }
+                ]
+            }
+        )
+
 
 @attr('shard_2')
 @ddt.ddt
