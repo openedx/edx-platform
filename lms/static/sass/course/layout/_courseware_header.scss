@@ -32,11 +32,11 @@
         @include border-left(1px solid $gray-d3);
       }
 
-      a {
+      a,
+      a:visited {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
         @extend %t-title7;
         @extend %t-regular;
-        border-bottom: 3px solid transparent;
         color: $gray-d1;
         display: block;
         text-align: center;
@@ -45,19 +45,17 @@
         &:hover,
         &:focus {
           color: $blue;
-          border-color: $blue;
+          border-bottom: 4px solid $blue;
         }
 
         &.active {
-          border-bottom: 3px solid $gray-d4;
+          border-bottom: 4px solid $blue;
           background-color: transparent;
-          color: $gray-d4;
-          font-weight: $font-bold;
-          font-size: em(18);
+          color: $blue;
 
           &:hover,
           &:focus {
-            color: $gray-d4;
+            color: $blue;
           }
         }
       }
