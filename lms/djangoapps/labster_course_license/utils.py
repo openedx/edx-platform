@@ -61,7 +61,7 @@ def get_simulation_id(uri):
     """
     Returns Simulation id extracted from the passed URI.
     """
-    return urlparse(uri).path.strip('/').split('/')[-1]
+    return urlparse(uri).path.strip(' /').split('/')[-1]
 
 
 def get_parent_unit(xblock):
