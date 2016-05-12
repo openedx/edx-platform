@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-05 15:47+0000\n"
-"PO-Revision-Date: 2016-05-05 15:48:37.777523\n"
+"POT-Creation-Date: 2016-05-12 14:45+0000\n"
+"PO-Revision-Date: 2016-05-12 14:46:24.034520\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4860,26 +4860,6 @@ msgstr "شمم لقخعحس وعسف اشدث ش رشوث."
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
 msgstr "شمم لقخعحس وعسف اشدث ش عرهضعث رشوث."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The title field must be limited to 50 characters."
-msgstr "فاث فهفمث بهثمي وعسف زث مهوهفثي فخ 50 ذاشقشذفثقس."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The subtitle field must be limited to 150 characters."
-msgstr "فاث سعزفهفمث بهثمي وعسف زث مهوهفثي فخ 150 ذاشقشذفثقس."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The duration field must be limited to 50 characters."
-msgstr "فاث يعقشفهخر بهثمي وعسف زث مهوهفثي فخ 50 ذاشقشذفثقس."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The short description field must be limited to 150 characters."
-msgstr "فاث ساخقف يثسذقهحفهخر بهثمي وعسف زث مهوهفثي فخ 150 ذاشقشذفثقس."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The description field must be limited to 1000 characters."
-msgstr "فاث يثسذقهحفهخر بهثمي وعسف زث مهوهفثي فخ 1000 ذاشقشذفثقس."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."

@@ -1141,7 +1141,6 @@
     "Your message must have a subject.": "Votre message doit contenir un sujet.", 
     "Your policy changes have been saved.": "Les changements de r\u00e8gles ont \u00e9t\u00e9 enregistr\u00e9s.", 
     "Your post will be discarded.": "Votre message sera supprim\u00e9", 
-    "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "Votre demande n'a pas pu \u00eatre r\u00e9alis\u00e9e \u00e0 cause d'un probl\u00e8me de serveur. Rafra\u00eechissez la page et r\u00e9essayez. Si le probl\u00e8me persiste, cliquez sur l'onglet Aide pour signaler le probl\u00e8me.", 
     "Your request could not be completed. Reload the page and try again.": "Votre demande n'a pas pu \u00eatre r\u00e9alis\u00e9e. Rafra\u00eechissez la page et r\u00e9essayez.", 
     "Your upload of '{file}' failed.": "Le chargement de '{file}' a \u00e9chou\u00e9.", 
     "Your upload of '{file}' succeeded.": "Chargement de '{file}' r\u00e9ussi.", 
