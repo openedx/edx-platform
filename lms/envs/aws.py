@@ -290,6 +290,8 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
 # Setting for overriding default filtering facets for Course discovery
 COURSE_DISCOVERY_FILTERS = ENV_TOKENS.get('COURSE_DISCOVERY_FILTERS', None)
+_ = lambda s: s
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
         'name': _('Organization'),
