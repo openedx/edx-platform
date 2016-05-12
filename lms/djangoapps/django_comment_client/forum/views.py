@@ -62,9 +62,6 @@ class DiscussionTab(EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        for tab in course.tabs:
-            if tab.type == "discussion" and tab.is_hidden:
-                 return False
         if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)
