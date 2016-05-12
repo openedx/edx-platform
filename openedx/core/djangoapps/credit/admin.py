@@ -52,6 +52,8 @@ class CreditRequestAdmin(admin.ModelAdmin):
 class CreditRequirementAdmin(admin.ModelAdmin):
     """ Admin for CreditRequirement. """
     list_display = ('course', 'namespace', 'name', 'display_name', 'active',)
+    list_filter = ('active', 'namespace',)
+    search_fields = ('course__course_key', 'namespace', 'name',)
 
     class Meta(object):
         model = CreditRequirement
@@ -60,6 +62,7 @@ class CreditRequirementAdmin(admin.ModelAdmin):
 class CreditRequirementStatusAdmin(admin.ModelAdmin):
     """ Admin for CreditRequirementStatus. """
     list_display = ('username', 'requirement', 'status',)
+    search_fields = ('username', 'requirement__course__course_key',)
 
     class Meta(object):
         model = CreditRequirementStatus
