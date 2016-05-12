@@ -232,6 +232,13 @@ def get_authenticated_user(auth_provider, username, uid):
     user.backend = auth_provider.get_authentication_backend()
     return user
 
+def get_email_from_pipeline(running_pipeline):
+    """Get email from running_pipeline"""
+    try:
+        return running_pipeline['kwargs']['details']['email']
+    except:
+        return None
+
 def get_authenticated_user_by_email(auth_provider, email):
     """Gets a saved user authenticated by a particular backend.
 
@@ -273,8 +280,9 @@ def get_authenticated_user_helper(auth_provider, running_pipeline):
             running_pipeline['kwargs']['uid']
         )
     except:
-        user = get_authenticated_user_by_email(auth_provider, running_pipeline['kwargs']['details']['email'])
-        update_user_social_account_link(user, running_pipeline)
+        if running_pipeline['kwargs']['details']['email']:
+            user = get_authenticated_user_by_email(auth_provider, get_email_from_pipeline(running_pipeline))
+            update_user_social_account_link(user, running_pipeline)
 
     return user
 
@@ -289,16 +297,19 @@ def update_user_social_account_link(user, running_pipeline):
     from social.apps.django_app.default.models import UserSocialAuth
 
     uid = running_pipeline['kwargs']['uid']
+    provider = running_pipeline['backend']
+    extra_data = {
+        'access_token': running_pipeline['kwargs']['response']['access_token'],
+        'expires': 'null',
+        'id': uid
+    }
 
-    if not UserSocialAuth.objects.filter(user_id=user.id, uid=uid).exists():
-        provider = running_pipeline['backend']
-        extra_data = {
-            'access_token': running_pipeline['kwargs']['response']['access_token'],
-            'expires': 'null',
-            'id': uid
-        }
-        UserSocialAuth.objects.create(provider=provider, uid=uid, extra_data=extra_data, user_id=user.id)
-        UserSocialAuth.objects.filter(provider=provider, user_id=user.id).exclude(uid=uid).delete()
+    UserSocialAuth.objects.update_or_create({
+        'provider': provider,
+        'uid': uid,
+        'extra_data': extra_data,
+        'user_id': user.id}, provider=provider, user_id=user.id
+    )
 
 def _get_enabled_provider(provider_id):
     """Gets an enabled provider by its provider_id member or throws."""
