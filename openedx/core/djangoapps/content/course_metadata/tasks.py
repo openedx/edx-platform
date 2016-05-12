@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content.course_metadata.utils import get_course_lea
 log = logging.getLogger('edx.celery.task')
 
 
-@task(name=u'lms.djangoapps.api_manager.tasks.update_course_metadata')
+@task(name=u'openedx.core.djangoapps.content.course_metadata.tasks.update_course_aggregate_metadata')
 def update_course_aggregate_metadata(course_key):  # pylint: disable=invalid-name
     """
     Regenerates and updates the course aggregate metadata (in the database) for the specified course.

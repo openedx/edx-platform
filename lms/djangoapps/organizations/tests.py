@@ -16,10 +16,12 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from rest_framework.test import APIClient
 
+from api_manager.models import CourseGroupRelationship
 from gradebook.models import StudentGradebook
+from organizations.models import OrganizationGroupUser
 from student.models import UserProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, GroupFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -308,6 +310,81 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[0]['username'], self.test_user.username)
         self.assertEqual(response.data[0]['email'], self.test_user.email)
 
+    def test_organizations_courses_get(self):
+        organization = self.setup_test_organization()
+        courses = CourseFactory.create_batch(2)
+        groups = GroupFactory.create_batch(2)
+
+        for i in xrange(2):
+            CourseGroupRelationship.objects.create(course_id=courses[i].id, group=groups[i])
+            groups[i].organizations.add(organization['id'])
+
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        courses_uri = '{}courses/'.format(test_uri)
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 0)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+        # test organization course having multiple coursegrouprelationships
+        CourseGroupRelationship.objects.create(course_id=courses[0].id, group=groups[1])
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 0)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+    def test_organizations_courses_get_organization_group_with_no_course(self):
+        organization = self.setup_test_organization()
+        group = GroupFactory.create()
+        group.organizations.add(organization['id'])
+
+        courses_uri = '{}{}/courses/'.format(self.base_organizations_uri, organization['id'])
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_organizations_courses_get_enrolled_users(self):
+        organization = self.setup_test_organization()
+        courses = CourseFactory.create_batch(2)
+        groups = GroupFactory.create_batch(2)
+
+        for i in xrange(2):
+            CourseGroupRelationship.objects.create(course_id=courses[i].id, group=groups[i])
+            groups[i].organizations.add(organization['id'])
+
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=courses[0].id)
+
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        courses_uri = '{}courses/'.format(test_uri)
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 1)
+        self.assertEqual(response.data[0]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 0)
+
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=courses[1].id)
+        CourseEnrollmentFactory.create(user=self.test_user2, course_id=courses[1].id)
+
+        response = self.do_get(courses_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], unicode(courses[0].id))
+        self.assertEqual(len(response.data[0]['enrolled_users']), 1)
+        self.assertEqual(response.data[0]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['id'], unicode(courses[1].id))
+        self.assertEqual(len(response.data[1]['enrolled_users']), 2)
+        self.assertEqual(response.data[1]['enrolled_users'][0], self.test_user.id)
+        self.assertEqual(response.data[1]['enrolled_users'][1], self.test_user2.id)
+
     def test_organizations_users_get_with_course_count(self):
         CourseEnrollmentFactory.create(user=self.test_user, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.test_user2, course_id=self.course.id)
@@ -364,16 +441,39 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         """
         Tests organization user link removal API works as expected if given user ids are valid
         """
-        organization = self.setup_test_organization(org_data={'users': [self.test_user.id, self.test_user2.id]})
+        org_users = [self.test_user.id, self.test_user2.id]
+        organization = self.setup_test_organization(org_data={'users': org_users})
         test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
         users_uri = '{}users/'.format(test_uri)
         data = {"users": "{user_id1},{user_id2}".format(user_id1=self.test_user.id, user_id2=self.test_user2.id)}
         response = self.do_delete(users_uri, data=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['detail'], _("2 users removed from organization"))
+        self.assertEqual(response.data['detail'], _("2 user(s) removed from organization"))
         response = self.do_get("{}?view=ids".format(users_uri))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+        # users in User model are not deleted
+        self.assertEqual(len(org_users), User.objects.filter(id__in=org_users).count())
+
+    def test_organizations_single_user_delete(self):
+        """
+        Tests organization user link removal API works as expected if single user needs to be deleted
+        """
+        org_users = [self.test_user.id, self.test_user2.id]
+        organization = self.setup_test_organization(org_data={'users': org_users})
+        test_uri = '{}{}/'.format(self.base_organizations_uri, organization['id'])
+        users_uri = '{}users/'.format(test_uri)
+        data = {"users": "{user_id1}".format(user_id1=self.test_user.id)}
+        response = self.do_delete(users_uri, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['detail'], _("1 user(s) removed from organization"))
+        response = self.do_get("{}?view=ids".format(users_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        # users in User model are not deleted
+        self.assertEqual(len(org_users), User.objects.filter(id__in=org_users).count())
 
     def test_organizations_users_delete_invalid(self):
         """
@@ -392,7 +492,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
 
         data = {"users": 112323333329}
         response = self.do_delete(users_uri, data=data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
     def test_organizations_users_delete_non_existing(self):
         """
@@ -403,8 +503,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         users_uri = '{}users/'.format(test_uri)
         data = {"users": 112323333329}
         response = self.do_delete(users_uri, data=data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['detail'], _("0 users removed from organization"))
+        self.assertEqual(response.status_code, 204)
 
     def test_organizations_users_delete_without_param(self):
         """
@@ -523,3 +622,149 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 0)
         self.assertEqual(response.data['users_grade_average'], 0)
+
+    def test_organizations_groups_users_get(self):
+        organization = self.setup_test_organization()
+        organization_two = self.setup_test_organization()
+        group = GroupFactory.create()
+        users = UserFactory.create_batch(5)
+        group.organizations.add(organization['id'])
+        group.organizations.add(organization_two['id'])
+        for user in users:
+            OrganizationGroupUser.objects.create(organization_id=organization['id'], group=group, user=user)
+
+        # test when organization group have no users
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], 1234)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+        # test when organization group have users
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], group.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), len(users))
+        for i, user in enumerate(response.data):
+            self.assertEqual(user['id'], users[i].id)
+
+        # test organization_two group users
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization_two['id'], group.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_organizations_groups_users_post(self):
+        organization = self.setup_test_organization()
+        organization_two = self.setup_test_organization()
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(5)
+        groups[0].organizations.add(organization['id'])
+        groups[0].organizations.add(organization_two['id'])
+
+        # test for invalid user id
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[1].id)
+        data = {
+            'users': '1,qwerty'
+        }
+        response = self.do_delete(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+        # group does not belong to organization
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[1].id)
+        data = {
+            'users': ','.join([str(user.id) for user in users])
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+        expected_response = "Group {} does not belong to organization {}".format(groups[1].id, organization['id'])
+        self.assertEqual(response.data['detail'], expected_response)
+
+        # group belong to organization but users does not exit
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[0].id)
+        data = {
+            'users': '1234,9912,9800'
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+        # group belong to organization and users exist
+        data = {
+            'users': ','.join([str(user.id) for user in users])
+        }
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        user_ids = ', '.join([str(user.id) for user in users])
+        expected_response = "user id(s) {} added to organization {}'s group {}".format(user_ids,
+                                                                                       organization['id'],
+                                                                                       groups[0].id)
+        self.assertEqual(response.data['detail'], expected_response)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), len(users))
+        for i, user in enumerate(response.data):
+            self.assertEqual(user['id'], users[i].id)
+        # test users were not added to organization_two group relation
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization_two['id'], groups[0].id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_organizations_groups_users_delete(self):
+        organization = self.setup_test_organization()
+        organization_two = self.setup_test_organization()
+        groups = GroupFactory.create_batch(2)
+        users = UserFactory.create_batch(5)
+        groups[0].organizations.add(organization['id'])
+        groups[0].organizations.add(organization_two['id'])
+        for user in users:
+            OrganizationGroupUser.objects.create(organization_id=organization['id'], group=groups[0], user=user)
+            OrganizationGroupUser.objects.create(organization_id=organization_two['id'], group=groups[0], user=user)
+
+        # test for invalid user id
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[1].id)
+        data = {
+            'users': '1,qwerty'
+        }
+        response = self.do_delete(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+        # group does not belong to organization
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[1].id)
+        data = {
+            'users': ','.join([str(user.id) for user in users])
+        }
+        response = self.do_delete(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+        expected_response = "Group {} does not belong to organization {}".format(groups[1].id, organization['id'])
+        self.assertEqual(response.data['detail'], expected_response)
+
+        # group belong to organization but users does not exit
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization['id'], groups[0].id)
+        data = {
+            'users': '1234,9912,9800'
+        }
+        response = self.do_delete(test_uri, data)
+        self.assertEqual(response.status_code, 204)
+
+        # organization group user relationship exists for users
+        data = {
+            'users': ','.join([str(user.id) for user in users])
+        }
+        response = self.do_delete(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        user_ids = ', '.join([str(user.id) for user in users])
+        expected_response = "user id(s) {} removed from organization {}'s group {}".format(user_ids,
+                                                                                           organization['id'],
+                                                                                           groups[0].id)
+        self.assertEqual(response.data['detail'], expected_response)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        # test users were not removed from organization_two group relation
+        test_uri = '{}{}/groups/{}/users'.format(self.base_organizations_uri, organization_two['id'], groups[0].id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), len(users))
