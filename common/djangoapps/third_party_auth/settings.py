@@ -84,3 +84,6 @@ def apply_settings(django_settings):
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )
+
+    # Set scheme to use for redirection in python-social-auth
+    django_settings.REDIRECT_IS_HTTPS = settings.FEATURES.get('THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS', False)
