@@ -196,7 +196,6 @@ class TestPaverRunQuality(unittest.TestCase):
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
 
         # Test that pep8, pylint, and jshint were called by counting the calls to
         # _get_pep8_violations (for pep8) and sh (for diff-quality pylint & jshint)
@@ -215,7 +214,7 @@ class TestPaverRunQuality(unittest.TestCase):
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
+
         # Test that both pep8 and pylint were called by counting the calls
         # Assert that _get_pep8_violations (which calls "pep8") is called once
         self.assertEqual(_mock_pep8_violations.call_count, 1)
