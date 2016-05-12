@@ -510,24 +510,19 @@ def course_about(request, course_id):
         ecommerce_bulk_checkout_link = ''
         professional_mode = None
         ecomm_service = EcommerceService()
-        _is_ecomm_service_enabled = ecomm_service.is_enabled(request.user)
-        if _is_ecomm_service_enabled and (
-                CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
-        ):
+        is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
+        if ecomm_service.is_enabled(request.user) and (is_professional_mode):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
             if professional_mode.bulk_sku:
                 ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
 
-        # We need to look up the price from the CourseMode only when the EcommerceService is enabled OR
-        # the legacy shoppingcart ecommerce implementation is enabled.
-        registration_price = 0
-        if _is_ecomm_service_enabled or _is_shopping_cart_enabled:
-            registration_price = CourseMode.min_course_price_for_currency(
-                course_key,
-                settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-            )
+        # Find the minimum price for the course across all course modes
+        registration_price = CourseMode.min_course_price_for_currency(
+            course_key,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
         course_price = get_cosmetic_display_price(course, registration_price)
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
