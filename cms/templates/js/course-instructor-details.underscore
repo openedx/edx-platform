@@ -26,11 +26,11 @@
   <div class="field image field-course-instructor-image current-instructor-image">
   <label for="course-instructor-image-<%- index %>"><%- gettext("Photo") %></label>
     <span class="wrapper-instructor-image">
-        <img class="instructor-image" src="<%- data['image']%>" alt="<%- gettext('Instructor Photo') %>" />
+        <img id="course-instructor-image-preview-<%- index %>" class="instructor-image" src="<%- data['image']%>" alt="<%- gettext('Instructor Photo') %>" />
     </span>
     <div class="wrapper-input">
       <div class="input">
-        <input type="text" dir="ltr" class="long new-instructor-image-url" id="course-instructor-image-<%- index %>" value="<%- data['image'] %>" data-field="image" placeholder="<%- gettext('Instructor Photo URL') %>" autocomplete="off" />
+        <input type="text" dir="ltr" class="long new-instructor-image-url" id="course-instructor-image-<%- index %>" value="<%- data['image'] %>" data-index="<%- index %>"" data-field="image" placeholder="<%- gettext('Instructor Photo URL') %>" autocomplete="off" />
         <span class="tip tip-stacked"><%- gettext("Please add a photo of the instructor (Note: only JPEG or PNG format supported)")%></span>
       </div>
       <button type="button" class="action action-upload-instructor-image" data-index=<%- index %>><%- gettext("Upload Photo") %></button>
