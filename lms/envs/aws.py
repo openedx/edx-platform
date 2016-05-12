@@ -290,6 +290,20 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
 # Setting for overriding default filtering facets for Course discovery
 COURSE_DISCOVERY_FILTERS = ENV_TOKENS.get('COURSE_DISCOVERY_FILTERS', None)
+COURSE_DISCOVERY_MEANINGS = {
+    'org': {
+        'name': _('Organization'),
+    },
+    'modes': {
+        'name': _('Course Type'),
+        'terms': {
+            'honor': _('Honor'),
+            'verified': _('Verified'),
+        },
+    },
+    'language': LANGUAGE_MAP,
+}
+COURSE_DISCOVERY_MEANINGS = ENV_TOKENS.get('COURSE_DISCOVERY_MEANINGS', COURSE_DISCOVERY_MEANINGS)
 
 # Badgr API
 BADGR_API_TOKEN = ENV_TOKENS.get('BADGR_API_TOKEN', BADGR_API_TOKEN)
