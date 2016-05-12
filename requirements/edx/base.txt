@@ -45,7 +45,7 @@ edx-management-commands==0.1.1
 edx-django-oauth2-provider==1.0.3
 edx-oauth2-provider==1.0.1
 edx-opaque-keys==0.2.1
-edx-organizations==0.4.0
+edx-organizations==0.4.1
 edx-rest-api-client==1.2.1
 edx-search==0.1.2
 facebook-sdk==0.4.0
