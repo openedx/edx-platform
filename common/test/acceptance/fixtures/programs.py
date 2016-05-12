@@ -65,4 +65,5 @@ class ProgramsConfigMixin(object):
             'enable_certification': is_enabled,
             'xseries_ad_enabled': is_enabled,
             'program_listing_enabled': is_enabled,
+            'program_details_enabled': is_enabled,
         }).install()

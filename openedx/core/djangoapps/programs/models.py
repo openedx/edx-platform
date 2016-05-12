@@ -84,6 +84,11 @@ class ProgramsApiConfig(ConfigurationModel):
         default=False
     )
 
+    program_details_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show program details pages"),
+        default=False
+    )
+
     @property
     def internal_api_url(self):
         """
@@ -156,3 +161,10 @@ class ProgramsApiConfig(ConfigurationModel):
         Indicates whether we want to show program listing page
         """
         return self.enabled and self.program_listing_enabled
+
+    @property
+    def show_program_details(self):
+        """
+        Indicates whether we want to show program details pages
+        """
+        return self.enabled and self.program_details_enabled
