@@ -230,6 +230,23 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
             'graded', new_version.get_explicitly_set_fields_by_scope(scope=Scope.settings)
         )
 
+    def test_xblock_invalid_field_value_type(self):
+        # Setting the wrong field-value in Xblock-field will raise TypeError.
+        # Example if xblock-field is of 'Dictionary' type by setting the 'List' value in that dict-type will raise
+        # TypeError.
+
+        # Set the XBlock's location
+        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        # Explicitly set the content field
+        self.xblock.test_content_field = ['Explicitly set']
+        self.xblock.save()
+
+        # clearing the dirty fields and removing value from cache will fetch the value from field-data.
+        self.xblock._dirty_fields = {}  # pylint: disable=protected-access
+        self.xblock.fields['test_content_field']._del_cached_value(self.xblock)  # pylint: disable=protected-access
+        with self.assertRaises(TypeError):
+            self.xblock.get_explicitly_set_fields_by_scope(scope=Scope.content)
+
 
 class StubXBlockWithMutableFields(StubXBlock):
     """
