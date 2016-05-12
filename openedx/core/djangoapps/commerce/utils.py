@@ -32,6 +32,7 @@ def is_commerce_service_configured():
 
 def ecommerce_api_client(user):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
+    jwt_auth = helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
     return EdxRestApiClient(
         helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL),
         helpers.get_value("ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY),
@@ -39,6 +40,6 @@ def ecommerce_api_client(user):
         user.profile.name if hasattr(user, 'profile') else None,
         user.email,
         tracking_context=create_tracking_context(user),
-        issuer=settings.JWT_ISSUER,
-        expires_in=settings.JWT_EXPIRATION
+        issuer=jwt_auth['JWT_ISSUER'],
+        expires_in=jwt_auth['JWT_EXPIRATION']
     )
