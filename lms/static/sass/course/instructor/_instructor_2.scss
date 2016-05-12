@@ -406,11 +406,6 @@
 // view - bulk email
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#send_email {
-  h2 {
-    // override forced uppercase
-    text-transform: none;
-  }
-
   // form fields
   .list-fields {
     list-style: none;

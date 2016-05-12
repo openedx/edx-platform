@@ -3,7 +3,8 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Generate Registration Code Modal')}">
+<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-registration-code">
+    <h2 id="header-registration-code" class="hd hd-2">${_("Generate Registration Code Modal")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
@@ -15,7 +16,7 @@ from django.core.urlresolvers import reverse
 
     <div id="registration-content">
       <header>
-        <h2>${_("Create Enrollment Codes")}</h2>
+        <h3 class="hd hd-3">${_("Create Enrollment Codes")}</h3>
       </header>
 
       <div class="instructions">

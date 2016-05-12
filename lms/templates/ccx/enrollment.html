@@ -4,10 +4,10 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+<h2 class="hd hd-2">${_("Batch Enrollment")}</h2>
 <div class="batch-enrollment" style="float:left;width:50%">
   <form method="POST" action="ccx_invite">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-  <h2> ${_("Batch Enrollment")} </h2>
   <label for="student-ids" class="sr">${_("Email Addresses/Usernames")}</label>
   <p id="label_student_ids" class="text-helper">
       ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
