@@ -4,7 +4,7 @@
 #   * @mollydb - to check licensing
 #   * @edx/devops - to check system requirements
 
-numpy==1.6.2
+numpy==1.11.0
 networkx==1.7
 sympy==0.7.1
 pyparsing==2.0.1
