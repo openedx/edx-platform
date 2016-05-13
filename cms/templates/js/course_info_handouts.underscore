@@ -2,7 +2,7 @@
 
 <% 
 if (infoSidebarName.length == 0) { %>
-    <h2 class="title" style="color:darkgray;" ><%= gettext("Course Handouts") %></h2>
+    <h2 class="title" style="color:darkgray;" ><%= gettext("Course Home Sidebar") %></h2>
 <% }else{ %>
     <h2 class="title"><%= infoSidebarName %></h2>
 <% } %>
