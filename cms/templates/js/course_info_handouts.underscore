@@ -1,6 +1,12 @@
 <a href="#" class="edit-button"><span class="edit-icon"></span><%= gettext("Edit") %></a>
 
-<h2 class="title"><%= gettext("Course Handouts") %></h2>
+<% 
+if (infoSidebarName.length == 0) { %>
+    <h2 class="title" style="color:darkgray;" ><%= gettext("Course Home Sidebar") %></h2>
+<% }else{ %>
+    <h2 class="title"><%= infoSidebarName %></h2>
+<% } %>
+
 <%if (model.get('data') != null) { %>
   <div class="handouts-content">
 

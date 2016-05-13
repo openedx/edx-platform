@@ -882,6 +882,7 @@ def course_info_handler(request, course_key_string):
                 'course_info.html',
                 {
                     'context_course': course_module,
+                    'course_locator': course_key,
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                     'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
