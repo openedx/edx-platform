@@ -6,6 +6,9 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from django.core.cache import caches
+import request_cache
+
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
@@ -194,6 +197,96 @@ class UserTagsService(object):
         )
 
 
+class CacheService(object):
+    """
+
+    """
+    def __init__(self, req_cache_root, django_cache=None):
+        """
+        Create a CacheService that can generate named Caches for XBlocks.
+
+        `req_cache_root` should be a `dict`-like object, and will be where we
+        store the in-memory cached version of various objects during a single
+        request. Each named cache that is returned by `get_cache()` will create
+        a new entry here. So for example, if you did the following from inside
+        an XBlock:
+
+        cache_service = self.runtime.service(self, 'cache')
+        perm_cache = cache_service.get_cache("discussion.permissions")
+        tmpl_cache = cache_service.get_cache("discussion.templates")
+
+        Then `req_cache_root` would look like:
+
+          {
+              "discussion.permissions": {},
+              "discussion.templates": {}
+          }
+
+        `django_cache` is the explicit Django low level cache object we want to
+        use, in case there's a specific named cache that is preferred. By
+        default, it'll just use django.core.cache.cache.
+        """
+
+        # Create an entry in the request_cache where we will put all
+        # CacheService generated cache data. We'll further namespace with our
+        # own get_cache() method. So:
+        #
+        # request_cache = {
+        #
+        # }
+        self._local_cache_root = local_cache_root
+        self._django_cache = django_cache or caches['request']
+
+    def get_cache(self, name):
+        """
+        Return a named Cache object that get/set can be called on.
+
+        This is to do simple namespacing, and is not intended to guard against
+        malicious behavior. The `name` parameter should include your XBlock's
+        tag as a prefix parameter.
+        """
+        if name not in self._request_cache:
+            self._request_cache[name] = {}
+
+        return Cache(name, self._request_cache, self._django_cache)
+
+
+class Cache(object):
+    """
+    Low level Cache object for use by an XBlock.
+
+    To get an instance of this from within an XBlock, you would do something
+    like::
+
+        cache = self.runtime.service(self, 'cache').get_cache("myxblock")
+        cached_value = cache.get(key)
+        cache.set(key, value, timeout)
+
+    """
+
+    def __init__(self, name, cache_dict, django_cache):
+        self._cache_dict = cache_dict
+        self._django_cache = django_cache
+
+    def get(self, key):
+        pass
+
+    def get_many(self, keys):
+        pass
+
+    def set(self, key, value, timeout, version=1):
+        """
+        Set key -> value mapping in cache.
+
+        `key` should be hashable
+
+        """
+        self._cache_dict[key] = value
+
+    def set_many(self, kv_dict, timeout):
+        pass
+
+
 class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
@@ -215,6 +308,9 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['user_tags'] = UserTagsService(self)
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
+        services['cache'] = CacheService(request_cache.get_cache("xblock_cache_service"))
+
+
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 

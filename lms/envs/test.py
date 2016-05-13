@@ -233,6 +233,12 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+
+    ##### ADD REQUEST CACHE HERE
+    'request': {
+        'BACKEND': 'request_cache.RequestPlusRemoteCache',
+        'REMOTE_CACHE_NAME': 'default',
+    }
 }
 
 # Dummy secret key for dev

@@ -57,6 +57,7 @@ def has_permission(user, permission, course_id):
 
 
 @XBlock.wants('user')
+@XBlock.wants('cache')
 class DiscussionModule(DiscussionFields, XModule):
     """
     XModule for discussion forums.
@@ -77,11 +78,12 @@ class DiscussionModule(DiscussionFields, XModule):
         user_service = self.runtime.service(self, 'user')
         if user_service:
             user = user_service._django_user  # pylint: disable=protected-access
+
         if user:
-            course_key = course.id
-            can_create_comment = has_permission(user, "create_comment", course_key)
-            can_create_subcomment = has_permission(user, "create_sub_comment", course_key)
-            can_create_thread = has_permission(user, "create_thread", course_key)
+            course_key = self.course_id
+            can_create_comment = self.has_permission(user, "create_comment", course_key)
+            can_create_subcomment = self.has_permission(user, "create_sub_comment", course_key)
+            can_create_thread = self.has_permission(user, "create_thread", course_key)
         else:
             can_create_comment = False
             can_create_subcomment = False
@@ -99,12 +101,21 @@ class DiscussionModule(DiscussionFields, XModule):
             template = 'discussion/_discussion_module.html'
         return self.system.render_template(template, context)
 
-    def get_course(self):
+    def has_permission(self, user, permission, course_id):
         """
-        Return CourseDescriptor by course id.
+        Copied from django_comment_client/permissions.py because I can't import
+        that file from here. It causes the xmodule_assets command to fail.
         """
-        course = self.runtime.modulestore.get_course(self.course_id)
-        return course
+        cache = self.runtime.service(self, 'cache').get_cache("discussion.permissions")
+        cache_key = (user, course_id, permission)
+        cached_answer = cache.get(cache_key)
+        if cached_answer is not None:
+            return cached_answer
+
+        has_perm = any(role.has_permission(permission) for role in user.roles.filter(course_id=course_id))
+        cache.set(cache_key, has_perm, 0)
+
+        return has_perm
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):

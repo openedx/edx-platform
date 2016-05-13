@@ -201,6 +201,13 @@ if 'loc_cache' not in CACHES:
         'LOCATION': 'edx_location_mem_cache',
     }
 
+# Create a request cache if one is not already specified.
+if 'request' not in CACHES:
+    CACHES['request'] = {
+        'BACKEND': 'request_cache.RequestPlusRemoteCache',
+        'REMOTE_CACHE_NAME': 'default',
+    }
+
 # Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
 DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)

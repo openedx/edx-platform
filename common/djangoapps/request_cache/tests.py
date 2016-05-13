@@ -18,3 +18,9 @@ class TestRequestCache(TestCase):
         stub = get_request_or_stub()
         expected_url = "http://{site_name}/foobar".format(site_name=settings.SITE_NAME)
         self.assertEqual(stub.build_absolute_uri("foobar"), expected_url)
+
+
+class TestDjangoRequestCache(TestCase):
+
+    pass
+
