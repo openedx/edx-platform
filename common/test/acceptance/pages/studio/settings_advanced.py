@@ -107,6 +107,13 @@ class AdvancedSettingsPage(CoursePage):
 
         return -1
 
+    def get_index_of(self, key):
+        """
+        Returns the index of a setting passed as key.
+        Returns -1 when key is not found. 
+        """
+        return self._get_index_of(key)
+
     def save(self):
         press_the_notification_button(self, "Save")
 
@@ -117,6 +124,19 @@ class AdvancedSettingsPage(CoursePage):
         index = self._get_index_of(key)
         type_in_codemirror(self, index, new_value)
         self.save()
+
+    def set_value_without_saving(self, key, new_value):
+        """
+        Set value without saving it.
+        """
+        index = self._get_index_of(key)
+        type_in_codemirror(self, index, new_value)
+
+    def click_toggle_button(self):
+        """
+        Click toggle button with css class deprecated-settings-label.
+        """
+        self.q(css='.deprecated-settings-label').click()
 
     def get(self, key):
         index = self._get_index_of(key)
@@ -222,3 +242,10 @@ class AdvancedSettingsPage(CoursePage):
             'learning_info',
             'instructor_info'
         ]
+
+    def get_all_displayed_settings(self):
+        """
+        Get names of all displayed settings.
+        """
+        query = self.q(css=SETTINGS_NAME_SELECTOR)
+        return query.text

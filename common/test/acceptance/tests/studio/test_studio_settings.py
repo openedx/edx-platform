@@ -571,3 +571,225 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             include=['section.edit-settings-timed-examination']
         )
         self.course_outline.a11y_audit.check_for_accessibility_errors()
+
+
+@attr('shard_8')
+class AdvancedSettingsTest(StudioCourseTest):
+    """
+    Tests for Advanced Settings tab in studio.
+    """
+    DEPRECATED_SETTINGS = ["CSS Class for Course Reruns", "Hide Progress Tab", "XQA Key"]
+    DISPLAY_NAME_KEY = "Course Banner Image"
+    DISPLAY_NAME_VALUE = '"images_course_image.jpg"'
+    ADVANCED_MODULES_KEY = "Advanced Module List"
+
+    def setUp(self, is_staff=False, test_xss=True):
+        super(AdvancedSettingsTest, self).setUp()
+        self.advanced_settings = AdvancedSettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.type_fields = ['Course Display Name', 'Advanced Module List', 'Discussion Topic Mapping',
+                            'Maximum Attempts', 'Course Announcement Date']
+
+        # Before every test, make sure to visit the page first
+        self.advanced_settings.visit()
+
+    def verify_deprecated_settings_shown(self, expected):
+        """
+        Verify deprecated settings are displayed/not display based on the
+        argument. If argument passed has the value not, then it is assumed that
+        deprecated settings should not be shown.
+        """
+        for setting in self.DEPRECATED_SETTINGS:
+            if expected == "not":
+                self.assertEquals(-1, self.advanced_settings.get_index_of(setting))
+            else:
+                self.assertNotEquals(-1, self.advanced_settings.get_index_of(setting))
+
+    def assert_policy_entries(self, expected_keys, expected_values):
+        """
+        Ensure keys in expected_keys has corresponding displayed values
+        in expected_values.
+        """
+        for key, value in zip(expected_keys, expected_values):
+            index = self.advanced_settings.get_index_of(key)
+            self.assertNotEquals(index == -1, "Could not find key: {key}".format(key=key))
+            found_value = self.advanced_settings.get(key)
+            self.assertEquals(
+                value, found_value,
+                "Expected {} to have value {} but found {}".format(key, value, found_value)
+            )
+
+    def test_author_sees_default_advanced_settings(self):
+        """
+        Scenario: A course author sees default advanced settings
+        Given I have opened a new course in Studio
+        When I select the Advanced Settings
+        Then I see default advanced settings
+        """
+        # Verify some of the advanced settings.
+        self.assert_policy_entries(
+            [self.ADVANCED_MODULES_KEY, self.DISPLAY_NAME_KEY, "Show Calculator"],
+            ["[]", self.DISPLAY_NAME_VALUE, "false"])
+
+    def test_new_entries_appear_alphabetically(self):
+        """
+        Scenario: Add new entries, and they appear alphabetically after save
+        Given I am on the Advanced Course Settings page in Studio
+        Then the settings are alphabetized
+        """
+        # Get all keys displayed on the page.
+        all_keys = self.advanced_settings.get_all_displayed_settings()
+        # Returned keys should match its sorted version.
+        self.assertEquals(sorted(all_keys), all_keys, "Settings are alphabetically ordered")
+
+    def test_cancel_edit_key_value(self):
+        """
+        Scenario: Test cancel editing key value
+        Given I am on the Advanced Course Settings page in Studio
+        When I edit the value of a policy key
+        And I press the "Cancel" notification button
+        Then the policy key value is unchanged
+        And I reload the page
+        Then the policy key value is unchanged
+        """
+        default_course_name = self.advanced_settings.get('Course Display Name')
+        # Change the value of 'Course Display Name'.
+        self.advanced_settings.set_value_without_saving('Course Display Name', 1)
+        # Cancel and don't save the value when asked in notification.
+        self.advanced_settings.cancel()
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), default_course_name)
+        # Refresh the page.
+        self.advanced_settings.refresh_and_wait_for_load()
+        # 'Course Display Name' should be same as before.
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), default_course_name)
+
+    def test_edit_key_value(self):
+        """
+        Scenario: Test editing key value
+        Given I am on the Advanced Course Settings page in Studio
+        When I edit the value of a policy key and save
+        Then the policy key value is changed
+        And I reload the page
+        Then the policy key value is changed
+        """
+        course_name_to_set = '"New Course Name"'
+        # Change the value of 'Course Display Name' and save it.
+        self.advanced_settings.set('Course Display Name', course_name_to_set)
+        new_course_name = self.advanced_settings.get('Course Display Name')
+        # Course name has been changed.
+        self.assertEquals(new_course_name, course_name_to_set)
+        # Refresh the page.
+        self.advanced_settings.refresh_and_wait_for_load()
+        new_course_name = self.advanced_settings.get('Course Display Name')
+        # Course name has been changed.
+        self.assertEquals(new_course_name, course_name_to_set)
+
+    def test_multi_lines_input_appearance(self):
+        """
+        Scenario: Test how multi-line input appears
+        Given I am on the Advanced Course Settings page in Studio
+        When I create a JSON object as a value for "Discussion Topic Mapping"
+        Then it is displayed as formatted
+        And I reload the page
+        Then it is displayed as formatted
+        """
+        new_json_value_to_set = '{"key": "value", "key_2": "value_2"}'
+        expected_json_value = '{\n    "key": "value",\n    "key_2": "value_2"\n}'
+        # Set value of Discussion Topic Mapping.
+        self.advanced_settings.set('Discussion Topic Mapping', new_json_value_to_set)
+        # Value should be properly formatted.
+        self.assertEquals(self.advanced_settings.get('Discussion Topic Mapping'), expected_json_value)
+        # Refresh the page.
+        self.advanced_settings.refresh_and_wait_for_load()
+        # Value should still be well formatted.
+        self.assertEquals(self.advanced_settings.get('Discussion Topic Mapping'), expected_json_value)
+
+    def test_error_on_wrong_input(self):
+        """
+        Scenario: Test error if value supplied is of the wrong type
+        Given I am on the Advanced Course Settings page in Studio
+        When I create a JSON object as a value for "Course Display Name"
+        Then I get an error on save
+        And I reload the page
+        Then the policy key value is unchanged
+        """
+        # Get current Course Display Name value.
+        default_course_name = self.advanced_settings.get('Course Display Name')
+        new_json_value_to_set = '{"key": "value", "key_2": "value_2"}'
+        # Set value of Course Display Name.
+        self.advanced_settings.set('Course Display Name', new_json_value_to_set)
+        # Make sure error message is shown successfully.
+        self.advanced_settings.wait_for(
+            lambda: self.advanced_settings.q(css='.error-item-message').present,
+            "Error message is shown successfully on wrong input."
+        )
+        # Refresh the page.
+        self.advanced_settings.refresh_and_wait_for_load()
+        # New value shouldn't been saved.
+        self.assertEquals(default_course_name, self.advanced_settings.get('Course Display Name'))
+
+    def test_automatic_quoting_on_non_json_value(self):
+        """
+        Scenario: Test automatic quoting of non-JSON values
+        Given I am on the Advanced Course Settings page in Studio
+        When I create a non-JSON value not in quotes
+        Then it is displayed as a string
+        And I reload the page
+        Then it is displayed as a string
+        """
+        value_to_set = 'quote me'
+        self.advanced_settings.set('Course Display Name', value_to_set)
+        expected_value = '"quote me"'
+        # New value should be in quotes.
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), expected_value)
+        # Refresh the page.
+        self.advanced_settings.refresh_and_wait_for_load()
+        # New value should still be in quotes.
+        self.assertEquals(self.advanced_settings.get('Course Display Name'), expected_value)
+
+    def test_confirmation_on_save(self):
+        """
+        Scenario: Confirmation is shown on save
+        Given I am on the Advanced Course Settings page in Studio
+        When I edit the value of a policy key
+        And I press the "Save" notification button
+        Then I see a confirmation that my changes have been saved
+        """
+        # Set the Course Display Name to a new value.
+        self.advanced_settings.set('Course Display Name', 'New Course Name')
+        # Make sure we get save confirmation is shown.
+        self.advanced_settings.wait_for(
+            lambda: self.advanced_settings.q(css='#alert-confirmation').present,
+            "Confirmation of save has been shown."
+        )
+
+    def test_deprecated_settings_not_shown(self):
+        """
+        Scenario: Deprecated Settings are not shown by default
+        Given I am on the Advanced Course Settings page in Studio
+        Then deprecated settings are not shown
+        """
+        self.verify_deprecated_settings_shown("not")
+
+    def test_deprecated_settings_toggle(self):
+        """
+        Scenario: Deprecated Settings can be toggled
+        Given I am on the Advanced Course Settings page in Studio
+        When I toggle the display of deprecated settings
+        Then deprecated settings are then shown
+        And I toggle the display of deprecated settings
+        Then deprecated settings are not shown
+        """
+        # Click toggle button to toggle the display of deprecated settings.
+        self.advanced_settings.click_toggle_button()
+        # Verify that deprecated settings are shown.
+        self.verify_deprecated_settings_shown("yes")
+        # Click toggle button to toggle the display of deprecated settings.
+        self.advanced_settings.click_toggle_button()
+        # Verify that deprecated settings are not shown.
+        self.verify_deprecated_settings_shown("not")
