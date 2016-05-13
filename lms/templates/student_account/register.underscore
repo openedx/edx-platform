@@ -18,7 +18,8 @@
                 <%- _.sprintf( gettext("We have completed the fields below as provided by %(currentProvider)s. Please complete the missing required fields."), context ) %>
             </p>
             <p class="message-copy">
-                <%- _.sprintf( gettext("If you clicked the %(currentProvider)s button by mistake and would like to use another %(currentProvider)s account, or another social login button, please clear the cookies in this browser, or try again from another browser."), context ) %>
+                <%- _.sprintf( gettext("If you clicked the %(currentProvider)s button by mistake and would like to use another %(currentProvider)s account, or another social login button, please click"), context ) %>
+                <a href="/reload_login"><%- _.sprintf( gettext("here")) %></a>.
             </p>
             <p class="message-copy">
                 <%- _.sprintf( gettext("Refer to our")) %>
