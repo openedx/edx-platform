@@ -4,10 +4,10 @@
 import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true
-from common import type_in_codemirror, open_new_course
-from advanced_settings import change_value, ADVANCED_MODULES_KEY
+from common import type_in_codemirror, open_new_course, press_the_notification_button
 from course_import import import_file
 
+KEY_CSS = '.key h3.title'
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
@@ -16,6 +16,7 @@ SHOW_ANSWER = "Show Answer"
 SHOW_RESET_BUTTON = "Show Reset Button"
 TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
 MATLAB_API_KEY = "Matlab API key"
+ADVANCED_MODULES_KEY = "Advanced Module List"
 
 
 @step('I have created a Blank Common Problem$')
@@ -378,6 +379,23 @@ def verify_unset_display_name():
 def set_weight(weight):
     index = world.get_setting_entry_index(PROBLEM_WEIGHT)
     world.set_field_value(index, weight)
+
+
+def get_index_of(expected_key):
+    for i, element in enumerate(world.css_find(KEY_CSS)):
+        # Sometimes get stale reference if I hold on to the array of elements
+        key = world.css_value(KEY_CSS, index=i)
+        if key == expected_key:
+            return i
+
+    return -1
+
+
+def change_value(step, key, new_value):
+    index = get_index_of(key)
+    type_in_codemirror(index, new_value)
+    press_the_notification_button(step, "Save")
+    world.wait_for_ajax_complete()
 
 
 def open_high_level_source():
