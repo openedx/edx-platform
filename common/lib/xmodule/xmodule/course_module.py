@@ -438,6 +438,14 @@ class CourseFields(object):
             "Your course handouts appear in the right panel of the page."
         ),
         scope=Scope.settings, default=_('Course Handouts'))
+    course_home_sidebar_enabled = Boolean(
+        display_name=_("Enable the Course Home Sidebar"),
+        help=_(
+            "Enter true or false. If true, you will able to use and update the Course Home Sidebar. If False the"
+            "sidebar will be hidden from view."
+        ),
+        scope=Scope.settings, default=True
+    )
     show_timezone = Boolean(
         help=_(
             "True if timezones should be shown on dates in the courseware. "
