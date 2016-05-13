@@ -77,24 +77,28 @@ from openedx.core.djangolib.markup import HTML, ugettext as _
       <h1>${_("Course Updates and News")}</h1>
       ${get_course_info_section(request, masquerade_user, course, 'updates')}
     </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if SelfPacedConfiguration.current().enable_course_home_improvements:
-        <h1>${_("Important Course Dates")}</h1>
-        ${get_course_date_summary(course, user)}
-      % endif
+    % if course.course_home_sidebar_enabled:
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+        % if SelfPacedConfiguration.current().enable_course_home_improvements:
+          <h1>${_("Important Course Dates")}</h1>
+          ${get_course_date_summary(course, user)}
+        % endif
 
-      <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'handouts')}
-    </section>
+        <h1>${_(course.info_sidebar_name)}</h1>
+        ${get_course_info_section(request, masquerade_user, course, 'handouts')}
+      </section>
+    % endif
     % else:
     <section class="updates">
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, masquerade_user, course, 'guest_updates')}
     </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'guest_handouts')}
-    </section>
+    % if course.course_home_sidebar_enabled:
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+        <h1>${_("Course Handouts")}</h1>
+        ${get_course_info_section(request, masquerade_user, course, 'guest_handouts')}
+      </section>
+    % endif
     % endif
   </div>
 </section>
