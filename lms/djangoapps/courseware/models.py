@@ -315,6 +315,7 @@ class CoursePreference(models.Model):
     pref_value = models.CharField(max_length=255, null=True)
 
     class Meta:
+        app_label = 'courseware'
         unique_together = (('course_id', 'pref_key'))
 
     @classmethod

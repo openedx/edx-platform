@@ -16,6 +16,7 @@ class CmeUserProfile(UserProfile):
     """
 
     class Meta:
+        app_label = 'cme_registration'
         db_table = "cme_registration"
 
     first_name = models.CharField(max_length=50, blank=True, null=True)
