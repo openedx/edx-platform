@@ -236,6 +236,7 @@ def i18n_robot_push():
 
 @task
 @needs(
+    "pavelib.i18n.i18n_validate_transifex_config",
     "pavelib.i18n.i18n_generate",
 )
 def i18n_release_push():
@@ -247,6 +248,21 @@ def i18n_release_push():
         return
 
     sh("i18n_tool transifex push " + " ".join(resources))
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_validate_transifex_config",
+)
+def i18n_release_pull():
+    """
+    Pull release-specific translationg from Transifex.
+    """
+    resources = find_release_resources()
+    if resources is None:
+        return
+
+    sh("i18n_tool transifex pull " + " ".join(resources))
 
 
 def find_release_resources():
