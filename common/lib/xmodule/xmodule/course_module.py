@@ -442,7 +442,7 @@ class CourseFields(object):
         display_name=_("Enable the Course Home Sidebar"),
         help=_(
             "Enter true or false. If true, you will able to use and update the Course Home Sidebar. If False the"
-            "sidebar will be hidden from view."
+            " sidebar will be hidden from view."
         ),
         scope=Scope.settings, default=True
     )
