@@ -3,7 +3,6 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-import cgi
 from collections import Counter
 import json
 import logging
@@ -25,6 +24,7 @@ from boto.ses.exceptions import (
     SESIllegalAddressError,
 )
 from boto.exception import AWSConnectionError
+from markupsafe import escape
 
 from celery import task, current_task  # pylint: disable=no-name-in-module
 from celery.states import SUCCESS, FAILURE, RETRY  # pylint: disable=no-name-in-module, import-error
@@ -434,7 +434,7 @@ def _get_source_address(course_id, course_title, truncate=True):
 
     # It seems that this value is also escaped when set out to amazon, judging
     # from our logs
-    escaped_encoded_from_addr = cgi.escape(encoded_from_addr)
+    escaped_encoded_from_addr = escape(encoded_from_addr)
     if len(escaped_encoded_from_addr) >= 320 and truncate:
         from_addr = format_address(course_name)
 

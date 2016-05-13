@@ -2,8 +2,8 @@
 """
 Unit tests for sending course email
 """
-import cgi
 import json
+from markupsafe import escape
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 import os
@@ -344,7 +344,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         __, encoded_unexpected_from_addr = forbid_multi_line_headers(
             "from", unexpected_from_addr, 'utf-8'
         )
-        escaped_encoded_unexpected_from_addr = cgi.escape(encoded_unexpected_from_addr)
+        escaped_encoded_unexpected_from_addr = escape(encoded_unexpected_from_addr)
 
         # it's shorter than 320 characters when just encoded
         self.assertEqual(len(encoded_unexpected_from_addr), 318)
