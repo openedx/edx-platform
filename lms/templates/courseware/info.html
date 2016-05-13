@@ -84,7 +84,11 @@ from openedx.core.djangolib.markup import HTML, ugettext as _
           ${get_course_date_summary(course, user)}
         % endif
 
-        <h1>${_(course.info_sidebar_name)}</h1>
+        % if len(course.info_sidebar_name) == 0:
+          <h1 style="color:darkgray;">Course Home Sidebar</h1>
+        %else:
+          <h1>${_(course.info_sidebar_name)}</h1>
+        %endif
         ${get_course_info_section(request, masquerade_user, course, 'handouts')}
       </section>
     % endif
