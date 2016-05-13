@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursemode',
             name='bulk_sku',
-            field=models.CharField(help_text='This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service.', max_length=255, null=True, verbose_name=b'Bulk SKU', blank=True),
+            field=models.CharField(default=None, max_length=255, blank=True, help_text='This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service.', null=True, verbose_name=b'Bulk SKU'),
         ),
     ]
