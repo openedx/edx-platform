@@ -102,6 +102,7 @@ class CourseMode(models.Model):
         max_length=255,
         null=True,
         blank=True,
+        default=None,  # Need this in order to set DEFAULT NULL on the database column
         verbose_name="Bulk SKU",
         help_text=_(
             u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
