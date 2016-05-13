@@ -59,7 +59,7 @@ from openedx.core.djangolib.js_utils import (
     </section>
     % if not context_course.course_home_sidebar_enabled:
       <section class="content">
-        <a href="/settings/advanced/${course_locator}" class=" button new-button" style="float: right;">Handouts <i class="icon fa fa-question" style="padding-bottom: 3%;"></i></a>
+        <a href="/settings/advanced/${course_locator}" class=" button new-button" style="float: right;">${_(context_course.info_sidebar_name)} <i class="icon fa fa-question" style="padding-bottom: 3%;"></i></a>
     </section>
     % endif
   </div>
@@ -73,6 +73,9 @@ from openedx.core.djangolib.js_utils import (
           </article>
         </div>
         % if context_course.course_home_sidebar_enabled:
+          <script>
+            var infoSidebarName = "${_(context_course.info_sidebar_name)}";
+          </script>
         <div class="sidebar course-handouts" id="course-handouts-view"></div>
         % endif
       </div>
