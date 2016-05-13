@@ -1,10 +1,10 @@
 {
     "rules": {
-        "javascript-concat-html": 313,
+        "javascript-concat-html": 230,
         "javascript-escape": 7,
-        "javascript-interpolate": 71,
-        "javascript-jquery-append": 120,
-        "javascript-jquery-html": 313,
+        "javascript-interpolate": 66,
+        "javascript-jquery-append": 114,
+        "javascript-jquery-html": 304,
         "javascript-jquery-insert-into-target": 26,
         "javascript-jquery-insertion": 30,
         "javascript-jquery-prepend": 12,
@@ -28,5 +28,5 @@
         "python-wrap-html": 279,
         "underscore-not-escaped": 709
     },
-    "total": 2509
+    "total": 2405
 }
