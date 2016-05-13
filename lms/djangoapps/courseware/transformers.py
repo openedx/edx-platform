@@ -46,8 +46,30 @@ class GradesBlockTransformer(BlockStructureTransformer):
         transformer's transform method.
         """
         block_structure.request_xblock_fields(*cls.FIELDS_TO_COLLECT)
+        cls._collect_max_scores(block_structure)
 
-        cls.collect_max_scores(block_structure)
+    def transform(self, block_structure, usage_context):
+        """
+        Perform no transformations.
+        """
+        pass
+
+    @classmethod
+    def _collect_max_scores(cls, block_structure):
+        """
+        Collect the `max_score` for every block in the provided `block_structure`.
+        """
+        for module in cls._iter_xmodules(block_structure):
+            cls._collect_max_score(block_structure, module)
+
+    @classmethod
+    def _collect_max_score(cls, block_structure, module):
+        """
+        Collect the `max_score` from the given module, storing it as a
+        `transformer_block_field` associated with the `GradesBlockTransformer`.
+        """
+        score = module.max_score()
+        block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
 
     @staticmethod
     def _iter_xmodules(block_structure):
@@ -67,26 +89,3 @@ class GradesBlockTransformer(BlockStructureTransformer):
             usage_id = unicode(block_locator)  # pylint: disable=protected-access
             module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
             yield module
-
-    @classmethod
-    def collect_max_scores(cls, block_structure):
-        """
-        Collect the `max_score` for every block in the provided `block_structure`.
-        """
-        for module in cls._iter_xmodules(block_structure):
-            cls._collect_max_score(block_structure, module)
-
-    @classmethod
-    def _collect_max_score(cls, block_structure, module):
-        """
-        Collect the `max_score` from the given module, storing it as a
-        `transformer_block_field` associated with the `GradesBlockTransformer`.
-        """
-        score = module.max_score()
-        block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
-
-    def transform(self, block_structure, usage_context):
-        """
-        Perform no transformations.
-        """
-        pass
