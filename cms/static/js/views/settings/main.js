@@ -305,6 +305,8 @@ var DetailsView = ValidatingView.extend({
         this.setField(event);
         var url = $(event.currentTarget).val();
         var image_name = _.last(url.split('/'));
+        // If image path is entered directly, we need to strip the asset prefix
+        image_name = _.last(image_name.split('block@'));
         this.model.set(image_field, image_name);
         // Wait to set the image src until the user stops typing
         clearTimeout(this.imageTimer);
