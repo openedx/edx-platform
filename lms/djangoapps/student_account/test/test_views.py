@@ -351,7 +351,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             reverse("register_user"),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
-        self.assertContains(resp, "Create your Test Microsite Account")
+        self.assertContains(resp, "Create your Test Microsite learning and research account!")
         self.assertContains(resp, "register-form")
 
     def test_login_registration_xframe_protected(self):
