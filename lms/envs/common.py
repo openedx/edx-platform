@@ -2129,6 +2129,8 @@ JWT_AUTH = {
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
     'JWT_LEEWAY': 1,
     'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
+    # Number of seconds before JWT tokens expire
+    'JWT_EXPIRATION': 30,
 }
 
 # The footer URLs dictionary maps social footer names
@@ -2781,9 +2783,6 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # The time value is in seconds.
 LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
-# Number of seconds before JWT tokens expire
-JWT_EXPIRATION = 30
-JWT_ISSUER = None
 
 # For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
 PUBLIC_RSA_KEY = None

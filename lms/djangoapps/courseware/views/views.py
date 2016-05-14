@@ -489,16 +489,11 @@ def course_about(request, course_id):
         )
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-        registration_price = 0
         in_cart = False
         reg_then_add_to_cart_link = ""
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
         if _is_shopping_cart_enabled:
-            registration_price = CourseMode.min_course_price_for_currency(
-                course_key,
-                settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-            )
             if request.user.is_authenticated():
                 cart = shoppingcart.models.Order.get_cart_for_user(request.user)
                 in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
@@ -512,7 +507,8 @@ def course_about(request, course_id):
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
         ecommerce_checkout_link = ''
-        professional_mode = ''
+        ecommerce_bulk_checkout_link = ''
+        professional_mode = None
         ecomm_service = EcommerceService()
         if ecomm_service.is_enabled(request.user) and (
                 CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
@@ -520,7 +516,14 @@ def course_about(request, course_id):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
+            if professional_mode.bulk_sku:
+                ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
 
+        # Find the minimum price for the course across all course modes
+        registration_price = CourseMode.min_course_price_for_currency(
+            course_key,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
         course_price = get_cosmetic_display_price(course, registration_price)
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
@@ -555,6 +558,7 @@ def course_about(request, course_id):
             'in_cart': in_cart,
             'ecommerce_checkout': ecomm_service.is_enabled(request.user),
             'ecommerce_checkout_link': ecommerce_checkout_link,
+            'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
