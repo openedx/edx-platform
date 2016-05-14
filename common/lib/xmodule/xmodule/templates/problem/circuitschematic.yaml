@@ -5,18 +5,18 @@ metadata:
 data: |
       <problem>
         <p>
-        Circuit schematic problems allow students to create virtual circuits by 
-        arranging elements such as voltage sources, capacitors, resistors, and 
-        MOSFETs on an interactive grid. The system evaluates a DC, AC, or 
+        Circuit schematic problems allow students to create virtual circuits by
+        arranging elements such as voltage sources, capacitors, resistors, and
+        MOSFETs on an interactive grid. The system evaluates a DC, AC, or
         transient analysis of the circuit.
         </p>
         <p>
-        For more information, see 
-        <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/circuit_schematic_builder.html" target="_blank">
+        For more information, see
+        <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/circuit_schematic_builder.html" target="_blank">
         Circuit Schematic Builder Problem</a> in <i>Building and Running an edX Course</i>.
         </p>
         <p>
-        When you add the problem, be sure to select <strong>Settings</strong> 
+        When you add the problem, be sure to select <strong>Settings</strong>
         to specify a <strong>Display Name</strong> and other values that apply.
         </p>
         <p>You can use the following example problems as models.</p>
@@ -32,7 +32,7 @@ data: |
         if response[0] == 'dc':
             for node in response[1:]:
                 dc_value = node['output']
-    
+
       if dc_value == .5:
         correct = ['correct']
       else:
@@ -61,14 +61,14 @@ data: |
         correct = ['incorrect']
       </answer>
       </schematicresponse>
-    
+
       <solution>
           <div class="detailed-solution">
               <p>Explanation</p>
               <p>
               You can form a voltage divider that evenly divides the input
               voltage with two identically valued resistors, with the sampled
-              voltage taken in between the two. 
+              voltage taken in between the two.
               </p>
               <p><img src="/static/images/voltage_divider.png" alt=""/></p>
               <p>
