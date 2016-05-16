@@ -98,7 +98,6 @@ from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 
-
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -255,6 +254,33 @@ def redirect_to_course_position(course_module, content_depth):
     urlargs['section'] = section.url_name
     return redirect(reverse('courseware_section', kwargs=urlargs))
 
+
+def redirect_to_chapter_section(course_module, content_depth):
+    """
+    Return a redirect to the user's current place in the course.
+
+    If there is no entrance exam at the root of the course chapter, then this
+    function will make sure the user is redirected to a section in stead
+    of a chapter.
+
+    If there is no current position in the course or chapter, then selects
+    the first child.
+
+    """
+    urlargs = {'course_id': course_module.id.to_deprecated_string()}
+    chapter = get_current_child(course_module, min_depth=content_depth)
+    if chapter is None:
+        # oops.  Something bad has happened.
+        raise Http404("No chapter found when loading current position in course")
+
+    # Relying on default of returning first child
+    section = get_current_child(chapter, min_depth=content_depth - 1)
+    if section is None:
+        raise Http404("No section found when loading current position in course")
+
+    urlargs['chapter'] = chapter.url_name
+    urlargs['section'] = section.url_name
+    return redirect(reverse('courseware_section', kwargs=urlargs))
 
 def save_child_position(seq_module, child_name):
     """
@@ -475,6 +501,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
+            if not course_has_entrance_exam(course):
+                return redirect_to_chapter_section(course_module, CONTENT_DEPTH)
             return redirect_to_course_position(course_module, CONTENT_DEPTH)
 
         chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
@@ -558,6 +586,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 course_module.position = None
                 course_module.save()
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
+
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
 
@@ -588,7 +617,6 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 # at least return a nice error message
                 log.exception("Error while rendering courseware-error page")
                 raise
-
     return result
 
 
