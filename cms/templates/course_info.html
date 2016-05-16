@@ -58,9 +58,15 @@ from openedx.core.djangolib.js_utils import (
       </div>
     </section>
     % if not context_course.course_home_sidebar_enabled:
-      <section class="content">
-        <a href="/settings/advanced/${course_locator}" class=" button new-button" style="float: right;">${_(context_course.info_sidebar_name)} <i class="icon fa fa-question" style="padding-bottom: 3%;"></i></a>
-    </section>
+      % if len(context_course.info_sidebar_name) == 0:
+        <section class="content">
+          <a href="/settings/advanced/${course_locator}" class=" button new-button" style="float: right;">Course Home Sidebar <i class="icon fa fa-question" style="padding-bottom: 3%;"></i></a>
+        </section>
+      % else:
+        <section class="content">
+          <a href="/settings/advanced/${course_locator}" class=" button new-button" style="float: right;">${_(context_course.info_sidebar_name)} <i class="icon fa fa-question" style="padding-bottom: 3%;"></i></a>
+        </section>
+      % endif
     % endif
   </div>
 
@@ -72,11 +78,11 @@ from openedx.core.djangolib.js_utils import (
             <ol class="update-list" id="course-update-list"></ol>
           </article>
         </div>
-        % if context_course.course_home_sidebar_enabled:
           <script>
             var infoSidebarName = "${_(context_course.info_sidebar_name)}";
           </script>
-        <div class="sidebar course-handouts" id="course-handouts-view"></div>
+        % if context_course.course_home_sidebar_enabled:
+          <div class="sidebar course-handouts" id="course-handouts-view"></div>
         % endif
       </div>
     </div>
