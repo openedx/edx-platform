@@ -158,7 +158,7 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getCourseData: function (courseId) {
-            var courseDetailUrl = '/api/course_structure/v0/courses/{courseId}/';
+            var courseDetailUrl = '/api/courses/v1/courses/{courseId}/';
             return $.ajax({
                 url: edx.StringUtils.interpolate(courseDetailUrl, {courseId: courseId}),
                 type: 'GET',
