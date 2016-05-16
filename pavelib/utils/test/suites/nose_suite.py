@@ -113,36 +113,38 @@ class SystemTestSuite(NoseTestSuite):
         self.test_id = kwargs.get('test_id', self._default_test_id)
         self.fasttest = kwargs.get('fasttest', False)
 
+        self.processes = kwargs.get('processes', None)
+        self.randomize = kwargs.get('randomize', None)
+
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
 
     @property
     def cmd(self):
-        cmd = (
-            './manage.py {system} test --verbosity={verbosity} '
-            '{test_id} {test_opts} --settings=test {system_opts} {extra} '
-            '--with-xunitmp --xunitmp-file={xunit_report}'.format(
-                system=self.root,
-                verbosity=self.verbosity,
-                test_id=self.test_id,
-                test_opts=self.test_options_flags,
-                system_opts=self._system_options,
-                extra=self.extra_args,
-                xunit_report=self.report_dir / "nosetests.xml",
-            )
-        )
+        if self.processes is None:
+            # Use one process per core for LMS tests, and no multiprocessing
+            # otherwise.
+            self.processes = -1 if self.root == 'lms' else 0
 
-        return self._under_coverage_cmd(cmd)
+        if self.randomize is None:
+            self.randomize = self.root == 'lms'
 
-    @property
-    def _system_options(self):
-        """
-        Test arguments that are only enabled for specific systems.
-        """
-        if self.root == 'lms':
-            return '--with-randomly --with-database-isolation --processes=-1'
+        cmd = [
+            './manage.py', self.root, 'test',
+            '--verbosity={}'.format(self.verbosity),
+            self.test_id,
+            self.test_options_flags,
+            '--settings=test',
+            self.extra_args,
+            '--with-xunitmp',
+            '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
+            '--processes={}'.format(self.processes),
+            '--with-database-isolation',
+        ]
+        if self.randomize:
+            cmd.append('--with-randomly')
 
-        return ''
+        return self._under_coverage_cmd(" ".join(cmd))
 
     @property
     def _default_test_id(self):

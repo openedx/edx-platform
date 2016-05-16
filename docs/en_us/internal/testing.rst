@@ -208,6 +208,18 @@ To run a single test format the command like this.
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
 
+The ``lms`` suite of tests runs concurrently, and with randomized order, by default.
+You can override these by using ``--no-randomize`` to disable randomization,
+and ``--processes=N`` to control how many tests will run concurrently (``0`` will
+disable concurrency). For example:
+
+::
+    # This will run all tests in the order that they appear in their files, serially
+    paver test_system -s lms --no-randomize --processes=0
+
+    # This will run using only 2 processes for tests
+    paver test_system -s lms --processes=2
+
 To re-run all failing django tests from lms or cms, use the
 ``--failed``,\ ``-f`` flag (see note at end of section).
 
