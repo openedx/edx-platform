@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from bulk_email.models import Optout
+from bulk_email.models import Optout, BulkEmailFlag
 from bulk_email.tasks import _get_source_address
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from instructor_task.subtasks import update_subtask_status
@@ -79,7 +79,6 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         """
         self.client.login(username=user.username, password="test")
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def goto_instructor_dash_email_view(self):
         """
         Goes to the instructor dashboard to verify that the email section is
@@ -90,7 +89,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         # navigate to a particular email section
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
+        # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
         self.assertIn(email_section, response.content)
 
     @classmethod
@@ -104,6 +103,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(EmailSendFromDashboardTestCase, self).setUp()
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         self.create_staff_and_instructor()
         self.create_students()
 
@@ -121,19 +121,22 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
             'success': True,
         }
 
+    def tearDown(self):
+        super(EmailSendFromDashboardTestCase, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
+
 
 @attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
     Tests email sending with mocked html_to_text.
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_disabled(self):
         """
         Test response when email is disabled for course.
         """
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         test_email = {
             'action': 'Send email',
             'send_to': 'myself',
@@ -402,7 +405,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
 
 @attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """

@@ -15,6 +15,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from bulk_email.models import BulkEmailFlag
 
 
 @attr('shard_1')
@@ -42,6 +43,11 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'course_id': self.course.id.to_deprecated_string(),
             'success': True,
         }
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    def tearDown(self):
+        super(TestOptoutCourseEmails, self).tearDown()
+        BulkEmailFlag.objects.all().delete()
 
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
@@ -49,10 +55,9 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
+        # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
         self.assertTrue(email_section in response.content)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optout_course(self):
         """
         Make sure student does not receive course email after opting out.
@@ -80,7 +85,6 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # Assert that self.student.email not in mail.to, outbox should be empty
         self.assertEqual(len(mail.outbox), 0)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_optin_course(self):
         """
         Make sure student receives course email after opting in.
