@@ -164,7 +164,7 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getCourseData: function (courseId) {
-            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            var courseDetailUrl = '/api/courses/v1/courses/%s/';
             return $.ajax({
                 url: _.sprintf(courseDetailUrl, courseId),
                 type: 'GET',
