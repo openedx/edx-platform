@@ -4,7 +4,7 @@
     var Tooltip = Backbone.View.extend({
         className: 'tooltip',
 
-        template: _.template('<div class="tooltip-content"><%= content %></div><div class="tooltip-arrow">▾</div>'),
+        template: _.template('<div class="tooltip-content"><%= content %></div><div class="tooltip-arrow" aria-hidden="true">▾</div>'),
 
         events: {
             'mouseenter': 'show',
