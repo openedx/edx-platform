@@ -6,6 +6,11 @@ from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
+try:
+    from pygments.console import colorize
+except ImportError:
+    colorize = lambda color, text: text
+
 __test__ = False  # do not collect
 
 
@@ -33,6 +38,7 @@ class NoseTestSuite(TestSuite):
         self.test_ids = self.test_id_dir / 'noseids'
         self.extra_args = kwargs.get('extra_args', '')
         self.cov_args = kwargs.get('cov_args', '')
+        self.use_ids = True
 
     def __enter__(self):
         super(NoseTestSuite, self).__enter__()
@@ -101,6 +107,9 @@ class NoseTestSuite(TestSuite):
         if self.pdb:
             opts += " --pdb"
 
+        if self.use_ids:
+            opts += " --with-id"
+
         return opts
 
 
@@ -116,18 +125,29 @@ class SystemTestSuite(NoseTestSuite):
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
 
-    def __enter__(self):
-        super(SystemTestSuite, self).__enter__()
-
-    @property
-    def cmd(self):
         if self.processes is None:
             # Use one process per core for LMS tests, and no multiprocessing
             # otherwise.
             self.processes = -1 if self.root == 'lms' else 0
 
+        self.processes = int(self.processes)
+
         if self.randomize is None:
             self.randomize = self.root == 'lms'
+
+        if self.processes != 0 and self.verbosity > 1:
+            print colorize(
+                'red',
+                "The TestId module and multiprocessing module can't be run "
+                "together in verbose mode. Disabling TestId for {} tests.".format(self.root)
+            )
+            self.use_ids = False
+
+    def __enter__(self):
+        super(SystemTestSuite, self).__enter__()
+
+    @property
+    def cmd(self):
 
         cmd = [
             './manage.py', self.root, 'test',
