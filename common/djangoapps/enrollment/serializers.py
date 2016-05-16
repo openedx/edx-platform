@@ -82,6 +82,17 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         lookup_field = 'username'
 
 
+class SupportCourseEnrollmentSerializer(CourseEnrollmentSerializer):
+    """Serializes for support users for CourseEnrollment models. It will include
+    expired modes by default.
+
+    Aggregates all data from the Course Enrollment table, and pulls in the serialization for
+    the Course Descriptor and course modes, to give a complete representation of course enrollment.
+
+    """
+    course_details = CourseSerializer(source="course_overview", include_expired=True)
+
+
 class ModeSerializer(serializers.Serializer):
     """Serializes a course's 'Mode' tuples
 

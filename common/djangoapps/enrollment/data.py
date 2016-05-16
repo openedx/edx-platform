@@ -11,7 +11,7 @@ from enrollment.errors import (
     CourseEnrollmentClosedError, CourseEnrollmentFullError,
     CourseEnrollmentExistsError, UserNotFoundError, InvalidEnrollmentAttribute
 )
-from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
+from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer, SupportCourseEnrollmentSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
@@ -23,7 +23,7 @@ from student.models import (
 log = logging.getLogger(__name__)
 
 
-def get_course_enrollments(user_id):
+def get_course_enrollments(user_id, support_user=False):
     """Retrieve a list representing all aggregated data for a user's course enrollments.
 
     Construct a representation of all course enrollment data for a specific user.
@@ -40,7 +40,10 @@ def get_course_enrollments(user_id):
         is_active=True
     ).order_by('created')
 
-    enrollments = CourseEnrollmentSerializer(qset, many=True).data
+    if support_user:
+        enrollments = SupportCourseEnrollmentSerializer(qset, many=True).data
+    else:
+        enrollments = CourseEnrollmentSerializer(qset, many=True).data
 
     # Find deleted courses and filter them out of the results
     deleted = []

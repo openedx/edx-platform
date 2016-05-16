@@ -56,7 +56,7 @@ class EnrollmentSupportListView(GenericAPIView):
         except User.DoesNotExist:
             return JsonResponse([])
 
-        enrollments = get_enrollments(user.username)
+        enrollments = get_enrollments(user.username, support_user=True)
         for enrollment in enrollments:
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
@@ -98,7 +98,7 @@ class EnrollmentSupportListView(GenericAPIView):
             # Wrapped in a transaction so that we can be sure the
             # ManualEnrollmentAudit record is always created correctly.
             with transaction.atomic():
-                update_enrollment(user.username, course_id, mode=new_mode)
+                update_enrollment(user.username, course_id, mode=new_mode, support_user=True)
                 manual_enrollment = ManualEnrollmentAudit.create_manual_enrollment_audit(
                     request.user,
                     enrollment.user.email,
