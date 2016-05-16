@@ -83,6 +83,7 @@ class GradesBlockTransformer(BlockStructureTransformer):
         """
         request = RequestFactory().get('/dummy-collect-max-grades')
         request.user = AnonymousUser()
+        request.user.known = False
         request.session = {}
         for block_locator in block_structure.post_order_traversal():
             course_id = unicode(block_locator.course_key)
