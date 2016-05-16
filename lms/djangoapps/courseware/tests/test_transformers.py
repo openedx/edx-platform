@@ -44,6 +44,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
                         u'weight': 2,
                         u'has_score': True,
                         u'due': u'2099-10-31T23:59:59+00:00',
+                        u'visible_to_staff_only': True,
                     },
                     u'#type': u'problem',
                     u'#ref': u'problem_2',
