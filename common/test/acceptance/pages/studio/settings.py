@@ -8,6 +8,7 @@ from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import requirejs
 
 from .course_page import CoursePage
+from .users import wait_for_ajax_or_reload
 from .utils import press_the_notification_button
 
 
@@ -26,6 +27,7 @@ class SettingsPage(CoursePage):
     # Helpers
     ################
     def is_browser_on_page(self):
+        wait_for_ajax_or_reload(self.browser)
         return self.q(css='body.view-settings').visible
 
     def wait_for_require_js(self):
@@ -34,6 +36,20 @@ class SettingsPage(CoursePage):
         """
         if hasattr(self, 'wait_for_js'):
             self.wait_for_js()  # pylint: disable=no-member
+
+    def wait_for_jquery_value(self, jquery_element, value):
+        """
+        Use jQuery to obtain the element's value.
+        This is useful for when jQuery performs functions towards the
+        end of the page load. (In other words, waiting for jquery to
+        load is not enough; we need to also query values that it has
+        injected onto the page to ensure it's done.)
+        """
+        self.wait_for(
+            lambda: self.browser.execute_script(
+                "return $('{ele}').val();".format(ele=jquery_element)) == '{val}'.format(val=value),
+            'wait for jQuery to finish loading data on page.'
+        )
 
     def refresh_and_wait_for_load(self):
         """
@@ -267,7 +283,7 @@ class SettingsPage(CoursePage):
         """
 
         # wait for upload button
-        self.wait_for_element_presence(upload_btn_selector, 'upload button is present')
+        self.wait_for_element_visibility(upload_btn_selector, 'upload button is present')
 
         self.q(css=upload_btn_selector).results[0].click()
 
