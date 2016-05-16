@@ -111,7 +111,7 @@ from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, UserAttribute
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from embargo import api as embargo_api
@@ -1814,6 +1814,8 @@ def create_account_with_params(request, params):
     login(request, new_user)
     request.session.set_expiry(0)
 
+    _record_registration_attribution(request, new_user)
+
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
@@ -1852,6 +1854,16 @@ def _enroll_user_in_pending_courses(student):
                     manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
                     manual_enrollment_audit.reason, enrollment
                 )
+
+
+def _record_registration_attribution(request, user):
+    """
+    Attribute this user's registration to the referring affiliate, if
+    applicable.
+    """
+    affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
+    if user is not None and affiliate_id is not None:
+        UserAttribute.set_user_attribute(user, settings.AFFILIATE_COOKIE_NAME, affiliate_id)
 
 
 @csrf_exempt

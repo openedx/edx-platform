@@ -24,7 +24,7 @@ from django.test.client import Client
 from course_modes.models import CourseMode
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
-    unique_id_for_user, LinkedInAddToProfileConfiguration
+    unique_id_for_user, LinkedInAddToProfileConfiguration, UserAttribute
 )
 from student.views import (
     process_survey_link,
@@ -1157,3 +1157,26 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.assertContains(response, 'This course is 1 of 3 courses in the', count)
         self.assertContains(response, self.program_name, count * 2)
         self.assertContains(response, 'View XSeries Details', count)
+
+
+class UserAttributeTests(TestCase):
+    """Tests for the UserAttribute model."""
+
+    def setUp(self):
+        super(UserAttributeTests, self).setUp()
+        self.user = UserFactory()
+        self.name = 'test'
+        self.value = 'test-value'
+
+    def test_get_set_attribute(self):
+        self.assertIsNone(UserAttribute.get_user_attribute(self.user, self.name))
+        UserAttribute.set_user_attribute(self.user, self.name, self.value)
+        self.assertEqual(UserAttribute.get_user_attribute(self.user, self.name), self.value)
+        new_value = 'new_value'
+        UserAttribute.set_user_attribute(self.user, self.name, new_value)
+        self.assertEqual(UserAttribute.get_user_attribute(self.user, self.name), new_value)
+
+    def test_unicode(self):
+        UserAttribute.set_user_attribute(self.user, self.name, self.value)
+        for field in (self.name, self.value, self.user.username):
+            self.assertIn(field, unicode(UserAttribute.objects.get(user=self.user)))
