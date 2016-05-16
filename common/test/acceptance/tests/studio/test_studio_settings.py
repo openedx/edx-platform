@@ -5,6 +5,7 @@ Acceptance tests for Studio's Setting pages
 from __future__ import unicode_literals
 import os
 
+from flaky import flaky
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -571,3 +572,40 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             include=['section.edit-settings-timed-examination']
         )
         self.course_outline.a11y_audit.check_for_accessibility_errors()
+
+
+class StudioSettingsImageUploadTest(StudioCourseTest):
+    """
+    Class to test course settings image uploads.
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioSettingsImageUploadTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+
+    @flaky(max_runs=20, min_passes=20)
+    def test_upload_course_card_image(self):
+        self.settings_page.visit()
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-course-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#course-image'))
+
+    @flaky(max_runs=20, min_passes=20)
+    def test_upload_course_banner_image(self):
+        self.settings_page.visit()
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-banner-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#banner-image'))
+
+    @flaky(max_runs=20, min_passes=20)
+    def test_upload_course_video_thumbnail_image(self):
+        self.settings_page.visit()
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-video-thumbnail-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
