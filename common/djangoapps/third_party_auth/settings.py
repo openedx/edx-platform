@@ -89,3 +89,17 @@ def apply_settings(django_settings):
 
     # Set scheme to use for redirection in python-social-auth
     django_settings.REDIRECT_IS_HTTPS = getattr(settings, 'THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS', False)
+
+    # Add email to requested authorizations.
+    django_settings.SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress']
+
+    # Add the fields so they will be requested from linkedin.
+    django_settings.SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address']
+
+    # Arrange to add the fields to UserSocialAuth.extra_data
+    django_settings.SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA = [
+        ('id', 'id'),
+        ('firstName', 'first_name'),
+        ('lastName', 'last_name'),
+        ('emailAddress', 'email_address')
+    ]
