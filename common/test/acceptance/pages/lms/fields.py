@@ -204,6 +204,8 @@ class FieldsMixin(object):
 
         if value is not None:
             select_option_by_text(query, value)
+            # Changing some dropdowns, e.g. Preferred Language, will make a PATCH request to update the value
+            self.wait_for_ajax()
 
         if self.mode_for_field(field_id) == 'edit':
             return get_selected_option_text(query)
