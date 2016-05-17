@@ -41,6 +41,7 @@ response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {
     'problem': {'tag': 'div'},
+    'question': {'tag': 'div'},
     'text': {'tag': 'span'},
     'math': {'tag': 'span'},
 }
@@ -135,7 +136,6 @@ class LoncapaProblem(object):
             seed (int): random number generator seed.
 
         """
-
         ## Initialize class variables from state
         self.do_reset()
         self.problem_id = id
@@ -814,6 +814,10 @@ class LoncapaProblem(object):
 
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
+            if problemtree.tag == 'problem':
+                tree.set('class', 'questions')
+            elif problemtree.tag == 'question':
+                tree.set('class', 'question')
         else:
             # copy attributes over if not innocufying
             for (key, value) in problemtree.items():

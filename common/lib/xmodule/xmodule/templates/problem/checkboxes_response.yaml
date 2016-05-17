@@ -23,25 +23,27 @@ metadata:
 
 data: |
       <problem>
-        <p>Checkbox problems allow learners to select multiple options. Learners can see all the options along with the problem text.</p>
-        <p>When you add the component, be sure to select <strong>Settings</strong> 
-        to specify a <strong>Display Name</strong> and other values that apply.</p>
-        <p>You can use the following example problem as a model.</p>
-          <p>The following languages are in the Indo-European family:</p>
-          <choiceresponse>
-            <checkboxgroup>
-              <choice correct="true" name="urdu">Urdu</choice>
-              <choice correct="false" name="finnish">Finnish</choice>
-              <choice correct="true" name="marathi">Marathi</choice>
-              <choice correct="true" name="french">French</choice>
-              <choice correct="false" name="hungarian">Hungarian</choice>
-            </checkboxgroup>
-          </choiceresponse>
-        <p><strong>Note</strong>: Make sure you select all of the correct options—there may be more than one!</p>
-        <solution>
-         <div class="detailed-solution">
-             <p>Explanation</p>
-             <p>Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.</p> 
-          </div>
-        </solution>
+        <question>
+          <p>Checkbox problems allow learners to select multiple options. Learners can see all the options along with the problem text.</p>
+          <p>When you add the component, be sure to select <strong>Settings</strong>
+          to specify a <strong>Display Name</strong> and other values that apply.</p>
+          <p>You can use the following example problem as a model.</p>
+            <p>The following languages are in the Indo-European family:</p>
+            <choiceresponse>
+              <checkboxgroup>
+                <choice correct="true" name="urdu">Urdu</choice>
+                <choice correct="false" name="finnish">Finnish</choice>
+                <choice correct="true" name="marathi">Marathi</choice>
+                <choice correct="true" name="french">French</choice>
+                <choice correct="false" name="hungarian">Hungarian</choice>
+              </checkboxgroup>
+            </choiceresponse>
+          <p><strong>Note</strong>: Make sure you select all of the correct options—there may be more than one!</p>
+          <solution>
+           <div class="detailed-solution">
+               <p>Explanation</p>
+               <p>Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hungarian are in the Uralic family.</p>
+            </div>
+          </solution>
+        </question>
       </problem>

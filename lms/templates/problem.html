@@ -1,13 +1,17 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header">
-  ${ problem['name'] }
-</h3>
 
 <div class="problem-progress"></div>
 
 <div class="problem">
+
+  <h3 class="hd hd-2 problem-header problem-title">
+    ${ problem['name'] }
+  </h3>
+
+
+
     <div aria-live="polite">
         ${ problem['html'] }
     </div>
