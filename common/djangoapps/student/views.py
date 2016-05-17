@@ -1044,7 +1044,6 @@ def change_enrollment(request, check_access=True):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
-
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
@@ -1074,7 +1073,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         requested_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
         try:
-            user = pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
+            user = pipeline.get_authenticated_user_helper(requested_provider, running_pipeline)
             third_party_auth_successful = True
         except User.DoesNotExist:
             AUDIT_LOG.warning(
