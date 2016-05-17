@@ -8,6 +8,7 @@ from bok_choy.promise import EmptyPromise
 from bok_choy.javascript import requirejs
 
 from .course_page import CoursePage
+from .users import wait_for_ajax_or_reload
 from .utils import press_the_notification_button
 
 
@@ -26,6 +27,7 @@ class SettingsPage(CoursePage):
     # Helpers
     ################
     def is_browser_on_page(self):
+        wait_for_ajax_or_reload(self.browser)
         return self.q(css='body.view-settings').visible
 
     def wait_for_require_js(self):
@@ -267,7 +269,7 @@ class SettingsPage(CoursePage):
         """
 
         # wait for upload button
-        self.wait_for_element_presence(upload_btn_selector, 'upload button is present')
+        self.wait_for_element_visibility(upload_btn_selector, 'upload button is present')
 
         self.q(css=upload_btn_selector).results[0].click()
 
