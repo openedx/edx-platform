@@ -164,7 +164,7 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getCourseData: function (courseId) {
-            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            var courseDetailUrl = '/api/courses/v1/courses/%s/';
             return $.ajax({
                 url: _.sprintf(courseDetailUrl, courseId),
                 type: 'GET',
@@ -253,7 +253,13 @@ var edx = edx || {};
                 for (var i = 0; i < length; i++) {
                     var line = order.lines[i],
                         attributeValues = _.find(line.product.attribute_values, function (attribute) {
-                            return attribute.name === 'course_key'
+                            // If the attribute has a 'code' property, compare its value, otherwise compare 'name'
+                            var value_to_match = 'course_key';
+                            if (attribute.code) {
+                                return attribute.code === value_to_match;
+                            } else {
+                                return attribute.name === value_to_match;
+                            }
                         });
 
                     // This method assumes that all items in the order are related to a single course.
