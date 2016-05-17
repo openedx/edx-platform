@@ -214,6 +214,7 @@ def enrolled_students_features(course_key, features):
     students = User.objects.filter(
         courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
+        is_staff=0,
     ).order_by('username').select_related('profile')
 
     if include_cohort_column:
