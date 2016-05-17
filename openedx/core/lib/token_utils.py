@@ -11,7 +11,7 @@ from provider.oauth2.models import Client
 from student.models import UserProfile, anonymous_id_for_user
 
 
-def get_id_token(user, client_name):
+def get_id_token(user, client_name, secret_key=None):
     """Construct a JWT for use with the named client.
 
     The JWT is signed with the named client's secret, and includes the following claims:
@@ -31,6 +31,8 @@ def get_id_token(user, client_name):
     Arguments:
         user (User): User for which to generate the JWT.
         client_name (unicode): Name of the OAuth2 Client for which the token is intended.
+        secret_key (str): Optional secret key for signing the JWT. Defaults to the configured client secret
+            if not provided.
 
     Returns:
         str: the JWT
@@ -64,7 +66,10 @@ def get_id_token(user, client_name):
         'sub': anonymous_id_for_user(user, None),
     }
 
-    return jwt.encode(payload, client.client_secret)
+    if secret_key is None:
+        secret_key = client.client_secret
+
+    return jwt.encode(payload, secret_key)
 
 
 def get_asymmetric_token(user, client_id):
