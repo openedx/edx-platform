@@ -6,6 +6,7 @@ import logging
 import uuid
 import json
 import warnings
+import os
 from collections import defaultdict
 from urlparse import urljoin
 
@@ -127,6 +128,10 @@ from openedx.core.djangoapps.credentials.utils import get_user_program_credentia
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
+
+# SailThru integration
+from sailthru.sailthru_client import SailthruClient
+from sailthru.sailthru_error import SailthruClientError
 
 
 log = logging.getLogger("edx.student")
@@ -1488,6 +1493,26 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
+def add_user_to_sailthru(user):
+    try:
+        sailthru_client = SailthruClient(os.environ['SAILTHRU_API_KEY'], os.environ['SAILTHRU_API_SECRET'])
+        response = sailthru_client.api_post("user", user)
+    except SailthruClientError as e:
+        # Handle exceptions
+        log.info ("Exception")
+        log.info (e)
+
+    if response.is_ok():
+        body = response.get_body()
+        # handle body which is of type dictionary
+        log.info (body)
+    else:
+        error = response.get_error()
+        log.info ("Error: " + error.get_message())
+        log.info ("Status Code: " + str(response.get_status_code()))
+        log.info ("Error Code: " + str(error.get_error_code()))
+
+
 def _do_create_account(form, custom_form=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
@@ -1729,6 +1754,7 @@ def create_account_with_params(request, params):
             }
         ]
 
+
         if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
             identity_args.append({
                 "MailChimp": {
@@ -1753,6 +1779,12 @@ def create_account_with_params(request, params):
                 }
             }
         )
+
+    if settings.FEATURES.get('ENABLE_SAILTHRU'):
+        sailthru_user = {"id": user.email}
+        sailthru_user['name'] = profile.name
+        sailthru_user['vars'] = profile
+        add_user_to_sailthru(sailthru_user)
 
     create_comments_service_user(user)
 
