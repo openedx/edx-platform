@@ -155,7 +155,8 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack")
         call_task("pavelib.servers.update_db", options=options)
-        db_command = "python manage.py {server} --settings={settings} migrate --traceback --pythonpath=."
+        # pylint: disable=line-too-long
+        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEquals(
             self.task_messages,
             [

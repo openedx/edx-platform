@@ -2,8 +2,11 @@
 Check code quality using pep8, pylint, and diff_quality.
 """
 from paver.easy import sh, task, cmdopts, needs, BuildFailure
+import json
 import os
 import re
+
+from openedx.core.djangolib.markup import HTML
 
 from .utils.envs import Env
 
@@ -133,8 +136,8 @@ def run_pylint(options):
 
     # Fail number of violations is greater than the limit
     if num_violations > violations_limit > -1:
-        raise Exception("Failed. Too many pylint violations. "
-                        "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+        raise BuildFailure("Failed. Too many pylint violations. "
+                           "The limit is {violations_limit}.".format(violations_limit=violations_limit))
 
 
 def _count_pylint_violations(report_file):
@@ -216,7 +219,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
     if count:
         failure_string = "Too many pep8 violations. " + violations_count_str
         failure_string += "\n\nViolations:\n{violations_list}".format(violations_list=violations_list)
-        raise Exception(failure_string)
+        raise BuildFailure(failure_string)
 
 
 @task
@@ -291,11 +294,158 @@ def run_jshint(options):
 
     # Fail if number of violations is greater than the limit
     if num_violations > violations_limit > -1:
-        raise Exception(
+        raise BuildFailure(
             "JSHint Failed. Too many violations ({count}).\nThe limit is {violations_limit}.".format(
                 count=num_violations, violations_limit=violations_limit
             )
         )
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+@cmdopts([
+    ("thresholds=", "t", "json containing limit for number of acceptable violations per rule"),
+])
+def run_safelint(options):
+    """
+    Runs safe_template_linter.py on the codebase
+    """
+
+    thresholds_option = getattr(options, 'thresholds', '{}')
+    try:
+        violation_thresholds = json.loads(thresholds_option)
+    except ValueError:
+        violation_thresholds = None
+    if isinstance(violation_thresholds, dict) is False or \
+            any(key not in ("total", "rules") for key in violation_thresholds.keys()):
+
+        raise BuildFailure(
+            """Error. Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
+            """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
+            """with property names in double-quotes.""".format(
+                thresholds_option=thresholds_option
+            )
+        )
+
+    safelint_script = "safe_template_linter.py"
+    safelint_report_dir = (Env.REPORT_DIR / "safelint")
+    safelint_report = safelint_report_dir / "safelint.report"
+    _prepare_report_dir(safelint_report_dir)
+
+    sh(
+        "{repo_root}/scripts/{safelint_script} --rule-totals >> {safelint_report}".format(
+            repo_root=Env.REPO_ROOT,
+            safelint_script=safelint_script,
+            safelint_report=safelint_report,
+        ),
+        ignore_error=True
+    )
+
+    safelint_counts = _get_safelint_counts(safelint_report)
+
+    try:
+        metrics_str = "Number of {safelint_script} violations: {num_violations}\n".format(
+            safelint_script=safelint_script, num_violations=int(safelint_counts['total'])
+        )
+        if 'rules' in safelint_counts and any(safelint_counts['rules']):
+            metrics_str += "\n"
+            rule_keys = sorted(safelint_counts['rules'].keys())
+            for rule in rule_keys:
+                metrics_str += "{rule} violations: {count}\n".format(
+                    rule=rule,
+                    count=int(safelint_counts['rules'][rule])
+                )
+    except TypeError:
+        raise BuildFailure(
+            "Error. Number of {safelint_script} violations could not be found in {safelint_report}".format(
+                safelint_script=safelint_script, safelint_report=safelint_report
+            )
+        )
+
+    metrics_report = (Env.METRICS_DIR / "safelint")
+    # Record the metric
+    _write_metric(metrics_str, metrics_report)
+    # Print number of violations to log.
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
+
+    error_message = ""
+
+    # Test total violations against threshold.
+    if 'total' in violation_thresholds.keys():
+        if violation_thresholds['total'] < safelint_counts['total']:
+            error_message = "Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
+                count=safelint_counts['total'], violations_limit=violation_thresholds['total']
+            )
+
+    # Test rule violations against thresholds.
+    if 'rules' in violation_thresholds:
+        threshold_keys = sorted(violation_thresholds['rules'].keys())
+        for threshold_key in threshold_keys:
+            if threshold_key not in safelint_counts['rules']:
+                error_message += (
+                    "\nNumber of {safelint_script} violations for {rule} could not be found in "
+                    "{safelint_report}."
+                ).format(
+                    safelint_script=safelint_script, rule=threshold_key, safelint_report=safelint_report
+                )
+            elif violation_thresholds['rules'][threshold_key] < safelint_counts['rules'][threshold_key]:
+                error_message += \
+                    "\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
+                        rule=threshold_key, count=safelint_counts['rules'][threshold_key],
+                        violations_limit=violation_thresholds['rules'][threshold_key],
+                    )
+
+    if error_message is not "":
+        raise BuildFailure(
+            "SafeTemplateLinter Failed.\n{error_message}\n"
+            "See {safelint_report} or run the following command to hone in on the problem:\n"
+            "  ./scripts/safe-commit-linter.sh -h".format(
+                error_message=error_message, safelint_report=safelint_report
+            )
+        )
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+def run_safecommit_report():
+    """
+    Runs safe-commit-linter.sh on the current branch.
+    """
+    safecommit_script = "safe-commit-linter.sh"
+    safecommit_report_dir = (Env.REPORT_DIR / "safecommit")
+    safecommit_report = safecommit_report_dir / "safecommit.report"
+    _prepare_report_dir(safecommit_report_dir)
+
+    sh(
+        "{repo_root}/scripts/{safecommit_script} | tee {safecommit_report}".format(
+            repo_root=Env.REPO_ROOT,
+            safecommit_script=safecommit_script,
+            safecommit_report=safecommit_report,
+        ),
+        ignore_error=True
+    )
+
+    safecommit_count = _get_safecommit_count(safecommit_report)
+
+    try:
+        num_violations = int(safecommit_count)
+    except TypeError:
+        raise BuildFailure(
+            "Error. Number of {safecommit_script} violations could not be found in {safecommit_report}".format(
+                safecommit_script=safecommit_script, safecommit_report=safecommit_report
+            )
+        )
+
+    # Print number of violations to log.
+    violations_count_str = "Number of {safecommit_script} violations: {num_violations}\n".format(
+        safecommit_script=safecommit_script, num_violations=num_violations
+    )
+
+    # Record the metric
+    metrics_report = (Env.METRICS_DIR / "safecommit")
+    _write_metric(violations_count_str, metrics_report)
+    # Output report to console.
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
 
 
 def _write_metric(metric, filename):
@@ -316,15 +466,28 @@ def _prepare_report_dir(dir_name):
     dir_name.mkdir_p()
 
 
-def _get_last_report_line(filename):
+def _get_report_contents(filename, last_line_only=False):
     """
-    Returns the last line of a given file. Used for getting output from quality output files.
+    Returns the contents of the given file. Use last_line_only to only return
+    the last line, which can be used for getting output from quality output
+    files.
+
+    Arguments:
+        last_line_only: True to return the last line only, False to return a
+            string with full contents.
+
+    Returns:
+        String containing full contents of the report, or the last line.
+
     """
     file_not_found_message = "The following log file could not be found: {file}".format(file=filename)
     if os.path.isfile(filename):
         with open(filename, 'r') as report_file:
-            lines = report_file.readlines()
-            return lines[len(lines) - 1]
+            if last_line_only:
+                lines = report_file.readlines()
+                return lines[len(lines) - 1]
+            else:
+                return report_file.read()
     else:
         # Raise a build error if the file is not found
         raise BuildFailure(file_not_found_message)
@@ -335,7 +498,7 @@ def _get_count_from_last_line(filename, file_type):
     This will return the number in the last line of a file.
     It is returning only the value (as a floating number).
     """
-    last_line = _get_last_report_line(filename)
+    last_line = _get_report_contents(filename, last_line_only=True)
     if file_type is "python_complexity":
         # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
         regex = r'\d+.\d+'
@@ -348,6 +511,66 @@ def _get_count_from_last_line(filename, file_type):
     # An AttributeError will occur if the regex finds no matches.
     # A ValueError will occur if the returned regex cannot be cast as a float.
     except (AttributeError, ValueError):
+        return None
+
+
+def _get_safelint_counts(filename):
+    """
+    This returns a dict of violations from the safelint report.
+
+    Arguments:
+        filename: The name of the safelint report.
+
+    Returns:
+        A dict containing the following:
+            rules: A dict containing the count for each rule as follows:
+                violation-rule-id: N, where N is the number of violations
+            total: M, where M is the number of total violations
+
+    """
+    report_contents = _get_report_contents(filename)
+    rule_count_regex = re.compile(r"^(?P<rule_id>[a-z-]+):\s+(?P<count>\d+) violations", re.MULTILINE)
+    total_count_regex = re.compile(r"^(?P<count>\d+) violations total", re.MULTILINE)
+    violations = {'rules': {}}
+    for violation_match in rule_count_regex.finditer(report_contents):
+        try:
+            violations['rules'][violation_match.group('rule_id')] = int(violation_match.group('count'))
+        except ValueError:
+            violations['rules'][violation_match.group('rule_id')] = None
+    try:
+        violations['total'] = int(total_count_regex.search(report_contents).group('count'))
+    # An AttributeError will occur if the regex finds no matches.
+    # A ValueError will occur if the returned regex cannot be cast as a float.
+    except (AttributeError, ValueError):
+        violations['total'] = None
+    return violations
+
+
+def _get_safecommit_count(filename):
+    """
+    Returns the violation count from the safecommit report.
+
+    Arguments:
+        filename: The name of the safecommit report.
+
+    Returns:
+        The count of safecommit violations, or None if there is  a problem.
+
+    """
+    report_contents = _get_report_contents(filename)
+
+    if 'No files linted' in report_contents:
+        return 0
+
+    file_count_regex = re.compile(r"^(?P<count>\d+) violations total", re.MULTILINE)
+    try:
+        validation_count = None
+        for count_match in file_count_regex.finditer(report_contents):
+            if validation_count is None:
+                validation_count = 0
+            validation_count += int(count_match.group('count'))
+        return validation_count
+    except ValueError:
         return None
 
 
@@ -383,9 +606,9 @@ def run_quality(options):
             sep = '-------------<br/>\n'
             title = "<h1>Quality Report: pep8</h1>\n"
             violations_bullets = ''.join(
-                ['<li>{violation}</li><br/>\n'.format(violation=violation) for violation in violations_list]
+                [HTML('<li>{violation}</li><br/>\n').format(violation=violation) for violation in violations_list]
             )
-            violations_str = '<ul>\n{bullets}</ul>\n'.format(bullets=violations_bullets)
+            violations_str = HTML('<ul>\n{bullets}</ul>\n').format(bullets=HTML(violations_bullets))
             violations_count_str = "<b>Violations</b>: {count}<br/>\n"
             fail_line = "<b>FAILURE</b>: pep8 count should be 0<br/>\n"
         else:

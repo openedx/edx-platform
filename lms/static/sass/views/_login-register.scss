@@ -245,7 +245,7 @@
                 color: $red;
             }
 
-            &[for="register-honor_code"] {
+            &[for="register-honor_code"], &[for="register-terms_of_service"] {
                 display: inline-block;
                 margin: 5px 5px 0 0;
                 width: 90%;

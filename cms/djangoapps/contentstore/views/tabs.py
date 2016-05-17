@@ -14,8 +14,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.tabs import CourseTabList, CourseTab, InvalidTabsException, StaticTab
-from opaque_keys.edx.keys import UsageKey
-from util.course_key_utils import course_key_from_string_or_404
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from ..utils import get_lms_link_for_item
 
@@ -40,7 +39,7 @@ def tabs_handler(request, course_key_string):
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    course_key = course_key_from_string_or_404(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 

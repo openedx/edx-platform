@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from courseware.views import get_current_child
+from courseware.views.views import get_current_child
 from courseware.access import has_access
 from openedx.core.lib.token_utils import get_id_token
 from student.models import anonymous_id_for_user

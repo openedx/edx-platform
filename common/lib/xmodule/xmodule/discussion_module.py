@@ -108,8 +108,9 @@ class DiscussionModule(DiscussionFields, XModule):
 
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
-
     module_class = DiscussionModule
+    resources_dir = None
+
     # The discussion XML format uses `id` and `for` attributes,
     # but these would overload other module attributes, so we prefix them
     # for actual use in the code
@@ -123,3 +124,9 @@ class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawD
         # We may choose to enable sort_keys in the future, but while Kevin is investigating....
         non_editable_fields.extend([DiscussionDescriptor.discussion_id, DiscussionDescriptor.sort_key])
         return non_editable_fields
+
+    def student_view_data(self):
+        """
+        Returns a JSON representation of the student_view of this XModule.
+        """
+        return {'topic_id': self.discussion_id}

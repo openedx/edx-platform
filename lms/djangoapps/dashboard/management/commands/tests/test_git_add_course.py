@@ -8,6 +8,8 @@ import StringIO
 import subprocess
 import unittest
 
+from nose.plugins.attrib import attr
+
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -34,6 +36,7 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
+@attr('shard_3')
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
@@ -47,6 +50,8 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
     GIT_REPO_DIR = settings.GIT_REPO_DIR
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def assertCommandFailureRegexp(self, regex, *args):
         """

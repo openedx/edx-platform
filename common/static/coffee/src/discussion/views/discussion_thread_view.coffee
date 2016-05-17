@@ -20,6 +20,7 @@ if Backbone?
       super()
       @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
       @context = options.context or "course"  # allowed values are "course" or "standalone"
+      @options = _.extend({}, options)
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
@@ -46,7 +47,7 @@ if Backbone?
         mode: @mode
         model: @model
         el: @el
-        course_settings: @course_settings
+        course_settings: @options.course_settings
         topicId: @topicId
       )
       @render()

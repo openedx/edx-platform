@@ -51,7 +51,7 @@
                 });
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).andCallFake( function() {} );
+                spyOn( view, 'redirect' ).and.callFake( function() {} );
 
                 view.render();
             };

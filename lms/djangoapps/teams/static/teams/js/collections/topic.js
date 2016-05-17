@@ -4,6 +4,7 @@
         function(_, gettext, BaseCollection, TopicModel) {
             var TopicCollection = BaseCollection.extend({
                 initialize: function(topics, options) {
+
                     var self = this;
 
                     BaseCollection.prototype.initialize.call(this, options);

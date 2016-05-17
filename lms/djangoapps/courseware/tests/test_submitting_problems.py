@@ -127,6 +127,8 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(TestSubmittingProblems, self).setUp()
 
@@ -316,7 +318,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         return [s.earned for s in hw_section['scores']]
 
 
-@attr('shard_1')
+@attr('shard_3')
 class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.

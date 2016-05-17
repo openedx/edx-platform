@@ -31,6 +31,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
 from xmodule.modulestore import ModuleStoreEnum
 
+from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory, UserProfileFactory
@@ -51,7 +52,7 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -192,7 +193,6 @@ class TestCommonExceptions400(TestCase):
 
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -207,6 +207,12 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             'robot-some-problem-urlname'
         )
         cls.problem_urlname = cls.problem_location.to_deprecated_string()
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorAPIDenyLevels, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorAPIDenyLevels, self).setUp()
@@ -3391,7 +3397,6 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -3409,6 +3414,12 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
             'subject': test_subject,
             'message': test_message,
         }
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorSendEmail, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorSendEmail, self).setUp()
@@ -3968,27 +3979,6 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         })
         self.assertEqual(response.status_code, 400, response.content)
 
-    @SharedModuleStoreTestCase.modifies_courseware
-    def test_reset_extension_to_deleted_date(self):
-        """
-        Test that we can delete a due date extension after deleting the normal
-        due date, without causing an error.
-        """
-        self.test_change_due_date()
-        self.week1.due = None
-        self.week1 = self.store.update_item(self.week1, self.user1.id)
-        # Now, week1's normal due date is deleted but the extension still exists.
-        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {
-            'student': self.user1.username,
-            'url': self.week1.location.to_deprecated_string(),
-        })
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(
-            None,
-            get_extended_due(self.course, self.week1, self.user1)
-        )
-
     def test_show_unit_extensions(self):
         self.test_change_due_date()
         url = reverse('show_unit_extensions',
@@ -4015,6 +4005,114 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             u'header': [u'Unit', u'Extended Due Date'],
             u'title': u'Due date extensions for %s (%s)' % (
                 self.user1.profile.name, self.user1.username)})
+
+
+@attr('shard_1')
+class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        super(TestDueDateExtensionsDeletedDate, self).setUp()
+
+        self.course = CourseFactory.create()
+        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.week1 = ItemFactory.create(due=self.due)
+            self.week2 = ItemFactory.create(due=self.due)
+            self.week3 = ItemFactory.create()  # No due date
+            self.course.children = [
+                self.week1.location.to_deprecated_string(),
+                self.week2.location.to_deprecated_string(),
+                self.week3.location.to_deprecated_string()
+            ]
+            self.homework = ItemFactory.create(
+                parent_location=self.week1.location,
+                due=self.due
+            )
+            self.week1.children = [self.homework.location.to_deprecated_string()]
+
+        user1 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week2.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week3.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user2 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user3 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        self.user1 = user1
+        self.user2 = user2
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_reset_extension_to_deleted_date(self):
+        """
+        Test that we can delete a due date extension after deleting the normal
+        due date, without causing an error.
+        """
+
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+                         get_extended_due(self.course, self.week1, self.user1))
+
+        self.week1.due = None
+        self.week1 = self.store.update_item(self.week1, self.user1.id)
+        # Now, week1's normal due date is deleted but the extension still exists.
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
 
 
 @attr('shard_1')

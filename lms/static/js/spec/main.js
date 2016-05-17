@@ -1,6 +1,8 @@
 (function(requirejs, define) {
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
+        baseUrl: '/base/',
+
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
@@ -29,9 +31,9 @@
             'moment': 'xmodule_js/common_static/js/vendor/moment.min',
             'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
-            'underscore': 'xmodule_js/common_static/common/js/vendor/underscore',
-            'underscore.string': 'xmodule_js/common_static/common/js/vendor/underscore.string',
-            'backbone': 'xmodule_js/common_static/js/vendor/backbone-min',
+            'underscore': 'common/js/vendor/underscore',
+            'underscore.string': 'common/js/vendor/underscore.string',
+            'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'xmodule_js/common_static/js/vendor/backbone.paginator.min',
             'backbone-super': 'js/vendor/backbone-super',
@@ -43,10 +45,7 @@
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
             'squire': 'xmodule_js/common_static/js/vendor/Squire',
-            'jasmine-jquery': 'xmodule_js/common_static/js/vendor/jasmine-jquery',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
-            'jasmine-stealth': 'xmodule_js/common_static/js/vendor/jasmine-stealth',
-            'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
             'youtube': '//www.youtube.com/player_api?noext',
@@ -65,11 +64,11 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
             'MathJaxProcessor': 'coffee/src/customwmd',
-            'picturefill': 'common/js/vendor/picturefill.min',
+            'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
-            'modernizr': 'xmodule_js/common_static/edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'xmodule_js/common_static/edx-pattern-library/js/afontgarde',
-            'edxicons': 'xmodule_js/common_static/edx-pattern-library/js/edx-icons',
+            'modernizr': 'edx-pattern-library/js/modernizr-custom',
+            'afontgarde': 'edx-pattern-library/js/afontgarde',
+            'edxicons': 'edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -101,9 +100,9 @@
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min',
 
             // Common edx utils
-            'common/js/utils/edx.utils.validate': 'xmodule_js/common_static/common/js/utils/edx.utils.validate',
-            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid',
-            'slick.core': 'xmodule_js/common_static/js/vendor/slick.core'
+            'common/js/utils/edx.utils.validate': 'common/js/utils/edx.utils.validate',
+            'slick.core': 'xmodule_js/common_static/js/vendor/slick.core',
+            'slick.grid': 'xmodule_js/common_static/js/vendor/slick.grid'
         },
         shim: {
             'gettext': {
@@ -256,18 +255,15 @@
             'sinon': {
                 exports: 'sinon'
             },
-            'jasmine-jquery': {
-                deps: ['jasmine']
+            'jasmine-imagediff': {},
+            'common/js/spec_helpers/jasmine-extensions': {
+                deps: ['jquery']
             },
-            'jasmine-imagediff': {
-                deps: ['jasmine']
+            'common/js/spec_helpers/jasmine-stealth': {
+                deps: ['underscore', 'underscore.string']
             },
-            'jasmine-stealth': {
-                deps: ['jasmine']
-            },
-            'jasmine.async': {
-                deps: ['jasmine'],
-                exports: 'AsyncSpec'
+            'common/js/spec_helpers/jasmine-waituntil': {
+                deps: ['jquery']
             },
             'xblock/core': {
                 exports: 'XBlock',
@@ -366,11 +362,18 @@
                 deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    window._ = require('underscore');
-                    window._.str = require('underscore.string');
-                    window.edx = edx || {};
-                    window.edx.HtmlUtils = require('edx-ui-toolkit/js/utils/html-utils');
-                    window.edx.StringUtils = require('edx-ui-toolkit/js/utils/string-utils');
+                    require([
+                        'underscore',
+                        'underscore.string',
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function (_, str, HtmlUtils, StringUtils) {
+                        window._ = _;
+                        window._.str = str;
+                        window.edx = edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
                 }
             },
             'js/verify_student/views/intro_step_view': {
@@ -495,8 +498,10 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    window.Backbone = require('backbone');
-                    window.URI = require('URI');
+                    require(['backbone', 'URI'], function (Backbone, URI) {
+                        window.Backbone = Backbone;
+                        window.URI = URI;
+                    });
                 }
             },
             'xmodule_js/common_static/coffee/src/discussion/content': {
@@ -550,13 +555,15 @@
             },
             'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_show_view': {
                 deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadShowView'
             },
             'xmodule_js/common_static/coffee/src/discussion/views/discussion_thread_view': {
                 deps: [
-                    'xmodule_js/common_static/coffee/src/discussion/utils'
+                    'xmodule_js/common_static/coffee/src/discussion/utils',
+                    'xmodule_js/common_static/coffee/src/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadView'
             },
@@ -638,124 +645,139 @@
         }
     });
 
-    // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
-    define([
-        // Run the LMS tests
-        'lms/include/js/spec/components/header/header_spec.js',
-        'lms/include/js/spec/components/card/card_spec.js',
-        'lms/include/js/spec/staff_debug_actions_spec.js',
-        'lms/include/js/spec/views/notification_spec.js',
-        'lms/include/js/spec/views/file_uploader_spec.js',
-        'lms/include/js/spec/dashboard/donation.js',
-        'lms/include/js/spec/dashboard/dropdown_spec.js',
-        'lms/include/js/spec/dashboard/track_events_spec.js',
-        'lms/include/js/spec/groups/views/cohorts_spec.js',
-        'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
-        'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
-        'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
-        'lms/include/js/spec/student_account/account_spec.js',
-        'lms/include/js/spec/student_account/access_spec.js',
-        'lms/include/js/spec/student_account/logistration_factory_spec.js',
-        'lms/include/js/spec/student_account/finish_auth_spec.js',
-        'lms/include/js/spec/student_account/hinted_login_spec.js',
-        'lms/include/js/spec/student_account/login_spec.js',
-        'lms/include/js/spec/student_account/institution_login_spec.js',
-        'lms/include/js/spec/student_account/register_spec.js',
-        'lms/include/js/spec/student_account/password_reset_spec.js',
-        'lms/include/js/spec/student_account/enrollment_spec.js',
-        'lms/include/js/spec/student_account/emailoptin_spec.js',
-        'lms/include/js/spec/student_account/shoppingcart_spec.js',
-        'lms/include/js/spec/student_account/account_settings_factory_spec.js',
-        'lms/include/js/spec/student_account/account_settings_fields_spec.js',
-        'lms/include/js/spec/student_account/account_settings_view_spec.js',
-        'lms/include/js/spec/views/fields_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
-        'lms/include/js/spec/student_profile/share_modal_view_spec.js',
-        'lms/include/js/spec/student_profile/badge_view_spec.js',
-        'lms/include/js/spec/student_profile/section_two_tab_spec.js',
-        'lms/include/js/spec/student_profile/badge_list_view_spec.js',
-        'lms/include/js/spec/student_profile/badge_list_container_spec.js',
-        'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
-        'lms/include/js/spec/verify_student/reverify_view_spec.js',
-        'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
-        'lms/include/js/spec/verify_student/image_input_spec.js',
-        'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
-        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
-        'lms/include/js/spec/edxnotes/views/shim_spec.js',
-        'lms/include/js/spec/edxnotes/views/note_item_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
-        'lms/include/js/spec/edxnotes/views/search_box_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
-        'lms/include/js/spec/edxnotes/views/tab_item_spec.js',
-        'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/tags_spec.js',
-        'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_visibility_factory_spec.js',
-        'lms/include/js/spec/edxnotes/models/tab_spec.js',
-        'lms/include/js/spec/edxnotes/models/note_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/events_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/store_error_handler_spec.js',
-        'lms/include/js/spec/edxnotes/collections/notes_spec.js',
-        'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/navigation_spec.js',
-        'lms/include/js/spec/courseware/updates_visibility.js',
-        'lms/include/js/spec/discovery/collections/filters_spec.js',
-        'lms/include/js/spec/discovery/models/course_card_spec.js',
-        'lms/include/js/spec/discovery/models/course_directory_spec.js',
-        'lms/include/js/spec/discovery/models/facet_option_spec.js',
-        'lms/include/js/spec/discovery/models/filter_spec.js',
-        'lms/include/js/spec/discovery/models/search_state_spec.js',
-        'lms/include/js/spec/discovery/views/course_card_spec.js',
-        'lms/include/js/spec/discovery/views/courses_listing_spec.js',
-        'lms/include/js/spec/discovery/views/filter_bar_spec.js',
-        'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
-        'lms/include/js/spec/discovery/views/search_form_spec.js',
-        'lms/include/js/spec/discovery/discovery_factory_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js',
-        'lms/include/support/js/spec/collections/enrollment_spec.js',
-        'lms/include/support/js/spec/models/enrollment_spec.js',
-        'lms/include/support/js/spec/views/enrollment_modal_spec.js',
-        'lms/include/support/js/spec/views/enrollment_spec.js',
-        'lms/include/support/js/spec/views/certificates_spec.js',
-        'lms/include/teams/js/spec/collections/topic_collection_spec.js',
-        'lms/include/teams/js/spec/teams_tab_factory_spec.js',
-        'lms/include/teams/js/spec/views/edit_team_spec.js',
-        'lms/include/teams/js/spec/views/edit_team_members_spec.js',
-        'lms/include/teams/js/spec/views/instructor_tools_spec.js',
-        'lms/include/teams/js/spec/views/my_teams_spec.js',
-        'lms/include/teams/js/spec/views/team_card_spec.js',
-        'lms/include/teams/js/spec/views/team_discussion_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_spec.js',
-        'lms/include/teams/js/spec/views/teams_spec.js',
-        'lms/include/teams/js/spec/views/teams_tab_spec.js',
-        'lms/include/teams/js/spec/views/topic_card_spec.js',
-        'lms/include/teams/js/spec/views/topic_teams_spec.js',
-        'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
-        'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
-        'lms/include/js/spec/views/message_banner_spec.js',
-        'lms/include/js/spec/markdown_editor_spec.js',
-        'lms/include/js/spec/learner_dashboard/collection_list_view_spec.js',
-        'lms/include/js/spec/learner_dashboard/sidebar_view_spec.js',
-        'lms/include/js/spec/learner_dashboard/program_card_view_spec.js',
-        'lms/include/js/spec/learner_dashboard/certificate_view_spec.js'
-    ]);
+    var testFiles = [
+        'js/spec/components/header/header_spec.js',
+        'js/spec/components/card/card_spec.js',
+        'js/spec/staff_debug_actions_spec.js',
+        'js/spec/views/notification_spec.js',
+        'js/spec/views/file_uploader_spec.js',
+        'js/spec/dashboard/donation.js',
+        'js/spec/dashboard/dropdown_spec.js',
+        'js/spec/dashboard/track_events_spec.js',
+        'js/spec/groups/views/cohorts_spec.js',
+        'js/spec/shoppingcart/shoppingcart_spec.js',
+        'js/spec/instructor_dashboard/ecommerce_spec.js',
+        'js/spec/instructor_dashboard/student_admin_spec.js',
+        'js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
+        'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
+        'js/spec/instructor_dashboard/certificates_spec.js',
+        'js/spec/student_account/account_spec.js',
+        'js/spec/student_account/access_spec.js',
+        'js/spec/student_account/logistration_factory_spec.js',
+        'js/spec/student_account/finish_auth_spec.js',
+        'js/spec/student_account/hinted_login_spec.js',
+        'js/spec/student_account/login_spec.js',
+        'js/spec/student_account/institution_login_spec.js',
+        'js/spec/student_account/register_spec.js',
+        'js/spec/student_account/password_reset_spec.js',
+        'js/spec/student_account/enrollment_spec.js',
+        'js/spec/student_account/emailoptin_spec.js',
+        'js/spec/student_account/shoppingcart_spec.js',
+        'js/spec/student_account/account_settings_factory_spec.js',
+        'js/spec/student_account/account_settings_fields_spec.js',
+        'js/spec/student_account/account_settings_view_spec.js',
+        'js/spec/views/fields_spec.js',
+        'js/spec/student_profile/learner_profile_factory_spec.js',
+        'js/spec/student_profile/learner_profile_view_spec.js',
+        'js/spec/student_profile/learner_profile_fields_spec.js',
+        'js/spec/student_profile/share_modal_view_spec.js',
+        'js/spec/student_profile/badge_view_spec.js',
+        'js/spec/student_profile/section_two_tab_spec.js',
+        'js/spec/student_profile/badge_list_view_spec.js',
+        'js/spec/student_profile/badge_list_container_spec.js',
+        'js/spec/verify_student/pay_and_verify_view_spec.js',
+        'js/spec/verify_student/reverify_view_spec.js',
+        'js/spec/verify_student/webcam_photo_view_spec.js',
+        'js/spec/verify_student/image_input_spec.js',
+        'js/spec/verify_student/review_photos_step_view_spec.js',
+        'js/spec/verify_student/make_payment_step_view_spec.js',
+        'js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
+        'js/spec/edxnotes/utils/logger_spec.js',
+        'js/spec/edxnotes/views/notes_factory_spec.js',
+        'js/spec/edxnotes/views/shim_spec.js',
+        'js/spec/edxnotes/views/note_item_spec.js',
+        'js/spec/edxnotes/views/notes_page_spec.js',
+        'js/spec/edxnotes/views/search_box_spec.js',
+        'js/spec/edxnotes/views/tabs_list_spec.js',
+        'js/spec/edxnotes/views/tab_item_spec.js',
+        'js/spec/edxnotes/views/tab_view_spec.js',
+        'js/spec/edxnotes/views/tabs/search_results_spec.js',
+        'js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+        'js/spec/edxnotes/views/tabs/course_structure_spec.js',
+        'js/spec/edxnotes/views/tabs/tags_spec.js',
+        'js/spec/edxnotes/views/visibility_decorator_spec.js',
+        'js/spec/edxnotes/views/notes_visibility_factory_spec.js',
+        'js/spec/edxnotes/models/tab_spec.js',
+        'js/spec/edxnotes/models/note_spec.js',
+        'js/spec/edxnotes/plugins/accessibility_spec.js',
+        'js/spec/edxnotes/plugins/events_spec.js',
+        'js/spec/edxnotes/plugins/scroller_spec.js',
+        'js/spec/edxnotes/plugins/caret_navigation_spec.js',
+        'js/spec/edxnotes/plugins/store_error_handler_spec.js',
+        'js/spec/edxnotes/collections/notes_spec.js',
+        'js/spec/search/search_spec.js',
+        'js/spec/navigation_spec.js',
+        'js/spec/courseware/updates_visibility.js',
+        'js/spec/discovery/collections/filters_spec.js',
+        'js/spec/discovery/models/course_card_spec.js',
+        'js/spec/discovery/models/course_directory_spec.js',
+        'js/spec/discovery/models/facet_option_spec.js',
+        'js/spec/discovery/models/filter_spec.js',
+        'js/spec/discovery/models/search_state_spec.js',
+        'js/spec/discovery/views/course_card_spec.js',
+        'js/spec/discovery/views/courses_listing_spec.js',
+        'js/spec/discovery/views/filter_bar_spec.js',
+        'js/spec/discovery/views/refine_sidebar_spec.js',
+        'js/spec/discovery/views/search_form_spec.js',
+        'js/spec/discovery/discovery_factory_spec.js',
+        'js/spec/ccx/schedule_spec.js',
+        'support/js/spec/collections/enrollment_spec.js',
+        'support/js/spec/models/enrollment_spec.js',
+        'support/js/spec/views/enrollment_modal_spec.js',
+        'support/js/spec/views/enrollment_spec.js',
+        'support/js/spec/views/certificates_spec.js',
+        'teams/js/spec/collections/topic_collection_spec.js',
+        'teams/js/spec/teams_tab_factory_spec.js',
+        'teams/js/spec/views/edit_team_spec.js',
+        'teams/js/spec/views/edit_team_members_spec.js',
+        'teams/js/spec/views/instructor_tools_spec.js',
+        'teams/js/spec/views/my_teams_spec.js',
+        'teams/js/spec/views/team_card_spec.js',
+        'teams/js/spec/views/team_discussion_spec.js',
+        'teams/js/spec/views/team_profile_spec.js',
+        'teams/js/spec/views/teams_spec.js',
+        'teams/js/spec/views/teams_tab_spec.js',
+        'teams/js/spec/views/topic_card_spec.js',
+        'teams/js/spec/views/topic_teams_spec.js',
+        'teams/js/spec/views/topics_spec.js',
+        'teams/js/spec/views/team_profile_header_actions_spec.js',
+        'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
+        'js/spec/bookmarks/bookmarks_list_view_spec.js',
+        'js/spec/bookmarks/bookmark_button_view_spec.js',
+        'js/spec/views/message_banner_spec.js',
+        'js/spec/markdown_editor_spec.js',
+        'js/spec/learner_dashboard/collection_list_view_spec.js',
+        'js/spec/learner_dashboard/sidebar_view_spec.js',
+        'js/spec/learner_dashboard/program_card_view_spec.js',
+        'js/spec/learner_dashboard/certificate_view_spec.js',
+        'js/spec/api_admin/catalog_preview_spec.js',
+    ];
 
+    for (var i = 0; i < testFiles.length; i++) {
+        testFiles[i] = '/base/' + testFiles[i];
+    }
+
+    var specHelpers = [
+        'common/js/spec_helpers/jasmine-extensions',
+        'common/js/spec_helpers/jasmine-stealth',
+        'common/js/spec_helpers/jasmine-waituntil'
+    ];
+
+    // Jasmine has a global stack for creating a tree of specs. We need to load
+    // spec files one by one, otherwise some end up getting nested under others.
+    window.requireSerial(specHelpers.concat(testFiles), function () {
+        // start test run, once Require.js is done
+        window.__karma__.start();
+    });
 }).call(this, requirejs, define);

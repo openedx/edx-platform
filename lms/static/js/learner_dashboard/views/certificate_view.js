@@ -21,8 +21,16 @@
                     this.render();
                 },
                 render: function() {
-                    if (this.context.certificatesData.length > 0) {
+                    var certificatesData = this.context.certificatesData || [];
+
+                    if (certificatesData.length) {
                         this.$el.html(this.tpl(this.context));
+                    } else {
+                        /**
+                         *  If not rendering remove el because
+                         *  styles are applied to it
+                         */
+                        this.remove();
                     }
                 }
             });

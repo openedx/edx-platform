@@ -46,6 +46,25 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         return instructor_dashboard_page
 
 
+@ddt.ddt
+class BulkEmailTest(BaseInstructorDashboardTest):
+    """
+    End-to-end tests for bulk emailing from instructor dash.
+    """
+    def setUp(self):
+        super(BulkEmailTest, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.send_email_page = instructor_dashboard_page.select_bulk_email()
+
+    @ddt.data("Myself", "Staff and admins", "All (students, staff, and admins)")
+    def test_email_queued_for_sending(self, recipient):
+        self.assertTrue(self.send_email_page.is_browser_on_page())
+        self.send_email_page.send_message(recipient)
+        self.send_email_page.verify_message_queued_successfully()
+
+
 @attr('shard_7')
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """

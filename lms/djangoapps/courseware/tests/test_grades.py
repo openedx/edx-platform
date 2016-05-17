@@ -151,6 +151,8 @@ class TestMaxScoresCache(SharedModuleStoreTestCase):
     Tests for the MaxScoresCache
     """
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @classmethod
     def setUpClass(cls):
         super(TestMaxScoresCache, cls).setUpClass()
@@ -366,13 +368,19 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         cls.seq1 = ItemFactory.create(
             parent=cls.chapter,
             category='sequential',
-            display_name="Test Sequential",
+            display_name="Test Sequential 1",
             graded=True
         )
         cls.seq2 = ItemFactory.create(
             parent=cls.chapter,
             category='sequential',
-            display_name="Test Sequential",
+            display_name="Test Sequential 2",
+            graded=True
+        )
+        cls.seq3 = ItemFactory.create(
+            parent=cls.chapter,
+            category='sequential',
+            display_name="Test Sequential 3",
             graded=True
         )
         cls.vert1 = ItemFactory.create(
@@ -385,10 +393,20 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             category='vertical',
             display_name='Test Vertical 2'
         )
+        cls.vert3 = ItemFactory.create(
+            parent=cls.seq3,
+            category='vertical',
+            display_name='Test Vertical 3'
+        )
         cls.randomize = ItemFactory.create(
             parent=cls.vert2,
             category='randomize',
             display_name='Test Randomize'
+        )
+        cls.library_content = ItemFactory.create(
+            parent=cls.vert3,
+            category='library_content',
+            display_name='Test Library Content'
         )
         problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
             question_text='The correct answer is Choice 3',
@@ -417,6 +435,19 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             parent=cls.randomize,
             category="problem",
             display_name="Test Problem 4",
+            data=problem_xml
+        )
+
+        cls.problem5 = ItemFactory.create(
+            parent=cls.library_content,
+            category="problem",
+            display_name="Test Problem 5",
+            data=problem_xml
+        )
+        cls.problem6 = ItemFactory.create(
+            parent=cls.library_content,
+            category="problem",
+            display_name="Test Problem 6",
             data=problem_xml
         )
 
@@ -483,6 +514,16 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         answer_problem(self.course, self.request, self.problem4)
 
         score = get_module_score(self.request.user, self.course, self.seq2)
+        self.assertEqual(score, 1.0)
+
+    def test_get_module_score_with_library_content(self):
+        """
+        Test test_get_module_score_with_library_content
+        """
+        answer_problem(self.course, self.request, self.problem5)
+        answer_problem(self.course, self.request, self.problem6)
+
+        score = get_module_score(self.request.user, self.course, self.seq3)
         self.assertEqual(score, 1.0)
 
 

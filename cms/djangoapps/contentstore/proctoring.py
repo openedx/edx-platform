@@ -83,7 +83,8 @@ def register_special_exams(course_key):
                 due_date=timed_exam.due,
                 is_proctored=timed_exam.is_proctored_exam,
                 is_practice_exam=timed_exam.is_practice_exam,
-                is_active=True
+                is_active=True,
+                hide_after_due=timed_exam.hide_after_due,
             )
             msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
             log.info(msg)
@@ -97,7 +98,8 @@ def register_special_exams(course_key):
                 due_date=timed_exam.due,
                 is_proctored=timed_exam.is_proctored_exam,
                 is_practice_exam=timed_exam.is_practice_exam,
-                is_active=True
+                is_active=True,
+                hide_after_due=timed_exam.hide_after_due,
             )
             msg = 'Created new timed exam {exam_id}'.format(exam_id=exam_id)
             log.info(msg)

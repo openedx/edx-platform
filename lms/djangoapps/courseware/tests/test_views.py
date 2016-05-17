@@ -3,7 +3,7 @@
 Tests courseware views.py
 """
 
-from urllib import urlencode
+from urllib import urlencode, quote
 import ddt
 import json
 import itertools
@@ -26,7 +26,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 from xblock.fragment import Fragment
 
-import courseware.views as views
+import courseware.views.views as views
 import shoppingcart
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
@@ -35,10 +35,12 @@ from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
+from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from courseware.views.index import render_accordion, CoursewareIndex
 from edxmako.tests import mako_middleware_process_request
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -51,7 +53,7 @@ from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
@@ -63,7 +65,7 @@ class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         super(TestJumpTo, self).setUp()
@@ -183,25 +185,31 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_1')
+@attr('shard_2')
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
+
     def setUp(self):
         super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        self.chapter = ItemFactory.create(
+            category='chapter',
+            parent_location=self.course.location,
+            display_name="Chapter 1",
+        )
         self.section = ItemFactory.create(
             category='sequential',
             parent_location=self.chapter.location,
             due=datetime(2013, 9, 18, 11, 30, 00),
+            display_name='Sequential 1',
         )
         self.vertical = ItemFactory.create(
             category='vertical',
             parent_location=self.section.location,
-            display_name='Vertical 1'
+            display_name='Vertical 1',
         )
         self.problem = ItemFactory.create(
             category='problem',
@@ -211,12 +219,13 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         self.section2 = ItemFactory.create(
             category='sequential',
-            parent_location=self.chapter.location
+            parent_location=self.chapter.location,
+            display_name='Sequential 2',
         )
         self.vertical2 = ItemFactory.create(
             category='vertical',
             parent_location=self.section2.location,
-            display_name='Vertical 2'
+            display_name='Vertical 2',
         )
         self.problem2 = ItemFactory.create(
             category='problem',
@@ -238,6 +247,12 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
 
+        self.request = self.request_factory.get("foo")
+        self.request.user = self.user
+
+        # refresh the course from the modulestore so that it has children
+        self.course = modulestore().get_course(self.course.id)
+
     def test_index_success(self):
         response = self._verify_index_response()
         self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
@@ -254,7 +269,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
     def test_index_nonexistent_chapter_masquerade(self):
-        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
@@ -263,7 +278,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, section_name='non-existent')
 
     def test_index_nonexistent_section_masquerade(self):
-        with patch('courseware.views.setup_masquerade') as patch_masquerade:
+        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, section_name='non-existent')
@@ -415,24 +430,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             get_redirect_url(self.course_key, self.section.location),
         )
 
-        self.assertIn(
-            'child=first',
-            get_redirect_url(self.course_key, self.section.location, child='first'),
-        )
-
-        self.assertIn(
-            'child=last',
-            get_redirect_url(self.course_key, self.section.location, child='last'),
-        )
-
-    def test_redirect_to_course_position(self):
-        mock_module = MagicMock()
-        mock_module.descriptor.id = 'Underwater Basketweaving'
-        mock_module.position = 3
-        mock_module.get_display_items.return_value = []
-        self.assertRaises(Http404, views.redirect_to_course_position,
-                          mock_module, views.CONTENT_DEPTH)
-
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
         self.assertEqual(response.status_code, 404)
@@ -470,15 +467,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             request_url = '/'.join(url_parts_copy)
             response = self.client.get(request_url)
             self.assertEqual(response.status_code, 404)
-
-    def test_registered_for_course(self):
-        self.assertFalse(views.registered_for_course('Basketweaving', None))
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertFalse(views.registered_for_course('dummy', mock_user))
-        mock_course = MagicMock()
-        mock_course.id = self.course_key
-        self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
     def test_get_cosmetic_display_price(self):
@@ -812,6 +800,33 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = views.course_info(request, course_id)
         self.assertEqual(response.status_code, 200)
 
+    def test_accordion(self):
+        table_of_contents = toc_for_course(
+            self.request.user,
+            self.request,
+            self.course,
+            unicode(self.course.get_children()[0].scope_ids.usage_id),
+            None,
+            None
+        )
+
+        # removes newlines and whitespace from the returned view string
+        view = ''.join(render_accordion(self.request, self.course, table_of_contents['chapters']).split())
+        # the course id unicode is re-encoded here because the quote function does not accept unicode
+        course_id = quote(unicode(self.course.id).encode("utf-8"))
+
+        self.assertIn(
+            u'href="/courses/{}/courseware/Chapter_1/Sequential_1/"><pclass="accordion-display-name">Sequential1</p>'
+            .format(course_id.decode("utf-8")),
+            view
+        )
+
+        self.assertIn(
+            u'href="/courses/{}/courseware/Chapter_1/Sequential_2/"><pclass="accordion-display-name">Sequential2</p>'
+            .format(course_id.decode("utf-8")),
+            view
+        )
+
 
 @attr('shard_1')
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
@@ -834,7 +849,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
         """
         course = CourseFactory.create(**course_kwargs)
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        section = ItemFactory.create(
+            category='sequential',
+            parent_location=chapter.location,
+            due=datetime(2013, 9, 18, 11, 30, 00)
+        )
         vertical = ItemFactory.create(category='vertical', parent_location=section.location)
         ItemFactory.create(category='problem', parent_location=vertical.location)
 
@@ -926,10 +945,10 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the accordion """
-        return views.render_accordion(
-            self.request.user, self.request, course,
-            unicode(course.get_children()[0].scope_ids.usage_id), None, None
+        table_of_contents = toc_for_course(
+            self.request.user, self.request, course, unicode(course.get_children()[0].scope_ids.usage_id), None, None
         )
+        return render_accordion(self.request, course, table_of_contents['chapters'])
 
 
 @attr('shard_1')
@@ -995,6 +1014,8 @@ class ProgressPageTests(ModuleStoreTestCase):
     Tests that verify that the progress page works correctly.
     """
 
+    ENABLED_CACHES = ['default', 'mongo_modulestore_inheritance', 'loc_cache']
+
     def setUp(self):
         super(ProgressPageTests, self).setUp()
         self.request_factory = RequestFactory()
@@ -1053,7 +1074,6 @@ class ProgressPageTests(ModuleStoreTestCase):
             'azU3N_8$',
         ]
         for invalid_id in invalid_student_ids:
-
             self.assertRaises(
                 Http404, views.progress,
                 self.request,
@@ -1142,7 +1162,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        #course certificate configurations
+        # Course certificate configurations
         certificates = [
             {
                 'id': 1,
@@ -1340,7 +1360,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # status valid code
         # mocking xqueue and analytics
 
-        analytics_patcher = patch('courseware.views.analytics')
+        analytics_patcher = patch('courseware.views.views.analytics')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -1349,7 +1369,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             resp = self.client.post(self.url)
             self.assertEqual(resp.status_code, 200)
 
-            #Verify Google Analytics event fired after generating certificate
+            # Verify Google Analytics event fired after generating certificate
             mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
                 self.student.id,  # pylint: disable=no-member
                 'edx.bi.user.certificate.generate',
@@ -1360,8 +1380,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
                 context={
                     'ip': '127.0.0.1',
-                    'Google Analytics':
-                    {'clientId': None}
+                    'Google Analytics': {'clientId': None}
                 }
             )
             mock_tracker.reset_mock()
@@ -1464,7 +1483,7 @@ class ViewCheckerBlock(XBlock):
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """
-    Tests of the courseware.index view.
+    Tests of the courseware.views.index view.
     """
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
@@ -1506,7 +1525,9 @@ class TestIndexView(ModuleStoreTestCase):
         mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        response = CoursewareIndex.as_view()(
+            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
+        )
         self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
@@ -1534,7 +1555,9 @@ class TestIndexView(ModuleStoreTestCase):
         request.user = user
         mako_middleware_process_request(request)
 
-        response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
+        response = CoursewareIndex.as_view()(
+            request, unicode(course.id), chapter=chapter.url_name, section=section.url_name
+        )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
 
@@ -1542,6 +1565,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the index view for a course with gated content
     """
+
     def setUp(self):
         """
         Set up the initial test data
@@ -1555,7 +1579,9 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.store.update_item(self.course, 0)
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
+        ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
         self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
+        ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
         gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
 
@@ -1579,7 +1605,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         mako_middleware_process_request(request)
 
         with self.assertRaises(Http404):
-            __ = views.index(
+            CoursewareIndex.as_view()(
                 request,
                 unicode(self.course.id),
                 chapter=self.chapter.url_name,
@@ -1593,6 +1619,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
+
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()

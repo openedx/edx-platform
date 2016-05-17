@@ -32,6 +32,7 @@ from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-modul
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
@@ -384,13 +385,20 @@ def _filter_optouts_from_recipients(to_list, course_id):
     return to_list, num_optout
 
 
-def _get_source_address(course_id, course_title):
+def _get_source_address(course_id, course_title, truncate=True):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
 
     Makes a unique from name and address for each course, e.g.
 
-        "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
+        "COURSE_TITLE" Course Staff <course_name-no-reply@courseupdates.edx.org>
+
+    If, when decoded to ascii, this from_addr is longer than 320 characters,
+    use the course_name rather than the course title, e.g.
+
+        "course_name" Course Staff <course_name-no-reply@courseupdates.edx.org>
+
+    The "truncate" kwarg is only used for tests.
 
     """
     course_title_no_quotes = re.sub(r'"', '', course_title)
@@ -418,10 +426,11 @@ def _get_source_address(course_id, course_title):
 
     from_addr = format_address(course_title_no_quotes)
 
-    # If it's longer than 320 characters, reformat, but with the course name
-    # rather than course title. Amazon SES's from address field appears to have a maximum
-    # length of 320.
-    if len(from_addr) >= 320:
+    # If the encoded from_addr is longer than 320 characters, reformat,
+    # but with the course name rather than course title.
+    # Amazon SES's from address field appears to have a maximum length of 320.
+    __, encoded_from_addr = forbid_multi_line_headers('from', from_addr, 'utf-8')
+    if len(encoded_from_addr) >= 320 and truncate:
         from_addr = format_address(course_name)
 
     return from_addr

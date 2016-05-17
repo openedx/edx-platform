@@ -292,7 +292,9 @@ from lms.envs.common import (
 
 # Forwards-compatibility with Django 1.7
 CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
-
+# It is highly recommended that you override this in any environment accessed by
+# end users
+CSRF_COOKIE_SECURE = False
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
@@ -324,6 +326,10 @@ MIDDLEWARE_CLASSES = (
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    # Enable SessionAuthenticationMiddleware in order to invalidate
+    # user sessions after a password change.
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
     'crum.CurrentRequestUserMiddleware',
@@ -483,7 +489,6 @@ STATIC_ROOT = ENV_ROOT / "staticfiles" / EDX_PLATFORM_REVISION
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    LMS_ROOT / "static",
 
     # This is how you would use the textbook images locally
     # ("book", ENV_ROOT / "book_images"),
@@ -523,6 +528,7 @@ STATICFILES_FINDERS = [
     'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -683,8 +689,11 @@ REQUIRE_DEBUG = False
 REQUIRE_EXCLUDE = ("build.txt",)
 
 # The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and rhino if not.
-# It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
+# auto will autodetect the environment and make use of node if available and
+# rhino if not.
+# It can also be a path to a custom class that subclasses
+# require.environments.Environment and defines some "args" function that
+# returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
 
@@ -903,6 +912,9 @@ INSTALLED_APPS = (
 
     # Management commands used for configuration automation
     'edx_management_commands.management_commands',
+
+    # Tagging
+    'cms.lib.xblock.tagging',
 )
 
 
@@ -952,7 +964,7 @@ EVENT_TRACKING_BACKENDS = {
             },
             'processors': [
                 {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.VideoEventProcessor'}
+                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -1181,3 +1193,6 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
+
+# Affiliate cookie tracking
+AFFILIATE_COOKIE_NAME = 'affiliate_id'

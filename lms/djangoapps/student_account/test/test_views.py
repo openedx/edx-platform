@@ -2,6 +2,7 @@
 """ Tests for student account views. """
 
 import re
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 from urllib import urlencode
 
@@ -21,6 +22,7 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -30,7 +32,7 @@ from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
-class StudentAccountUpdateTest(UrlResetMixin, TestCase):
+class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
@@ -61,8 +63,12 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
     INVALID_KEY = u"123abc"
 
+    URLCONF_MODULES = ['student_accounts.urls']
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
-        super(StudentAccountUpdateTest, self).setUp("student_account.urls")
+        super(StudentAccountUpdateTest, self).setUp()
 
         # Create/activate a new account
         activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -203,6 +209,7 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
         return self.client.post(path=reverse('password_change_request'), data=data)
 
 
+@attr('shard_3')
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -211,9 +218,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
+    URLCONF_MODULES = ['embargo']
+
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
+        super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # For these tests, three third party auth providers are enabled by default:
         self.configure_google_provider(enabled=True)

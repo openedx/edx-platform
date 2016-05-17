@@ -9,9 +9,6 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student import auth
-from django.http import Http404
-from contentstore.views.user import course_team_handler
-from django.test.client import RequestFactory
 
 
 class UsersTestCase(CourseTestCase):
@@ -318,11 +315,3 @@ class UsersTestCase(CourseTestCase):
             CourseEnrollment.is_enrolled(self.ext_user, self.course.id),
             'User ext_user should have been enrolled in the course'
         )
-
-    def test_invalid_course_id(self):
-        """ Asserts that Http404 is raised when the course id is not valid. """
-        request_factory = RequestFactory()
-        request = request_factory.get('/dummy-url')
-        request.user = self.user
-        with self.assertRaises(Http404):
-            course_team_handler(request, "/some.invalid.key/course-v1:TTT+CS01+2015_T0")

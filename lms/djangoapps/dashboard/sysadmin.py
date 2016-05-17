@@ -491,23 +491,7 @@ class Courses(SysadminDashboardView):
                         escape(str(err))
                     )
 
-            is_xml_course = (modulestore().get_modulestore_type(course_key) == ModuleStoreEnum.Type.xml)
-            if course_found and is_xml_course:
-                cdir = course.data_dir
-                self.def_ms.courses.pop(cdir)
-
-                # now move the directory (don't actually delete it)
-                new_dir = "{course_dir}_deleted_{timestamp}".format(
-                    course_dir=cdir,
-                    timestamp=int(time.time())
-                )
-                os.rename(settings.DATA_DIR / cdir, settings.DATA_DIR / new_dir)
-
-                self.msg += (u"<font color='red'>Deleted "
-                             u"{0} = {1} ({2})</font>".format(
-                                 cdir, course.id, course.display_name))
-
-            elif course_found and not is_xml_course:
+            if course_found:
                 # delete course that is stored with mongodb backend
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though

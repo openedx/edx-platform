@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 
 from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
@@ -157,6 +158,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
+@attr('shard_3')
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.

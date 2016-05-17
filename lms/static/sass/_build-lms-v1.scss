@@ -18,7 +18,6 @@
 @import 'elements/navigation';
 @import 'elements/pagination';
 @import 'elements/creative-commons';
-@import 'elements/program-card';
 
 // shared - course
 @import 'shared/fields';
@@ -59,8 +58,7 @@
 @import "views/financial-assistance";
 @import 'views/bookmarks';
 @import 'course/auto-cert';
-@import 'xseries_certificates';
-@import 'views/program-list';
+@import 'elements/xseries-certificates';
 @import 'views/api-access';
 
 // app - discussion

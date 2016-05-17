@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-04-14 20:36+0000\n"
-"PO-Revision-Date: 2016-04-14 20:37:17.183722\n"
+"POT-Creation-Date: 2016-05-12 14:45+0000\n"
+"PO-Revision-Date: 2016-05-12 14:46:24.034520\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -108,7 +108,9 @@ msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
 #: cms/templates/js/course_grade_policy.underscore
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
@@ -132,6 +134,7 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -216,6 +219,18 @@ msgstr "Ýöür çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρѕυм ∂σ
 #: lms/static/js/views/fields.js
 msgid "Error"
 msgstr "Érrör Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/assets/library_content/public/js/library_content_edit.js
+#: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
+msgid "Updating with latest library content"
+msgstr ""
+"Ûpdätïng wïth lätést lïßrärý çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
+#: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
+msgid "Creating missing groups"
+msgstr "Çréätïng mïssïng gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -1417,6 +1432,7 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -1836,16 +1852,6 @@ msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/xmodule/xmodule/public/js/library_content_edit.js
-msgid "Updating with latest library content"
-msgstr ""
-"Ûpdätïng wïth lätést lïßrärý çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
-msgid "Creating missing groups"
-msgstr "Çréätïng mïssïng gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -2775,17 +2781,9 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-" and try again. If the issue persists, click the Help tab to report the "
-"problem."
 msgstr ""
 "Ýöür réqüést çöüld nöt ßé çömplétéd düé tö ä sérvér prößlém. Rélöäd thé pägé"
-" änd trý ägäïn. Ìf thé ïssüé pérsïsts, çlïçk thé Hélp täß tö répört thé "
-"prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -3864,6 +3862,10 @@ msgstr ""
 "Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: lms/static/js/api_admin/views/catalog_preview.js
+msgid "Preview this query"
+msgstr "Prévïéw thïs qüérý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
 #: lms/static/js/bookmarks/views/bookmark_button.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -4336,6 +4338,52 @@ msgstr "Çöhörts Énäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Çöhörts Dïsäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
+"'{verifiedCohortName}'. To change the configuration for verified track "
+"cohorts, contact your edX partner manager."
+msgstr ""
+"Thïs çöürsé üsés äütömätïç çöhörtïng för vérïfïéd träçk léärnérs. Ýöü çännöt"
+" dïsäßlé çöhörts, änd ýöü çännöt rénämé thé mänüäl çöhört näméd "
+"'{verifiedCohortName}'. Tö çhängé thé çönfïgürätïön för vérïfïéd träçk "
+"çöhörts, çöntäçt ýöür édX pärtnér mänägér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιł#"
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
+"cohort named '{verifiedCohortName}' for the feature to work."
+msgstr ""
+"Thïs çöürsé häs äütömätïç çöhörtïng énäßléd för vérïfïéd träçk léärnérs, ßüt"
+" thé réqüïréd çöhört döés nöt éxïst. Ýöü müst çréäté ä mänüällý-ässïgnéd "
+"çöhört näméd '{verifiedCohortName}' för thé féätüré tö wörk. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ησ#"
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
+msgstr ""
+"Thïs çöürsé häs äütömätïç çöhörtïng énäßléd för vérïfïéd träçk léärnérs, ßüt"
+" çöhörts äré dïsäßléd. Ýöü müst énäßlé çöhörts för thé féätüré tö wörk. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм #"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5658,6 +5706,16 @@ msgid "There was an error with the upload"
 msgstr ""
 "Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
+#: cms/static/js/views/instructor_info.js
+msgid "Upload instructor image."
+msgstr "Ûplöäd ïnstrüçtör ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
+msgid "Files must be in JPEG or PNG format."
+msgstr ""
+"Fïlés müst ßé ïn JPÉG ör PNG förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
 #: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
 msgstr "Àll Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -6056,6 +6114,13 @@ msgstr ""
 "Nö välïdätïön ïs pérförméd ön pölïçý kéýs ör välüé päïrs. Ìf ýöü äré hävïng "
 "dïffïçültïés, çhéçk ýöür förmättïng. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
+#: cms/static/js/views/settings/grader.js
+msgid ""
+"For grading to work, you must change all {oldName} subsections to {newName}."
+msgstr ""
+"För grädïng tö wörk, ýöü müst çhängé äll {oldName} süßséçtïöns tö {newName}."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
 msgstr "Çöürsé Çrédït Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -6073,19 +6138,22 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/settings/main.js
-msgid "%(hours)s:%(minutes)s (current UTC time)"
+msgid "{hours}:{minutes} (current UTC time)"
 msgstr ""
-"%(hours)s:%(minutes)s (çürrént ÛTÇ tïmé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"{hours}:{minutes} (çürrént ÛTÇ tïmé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr "Ûplöäd ýöür çöürsé ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/js/views/settings/main.js
-msgid "Files must be in JPEG or PNG format."
+msgid "Upload your banner image."
+msgstr "Ûplöäd ýöür ßännér ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/views/settings/main.js
+msgid "Upload your video thumbnail image."
 msgstr ""
-"Fïlés müst ßé ïn JPÉG ör PNG förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Ûplöäd ýöür vïdéö thümßnäïl ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
@@ -6292,6 +6360,7 @@ msgstr "Däté Ⱡ'σяєм ι#"
 
 #: cms/templates/js/edit-chapter.underscore
 #: lms/templates/ccx/schedule.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "gettext("
 msgstr "géttéxt( Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -6974,6 +7043,18 @@ msgstr "Léävé Téäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
+#: lms/templates/api_admin/catalog-error.underscore
+msgid ""
+"There was an error retrieving preview results for this catalog. Please check"
+" that your query is correct and try again."
+msgstr ""
+"Théré wäs än érrör rétrïévïng prévïéw résülts för thïs çätälög. Pléäsé çhéçk"
+" thät ýöür qüérý ïs çörréçt änd trý ägäïn. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/api_admin/catalog-results.underscore
+msgid "This catalog's courses:"
+msgstr "Thïs çätälög's çöürsés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
 msgstr "Mý Böökmärks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -7390,11 +7471,11 @@ msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм 
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid ""
-"Generate certificates for all users on the Exception list for whom "
-"certificates have not yet been run"
+"Generate certificates for all users on the Exception list who do not yet "
+"have a certificate"
 msgstr ""
-"Généräté çértïfïçätés för äll üsérs ön thé Éxçéptïön lïst för whöm "
-"çértïfïçätés hävé nöt ýét ßéén rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Généräté çértïfïçätés för äll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét "
+"hävé ä çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate a Certificate for all users on the Exception list"
@@ -7671,6 +7752,28 @@ msgstr "Ûséd Ⱡ'σяєм ι#"
 msgid "Valid"
 msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "XSeries Program Certificates"
+msgstr "XSérïés Prögräm Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "certificate.credential_url"
+msgstr "çértïfïçäté.çrédéntïäl_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "certificate.display_name"
+msgstr "çértïfïçäté.dïspläý_nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "You are not enrolled in any XSeries Programs yet."
+msgstr ""
+"Ýöü äré nöt énrölléd ïn äný XSérïés Prögräms ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "Explore XSeries Programs"
+msgstr "Éxplöré XSérïés Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
 "Browse recently launched courses and see what\\'s new in your favorite "
@@ -7684,12 +7787,18 @@ msgid "Explore New XSeries"
 msgstr "Éxplöré Néw XSérïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "org.display_name"
-msgstr "örg.dïspläý_nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "type"
 msgstr "týpé Ⱡ'σяєм ι#"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+#, python-format
+msgid ""
+"You have earned certificates in %(completed_courses)s of the "
+"%(total_courses)s courses so far."
+msgstr ""
+"Ýöü hävé éärnéd çértïfïçätés ïn %(completed_courses)s öf thé "
+"%(total_courses)s çöürsés sö fär. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α#"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -8982,6 +9091,77 @@ msgstr ""
 "Thïs çöntént gröüp ïs üséd ïn öné ör möré ünïts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Name"
+msgstr "Ìnstrüçtör Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's name"
+msgstr ""
+"Pléäsé ädd thé ïnstrüçtör's nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Title"
+msgstr "Ìnstrüçtör Tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's title"
+msgstr ""
+"Pléäsé ädd thé ïnstrüçtör's tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+msgid "Organization"
+msgstr "Örgänïzätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Organization Name"
+msgstr "Örgänïzätïön Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the institute where the instructor is associated"
+msgstr ""
+"Pléäsé ädd thé ïnstïtüté whéré thé ïnstrüçtör ïs ässöçïätéd Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Biography"
+msgstr "Bïögräphý Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Biography"
+msgstr "Ìnstrüçtör Bïögräphý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's biography"
+msgstr ""
+"Pléäsé ädd thé ïnstrüçtör's ßïögräphý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Photo"
+msgstr "Phötö Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo"
+msgstr "Ìnstrüçtör Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo URL"
+msgstr "Ìnstrüçtör Phötö ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid ""
+"Please add a photo of the instructor (Note: only JPEG or PNG format "
+"supported)"
+msgstr ""
+"Pléäsé ädd ä phötö öf thé ïnstrüçtör (Nöté: önlý JPÉG ör PNG förmät "
+"süppörtéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Upload Photo"
+msgstr "Ûplöäd Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
 #: cms/templates/js/course-outline.underscore
 #, python-format
 msgid "Prerequisite: %(prereq_display_name)s"
@@ -9067,6 +9247,17 @@ msgid "Due:"
 msgstr "Düé: Ⱡ'σяєм ι#"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Exam will remain hidden after due date"
+msgstr ""
+"Éxäm wïll rémäïn hïddén äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Exam will be visible after due date"
+msgstr ""
+"Éxäm wïll ßé vïsïßlé äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr ""
@@ -9078,6 +9269,14 @@ msgstr ""
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
 msgstr "Çlïçk tö ädd ä néw %(xblock_type)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Learning Outcome"
+msgstr "Léärnïng Öütçömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Add a learning outcome here"
+msgstr "Àdd ä léärnïng öütçömé héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Assignment Type Name"
@@ -9557,10 +9756,6 @@ msgid "Signatory"
 msgstr "Sïgnätörý Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/signatory-details.underscore
-msgid "Organization"
-msgstr "Örgänïzätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"
 msgstr "Sïgnätüré Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -9713,6 +9908,10 @@ msgid "Set as a Special Exam"
 msgstr "Sét äs ä Spéçïäl Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Exam Types"
+msgstr "Éxäm Týpés Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "Tïméd Ⱡ'σяєм ιρѕ#"
 
@@ -9806,6 +10005,24 @@ msgstr ""
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Hide Exam After Due Date"
+msgstr "Hïdé Éxäm Àftér Düé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"By default, submitted exams are available for review after the due date has "
+"passed. Select this option to keep exams hidden after that date."
+msgstr ""
+"Bý défäült, süßmïttéd éxäms äré äväïläßlé för révïéw äftér thé düé däté häs "
+"pässéd. Séléçt thïs öptïön tö kéép éxäms hïddén äftér thät däté. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"

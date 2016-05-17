@@ -41,14 +41,20 @@ class BlockStructureCache(object):
         data_to_cache = (
             block_structure._block_relations,
             block_structure._transformer_data,
-            block_structure._block_data_map
+            block_structure._block_data_map,
         )
         zp_data_to_cache = zpickle(data_to_cache)
+
+        # Set the timeout value for the cache to None. This caches the
+        # value forever. The expectation is that the caller will delete
+        # the cached value once it is outdated.
         self._cache.set(
             self._encode_root_cache_key(block_structure.root_block_usage_key),
-            zp_data_to_cache
+            zp_data_to_cache,
+            timeout=None,
         )
-        logger.debug(
+
+        logger.info(
             "Wrote BlockStructure %s to cache, size: %s",
             block_structure.root_block_usage_key,
             len(zp_data_to_cache),
@@ -77,13 +83,13 @@ class BlockStructureCache(object):
         # Find root_block_usage_key in the cache.
         zp_data_from_cache = self._cache.get(self._encode_root_cache_key(root_block_usage_key))
         if not zp_data_from_cache:
-            logger.debug(
+            logger.info(
                 "Did not find BlockStructure %r in the cache.",
                 root_block_usage_key,
             )
             return None
         else:
-            logger.debug(
+            logger.info(
                 "Read BlockStructure %r from cache, size: %s",
                 root_block_usage_key,
                 len(zp_data_from_cache),
@@ -109,7 +115,7 @@ class BlockStructureCache(object):
                 the cache.
         """
         self._cache.delete(self._encode_root_cache_key(root_block_usage_key))
-        logger.debug(
+        logger.info(
             "Deleted BlockStructure %r from the cache.",
             root_block_usage_key,
         )

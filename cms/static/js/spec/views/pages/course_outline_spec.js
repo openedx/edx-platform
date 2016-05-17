@@ -1,14 +1,15 @@
 define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/utils/view_utils", "js/views/pages/course_outline",
         "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
-        "common/js/spec_helpers/template_helpers"],
-    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
+        "common/js/spec_helpers/template_helpers", 'js/models/course',],
+    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils,
+             EditHelpers, TemplateHelpers, Course) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
                 getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState,
                 collapseItemsAndVerifyState, createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
                 verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
-                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON
+                createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
                 mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
                 mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
@@ -214,6 +215,15 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
             };
 
             beforeEach(function () {
+                window.course = new Course({
+                    id: '5',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
+
                 EditHelpers.installMockAnalytics();
                 EditHelpers.installViewTemplates();
                 TemplateHelpers.installTemplates([
@@ -252,6 +262,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 $("#start_date").datepicker( "destroy" );
                 $("#due_date").datepicker( "destroy" );
                 $('.ui-datepicker').remove();
+                delete window.course;
             });
 
             describe('Initial display', function() {
@@ -346,8 +357,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('can start reindex of a course', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var successSpy = spyOn(outlinePage, 'onIndexSuccess').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
                     reindexButton.attr('href', test_url)
@@ -360,11 +371,11 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
 
                 it('shows an error message when reindexing fails', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
-                    var errorSpy = spyOn(outlinePage, 'onIndexError').andCallThrough();
+                    var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+                    var errorSpy = spyOn(outlinePage, 'onIndexError').and.callThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
                     var test_url = '/course/5/search_reindex';
-                    reindexButton.attr('href', test_url)
+                    reindexButton.attr('href', test_url);
                     reindexButton.trigger('click');
                     AjaxHelpers.expectJsonRequest(requests, 'GET', test_url);
                     AjaxHelpers.respondWithError(requests, 500, createMockIndexJSON(false));
@@ -587,7 +598,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 var getDisplayNameWrapper, setEditModalValues, mockServerValuesJson,
                     selectDisableSpecialExams, selectBasicSettings, selectAdvancedSettings,
                     selectAccessSettings, selectTimedExam, selectProctoredExam, selectPracticeExam,
-                    selectPrerequisite, selectLastPrerequisiteSubsection;
+                    selectPrerequisite, selectLastPrerequisiteSubsection, checkOptionFieldVisibility;
 
                 getDisplayNameWrapper = function() {
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
@@ -601,7 +612,7 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 };
 
                 selectDisableSpecialExams = function() {
-                    this.$("#id_not_timed").prop('checked', true).trigger('change');
+                    this.$("input.no_special_exam").prop('checked', true).trigger('change');
                 };
 
                 selectBasicSettings = function() {
@@ -616,22 +627,23 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                    this.$(".modal-section .settings-tab-button[data-tab='access']").click();
                 };
 
-                selectTimedExam = function(time_limit) {
-                    this.$("#id_timed_exam").prop('checked', true).trigger('change');
-                    this.$("#id_time_limit").val(time_limit);
-                    this.$("#id_time_limit").trigger('focusout');
+                selectTimedExam = function(time_limit, hide_after_due) {
+                    this.$("input.timed_exam").prop('checked', true).trigger('change');
+                    this.$(".field-time-limit input").val(time_limit);
+                    this.$(".field-time-limit input").trigger('focusout');
+                    this.$('.field-hide-after-due input').prop('checked', hide_after_due).trigger('change');
                 };
 
                 selectProctoredExam = function(time_limit) {
-                    this.$("#id_proctored_exam").prop('checked', true).trigger('change');
-                    this.$("#id_time_limit").val(time_limit);
-                    this.$("#id_time_limit").trigger('focusout');
+                    this.$("input.proctored_exam").prop('checked', true).trigger('change');
+                    this.$(".field-time-limit input").val(time_limit);
+                    this.$(".field-time-limit input").trigger('focusout');
                 };
 
                 selectPracticeExam = function(time_limit) {
-                    this.$("#id_practice_exam").prop('checked', true).trigger('change');
-                    this.$("#id_time_limit").val(time_limit);
-                    this.$("#id_time_limit").trigger('focusout');
+                    this.$("input.practice_exam").prop('checked', true).trigger('change');
+                    this.$(".field-time-limit input").val(time_limit);
+                    this.$(".field-time-limit input").trigger('focusout');
                 };
 
                 selectPrerequisite = function() {
@@ -641,6 +653,13 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                 selectLastPrerequisiteSubsection = function(minScore) {
                     this.$("#prereq option:last").prop('selected', true).trigger('change');
                     this.$("#prereq_min_score").val(minScore).trigger('keyup');
+                };
+
+                // Helper to validate oft-checked additional option fields' visibility
+                checkOptionFieldVisibility = function(time_limit, review_rules, hide_after_due) {
+                    expect($('.field-time-limit').is(':visible')).toBe(time_limit);
+                    expect($('.field-exam-review-rules').is(':visible')).toBe(review_rules);
+                    expect($('.field-hide-after-due').is(':visible')).toBe(hide_after_due);
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
@@ -659,8 +678,9 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                             is_prereq: false,
                             "is_time_limited": true,
                             "is_practice_exam": false,
-                            "is_proctored_exam": true,
-                            "default_time_limit_minutes": 150
+                            "is_proctored_exam": false,
+                            "default_time_limit_minutes": 150,
+                            "hide_after_due": true,
                         }, [
                             createMockVerticalJSON({
                                 has_changes: true,
@@ -804,13 +824,13 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     for (i = 0; i < valid_times.length; i++){
                         time_limit = valid_times[i];
                         selectTimedExam(time_limit);
-                        expect($("#id_time_limit").val()).toEqual(time_limit);
+                        expect($(".field-time-limit input").val()).toEqual(time_limit);
                     }
                     for (i = 0; i < invalid_times.length; i++){
                         time_limit = invalid_times[i];
                         selectTimedExam(time_limit);
-                        expect($("#id_time_limit").val()).not.toEqual(time_limit);
-                        expect($("#id_time_limit").val()).toEqual(default_time);
+                        expect($(".field-time-limit input").val()).not.toEqual(time_limit);
+                        expect($(".field-time-limit input").val()).toEqual(default_time);
                     }
                 });
 
@@ -818,7 +838,8 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
-                    selectProctoredExam("02:30");
+                    selectAdvancedSettings();
+                    selectTimedExam("02:30", true);
                     $(".wrapper-modal-window .action-save").click();
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
@@ -831,8 +852,9 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                             "exam_review_rules": "",
                             "is_time_limited": true,
                             "is_practice_exam": false,
-                            "is_proctored_enabled": true,
-                            "default_time_limit_minutes": 150
+                            "is_proctored_enabled": false,
+                            "default_time_limit_minutes": 150,
+                            "hide_after_due": true,
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -861,30 +883,35 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
                     expect($("#staff_lock").is(":checked")).toBe(true);
-                    expect($("#id_timed_exam").is(":checked")).toBe(false);
-                    expect($("#id_proctored_exam").is(":checked")).toBe(true);
-                    expect($("#id_not_timed").is(":checked")).toBe(false);
-                    expect($("#id_practice_exam").is(":checked")).toBe(false);
-                    expect($("#id_time_limit").val()).toBe("02:30");
+                    expect($("input.timed_exam").is(":checked")).toBe(true);
+                    expect($("input.proctored_exam").is(":checked")).toBe(false);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($("input.practice_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("02:30");
+                    expect($(".field-hide-after-due input").is(":checked")).toBe(true);
                 });
 
-                it('can hide the time limit field when the None radio box is selected', function() {
+                it('can hide time limit and hide after due fields when the None radio box is selected', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectAdvancedSettings();
                     selectDisableSpecialExams();
 
-                    // id_time_limit_div should be hidden when None is specified
-                    expect($('#id_time_limit_div')).toHaveClass('is-hidden');
+                    // all additional options should be hidden
+                    expect($('.exam-options').is(':hidden')).toBe(true);
                 });
 
                 it('can select the practice exam', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectAdvancedSettings();
                     selectPracticeExam("00:30");
-                    // id_time_limit_div should not be hidden when practice exam is specified
-                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+
+                    // time limit should be visible, review rules and hide after due should be hidden
+                    checkOptionFieldVisibility(true, false, false);
+                    
                     $(".wrapper-modal-window .action-save").click();
                 });
 
@@ -892,9 +919,12 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectAdvancedSettings();
                     selectTimedExam("00:30");
-                    // id_time_limit_div should not be hidden when timed exam is specified
-                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    
+                    // time limit and hide after due should be visible, review rules should be hidden
+                    checkOptionFieldVisibility(true, false, true);
+                
                     $(".wrapper-modal-window .action-save").click();
                 });
 
@@ -902,9 +932,12 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectAdvancedSettings();
                     selectProctoredExam("00:30");
-                    // id_time_limit_div should not be hidden when timed exam is specified
-                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
+                    
+                    // time limit and review rules should be visible, hide after due should be hidden
+                    checkOptionFieldVisibility(true, true, false);
+
                     $(".wrapper-modal-window .action-save").click();
 
                 });
@@ -913,10 +946,12 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
+                    selectAdvancedSettings();
                     selectProctoredExam("abcd");
-                    // id_time_limit_div should not be hidden when timed exam is specified
-                    expect($('#id_time_limit_div')).not.toHaveClass('is-hidden"');
-                    expect($('#id_time_limit')).toHaveValue('00:30');
+
+                    // time limit field should be visible and have the correct value
+                    expect($('.field-time-limit').is(':visible')).toBe(true);
+                    expect($('.field-time-limit input').val()).toEqual("00:30");
 
                 });
 
@@ -933,21 +968,24 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                     "is_time_limited": false,
                                     "is_practice_exam": false,
                                     "is_proctored_exam": false,
-                                    "default_time_limit_minutes": 150
+                                    "default_time_limit_minutes": 150,
+                                    "hide_after_due": false,
                                 }, [
                                 ]),
                             ])
                         ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    expect($("#id_timed_exam").is(":checked")).toBe(false);
-                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
-                    expect($("#id_not_timed").is(":checked")).toBe(true);
-                    expect($("#id_practice_exam").is(":checked")).toBe(false);
-                    expect($("#id_time_limit").val()).toBe("02:30");
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(false);
+                    expect($("input.proctored_exam").is(":checked")).toBe(false);
+                    expect($("input.no_special_exam").is(":checked")).toBe(true);
+                    expect($("input.practice_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("02:30");
+                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
-                it('can show a saved timed exam correctly', function() {
+                it('can show a saved timed exam correctly when hide_after_due is true', function() {
                     var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
                             createMockSectionJSON({
                                 has_changes: true,
@@ -960,18 +998,51 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                     "is_time_limited": true,
                                     "is_practice_exam": false,
                                     "is_proctored_exam": false,
-                                    "default_time_limit_minutes": 10
+                                    "default_time_limit_minutes": 10,
+                                    "hide_after_due": true,
                                 }, [
                                 ]),
                             ])
                         ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    expect($("#id_timed_exam").is(":checked")).toBe(true);
-                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
-                    expect($("#id_not_timed").is(":checked")).toBe(false);
-                    expect($("#id_practice_exam").is(":checked")).toBe(false);
-                    expect($("#id_time_limit").val()).toBe("00:10");
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(true);
+                    expect($("input.proctored_exam").is(":checked")).toBe(false);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($("input.practice_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("00:10");
+                    expect($('.field-hide-after-due input').is(":checked")).toBe(true);
+                });
+
+                it('can show a saved timed exam correctly when hide_after_due is true', function() {
+                    var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                            createMockSectionJSON({
+                                has_changes: true,
+                                enable_proctored_exams: true,
+                                enable_timed_exams: true
+
+                            }, [
+                                createMockSubsectionJSON({
+                                    has_changes: true,
+                                    "is_time_limited": true,
+                                    "is_practice_exam": false,
+                                    "is_proctored_exam": false,
+                                    "default_time_limit_minutes": 10,
+                                    "hide_after_due": false,
+                                }, [
+                                ]),
+                            ])
+                        ]);
+                    createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+                    outlinePage.$('.outline-subsection .configure-button').click();
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(true);
+                    expect($("input.proctored_exam").is(":checked")).toBe(false);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($("input.practice_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("00:10");
+                    expect($('.field-hide-after-due input').is(":checked")).toBe(false);
                 });
 
                 it('can show a saved practice exam correctly', function() {
@@ -994,11 +1065,13 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                         ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    expect($("#id_timed_exam").is(":checked")).toBe(false);
-                    expect($("#id_proctored_exam").is(":checked")).toBe(false);
-                    expect($("#id_not_timed").is(":checked")).toBe(false);
-                    expect($("#id_practice_exam").is(":checked")).toBe(true);
-                    expect($("#id_time_limit").val()).toBe("02:30");
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(false);
+                    expect($("input.proctored_exam").is(":checked")).toBe(false);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($("input.practice_exam").is(":checked")).toBe(true);
+                    expect($(".field-time-limit input").val()).toBe("02:30");
+                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
                 it('can show a saved proctored exam correctly', function() {
@@ -1021,11 +1094,13 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                         ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    expect($("#id_timed_exam").is(":checked")).toBe(false);
-                    expect($("#id_proctored_exam").is(":checked")).toBe(true);
-                    expect($("#id_not_timed").is(":checked")).toBe(false);
-                    expect($("#id_practice_exam").is(":checked")).toBe(false);
-                    expect($("#id_time_limit").val()).toBe("02:30");
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(false);
+                    expect($("input.proctored_exam").is(":checked")).toBe(true);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($("input.practice_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("02:30");
+                    expect($('.field-hide-after-due').is(':hidden')).toBe(true);
                 });
 
                 it('does not show proctored settings if proctored exams not enabled', function() {
@@ -1041,16 +1116,19 @@ define(["jquery", "common/js/spec_helpers/ajax_helpers", "common/js/components/u
                                     "is_time_limited": true,
                                     "is_practice_exam": false,
                                     "is_proctored_exam": false,
-                                    "default_time_limit_minutes": 150
+                                    "default_time_limit_minutes": 150,
+                                    "hide_after_due": true,
                                 }, [
                                 ]),
                             ])
                         ]);
                     createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    expect($("#id_timed_exam").is(":checked")).toBe(true);
-                    expect($("#id_not_timed").is(":checked")).toBe(false);
-                    expect($("#id_time_limit").val()).toBe("02:30");
+                    selectAdvancedSettings();
+                    expect($("input.timed_exam").is(":checked")).toBe(true);
+                    expect($("input.no_special_exam").is(":checked")).toBe(false);
+                    expect($(".field-time-limit input").val()).toBe("02:30");
+                    expect($('.field-hide-after-due input').is(":checked")).toBe(true);
                 });
 
                 it('can select prerequisite', function() {

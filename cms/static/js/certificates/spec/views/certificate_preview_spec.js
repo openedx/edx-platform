@@ -18,23 +18,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         preview_certificate: '.preview-certificate-link'
     };
 
-    beforeEach(function() {
-        window.course = new Course({
-            id: '5',
-            name: 'Course Name',
-            url_name: 'course_name',
-            org: 'course_org',
-            num: 'course_num',
-            revision: 'course_rev'
-        });
-        window.CMS.User = {isGlobalStaff: true};
-    });
-
-    afterEach(function() {
-        delete window.course;
-        delete window.CMS.User;
-    });
-
     describe('Certificate Web Preview Spec:', function() {
 
         var selectDropDownByText = function ( element, value ) {
@@ -45,8 +28,18 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplate('certificate-web-preview', true);
             appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
+
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.CMS.User = {isGlobalStaff: true};
+
             this.view = new CertificatePreview({
                 el: $('.preview-certificate'),
                 course_modes: ['test1', 'test2', 'test3'],
@@ -55,6 +48,11 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 is_active: true
             });
             appendSetFixtures(this.view.render().el);
+        });
+
+        afterEach(function() {
+            delete window.course;
+            delete window.CMS.User;
         });
 
         describe('Certificate preview', function() {
@@ -122,7 +120,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
             it('certificate web preview should be removed when method "remove" called', function () {
                 this.view.remove();
-                expect(this.view.el.innerHTML).toContain("");
+                expect(this.view.el.innerHTML).toBe('');
             });
 
             it('method "show" should call the render function', function () {

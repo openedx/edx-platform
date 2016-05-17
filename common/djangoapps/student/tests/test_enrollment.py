@@ -4,6 +4,7 @@ Tests for student enrollment.
 import ddt
 import unittest
 from mock import patch
+from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,6 +21,7 @@ from student.roles import (
 )
 
 
+@attr('shard_3')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
@@ -30,6 +32,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
+    URLCONF_MODULES = ['embargo']
 
     @classmethod
     def setUpClass(cls):
@@ -40,7 +43,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentTest, self).setUp('embargo')
+        super(EnrollmentTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1

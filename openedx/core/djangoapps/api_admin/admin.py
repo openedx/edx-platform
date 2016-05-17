@@ -15,5 +15,4 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'website', 'reason', 'company_name', 'company_address', 'contacted', )
     exclude = ('site',)
 
-
 admin.site.register(ApiAccessConfig, ConfigurationModelAdmin)

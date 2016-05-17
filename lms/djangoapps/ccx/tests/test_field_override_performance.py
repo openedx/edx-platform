@@ -7,7 +7,7 @@ import itertools
 import mock
 from nose.plugins.skip import SkipTest
 
-from courseware.views import progress
+from courseware.views.views import progress
 from courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
@@ -30,7 +30,7 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
+@attr('shard_3')
 @mock.patch.dict(
     'django.conf.settings.FEATURES',
     {
@@ -51,6 +51,8 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         """

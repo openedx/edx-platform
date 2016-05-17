@@ -25,6 +25,7 @@ from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+from xmodule.course_module import Textbook
 
 
 class Dummy(object):
@@ -190,7 +191,7 @@ class ToyCourseFactory(SampleCourseFactory):
 
         fields = {
             'block_info_tree': TOY_BLOCK_INFO_TREE,
-            'textbooks': [["Textbook", "path/to/a/text_book"]],
+            'textbooks': [Textbook("Textbook", "path/to/a/text_book")],
             'wiki_slug': "toy",
             'graded': True,
             'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},

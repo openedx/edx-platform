@@ -97,6 +97,16 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    hide_after_due = Boolean(
+        display_name=_("Hide Exam Results After Due Date"),
+        help=_(
+            "This setting overrides the default behavior of showing exam results after the due date has passed."
+            " Currently only supported for timed exams."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     is_practice_exam = Boolean(
         display_name=_("Is Practice Exam"),
         help=_(
@@ -176,7 +186,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if context.get('requested_child') == 'first':
             self.position = 1
         elif context.get('requested_child') == 'last':
-            self.position = len(display_items) or None
+            self.position = len(display_items) or 1
         elif self.position is None or self.position > len(display_items):
             self.position = 1
 
@@ -237,16 +247,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'position': self.position,
             'tag': self.location.category,
             'ajax_url': self.system.ajax_url,
-            'next_url': _compute_next_url(
-                self.location,
-                parent_module,
-                context.get('redirect_url_func'),
-            ),
-            'prev_url': _compute_previous_url(
-                self.location,
-                parent_module,
-                context.get('redirect_url_func'),
-            ),
+            'next_url': context.get('next_url'),
+            'prev_url': context.get('prev_url'),
         }
 
         fragment.add_content(self.system.render_template("seq_module.html", params))
@@ -400,6 +402,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    resources_dir = None
 
     show_in_read_only_mode = True
 
@@ -455,88 +458,3 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         xblock_body["content_type"] = "Sequence"
 
         return xblock_body
-
-
-def _compute_next_url(block_location, parent_block, redirect_url_func):
-    """
-    Returns the url for the next block after the given block.
-    """
-    def get_next_block_location(parent_block, index_in_parent):
-        """
-        Returns the next block in the parent_block after the block with the given
-        index_in_parent.
-        """
-        if index_in_parent + 1 < len(parent_block.children):
-            return parent_block.children[index_in_parent + 1]
-        else:
-            return None
-
-    return _compute_next_or_prev_url(
-        block_location,
-        parent_block,
-        redirect_url_func,
-        get_next_block_location,
-        'first',
-    )
-
-
-def _compute_previous_url(block_location, parent_block, redirect_url_func):
-    """
-    Returns the url for the previous block after the given block.
-    """
-    def get_previous_block_location(parent_block, index_in_parent):
-        """
-        Returns the previous block in the parent_block before the block with the given
-        index_in_parent.
-        """
-        return parent_block.children[index_in_parent - 1] if index_in_parent else None
-
-    return _compute_next_or_prev_url(
-        block_location,
-        parent_block,
-        redirect_url_func,
-        get_previous_block_location,
-        'last',
-    )
-
-
-def _compute_next_or_prev_url(
-        block_location,
-        parent_block,
-        redirect_url_func,
-        get_next_or_prev_block,
-        redirect_url_child_param,
-):
-    """
-    Returns the url for the next or previous block from the given block.
-
-    Arguments:
-        block_location: Location of the block that is being navigated.
-        parent_block: Parent block of the given block.
-        redirect_url_func: Function that computes a redirect URL directly to
-            a block, given the block's location.
-        get_next_or_prev_block: Function that returns the next or previous
-            block in the parent, or None if doesn't exist.
-        redirect_url_child_param: Value to pass for the child parameter to the
-            redirect_url_func.
-    """
-    if redirect_url_func:
-        index_in_parent = parent_block.children.index(block_location)
-        next_or_prev_block_location = get_next_or_prev_block(parent_block, index_in_parent)
-        if next_or_prev_block_location:
-            return redirect_url_func(
-                block_location.course_key,
-                next_or_prev_block_location,
-                child=redirect_url_child_param,
-            )
-        else:
-            grandparent = parent_block.get_parent()
-            if grandparent:
-                return _compute_next_or_prev_url(
-                    parent_block.location,
-                    grandparent,
-                    redirect_url_func,
-                    get_next_or_prev_block,
-                    redirect_url_child_param,
-                )
-    return None

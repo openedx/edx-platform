@@ -1,18 +1,16 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-
 from celery import task
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from edx_rest_api_client.client import EdxRestApiClient
 
-from lms.djangoapps.certificates.api import get_certificates_for_user, is_passing_status
-
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_user_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.utils import get_completed_courses
 from openedx.core.lib.token_utils import get_id_token
 
 
@@ -35,26 +33,6 @@ def get_api_client(api_config, student):
     """
     id_token = get_id_token(student, api_config.OAUTH2_CLIENT_NAME)
     return EdxRestApiClient(api_config.internal_api_url, jwt=id_token)
-
-
-def get_completed_courses(student):
-    """
-    Determine which courses have been completed by the user.
-
-    Args:
-        student:
-            User object representing the student
-
-    Returns:
-        iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
-
-    """
-    all_certs = get_certificates_for_user(student.username)
-    return [
-        {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
-        for cert in all_certs
-        if is_passing_status(cert['status'])
-    ]
 
 
 def get_completed_programs(client, course_certificates):
@@ -193,6 +171,7 @@ def award_program_certificates(self, username):
         if not program_ids:
             # Again, no reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
+            LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
         # Determine which program certificates the user has already been
@@ -235,5 +214,7 @@ def award_program_certificates(self, username):
             # N.B. This logic assumes that this task is idempotent
             LOGGER.info('Retrying task to award failed certificates to user %s', username)
             raise self.retry(countdown=countdown, max_retries=config.max_retries)
+    else:
+        LOGGER.info('User %s is not eligible for any new program certificates', username)
 
     LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)

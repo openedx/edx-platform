@@ -4,6 +4,7 @@ Unit tests for instructor_dashboard.py.
 import ddt
 import datetime
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.conf import settings
@@ -42,6 +43,7 @@ def intercept_renderer(path, context):
     return response
 
 
+@attr('shard_3')
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """

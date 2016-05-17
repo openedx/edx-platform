@@ -294,6 +294,9 @@ class CreditRequirement(TimeStampedModel):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
+    def __unicode__(self):
+        return '{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
+
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
         """
@@ -427,6 +430,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     class Meta(object):
         unique_together = ('username', 'requirement')
+        verbose_name_plural = _('Credit requirement statuses')
 
     @classmethod
     def get_statuses(cls, requirements, username):

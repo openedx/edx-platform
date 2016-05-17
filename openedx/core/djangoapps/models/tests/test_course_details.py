@@ -95,10 +95,40 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
                 jsondetails.course_image_name
             )
+            jsondetails.banner_image_name = "an_image.jpg"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).banner_image_name,
+                jsondetails.banner_image_name
+            )
+            jsondetails.video_thumbnail_image_name = "an_image.jpg"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).video_thumbnail_image_name,
+                jsondetails.video_thumbnail_image_name
+            )
             jsondetails.language = "hr"
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).language,
                 jsondetails.language
+            )
+            jsondetails.learning_info = ["test", "test"]
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).learning_info,
+                jsondetails.learning_info
+            )
+            jsondetails.instructor_info = {
+                "instructors": [
+                    {
+                        "name": "test",
+                        "title": "test",
+                        "organization": "test",
+                        "image": "test",
+                        "bio": "test"
+                    }
+                ]
+            }
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).instructor_info,
+                jsondetails.instructor_info
             )
 
     def test_toggle_pacing_during_course_run(self):

@@ -31,7 +31,8 @@ var edx = edx || {};
             var templateHtml = $("#receipt-tpl").html(),
                 context = {
                     platformName: this.$el.data('platform-name'),
-                    verified: this.$el.data('verified').toLowerCase() === 'true'
+                    verified: this.$el.data('verified').toLowerCase() === 'true',
+                    is_request_in_themed_site: this.$el.data('is-request-in-themed-site').toLowerCase() === 'true'
                 },
                 providerId;
 
@@ -46,6 +47,8 @@ var edx = edx || {};
             this.$el.html(_.template(templateHtml)(context));
 
             this.trackLinks();
+
+            this.trackPurchase(data);
 
             this.renderCourseNamePlaceholder(this.courseKey);
 
@@ -75,6 +78,14 @@ var edx = edx || {};
         renderError: function () {
             // Display an error
             $('#error-container').removeClass('hidden');
+        },
+
+        trackPurchase: function (order) {
+            window.analytics.track("Completed Order", {
+                orderId: order.number,
+                total: order.total_excl_tax,
+                currency: order.currency
+            });
         },
 
         render: function () {
@@ -295,7 +306,7 @@ var edx = edx || {};
         el: $('#receipt-container')
     });
 
-})(jQuery, _, _.str, Backbone);
+})(jQuery, _, _.str, Backbone);  // jshint ignore:line
 
 function completeOrder(event) {     // jshint ignore:line
     var courseKey = $(event).data("course-key"),

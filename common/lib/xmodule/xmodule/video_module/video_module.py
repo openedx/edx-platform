@@ -332,7 +332,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             ## There is no option in the "Advanced Editor" to set this option. However,
             ## this option will have an effect if changed to "True". The code on
             ## front-end exists.
-            'autohideHtml5': False
+            'autohideHtml5': False,
+
+            # This is the server's guess at whether youtube is available for
+            # this user, based on what was recorded the last time we saw the
+            # user, and defaulting to True.
+            'recordedYoutubeIsAvailable': self.youtube_is_available,
         }
 
         bumperize(self)

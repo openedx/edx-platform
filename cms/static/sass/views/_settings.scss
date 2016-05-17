@@ -516,7 +516,7 @@
     }
 
     // specific fields - course image
-    #field-course-image {
+    #field-course-image, #field-banner-image, #field-video-thumbnail-image {
 
       .current-course-image {
         margin-bottom: ($baseline/2);
@@ -826,6 +826,146 @@
 
       .actions {
         float: left;
+        width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+    }
+
+    &.course-learning-info {
+      .list-input {
+        margin-bottom: $baseline;
+        .course-settings-learning-fields {
+          .field {
+            .input-learning-info {
+              width: flex-grid(10, 12);
+              display: inline-block;
+            }
+            .delete-button {
+              padding-bottom: 3px;
+              line-height: 3.5rem;
+            }
+          }
+        }
+      }
+
+      .actions {
+        width: flex-grid(9, 9);
+
+        .new-button {
+          @extend %btn-primary-green;
+        }
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+    }
+
+    &.instructor-types {
+      .list-input {
+        .course-instructor-details-fields {
+          .field {
+            width: flex-grid(2, 6);
+            &.field-course-instructor-bio {
+              width: flex-grid(6, 6);
+            }
+            &.current-instructor-image {
+              width: flex-grid(6, 6);
+              text-align: left;
+              padding: 0;
+              .wrapper-instructor-image {
+                margin: 15px auto;
+              }
+            }
+          }
+        }
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .field-group {
+        @include clearfix();
+        width: flex-grid(9, 9);
+        margin-bottom: ($baseline*1.5);
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+
+        .field {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(3, 6);
+          margin-bottom: ($baseline/2);
+          margin-right: flex-gutter();
+        }
+
+        // specific fields - course image
+        .field-course-instructor-image {
+          margin-bottom: ($baseline/2);
+          padding: ($baseline/2) $baseline;
+          background: $gray-l5;
+          text-align: left;
+
+          .wrapper-instructor-image {
+            display: block;
+            width: 375px;
+            height: 200px;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 1px solid $gray-l4;
+            box-shadow: 0 1px 1px $shadow-l1;
+            padding: ($baseline/2);
+            background: $white;
+          }
+
+          .instructor-image {
+            display: block;
+            width: 100%;
+            min-height: 100%;
+          }
+
+          .msg {
+            @extend %t-copy-sub2;
+            display: block;
+            margin-top: ($baseline/2);
+            color: $gray-l3;
+          }
+        }
+
+        .wrapper-input {
+          @include clearfix();
+          width: flex-grid(9,9);
+
+          .input {
+            float: left;
+            width: flex-grid(6,9);
+            margin-right: flex-gutter();
+          }
+
+          .action-upload-instructor-image {
+            @extend %ui-btn-flat-outline;
+            float: right;
+            width: flex-grid(2,9);
+            margin-top: ($baseline/4);
+            padding: ($baseline/2) $baseline;
+          }
+        }
+      }
+
+
+      .actions {
         width: flex-grid(9, 9);
 
         .new-button {

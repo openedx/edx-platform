@@ -1,4 +1,5 @@
 requirejs.config({
+    baseUrl: '/base/',
     paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
@@ -26,9 +27,9 @@ requirejs.config({
         "moment": "xmodule_js/common_static/js/vendor/moment.min",
         "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
         "text": "xmodule_js/common_static/js/vendor/requirejs/text",
-        "underscore": "xmodule_js/common_static/common/js/vendor/underscore",
-        "underscore.string": "xmodule_js/common_static/common/js/vendor/underscore.string",
-        "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
+        "underscore": "common/js/vendor/underscore",
+        "underscore.string": "common/js/vendor/underscore.string",
+        "backbone": "common/js/vendor/backbone",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
         "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "backbone-relational": "xmodule_js/common_static/js/vendor/backbone-relational.min",
@@ -42,17 +43,14 @@ requirejs.config({
         "accessibility": "xmodule_js/common_static/js/src/accessibility_tools",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.17.0",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
-        "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
         "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
-        "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
-        "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
         "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
-        "modernizr": "xmodule_js/common_static/edx-pattern-library/js/modernizr-custom",
-        "afontgarde": "xmodule_js/common_static/edx-pattern-library/js/afontgarde",
-        "edxicons": "xmodule_js/common_static/edx-pattern-library/js/edx-icons",
+        "modernizr": "edx-pattern-library/js/modernizr-custom",
+        "afontgarde": "edx-pattern-library/js/afontgarde",
+        "edxicons": "edx-pattern-library/js/edx-icons",
 
         "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
@@ -158,17 +156,17 @@ requirejs.config({
         "mathjax": {
             exports: "MathJax",
             init: ->
-              MathJax.Hub.Config
-                tex2jax:
-                  inlineMath: [
-                    ["\\(","\\)"],
-                    ['[mathjaxinline]','[/mathjaxinline]']
-                  ]
-                  displayMath: [
-                    ["\\[","\\]"],
-                    ['[mathjax]','[/mathjax]']
-                  ]
-              MathJax.Hub.Configured()
+                MathJax.Hub.Config
+                    tex2jax:
+                        inlineMath: [
+                            ["\\(", "\\)"],
+                            ['[mathjaxinline]', '[/mathjaxinline]']
+                        ]
+                        displayMath: [
+                            ["\\[", "\\]"],
+                            ['[mathjax]', '[/mathjax]']
+                        ]
+                MathJax.Hub.Configured()
         },
         "URI": {
             exports: "URI"
@@ -179,18 +177,15 @@ requirejs.config({
         "sinon": {
             exports: "sinon"
         },
-        "jasmine-jquery": {
-            deps: ["jasmine"]
+        "jasmine-imagediff": {},
+        "common/js/spec_helpers/jasmine-extensions": {
+            deps: ["jquery"]
         },
-        "jasmine-imagediff": {
-            deps: ["jasmine"]
+        "common/js/spec_helpers/jasmine-stealth": {
+            deps: ["underscore", "underscore.string"]
         },
-        "jasmine-stealth": {
-            deps: ["jasmine"]
-        },
-        "jasmine.async": {
-            deps: ["jasmine"],
-            exports: "AsyncSpec"
+        "common/js/spec_helpers/jasmine-waituntil": {
+            deps: ["jquery"]
         },
         "xblock/core": {
             exports: "XBlock",
@@ -201,7 +196,7 @@ requirejs.config({
             deps: ["xblock/core"]
         },
         "mock-ajax": {
-            deps: ["jasmine", "jquery"]
+            deps: ["jquery"]
         }
 
         "coffee/src/main": {
@@ -221,35 +216,33 @@ requirejs.config({
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
-define([
+testFiles = [
     "coffee/spec/main_spec",
-
-    "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
+    "coffee/spec/models/course_spec",
+    "coffee/spec/models/metadata_spec",
     "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
-    "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
+    "coffee/spec/models/settings_grading_spec",
+    "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
-
     "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
-
-    "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
-    "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
+    "js/spec/video/transcripts/utils_spec",
+    "js/spec/video/transcripts/editor_spec",
+    "js/spec/video/transcripts/videolist_spec",
+    "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
-
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
     "js/spec/models/xblock_info_spec",
     "js/spec/models/xblock_validation_spec",
     "js/spec/models/license_spec",
-
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
-
     "js/spec/views/active_video_upload_list_spec",
     "js/spec/views/previous_video_upload_spec",
     "js/spec/views/previous_video_upload_list_spec",
@@ -266,7 +259,6 @@ define([
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/login_studio_spec",
-
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
@@ -274,25 +266,32 @@ define([
     "js/spec/views/pages/course_rerun_spec",
     "js/spec/views/pages/index_spec",
     "js/spec/views/pages/library_users_spec",
-
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
     "js/spec/views/modals/validation_error_modal_spec",
-
     "js/spec/views/settings/main_spec",
-
     "js/spec/factories/xblock_validation_spec",
-
     "js/spec/xblock/cms.runtime.v1_spec",
-
-    # Certificates application test suite mappings
     "js/certificates/spec/models/certificate_spec",
     "js/certificates/spec/views/certificate_details_spec",
     "js/certificates/spec/views/certificate_editor_spec",
     "js/certificates/spec/views/certificates_list_spec",
-    "js/certificates/spec/views/certificate_preview_spec",
+    "js/certificates/spec/views/certificate_preview_spec"
+]
 
-    # these tests are run separately in the cms-squire suite, due to process
-    # isolation issues with Squire.js
-    # "coffee/spec/views/assets_spec"
-    ])
+i = 0
+while i < testFiles.length
+    testFiles[i] = '/base/' + testFiles[i] + '.js'
+    i++
+
+specHelpers = [
+  'common/js/spec_helpers/jasmine-extensions',
+  'common/js/spec_helpers/jasmine-stealth',
+  'common/js/spec_helpers/jasmine-waituntil'
+]
+
+# Jasmine has a global stack for creating a tree of specs. We need to load
+# spec files one by one, otherwise some end up getting nested under others.
+requireSerial specHelpers.concat(testFiles), ->
+# start test run, once Require.js is done
+    window.__karma__.start()

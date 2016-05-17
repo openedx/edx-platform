@@ -10,6 +10,7 @@ from microsite_configuration import microsite
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 
 log = logging.getLogger(__name__)
@@ -75,5 +76,6 @@ def checkout_receipt(request):
         'payment_support_email': payment_support_email,
         'username': request.user.username,
         'nav_hidden': True,
+        'is_request_in_themed_site': is_request_in_themed_site()
     }
     return render_to_response('commerce/checkout_receipt.html', context)

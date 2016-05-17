@@ -18,6 +18,10 @@ from xmodule.modulestore.django import modulestore
 # handled separately; its value maps to an alternate key name.
 ABOUT_ATTRIBUTES = [
     'syllabus',
+    'title',
+    'subtitle',
+    'duration',
+    'description',
     'short_description',
     'overview',
     'effort',
@@ -43,6 +47,10 @@ class CourseDetails(object):
         self.enrollment_start = None
         self.enrollment_end = None
         self.syllabus = None  # a pdf file asset
+        self.title = ""
+        self.subtitle = ""
+        self.duration = ""
+        self.description = ""
         self.short_description = ""
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
@@ -50,6 +58,10 @@ class CourseDetails(object):
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.banner_image_name = ""
+        self.banner_image_asset_path = ""
+        self.video_thumbnail_image_name = ""
+        self.video_thumbnail_image_asset_path = ""
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -58,6 +70,8 @@ class CourseDetails(object):
             '50'
         )  # minimum passing score for entrance exam content module/tree,
         self.self_paced = None
+        self.learning_info = []
+        self.instructor_info = []
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):
@@ -80,21 +94,33 @@ class CourseDetails(object):
         Fetch the course details for the given course from persistence
         and return a CourseDetails model.
         """
-        descriptor = modulestore().get_course(course_key)
-        course_details = cls(course_key.org, course_key.course, course_key.run)
+        return cls.populate(modulestore().get_course(course_key))
 
-        course_details.start_date = descriptor.start
-        course_details.end_date = descriptor.end
-        course_details.enrollment_start = descriptor.enrollment_start
-        course_details.enrollment_end = descriptor.enrollment_end
-        course_details.pre_requisite_courses = descriptor.pre_requisite_courses
-        course_details.course_image_name = descriptor.course_image
-        course_details.course_image_asset_path = course_image_url(descriptor)
-        course_details.language = descriptor.language
-        course_details.self_paced = descriptor.self_paced
+    @classmethod
+    def populate(cls, course_descriptor):
+        """
+        Returns a fully populated CourseDetails model given the course descriptor
+        """
+        course_key = course_descriptor.id
+        course_details = cls(course_key.org, course_key.course, course_key.run)
+        course_details.start_date = course_descriptor.start
+        course_details.end_date = course_descriptor.end
+        course_details.enrollment_start = course_descriptor.enrollment_start
+        course_details.enrollment_end = course_descriptor.enrollment_end
+        course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
+        course_details.course_image_name = course_descriptor.course_image
+        course_details.course_image_asset_path = course_image_url(course_descriptor, 'course_image')
+        course_details.banner_image_name = course_descriptor.banner_image
+        course_details.banner_image_asset_path = course_image_url(course_descriptor, 'banner_image')
+        course_details.video_thumbnail_image_name = course_descriptor.video_thumbnail_image
+        course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
+        course_details.language = course_descriptor.language
+        course_details.self_paced = course_descriptor.self_paced
+        course_details.learning_info = course_descriptor.learning_info
+        course_details.instructor_info = course_descriptor.instructor_info
 
         # Default course license is "All Rights Reserved"
-        course_details.license = getattr(descriptor, "license", "all-rights-reserved")
+        course_details.license = getattr(course_descriptor, "license", "all-rights-reserved")
 
         course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
@@ -209,6 +235,15 @@ class CourseDetails(object):
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
 
+        if 'banner_image_name' in jsondict and jsondict['banner_image_name'] != descriptor.banner_image:
+            descriptor.banner_image = jsondict['banner_image_name']
+            dirty = True
+
+        if 'video_thumbnail_image_name' in jsondict \
+                and jsondict['video_thumbnail_image_name'] != descriptor.video_thumbnail_image:
+            descriptor.video_thumbnail_image = jsondict['video_thumbnail_image_name']
+            dirty = True
+
         if 'pre_requisite_courses' in jsondict \
                 and sorted(jsondict['pre_requisite_courses']) != sorted(descriptor.pre_requisite_courses):
             descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
@@ -216,6 +251,14 @@ class CourseDetails(object):
 
         if 'license' in jsondict:
             descriptor.license = jsondict['license']
+            dirty = True
+
+        if 'learning_info' in jsondict:
+            descriptor.learning_info = jsondict['learning_info']
+            dirty = True
+
+        if 'instructor_info' in jsondict:
+            descriptor.instructor_info = jsondict['instructor_info']
             dirty = True
 
         if 'language' in jsondict and jsondict['language'] != descriptor.language:

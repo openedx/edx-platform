@@ -7,10 +7,11 @@ define([ // jshint ignore:line
     'gettext',
     'js/views/list_item_editor',
     'js/certificates/models/signatory',
-    'js/certificates/views/signatory_editor'
+    'js/certificates/views/signatory_editor',
+    'text!templates/certificate-editor.underscore'
 ],
 function($, _, Backbone, gettext,
-         ListItemEditorView, SignatoryModel, SignatoryEditorView) {
+         ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate) {
     'use strict';
 
     // If signatories limit is required to specific value then we can change it.
@@ -41,14 +42,15 @@ function($, _, Backbone, gettext,
             ].join(' ');
         },
 
-        initialize: function() {
+        initialize: function(options) {
             // Set up the initial state of the attributes set for this model instance
             _.bindAll(this, "onSignatoryRemoved", "clearErrorMessage");
+            this.max_signatories_limit = options.max_signatories_limit || MAX_SIGNATORIES_LIMIT;
+            this.template = _.template(certificateEditorTemplate);
             this.eventAgg = _.extend({}, Backbone.Events);
             this.eventAgg.bind("onSignatoryRemoved", this.onSignatoryRemoved);
             this.eventAgg.bind("onSignatoryUpdated", this.clearErrorMessage);
             ListItemEditorView.prototype.initialize.call(this);
-            this.template = this.loadTemplate('certificate-editor');
         },
 
         onSignatoryRemoved: function() {
@@ -87,7 +89,7 @@ function($, _, Backbone, gettext,
 
         disableAddSignatoryButton: function() {
             // Disable the 'Add Signatory' link if the constraint has been met.
-            if(this.$(".signatory-edit-list > div.signatory-edit").length >= MAX_SIGNATORIES_LIMIT) {
+            if(this.$(".signatory-edit-list > div.signatory-edit").length >= this.max_signatories_limit) {
                 this.$(".action-add-signatory").addClass("disableClick");
             }
         },

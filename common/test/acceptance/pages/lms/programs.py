@@ -20,3 +20,11 @@ class ProgramListingPage(PageObject):
     def is_sidebar_present(self):
         """Check whether sidebar is present."""
         return self.q(css='.sidebar').present
+
+
+class ProgramDetailsPage(PageObject):
+    """Program details page."""
+    url = BASE_URL + '/dashboard/programs/123'
+
+    def is_browser_on_page(self):
+        return self.q(css='.js-program-details-wrapper').present

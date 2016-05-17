@@ -10,7 +10,6 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal
 from nose.plugins.attrib import attr
@@ -24,8 +23,9 @@ from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
+
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -350,15 +350,12 @@ class ViewsTestCaseMixin(object):
 @disable_signal(views, 'thread_edited')
 class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
 
+    CREATE_USER = False
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
-        super(ViewsQueryCountTestCase, self).setUp(create_user=False)
-
-    def clear_caches(self):
-        """Clears caches so that query count numbers are accurate."""
-        for cache in settings.CACHES:
-            caches[cache].clear()
-        RequestCache.clear_request_cache()
+        super(ViewsQueryCountTestCase, self).setUp()
 
     def count_queries(func):  # pylint: disable=no-self-argument
         """

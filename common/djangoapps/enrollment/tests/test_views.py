@@ -9,6 +9,7 @@ import datetime
 import ddt
 from django.core.cache import cache
 from mock import patch
+from nose.plugins.attrib import attr
 from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
@@ -125,6 +126,7 @@ class EnrollmentTestMixin(object):
         self.assertEqual(actual_mode, expected_mode)
 
 
+@attr('shard_3')
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -138,6 +140,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
 
     OTHER_USERNAME = "Jane"
     OTHER_EMAIL = "jane@example.com"
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         """ Create a course and user, then log in. """
@@ -398,6 +402,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             mode_slug=CourseMode.HONOR,
             mode_display_name=CourseMode.HONOR,
             sku='123',
+            bulk_sku="BULK123"
         )
         resp = self.client.get(
             reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
@@ -409,6 +414,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.HONOR)
         self.assertEqual(mode['sku'], '123')
+        self.assertEqual(mode['bulk_sku'], 'BULK123')
         self.assertEqual(mode['name'], CourseMode.HONOR)
 
     def test_get_course_details_with_credit_course(self):
@@ -888,10 +894,12 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentEmbargoTest, self).setUp('embargo')
+        super(EnrollmentEmbargoTest, self).setUp()
 
         self.course = CourseFactory.create()
         # Load a CourseOverview. This initial load should result in a cache

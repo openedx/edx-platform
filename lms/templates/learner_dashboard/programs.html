@@ -1,3 +1,6 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-learner-dashboard" %>
+
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
@@ -13,6 +16,7 @@ from openedx.core.djangolib.js_utils import (
 ProgramListFactory({
     programsData: ${programs | n, dump_js_escaped_json},
     certificatesData: ${credentials | n, dump_js_escaped_json},
+    userProgress: ${progress | n, dump_js_escaped_json},
     xseriesUrl: '${xseries_url | n, js_escaped_string}',
     xseriesImage: '${static.url('images/xseries-certificate-visual.png')}'
 });
@@ -21,7 +25,10 @@ ProgramListFactory({
 
 <%block name="pagetitle">${_("Programs")}</%block>
 
-<div class="program-list-wrapper">
-    <div class="program-cards-container"></div>
-    <div class="sidebar"></div>
-</div>
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="program-list-wrapper grid-container">
+        <h2 class="sr-only">${_("Your Programs")}</h2>
+        <div class="program-cards-container col"></div>
+        <div class="sidebar col col-last"></div>
+    </div>
+</main>

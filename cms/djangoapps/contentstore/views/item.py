@@ -21,6 +21,7 @@ from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
 from xblock.fields import Scope
 from xblock.fragment import Fragment
+from xblock_django.user_service import DjangoXBlockUserService
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
@@ -50,6 +51,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
+
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -104,6 +106,9 @@ def xblock_handler(request, usage_key_string):
                 :children: the unicode representation of the UsageKeys of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
+                :fields: any other xblock fields to be set. Only supported by update.
+                    This is represented as a dictionary:
+                        {'field_name': 'field_value'}
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
                 :isPrereq: Set this xblock as a prerequisite which can be used to limit access to other xblocks
@@ -167,6 +172,7 @@ def xblock_handler(request, usage_key_string):
                 prereq_usage_key=request.json.get('prereqUsageKey'),
                 prereq_min_score=request.json.get('prereqMinScore'),
                 publish=request.json.get('publish'),
+                fields=request.json.get('fields'),
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
@@ -196,6 +202,49 @@ def xblock_handler(request, usage_key_string):
             "Only instance creation is supported without a usage key.",
             content_type="text/plain"
         )
+
+
+class StudioPermissionsService(object):
+    """
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentDescriptor (and library_tools.py).
+    """
+    def __init__(self, user):
+        self._user = user
+
+    def can_read(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_read_access(self._user, course_key)
+
+    def can_write(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_write_access(self._user, course_key)
+
+
+class StudioEditModuleRuntime(object):
+    """
+    An extremely minimal ModuleSystem shim used for XBlock edits and studio_view.
+    (i.e. whenever we're not using PreviewModuleSystem.) This is required to make information
+    about the current user (especially permissions) available via services as needed.
+    """
+    def __init__(self, user):
+        self._user = user
+
+    def service(self, block, service_name):
+        """
+        This block is not bound to a user but some blocks (LibraryContentModule) may need
+        user-specific services to check for permissions, etc.
+        If we return None here, CombinedSystem will load services from the descriptor runtime.
+        """
+        if block.service_declaration(service_name) is not None:
+            if service_name == "user":
+                return DjangoXBlockUserService(self._user)
+            if service_name == "studio_user_permissions":
+                return StudioPermissionsService(self._user)
+        return None
 
 
 @require_http_methods(("GET"))
@@ -231,6 +280,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
         ))
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
+            if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
+                xblock.xmodule_runtime = StudioEditModuleRuntime(request.user)
+
             try:
                 fragment = xblock.render(view_name)
             # catch exceptions indiscriminately, since after this point they escape the
@@ -375,6 +427,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
             old_metadata = own_metadata(xblock)
         if old_content is None:
             old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+        xblock.xmodule_runtime = StudioEditModuleRuntime(user)
         xblock.editor_saved(user, old_metadata, old_content)
 
     # Update after the callback so any changes made in the callback will get persisted.
@@ -382,11 +435,13 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
-                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None, publish=None):
+                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
+                 publish=None, fields=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
+
     """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
@@ -407,6 +462,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             xblock.data = data
         else:
             data = old_content['data'] if 'data' in old_content else None
+
+        if fields:
+            for field_name in fields:
+                setattr(xblock, field_name, fields[field_name])
 
         if children_strings is not None:
             children = []
@@ -561,7 +620,7 @@ def _create_item(request):
         user=request.user,
         category=category,
         display_name=request.json.get('display_name'),
-        boilerplate=request.json.get('boilerplate')
+        boilerplate=request.json.get('boilerplate'),
     )
 
     return JsonResponse(
@@ -624,6 +683,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
+            dest_module.xmodule_runtime = StudioEditModuleRuntime(user)
             children_handled = dest_module.studio_post_duplicate(store, source_item)
 
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
@@ -935,7 +995,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
                 "exam_review_rules": xblock.exam_review_rules,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes
+                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                "hide_after_due": xblock.hide_after_due,
             })
 
     # Update with gating info

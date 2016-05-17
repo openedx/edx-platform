@@ -46,11 +46,14 @@ from certificates.models import (
     CertificateInvalidation,
 )
 from certificates import api as certs_api
+from bulk_email.models import BulkEmailFlag
 from util.date_utils import get_default_time_display
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
+from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from openedx.core.djangolib.markup import Text, HTML
 
 log = logging.getLogger(__name__)
 
@@ -111,13 +114,13 @@ def instructor_dashboard_2(request, course_id):
     if settings.ANALYTICS_DASHBOARD_URL:
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+        link_start = HTML("<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             "To gain insights into student enrollment and participation {link_start}"
             "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
         )
-        analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+        analytics_dashboard_message = Text(analytics_dashboard_message).format(
+            link_start=link_start, link_end=HTML("</a>"), analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
 
         # Temporarily show the "Analytics" section until we have a better way of linking to Insights
         sections.append(_section_analytics(course, access))
@@ -138,7 +141,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if bulk_email_is_enabled_for_course(course_key):
+    if BulkEmailFlag.feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization
@@ -327,6 +330,7 @@ def _section_certificates(course):
         'example_certificate_status': example_cert_status,
         'can_enable_for_course': can_enable_for_course,
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
+        'is_self_paced': course.self_paced,
         'instructor_generation_enabled': instructor_generation_enabled,
         'html_cert_enabled': html_cert_enabled,
         'active_certificate': certs_api.get_active_web_certificate(course),
@@ -476,6 +480,9 @@ def _section_cohort_management(course, access):
         'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
         'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
+        'verified_track_cohorting_url': reverse(
+            'verified_track_cohorting', kwargs={'course_key_string': unicode(course_key)}
+        ),
     }
     return section_data
 
@@ -625,8 +632,9 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-    link = u"<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
-                                                               settings.ANALYTICS_DASHBOARD_NAME)
+    link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
+        analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
+    )
     return link
 
 

@@ -1,6 +1,22 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -33,7 +49,7 @@
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
-# rafcha <raphael.chay@gmail.com>, 2014-2015
+# rafcha <raphael.chay@gmail.com>, 2014-2016
 # Régis Behmo <transifex.stuff@behmo.com>, 2016
 # Régis Millet <kulgar@ct2c.fr>, 2015
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
@@ -48,8 +64,24 @@
 # Xynn <xynn.anhnguyen@gmail.com>, 2015
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2016 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2016 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -121,9 +153,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-30 19:38+0000\n"
-"PO-Revision-Date: 2016-04-06 10:16+0000\n"
-"Last-Translator: moocit-france <contact@moocit.fr>\n"
+"POT-Creation-Date: 2016-05-06 14:29+0000\n"
+"PO-Revision-Date: 2016-05-09 11:26+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -203,7 +235,9 @@ msgstr "Annuler"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
 #: cms/templates/js/course_grade_policy.underscore
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
@@ -227,6 +261,7 @@ msgstr "Chargement en cours"
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -290,6 +325,7 @@ msgstr "Avancé"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/forum-action-close.underscore
+#: lms/templates/student_profile/share_modal.underscore
 msgid "Close"
 msgstr "Fermer"
 
@@ -310,6 +346,16 @@ msgstr "Vos modifications ont été enregistrées."
 #: lms/static/js/views/fields.js
 msgid "Error"
 msgstr "Erreur"
+
+#: common/lib/xmodule/xmodule/assets/library_content/public/js/library_content_edit.js
+#: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
+msgid "Updating with latest library content"
+msgstr "Mise à jour des derniers ajouts à la bibliothèque"
+
+#: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
+#: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
+msgid "Creating missing groups"
+msgstr "Création des groupes manquants"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -1503,6 +1549,7 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -1838,34 +1885,36 @@ msgid "Do not show again"
 msgstr "Ne pas montrer de nouveau"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn on closed captioning"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Turn off transcript"
+msgid "Transcript will be displayed when you start playing the video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
-"Language: Press the UP arrow key to enter the language menu, then use UP and"
-" DOWN arrow keys to navigate language options. Press ENTER to change to the "
+"Activating a link in this group will skip to the corresponding point in the "
+"video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Video transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Start of transcript. Skip to the end."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "End of transcript. Skip to the start."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid ""
+"Language: Press the UP arrow key to enter the language menu then use UP and "
+"DOWN arrow keys to navigate language options. Press ENTER to change to the "
 "selected language."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "Open language menu"
-msgstr "Ouvrir le menu des langues"
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid ""
-"Activating an item in this group will spool the video to the corresponding "
-"time point. To skip transcript, go to previous item."
-msgstr ""
-"L'activation d'un élément de ce groupe jouera la vidéo à partir de ce point."
-" Pour passer la transcription, allez à l'élément précédent."
-
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-msgid "<li>Transcript will be displayed when "
+msgid "Open language menu."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
@@ -1877,20 +1926,16 @@ msgid "(Caption will be displayed when you start playing the video.)"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on closed captioning"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
 msgstr "Activer la transcription"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Désactiver la transcription"
-
-#: common/lib/xmodule/xmodule/public/js/library_content_edit.js
-msgid "Updating with latest library content"
-msgstr "Mise à jour des derniers ajouts à la bibliothèque"
-
-#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
-msgid "Creating missing groups"
-msgstr "Création des groupes manquants"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -2186,6 +2231,17 @@ msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 "Merci de ne pas utiliser d'espace ou caractères spéciaux dans ce champ."
 
+#: common/static/common/js/components/views/paginated_view.js
+#: common/static/common/js/components/views/paging_footer.js
+msgid "Pagination"
+msgstr ""
+
+#: common/static/common/js/components/views/paginated_view.js
+msgid ""
+"Your request could not be completed. Reload the page and try again. If the "
+"issue persists, click the Help tab to report the problem."
+msgstr ""
+
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing %(first_index)s out of %(num_items)s total"
 msgstr "%(first_index)s sur %(num_items)s au total"
@@ -2472,6 +2528,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "nom"
 
@@ -2480,6 +2537,11 @@ msgstr "nom"
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "total équipe"
+
+#: lms/djangoapps/teams/static/teams/js/teams_tab_factory.js
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Teams"
+msgstr "Équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Create"
@@ -2674,13 +2736,13 @@ msgstr[1] "%(memberCount)s / %(maxMemberCount)s membres"
 msgid "All teams"
 msgstr "Toutes les équipes"
 
+#: lms/djangoapps/teams/static/teams/js/views/teams.js
+msgid "Teams Pagination"
+msgstr ""
+
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Topics"
 msgstr "Sujets"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Teams"
-msgstr "Équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
@@ -2712,12 +2774,7 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-" and try again. If the issue persists, click the Help tab to report the "
-"problem."
 msgstr ""
-"Votre demande n'a pas pu être réalisée à cause d'un problème de serveur. "
-"Rafraîchissez la page et réessayez. Si le problème persiste, cliquez sur "
-"l'onglet Aide pour signaler le problème."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -3657,6 +3714,10 @@ msgstr "Titre"
 msgid "You have been logged out of your edX account. "
 msgstr "Vous avez été déconnecté de votre compte edX"
 
+#: lms/static/js/api_admin/views/catalog_preview.js
+msgid "Preview this query"
+msgstr ""
+
 #: lms/static/js/bookmarks/views/bookmark_button.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -4047,6 +4108,27 @@ msgstr "Cohortes activées"
 msgid "Cohorts Disabled"
 msgstr "Cohortes désactivées"
 
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
+"'{verifiedCohortName}'. To change the configuration for verified track "
+"cohorts, contact your edX partner manager."
+msgstr ""
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
+"cohort named '{verifiedCohortName}' for the feature to work."
+msgstr ""
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
 msgstr "Autoriser les étudiants à générer des certificats pour ce cours?"
@@ -4322,6 +4404,10 @@ msgstr "Lier"
 msgid "Successfully unlinked."
 msgstr "Lien supprimé."
 
+#: lms/static/js/student_profile/views/badge_list_container.js
+msgid "Accomplishments Pagination"
+msgstr ""
+
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
 msgstr "Les utilisateurs de {platform_name} peuvent voir mon:"
@@ -4383,6 +4469,18 @@ msgstr "Image du profil"
 #: lms/static/js/student_profile/views/learner_profile_fields.js
 msgid "Profile image for {username}"
 msgstr "Image de profil pour {username}"
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "About Me"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Accomplishments"
+msgstr ""
+
+#: lms/static/js/student_profile/views/learner_profile_view.js
+msgid "Profile"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -4903,6 +5001,10 @@ msgstr ""
 msgid "You must specify a name"
 msgstr "Vous devez indiquer un nom"
 
+#: cms/static/js/models/course_update.js
+msgid "Action required: Enter a valid date."
+msgstr ""
+
 #: cms/static/js/models/group.js
 msgid "Group name is required"
 msgstr "Un nom de groupe est requis"
@@ -4930,6 +5032,26 @@ msgstr "Tous les groupes doivent avoir un nom."
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
 msgstr "Tous les groupes doivent avoir un nom unique."
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The title field must be limited to 50 characters."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The subtitle field must be limited to 150 characters."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The duration field must be limited to 50 characters."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The short description field must be limited to 150 characters."
+msgstr ""
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The description field must be limited to 1000 characters."
+msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
@@ -5172,6 +5294,14 @@ msgstr "Erreur lors de l'importation du cours"
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "Il y a eu une erreur pendant le téléchargement"
+
+#: cms/static/js/views/instructor_info.js
+msgid "Upload instructor image."
+msgstr ""
+
+#: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
+msgid "Files must be in JPEG or PNG format."
+msgstr "Les fichiers doivent être au format JPEG ou PNG."
 
 #: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
@@ -5495,6 +5625,11 @@ msgid ""
 "difficulties, check your formatting."
 msgstr ""
 
+#: cms/static/js/views/settings/grader.js
+msgid ""
+"For grading to work, you must change all {oldName} subsections to {newName}."
+msgstr ""
+
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
 msgstr "Critères d'obtention de crédit du cours"
@@ -5508,16 +5643,20 @@ msgid "Course pacing cannot be changed once a course has started."
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
-msgid "%(hours)s:%(minutes)s (current UTC time)"
-msgstr "%(hours)s:%(minutes)s (Heure actuelle UTC )"
+msgid "{hours}:{minutes} (current UTC time)"
+msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr "Téléchargez votre image de cours."
 
 #: cms/static/js/views/settings/main.js
-msgid "Files must be in JPEG or PNG format."
-msgstr "Les fichiers doivent être au format JPEG ou PNG."
+msgid "Upload your banner image."
+msgstr ""
+
+#: cms/static/js/views/settings/main.js
+msgid "Upload your video thumbnail image."
+msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
@@ -5704,6 +5843,12 @@ msgstr "Non programmé"
 msgid "Date"
 msgstr "Date"
 
+#: cms/templates/js/edit-chapter.underscore
+#: lms/templates/ccx/schedule.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "gettext("
+msgstr ""
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -5729,8 +5874,9 @@ msgid "Zoom Out"
 msgstr "Dézoomer "
 
 #: common/static/common/templates/components/paging-footer.underscore
-msgid "Page number"
-msgstr "Numéro de page"
+#, python-format
+msgid "Page number out of %(total_pages)s"
+msgstr ""
 
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
@@ -6339,6 +6485,16 @@ msgstr ""
 msgid "Donate"
 msgstr "Faire un don"
 
+#: lms/templates/api_admin/catalog-error.underscore
+msgid ""
+"There was an error retrieving preview results for this catalog. Please check"
+" that your query is correct and try again."
+msgstr ""
+
+#: lms/templates/api_admin/catalog-results.underscore
+msgid "This catalog's courses:"
+msgstr ""
+
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
 msgstr ""
@@ -6382,10 +6538,6 @@ msgstr "Date d'échéance"
 #: lms/templates/ccx/schedule.underscore
 msgid "remove all"
 msgstr "tout supprimer"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "gettext("
-msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Section"
@@ -6712,15 +6864,9 @@ msgid "Generate Exception Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all "
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "New"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "additions to the Exception list"
+msgid ""
+"Generate certificates for all users on the Exception list who do not yet "
+"have a certificate"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -6962,6 +7108,47 @@ msgstr "Utilisé"
 msgid "Valid"
 msgstr "Valide"
 
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "XSeries Program Certificates"
+msgstr ""
+
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "certificate.credential_url"
+msgstr ""
+
+#: lms/templates/learner_dashboard/certificate.underscore
+msgid "certificate.display_name"
+msgstr ""
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "You are not enrolled in any XSeries Programs yet."
+msgstr ""
+
+#: lms/templates/learner_dashboard/empty_programs_list.underscore
+msgid "Explore XSeries Programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid ""
+"Browse recently launched courses and see what\\'s new in your favorite "
+"subjects"
+msgstr ""
+
+#: lms/templates/learner_dashboard/explore_new_programs.underscore
+msgid "Explore New XSeries"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "type"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_card.underscore
+#, python-format
+msgid ""
+"You have earned certificates in %(completed_courses)s of the "
+"%(total_courses)s courses so far."
+msgstr ""
+
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
 #, python-format
@@ -7006,7 +7193,6 @@ msgid "section.title"
 msgstr "section.title"
 
 #: lms/templates/student_account/account_settings.underscore
-#: lms/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Une erreur est survenue. Merci de rafraîchir la page."
 
@@ -7195,13 +7381,69 @@ msgstr "Champ requis"
 msgid "Already have an account?"
 msgstr "Vous avez déjà un compte ?"
 
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Share your \"%(display_name)s\" award"
+msgstr ""
+
+#: lms/templates/student_profile/badge.underscore
+msgid "Share"
+msgstr ""
+
+#: lms/templates/student_profile/badge.underscore
+#, python-format
+msgid "Earned %(created)s."
+msgstr ""
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "What's Your Next Accomplishment?"
+msgstr ""
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Start working toward your next learning goal."
+msgstr ""
+
+#: lms/templates/student_profile/badge_placeholder.underscore
+msgid "Find a course"
+msgstr ""
+
 #: lms/templates/student_profile/learner_profile.underscore
+msgid "An error occurred. Try loading the page again."
+msgstr ""
+
+#: lms/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr "Vous partagez actuellement votre profil restreint."
 
-#: lms/templates/student_profile/learner_profile.underscore
-msgid "This edX learner is currently sharing a limited profile."
-msgstr "Cette utilisateur partage actuellement un profil restreint."
+#: lms/templates/student_profile/section_two.underscore
+msgid "This learner is currently sharing a limited profile."
+msgstr ""
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Share on Mozilla Backpack"
+msgstr ""
+
+#: lms/templates/student_profile/share_modal.underscore
+msgid ""
+"To share your certificate on Mozilla Backpack, you must first have a "
+"Backpack account. Complete the following steps to add your certificate to "
+"Backpack."
+msgstr ""
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
+"your existing account"
+msgstr ""
+
+#: lms/templates/student_profile/share_modal.underscore
+#, python-format
+msgid ""
+"%(download_link_start)sDownload this image (right-click or option-click, "
+"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
+"your backpack.</li>"
+msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -7291,9 +7533,8 @@ msgid "Take Your Photo"
 msgstr "Prendre votre photo"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"When your face is in position, use the camera button %(icon)s below to take "
+"When your face is in position, use the camera button {icon} below to take "
 "your photo."
 msgstr ""
 
@@ -7315,10 +7556,9 @@ msgstr ""
 "La photo de votre visage concorde avec la photo sur votre pièce d'identité."
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#, python-format
 msgid ""
-"To use the current photo, select the camera button %(icon)s. To take another"
-" photo, select the retake button %(icon)s."
+"To use the current photo, select the camera button {icon}. To take another "
+"photo, select the retake button {icon}."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -7401,8 +7641,7 @@ msgid "Make sure your ID is well-lit"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your ID"
+msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -7433,8 +7672,7 @@ msgid "Be sure your entire face is inside the frame"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
+msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -7442,8 +7680,7 @@ msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
-#, python-format
-msgid "Thanks for returning to verify your ID in: %(courseName)s"
+msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -7483,13 +7720,12 @@ msgstr ""
 " et photo."
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are enrolling in: %(courseName)s"
-msgstr "Vous vous inscrivez à : %(courseName)s"
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+msgid "You are enrolling in: {courseName}"
+msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "You are upgrading your enrollment for: %(courseName)s"
+msgid "You are upgrading your enrollment for: {courseName}"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -7535,9 +7771,8 @@ msgid "You have already verified your ID!"
 msgstr "Vous avez déjà vérifié votre ID!"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
-msgid "Your verification status is good until %(verificationGoodUntil)s."
-msgstr "Votre vérification est valable jusqu'au %(verificationGoodUntil)s."
+msgid "Your verification status is good until {verificationGoodUntil}."
+msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -7548,13 +7783,7 @@ msgid "Account Not Activated"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "You are enrolling in %(courseName)s"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Upgrade to a Verified Certificate for %(courseName)s"
+msgid "Upgrade to a Verified Certificate for {courseName}"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -7567,13 +7796,11 @@ msgid "Check your email for an activation message."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Professional Certificate for %(courseName)s"
+msgid "Professional Certificate for {courseName}"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
-msgid "Verified Certificate for %(courseName)s"
+msgid "Verified Certificate for {courseName}"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -7604,9 +7831,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid "Thank you! We have received your payment for %(courseName)s."
-msgstr "Merci ! Nous avons reçu votre paiement pour  %(courseName)s."
+msgid "Thank you! We have received your payment for {courseName}."
+msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -8003,6 +8229,69 @@ msgstr ""
 msgid "This content group is used in one or more units."
 msgstr ""
 
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Name"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's name"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Title"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's title"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+msgid "Organization"
+msgstr "Organisation"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Organization Name"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the institute where the instructor is associated"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Biography"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Biography"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's biography"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Photo"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo URL"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid ""
+"Please add a photo of the instructor (Note: only JPEG or PNG format "
+"supported)"
+msgstr ""
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Upload Photo"
+msgstr ""
+
 #: cms/templates/js/course-outline.underscore
 #, python-format
 msgid "Prerequisite: %(prereq_display_name)s"
@@ -8038,7 +8327,7 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr "Examen minuté"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -8082,6 +8371,14 @@ msgid "Due:"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Exam will remain hidden after due date"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Exam will be visible after due date"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr ""
@@ -8090,6 +8387,14 @@ msgstr ""
 #: cms/templates/js/xblock-outline.underscore
 #, python-format
 msgid "Click to add a new %(xblock_type)s"
+msgstr ""
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Learning Outcome"
+msgstr ""
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Add a learning outcome here"
 msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
@@ -8185,21 +8490,11 @@ msgid "Chapter Name"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "Chapter %s"
-msgstr ""
-
-#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
-msgstr ""
-
-#: cms/templates/js/edit-chapter.underscore
-#, python-format
-msgid "path/to/introductionToCookieBaking-CH%d.pdf"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
@@ -8522,10 +8817,6 @@ msgid "Signatory"
 msgstr ""
 
 #: cms/templates/js/signatory-details.underscore
-msgid "Organization"
-msgstr "Organisation"
-
-#: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
 msgid "Signature Image"
 msgstr ""
@@ -8562,11 +8853,11 @@ msgstr ""
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization "
-msgstr ""
+msgstr "Organisation"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid "Organization of the signatory"
-msgstr ""
+msgstr "Organisation du signataire"
 
 #: cms/templates/js/signatory-editor.underscore
 msgid ""
@@ -8649,6 +8940,10 @@ msgid "Set as a Special Exam"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Exam Types"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr ""
 
@@ -8705,6 +9000,16 @@ msgid ""
 "Specify any additional rules or rule exceptions that the proctoring review "
 "team should enforce when reviewing the videos. For example, you could "
 "specify that calculators are allowed."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Hide Exam After Due Date"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"By default, submitted exams are available for review after the due date has "
+"passed. Select this option to keep exams hidden after that date."
 msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore

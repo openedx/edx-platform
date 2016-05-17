@@ -107,12 +107,8 @@
 
                 var template = [
                     '<div class="subtitles" role="region" id="transcript-' + this.state.id + '">',
-                        '<a href="#transcript-end-' + this.state.id + '"',
-                        'id="transcript-start-' + this.state.id + '" class="transcript-start"></a>',
                         '<h3 id="transcript-label-' + this.state.id + '" class="transcript-title sr"></h3>',
                         '<ol id="transcript-captions" class="subtitles-menu"></ol>',
-                        '<a href="#transcript-start-' + this.state.id + '"',
-                        'id="transcript-end-' + this.state.id + '" class="transcript-end">\</a>',
                     '</div>'
                 ].join('');
 
@@ -325,9 +321,6 @@
                 var button = this.languageChooserEl,
                     menu = button.parent().find('.menu');
 
-
-                this.state.el.trigger('language_menu:show');
-
                 button
                     .addClass('is-opened');
 
@@ -340,8 +333,6 @@
                 event.preventDefault();
 
                 var button = this.languageChooserEl;
-
-                this.state.el.trigger('language_menu:hide');
 
                 button
                     .removeClass('is-opened')
@@ -381,7 +372,13 @@
             onContainerMouseEnter: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').addClass('is-opened');
-                this.state.el.trigger('language_menu:show');
+
+                // We only want to fire the analytics event if a menu is
+                // present instead of on the container hover, since it wraps
+                // the "CC" and "Transcript" buttons as well.
+                if ($(event.currentTarget).find('.lang').length) {
+                    this.state.el.trigger('language_menu:show');
+                }
             },
 
             /**
@@ -392,7 +389,13 @@
             onContainerMouseLeave: function (event) {
                 event.preventDefault();
                 $(event.currentTarget).find('.lang').removeClass('is-opened');
-                this.state.el.trigger('language_menu:hide');
+
+                // We only want to fire the analytics event if a menu is
+                // present instead of on the container hover, since it wraps
+                // the "CC" and "Transcript" buttons as well.
+                if ($(event.currentTarget).find('.lang').length) {
+                    this.state.el.trigger('language_menu:hide');
+                }
             },
 
             /**
@@ -756,7 +759,7 @@
                     self.subtitlesEl.find('.transcript-end')
                         .text(gettext('End of transcript. Skip to the start.'));
 
-                    self.container.find('.menu-container .control')
+                    self.container.find('.menu-container .language-menu')
                         .attr('aria-label', gettext('Language: Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // jshint ignore:line
 
                     self.container.find('.menu-container .control .control-text')
@@ -778,14 +781,12 @@
 
                 this.subtitlesMenuEl
                     .prepend(
-                        $('<li class="spacing">')
+                        $('<li class="spacing"><a href="#transcript-end-' + this.state.id + '" id="transcript-start-' + this.state.id + '" class="transcript-start"></a>') // jshint ignore: line
                             .height(this.topSpacingHeight())
-                            .attr('tabindex', -1)
                     )
                     .append(
-                        $('<li class="spacing">')
+                        $('<li class="spacing"><a href="#transcript-start-' + this.state.id + '" id="transcript-end-' + this.state.id + '" class="transcript-end"></a>') // jshint ignore: line
                             .height(this.bottomSpacingHeight())
-                            .attr('tabindex', -1)
                     );
             },
 
@@ -1124,6 +1125,8 @@
                     this.captionDisplayEl
                         .text(gettext('(Caption will be displayed when you start playing the video.)'));
                 }
+                
+                this.state.el.trigger('captions:show');
             },
 
             hideClosedCaptions: function() {
@@ -1137,6 +1140,8 @@
                     .removeClass('is-active')
                     .find('.control-text')
                         .text(gettext('Turn on closed captioning'));
+
+                this.state.el.trigger('captions:hide');
             },
 
             updateCaptioningCookie: function(method) {
@@ -1184,7 +1189,7 @@
                     state.el.addClass('closed');
                     text = gettext('Turn on transcripts');
                     if (trigger_event) {
-                        this.state.el.trigger('captions:hide');
+                        this.state.el.trigger('transcript:hide');
                     }
 
                     transcriptControlEl
@@ -1197,7 +1202,7 @@
                     this.scrollCaption();
                     text = gettext('Turn off transcripts');
                     if (trigger_event) {
-                        this.state.el.trigger('captions:show');
+                        this.state.el.trigger('transcript:show');
                     }
 
                     transcriptControlEl

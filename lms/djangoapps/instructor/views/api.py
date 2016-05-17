@@ -91,7 +91,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from certificates import api as certs_api
 from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses, CertificateInvalidation
 
-from bulk_email.models import CourseEmail
+from bulk_email.models import CourseEmail, BulkEmailFlag
 from student.models import get_user_by_username_or_email
 
 from .tools import (
@@ -104,7 +104,6 @@ from .tools import (
     parse_datetime,
     set_due_date_extension,
     strip_if_string,
-    bulk_email_is_enabled_for_course,
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1246,7 +1245,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features = [
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals'
+            'goals', 'city', 'country'
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1264,6 +1263,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
+        'city': _('City'),
+        'country': _('Country'),
     }
 
     if is_course_cohorted(course.id):
@@ -2485,7 +2486,7 @@ def send_email(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    if not bulk_email_is_enabled_for_course(course_id):
+    if not BulkEmailFlag.feature_enabled(course_id):
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     send_to = request.POST.get("send_to")

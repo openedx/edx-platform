@@ -84,7 +84,12 @@ case "$TEST_SUITE" in
         paver run_jshint -l $JSHINT_THRESHOLD > jshint.log || { cat jshint.log; EXIT=1; }
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+        echo "Running safe template linter report."
+        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
+        echo "Running safe commit linter report."
+        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        echo "Running diff quality."
         paver run_quality -p 100 || EXIT=1
 
         # Need to create an empty test result so the post-build
@@ -99,13 +104,16 @@ case "$TEST_SUITE" in
                 paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
                 ;;
             "1")
-                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p" -v
                 ;;
             "2")
-                paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_2' --with-flaky" --cov_args="-p" -v
                 ;;
             "3")
-                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False' --with-flaky" --cov_args="-p"
+                paver test_system -s lms --extra_args="--attr='shard_3' --with-flaky" --cov_args="-p" -v
+                ;;
+            "4")
+                paver test_system -s lms --extra_args="--attr='shard_1=False,shard_2=False,shard_3=False' --with-flaky" --cov_args="-p" -v
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -119,11 +127,11 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p" -v
         ;;
 
     "commonlib-unit")
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+        paver test_lib --extra_args="--with-flaky" --cov_args="-p" -v
         ;;
 
     "js-unit")
@@ -158,6 +166,13 @@ case "$TEST_SUITE" in
         ;;
 
     "bok-choy")
+
+        # Back compatibility support for firefox upgrade:
+        # Copy newer firefox version to project root,
+        # set that as the path for bok-choy to use.
+        cp -R $HOME/firefox/ firefox/
+        export SELENIUM_FIREFOX_PATH=firefox/firefox
+
         case "$SHARD" in
 
             "all")

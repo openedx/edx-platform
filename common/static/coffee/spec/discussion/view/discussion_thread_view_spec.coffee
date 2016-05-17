@@ -3,11 +3,12 @@ describe "DiscussionThreadView", ->
         DiscussionSpecHelper.setUpGlobals()
         DiscussionSpecHelper.setUnderscoreFixtures()
 
-        jasmine.Clock.useMock()
+        jasmine.clock().install()
         @threadData = DiscussionViewSpecHelper.makeThreadWithProps({})
         @thread = new Thread(@threadData)
         @discussion = new Discussion(@thread)
-        spyOn($, "ajax")
+        deferred = $.Deferred();
+        spyOn($, "ajax").and.returnValue(deferred);
         # Avoid unnecessary boilerplate
         spyOn(DiscussionThreadShowView.prototype, "convertMath")
         spyOn(DiscussionContentView.prototype, "makeWmdEditor")
@@ -15,8 +16,12 @@ describe "DiscussionThreadView", ->
         spyOn(DiscussionUtil, "setWmdContent")
         spyOn(ThreadResponseShowView.prototype, "convertMath")
 
+    afterEach ->
+        $.ajax.calls.reset()
+        jasmine.clock().uninstall()
+
     renderWithContent = (view, content) ->
-        $.ajax.andCallFake((params) =>
+        $.ajax.and.callFake((params) =>
             params.success(
                 createAjaxResponseJson(content, false),
                 'success'
@@ -24,7 +29,7 @@ describe "DiscussionThreadView", ->
             {always: ->}
         )
         view.render()
-        jasmine.Clock.tick(100)
+        jasmine.clock().tick(100)
 
     renderWithTestResponses = (view, count, options) ->
         renderWithContent(
@@ -85,8 +90,8 @@ describe "DiscussionThreadView", ->
     postResponse = (view, index) ->
         testResponseJson = createTestResponseJson(index)
         responseText = testResponseJson.body
-        spyOn(view, "getWmdContent").andReturn(responseText)
-        $.ajax.andCallFake((params) =>
+        spyOn(view, "getWmdContent").and.returnValue(responseText)
+        $.ajax.and.callFake((params) =>
             expect(params.type).toEqual("POST")
             expect(params.data.body).toEqual(responseText)
             params.success(
@@ -112,7 +117,7 @@ describe "DiscussionThreadView", ->
             renderWithTestResponses(view, 1)
             if mode == "inline"
                 view.expand()
-            spyOn(DiscussionUtil, "updateWithUndo").andCallFake(
+            spyOn(DiscussionUtil, "updateWithUndo").and.callFake(
                 (model, updates, safeAjaxParams, errorMsg) ->
                     model.set(updates)
             )
@@ -240,16 +245,18 @@ describe "DiscussionThreadView", ->
                 expect(@view.$el.find(".responses li").length).toEqual(0)
 
         describe "focus", ->
-            it "sends focus to the conversation when opened", ->
+            it "sends focus to the conversation when opened", (done) ->
                 DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})
                 @view.render()
                 @view.expand()
-                waitsFor (->
+                self = @
+                jasmine.waitUntil(->
                     # This is the implementation of "toBeFocused". However, simply calling that method
                     # with no wait seems to be flaky.
-                    article = @view.$el.find('.discussion-article')
+                    article = self.view.$el.find('.discussion-article')
                     return article[0] == article[0].ownerDocument.activeElement
-                ), "conversation did not receive focus", 3000
+                ).then ->
+                    done()
 
         describe "expand/collapse", ->
             it "shows/hides appropriate content", ->
@@ -269,12 +276,12 @@ describe "DiscussionThreadView", ->
                 @view.render()
                 expect($(".post-body").text()).toEqual(expectedAbbreviation)
                 expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled()
-                DiscussionThreadShowView.prototype.convertMath.reset()
+                DiscussionThreadShowView.prototype.convertMath.calls.reset()
 
                 @view.expand()
                 expect($(".post-body").text()).toEqual(longBody)
                 expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled()
-                DiscussionThreadShowView.prototype.convertMath.reset()
+                DiscussionThreadShowView.prototype.convertMath.calls.reset()
 
                 @view.collapse()
                 expect($(".post-body").text()).toEqual(expectedAbbreviation)

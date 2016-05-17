@@ -16,7 +16,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="pagetitle">${_("Account Settings")}</%block>
-<%block name="nav_skip">#content</%block>
 
 % if duplicate_provider:
     <section>
@@ -37,7 +36,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
     var platformName = '${ static.get_platform_name() | n, js_escaped_string }';
 
     AccountSettingsFactory(
-        fieldsData, 
+        fieldsData,
         authData,
         '${ user_accounts_api_url | n, js_escaped_string }',
         '${ user_preferences_api_url | n, js_escaped_string }',

@@ -29,10 +29,6 @@ class TestArgParsing(unittest.TestCase):
         with self.assertRaises(CommandError):
             self.command.handle("foo", "user@foo.org", "org", "course", "run")
 
-    def test_xml_store(self):
-        with self.assertRaises(CommandError):
-            self.command.handle(ModuleStoreEnum.Type.xml, "user@foo.org", "org", "course", "run")
-
     def test_nonexistent_user_id(self):
         errstring = "No user 99 found"
         with self.assertRaisesRegexp(CommandError, errstring):
@@ -49,9 +45,6 @@ class TestCreateCourse(ModuleStoreTestCase):
     """
     Unit tests for creating a course in either old mongo or split mongo via command line
     """
-
-    def setUp(self):
-        super(TestCreateCourse, self).setUp(create_user=True)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_all_stores_user_email(self, store):

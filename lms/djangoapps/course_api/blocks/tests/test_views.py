@@ -22,6 +22,7 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     Test class for BlocksView
     """
     requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']
+    BLOCK_TYPES_WITH_STUDENT_VIEW_DATA = ['video', 'discussion']
 
     @classmethod
     def setUpClass(cls):
@@ -203,10 +204,16 @@ class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
             )
 
     def test_student_view_data_param(self):
-        response = self.verify_response(params={'student_view_data': ['video', 'chapter']})
+        response = self.verify_response(params={
+            'student_view_data': self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA + ['chapter']
+        })
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].itervalues():
-            self.assert_in_iff('student_view_data', block_data, block_data['type'] == 'video')
+            self.assert_in_iff(
+                'student_view_data',
+                block_data,
+                block_data['type'] in self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA
+            )
 
     def test_navigation_param(self):
         response = self.verify_response(params={'nav_depth': 10})

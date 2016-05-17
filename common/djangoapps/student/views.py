@@ -57,6 +57,7 @@ from student.models import (
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
@@ -84,7 +85,6 @@ from external_auth.login_and_register import (
     register as external_auth_register
 )
 
-from bulk_email.models import Optout, CourseAuthorization
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -112,7 +112,7 @@ from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, UserAttribute
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from embargo import api as embargo_api
@@ -127,7 +127,7 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
+from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard, get_display_category
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 # SailThru integration
@@ -317,7 +317,6 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     # simplify the status for the template using this lookup table
     template_state = {
         CertificateStatuses.generating: 'generating',
-        CertificateStatuses.regenerating: 'generating',
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
@@ -510,6 +509,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
     if CourseMode.VERIFIED in modes and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES:
         mode_info['show_upsell'] = True
         mode_info['verified_sku'] = modes['verified'].sku
+        mode_info['verified_bulk_sku'] = modes['verified'].bulk_sku
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
@@ -654,9 +654,7 @@ def dashboard(request):
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
-            settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(enrollment.course_id) != ModuleStoreEnum.Type.xml and
-            CourseAuthorization.instructor_email_enabled(enrollment.course_id)
+            BulkEmailFlag.feature_enabled(enrollment.course_id)
         )
     )
 
@@ -1848,6 +1846,8 @@ def create_account_with_params(request, params):
     login(request, new_user)
     request.session.set_expiry(0)
 
+    _record_registration_attribution(request, new_user)
+
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
@@ -1886,6 +1886,16 @@ def _enroll_user_in_pending_courses(student):
                     manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
                     manual_enrollment_audit.reason, enrollment
                 )
+
+
+def _record_registration_attribution(request, user):
+    """
+    Attribute this user's registration to the referring affiliate, if
+    applicable.
+    """
+    affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
+    if user is not None and affiliate_id is not None:
+        UserAttribute.set_user_attribute(user, settings.AFFILIATE_COOKIE_NAME, affiliate_id)
 
 
 @csrf_exempt
@@ -1940,8 +1950,9 @@ def auto_auth(request):
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
     * `no_login`: Define this to create the user but not login
-    * `redirect`: Set to "true" will redirect to course if course_id is defined, otherwise it will redirect to dashboard
-
+    * `redirect`: Set to "true" will redirect to the `redirect_to` value if set, or
+        course home page if course_id is defined, otherwise it will redirect to dashboard
+    * `redirect_to`: will redirect to to this url
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -1957,6 +1968,7 @@ def auto_auth(request):
     is_staff = request.GET.get('staff', None)
     is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
+    redirect_to = request.GET.get('redirect_to', None)
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
@@ -1965,7 +1977,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
-    redirect_when_done = request.GET.get('redirect', '').lower() == 'true'
+    redirect_when_done = request.GET.get('redirect', '').lower() == 'true' or redirect_to
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -2030,8 +2042,11 @@ def auto_auth(request):
     # Provide the user with a valid CSRF token
     # then return a 200 response unless redirect is true
     if redirect_when_done:
+        # Redirect to specific page if specified
+        if redirect_to:
+            redirect_url = redirect_to
         # Redirect to course info page if course_id is known
-        if course_id:
+        elif course_id:
             try:
                 # redirect to course info page in LMS
                 redirect_url = reverse(
@@ -2480,8 +2495,8 @@ def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invali
                             'xseries' + '/{}'
                         ).format(program['marketing_slug'])
                     })
-                    programs_for_course['display_category'] = program.get('display_category')
                     programs_for_course['category'] = program.get('category')
+                    programs_for_course['display_category'] = get_display_category(program)
                 except KeyError:
                     log.warning('Program structure is invalid, skipping display: %r', program)
 

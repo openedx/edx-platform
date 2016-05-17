@@ -805,6 +805,22 @@ class TestEditItem(TestEditItemSetup):
         self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
 
+    def test_update_generic_fields(self):
+        new_display_name = 'New Display Name'
+        new_max_attempts = 2
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'fields': {
+                    'display_name': new_display_name,
+                    'max_attempts': new_max_attempts,
+                }
+            }
+        )
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
+        self.assertEqual(problem.display_name, new_display_name)
+        self.assertEqual(problem.max_attempts, new_max_attempts)
+
     def test_delete_child(self):
         """
         Test deleting a child.

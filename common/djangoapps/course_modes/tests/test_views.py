@@ -8,6 +8,7 @@ import decimal
 import ddt
 import freezegun
 from mock import patch
+from nose.plugins.attrib import attr
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -25,12 +26,18 @@ from course_modes.models import CourseMode, Mode
 from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
+@attr('shard_3')
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
+    """
+    Course Mode View tests
+    """
+    URLCONF_MODULES = ['course_modes.urls']
+
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
-        super(CourseModeViewTest, self).setUp('course_modes.urls')
+        super(CourseModeViewTest, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
@@ -94,7 +101,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # Create the course modes
         prof_course = CourseFactory.create()
         CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=prof_course.id,
-                          min_price=100, sku='TEST')
+                          min_price=100, sku='TEST', bulk_sku="BULKTEST")
         ecomm_test_utils.update_commerce_config(enabled=True)
         # Enroll the user in the test course
         CourseEnrollmentFactory(
@@ -297,7 +304,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(response.status_code, 200)
 
-        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None)]
+        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
         self.assertEquals(course_mode, expected_mode)
@@ -321,7 +328,19 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(response.status_code, 200)
 
-        expected_mode = [Mode(mode_slug, mode_display_name, min_price, suggested_prices, currency, None, None, None)]
+        expected_mode = [
+            Mode(
+                mode_slug,
+                mode_display_name,
+                min_price,
+                suggested_prices,
+                currency,
+                None,
+                None,
+                None,
+                None
+            )
+        ]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
         self.assertEquals(course_mode, expected_mode)
@@ -344,8 +363,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         url = reverse('create_mode', args=[unicode(self.course.id)])
         self.client.get(url, parameters)
 
-        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None)
-        verified_mode = Mode(u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None, None)
+        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        verified_mode = Mode(u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None, None, None)
         expected_modes = [honor_mode, verified_mode]
         course_modes = CourseMode.modes_for_course(self.course.id)
 
@@ -387,9 +406,11 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TrackSelectionEmbargoTest, self).setUp('embargo')
+        super(TrackSelectionEmbargoTest, self).setUp()
 
         # Create a course and course modes
         self.course = CourseFactory.create()

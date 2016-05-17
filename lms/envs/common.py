@@ -130,14 +130,6 @@ FEATURES = {
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
-    # Enables the LMS bulk email feature for course staff
-    'ENABLE_INSTRUCTOR_EMAIL': True,
-    # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
-    #   for each course via django-admin interface.
-    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default
-    #   for all Mongo-backed courses.
-    'REQUIRE_COURSE_EMAIL_AUTH': True,
-
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
@@ -455,6 +447,18 @@ OAUTH_OIDC_USERINFO_HANDLERS = (
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
+################################## DJANGO OAUTH TOOLKIT #######################################
+
+OAUTH2_PROVIDER = {
+    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'email': 'Email scope',
+        'profile': 'Profile scope',
+    }
+}
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 # TODO: Move the Mako templating into a different engine in TEMPLATES below.
@@ -619,7 +623,7 @@ EVENT_TRACKING_BACKENDS = {
             },
             'processors': [
                 {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.VideoEventProcessor'}
+                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -732,14 +736,6 @@ MODULESTORE = {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
                         'render_template': 'edxmako.shortcuts.render_to_string',
-                    }
-                },
-                {
-                    'NAME': 'xml',
-                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                    'OPTIONS': {
-                        'data_dir': DATA_DIR,
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                     }
                 }
             ]
@@ -1102,6 +1098,9 @@ MIDDLEWARE_CLASSES = (
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    # Enable SessionAuthenticationMiddleware in order to invalidate
+    # user sessions after a password change.
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
@@ -1181,6 +1180,7 @@ STATICFILES_FINDERS = [
     'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
 ]
 
@@ -1245,8 +1245,7 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
-    'js/vendor/underscore.string.min.js',
-    'common/js/vendor/picturefill.min.js',
+    'common/js/vendor/picturefill.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -1257,7 +1256,7 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'js/vendor/backbone-min.js',
+    'common/js/vendor/backbone.js',
     'edx-pattern-library/js/modernizr-custom.js',
 ]
 
@@ -1491,6 +1490,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'style-learner-dashboard': {
+        'source_filenames': [
+            'css/lms-learner-dashboard.css',
+        ],
+        'output_filename': 'css/lms-learner-dashboard.css',
+    },
+    'style-learner-dashboard-rtl': {
+        'source_filenames': [
+            'css/lms-learner-dashboard-rtl.css',
+        ],
+        'output_filename': 'css/lms-learner-dashboard-rtl.css',
+    },
 }
 
 
@@ -1660,6 +1671,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'moment': 'js/vendor/moment.min.js',
     'jquery.url': 'js/vendor/url.min.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
+    'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
@@ -2045,7 +2057,9 @@ MIGRATION_MODULES = {
 
 # Forwards-compatibility with Django 1.7
 CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
-
+# It is highly recommended that you override this in any environment accessed by
+# end users
+CSRF_COOKIE_SECURE = False
 
 ######################### Django Rest Framework ########################
 
@@ -2112,14 +2126,18 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
 
 # JWT Settings
 JWT_AUTH = {
-    'JWT_SECRET_KEY': None,
+    # TODO Set JWT_SECRET_KEY to a secure value. By default, SECRET_KEY will be used.
+    # 'JWT_SECRET_KEY': '',
     'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY_EXPIRATION': True,
-    'JWT_ISSUER': None,
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
+    # TODO Set JWT_ISSUER and JWT_AUDIENCE to values specific to your service/organization.
+    'JWT_ISSUER': 'change-me',
     'JWT_AUDIENCE': None,
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
     'JWT_LEEWAY': 1,
-    'JWT_DECODE_HANDLER': 'openedx.core.lib.api.jwt_decode_handler.decode',
+    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
+    # Number of seconds before JWT tokens expire
+    'JWT_EXPIRATION': 30,
 }
 
 # The footer URLs dictionary maps social footer names
@@ -2218,14 +2236,6 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
-
-################ Enable JWT auth ####################
-# When this feature flag is set to False, API endpoints using
-# JSONWebTokenAuthentication will reject requests using JWT to authenticate,
-# even if those tokens are valid. Set this to True only if you need those
-# endpoints, and have configured settings 'JWT_AUTH' to override its default
-# values with secure values.
-FEATURES['ENABLE_JWT_AUTH'] = False
 
 ######################## CAS authentication ###########################
 
@@ -2585,6 +2595,7 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     # Taiwan is specifically not translated to avoid it being translated as "Taiwan (Province of China)"
     "TW": "Taiwan",
+    'XK': _('Kosovo'),
 }
 
 # which access.py permission name to check in order to determine if a course is visible in
@@ -2779,9 +2790,10 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # The time value is in seconds.
 LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
-# Number of seconds before JWT tokens expire
-JWT_EXPIRATION = 30
-JWT_ISSUER = None
+
+# For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
+PUBLIC_RSA_KEY = None
+PRIVATE_RSA_KEY = None
 
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
@@ -2880,3 +2892,6 @@ API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
 API_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/overview.html'
 AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/authentication.html'
+
+# Affiliate cookie tracking
+AFFILIATE_COOKIE_NAME = 'affiliate_id'

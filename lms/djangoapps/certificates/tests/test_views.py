@@ -12,6 +12,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from certificates.api import get_certificate_url
 from certificates.models import (
@@ -38,7 +39,7 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 @attr('shard_1')
 @ddt.ddt
-class UpdateExampleCertificateViewTest(TestCase):
+class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     """Tests for the XQueue callback that updates example certificates. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -47,6 +48,8 @@ class UpdateExampleCertificateViewTest(TestCase):
     TEMPLATE = 'test.pdf'
     DOWNLOAD_URL = 'http://www.example.com'
     ERROR_REASON = 'Kaboom!'
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(UpdateExampleCertificateViewTest, self).setUp()

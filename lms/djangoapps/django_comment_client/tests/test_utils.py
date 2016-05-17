@@ -25,8 +25,8 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -63,8 +63,10 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     Base testcase class for access and roles for the
     comment client service integration
     """
+    CREATE_USER = False
+
     def setUp(self):
-        super(AccessUtilsTestCase, self).setUp(create_user=False)
+        super(AccessUtilsTestCase, self).setUp()
 
         self.course = CourseFactory.create()
         self.course_id = self.course.id
@@ -118,7 +120,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CoursewareContextTestCase, self).setUp(create_user=True)
+        super(CoursewareContextTestCase, self).setUp()
 
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
@@ -200,12 +202,13 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), expected_discussion_modules)
 
 
+@attr('shard_3')
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
     """
     def setUp(self):
-        super(CachedDiscussionIdMapTestCase, self).setUp(create_user=True)
+        super(CachedDiscussionIdMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
         self.discussion = ItemFactory.create(
@@ -339,7 +342,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CategoryMapTestCase, self).setUp(create_user=True)
+        super(CategoryMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",
@@ -1248,14 +1251,14 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
     Test the is_commentable_cohorted function.
     """
 
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
         super(IsCommentableCohortedTestCase, self).setUp()
-        self.toy_course_key = CourseLocator("edX", "toy", "2012_Fall", deprecated=True)
+        self.toy_course_key = ToyCourseFactory.create().id
 
     def test_is_commentable_cohorted(self):
         course = modulestore().get_course(self.toy_course_key)

@@ -23,6 +23,7 @@
             'js/edxnotes/views/page_factory',
             'js/financial-assistance/financial_assistance_form_factory',
             'js/groups/views/cohorts_dashboard_factory',
+            'js/header_factory',
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',
             'js/student_account/logistration_factory',
@@ -34,7 +35,9 @@
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
             'js/bookmarks/bookmarks_factory',
-            'js/learner_dashboard/program_list_factory'
+            'js/learner_dashboard/program_details_factory',
+            'js/learner_dashboard/program_list_factory',
+            'js/api_admin/catalog_preview_factory'
         ]),
 
         /**

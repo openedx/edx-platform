@@ -118,7 +118,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, view.helpMessage);
             view.showSuccessMessage();
             expectMessageContains(view, view.indicators.success);
-            jasmine.Clock.tick(7000);
+            jasmine.clock().tick(7000);
             // Message gets reset
             expectMessageContains(view, view.helpMessage);
 
@@ -126,7 +126,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, view.indicators.success);
             // But if we change the message, it should not get reset.
             view.showHelpMessage("Do not reset this!");
-            jasmine.Clock.tick(7000);
+            jasmine.clock().tick(7000);
             expectMessageContains(view, "Do not reset this!");
         };
 

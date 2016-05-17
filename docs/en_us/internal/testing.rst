@@ -341,16 +341,15 @@ To run JavaScript tests in a browser, run these commands.
 To debug these tests on devstack in a local browser:
 
  * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
- * open the same URL in your browser but change the IP address to 192.168.33.10, e.g.
-    http://192.168.33.10:TEST_PORT/suite/cms
+ * open http://192.168.33.10:9876/debug.html in your host system's browser of choice
  * this will run all the tests and show you the results including details of any failures
  * you can click on an individually failing test and/or suite to re-run it by itself
  * you can now use the browser's developer tools to debug as you would any other JavaScript code
 
 Note: the port is also output to the console that you ran the tests from if you find that easier.
 
-These paver commands call through to a custom test runner. For more
-info, see `js-test-tool <https://github.com/edx/js-test-tool>`__.
+These paver commands call through to Karma. For more
+info, see `karma-runner.github.io <https://karma-runner.github.io/>`__.
 
 Running Bok Choy Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
