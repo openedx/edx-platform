@@ -49,8 +49,8 @@
         });
 
         it('from the start, focus grabbers are disabled', function () {
-            expect(state.focusGrabber.elFirst.attr('tabindex')).toBe(-1);
-            expect(state.focusGrabber.elLast.attr('tabindex')).toBe(-1);
+            expect(state.focusGrabber.elFirst.attr('tabindex')).toBe('-1');
+            expect(state.focusGrabber.elLast.attr('tabindex')).toBe('-1');
         });
 
         it(

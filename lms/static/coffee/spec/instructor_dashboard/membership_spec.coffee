@@ -3,12 +3,6 @@ describe 'AutoEnrollment', ->
     loadFixtures 'coffee/fixtures/autoenrollment.html'
     @autoenrollment = new AutoEnrollmentViaCsv $('.auto_enroll_csv')
 
-  it 'binds to the enrollment_signup_button on click event', ->
-    expect(@autoenrollment.$enrollment_signup_button).toHandle 'click'
-
-  it 'binds to the browse button on change event', ->
-    expect(@autoenrollment.$browse_button).toHandle 'change'
-
   it 'binds the ajax call and the result will be success', ->
     spyOn($, "ajax").and.callFake((params) =>
       params.success({row_errors: [], general_errors: [], warnings: []})

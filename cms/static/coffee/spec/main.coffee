@@ -4,14 +4,15 @@ requirejs.config({
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
-        "jquery": "xmodule_js/common_static/js/vendor/jquery.min",
+        "jquery": "xmodule_js/common_static/common/js/vendor/jquery",
+        "jquery-migrate": "xmodule_js/common_static/common/js/vendor/jquery-migrate",
         "jquery.ui": "xmodule_js/common_static/js/vendor/jquery-ui.min",
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal",
         "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
-        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
+        "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo.min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
@@ -65,6 +66,7 @@ requirejs.config({
         "date": {
             exports: "Date"
         },
+        "jquery-migrate": ['jquery'],
         "jquery.ui": {
             deps: ["jquery"],
             exports: "jQuery.ui"
@@ -218,6 +220,7 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
 testFiles = [
     "coffee/spec/main_spec",
+
     "coffee/spec/models/course_spec",
     "coffee/spec/models/metadata_spec",
     "coffee/spec/models/section_spec",
@@ -228,21 +231,26 @@ testFiles = [
     "coffee/spec/views/course_info_spec",
     "coffee/spec/views/metadata_edit_spec",
     "coffee/spec/views/module_edit_spec",
+
     "coffee/spec/views/textbook_spec",
     "coffee/spec/views/upload_spec",
+
     "js/spec/video/transcripts/utils_spec",
     "js/spec/video/transcripts/editor_spec",
     "js/spec/video/transcripts/videolist_spec",
     "js/spec/video/transcripts/message_manager_spec",
     "js/spec/video/transcripts/file_uploader_spec",
+
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
     "js/spec/models/xblock_info_spec",
     "js/spec/models/xblock_validation_spec",
     "js/spec/models/license_spec",
+
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
+
     "js/spec/views/active_video_upload_list_spec",
     "js/spec/views/previous_video_upload_spec",
     "js/spec/views/previous_video_upload_list_spec",
@@ -259,6 +267,7 @@ testFiles = [
     "js/spec/views/license_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/login_studio_spec",
+
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
@@ -266,12 +275,18 @@ testFiles = [
     "js/spec/views/pages/course_rerun_spec",
     "js/spec/views/pages/index_spec",
     "js/spec/views/pages/library_users_spec",
+
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
     "js/spec/views/modals/validation_error_modal_spec",
+
     "js/spec/views/settings/main_spec",
+
     "js/spec/factories/xblock_validation_spec",
+
     "js/spec/xblock/cms.runtime.v1_spec",
+
+    # Certificates application test suite mappings
     "js/certificates/spec/models/certificate_spec",
     "js/certificates/spec/views/certificate_details_spec",
     "js/certificates/spec/views/certificate_editor_spec",

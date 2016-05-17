@@ -6,23 +6,6 @@ define([
     var _t = Annotator._t;
 
     /**
-     * We currently run JQuery 1.7.2 in Jasmine tests and LMS.
-     * AnnotatorJS 1.2.9. uses two calls to addBack (in the two functions
-     * 'isAnnotator' and 'onHighlightMouseover') which was only defined in
-     * JQuery 1.8.0. In LMS, it works without throwing an error because
-     * JQuery.UI 1.10.0 adds support to jQuery<1.8 by augmenting '$.fn' with
-     * that missing function. It is not the case for all Jasmine unit tests,
-     * so we add it here if necessary.
-     **/
-    if (!$.fn.addBack) {
-        $.fn.addBack = function (selector) {
-            return this.add(
-                selector === null ? this.prevObject : this.prevObject.filter(selector)
-            );
-        };
-    }
-
-    /**
      * The original _setupDynamicStyle uses a very expensive call to
      * Util.maxZIndex(...) that sets the z-index of .annotator-adder,
      * .annotator-outer, .annotator-notice, .annotator-filter. We set these

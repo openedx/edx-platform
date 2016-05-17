@@ -90,6 +90,16 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         uploadDialogTpl = readFixtures('upload-dialog.underscore');
 
         beforeEach(function() {
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.CMS.User = {isGlobalStaff: true};
+
             TemplateHelpers.installTemplates(['certificate-editor', 'signatory-editor'], true);
 
             window.course = new Course({
@@ -120,6 +130,11 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
             appendSetFixtures(this.view.render().el);
             CustomMatchers(); // jshint ignore:line
+        });
+
+        afterEach(function() {
+            delete window.course;
+            delete window.CMS.User;
         });
 
         afterEach(function() {

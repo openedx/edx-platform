@@ -99,7 +99,7 @@ define(["jquery", "URI", "common/js/spec_helpers/ajax_helpers", "common/js/compo
                             mimetype: "application/javascript", kind: "url", data: missingJavaScriptUrl
                         }]
                     ]);
-                    expect(promise.isRejected()).toBe(true);
+                    expect(promise.state()).toBe("rejected");
                 });
 
                 it('Triggers an event to the runtime when a notification-action-button is clicked', function () {
