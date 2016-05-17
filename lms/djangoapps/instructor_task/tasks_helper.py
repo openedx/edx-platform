@@ -736,8 +736,9 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             task_progress.succeeded += 1
             if not header:
                 header = [section['label'] for section in gradeset[u'section_breakdown']]
+                ## FUN : remove the following field for user privacy (#2837) : email
                 rows.append(
-                    ["id", "email", "username", "grade"] + header + cohorts_header +
+                    ["id", "username", "grade"] + header + cohorts_header +
                     group_configs_header + teams_header +
                     ['Enrollment Track', 'Verification Status'] + certificate_info_header
                 )
@@ -787,7 +788,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # still have 100% for the course.
             row_percents = [percents.get(label, 0.0) for label in header]
             rows.append(
-                [student.id, student.email, student.username, gradeset['percent']] +
+                ## FUN : remove the following field for user privacy (#2837) : email
+                [student.id, student.username, gradeset['percent']] +
                 row_percents + cohorts_group_name + group_configs_group_names + team_name +
                 [enrollment_mode] + [verification_status] + certificate_info
             )
@@ -920,7 +922,8 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     # This struct encapsulates both the display names of each static item in the
     # header row as values as well as the django User field names of those items
     # as the keys.  It is structured in this way to keep the values related.
-    header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
+    ## FUN : remove the following field for user privacy (#2837) : email
+    header_row = OrderedDict([('id', 'Student ID'), ('username', 'Username')])
 
     try:
         course_structure = CourseStructure.objects.get(course_id=course_id)

@@ -1127,27 +1127,22 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     # Allow for microsites to be able to define additional columns (e.g. )
     query_features = microsite.get_value('student_profile_download_fields')
 
+    ## FUN : remove the following fields for user privacy (#2837) :
+    ## id - name - email - language - location - mailing address
     if not query_features:
         query_features = [
-            'id', 'username', 'name', 'email', 'language', 'location',
-            'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'city', 'country', 'goals'
+            'username', 'year_of_birth', 'gender',
+            'level_of_education', 'city', 'country', 'goals'
         ]
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
     # used as the header row in the CSV, but could be in the future.
     query_features_names = {
-        'id': _('User ID'),
         'username': _('Username'),
-        'name': _('Name'),
-        'email': _('Email'),
-        'language': _('Language'),
-        'location': _('Location'),
         'year_of_birth': _('Birth Year'),
         'gender': _('Gender'),
         'level_of_education': _('Level of Education'),
-        'mailing_address': _('Mailing Address'),
         'city': _('City'),
         'country': _('Country'),
         'goals': _('Goals'),
