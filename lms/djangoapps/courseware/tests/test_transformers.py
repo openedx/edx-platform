@@ -31,6 +31,11 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         self.client.login(username=self.student.username, password=password)
 
     def assert_collected_xblock_fields(self, block_structure, usage_key, **expectations):
+        """
+        Given a block structure, a block usage key, and a list of keyword 
+        arguments representing XBlock fields, verify that the block structure 
+        has the specified values for each XBlock field.
+        """
         self.assertGreater(len(expectations), 0)
         for field in expectations:
             self.assertEqual(
@@ -39,6 +44,12 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
             )
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
+        """
+        Given a block structure, a block usage key, a transformer, and a list 
+        of keyword arguments representing transformer block fields, verify that
+        the block structure has the specified values for each transformer block
+        field.
+        """
         self.assertGreater(len(expectations), 0)
         for field in expectations:
             self.assertEqual(
@@ -47,6 +58,11 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
             )
 
     def build_course_with_problems(self, data='<problem></problem>', metadata=None):
+        """
+        Create a test course with the requested problem `data` and `metadata` values.
+
+        Appropriate defaults are provided when either argument is omitted.
+        """
         metadata = metadata or self.problem_metadata
         return self.build_course([
             {
@@ -67,8 +83,6 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         ])
 
     def test_grades_collected_basic(self):
-
-        expected_max_score = 1
 
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
