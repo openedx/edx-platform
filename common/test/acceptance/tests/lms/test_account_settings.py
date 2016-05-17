@@ -226,6 +226,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             self.account_settings_page.value_for_dropdown_field(field_id, new_value)
             # An XHR request is made when changing the field
             self.account_settings_page.wait_for_ajax()
+            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()
             else:
