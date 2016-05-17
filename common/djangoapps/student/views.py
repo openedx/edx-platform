@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-                         HttpResponseServerError, Http404)
+                         HttpResponseServerError, Http404, HttpResponseRedirect)
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
@@ -2506,3 +2506,8 @@ def details_reset_confirm(request):
             return TemplateResponse(request, 'registration/details_reset.html', context)
 
     return TemplateResponse(request, 'registration/details_reset.html', context)
+
+
+def reload_login(request):
+    logout(request)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

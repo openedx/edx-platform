@@ -1,17 +1,20 @@
 <div class="status already-authenticated-msg hidden">
     <% if (context.currentProvider) { %>
         <p class="message-copy">
-            <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any %(platformName)s account. To link your accounts, login now using your %(platformName)s password."), context ) %>
+           <%- _.sprintf( gettext("The %(currentProvider)s account you used is not associated to any %(platformName)s account. To try again with another %(currentProvider)s account or another social login button, please click"), context ) %>
+           <a href="/reload_login"><%- _.sprintf( gettext("here")) %></a>
         </p>
         <p class="message-copy">
-            <%- _.sprintf( gettext("To try again with another %(currentProvider)s account or another social login button, please clear the cookies in this browser, or try again from another browser."), context) %>
+           <%- _.sprintf( gettext("If you have an account with %(platformName)s and this is your first time logging in to this new system, access your account"), context) %>
+             <a href="/access_new_account"><%- _.sprintf( gettext("here")) %></a>;
+          <%- _.sprintf( gettext("otherwise, login below using your %(platformName)s credentials. Once logged in you can link your %(currentProvider)s account in the user profile."), context) %>
         </p>
         <p class="message-copy">
-            <%- _.sprintf( gettext("Refer to our")) %>
-            <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page</a>
-            <%- _.sprintf( gettext("for more information.")) %>
-        </p>
-    <% } %>
+          <%- _.sprintf( gettext("Refer to our")) %>
+           <a href="http://support.bigdatauniversity.com/knowledgebase/articles/888321-beta-faqs">FAQ page</a>
+          <%- _.sprintf( gettext("for more information.")) %>
+       </p>
+  <% } %>
 </div>
 
 <div class="js-reset-success status submission-success hidden">
