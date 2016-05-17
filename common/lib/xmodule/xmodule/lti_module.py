@@ -78,7 +78,7 @@ log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
     "<a target='_blank' "
-    "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
+    "href='http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
 )
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
