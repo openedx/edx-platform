@@ -10,6 +10,8 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
+from django.conf import settings
+
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
@@ -86,4 +88,4 @@ def apply_settings(django_settings):
     )
 
     # Set scheme to use for redirection in python-social-auth
-    django_settings.REDIRECT_IS_HTTPS = settings.FEATURES.get('THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS', False)
+    django_settings.REDIRECT_IS_HTTPS = getattr(settings, 'THIRD_PARTY_AUTH_REDIRECT_IS_HTTPS', False)
