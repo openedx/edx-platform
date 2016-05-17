@@ -32,8 +32,8 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
 
     def assert_collected_xblock_fields(self, block_structure, usage_key, **expectations):
         """
-        Given a block structure, a block usage key, and a list of keyword 
-        arguments representing XBlock fields, verify that the block structure 
+        Given a block structure, a block usage key, and a list of keyword
+        arguments representing XBlock fields, verify that the block structure
         has the specified values for each XBlock field.
         """
         self.assertGreater(len(expectations), 0)
@@ -45,7 +45,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
         """
-        Given a block structure, a block usage key, a transformer, and a list 
+        Given a block structure, a block usage key, a transformer, and a list
         of keyword arguments representing transformer block fields, verify that
         the block structure has the specified values for each transformer block
         field.
