@@ -3,6 +3,7 @@
 Unit tests for sending course email
 """
 import json
+from markupsafe import escape
 from mock import patch, Mock
 from nose.plugins.attrib import attr
 import os
@@ -314,6 +315,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
+    @override_settings(BULK_EMAIL_DEFAULT_FROM_EMAIL="no-reply@courseupdates.edx.org")
     def test_long_course_display_name(self):
         """
         This test tests that courses with exorbitantly large display names
@@ -328,11 +330,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         }
 
         # make display_name that's longer than 320 characters when encoded
-        # to ascii, but shorter than 320 unicode characters
-        long_name = u"é" * 200
+        # to ascii and escaped, but shorter than 320 unicode characters
+        long_name = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
 
         course = CourseFactory.create(
-            display_name=long_name, number="bulk_email_course_name"
+            display_name=long_name,
+            org="IMF",
+            number="FPP.1x",
+            run="2016",
         )
         instructor = InstructorFactory(course_key=course.id)
 
@@ -342,8 +347,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         __, encoded_unexpected_from_addr = forbid_multi_line_headers(
             "from", unexpected_from_addr, 'utf-8'
         )
-        self.assertEqual(len(encoded_unexpected_from_addr), 748)
-        self.assertEqual(len(unexpected_from_addr), 261)
+        escaped_encoded_unexpected_from_addr = escape(encoded_unexpected_from_addr)
+
+        # it's shorter than 320 characters when just encoded
+        self.assertEqual(len(encoded_unexpected_from_addr), 318)
+        # escaping it brings it over that limit
+        self.assertEqual(len(escaped_encoded_unexpected_from_addr), 324)
+        # when not escaped or encoded, it's well below 320 characters
+        self.assertEqual(len(unexpected_from_addr), 137)
 
         self.login_as_user(instructor)
         send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
@@ -354,14 +365,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         from_email = mail.outbox[0].from_email
 
         expected_from_addr = (
-            u'"{course_name}" Course Staff <{course_name}-no-reply@example.com>'
+            u'"{course_name}" Course Staff <{course_name}-no-reply@courseupdates.edx.org>'
         ).format(course_name=course.id.course)
 
         self.assertEqual(
             from_email,
             expected_from_addr
         )
-        self.assertEqual(len(from_email), 83)
+        self.assertEqual(len(from_email), 61)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
     @patch('bulk_email.tasks.update_subtask_status')
