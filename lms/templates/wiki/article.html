@@ -12,18 +12,16 @@
 
   <div class="article-wrapper">
 
-    <main id="main" aria-label="Content" tabindex="-1">
-        <article class="main-article" id="main-article">
-            {% if selected_tab != "edit" %}
-              <h1>{{ article.current_revision.title }}</h1>
+    <article class="main-article" id="main-article">
+        {% if selected_tab != "edit" %}
+          <h1>{{ article.current_revision.title }}</h1>
 
-            {% endif %}
+        {% endif %}
 
-            {% block wiki_contents_tab %}
-            {% wiki_render article %}
-            {% endblock %}
-        </article>
-    </main>
+        {% block wiki_contents_tab %}
+        {% wiki_render article %}
+        {% endblock %}
+    </article>
 
     <div class="article-functions">
       <ul class="nav nav-tabs">
