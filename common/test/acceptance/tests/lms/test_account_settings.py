@@ -222,7 +222,8 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
 
         for new_value in new_values:
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+            # set the new value
+            self.account_settings_page.value_for_dropdown_field(field_id, new_value)
             # An XHR request is made when changing the field
             self.account_settings_page.wait_for_ajax()
             if reloads_on_save:
