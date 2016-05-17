@@ -810,15 +810,22 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         for modulestore in self.modulestores:
             modulestore.close_connections()
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
-        A destructive operation to drop all databases and close all db connections.
+        A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         for modulestore in self.modulestores:
             # drop database if the store supports it (read-only stores do not)
             if hasattr(modulestore, '_drop_database'):
-                modulestore._drop_database()  # pylint: disable=protected-access
+                modulestore._drop_database(database, collections, connections)  # pylint: disable=protected-access
 
     @strip_key
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):

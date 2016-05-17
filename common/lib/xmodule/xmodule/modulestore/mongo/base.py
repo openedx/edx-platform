@@ -611,17 +611,32 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.database.connection._ensure_connected()
         return self.database.connection.max_wire_version
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(MongoModuleStore, self)._drop_database()
+        super(MongoModuleStore, self)._drop_database(database, collections, connections)
 
         connection = self.collection.database.connection
-        connection.drop_database(self.collection.database.proxied_object)
-        connection.close()
+
+        if database:
+            connection.drop_database(self.collection.database.proxied_object)
+        elif collections:
+            self.collection.drop()
+        else:
+            self.collection.remove({})
+
+        if connections:
+            connection.close()
 
     @autoretry_read()
     def fill_in_run(self, course_key):

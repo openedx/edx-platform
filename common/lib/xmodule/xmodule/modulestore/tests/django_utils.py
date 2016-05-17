@@ -4,6 +4,7 @@ Modulestore configuration for test cases.
 """
 import copy
 import functools
+import os
 from uuid import uuid4
 from contextlib import contextmanager
 
@@ -93,7 +94,7 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule_{}'.format(uuid4().hex),
+                'db': 'test_xmodule_{}'.format(os.getpid()),
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -120,7 +121,7 @@ def split_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule_{}'.format(uuid4().hex),
+                'db': 'test_xmodule_{}'.format(os.getpid()),
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -139,7 +140,7 @@ def contentstore_config():
         'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
         'DOC_STORE_CONFIG': {
             'host': MONGO_HOST,
-            'db': 'test_xcontent_{}'.format(uuid4().hex),
+            'db': 'test_xcontent_{}'.format(os.getpid()),
             'port': MONGO_PORT_NUM,
         },
         # allow for additional options that can be keyed on a name, e.g. 'trashcan'
@@ -161,7 +162,7 @@ def drop_mongo_collections(mock_create):
 
     module_store = modulestore()
     if hasattr(module_store, '_drop_database'):
-        module_store._drop_database()  # pylint: disable=protected-access
+        module_store._drop_database(database=False)  # pylint: disable=protected-access
     _CONTENTSTORE.clear()
     if hasattr(module_store, 'close_connections'):
         module_store.close_connections()
