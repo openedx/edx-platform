@@ -17,23 +17,20 @@
 
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
-    background: url("#{$static-path}/images/calc-icon.png") $black-t1 no-repeat center;
-    border-bottom: 0;
-    color: $white;
-    float: right;
-    height: $baseline;
-    margin-right: ($baseline*0.75);
-    padding: $baseline;
+    @include float(right);
+    @include right($baseline*.75);
     position: relative;
     top: -42px;
-    width: ($baseline*0.75);
+    border-bottom: 0;
+    padding: ($baseline/1.5);
+    background: $black-t1;
+    color: $white;
 
     &:hover, &:focus {
-      background: url("#{$static-path}/images/calc-icon.png") $gray-d1 no-repeat center;
+      background: $gray-d1;
     }
 
     &.closed {
-      background-image: url("#{$static-path}/images/close-calc-icon.png");
       background-color: $black;
       top: -36px;
     }
