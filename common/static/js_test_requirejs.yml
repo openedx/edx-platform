@@ -33,8 +33,8 @@ lib_paths:
     - js/vendor/jasmine-imagediff.js
     - js/vendor/jquery.simulate.js
     - js/vendor/jquery.truncate.js
-    - js/vendor/underscore-min.js
-    - js/vendor/underscore.string.min.js
+    - common/js/vendor/underscore.js
+    - common/js/vendor/underscore.string.js
     - js/vendor/backbone-min.js
     - js/vendor/backbone.paginator.min.js
     - js/vendor/jquery.timeago.js

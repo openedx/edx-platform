@@ -10,21 +10,16 @@ from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from nose.plugins.attrib import attr
 
 from django.conf import settings
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.timezone import utc as UTC
-from django.utils.translation import ugettext as _
 import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from dashboard.models import CourseImportLog
-from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
 from datetime import datetime
-from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore

@@ -478,9 +478,10 @@ def cas_login(request, next_page=None, required=False):
 
     if request.user.is_authenticated():
         user = request.user
-        if not UserProfile.objects.filter(user=user):
-            user_profile = UserProfile(name=user.username, user=user)
-            user_profile.save()
+        UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'name': user.username}
+        )
 
     return ret
 

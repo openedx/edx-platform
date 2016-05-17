@@ -3,15 +3,18 @@ Tests for users API
 """
 # pylint: disable=no-member
 import datetime
+
 import ddt
 from mock import patch
 from nose.plugins.attrib import attr
 import pytz
-
 from django.conf import settings
 from django.utils import timezone
 from django.template import defaultfilters
 from django.test import RequestFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 
 from certificates.api import generate_user_certificates
 from certificates.models import CertificateStatuses
@@ -25,13 +28,14 @@ from course_modes.models import CourseMode
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
-from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from util.testing import UrlResetMixin
-
 from .. import errors
-from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileCourseAccessTestMixin
+from mobile_api.testutils import (
+    MobileAPITestCase,
+    MobileAuthTestMixin,
+    MobileAuthUserTestMixin,
+    MobileCourseAccessTestMixin,
+)
 from .serializers import CourseEnrollmentSerializer
 
 

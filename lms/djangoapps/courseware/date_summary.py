@@ -182,7 +182,11 @@ class CourseEndDate(DateSummary):
     @property
     def description(self):
         if datetime.now(pytz.UTC) <= self.date:
-            return _('To earn a certificate, you must complete all requirements before this date.')
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+            if is_active and CourseMode.is_eligible_for_certificate(mode):
+                return _('To earn a certificate, you must complete all requirements before this date.')
+            else:
+                return _('After this date, course content will be archived.')
         return _('This course is archived, which means you can review course content but it is no longer active.')
 
     @property
@@ -212,6 +216,27 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             )
             return ecommerce_service.checkout_page_url(course_mode.sku)
         return reverse('verify_student_upgrade_and_verify', args=(self.course.id,))
+
+    @property
+    def is_enabled(self):
+        """
+        Whether or not this summary block should be shown.
+
+        By default, the summary is only shown if it has date and the date is in the
+        future and the user's enrollment is in upsell modes
+        """
+        is_enabled = super(VerifiedUpgradeDeadlineDate, self).is_enabled
+        if not is_enabled:
+            return False
+
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+
+        # Return `true` if user is not enrolled in course
+        if enrollment_mode is None and is_active is None:
+            return True
+
+        # Show the summary if user enrollment is in which allow user to upsell
+        return is_active and enrollment_mode in CourseMode.UPSELL_TO_VERIFIED_MODES
 
     @lazy
     def date(self):

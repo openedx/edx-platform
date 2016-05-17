@@ -161,3 +161,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 lambda course_key, block_location, child: block_location,
             )
             self.assertEquals(actual_next_sequence_location, expected_prev_sequence_location)
+
+    def test_tooltip(self):
+        html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
+        for child in self.sequence_3_1.children:
+            self.assertIn("'page_title': '{}'".format(child.name), html)

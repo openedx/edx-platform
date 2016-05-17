@@ -96,7 +96,7 @@ class @Sequence
     if is_at_boundary and boundary_url == 'None'
       @disableButton(button_class)
     else
-      button_label = action_label_prefix + (if is_at_boundary then ' Section' else ' Unit')
+      button_label = action_label_prefix + (if is_at_boundary then ' Subsection' else ' Unit')
       @setButtonLabel(button_class, button_label)
       @enableButton(button_class, button_action)
 

@@ -1,0 +1,21 @@
+// Studio - css architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+// Table of Contents
+// * +Libs and Resets
+// * +Vendor and Rebase
+// * +Base - Utilities
+// * +Base - Assets
+// * +Base - Starter
+// * +Base - Elements
+// * +Base - Specific Views
+// * +Base - Contexts
+// * +Xmodule
+
+// +Libs and Resets - *do not edit*
+// ====================
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+@import 'build-v1'; // shared app style assets/rendering

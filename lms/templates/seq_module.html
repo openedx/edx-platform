@@ -23,7 +23,7 @@
            id="tab_${idx}">
             <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
             <i class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></i>
-            <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
+            <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
           </button>
         </li>
         % endfor

@@ -61,13 +61,7 @@ from lms.envs.common import (
     # Django REST framework configuration
     REST_FRAMEWORK,
 
-    STATICI18N_OUTPUT_DIR,
-
-    # Dafault site id to use in case there is no site that matches with the request headers.
-    DEFAULT_SITE_ID,
-
-    # Cache time out settings for comprehensive theming system
-    THEME_CACHE_TIMEOUT,
+    STATICI18N_OUTPUT_DIR
 )
 from path import Path as path
 from warnings import simplefilter
@@ -350,9 +344,6 @@ MIDDLEWARE_CLASSES = (
 
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
-    # django current site middleware with default site
-    'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
-
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
@@ -457,6 +448,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 
 # Site info
+SITE_ID = 1
 SITE_NAME = "localhost:8001"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
@@ -528,7 +520,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -543,6 +535,7 @@ from openedx.core.lib.rooted_paths import rooted_glob
 PIPELINE_CSS = {
     'style-vendor': {
         'source_filenames': [
+            'js/vendor/afontgarde/afontgarde.css',
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
             'css/vendor/html5-input-polyfills/number-polyfill.css',
@@ -568,19 +561,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-main': {
-        # this is unnecessary and can be removed
+    'style-main-v1': {
         'source_filenames': [
-            'css/studio-main.css',
+            'css/studio-main-v1.css',
         ],
-        'output_filename': 'css/studio-main.css',
+        'output_filename': 'css/studio-main-v1.css',
     },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
+    'style-main-v1-rtl': {
         'source_filenames': [
-            'css/studio-main-rtl.css',
+            'css/studio-main-v1-rtl.css',
         ],
-        'output_filename': 'css/studio-main-rtl.css',
+        'output_filename': 'css/studio-main-v1-rtl.css',
+    },
+    'style-main-v2': {
+        'source_filenames': [
+            'css/studio-main-v2.css',
+        ],
+        'output_filename': 'css/studio-main-v2.css',
+    },
+    'style-main-v2-rtl': {
+        'source_filenames': [
+            'css/studio-main-v2-rtl.css',
+        ],
+        'output_filename': 'css/studio-main-v2-rtl.css',
     },
     'style-edx-icons': {
         'source_filenames': [
@@ -823,6 +826,9 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
+
     # comment common
     'django_comment_common',
 
@@ -873,9 +879,12 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
+    'edx_oauth2_provider',
+
+    # django-oauth-toolkit
     'oauth2_provider',
 
     # These are apps that aren't strictly needed by Studio, but are imported by
@@ -891,6 +900,9 @@ INSTALLED_APPS = (
 
     # Static i18n support
     'statici18n',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
 )
 
 

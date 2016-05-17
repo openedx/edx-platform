@@ -44,11 +44,11 @@
       padding-bottom: 40px;
 
       .logo {
-        border-right: 1px solid rgb(200,200,200);
+        @include border-right(1px solid rgb(200,200,200));
         @include box-sizing(border-box);
-        float: left;
+        @include float(left);
         height: 115px;
-        margin-right: flex-gutter();
+        @include margin-right(flex-gutter());
         text-align: center;
         width: flex-grid(3);
 
@@ -61,11 +61,11 @@
 
       h2.mission-quote {
         @include box-sizing(border-box);
-        float: right;
+        @include float(right);
         font-style: italic;
         line-height: 1.4;
         margin: 0;
-        padding: 5px 0px 5px 20px;
+        @include padding(5px, 0px, 5px, 20px);
         text-transform: none;
         width: flex-grid(9);
       }
@@ -108,22 +108,22 @@
 
       > article {
         @include box-sizing(border-box);
-        float: left;
-        padding-left: $baseline;
+        @include float(left);
+        @include padding-left($baseline);
         width: flex-grid(9);
       }
 
       &.left {
         .photo {
-          float: left;
-          margin-right: flex-gutter();
+          @include float(left);
+          @include margin-right(flex-gutter());
         }
       }
 
       &.right {
         .photo {
-          float: right;
-          margin-left: flex-gutter();
+          @include float(right);
+          @include margin-left(flex-gutter());
         }
       }
 
@@ -136,11 +136,11 @@
       @include clearfix();
 
       > article {
-        float: left;
+        @include float(left);
         width: flex-grid(6);
 
         &:first-child {
-          margin-right: flex-gutter();
+          @include margin-right(flex-gutter());
         }
       }
     }
@@ -153,8 +153,8 @@
     nav.categories {
       border: 1px solid rgb(220,220,220);
       @include box-sizing(border-box);
-      float: left;
-      margin-left: flex-gutter();
+      @include float(left);
+      @include margin-left(flex-gutter());
       padding: 20px;
       width: flex-grid(3);
 
@@ -162,7 +162,7 @@
         display: block;
         letter-spacing: 1px;
         margin: 0px -20px;
-        padding: 12px 0px 12px 20px;
+        @include padding(12px, 0px, 12px, 20px);
         text-align: left;
 
         &:hover, &:focus {
@@ -173,7 +173,7 @@
     }
 
     .responses {
-      float: left;
+      @include float(left);
       width: flex-grid(9);
 
       .category {
@@ -219,9 +219,9 @@
         background: rgb(255,255,255);
         border: 1px solid rgb(120,120,120);
         @include box-sizing(border-box);
-        float: left;
+        @include float(left);
         height: 140px;
-        margin-right: flex-gutter();
+        @include margin-right(flex-gutter());
         overflow: hidden;
         width: flex-grid(2);
 
@@ -233,7 +233,7 @@
       }
 
       .press-info {
-        float: left;
+        @include float(left);
         width: flex-grid(10);
 
         header {
@@ -247,7 +247,7 @@
 
           span.post-date {
             color: $lighter-base-font-color;
-            margin-right: ($baseline/2);
+            @include margin-right($baseline/2);
           }
         }
       }
@@ -263,7 +263,7 @@
       background: rgb(255,255,255);
       border: 1px solid rgb(210,210,210);
       padding: 1px;
-      float: left;
+      @include float(left);
       width: flex-grid(3);
 
       img {
@@ -273,8 +273,8 @@
 
     .contacts {
       @include box-sizing(border-box);
-      float: left;
-      padding-left: 40px;
+      @include float(left);
+      @include padding-left(40px);
       width: flex-grid(9);
 
       ul {

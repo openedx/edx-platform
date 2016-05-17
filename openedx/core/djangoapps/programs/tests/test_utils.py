@@ -7,16 +7,20 @@ from django.test import TestCase
 import httpretty
 import mock
 from nose.plugins.attrib import attr
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.utils import (
-    get_programs, get_programs_for_credentials, get_programs_for_dashboard
+    get_programs,
+    get_programs_for_dashboard,
+    get_programs_for_credentials,
+    get_engaged_programs,
+    get_display_category
 )
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -106,6 +110,7 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         actual = get_programs_for_dashboard(self.user, self.COURSE_KEYS)
         expected = {}
         for program in self.PROGRAMS_API_RESPONSE['results']:
+            program['display_category'] = get_display_category(program)
             for course_code in program['course_codes']:
                 for run in course_code['run_modes']:
                     course_key = run['course_key']
@@ -146,7 +151,7 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         self.mock_programs_api()
 
         actual = get_programs_for_credentials(self.user, self.PROGRAMS_CREDENTIALS_DATA)
-        expected = self.PROGRAMS_API_RESPONSE['results']
+        expected = self.PROGRAMS_API_RESPONSE['results'][:2]
         expected[0]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[0]['certificate_url']
         expected[1]['credential_url'] = self.PROGRAMS_CREDENTIALS_DATA[1]['certificate_url']
 
@@ -185,3 +190,111 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin,
         ]
         actual = get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
+
+    def _create_enrollments(self, *course_ids):
+        """Variadic helper method used to create course enrollments."""
+        return [CourseEnrollmentFactory(user=self.user, course_id=c) for c in course_ids]
+
+    @httpretty.activate
+    def test_get_engaged_programs(self):
+        """
+        Verify that correct programs are returned in the correct order when the user
+        has multiple enrollments.
+        """
+        self.create_programs_config()
+        self.mock_programs_api()
+
+        enrollments = self._create_enrollments(*self.COURSE_KEYS)
+        actual = get_engaged_programs(self.user, enrollments)
+
+        programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
+        # get_engaged_programs iterates across a list returned by the programs
+        # API to create flattened lists keyed by course ID. These lists are
+        # joined in order of enrollment creation time when constructing the
+        # list of engaged programs. As such, two programs sharing an enrollment
+        # should be returned in the same order found in the API response. In this
+        # case, the most recently created enrollment is for a run mode present in
+        # the last two test programs.
+        expected = [
+            programs[1],
+            programs[2],
+            programs[0],
+        ]
+
+        self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_engaged_programs_single_program(self):
+        """
+        Verify that correct program is returned when the user has a single enrollment
+        appearing in one program.
+        """
+        self.create_programs_config()
+        self.mock_programs_api()
+
+        enrollments = self._create_enrollments(self.COURSE_KEYS[0])
+        actual = get_engaged_programs(self.user, enrollments)
+
+        programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
+        expected = [programs[0]]
+
+        self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_engaged_programs_shared_enrollment(self):
+        """
+        Verify that correct programs are returned when the user has a single enrollment
+        appearing in multiple programs.
+        """
+        self.create_programs_config()
+        self.mock_programs_api()
+
+        enrollments = self._create_enrollments(self.COURSE_KEYS[-1])
+        actual = get_engaged_programs(self.user, enrollments)
+
+        programs = self.PROGRAMS_API_RESPONSE['results']
+        for program in programs:
+            program['display_category'] = get_display_category(program)
+        expected = programs[-2:]
+
+        self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_engaged_no_enrollments(self):
+        """Verify that no programs are returned when the user has no enrollments."""
+        self.create_programs_config()
+        self.mock_programs_api()
+
+        actual = get_engaged_programs(self.user, [])
+        expected = []
+
+        self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_engaged_no_programs(self):
+        """Verify that no programs are returned when no programs exist."""
+        self.create_programs_config()
+        self.mock_programs_api(data=[])
+
+        enrollments = self._create_enrollments(*self.COURSE_KEYS)
+        actual = get_engaged_programs(self.user, enrollments)
+        expected = []
+
+        self.assertEqual(expected, actual)
+
+    @httpretty.activate
+    def test_get_display_category_success(self):
+        self.create_programs_config()
+        self.mock_programs_api()
+        actual_programs = get_programs(self.user)
+        for program in actual_programs:
+            expected = 'XSeries'
+            self.assertEqual(expected, get_display_category(program))
+
+    def test_get_display_category_none(self):
+        self.assertEqual('', get_display_category(None))
+        self.assertEqual('', get_display_category({"id": "test"}))

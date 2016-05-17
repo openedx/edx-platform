@@ -4,13 +4,13 @@
 import re
 from unittest import skipUnless
 from urllib import urlencode
-import json
 
 import mock
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
@@ -26,7 +26,7 @@ from student_account.views import account_settings_context
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.theming.test_util import with_edx_domain_context
 
 
 @ddt.ddt
@@ -214,9 +214,15 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
-        # For these tests, two third party auth providers are enabled by default:
+
+        # For these tests, three third party auth providers are enabled by default:
         self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)
+        self.configure_dummy_provider(
+            enabled=True,
+            icon_class='',
+            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+        )
 
     @ddt.data(
         ("signin_user", "login"),
@@ -241,13 +247,13 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.assertRedirects(response, reverse("dashboard"))
 
     @ddt.data(
-        (None, "signin_user"),
-        (None, "register_user"),
-        ("edx.org", "signin_user"),
-        ("edx.org", "register_user"),
+        (False, "signin_user"),
+        (False, "register_user"),
+        (True, "signin_user"),
+        (True, "register_user"),
     )
     @ddt.unpack
-    def test_login_and_registration_form_signin_preserves_params(self, theme, url_name):
+    def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
         params = [
             ('course_id', 'edX/DemoX/Demo_Course'),
             ('enrollment_action', 'enroll'),
@@ -255,7 +261,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
@@ -271,7 +277,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ]
 
         # Verify that this parameter is also preserved
-        with with_comprehensive_theme_context(theme):
+        with with_edx_domain_context(is_edx_domain):
             response = self.client.get(reverse(url_name), params)
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
@@ -290,6 +296,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ("register_user", "google-oauth2", "Google"),
         ("signin_user", "facebook", "Facebook"),
         ("register_user", "facebook", "Facebook"),
+        ("signin_user", "dummy", "Dummy"),
+        ("register_user", "dummy", "Dummy"),
     )
     @ddt.unpack
     def test_third_party_auth(self, url_name, current_backend, current_provider):
@@ -314,9 +322,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
+                "id": "oa2-dummy",
+                "name": "Dummy",
+                "iconClass": None,
+                "iconImage": settings.MEDIA_URL + "icon.svg",
+                "loginUrl": self._third_party_login_url("dummy", "login", params),
+                "registerUrl": self._third_party_login_url("dummy", "register", params)
+            },
+            {
                 "id": "oa2-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
+                "iconImage": None,
                 "loginUrl": self._third_party_login_url("facebook", "login", params),
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
@@ -324,9 +341,10 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
                 "id": "oa2-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
+                "iconImage": None,
                 "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
-            }
+            },
         ]
         self._assert_third_party_auth_data(response, current_backend, current_provider, expected_providers)
 

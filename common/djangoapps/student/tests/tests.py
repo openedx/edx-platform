@@ -45,6 +45,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -226,7 +227,7 @@ class DashboardTest(ModuleStoreTestCase):
         """
         Check that the css class and the status message are in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
@@ -249,18 +250,21 @@ class DashboardTest(ModuleStoreTestCase):
         Test that the certificate verification status for courses is visible on the dashboard.
         """
         self.client.login(username="jack", password="test")
-        self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
-        self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self._check_verification_status_on('verified', 'You&#39;re enrolled as a verified student')
+        self._check_verification_status_on('honor', 'You&#39;re enrolled as an honor code student')
         self._check_verification_status_off('audit', '')
-        self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
-        self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
+        self._check_verification_status_on('professional', 'You&#39;re enrolled as a professional education student')
+        self._check_verification_status_on(
+            'no-id-professional',
+            'You&#39;re enrolled as a professional education student',
+        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def _check_verification_status_off(self, mode, value):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
-        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
 
         if mode == 'verified':
@@ -492,12 +496,13 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @with_is_edx_domain(True)
     def test_dashboard_header_nav_has_find_courses(self):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))
 
-        # "Find courses" is shown in the side panel
-        self.assertContains(response, "Find courses")
+        # "Explore courses" is shown in the side panel
+        self.assertContains(response, "Explore courses")
 
         # But other links are hidden in the navigation
         self.assertNotContains(response, "How it Works")
@@ -916,6 +921,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         self.course_3 = CourseFactory.create()
         self.program_name = 'Testing Program'
         self.category = 'xseries'
+        self.display_category = 'XSeries'
 
         CourseModeFactory.create(
             course_id=self.course_1.id,
@@ -935,6 +941,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
             programs[unicode(course)] = [{
                 'id': _id,
                 'category': self.category,
+                'display_category': self.display_category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
                 'status': program_status,
@@ -977,6 +984,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 u'edx/demox/Run_1': [{
                     'id': 0,
                     'category': self.category,
+                    'display_category': self.display_category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
                     'status': program_status,

@@ -20,7 +20,7 @@ if Backbone?
 
     setSortComparator: (sortBy) ->
       switch sortBy
-        when 'date' then @comparator = @sortByDateRecentFirst
+        when 'activity' then @comparator = @sortByDateRecentFirst
         when 'votes' then @comparator = @sortByVotes
         when 'comments' then @comparator = @sortByComments
 
@@ -49,7 +49,7 @@ if Backbone?
           url = DiscussionUtil.urlFor 'followed_threads', options.user_id
       if options['group_id']
         data['group_id'] = options['group_id']
-      data['sort_key'] = sort_options.sort_key || 'date'
+      data['sort_key'] = sort_options.sort_key || 'activity'
       data['sort_order'] = sort_options.sort_order || 'desc'
       DiscussionUtil.safeAjax
         $elem: @$el
@@ -117,14 +117,14 @@ if Backbone?
 
     pinnedThreadsSortComparatorWithDate: (thread, ascending)->
       # if threads are pinned they should be displayed on top.
-      # Unpinned will be sorted by their date
-      threadCreatedTime = new Date(thread.get("created_at")).getTime()
+      # Unpinned will be sorted by their last activity date
+      threadLastActivityAtTime = new Date(thread.get("last_activity_at")).getTime()
       if thread.get('pinned')
         #use tomorrow's date
         today = new Date();
-        preferredDate = new Date(today.getTime() + (24 * 60 * 60 * 1000) + threadCreatedTime);
+        preferredDate = new Date(today.getTime() + (24 * 60 * 60 * 1000) + threadLastActivityAtTime);
       else
-        preferredDate = threadCreatedTime
+        preferredDate = threadLastActivityAtTime
       if ascending
         preferredDate
       else

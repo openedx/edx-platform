@@ -20,7 +20,7 @@
   @extend %text-sr;
 }
 
-.nav-contents, .nav-skip {
+.nav-contents, .nav-skip, .transcript-skip {
   @extend %nav-skip;
 }
 
@@ -113,5 +113,41 @@
   // --------------------
   &.has-utility-calculator {
     @include right($baseline*2.50);
+  }
+}
+
+%button-reset {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  background: transparent none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+%page-content-nav {
+  margin-bottom: $baseline;
+  border-bottom: 3px solid $gray-l5;
+
+  .nav-item {
+    @extend %button-reset;
+    display: inline-block;
+    margin-bottom: -3px; // to match the border
+    border-bottom: 3px solid $gray-l5;
+    padding: ($baseline*.75);
+    color: $gray-d2;
+
+    &.is-active {
+      border-bottom: 3px solid $gray-d2;
+      color: $gray-d2;
+    }
+
+    // STATE: hover and focus
+    &:hover,
+    &:focus {
+      border-bottom: 3px solid $link-color;
+      color: $link-color;
+    }
   }
 }

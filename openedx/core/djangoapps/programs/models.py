@@ -74,6 +74,16 @@ class ProgramsApiConfig(ConfigurationModel):
         )
     )
 
+    xseries_ad_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show xseries program advertising"),
+        default=False
+    )
+
+    program_listing_enabled = models.BooleanField(
+        verbose_name=_("Do we want to show program listing page"),
+        default=False
+    )
+
     @property
     def internal_api_url(self):
         """
@@ -132,3 +142,17 @@ class ProgramsApiConfig(ConfigurationModel):
         certificates for Program completion.
         """
         return self.enabled and self.enable_certification
+
+    @property
+    def show_xseries_ad(self):
+        """
+        Indicates whether we should show xseries add
+        """
+        return self.enabled and self.xseries_ad_enabled
+
+    @property
+    def show_program_listing(self):
+        """
+        Indicates whether we want to show program listing page
+        """
+        return self.enabled and self.program_listing_enabled

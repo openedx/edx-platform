@@ -6,7 +6,6 @@ import json
 from collections import OrderedDict
 
 from django.test.client import Client
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from survey.models import SurveyForm, SurveyAnswer

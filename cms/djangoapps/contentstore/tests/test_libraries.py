@@ -22,6 +22,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
+from xblock_django.user_service import DjangoXBlockUserService
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -83,9 +84,8 @@ class LibraryTestCase(ModuleStoreTestCase):
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            mocked_user_service = Mock(user_id=self.user.id)
-            mocked_user_service.get_current_user.return_value = XBlockUser(is_current_user=True)
-            lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
+            user_service = DjangoXBlockUserService(self.user)
+            lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
 
         handler_url = reverse_usage_url(
             'component_handler',

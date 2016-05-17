@@ -13,8 +13,9 @@ from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
-from django.core.urlresolvers import reverse
 
+from badges.events.course_complete import get_completion_badge
+from badges.utils import badges_enabled
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -42,9 +43,8 @@ from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    BadgeAssertion
-)
+    CertificateSocialNetworks)
+
 
 log = logging.getLogger(__name__)
 
@@ -355,21 +355,41 @@ def _track_certificate_events(request, context, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    badge = context['badge']
     # Badge Request Event Tracking Logic
-    if 'evidence_visit' in request.GET and badge:
-        tracker.emit(
-            'edx.badge.assertion.evidence_visited',
-            {
-                'user_id': user.id,
-                'course_id': unicode(course.id),
-                'enrollment_mode': badge.mode,
-                'assertion_id': badge.id,
-                'assertion_image_url': badge.data['image'],
-                'assertion_json_url': badge.data['json']['id'],
-                'issuer': badge.data['issuer'],
-            }
-        )
+    course_key = course.location.course_key
+
+    if 'evidence_visit' in request.GET:
+        badge_class = get_completion_badge(course_key, user)
+        if not badge_class:
+            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
+            badges = []
+        else:
+            badges = badge_class.get_for_user(user)
+        if badges:
+            # There should only ever be one of these.
+            badge = badges[0]
+            tracker.emit(
+                'edx.badge.assertion.evidence_visited',
+                {
+                    'badge_name': badge.badge_class.display_name,
+                    'badge_slug': badge.badge_class.slug,
+                    'badge_generator': badge.backend,
+                    'issuing_component': badge.badge_class.issuing_component,
+                    'user_id': user.id,
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': badge.badge_class.mode,
+                    'assertion_id': badge.id,
+                    'assertion_image_url': badge.image_url,
+                    'assertion_json_url': badge.assertion_url,
+                    'issuer': badge.data.get('issuer'),
+                }
+            )
+        else:
+            log.warn(
+                "Could not find badge for %s on course %s.",
+                user.id,
+                course_key,
+            )
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
@@ -425,10 +445,11 @@ def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
     """
-    try:
-        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
-    except BadgeAssertion.DoesNotExist:
-        badge = None
+    badge = None
+    if badges_enabled() and course.issue_badges:
+        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        if badges:
+            badge = badges[0]
     context['badge'] = badge
 
 
@@ -475,6 +496,11 @@ def render_html_view(request, user_id, course_id):
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        raise Http404
+
     preview_mode = request.GET.get('preview', None)
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
@@ -485,6 +511,11 @@ def render_html_view(request, user_id, course_id):
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
     if not has_html_certificates_enabled(course_id):
+        log.info(
+            "Invalid cert: HTML certificates disabled for %s. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Load the course and user objects
@@ -494,12 +525,22 @@ def render_html_view(request, user_id, course_id):
         course = modulestore().get_course(course_key)
 
     # For any other expected exceptions, kick the user back to the "Invalid" screen
-    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist):
+    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist) as exception:
+        error_str = (
+            "Invalid cert: error finding course %s or user with id "
+            "%d. Specific error: %s"
+        )
+        log.info(error_str, course_id, user_id, str(exception))
         return render_to_response(invalid_template_path, context)
 
     # Load user's certificate
     user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
     if not user_certificate:
+        log.info(
+            "Invalid cert: User %d does not have eligible cert for %s.",
+            user_id,
+            course_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Get the active certificate configuration for this course
@@ -507,7 +548,13 @@ def render_html_view(request, user_id, course_id):
     # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
     active_configuration = get_active_web_certificate(course, preview_mode)
     if active_configuration is None:
+        log.info(
+            "Invalid cert: course %s does not have an active configuration. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
+
     context['certificate_data'] = active_configuration
 
     # Append/Override the existing view context values with any mode-specific ConfigurationModel values

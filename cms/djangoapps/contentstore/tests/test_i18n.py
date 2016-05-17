@@ -82,32 +82,38 @@ class TestModuleI18nService(ModuleStoreTestCase):
         Test django translation service works fine.
         """
 
-        def wrap_with_xyz(func):
+        class wrap_ugettext_with_xyz(object):  # pylint: disable=invalid-name
             """
-            A decorator function that just adds 'XYZ ' to the front of all strings
+            A context manager function that just adds 'XYZ ' to the front
+            of all strings of the module ugettext function.
             """
-            def new_func(*args, **kwargs):
-                """ custom function """
-                output = func(*args, **kwargs)
-                return "XYZ " + output
-            return new_func
 
-        old_lang = translation.get_language()
+            def __init__(self, module):
+                self.module = module
+                self.old_ugettext = module.ugettext
+
+            def __enter__(self):
+                def new_ugettext(*args, **kwargs):
+                    """ custom function """
+                    output = self.old_ugettext(*args, **kwargs)
+                    return "XYZ " + output
+                self.module.ugettext = new_ugettext
+
+            def __exit__(self, _type, _value, _traceback):
+                self.module.ugettext = self.old_ugettext
 
         i18n_service = self.get_module_i18n_service(self.descriptor)
 
         # Activate french, so that if the fr files haven't been loaded, they will be loaded now.
-        translation.activate("fr")
-        french_translation = translation.trans_real._active.value  # pylint: disable=protected-access
+        with translation.override("fr"):
+            french_translation = translation.trans_real._active.value  # pylint: disable=protected-access
 
-        # wrap the ugettext functions so that 'TEST ' will prefix each translation
-        french_translation.ugettext = wrap_with_xyz(french_translation.ugettext)
-        self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ dummy language')
+            # wrap the ugettext functions so that 'XYZ ' will prefix each translation
+            with wrap_ugettext_with_xyz(french_translation):
+                self.assertEqual(i18n_service.ugettext(self.test_language), 'XYZ dummy language')
 
-        # Turn back on our old translations
-        translation.activate(old_lang)
-        del old_lang
-        self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
+            # Check that the old ugettext has been put back into place
+            self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
     @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):

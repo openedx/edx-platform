@@ -6,6 +6,8 @@ import re
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
+from badges.service import BadgingService
+from badges.utils import badges_enabled
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from request_cache.middleware import RequestCache
 import xblock.reference.plugins
@@ -211,8 +213,11 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
+        store = modulestore()
         services['settings'] = SettingsService()
         services['user_tags'] = UserTagsService(self)
+        if badges_enabled():
+            services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 

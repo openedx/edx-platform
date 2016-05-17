@@ -32,7 +32,11 @@ from instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment, CourseEnrollmentException
-from student.roles import CourseCcxCoachRole
+from student.roles import (
+    CourseCcxCoachRole,
+    CourseInstructorRole,
+    CourseStaffRole
+)
 
 from lms.djangoapps.ccx.overrides import get_override_for_ccx
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
@@ -181,7 +185,7 @@ def get_ccx_by_ccx_id(course, coach, ccx_id):
     return ccx
 
 
-def get_valid_student_email(identifier):
+def get_valid_student_with_email(identifier):
     """
     Helper function to get an user email from an identifier and validate it.
 
@@ -195,7 +199,9 @@ def get_valid_student_email(identifier):
         identifier (str): Username or email of the user to enroll
 
     Returns:
-        str: A validated email for the user to enroll
+        (tuple): tuple containing:
+            email (str): A validated email for the user to enroll.
+            user (User): A valid User object or None.
 
     Raises:
         CCXUserValidationException: if the username is not found or the email
@@ -212,10 +218,10 @@ def get_valid_student_email(identifier):
         validate_email(email)
     except ValidationError:
         raise CCXUserValidationException('Could not find a user with name or email "{0}" '.format(identifier))
-    return email
+    return email, user
 
 
-def ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params):
+def ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, coach):
     """
     Function to enroll/add or unenroll/revoke students.
 
@@ -231,6 +237,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
         email_students (bool): Flag to send an email to students
         course_key (CCXLocator): a CCX course key
         email_params (dict): dictionary of settings for the email to be sent
+        coach (User): ccx coach
 
     Returns:
         list: list of error
@@ -239,24 +246,32 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
 
     if action == 'Enroll' or action == 'add':
         ccx_course_overview = CourseOverview.get_from_id(course_key)
+        course_locator = course_key.to_course_locator()
+        staff = CourseStaffRole(course_locator).users_with_role()
+        admins = CourseInstructorRole(course_locator).users_with_role()
+
         for identifier in identifiers:
-            if CourseEnrollment.objects.is_course_full(ccx_course_overview):
+            must_enroll = False
+            try:
+                email, student = get_valid_student_with_email(identifier)
+                if student:
+                    must_enroll = student in staff or student in admins or student == coach
+            except CCXUserValidationException as exp:
+                log.info("%s", exp)
+                errors.append("{0}".format(exp))
+                continue
+
+            if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
                 error = _('The course is full: the limit is {max_student_enrollments_allowed}').format(
                     max_student_enrollments_allowed=ccx_course_overview.max_student_enrollments_allowed)
                 log.info("%s", error)
                 errors.append(error)
                 break
-            try:
-                email = get_valid_student_email(identifier)
-            except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
-                continue
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
     elif action == 'Unenroll' or action == 'revoke':
         for identifier in identifiers:
             try:
-                email = get_valid_student_email(identifier)
+                email, __ = get_valid_student_with_email(identifier)
             except CCXUserValidationException as exp:
                 log.info("%s", exp)
                 errors.append("{0}".format(exp))

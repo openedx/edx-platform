@@ -166,8 +166,11 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Create a user account
         email, password = self._create_unique_user()
 
-        # Navigate to the login page and try to log in using "Dummy" provider
+        # Navigate to the login page
         self.login_page.visit()
+        self.assertScreenshot('#login .login-providers', 'login-providers')
+
+        # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
 
         # The user will be redirected somewhere and then back to the login page:
@@ -206,6 +209,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # We should now be redirected to the login page
         self.login_page.wait_for_page()
         self.assertIn("Would you like to sign in using your Dummy credentials?", self.login_page.hinted_login_prompt)
+        self.assertScreenshot('#hinted-login-form', 'hinted-login')
         self.login_page.click_third_party_dummy_provider()
 
         # We should now be redirected to the course page
@@ -329,8 +333,11 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         Test that we can register using third party credentials, and that the
         third party account gets linked to the edX account.
         """
-        # Navigate to the register page and try to authenticate using the "Dummy" provider
+        # Navigate to the register page
         self.register_page.visit()
+        self.assertScreenshot('#register .login-providers', 'register-providers')
+
+        # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()
 
         # The user will be redirected somewhere and then back to the register page:
@@ -817,13 +824,13 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(3, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Locked Subsection")
-        self.assertEqual(["Html Child in locked subsection"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
     def test_visible_to_student(self):
         """
@@ -839,10 +846,10 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual(2, len(self.course_nav.sections['Test Section']))
 
         self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Unlocked Unit'], self.course_nav.sequence_items)
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
-        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+        self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
 @attr('shard_1')
@@ -1291,3 +1298,31 @@ class LMSLanguageTest(UniqueCourseTest):
             get_selected_option_text(language_selector),
             u'English'
         )
+
+
+@attr('a11y')
+class CourseInfoA11yTest(UniqueCourseTest):
+    """Accessibility test for course home/info page."""
+
+    def setUp(self):
+        super(CourseInfoA11yTest, self).setUp()
+        self.course_fixture = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='January 29, 2014', content='Test course update1')
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='February 5th, 2014', content='Test course update2')
+        )
+        self.course_fixture.add_update(
+            CourseUpdateDesc(date='March 31st, 2014', content='Test course update3')
+        )
+        self.course_fixture.install()
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_course_home_a11y(self):
+        self.course_info_page.visit()
+        self.course_info_page.a11y_audit.check_for_accessibility_errors()

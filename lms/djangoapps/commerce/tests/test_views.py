@@ -1,6 +1,5 @@
 """ Tests for commerce views. """
-import json
-from uuid import uuid4
+
 from nose.plugins.attrib import attr
 
 import ddt
@@ -9,7 +8,7 @@ from django.test import TestCase
 import mock
 
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
 class UserMixin(object):
@@ -86,7 +85,7 @@ class ReceiptViewTests(UserMixin, TestCase):
         self.assertRegexpMatches(response.content, user_message if is_user_message_expected else system_message)
         self.assertNotRegexpMatches(response.content, user_message if not is_user_message_expected else system_message)
 
-    @with_comprehensive_theme("edx.org")
+    @with_is_edx_domain(True)
     def test_hide_nav_header(self):
         self._login()
         post_data = {'decision': 'ACCEPT', 'reason_code': '200', 'signed_field_names': 'dummy'}

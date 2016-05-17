@@ -1,0 +1,157 @@
+// +Imports
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+//Patern Library button colors
+$pl-button-border-color: #065683;
+$pl-button-color: #0079bc;
+
+.program-list-wrapper{
+  @include outer-container;
+  padding: $baseline $baseline;
+}
+
+.program-cards-container{
+  @include outer-container;
+  @include span-columns(12);
+}
+.sidebar{
+  @include outer-container;
+  @include span-columns(12);
+  float: right !important;
+  margin-bottom: $baseline;
+  .certificate-container{
+    @include xseries-certificate-container();
+  }
+  .program-advertise{
+    padding: $baseline;
+    background-color: $body-bg;
+    box-sizing: border-box;
+    border: 1px solid $border-color-l3;
+    clear: both;
+    .advertise-message{
+      font-size: em(12);
+      color: $gray-d4;
+      margin-bottom: $baseline;
+    }
+    .ad-link{
+      text-align:center;
+      a{
+        padding: $baseline * 0.5; 
+        border: 1px solid $pl-button-border-color;
+        color: $pl-button-color;
+        font-size: em(16);
+        text-decoration: none;
+        display: block;
+        line-height: 1.2;
+        &:hover,
+        &:focus,
+        &:active{
+          color: $white;
+          background-color: $pl-button-color;
+        }
+        span{
+          @include margin-left($baseline*0.25);
+        }
+      }
+    }
+  }
+}
+
+
+
+@include media($bp-medium) {
+  .program-cards-container{
+    @include span-columns(8);
+  }
+  .sidebar{
+    @include span-columns(8);
+  }
+}
+
+
+
+@include media($bp-large) {
+  .program-cards-container{
+    @include span-columns(9);
+  }
+  .sidebar{
+    @include omega(n);
+    @include span-columns(3);
+  }
+}
+
+@include media($bp-huge) {
+  .program-cards-container{
+    @include span-columns(9);
+  }
+  .sidebar{
+    @include omega(n);
+    @include span-columns(3);
+  }
+}
+
+// CASE: empty list of programs
+  .empty-programs-message {
+    border: 3px solid $gray-l4;
+    background: $gray-l6;
+    padding: ($baseline*2) 0;
+    text-align: center;
+
+    p {
+      @include font-size(24);
+      color: $lighter-base-font-color;
+      margin-bottom: $baseline;
+      text-shadow: 0 1px rgba(255,255,255, 0.6);
+    }
+
+    a {
+      @include box-sizing(border-box);
+      background-color: $blue;
+      border: 1px solid $blue;
+      box-shadow: 0 1px 8px 0 $shadow-l1;
+      color: $white;
+      font-family: $sans-serif;
+      display: inline-block;
+      letter-spacing: 1px;
+      margin-top: ($baseline/4);
+      margin-left: ($baseline/4);
+      padding: 15px 20px;
+
+      &:hover, &:focus {
+        background: $blue-l2;
+        text-decoration: none;
+      }
+    }
+
+    .find-xseries-programs {
+      @extend %btn-pl-black-base;
+      .action-xseries-icon {
+        @include float(left);
+        @include margin-right($baseline*0.4);
+
+        display: inline;
+        background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
+        background-color: transparent;
+
+        width: ($baseline*1.1);
+        height: ($baseline*1.1);
+      }
+      &:hover,
+      &:focus {
+
+        .action-xseries-icon {
+          @include float(left);
+          @include margin-right($baseline*0.4);
+
+          display: inline;
+          background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
+          background-color: transparent;
+
+          width: ($baseline*1.1);
+          height: ($baseline*1.1);
+        }
+      }
+    }
+  }

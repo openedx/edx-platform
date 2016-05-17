@@ -34,14 +34,18 @@ lib_paths:
     - js/vendor/jquery.truncate.js
     - js/vendor/mustache.js
     - common/js/vendor/underscore.js
-    - js/vendor/underscore.string.min.js
+    - common/js/vendor/underscore.string.js
     - js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
+    - js/vendor/draggabilly.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
     - js/test/i18n.js
     - coffee/src/jquery.immediateDescendents.js
+    - edx-pattern-library/js/modernizr-custom.js
+    - edx-pattern-library/js/afontgarde.js
+    - edx-pattern-library/js/edx-icons.js
 
 # Paths to source JavaScript files
 src_paths:

@@ -30,8 +30,6 @@ from util.db import NoOpMigrationModules
 from lms.envs.test import (
     WIKI_ENABLED,
     PLATFORM_NAME,
-    SITE_ID,
-    DEFAULT_SITE_ID,
     SITE_NAME,
     DEFAULT_FILE_STORAGE,
     MEDIA_ROOT,
@@ -284,8 +282,6 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
-TEST_THEME = COMMON_ROOT / "test" / "test-theme"
-
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
@@ -325,6 +321,5 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
-# API access management. Necessary so that django-simple-history
-# doesn't break when running pre-test migrations.
+# API access management -- needed for simple-history to run.
 INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)

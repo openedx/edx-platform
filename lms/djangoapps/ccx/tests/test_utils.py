@@ -12,17 +12,12 @@ from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
 )
-from student.tests.factories import (
-    AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory
-)
+from student.tests.factories import AdminFactory
 
 from student.models import CourseEnrollment, CourseEnrollmentException
 
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import CourseFactory

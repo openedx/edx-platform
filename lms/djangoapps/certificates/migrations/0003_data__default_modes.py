@@ -10,8 +10,11 @@ from django.core.files import File
 def forwards(apps, schema_editor):
     """Add default modes"""
     BadgeImageConfiguration = apps.get_model("certificates", "BadgeImageConfiguration")
-
-    objects = BadgeImageConfiguration.objects
+    db_alias = schema_editor.connection.alias
+    # This will need to be changed if badges/certificates get moved out of the default db for some reason.
+    if db_alias != 'default':
+        return
+    objects = BadgeImageConfiguration.objects.using(db_alias)
     if not objects.exists():
         for mode in ['honor', 'verified', 'professional']:
             conf = objects.create(mode=mode)
@@ -34,5 +37,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards,backwards)
+        migrations.RunPython(forwards, backwards)
     ]

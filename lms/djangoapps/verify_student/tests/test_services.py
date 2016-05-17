@@ -31,7 +31,7 @@ class TestReverificationService(ModuleStoreTestCase):
         self.user = UserFactory.create(username="rusty", password="test")
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
-        CourseModeFactory(
+        CourseModeFactory.create(
             mode_slug="verified",
             course_id=self.course_id,
             min_price=100,

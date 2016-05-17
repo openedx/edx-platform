@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 import httpretty
 import mock
-from oauth2_provider.tests.factories import ClientFactory
+from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig

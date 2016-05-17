@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load sekizai_tags i18n microsite theme_pipeline optional_include %}
+{% load sekizai_tags i18n microsite pipeline optional_include %}
 {% load url from future %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
@@ -9,7 +9,7 @@
  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
 
   {% stylesheet 'style-vendor' %}
-  {% stylesheet 'style-main' %}
+  {% stylesheet 'style-main-v1' %}
 
   {% block main_vendor_js %}
   {% javascript 'main_vendor' %}

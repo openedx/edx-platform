@@ -3,9 +3,8 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
-import time
+import ddt
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -652,6 +651,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
 
 
 @attr('shard_7')
+@ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
@@ -906,6 +906,36 @@ class CertificatesTest(BaseInstructorDashboardTest):
                              ' below to send the certificate.',
             self.certificates_section.message.text
         )
+
+    @ddt.data(
+        ('Test \nNotes', 'Test Notes'),
+        ('<Test>Notes</Test>', '<Test>Notes</Test>'),
+    )
+    @ddt.unpack
+    def test_notes_escaped_in_add_certificate_exception(self, notes, expected_notes):
+        """
+        Scenario: On the Certificates tab of the Instructor Dashboard, Instructor can add new certificate
+        exception to list.
+
+            Given that I am on the Certificates tab on the Instructor Dashboard
+            When I fill in student username and notes (which contains character which are needed to be escaped)
+            and click 'Add Exception' button, then new certificate exception should be visible in
+            certificate exceptions list.
+        """
+        # Add a student to Certificate exception list
+        self.certificates_section.add_certificate_exception(self.user_name, notes)
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertIn(expected_notes, self.certificates_section.last_certificate_exception.text)
+
+        # Revisit Page & verify that added exceptions are also synced with backend
+        self.certificates_section.refresh()
+
+        # Wait for the certificate exception section to render
+        self.certificates_section.wait_for_certificate_exceptions_section()
+
+        # Validate certificate exception synced with server is visible in certificate exceptions list
+        self.assertIn(self.user_name, self.certificates_section.last_certificate_exception.text)
+        self.assertIn(expected_notes, self.certificates_section.last_certificate_exception.text)
 
 
 @attr('shard_7')

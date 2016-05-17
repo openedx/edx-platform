@@ -8,8 +8,7 @@ from django.forms import (
     ChoiceField,
     Form,
     IntegerField,
-    NullBooleanField,
-    Select)
+)
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator

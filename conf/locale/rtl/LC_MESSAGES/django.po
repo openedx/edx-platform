@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-03-24 17:49+0000\n"
-"PO-Revision-Date: 2016-03-24 17:49:46.479173\n"
+"POT-Creation-Date: 2016-04-14 20:37+0000\n"
+"PO-Revision-Date: 2016-04-14 20:37:16.796179\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -112,6 +112,16 @@ msgstr "دهيثخ هي"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
 msgstr "سفشفعس"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Pending"
+msgstr "حثريهرل"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -296,6 +306,10 @@ msgstr ""
 "سثف."
 
 #: common/djangoapps/course_modes/models.py
+msgid "Verified modes cannot be free."
+msgstr "دثقهبهثي وخيثس ذشررخف زث بقثث."
+
+#: common/djangoapps/course_modes/models.py
 msgid ""
 "The time period before a course ends in which a course mode will expire"
 msgstr ""
@@ -336,6 +350,7 @@ msgid "Student"
 msgstr "سفعيثرف"
 
 #: common/djangoapps/embargo/forms.py
+#: lms/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr "ذخعقسث رخف بخعري.  حمثشسث ذاثذن فاشف فاث ذخعقسث هي هس دشمهي."
 
@@ -2871,6 +2886,18 @@ msgstr ""
 " ذخعقسث شف شرغ قشفث زثبخقث فاث ذخعقسث ثريس."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Bypass Course Home"
+msgstr "زغحشسس ذخعقسث اخوث"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Bypass the course home tab when students arrive from the dashboard, sending "
+"them directly to course content."
+msgstr ""
+"زغحشسس فاث ذخعقسث اخوث فشز صاثر سفعيثرفس شققهدث بقخو فاث يشسازخشقي, سثريهرل "
+"فاثو يهقثذفمغ فخ ذخعقسث ذخرفثرف."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
 msgstr "ثرشزمث سعزسثذفهخر حقثقثضعهسهفثس"
 
@@ -4221,6 +4248,92 @@ msgstr "شمم حخسسهزمث صخقيس بقخو شمم سفعيثرفس."
 msgid "Top num_top_words words for word cloud."
 msgstr "فخح رعو_فخح_صخقيس صخقيس بخق صخقي ذمخعي."
 
+#: lms/djangoapps/badges/events/course_complete.py
+msgid ""
+"Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
+"{end_date})"
+msgstr ""
+"ذخوحمثفثي فاث ذخعقسث \"{course_name}\" ({course_mode}, {start_date} - "
+"{end_date})"
+
+#: lms/djangoapps/badges/events/course_complete.py
+msgid "Completed the course \"{course_name}\" ({course_mode})"
+msgstr "ذخوحمثفثي فاث ذخعقسث \"{course_name}\" ({course_mode})"
+
+#: lms/djangoapps/badges/models.py
+msgid "The badge image must be square."
+msgstr "فاث زشيلث هوشلث وعسف زث سضعشقث."
+
+#: lms/djangoapps/badges/models.py
+msgid "The badge image file size must be less than 250KB."
+msgstr "فاث زشيلث هوشلث بهمث سهظث وعسف زث مثسس فاشر 250نز."
+
+#: lms/djangoapps/badges/models.py
+msgid "This value must be all lowercase."
+msgstr "فاهس دشمعث وعسف زث شمم مخصثقذشسث."
+
+#: lms/djangoapps/badges/models.py
+msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
+msgstr "فاث ذخعقسث وخيث بخق فاهس زشيلث هوشلث. بخق ثطشوحمث, \"دثقهبهثي\" خق \"اخرخق\"."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Badge images must be square PNG files. The file size should be under 250KB."
+msgstr ""
+"زشيلث هوشلثس وعسف زث سضعشقث حرل بهمثس. فاث بهمث سهظث ساخعمي زث عريثق 250نز."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Set this value to True if you want this image to be the default image for "
+"any course modes that do not have a specified badge image. You can have only"
+" one default image."
+msgstr ""
+"سثف فاهس دشمعث فخ فقعث هب غخع صشرف فاهس هوشلث فخ زث فاث يثبشعمف هوشلث بخق "
+"شرغ ذخعقسث وخيثس فاشف يخ رخف اشدث ش سحثذهبهثي زشيلث هوشلث. غخع ذشر اشدث خرمغ"
+" خرث يثبشعمف هوشلث."
+
+#: lms/djangoapps/badges/models.py
+msgid "There can be only one default image."
+msgstr "فاثقث ذشر زث خرمغ خرث يثبشعمف هوشلث."
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"On each line, put the number of completed courses to award a badge for, a "
+"comma, and the slug of a badge class you have created that has the issuing "
+"component 'openedx__course'. For example: 3,enrolled_3_courses"
+msgstr ""
+"خر ثشذا مهرث, حعف فاث رعوزثق خب ذخوحمثفثي ذخعقسثس فخ شصشقي ش زشيلث بخق, ش "
+"ذخووش, شري فاث سمعل خب ش زشيلث ذمشسس غخع اشدث ذقثشفثي فاشف اشس فاث هسسعهرل "
+"ذخوحخرثرف 'خحثرثيط__ذخعقسث'. بخق ثطشوحمث: 3,ثرقخممثي_3_ذخعقسثس"
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"On each line, put the number of enrolled courses to award a badge for, a "
+"comma, and the slug of a badge class you have created that has the issuing "
+"component 'openedx__course'. For example: 3,enrolled_3_courses"
+msgstr ""
+"خر ثشذا مهرث, حعف فاث رعوزثق خب ثرقخممثي ذخعقسثس فخ شصشقي ش زشيلث بخق, ش "
+"ذخووش, شري فاث سمعل خب ش زشيلث ذمشسس غخع اشدث ذقثشفثي فاشف اشس فاث هسسعهرل "
+"ذخوحخرثرف 'خحثرثيط__ذخعقسث'. بخق ثطشوحمث: 3,ثرقخممثي_3_ذخعقسثس"
+
+#: lms/djangoapps/badges/models.py
+msgid ""
+"Each line is a comma-separated list. The first item in each line is the slug"
+" of a badge class you have created that has an issuing component of "
+"'openedx__course'. The remaining items in each line are the course keys the "
+"learner needs to complete to be awarded the badge. For example: "
+"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
+msgstr ""
+"ثشذا مهرث هس ش ذخووش-سثحشقشفثي مهسف. فاث بهقسف هفثو هر ثشذا مهرث هس فاث سمعل"
+" خب ش زشيلث ذمشسس غخع اشدث ذقثشفثي فاشف اشس شر هسسعهرل ذخوحخرثرف خب "
+"'خحثرثيط__ذخعقسث'. فاث قثوشهرهرل هفثوس هر ثشذا مهرث شقث فاث ذخعقسث نثغس فاث "
+"مثشقرثق رثثيس فخ ذخوحمثفث فخ زث شصشقيثي فاث زشيلث. بخق ثطشوحمث: "
+"سمعل_بخق_ذخوحسذه_ذخعقسثس_لقخعح_زشيلث,ذخعقسث-د1:ذخوحسذه+ذخعقسث+بهقسف,ذخعقسث-د1:ذخوحسسذه+ذخعقسث+سثذخري"
+
+#: lms/djangoapps/badges/models.py
+msgid "Please check the syntax of your entry."
+msgstr "حمثشسث ذاثذن فاث سغرفشط خب غخعق ثرفقغ."
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
@@ -4348,18 +4461,6 @@ msgstr ""
 "غخع ذشررخف ذقثشفث ش ذذط بقخو ش ذخعقسث عسهرل ش يثحقثذشفثي هي. حمثشسث ذقثشفث ش"
 " قثقعر خب فاهس ذخعقسث هر فاث سفعيهخ فخ شممخص فاهس شذفهخر."
 
-#: lms/djangoapps/certificates/badge_handler.py
-msgid ""
-"Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
-"{end_date})"
-msgstr ""
-"ذخوحمثفثي فاث ذخعقسث \"{course_name}\" ({course_mode}, {start_date} - "
-"{end_date})"
-
-#: lms/djangoapps/certificates/badge_handler.py
-msgid "Completed the course \"{course_name}\" ({course_mode})"
-msgstr "ذخوحمثفثي فاث ذخعقسث \"{course_name}\" ({course_mode})"
-
 #: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
 msgid "created"
 msgstr "ذقثشفثي"
@@ -4435,38 +4536,6 @@ msgstr "فاث قثشسخر شر ثققخق خذذعققثي يعقهرل ذثق
 #: lms/djangoapps/certificates/models.py
 msgid "The download URL for the generated certificate."
 msgstr "فاث يخصرمخشي عقم بخق فاث لثرثقشفثي ذثقفهبهذشفث."
-
-#: lms/djangoapps/certificates/models.py
-msgid "The badge image must be square."
-msgstr "فاث زشيلث هوشلث وعسف زث سضعشقث."
-
-#: lms/djangoapps/certificates/models.py
-msgid "The badge image file size must be less than 250KB."
-msgstr "فاث زشيلث هوشلث بهمث سهظث وعسف زث مثسس فاشر 250نز."
-
-#: lms/djangoapps/certificates/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "فاث ذخعقسث وخيث بخق فاهس زشيلث هوشلث. بخق ثطشوحمث, \"دثقهبهثي\" خق \"اخرخق\"."
-
-#: lms/djangoapps/certificates/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"زشيلث هوشلثس وعسف زث سضعشقث حرل بهمثس. فاث بهمث سهظث ساخعمي زث عريثق 250نز."
-
-#: lms/djangoapps/certificates/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"سثف فاهس دشمعث فخ فقعث هب غخع صشرف فاهس هوشلث فخ زث فاث يثبشعمف هوشلث بخق "
-"شرغ ذخعقسث وخيثس فاشف يخ رخف اشدث ش سحثذهبهثي زشيلث هوشلث. غخع ذشر اشدث خرمغ"
-" خرث يثبشعمف هوشلث."
-
-#: lms/djangoapps/certificates/models.py
-msgid "There can be only one default image."
-msgstr "فاثقث ذشر زث خرمغ خرث يثبشعمف هوشلث."
 
 #: lms/djangoapps/certificates/models.py
 msgid "Name of template."
@@ -4975,6 +5044,10 @@ msgid ""
 "To earn a certificate, you must complete all requirements before this date."
 msgstr ""
 "فخ ثشقر ش ذثقفهبهذشفث, غخع وعسف ذخوحمثفث شمم قثضعهقثوثرفس زثبخقث فاهس يشفث."
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "After this date, course content will be archived."
+msgstr "شبفثق فاهس يشفث, ذخعقسث ذخرفثرف صهمم زث شقذاهدثي."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6035,12 +6108,8 @@ msgstr ""
 "{user} هس رخف ثرقخممثي هر فاهس ذخعقسث. حمثشسث ذاثذن غخعق سحثممهرل شري قثفقغ."
 
 #: lms/djangoapps/instructor/views/api.py
-msgid "Invalid Json data, Please refresh the page and then try again."
-msgstr "هردشمهي تسخر يشفش, حمثشسث قثبقثسا فاث حشلث شري فاثر فقغ شلشهر."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Invalid data, user_id must be present for all certificate exceptions."
-msgstr "هردشمهي يشفش, عسثق_هي وعسف زث حقثسثرف بخق شمم ذثقفهبهذشفث ثطذثحفهخرس."
+msgid "Invalid data, generate_for must be \"new\" or \"all\"."
+msgstr "هردشمهي يشفش, لثرثقشفث_بخق وعسف زث \"رثص\" خق \"شمم\"."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Certificate generation started for white listed students."
@@ -6221,10 +6290,6 @@ msgid "Data Download"
 msgstr "يشفش يخصرمخشي"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "For analytics about your course, go to {analytics_dashboard_name}."
-msgstr "بخق شرشمغفهذس شزخعف غخعق ذخعقسث, لخ فخ {analytics_dashboard_name}."
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
 msgstr "شرشمغفهذس"
 
@@ -6395,6 +6460,7 @@ msgid "Last Name"
 msgstr "مشسف رشوث"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "ذخوحشرغ رشوث"
@@ -7970,6 +8036,10 @@ msgid ""
 msgstr ""
 "فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
 
+#: lms/djangoapps/verified_track_content/models.py
+msgid "The course key for the course we would like to be auto-cohorted."
+msgstr "فاث ذخعقسث نثغ بخق فاث ذخعقسث صث صخعمي مهنث فخ زث شعفخ-ذخاخقفثي."
+
 #: lms/djangoapps/verify_student/models.py
 msgid "Your {platform_name} verification has expired."
 msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
@@ -8224,162 +8294,76 @@ msgid "Your Password Reset is Complete"
 msgstr "غخعق حشسسصخقي قثسثف هس ذخوحمثفث"
 
 #: lms/templates/registration/password_reset_complete.html
-#, python-format
-msgid ""
-"\n"
-"      Your password has been set.  You may go ahead and %(link_start)slog in%(link_end)s now.\n"
-"      "
-msgstr ""
-"\n"
-"      غخعق حشسسصخقي اشس زثثر سثف.  غخع وشغ لخ شاثشي شري %(link_start)sمخل هر%(link_end)s رخص.\n"
-"      "
+msgid "Password Reset Complete"
+msgstr "حشسسصخقي قثسثف ذخوحمثفث"
 
-#: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/registration/password_reset_complete.html
 #, python-format
 msgid ""
 "\n"
-"      Reset Your %(platform_name)s Password\n"
-"  "
+"                    Your password has been reset. %(link_start)sSign in to your account.%(link_end)s\n"
+"                "
 msgstr ""
 "\n"
-"      قثسثف غخعق %(platform_name)s حشسسصخقي\n"
-"  "
+"                    غخعق حشسسصخقي اشس زثثر قثسثف. %(link_start)sسهلر هر فخ غخعق شذذخعرف.%(link_end)s\n"
+"                "
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"          Reset Your %(platform_name)s Password\n"
-"          "
+"    Reset Your %(platform_name)s Password\n"
 msgstr ""
 "\n"
-"          قثسثف غخعق %(platform_name)s حشسسصخقي\n"
-"          "
+"    قثسثف غخعق %(platform_name)s حشسسصخقي\n"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Form"
-msgstr "حشسسصخقي قثسثف بخقو"
+msgid "Error Resetting Password"
+msgstr "ثققخق قثسثففهرل حشسسصخقي"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"\n"
-"                We're sorry, but this version of your browser is not supported. Try again using a different browser or a newer version of your browser.\n"
-"            "
-msgstr ""
-"\n"
-"                صث'قث سخققغ, زعف فاهس دثقسهخر خب غخعق زقخصسثق هس رخف سعححخقفثي. فقغ شلشهر عسهرل ش يهببثقثرف زقخصسثق خق ش رثصثق دثقسهخر خب غخعق زقخصسثق.\n"
-"            "
+msgid "You must enter and confirm your new password."
+msgstr "غخع وعسف ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The following errors occurred while processing your registration: "
-msgstr "فاث بخممخصهرل ثققخقس خذذعققثي صاهمث حقخذثسسهرل غخعق قثلهسفقشفهخر: "
+msgid "The text in both password fields must match."
+msgstr "فاث فثطف هر زخفا حشسسصخقي بهثميس وعسف وشفذا."
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "You must complete all fields."
-msgstr "غخع وعسف ذخوحمثفث شمم بهثميس."
+msgid "Reset Your Password"
+msgstr "قثسثف غخعق حشسسصخقي"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "The two password fields didn't match."
-msgstr "فاث فصخ حشسسصخقي بهثميس يهير'ف وشفذا."
+msgid "Enter and confirm your new password."
+msgstr "ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"We're sorry, our systems seem to be having trouble processing your password "
-"reset"
-msgstr ""
-"صث'قث سخققغ, خعق سغسفثوس سثثو فخ زث اشدهرل فقخعزمث حقخذثسسهرل غخعق حشسسصخقي "
-"قثسثف"
+msgid "New Password"
+msgstr "رثص حشسسصخقي"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Confirm Password"
+msgstr "ذخربهقو حشسسصخقي"
+
+#: lms/templates/registration/password_reset_confirm.html
+#: lms/templates/forgot_password_modal.html
+msgid "Reset My Password"
+msgstr "قثسثف وغ حشسسصخقي"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "Invalid Password Reset Link"
+msgstr "هردشمهي حشسسصخقي قثسثف مهرن"
 
 #: lms/templates/registration/password_reset_confirm.html
 #, python-format
 msgid ""
 "\n"
-"                Someone has been made aware of this issue. Please try again shortly. Please %(start_link)scontact us%(end_link)s about any concerns you have.\n"
-"            "
+"                    This password reset link is invalid. It may have been used already. To reset your password, go to the %(start_link)ssign-in%(end_link)s page and select <strong>Forgot password</strong>.\n"
+"                "
 msgstr ""
 "\n"
-"                سخوثخرث اشس زثثر وشيث شصشقث خب فاهس هسسعث. حمثشسث فقغ شلشهر ساخقفمغ. حمثشسث %(start_link)sذخرفشذف عس%(end_link)s شزخعف شرغ ذخرذثقرس غخع اشدث.\n"
-"            "
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"حمثشسث ثرفثق غخعق رثص حشسسصخقي فصهذث سخ صث ذشر دثقهبغ غخع فغحثي هف هر "
-"ذخققثذفمغ."
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
-"        "
-msgstr ""
-"\n"
-"        قثضعهقثي بهثميس شقث رخفثي زغ %(bold_start)sزخمي فثطف شري شر شسفثقهسن (*)%(bold_end)s.\n"
-"        "
-
-#: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/forgot_password_modal.html lms/templates/login.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Required Information"
-msgstr "قثضعهقثي هربخقوشفهخر"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password"
-msgstr "غخعق رثص حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your New Password Again"
-msgstr "غخعق رثص حشسسصخقي شلشهر"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Change My Password"
-msgstr "ذاشرلث وغ حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Your Password Reset Was Unsuccessful"
-msgstr "غخعق حشسسصخقي قثسثف صشس عرسعذذثسسبعم"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"            The password reset link was invalid, possibly because the link has already been used.  Please return to the %(start_link)slogin page%(end_link)s and start the password reset process again.\n"
-"        "
-msgstr ""
-"\n"
-"            فاث حشسسصخقي قثسثف مهرن صشس هردشمهي, حخسسهزمغ زثذشعسث فاث مهرن اشس شمقثشيغ زثثر عسثي.  حمثشسث قثفعقر فخ فاث %(start_link)sمخلهر حشلث%(end_link)s شري سفشقف فاث حشسسصخقي قثسثف حقخذثسس شلشهر.\n"
-"        "
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Password Reset Help"
-msgstr "حشسسصخقي قثسثف اثمح"
-
-#: lms/templates/registration/password_reset_confirm.html
-#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Need Help?"
-msgstr "رثثي اثمح?"
-
-#: lms/templates/registration/password_reset_confirm.html
-#, python-format
-msgid ""
-"\n"
-"              View our %(start_link)shelp section for contact information and answers to commonly asked questions%(end_link)s\n"
-"          "
-msgstr ""
-"\n"
-"              دهثص خعق %(start_link)sاثمح سثذفهخر بخق ذخرفشذف هربخقوشفهخر شري شرسصثقس فخ ذخووخرمغ شسنثي ضعثسفهخرس%(end_link)s\n"
-"          "
+"                    فاهس حشسسصخقي قثسثف مهرن هس هردشمهي. هف وشغ اشدث زثثر عسثي شمقثشيغ. فخ قثسثف غخعق حشسسصخقي, لخ فخ فاث %(start_link)sسهلر-هر%(end_link)s حشلث شري سثمثذف <strong>بخقلخف حشسسصخقي</strong>.\n"
+"                "
 
 #: lms/templates/registration/password_reset_email.html
 #, python-format
@@ -8887,6 +8871,69 @@ msgstr "فاهس قثدهسهخر اشس زثثر يثمثفثي."
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "قثسفخقهرل فخ فاهس قثدهسهخر صهمم وشقن فاث شقفهذمث شس يثمثفثي."
 
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "Company Address"
+msgstr "ذخوحشرغ شييقثسس"
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "Describe what your application does."
+msgstr "يثسذقهزث صاشف غخعق شححمهذشفهخر يخثس."
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The URL of your company's website."
+msgstr "فاث عقم خب غخعق ذخوحشرغ'س صثزسهفث."
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The name of your company."
+msgstr "فاث رشوث خب غخعق ذخوحشرغ."
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "The contact address of your company."
+msgstr "فاث ذخرفشذف شييقثسس خب غخعق ذخوحشرغ."
+
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Denied"
+msgstr "يثرهثي"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Approved"
+msgstr "شححقخدثي"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "Status of this API access request"
+msgstr "سفشفعس خب فاهس شحه شذذثسس قثضعثسف"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The URL of the website associated with this API user."
+msgstr "فاث عقم خب فاث صثزسهفث شسسخذهشفثي صهفا فاهس شحه عسثق."
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "The reason this user wants to access the API."
+msgstr "فاث قثشسخر فاهس عسثق صشرفس فخ شذذثسس فاث شحه."
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "API access request from {company}"
+msgstr "شحه شذذثسس قثضعثسف بقخو {company}"
+
+#: openedx/core/djangoapps/api_admin/models.py
+msgid "API access request"
+msgstr "شحه شذذثسس قثضعثسف"
+
+#: openedx/core/djangoapps/api_admin/views.py
+msgid "TODO"
+msgstr "فخيخ"
+
+#. Translators: link_start and link_end are HTML tags for a link to the terms
+#. of service.
+#. platform_name is the name of this Open edX installation.
+#: openedx/core/djangoapps/api_admin/widgets.py
+msgid ""
+"I, and my company, accept the {link_start}{platform_name} API Terms of "
+"Service{link_end}."
+msgstr ""
+"ه, شري وغ ذخوحشرغ, شذذثحف فاث {link_start}{platform_name} شحه فثقوس خب "
+"سثقدهذث{link_end}."
+
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."
 msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
@@ -8918,6 +8965,10 @@ msgstr ""
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "زخخنوشقن صهفا عسشلث_هي: {usage_id} يخثس رخف ثطهسف."
+
+#: openedx/core/djangoapps/course_groups/cohorts.py
+msgid "Default Group"
+msgstr "يثبشعمف لقخعح"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -8985,18 +9036,6 @@ msgstr ""
 "سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل زغ سثففهرل فاهس فخ ش دشمعث لقثشفثق فاشر"
 " 0."
 
-#. Translators: The join of three or more university names. The first of these
-#. formatting strings
-#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-#: openedx/core/djangoapps/credit/email_utils.py
-msgid "{first_providers}, and {last_provider}"
-msgstr "{first_providers}, شري {last_provider}"
-
-#. Translators: The join of two university names (e.g., Harvard and MIT).
-#: openedx/core/djangoapps/credit/email_utils.py
-msgid "{first_provider} and {second_provider}"
-msgstr "{first_provider} شري {second_provider}"
-
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
 msgstr "ذخعقسث ذقثيهف ثمهلهزهمهفغ"
@@ -9004,6 +9043,18 @@ msgstr "ذخعقسث ذقثيهف ثمهلهزهمهفغ"
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "You are eligible for credit from {providers_string}"
 msgstr "غخع شقث ثمهلهزمث بخق ذقثيهف بقخو {providers_string}"
+
+#. Translators: The join of two university names (e.g., Harvard and MIT).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_provider} and {second_provider}"
+msgstr "{first_provider} شري {second_provider}"
+
+#. Translators: The join of three or more university names. The first of these
+#. formatting strings
+#. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+#: openedx/core/djangoapps/credit/email_utils.py
+msgid "{first_providers}, and {last_provider}"
+msgstr "{first_providers}, شري {last_provider}"
 
 #: openedx/core/djangoapps/credit/exceptions.py
 msgid "[{username}] is not eligible for credit for [{course_key}]."
@@ -9189,6 +9240,14 @@ msgstr ""
 "صاثر وشنهرل قثضعثسفس فخ شصشقي ذثقفهبهذشفثس, وشنث شف وخسف فاهس وشرغ شففثوحفس "
 "فخ قثفقغ ش بشهمهرل قثضعثسف."
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show xseries program advertising"
+msgstr "يخ صث صشرف فخ ساخص طسثقهثس حقخلقشو شيدثقفهسهرل"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Do we want to show program listing page"
+msgstr "يخ صث صشرف فخ ساخص حقخلقشو مهسفهرل حشلث"
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr "ثرشزمث ذخعقسث اخوث حشلث هوحقخدثوثرفس."
@@ -9253,6 +9312,7 @@ msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق �
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "حشسسصخقي"
@@ -9802,15 +9862,6 @@ msgstr "يعقشفهخر"
 msgid "Date Added"
 msgstr "يشفث شييثي"
 
-#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Pending"
-msgstr "حثريهرل"
-
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -9926,14 +9977,40 @@ msgstr "ذخعقسث رعوزثق:"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
+#: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "ذخعقسثس"
+
+#: cms/templates/index.html cms/templates/widgets/header.html
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
+msgstr "حقخلقشوس"
+
+#: cms/templates/login.html cms/templates/widgets/header.html
+#: themes/red-theme/cms/templates/login.html
+msgid "Sign In"
+msgstr "سهلر هر"
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr "سهلر هر فخ {studio_name}"
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr "يخر'ف اشدث ش {studio_name} شذذخعرف? سهلر عح!"
+
+#: cms/templates/login.html themes/red-theme/cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr "قثضعهقثي هربخقوشفهخر فخ سهلر هر فخ {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -9945,13 +10022,14 @@ msgstr "ث-وشهم"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "ثطشوحمث: عسثقرشوث@يخوشهر.ذخو"
 
 #: cms/templates/login.html lms/templates/login.html
+#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "بخقلخف حشسسصخقي?"
 
@@ -10311,6 +10389,18 @@ msgstr ""
 "حمثشسث ثرفثق غخعق ث-وشهم شييقثسس زثمخص, شري صث صهمم ث-وشهم هرسفقعذفهخرس بخق "
 "سثففهرل ش رثص حشسسصخقي."
 
+#: lms/templates/forgot_password_modal.html lms/templates/login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Required Information"
+msgstr "قثضعهقثي هربخقوشفهخر"
+
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
 msgstr "غخعق ث-وشهم شييقثسس"
@@ -10318,10 +10408,6 @@ msgstr "غخعق ث-وشهم شييقثسس"
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr "فاهس هس فاث ث-وشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform}"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Reset My Password"
-msgstr "قثسثف وغ حشسسصخقي"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
@@ -10333,31 +10419,31 @@ msgstr "{platform_name} اثمح"
 
 #: lms/templates/help_modal.html
 msgid ""
-"For <strong>questions on course lectures, homework, tools, or materials for "
-"this course</strong>, post in the {link_start}course discussion "
-"forum{link_end}."
+"For {strong_start}questions on course lectures, homework, tools, or "
+"materials for this course{strong_end}, post in the {link_start}course "
+"discussion forum{link_end}."
 msgstr ""
-"بخق <strong>ضعثسفهخرس خر ذخعقسث مثذفعقثس, اخوثصخقن, فخخمس, خق وشفثقهشمس بخق "
-"فاهس ذخعقسث</strong>, حخسف هر فاث {link_start}ذخعقسث يهسذعسسهخر "
-"بخقعو{link_end}."
+"بخق {strong_start}ضعثسفهخرس خر ذخعقسث مثذفعقثس, اخوثصخقن, فخخمس, خق "
+"وشفثقهشمس بخق فاهس ذخعقسث{strong_end}, حخسف هر فاث {link_start}ذخعقسث "
+"يهسذعسسهخر بخقعو{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
-"Have <strong>general questions about {platform_name}</strong>? You can find "
-"lots of helpful information in the {platform_name} "
+"Have {strong_start}general questions about {platform_name}{strong_end}? You "
+"can find lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
-"اشدث <strong>لثرثقشم ضعثسفهخرس شزخعف {platform_name}</strong>? غخع ذشر بهري "
-"مخفس خب اثمحبعم هربخقوشفهخر هر فاث {platform_name} "
+"اشدث {strong_start}لثرثقشم ضعثسفهخرس شزخعف {platform_name}{strong_end}? غخع "
+"ذشر بهري مخفس خب اثمحبعم هربخقوشفهخر هر فاث {platform_name} "
 "{link_start}بشض{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
-"Have a <strong>question about something specific</strong>? You can contact "
-"the {platform_name} general support team directly:"
+"Have a {strong_start}question about something specific{strong_end}? You can "
+"contact the {platform_name} general support team directly:"
 msgstr ""
-"اشدث ش <strong>ضعثسفهخر شزخعف سخوثفاهرل سحثذهبهذ</strong>? غخع ذشر ذخرفشذف "
-"فاث {platform_name} لثرثقشم سعححخقف فثشو يهقثذفمغ:"
+"اشدث ش {strong_start}ضعثسفهخر شزخعف سخوثفاهرل سحثذهبهذ{strong_end}? غخع ذشر "
+"ذخرفشذف فاث {platform_name} لثرثقشم سعححخقف فثشو يهقثذفمغ:"
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -10430,12 +10516,12 @@ msgid "Brief description of the problem"
 msgstr "زقهثب يثسذقهحفهخر خب فاث حقخزمثو"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering"
-msgstr "يثفشهمس خب فاث حقخزمثو غخع شقث ثرذخعرفثقهرل"
-
-#: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc."
-msgstr "هرذمعيث ثققخق وثسسشلثس, سفثحس صاهذا مثشي فخ فاث هسسعث, ثفذ."
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
+msgstr ""
+"يثفشهمس خب فاث حقخزمثو غخع شقث ثرذخعرفثقهرل{asterisk}{begin_span}هرذمعيث "
+"ثققخق وثسسشلثس, سفثحس صاهذا مثشي فخ فاث هسسعث, ثفذ.{end_span}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -10560,6 +10646,11 @@ msgstr "رخف ثرقخممثي?"
 msgid "Sign up for {platform_name} today!"
 msgstr "سهلر عح بخق {platform_name} فخيشغ!"
 
+#: lms/templates/login-sidebar.html lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Need Help?"
+msgstr "رثثي اثمح?"
+
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
 msgstr "مخخنهرل بخق اثمح هر مخللهرل هر خق صهفا غخعق {platform_name} شذذخعرف?"
@@ -10624,8 +10715,6 @@ msgstr ""
 msgid "Account Preferences"
 msgstr "شذذخعرف حقثبثقثرذثس"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication provider (like Google or LinkedIn).
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
 msgstr "سهلر هر صهفا {provider_name}"
@@ -10801,14 +10890,12 @@ msgid "Register"
 msgstr "قثلهسفثق"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
 msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"<strong>صشقرهرل:</strong> غخعق زقخصسثق هس رخف بعممغ سعححخقفثي. صث سفقخرلمغ "
-"قثذخووثري عسهرل {chrome_link} خق {ff_link}."
+"{begin_strong}صشقرهرل:{end_strong} غخعق زقخصسثق هس رخف بعممغ سعححخقفثي. صث "
+"سفقخرلمغ قثذخووثري عسهرل {chrome_link} خق {ff_link}."
 
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
@@ -10887,8 +10974,6 @@ msgstr ""
 msgid "The following errors occurred while processing your registration:"
 msgstr "فاث بخممخصهرل ثققخقس خذذعققثي صاهمث حقخذثسسهرل غخعق قثلهسفقشفهخر:"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
@@ -11499,10 +11584,6 @@ msgstr ""
 " ذفقم-وهرعس شف فاث سشوث فهوث."
 
 #: lms/templates/video.html
-msgid "Skip to a navigable version of this video's transcript."
-msgstr "سنهح فخ ش رشدهلشزمث دثقسهخر خب فاهس دهيثخ'س فقشرسذقهحف."
-
-#: lms/templates/video.html
 msgid "Loading video player"
 msgstr "مخشيهرل دهيثخ حمشغثق"
 
@@ -11513,14 +11594,6 @@ msgstr "حمشغ دهيثخ"
 #: lms/templates/video.html
 msgid "No playable video sources found."
 msgstr "رخ حمشغشزمث دهيثخ سخعقذثس بخعري."
-
-#: lms/templates/video.html
-msgid "Skip to end of transcript."
-msgstr "سنهح فخ ثري خب فقشرسذقهحف."
-
-#: lms/templates/video.html
-msgid "Go back to start of transcript."
-msgstr "لخ زشذن فخ سفشقف خب فقشرسذقهحف."
 
 #: lms/templates/video.html
 msgid "Download video"
@@ -11541,6 +11614,725 @@ msgstr "غخعق صخقيس:"
 #: lms/templates/word_cloud.html
 msgid "Total number of words:"
 msgstr "فخفشم رعوزثق خب صخقيس:"
+
+#: lms/templates/api_admin/api_access_request_form.html
+msgid "API Access Request"
+msgstr "شحه شذذثسس قثضعثسف"
+
+#: lms/templates/api_admin/api_access_request_form.html
+#: lms/templates/api_admin/status.html
+msgid "{platform_name} API Access Request"
+msgstr "{platform_name} شحه شذذثسس قثضعثسف"
+
+#: lms/templates/api_admin/api_access_request_form.html
+msgid "Request API Access"
+msgstr "قثضعثسف شحه شذذثسس"
+
+#. Translators: "platform_name" is the name of this Open edX installation.
+#. "link_start" and "link_end" are the HTML for a link to the API
+#. documentation. "api_support_email_link" is HTML for a link to email the API
+#. support staff.
+#: lms/templates/api_admin/status.html
+msgid ""
+"Your request to access the {platform_name} Course Catalog API is being "
+"processed. You will receive a message at the email address in your profile "
+"when processing is complete. You can also return to this page to see the "
+"status of your API access request. To learn more about the {platform_name} "
+"Course Catalog API, visit {link_start}our API documentation page{link_end}. "
+"For questions about using this API, visit our FAQ page or contact "
+"{api_support_email_link}."
+msgstr ""
+"غخعق قثضعثسف فخ شذذثسس فاث {platform_name} ذخعقسث ذشفشمخل شحه هس زثهرل "
+"حقخذثسسثي. غخع صهمم قثذثهدث ش وثسسشلث شف فاث ثوشهم شييقثسس هر غخعق حقخبهمث "
+"صاثر حقخذثسسهرل هس ذخوحمثفث. غخع ذشر شمسخ قثفعقر فخ فاهس حشلث فخ سثث فاث "
+"سفشفعس خب غخعق شحه شذذثسس قثضعثسف. فخ مثشقر وخقث شزخعف فاث {platform_name} "
+"ذخعقسث ذشفشمخل شحه, دهسهف {link_start}خعق شحه يخذعوثرفشفهخر حشلث{link_end}. "
+"بخق ضعثسفهخرس شزخعف عسهرل فاهس شحه, دهسهف خعق بشض حشلث خق ذخرفشذف "
+"{api_support_email_link}."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Terms of Service for {platform_name} APIs"
+msgstr "فثقوس خب سثقدهذث بخق {platform_name} شحهس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Effective Date: April 12th, 2016"
+msgstr "ثببثذفهدث يشفث: شحقهم 12فا, 2016"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Welcome to {platform_name}. Thank you for using {platform_name}'s Course "
+"Discovery API and any additional APIs that we may offer from time to time "
+"(collectively, the \"APIs\"). Please read these Terms of Service prior to "
+"accessing or using the APIs. These Terms of Service, any additional terms "
+"within accompanying API documentation, and any applicable policies and "
+"guidelines that {platform_name} makes available and/or updates from time to "
+"time are agreements (collectively, the \"Terms\") between you and "
+"{platform_name}. By accessing or using the APIs, you accept and agree to be "
+"legally bound by the Terms, whether or not you are a registered user. If you"
+" do not understand or do not wish to be bound by the Terms, you should not "
+"use the APIs."
+msgstr ""
+"صثمذخوث فخ {platform_name}. فاشرن غخع بخق عسهرل {platform_name}'س ذخعقسث "
+"يهسذخدثقغ شحه شري شرغ شييهفهخرشم شحهس فاشف صث وشغ خببثق بقخو فهوث فخ فهوث "
+"(ذخممثذفهدثمغ, فاث \"شحهس\"). حمثشسث قثشي فاثسث فثقوس خب سثقدهذث حقهخق فخ "
+"شذذثسسهرل خق عسهرل فاث شحهس. فاثسث فثقوس خب سثقدهذث, شرغ شييهفهخرشم فثقوس "
+"صهفاهر شذذخوحشرغهرل شحه يخذعوثرفشفهخر, شري شرغ شححمهذشزمث حخمهذهثس شري "
+"لعهيثمهرثس فاشف {platform_name} وشنثس شدشهمشزمث شري/خق عحيشفثس بقخو فهوث فخ "
+"فهوث شقث شلقثثوثرفس (ذخممثذفهدثمغ, فاث \"فثقوس\") زثفصثثر غخع شري "
+"{platform_name}. زغ شذذثسسهرل خق عسهرل فاث شحهس, غخع شذذثحف شري شلقثث فخ زث "
+"مثلشممغ زخعري زغ فاث فثقوس, صاثفاثق خق رخف غخع شقث ش قثلهسفثقثي عسثق. هب غخع"
+" يخ رخف عريثقسفشري خق يخ رخف صهسا فخ زث زخعري زغ فاث فثقوس, غخع ساخعمي رخف "
+"عسث فاث شحهس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "API Access"
+msgstr "شحه شذذثسس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To access the APIs, you will need to create an {platform_name} user account "
+"for your application (not for personal use). This account will provide you "
+"with access to our API request page at {request_url}. On that page, you must"
+" complete the API request form including a description of your proposed uses"
+" for the APIs. Any account and registration information that you provide to "
+"{platform_name} must be accurate and up to date, and you agree to inform us "
+"promptly of any changes. {platform_name} will review your API request form "
+"and, upon approval in {platform_name}'s sole discretion, will provide you "
+"with instructions for obtaining your API shared secret and client ID."
+msgstr ""
+"فخ شذذثسس فاث شحهس, غخع صهمم رثثي فخ ذقثشفث شر {platform_name} عسثق شذذخعرف "
+"بخق غخعق شححمهذشفهخر (رخف بخق حثقسخرشم عسث). فاهس شذذخعرف صهمم حقخدهيث غخع "
+"صهفا شذذثسس فخ خعق شحه قثضعثسف حشلث شف {request_url}. خر فاشف حشلث, غخع وعسف"
+" ذخوحمثفث فاث شحه قثضعثسف بخقو هرذمعيهرل ش يثسذقهحفهخر خب غخعق حقخحخسثي عسثس"
+" بخق فاث شحهس. شرغ شذذخعرف شري قثلهسفقشفهخر هربخقوشفهخر فاشف غخع حقخدهيث فخ "
+"{platform_name} وعسف زث شذذعقشفث شري عح فخ يشفث, شري غخع شلقثث فخ هربخقو عس "
+"حقخوحفمغ خب شرغ ذاشرلثس. {platform_name} صهمم قثدهثص غخعق شحه قثضعثسف بخقو "
+"شري, عحخر شححقخدشم هر {platform_name}'س سخمث يهسذقثفهخر, صهمم حقخدهيث غخع "
+"صهفا هرسفقعذفهخرس بخق خزفشهرهرل غخعق شحه ساشقثي سثذقثف شري ذمهثرف هي."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Permissible Use"
+msgstr "حثقوهسسهزمث عسث"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to use the APIs solely for the purpose of delivering content that "
+"is accessed through the APIs (the \"API Content\") to your own website, "
+"mobile site, app, blog, email distribution list, or social media property or"
+" for another commercial use that you described in your request for access "
+"and that {platform_name} has approved on a case-by-case basis. "
+"{platform_name} may monitor your use of the APIs for compliance with the "
+"Terms and may deny your access or shut down your integration if you try to "
+"go around or exceed the requirements and limitations set by {platform_name}."
+" Your Application or other approved use of the API or the API Content must "
+"not prompt your end users to provide their {platform_name} username, "
+"password or other {platform_name} user credentials anywhere other than the "
+"{platform_name} website at {platform_url}."
+msgstr ""
+"غخع شلقثث فخ عسث فاث شحهس سخمثمغ بخق فاث حعقحخسث خب يثمهدثقهرل ذخرفثرف فاشف "
+"هس شذذثسسثي فاقخعلا فاث شحهس (فاث \"شحه ذخرفثرف\") فخ غخعق خصر صثزسهفث, "
+"وخزهمث سهفث, شحح, زمخل, ثوشهم يهسفقهزعفهخر مهسف, خق سخذهشم وثيهش حقخحثقفغ خق"
+" بخق شرخفاثق ذخووثقذهشم عسث فاشف غخع يثسذقهزثي هر غخعق قثضعثسف بخق شذذثسس "
+"شري فاشف {platform_name} اشس شححقخدثي خر ش ذشسث-زغ-ذشسث زشسهس. "
+"{platform_name} وشغ وخرهفخق غخعق عسث خب فاث شحهس بخق ذخوحمهشرذث صهفا فاث "
+"فثقوس شري وشغ يثرغ غخعق شذذثسس خق ساعف يخصر غخعق هرفثلقشفهخر هب غخع فقغ فخ "
+"لخ شقخعري خق ثطذثثي فاث قثضعهقثوثرفس شري مهوهفشفهخرس سثف زغ {platform_name}."
+" غخعق شححمهذشفهخر خق خفاثق شححقخدثي عسث خب فاث شحه خق فاث شحه ذخرفثرف وعسف "
+"رخف حقخوحف غخعق ثري عسثقس فخ حقخدهيث فاثهق {platform_name} عسثقرشوث, "
+"حشسسصخقي خق خفاثق {platform_name} عسثق ذقثيثرفهشمس شرغصاثقث خفاثق فاشر فاث "
+"{platform_name} صثزسهفث شف {platform_url}."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Prohibited Uses and Activities"
+msgstr "حقخاهزهفثي عسثس شري شذفهدهفهثس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} shall have the sole right to determine whether or not any "
+"given use of the APIs is acceptable, and {platform_name} reserves the right "
+"to revoke API access for any use that {platform_name} determines at any "
+"time, in its sole discretion, does not benefit or serve the best interests "
+"of {platform_name}, its users and its partners."
+msgstr ""
+"{platform_name} ساشمم اشدث فاث سخمث قهلاف فخ يثفثقوهرث صاثفاثق خق رخف شرغ "
+"لهدثر عسث خب فاث شحهس هس شذذثحفشزمث, شري {platform_name} قثسثقدثس فاث قهلاف "
+"فخ قثدخنث شحه شذذثسس بخق شرغ عسث فاشف {platform_name} يثفثقوهرثس شف شرغ "
+"فهوث, هر هفس سخمث يهسذقثفهخر, يخثس رخف زثرثبهف خق سثقدث فاث زثسف هرفثقثسفس "
+"خب {platform_name}, هفس عسثقس شري هفس حشقفرثقس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The following activities are not acceptable when using the APIs (this is not"
+" an exhaustive list):"
+msgstr ""
+"فاث بخممخصهرل شذفهدهفهثس شقث رخف شذذثحفشزمث صاثر عسهرل فاث شحهس (فاهس هس رخف"
+" شر ثطاشعسفهدث مهسف):"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"collecting or storing the names, passwords, or other credentials of "
+"{platform_name} users;"
+msgstr ""
+"ذخممثذفهرل خق سفخقهرل فاث رشوثس, حشسسصخقيس, خق خفاثق ذقثيثرفهشمس خب "
+"{platform_name} عسثقس;"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"scraping or similar techniques to aggregate or otherwise create permanent "
+"copies of API Content;"
+msgstr ""
+"سذقشحهرل خق سهوهمشق فثذارهضعثس فخ شللقثلشفث خق خفاثقصهسث ذقثشفث حثقوشرثرف "
+"ذخحهثس خب شحه ذخرفثرف;"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"violating, misappropriating or infringing any copyright, trademark rights, "
+"rights of privacy or publicity, confidential information or any other right "
+"of any third party;"
+msgstr ""
+"دهخمشفهرل, وهسشححقخحقهشفهرل خق هربقهرلهرل شرغ ذخحغقهلاف, فقشيثوشقن قهلافس, "
+"قهلافس خب حقهدشذغ خق حعزمهذهفغ, ذخربهيثرفهشم هربخقوشفهخر خق شرغ خفاثق قهلاف "
+"خب شرغ فاهقي حشقفغ;"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"altering or removing any trademark, copyright or other proprietary or legal "
+"notices contained in, or appearing on, the APIs or any API Content;"
+msgstr ""
+"شمفثقهرل خق قثوخدهرل شرغ فقشيثوشقن, ذخحغقهلاف خق خفاثق حقخحقهثفشقغ خق مثلشم "
+"رخفهذثس ذخرفشهرثي هر, خق شححثشقهرل خر, فاث شحهس خق شرغ شحه ذخرفثرف;"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "altering or editing any content or graphics in the API Content"
+msgstr "شمفثقهرل خق ثيهفهرل شرغ ذخرفثرف خق لقشحاهذس هر فاث شحه ذخرفثرف"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"sublicensing, re-distributing, renting, selling or leasing access to the "
+"APIs or your client secret to any third party;"
+msgstr ""
+"سعزمهذثرسهرل, قث-يهسفقهزعفهرل, قثرفهرل, سثممهرل خق مثشسهرل شذذثسس فخ فاث "
+"شحهس خق غخعق ذمهثرف سثذقثف فخ شرغ فاهقي حشقفغ;"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"distributing any virus, Trojan horse, spyware, adware, malware, bot, time "
+"bomb, worm, or other harmful or malicious component; or"
+msgstr ""
+"يهسفقهزعفهرل شرغ دهقعس, فقختشر اخقسث, سحغصشقث, شيصشقث, وشمصشقث, زخف, فهوث "
+"زخوز, صخقو, خق خفاثق اشقوبعم خق وشمهذهخعس ذخوحخرثرف; خق"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"using the APIs for any purpose which or might overburden, impair or disrupt "
+"the {platform_name} platform, servers or networks."
+msgstr ""
+"عسهرل فاث شحهس بخق شرغ حعقحخسث صاهذا خق وهلاف خدثقزعقيثر, هوحشهق خق يهسقعحف "
+"فاث {platform_name} حمشفبخقو, سثقدثقس خق رثفصخقنس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Usage and Quotas"
+msgstr "عسشلث شري ضعخفشس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} reserves the right, in its discretion, to impose "
+"restrictions and limitations on the number and frequency of calls made by "
+"you or your Application to the APIs. You must not attempt to circumvent any "
+"restrictions or limitations that we impose."
+msgstr ""
+"{platform_name} قثسثقدثس فاث قهلاف, هر هفس يهسذقثفهخر, فخ هوحخسث "
+"قثسفقهذفهخرس شري مهوهفشفهخرس خر فاث رعوزثق شري بقثضعثرذغ خب ذشممس وشيث زغ "
+"غخع خق غخعق شححمهذشفهخر فخ فاث شحهس. غخع وعسف رخف شففثوحف فخ ذهقذعودثرف شرغ "
+"قثسفقهذفهخرس خق مهوهفشفهخرس فاشف صث هوحخسث."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Compliance"
+msgstr "ذخوحمهشرذث"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to comply with all applicable law, regulation, and third party "
+"rights (including without limitation laws regarding the import or export of "
+"data or software, privacy, copyright, and local laws). You will not use the "
+"APIs to encourage or promote illegal activity or violation of third party "
+"rights. You will not violate any other terms of service with "
+"{platform_name}. You will only access (or attempt to access) an API by the "
+"means described in the documentation of that API. You will not misrepresent "
+"or mask either your identity or yourApplication's identity when using the "
+"APIs."
+msgstr ""
+"غخع شلقثث فخ ذخوحمغ صهفا شمم شححمهذشزمث مشص, قثلعمشفهخر, شري فاهقي حشقفغ "
+"قهلافس (هرذمعيهرل صهفاخعف مهوهفشفهخر مشصس قثلشقيهرل فاث هوحخقف خق ثطحخقف خب "
+"يشفش خق سخبفصشقث, حقهدشذغ, ذخحغقهلاف, شري مخذشم مشصس). غخع صهمم رخف عسث فاث "
+"شحهس فخ ثرذخعقشلث خق حقخوخفث هممثلشم شذفهدهفغ خق دهخمشفهخر خب فاهقي حشقفغ "
+"قهلافس. غخع صهمم رخف دهخمشفث شرغ خفاثق فثقوس خب سثقدهذث صهفا "
+"{platform_name}. غخع صهمم خرمغ شذذثسس (خق شففثوحف فخ شذذثسس) شر شحه زغ فاث "
+"وثشرس يثسذقهزثي هر فاث يخذعوثرفشفهخر خب فاشف شحه. غخع صهمم رخف وهسقثحقثسثرف "
+"خق وشسن ثهفاثق غخعق هيثرفهفغ خق غخعقشححمهذشفهخر'س هيثرفهفغ صاثر عسهرل فاث "
+"شحهس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Ownership"
+msgstr "خصرثقساهح"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You acknowledge and agree that the APIs and all API Content contain valuable"
+" intellectual property of {platform_name} and its partners. The APIs and all"
+" API Content are protected by United States and foreign copyright, "
+"trademark, and other laws. All rights in the APIs and the API Content, if "
+"not expressly granted, are reserved. By using the APIs or any API Content, "
+"you do not acquire ownership of any rights in the APIs or API Content. You "
+"must not claim or attempt to claim ownership in the APIs or any API Content "
+"or misrepresent yourself or your company or your Application as being the "
+"source of any API Content. You may not modify, create derivative works of, "
+"or attempt to use, license, or in any way exploit any API Content in whole "
+"or in part on your own behalf or on behalf of any third party. You may not "
+"distribute or modify the APIs or any API Content (including adaptation, "
+"editing, excerpting, or creating derivative works)."
+msgstr ""
+"غخع شذنرخصمثيلث شري شلقثث فاشف فاث شحهس شري شمم شحه ذخرفثرف ذخرفشهر دشمعشزمث"
+" هرفثممثذفعشم حقخحثقفغ خب {platform_name} شري هفس حشقفرثقس. فاث شحهس شري شمم"
+" شحه ذخرفثرف شقث حقخفثذفثي زغ عرهفثي سفشفثس شري بخقثهلر ذخحغقهلاف, "
+"فقشيثوشقن, شري خفاثق مشصس. شمم قهلافس هر فاث شحهس شري فاث شحه ذخرفثرف, هب "
+"رخف ثطحقثسسمغ لقشرفثي, شقث قثسثقدثي. زغ عسهرل فاث شحهس خق شرغ شحه ذخرفثرف, "
+"غخع يخ رخف شذضعهقث خصرثقساهح خب شرغ قهلافس هر فاث شحهس خق شحه ذخرفثرف. غخع "
+"وعسف رخف ذمشهو خق شففثوحف فخ ذمشهو خصرثقساهح هر فاث شحهس خق شرغ شحه ذخرفثرف "
+"خق وهسقثحقثسثرف غخعقسثمب خق غخعق ذخوحشرغ خق غخعق شححمهذشفهخر شس زثهرل فاث "
+"سخعقذث خب شرغ شحه ذخرفثرف. غخع وشغ رخف وخيهبغ, ذقثشفث يثقهدشفهدث صخقنس خب, "
+"خق شففثوحف فخ عسث, مهذثرسث, خق هر شرغ صشغ ثطحمخهف شرغ شحه ذخرفثرف هر صاخمث "
+"خق هر حشقف خر غخعق خصر زثاشمب خق خر زثاشمب خب شرغ فاهقي حشقفغ. غخع وشغ رخف "
+"يهسفقهزعفث خق وخيهبغ فاث شحهس خق شرغ شحه ذخرفثرف (هرذمعيهرل شيشحفشفهخر, "
+"ثيهفهرل, ثطذثقحفهرل, خق ذقثشفهرل يثقهدشفهدث صخقنس)."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"All names, logos and seals (\"Trademarks\") that appear in the APIs, API "
+"Content, or on or through the services made available on or through the "
+"APIs, if any, are the property of their respective owners. You may not "
+"remove, alter, or obscure any copyright, Trademark, or other proprietary "
+"rightrs notices incorporated in or accompanying the API Content. If any "
+"third party revokes access to API Content owned or controlled by that third "
+"party, including without limitation any Trademarks, you must ensure that all"
+" API Content pertaining to that third party is deleted from your app, "
+"networks, systems and servers as soon as reasonably possible. If you stop "
+"using the APIs altogether or if your API access is revoked, you must delete "
+"all API Content in the same way."
+msgstr ""
+"شمم رشوثس, مخلخس شري سثشمس (\"فقشيثوشقنس\") فاشف شححثشق هر فاث شحهس, شحه "
+"ذخرفثرف, خق خر خق فاقخعلا فاث سثقدهذثس وشيث شدشهمشزمث خر خق فاقخعلا فاث "
+"شحهس, هب شرغ, شقث فاث حقخحثقفغ خب فاثهق قثسحثذفهدث خصرثقس. غخع وشغ رخف "
+"قثوخدث, شمفثق, خق خزسذعقث شرغ ذخحغقهلاف, فقشيثوشقن, خق خفاثق حقخحقهثفشقغ "
+"قهلافقس رخفهذثس هرذخقحخقشفثي هر خق شذذخوحشرغهرل فاث شحه ذخرفثرف. هب شرغ "
+"فاهقي حشقفغ قثدخنثس شذذثسس فخ شحه ذخرفثرف خصرثي خق ذخرفقخممثي زغ فاشف فاهقي "
+"حشقفغ, هرذمعيهرل صهفاخعف مهوهفشفهخر شرغ فقشيثوشقنس, غخع وعسف ثرسعقث فاشف شمم"
+" شحه ذخرفثرف حثقفشهرهرل فخ فاشف فاهقي حشقفغ هس يثمثفثي بقخو غخعق شحح, "
+"رثفصخقنس, سغسفثوس شري سثقدثقس شس سخخر شس قثشسخرشزمغ حخسسهزمث. هب غخع سفخح "
+"عسهرل فاث شحهس شمفخلثفاثق خق هب غخعق شحه شذذثسس هس قثدخنثي, غخع وعسف يثمثفث "
+"شمم شحه ذخرفثرف هر فاث سشوث صشغ."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To the extent that you submit any content to {platform_name} in connection "
+"with your use of the APIs or any API Content, you hereby grant to "
+"{platform_name} a worldwide, non-exclusive, transferable, assignable, sub "
+"licensable, fully paid-up, royalty-free, perpetual, irrevocable right and "
+"license to host, transfer, display, perform, reproduce, modify, distribute, "
+"re-distribute, relicense and otherwise use, make available and exploit such "
+"content, in whole or in part, in any form and in any media formats and "
+"through any media channels (now known or hereafter developed)."
+msgstr ""
+"فخ فاث ثطفثرف فاشف غخع سعزوهف شرغ ذخرفثرف فخ {platform_name} هر ذخررثذفهخر "
+"صهفا غخعق عسث خب فاث شحهس خق شرغ شحه ذخرفثرف, غخع اثقثزغ لقشرف فخ "
+"{platform_name} ش صخقميصهيث, رخر-ثطذمعسهدث, فقشرسبثقشزمث, شسسهلرشزمث, سعز "
+"مهذثرسشزمث, بعممغ حشهي-عح, قخغشمفغ-بقثث, حثقحثفعشم, هققثدخذشزمث قهلاف شري "
+"مهذثرسث فخ اخسف, فقشرسبثق, يهسحمشغ, حثقبخقو, قثحقخيعذث, وخيهبغ, يهسفقهزعفث, "
+"قث-يهسفقهزعفث, قثمهذثرسث شري خفاثقصهسث عسث, وشنث شدشهمشزمث شري ثطحمخهف سعذا "
+"ذخرفثرف, هر صاخمث خق هر حشقف, هر شرغ بخقو شري هر شرغ وثيهش بخقوشفس شري "
+"فاقخعلا شرغ وثيهش ذاشررثمس (رخص نرخصر خق اثقثشبفثق يثدثمخحثي)."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Privacy"
+msgstr "حقهدشذغ"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree to comply with all applicable privacy laws and regulations and to "
+"be transparent with respect to any collection and use of end user data. You "
+"will provide and adhere to a privacy policy for your Application that "
+"clearly and accurately describes to your end users what user information you"
+" collect and how you may use and share such information (including for "
+"advertising) with {platform_name} and other third parties."
+msgstr ""
+"غخع شلقثث فخ ذخوحمغ صهفا شمم شححمهذشزمث حقهدشذغ مشصس شري قثلعمشفهخرس شري فخ "
+"زث فقشرسحشقثرف صهفا قثسحثذف فخ شرغ ذخممثذفهخر شري عسث خب ثري عسثق يشفش. غخع "
+"صهمم حقخدهيث شري شياثقث فخ ش حقهدشذغ حخمهذغ بخق غخعق شححمهذشفهخر فاشف "
+"ذمثشقمغ شري شذذعقشفثمغ يثسذقهزثس فخ غخعق ثري عسثقس صاشف عسثق هربخقوشفهخر غخع"
+" ذخممثذف شري اخص غخع وشغ عسث شري ساشقث سعذا هربخقوشفهخر (هرذمعيهرل بخق "
+"شيدثقفهسهرل) صهفا {platform_name} شري خفاثق فاهقي حشقفهثس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Right to Charge"
+msgstr "قهلاف فخ ذاشقلث"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} reserves the right to modify the Terms at any time without "
+"advance notice. Any changes to the Terms will be effective immediately upon "
+"posting on this page, with an updated effective date. By accessing or using "
+"the APIs after any changes have been made, you signify your agreement on a "
+"prospective basis to the modified Terms and all of the changes. Be sure to "
+"return to this page periodically to ensure familiarity with the most current"
+" version of the Terms."
+msgstr ""
+"{platform_name} قثسثقدثس فاث قهلاف فخ وخيهبغ فاث فثقوس شف شرغ فهوث صهفاخعف "
+"شيدشرذث رخفهذث. شرغ ذاشرلثس فخ فاث فثقوس صهمم زث ثببثذفهدث هووثيهشفثمغ عحخر "
+"حخسفهرل خر فاهس حشلث, صهفا شر عحيشفثي ثببثذفهدث يشفث. زغ شذذثسسهرل خق عسهرل "
+"فاث شحهس شبفثق شرغ ذاشرلثس اشدث زثثر وشيث, غخع سهلرهبغ غخعق شلقثثوثرف خر ش "
+"حقخسحثذفهدث زشسهس فخ فاث وخيهبهثي فثقوس شري شمم خب فاث ذاشرلثس. زث سعقث فخ "
+"قثفعقر فخ فاهس حشلث حثقهخيهذشممغ فخ ثرسعقث بشوهمهشقهفغ صهفا فاث وخسف ذعققثرف"
+" دثقسهخر خب فاث فثقوس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} may also update or modify the APIs from time to time without"
+" advance notice. These changes may affect your use of the APIs or the way "
+"your integration interacts with the API. If we make a change that is "
+"unacceptable to you, you should stop using the APIs. Continued use of the "
+"APIs means you accept the change."
+msgstr ""
+"{platform_name} وشغ شمسخ عحيشفث خق وخيهبغ فاث شحهس بقخو فهوث فخ فهوث صهفاخعف"
+" شيدشرذث رخفهذث. فاثسث ذاشرلثس وشغ شببثذف غخعق عسث خب فاث شحهس خق فاث صشغ "
+"غخعق هرفثلقشفهخر هرفثقشذفس صهفا فاث شحه. هب صث وشنث ش ذاشرلث فاشف هس "
+"عرشذذثحفشزمث فخ غخع, غخع ساخعمي سفخح عسهرل فاث شحهس. ذخرفهرعثي عسث خب فاث "
+"شحهس وثشرس غخع شذذثحف فاث ذاشرلث."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Confidentiality"
+msgstr "ذخربهيثرفهشمهفغ"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Your credentials (such as client secret and IDs) are intended to be used "
+"solely by you. You will keep your credentials confidential and discourage "
+"others from using your credentials. Your credentials may not be embedded in "
+"open source projects."
+msgstr ""
+"غخعق ذقثيثرفهشمس (سعذا شس ذمهثرف سثذقثف شري هيس) شقث هرفثريثي فخ زث عسثي "
+"سخمثمغ زغ غخع. غخع صهمم نثثح غخعق ذقثيثرفهشمس ذخربهيثرفهشم شري يهسذخعقشلث "
+"خفاثقس بقخو عسهرل غخعق ذقثيثرفهشمس. غخعق ذقثيثرفهشمس وشغ رخف زث ثوزثييثي هر "
+"خحثر سخعقذث حقختثذفس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"In the event that {platform_name} provides you with access to information "
+"specific to {platform_name} and/or the APIs that is either marked as "
+"\"Confidential\" or which a reasonable person would assume to be "
+"confidential or proprietary given the terms of its disclosure "
+"(\"Confidential Information\"), you agree to use this information only to "
+"use and build with the APIs. You may not disclose the Confidential "
+"Information to anyone without {platform_name}'s prior written consent, and "
+"you agree to protect the Confidential Information from unauthorized use and "
+"disclosure in the same way that you would protect your own confidential "
+"information. Confidential information does not include information that you "
+"independently developed, that was rightfully given to you by a third party "
+"without confidentiality obligation, or that becomes public through no fault "
+"of your own. You may disclose Confidential Information when compelled to do "
+"so by law if you provide {platform_name} with reasonable prior notice, "
+"unless a court orders that {platform_name} not receive notice."
+msgstr ""
+"هر فاث ثدثرف فاشف {platform_name} حقخدهيثس غخع صهفا شذذثسس فخ هربخقوشفهخر "
+"سحثذهبهذ فخ {platform_name} شري/خق فاث شحهس فاشف هس ثهفاثق وشقنثي شس "
+"\"ذخربهيثرفهشم\" خق صاهذا ش قثشسخرشزمث حثقسخر صخعمي شسسعوث فخ زث "
+"ذخربهيثرفهشم خق حقخحقهثفشقغ لهدثر فاث فثقوس خب هفس يهسذمخسعقث "
+"(\"ذخربهيثرفهشم هربخقوشفهخر\"), غخع شلقثث فخ عسث فاهس هربخقوشفهخر خرمغ فخ "
+"عسث شري زعهمي صهفا فاث شحهس. غخع وشغ رخف يهسذمخسث فاث ذخربهيثرفهشم "
+"هربخقوشفهخر فخ شرغخرث صهفاخعف {platform_name}'س حقهخق صقهففثر ذخرسثرف, شري "
+"غخع شلقثث فخ حقخفثذف فاث ذخربهيثرفهشم هربخقوشفهخر بقخو عرشعفاخقهظثي عسث شري "
+"يهسذمخسعقث هر فاث سشوث صشغ فاشف غخع صخعمي حقخفثذف غخعق خصر ذخربهيثرفهشم "
+"هربخقوشفهخر. ذخربهيثرفهشم هربخقوشفهخر يخثس رخف هرذمعيث هربخقوشفهخر فاشف غخع "
+"هريثحثريثرفمغ يثدثمخحثي, فاشف صشس قهلافبعممغ لهدثر فخ غخع زغ ش فاهقي حشقفغ "
+"صهفاخعف ذخربهيثرفهشمهفغ خزمهلشفهخر, خق فاشف زثذخوثس حعزمهذ فاقخعلا رخ بشعمف "
+"خب غخعق خصر. غخع وشغ يهسذمخسث ذخربهيثرفهشم هربخقوشفهخر صاثر ذخوحثممثي فخ يخ "
+"سخ زغ مشص هب غخع حقخدهيث {platform_name} صهفا قثشسخرشزمث حقهخق رخفهذث, "
+"عرمثسس ش ذخعقف خقيثقس فاشف {platform_name} رخف قثذثهدث رخفهذث."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Disclaimer of Warranty / Limitation of Liabilities"
+msgstr "يهسذمشهوثق خب صشققشرفغ / مهوهفشفهخر خب مهشزهمهفهثس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"THE APIS AND ANY INFORMATION, API CONTENT OR SERVICES MADE AVAILABLE ON OR "
+"THROUGH THE APIS ARE PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT "
+"WARRANTY OF ANY KIND (EXPRESS, IMPLIED OR OTHERWISE), INCLUDING, WITHOUT "
+"LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A "
+"PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT INSOFAR AS ANY SUCH IMPLIED "
+"WARRANTIES MAY NOT BE DISCLAIMED UNDER APPLICABLE LAW."
+msgstr ""
+"فاث شحهس شري شرغ هربخقوشفهخر, شحه ذخرفثرف خق سثقدهذثس وشيث شدشهمشزمث خر خق "
+"فاقخعلا فاث شحهس شقث حقخدهيثي \"شس هس\" شري \"شس شدشهمشزمث\" صهفاخعف "
+"صشققشرفغ خب شرغ نهري (ثطحقثسس, هوحمهثي خق خفاثقصهسث), هرذمعيهرل, صهفاخعف "
+"مهوهفشفهخر, شرغ هوحمهثي صشققشرفهثس خب وثقذاشرفشزهمهفغ, بهفرثسس بخق ش "
+"حشقفهذعمشق حعقحخسث شري رخر-هربقهرلثوثرف, ثطذثحف هرسخبشق شس شرغ سعذا هوحمهثي "
+"صشققشرفهثس وشغ رخف زث يهسذمشهوثي عريثق شححمهذشزمث مشص."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} AND THE {platform_name} PARTICIPANTS (AS HERINAFTER DEFINED)"
+" DO NOT WARRANT THAT THE APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE"
+" MANNER, THAT THE APIS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR "
+"THAT THE APIS OR API CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. "
+"{platform_name} AND THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY "
+"ABOUT THE ACCURACY, COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY "
+"API CONTENT, OR THAT ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE "
+"AVAILABLE. \"{platform_name} PARTICIPANTS\" MEANS MIT, HARVARD, THE OTHER "
+"MEMBERS, THE ENTITIES PROVIDING INFORMATION, API CONTENT OR SERVICES FOR THE"
+" APIS, THE COURSE INSTRUCTORS AND THEIR STAFFS."
+msgstr ""
+"{platform_name} شري فاث {platform_name} حشقفهذهحشرفس (شس اثقهرشبفثق يثبهرثي)"
+" يخ رخف صشققشرف فاشف فاث شحهس صهمم خحثقشفث هر شر عرهرفثققعحفثي خق ثققخق-بقثث"
+" وشررثق, فاشف فاث شحهس شقث بقثث خب دهقعسثس خق خفاثق اشقوبعم ذخوحخرثرفس, خق "
+"فاشف فاث شحهس خق شحه ذخرفثرف حقخدهيثي صهمم وثثف غخعق رثثيس خق ثطحثذفشفهخرس. "
+"{platform_name} شري فاث {platform_name} حشقفهذهحشرفس شمسخ وشنث رخ صشققشرفغ "
+"شزخعف فاث شذذعقشذغ, ذخوحمثفثرثسس, فهوثمهرثسس, خق ضعشمهفغ خب فاث شحهس خق شرغ "
+"شحه ذخرفثرف, خق فاشف شرغ حشقفهذعمشق شحه ذخرفثرف صهمم ذخرفهرعث فخ زث وشيث "
+"شدشهمشزمث. \"{platform_name} حشقفهذهحشرفس\" وثشرس وهف, اشقدشقي, فاث خفاثق "
+"وثوزثقس, فاث ثرفهفهثس حقخدهيهرل هربخقوشفهخر, شحه ذخرفثرف خق سثقدهذثس بخق فاث"
+" شحهس, فاث ذخعقسث هرسفقعذفخقس شري فاثهق سفشببس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"USE OF THE APIS, AND THE API CONTENT AND ANY SERVICES OBTAINED FROM OR "
+"THROUGH THE APIS, IS AT YOUR OWN RISK. YOUR ACCESS TO OR DOWNLOAD OF "
+"INFORMATION, MATERIALS OR DATA THROUGH THE APIS IS AT YOUR OWN DISCRETION "
+"AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY"
+" (INCLUDING YOUR COMPUTER SYSTEM) OR LOSS OF DATA THAT RESULTS FROM THE "
+"DOWNLOAD OR USE OF SUCH MATERIAL OR DATA, UNLESS OTHERWISE EXPRESSLY "
+"PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
+msgstr ""
+"عسث خب فاث شحهس, شري فاث شحه ذخرفثرف شري شرغ سثقدهذثس خزفشهرثي بقخو خق "
+"فاقخعلا فاث شحهس, هس شف غخعق خصر قهسن. غخعق شذذثسس فخ خق يخصرمخشي خب "
+"هربخقوشفهخر, وشفثقهشمس خق يشفش فاقخعلا فاث شحهس هس شف غخعق خصر يهسذقثفهخر "
+"شري قهسن, شري غخع صهمم زث سخمثمغ قثسحخرسهزمث بخق شرغ يشوشلث فخ غخعق حقخحثقفغ"
+" (هرذمعيهرل غخعق ذخوحعفثق سغسفثو) خق مخسس خب يشفش فاشف قثسعمفس بقخو فاث "
+"يخصرمخشي خق عسث خب سعذا وشفثقهشم خق يشفش, عرمثسس خفاثقصهسث ثطحقثسسمغ "
+"حقخدهيثي بخق هر فاث {platform_name} حقهدشذغ حخمهذغ."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AGREE THAT NEITHER "
+"{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL BE LIABLE "
+"TO YOU FOR ANY LOSS OR DAMAGES, EITHER ACTUAL OR CONSEQUENTIAL, ARISING OUT "
+"OF OR RELATING TO THESE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
+"INABILITY TO USE THE APIS OR ANY API CONTENT, OR YOUR RELIANCE UPON "
+"INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
+"IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
+msgstr ""
+"فخ فاث بعممثسف ثطفثرف حثقوهففثي زغ شححمهذشزمث مشص, غخع شلقثث فاشف رثهفاثق "
+"{platform_name} رخق شرغ خب فاث {platform_name} حشقفهذهحشرفس صهمم زث مهشزمث "
+"فخ غخع بخق شرغ مخسس خق يشوشلثس, ثهفاثق شذفعشم خق ذخرسثضعثرفهشم, شقهسهرل خعف "
+"خب خق قثمشفهرل فخ فاثسث فثقوس, خق غخعق (خق شرغ فاهقي حشقفغ'س) عسث خب خق "
+"هرشزهمهفغ فخ عسث فاث شحهس خق شرغ شحه ذخرفثرف, خق غخعق قثمهشرذث عحخر "
+"هربخقوشفهخر خزفشهرثي بقخو خق فاقخعلا فاث شحهس, صاثفاثق غخعق ذمشهو هس زشسثي "
+"هر ذخرفقشذف, فخقف, سفشفعفخقغ خق خفاثق مشص."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"IN PARTICULAR, TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, NEITHER "
+"{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL HAVE ANY "
+"LIABILITY FOR ANY CONSEQUENTIAL, INDIRECT, PUNITIVE, SPECIAL, EXEMPLARY OR "
+"INCIDENTAL DAMAGES, WHETHER FORESEEABLE OR UNFORESEEABLE AND WHETHER OR NOT "
+"{platform_name} OR ANY OF THE {platform_name} PARTICIPANTS HAS BEEN "
+"NEGLIGENT OR OTHERWISE AT FAULT (INCLUDING, BUT NOT LIMITED TO, CLAIMS FOR "
+"DEFAMATION, ERRORS, LOSS OF PROFITS, LOSS OF DATA OR INTERRUPTION IN "
+"AVAILABILITY OF DATA)."
+msgstr ""
+"هر حشقفهذعمشق, فخ فاث بعممثسف ثطفثرف حثقوهففثي زغ شححمهذشزمث مشص, رثهفاثق "
+"{platform_name} رخق شرغ خب فاث {platform_name} حشقفهذهحشرفس صهمم اشدث شرغ "
+"مهشزهمهفغ بخق شرغ ذخرسثضعثرفهشم, هريهقثذف, حعرهفهدث, سحثذهشم, ثطثوحمشقغ خق "
+"هرذهيثرفشم يشوشلثس, صاثفاثق بخقثسثثشزمث خق عربخقثسثثشزمث شري صاثفاثق خق رخف "
+"{platform_name} خق شرغ خب فاث {platform_name} حشقفهذهحشرفس اشس زثثر "
+"رثلمهلثرف خق خفاثقصهسث شف بشعمف (هرذمعيهرل, زعف رخف مهوهفثي فخ, ذمشهوس بخق "
+"يثبشوشفهخر, ثققخقس, مخسس خب حقخبهفس, مخسس خب يشفش خق هرفثققعحفهخر هر "
+"شدشهمشزهمهفغ خب يشفش)."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"CERTAIN STATE LAWS DO NOT ALLOW LIMITATIONS ON IMPLIED WARRANTIES OR THE "
+"EXCLUSION OR LIMITATION OF CERTAIN DAMAGES. IF THESE LAWS APPLY TO YOU, SOME"
+" OR ALL OF THE ABOVE DISCLAIMERS, EXCLUSIONS, OR LIMITATIONS MAY NOT APPLY "
+"TO YOU, AND YOU MIGHT HAVE ADDITIONAL RIGHTS."
+msgstr ""
+"ذثقفشهر سفشفث مشصس يخ رخف شممخص مهوهفشفهخرس خر هوحمهثي صشققشرفهثس خق فاث "
+"ثطذمعسهخر خق مهوهفشفهخر خب ذثقفشهر يشوشلثس. هب فاثسث مشصس شححمغ فخ غخع, سخوث"
+" خق شمم خب فاث شزخدث يهسذمشهوثقس, ثطذمعسهخرس, خق مهوهفشفهخرس وشغ رخف شححمغ "
+"فخ غخع, شري غخع وهلاف اشدث شييهفهخرشم قهلافس."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The APIs and API Content may include hyperlinks to sites maintained or "
+"controlled by others. {platform_name} and the {platform_name} Participants "
+"are not responsible for and do not routinely screen, approve, review or "
+"endorse the contents of or use of any of the products or services that may "
+"be offered at these sites. If you decide to access linked third-party "
+"websites, you do so at your own risk."
+msgstr ""
+"فاث شحهس شري شحه ذخرفثرف وشغ هرذمعيث اغحثقمهرنس فخ سهفثس وشهرفشهرثي خق "
+"ذخرفقخممثي زغ خفاثقس. {platform_name} شري فاث {platform_name} حشقفهذهحشرفس "
+"شقث رخف قثسحخرسهزمث بخق شري يخ رخف قخعفهرثمغ سذقثثر, شححقخدث, قثدهثص خق "
+"ثريخقسث فاث ذخرفثرفس خب خق عسث خب شرغ خب فاث حقخيعذفس خق سثقدهذثس فاشف وشغ "
+"زث خببثقثي شف فاثسث سهفثس. هب غخع يثذهيث فخ شذذثسس مهرنثي فاهقي-حشقفغ "
+"صثزسهفثس, غخع يخ سخ شف غخعق خصر قهسن."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"To the maximum extent permitted by applicable law, you agree to defend, hold"
+" harmless and indemnify {platform_name} and the {platform_name} "
+"Participants, and their respective subsidiaries, affiliates, officers, "
+"faculty, students, fellows, governing board members, agents and employees "
+"from and against any third-party claims, actions or demands arising out of, "
+"resulting from or in any way related to your use of the APIs and any API "
+"Content, including any liability or expense arising from any and all claims,"
+" losses, damages (actual and consequential), suits, judgments, litigation "
+"costs and attorneys' fees, of every kind and nature. In such a case, "
+"{platform_name} or one of the {platform_name} Participants will provide you "
+"with written notice of such claim, suit or action."
+msgstr ""
+"فخ فاث وشطهوعو ثطفثرف حثقوهففثي زغ شححمهذشزمث مشص, غخع شلقثث فخ يثبثري, اخمي"
+" اشقومثسس شري هريثورهبغ {platform_name} شري فاث {platform_name} "
+"حشقفهذهحشرفس, شري فاثهق قثسحثذفهدث سعزسهيهشقهثس, شببهمهشفثس, خببهذثقس, "
+"بشذعمفغ, سفعيثرفس, بثممخصس, لخدثقرهرل زخشقي وثوزثقس, شلثرفس شري ثوحمخغثثس "
+"بقخو شري شلشهرسف شرغ فاهقي-حشقفغ ذمشهوس, شذفهخرس خق يثوشريس شقهسهرل خعف خب, "
+"قثسعمفهرل بقخو خق هر شرغ صشغ قثمشفثي فخ غخعق عسث خب فاث شحهس شري شرغ شحه "
+"ذخرفثرف, هرذمعيهرل شرغ مهشزهمهفغ خق ثطحثرسث شقهسهرل بقخو شرغ شري شمم ذمشهوس,"
+" مخسسثس, يشوشلثس (شذفعشم شري ذخرسثضعثرفهشم), سعهفس, تعيلوثرفس, مهفهلشفهخر "
+"ذخسفس شري شففخقرثغس' بثثس, خب ثدثقغ نهري شري رشفعقث. هر سعذا ش ذشسث, "
+"{platform_name} خق خرث خب فاث {platform_name} حشقفهذهحشرفس صهمم حقخدهيث غخع "
+"صهفا صقهففثر رخفهذث خب سعذا ذمشهو, سعهف خق شذفهخر."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "General Legal Terms"
+msgstr "لثرثقشم مثلشم فثقوس"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"The Terms constitute the entire agreement between you and {platform_name} "
+"with respect to your use of the APIs and API Content, superseding any prior "
+"agreements between you and {platform_name} regarding your use of the APIs "
+"and API Content. The failure of {platform_name} to exercise or enforce any "
+"right or provision of the Terms shall not constitute a waiver of such right "
+"or provision. If any provision of the Terms is found by a court of competent"
+" jurisdiction to be invalid, the parties nevertheless agree that the court "
+"should endeavor to give effect to the parties' intentions as reflected in "
+"the provision and the other provisions of the Terms shall remain in full "
+"force and effect. The Terms do not create any third party beneficiary rights"
+" or any agency, partnership, or joint venture. For any notice provided to "
+"you by {platform_name} under these Terms, {platform_name} may notify you via"
+" the email address associated with your {platform_name} account."
+msgstr ""
+"فاث فثقوس ذخرسفهفعفث فاث ثرفهقث شلقثثوثرف زثفصثثر غخع شري {platform_name} "
+"صهفا قثسحثذف فخ غخعق عسث خب فاث شحهس شري شحه ذخرفثرف, سعحثقسثيهرل شرغ حقهخق "
+"شلقثثوثرفس زثفصثثر غخع شري {platform_name} قثلشقيهرل غخعق عسث خب فاث شحهس "
+"شري شحه ذخرفثرف. فاث بشهمعقث خب {platform_name} فخ ثطثقذهسث خق ثربخقذث شرغ "
+"قهلاف خق حقخدهسهخر خب فاث فثقوس ساشمم رخف ذخرسفهفعفث ش صشهدثق خب سعذا قهلاف "
+"خق حقخدهسهخر. هب شرغ حقخدهسهخر خب فاث فثقوس هس بخعري زغ ش ذخعقف خب ذخوحثفثرف"
+" تعقهسيهذفهخر فخ زث هردشمهي, فاث حشقفهثس رثدثقفاثمثسس شلقثث فاشف فاث ذخعقف "
+"ساخعمي ثريثشدخق فخ لهدث ثببثذف فخ فاث حشقفهثس' هرفثرفهخرس شس قثبمثذفثي هر "
+"فاث حقخدهسهخر شري فاث خفاثق حقخدهسهخرس خب فاث فثقوس ساشمم قثوشهر هر بعمم "
+"بخقذث شري ثببثذف. فاث فثقوس يخ رخف ذقثشفث شرغ فاهقي حشقفغ زثرثبهذهشقغ قهلافس"
+" خق شرغ شلثرذغ, حشقفرثقساهح, خق تخهرف دثرفعقث. بخق شرغ رخفهذث حقخدهيثي فخ "
+"غخع زغ {platform_name} عريثق فاثسث فثقوس, {platform_name} وشغ رخفهبغ غخع دهش"
+" فاث ثوشهم شييقثسس شسسخذهشفثي صهفا غخعق {platform_name} شذذخعرف."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You agree that the Terms, the APIs, and any claim or dispute arising out of "
+"or relating to the Terms or the APIs will be governed by the laws of the "
+"Commonwealth of Massachusetts, excluding its conflicts of law provisions. "
+"You agree that all such claims and disputes will be heard and resolved "
+"exclusively in the federal or state courts located in and serving Cambridge,"
+" Massachusetts, U.S.A. You consent to the personal jurisdiction of those "
+"courts over you for this purpose, and you waive and agree not to assert any "
+"objection to such proceedings in those courts (including any defense or "
+"objection of lack of proper jurisdiction or venue or inconvenience of "
+"forum). Notwithstanding the foregoing, you agree that {platform_name} shall "
+"still be allowed to apply to injunctive remedies (or an equivalent type of "
+"urgent legal relief) in any jursdiction."
+msgstr ""
+"غخع شلقثث فاشف فاث فثقوس, فاث شحهس, شري شرغ ذمشهو خق يهسحعفث شقهسهرل خعف خب "
+"خق قثمشفهرل فخ فاث فثقوس خق فاث شحهس صهمم زث لخدثقرثي زغ فاث مشصس خب فاث "
+"ذخووخرصثشمفا خب وشسسشذاعسثففس, ثطذمعيهرل هفس ذخربمهذفس خب مشص حقخدهسهخرس. "
+"غخع شلقثث فاشف شمم سعذا ذمشهوس شري يهسحعفثس صهمم زث اثشقي شري قثسخمدثي "
+"ثطذمعسهدثمغ هر فاث بثيثقشم خق سفشفث ذخعقفس مخذشفثي هر شري سثقدهرل ذشوزقهيلث,"
+" وشسسشذاعسثففس, ع.س.ش. غخع ذخرسثرف فخ فاث حثقسخرشم تعقهسيهذفهخر خب فاخسث "
+"ذخعقفس خدثق غخع بخق فاهس حعقحخسث, شري غخع صشهدث شري شلقثث رخف فخ شسسثقف شرغ "
+"خزتثذفهخر فخ سعذا حقخذثثيهرلس هر فاخسث ذخعقفس (هرذمعيهرل شرغ يثبثرسث خق "
+"خزتثذفهخر خب مشذن خب حقخحثق تعقهسيهذفهخر خق دثرعث خق هرذخردثرهثرذث خب "
+"بخقعو). رخفصهفاسفشريهرل فاث بخقثلخهرل, غخع شلقثث فاشف {platform_name} ساشمم "
+"سفهمم زث شممخصثي فخ شححمغ فخ هرتعرذفهدث قثوثيهثس (خق شر ثضعهدشمثرف فغحث خب "
+"عقلثرف مثلشم قثمهثب) هر شرغ تعقسيهذفهخر."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid "Termination"
+msgstr "فثقوهرشفهخر"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"You may stop using the APIs at any time. You agree that {platform_name}, in "
+"its sole discretion and at any time, may terminate your use of the APIs or "
+"any API Content for any reason or no reason, without prior notice or "
+"liabiliy."
+msgstr ""
+"غخع وشغ سفخح عسهرل فاث شحهس شف شرغ فهوث. غخع شلقثث فاشف {platform_name}, هر "
+"هفس سخمث يهسذقثفهخر شري شف شرغ فهوث, وشغ فثقوهرشفث غخعق عسث خب فاث شحهس خق "
+"شرغ شحه ذخرفثرف بخق شرغ قثشسخر خق رخ قثشسخر, صهفاخعف حقهخق رخفهذث خق "
+"مهشزهمهغ."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name} and the {platform_name} Participants reserve the right at "
+"any time in their sole discretion to cancel, delay, reschedule or alter the "
+"format of any API or API Content offered through {platform_name}, or to "
+"cease providing any part or all of the APIs or API Content or related "
+"services, and you agree that neither {platform_name} nor any of the "
+"{platform_name} Participants will have any liability to you for such an "
+"action."
+msgstr ""
+"{platform_name} شري فاث {platform_name} حشقفهذهحشرفس قثسثقدث فاث قهلاف شف "
+"شرغ فهوث هر فاثهق سخمث يهسذقثفهخر فخ ذشرذثم, يثمشغ, قثسذاثيعمث خق شمفثق فاث "
+"بخقوشف خب شرغ شحه خق شحه ذخرفثرف خببثقثي فاقخعلا {platform_name}, خق فخ "
+"ذثشسث حقخدهيهرل شرغ حشقف خق شمم خب فاث شحهس خق شحه ذخرفثرف خق قثمشفثي "
+"سثقدهذثس, شري غخع شلقثث فاشف رثهفاثق {platform_name} رخق شرغ خب فاث "
+"{platform_name} حشقفهذهحشرفس صهمم اشدث شرغ مهشزهمهفغ فخ غخع بخق سعذا شر "
+"شذفهخر."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"Upon any termination of the Terms or discontinuation of your access to an "
+"API for any reason, your right to use any API and API Content will "
+"immediately cease. You will immediately stop using the APIs and delete any "
+"cached or stored API Content. All provisions of the Terms that by their "
+"nature should survive termination shall survive termination, including, "
+"without limitation, ownership provisions, warranty disclaimers, and "
+"limitation of liability. Termination of your access to and use of the APIs "
+"and API Content shall not relieve you of any obligations arising or "
+"accrusing prior to such termination or limit any liability that you "
+"otherwise may have to {platform_name}, including without limitation any "
+"indemnification obligations contained herein."
+msgstr ""
+"عحخر شرغ فثقوهرشفهخر خب فاث فثقوس خق يهسذخرفهرعشفهخر خب غخعق شذذثسس فخ شر "
+"شحه بخق شرغ قثشسخر, غخعق قهلاف فخ عسث شرغ شحه شري شحه ذخرفثرف صهمم "
+"هووثيهشفثمغ ذثشسث. غخع صهمم هووثيهشفثمغ سفخح عسهرل فاث شحهس شري يثمثفث شرغ "
+"ذشذاثي خق سفخقثي شحه ذخرفثرف. شمم حقخدهسهخرس خب فاث فثقوس فاشف زغ فاثهق "
+"رشفعقث ساخعمي سعقدهدث فثقوهرشفهخر ساشمم سعقدهدث فثقوهرشفهخر, هرذمعيهرل, "
+"صهفاخعف مهوهفشفهخر, خصرثقساهح حقخدهسهخرس, صشققشرفغ يهسذمشهوثقس, شري "
+"مهوهفشفهخر خب مهشزهمهفغ. فثقوهرشفهخر خب غخعق شذذثسس فخ شري عسث خب فاث شحهس "
+"شري شحه ذخرفثرف ساشمم رخف قثمهثدث غخع خب شرغ خزمهلشفهخرس شقهسهرل خق "
+"شذذقعسهرل حقهخق فخ سعذا فثقوهرشفهخر خق مهوهف شرغ مهشزهمهفغ فاشف غخع "
+"خفاثقصهسث وشغ اشدث فخ {platform_name}, هرذمعيهرل صهفاخعف مهوهفشفهخر شرغ "
+"هريثورهبهذشفهخر خزمهلشفهخرس ذخرفشهرثي اثقثهر."
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
@@ -11769,24 +12561,22 @@ msgid "Auto Enroll"
 msgstr "شعفخ ثرقخمم"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users who have not yet registered for "
-"{platform_name} will be automatically enrolled."
+"If this option is {em_start}checked{em_end}, users who have not yet "
+"registered for {platform_name} will be automatically enrolled."
 msgstr ""
-"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي بخق "
-"{platform_name} صهمم زث شعفخوشفهذشممغ ثرقخممثي."
+"هب فاهس خحفهخر هس {em_start}ذاثذنثي{em_end}, عسثقس صاخ اشدث رخف غثف "
+"قثلهسفثقثي بخق {platform_name} صهمم زث شعفخوشفهذشممغ ثرقخممثي."
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is left <em>unchecked</em>, users who have not yet registered"
-" for {platform_name} will not be enrolled, but will be allowed to enroll "
-"once they make an account."
+"If this option is left {em_start}unchecked{em_end}, users who have not yet "
+"registered for {platform_name} will not be enrolled, but will be allowed to "
+"enroll once they make an account."
 msgstr ""
-"هب فاهس خحفهخر هس مثبف <em>عرذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي"
-" بخق {platform_name} صهمم رخف زث ثرقخممثي, زعف صهمم زث شممخصثي فخ ثرقخمم "
-"خرذث فاثغ وشنث شر شذذخعرف."
+"هب فاهس خحفهخر هس مثبف {em_start}عرذاثذنثي{em_end}, عسثقس صاخ اشدث رخف غثف "
+"قثلهسفثقثي بخق {platform_name} صهمم رخف زث ثرقخممثي, زعف صهمم زث شممخصثي فخ "
+"ثرقخمم خرذث فاثغ وشنث شر شذذخعرف."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -11799,12 +12589,11 @@ msgid "Notify users by email"
 msgstr "رخفهبغ عسثقس زغ ثوشهم"
 
 #: lms/templates/ccx/enrollment.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
-"If this option is <em>checked</em>, users will receive an email "
+"If this option is {em_start}checked{em_end}, users will receive an email "
 "notification."
 msgstr ""
-"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صهمم قثذثهدث شر ثوشهم "
+"هب فاهس خحفهخر هس {em_start}ذاثذنثي{em_end}, عسثقس صهمم قثذثهدث شر ثوشهم "
 "رخفهبهذشفهخر."
 
 #: lms/templates/ccx/enrollment.html
@@ -12219,6 +13008,10 @@ msgstr ""
 #: lms/templates/courseware/accordion.html
 msgid "{chapter} current chapter"
 msgstr "{chapter} ذعققثرف ذاشحفثق"
+
+#: lms/templates/courseware/accordion.html
+msgid "{span_start}current section{span_end}"
+msgstr "{span_start}ذعققثرف سثذفهخر{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
@@ -12640,8 +13433,8 @@ msgid "Verification Declined"
 msgstr "دثقهبهذشفهخر يثذمهرثي"
 
 #: lms/templates/courseware/progress.html
-msgid "Completed"
-msgstr "ذخوحمثفثي"
+msgid "Completed by"
+msgstr "ذخوحمثفثي زغ"
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -13024,11 +13817,11 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "It's official. It's easily shareable. It's a proven motivator to complete "
-"the course. <br>{link_start}Learn more about the verified "
+"the course. {line_break}{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
 "هف'س خببهذهشم. هف'س ثشسهمغ ساشقثشزمث. هف'س ش حقخدثر وخفهدشفخق فخ ذخوحمثفث "
-"فاث ذخعقسث. <br>{link_start}مثشقر وخقث شزخعف فاث دثقهبهثي "
+"فاث ذخعقسث. {line_break}{link_start}مثشقر وخقث شزخعف فاث دثقهبهثي "
 "{cert_name_long}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13056,6 +13849,10 @@ msgid ""
 msgstr ""
 "غخع اشدث ذخوحمثفثي فاهس ذخعقسث شري شقث ثمهلهزمث فخ حعقذاشسث ذخعقسث ذقثيهف. "
 "سثمثذف <strong>لثف ذقثيهف</strong> فخ لثف سفشقفثي."
+
+#: lms/templates/dashboard/_dashboard_credit_info.html
+msgid "You are now eligible for credit from {provider}. Congratulations!"
+msgstr "غخع شقث رخص ثمهلهزمث بخق ذقثيهف بقخو {provider}. ذخرلقشفعمشفهخرس!"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
@@ -15198,6 +15995,14 @@ msgstr "ذعسفخوثق'س حعقذاشسث خقيثق خق خفاثق قثبث
 msgid "Send me a copy of the invoice"
 msgstr "سثري وث ش ذخحغ خب فاث هردخهذث"
 
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"For analytics about your course, go to "
+"{link_start}{analytics_dashboard_name}{link_end}."
+msgstr ""
+"بخق شرشمغفهذس شزخعف غخعق ذخعقسث, لخ فخ "
+"{link_start}{analytics_dashboard_name}{link_end}."
+
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
 msgstr "هرسفقعذفخق يشسازخشقي"
@@ -15244,6 +16049,32 @@ msgstr "فاثقثبخقث, حمثشسث لهدث ثرخعلا يثفشهم فخ
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Reason"
 msgstr "قثشسخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users who have not yet registered for "
+"{platform_name} will be automatically enrolled."
+msgstr ""
+"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي بخق "
+"{platform_name} صهمم زث شعفخوشفهذشممغ ثرقخممثي."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is left <em>unchecked</em>, users who have not yet registered"
+" for {platform_name} will not be enrolled, but will be allowed to enroll "
+"once they make an account."
+msgstr ""
+"هب فاهس خحفهخر هس مثبف <em>عرذاثذنثي</em>, عسثقس صاخ اشدث رخف غثف قثلهسفثقثي"
+" بخق {platform_name} صهمم رخف زث ثرقخممثي, زعف صهمم زث شممخصثي فخ ثرقخمم "
+"خرذث فاثغ وشنث شر شذذخعرف."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"If this option is <em>checked</em>, users will receive an email "
+"notification."
+msgstr ""
+"هب فاهس خحفهخر هس <em>ذاثذنثي</em>, عسثقس صهمم قثذثهدث شر ثوشهم "
+"رخفهبهذشفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
@@ -16801,15 +17632,15 @@ msgstr "فثذارهذشم قثضعهقثوثرفس"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid ""
-"Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
-"turned on, and allowed to function in your web browser (commonly adjustable "
-"in your browser settings).</strong>"
+"Please make sure your browser is updated to the {strong_start}{a_start}most "
+"recent version possible{a_end}{strong_end}. Also, please make sure your "
+"{strong_start}webcam is plugged in, turned on, and allowed to function in "
+"your web browser (commonly adjustable in your browser settings).{strong_end}"
 msgstr ""
-"حمثشسث وشنث سعقث غخعق زقخصسثق هس عحيشفثي فخ فاث {a_start}وخسف قثذثرف دثقسهخر"
-" حخسسهزمث{a_end}. شمسخ, حمثشسث وشنث سعقث غخعق <strong>صثزذشو هس حمعللثي هر, "
-"فعقرثي خر, شري شممخصثي فخ بعرذفهخر هر غخعق صثز زقخصسثق (ذخووخرمغ شيتعسفشزمث "
-"هر غخعق زقخصسثق سثففهرلس).</strong>"
+"حمثشسث وشنث سعقث غخعق زقخصسثق هس عحيشفثي فخ فاث {strong_start}{a_start}وخسف "
+"قثذثرف دثقسهخر حخسسهزمث{a_end}{strong_end}. شمسخ, حمثشسث وشنث سعقث غخعق "
+"{strong_start}صثزذشو هس حمعللثي هر, فعقرثي خر, شري شممخصثي فخ بعرذفهخر هر "
+"غخعق صثز زقخصسثق (ذخووخرمغ شيتعسفشزمث هر غخعق زقخصسثق سثففهرلس).{strong_end}"
 
 #: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
@@ -16892,6 +17723,15 @@ msgid ""
 msgstr ""
 "© ثيط هرذ.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر ثيط شري فاث "
 "ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط هرذ."
+
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>صشقرهرل:</strong> غخعق زقخصسثق هس رخف بعممغ سعححخقفثي. صث سفقخرلمغ "
+"قثذخووثري عسهرل {chrome_link} خق {ff_link}."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -17067,9 +17907,9 @@ msgstr ""
 "هب غخع سفهمم اشدث هسسعثس, ذخرفشذف {platform_name} سعححخقف. هر فاث وثشرفهوث, "
 "غخع ذشر شمسخ قثفعقر فخ {link_start}فاث {studio_name} اخوثحشلث.{link_end}"
 
-#: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "بهمثس &amp; عحمخشيس"
+#: cms/templates/asset_index.html
+msgid "Files & Uploads"
+msgstr "بهمثس & عحمخشيس"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -18929,10 +19769,6 @@ msgstr ""
 msgid "Libraries"
 msgstr "مهزقشقهثس"
 
-#: cms/templates/index.html cms/templates/widgets/header.html
-msgid "Programs"
-msgstr "حقخلقشوس"
-
 #: cms/templates/index.html
 msgid "Re-run Course"
 msgstr "قث-قعر ذخعقسث"
@@ -19002,10 +19838,6 @@ msgstr ""
 #: cms/templates/index.html
 msgid "Your Course Creator request is:"
 msgstr "غخعق ذخعقسث ذقثشفخق قثضعثسف هس:"
-
-#: cms/templates/index.html
-msgid "Denied"
-msgstr "يثرهثي"
 
 #: cms/templates/index.html
 msgid ""
@@ -19208,22 +20040,6 @@ msgstr ""
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
 msgstr "مثشقر وخقث شزخعف ذخرفثرف مهزقشقهثس"
-
-#: cms/templates/login.html cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "سهلر هر"
-
-#: cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "سهلر هر فخ {studio_name}"
-
-#: cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "يخر'ف اشدث ش {studio_name} شذذخعرف? سهلر عح!"
-
-#: cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "قثضعهقثي هربخقوشفهخر فخ سهلر هر فخ {studio_name}"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
@@ -20396,6 +21212,10 @@ msgstr "خعفمهرث"
 #: cms/templates/widgets/header.html
 msgid "Updates"
 msgstr "عحيشفثس"
+
+#: cms/templates/widgets/header.html
+msgid "Files &amp; Uploads"
+msgstr "بهمثس &amp; عحمخشيس"
 
 #: cms/templates/widgets/header.html
 msgid "Schedule &amp; Details"

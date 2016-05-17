@@ -29,7 +29,6 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-import datetime
 import imp
 import sys
 import os
@@ -372,9 +371,6 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
-
-    # Enable Next Button to jump sequences in Sequence Navigation bar.
-    'ENABLE_NEXT_BUTTON_ACROSS_SECTIONS': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -400,7 +396,7 @@ COURSES_ROOT = ENV_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
 # comprehensive theming system
-COMPREHENSIVE_THEME_DIR = REPO_ROOT / "themes"
+COMPREHENSIVE_THEME_DIR = ""
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
@@ -443,16 +439,16 @@ OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
 # OpenID Connect claim handlers
 
 OAUTH_OIDC_ID_TOKEN_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicIDTokenHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
+    'edx_oauth2_provider.oidc.handlers.BasicIDTokenHandler',
+    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
+    'edx_oauth2_provider.oidc.handlers.EmailHandler',
     'oauth2_handler.IDTokenHandler'
 )
 
 OAUTH_OIDC_USERINFO_HANDLERS = (
-    'oauth2_provider.oidc.handlers.BasicUserInfoHandler',
-    'oauth2_provider.oidc.handlers.ProfileHandler',
-    'oauth2_provider.oidc.handlers.EmailHandler',
+    'edx_oauth2_provider.oidc.handlers.BasicUserInfoHandler',
+    'edx_oauth2_provider.oidc.handlers.ProfileHandler',
+    'edx_oauth2_provider.oidc.handlers.EmailHandler',
     'oauth2_handler.UserInfoHandler'
 )
 
@@ -489,7 +485,6 @@ TEMPLATES = [
             'loaders': [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
-                'openedx.core.djangoapps.theming.template_loaders.ThemeFilesystemLoader',
                 'edxmako.makoloader.MakoFilesystemLoader',
                 'edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
@@ -789,6 +784,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 CMS_BASE = 'localhost:8001'
 
 # Site info
+SITE_ID = 1
 SITE_NAME = "example.com"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
@@ -943,7 +939,7 @@ LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Guidelines for translators
-TRANSLATORS_GUIDE = 'http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
+TRANSLATORS_GUIDE = 'http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/i18n_translators_guide.html'  # pylint: disable=line-too-long
 
 #################################### GITHUB #######################################
 # gitreload is used in LMS-workflow to pull content from github
@@ -1093,6 +1089,7 @@ simplefilter('ignore')
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'mobile_api.middleware.AppVersionUpgrade',
     'header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
@@ -1148,10 +1145,6 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-
-    # django current site middleware with default site
-    'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
-
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
@@ -1185,7 +1178,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
+    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -1251,7 +1244,9 @@ base_vendor_js = [
     'js/vendor/jquery.cookie.js',
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
+    'common/js/vendor/underscore.string.js',
     'js/vendor/underscore.string.min.js',
+    'common/js/vendor/picturefill.min.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -1262,7 +1257,8 @@ base_vendor_js = [
     'js/vendor/requirejs/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'js/vendor/backbone-min.js'
+    'js/vendor/backbone-min.js',
+    'edx-pattern-library/js/modernizr-custom.js',
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -1270,9 +1266,6 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/afontgarde/modernizr.fontface-generatedcontent.js',
-    'js/vendor/afontgarde/afontgarde.js',
-    'js/vendor/afontgarde/edx-icons.js'
 ]
 
 # Common files used by both RequireJS code and non-RequireJS code
@@ -1393,19 +1386,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-main': {
-        # this is unnecessary and can be removed
+    'style-main-v1': {
         'source_filenames': [
-            'css/lms-main.css',
+            'css/lms-main-v1.css',
         ],
-        'output_filename': 'css/lms-main.css',
+        'output_filename': 'css/lms-main-v1.css',
     },
-    'style-main-rtl': {
-        # this is unnecessary and can be removed
+    'style-main-v1-rtl': {
         'source_filenames': [
-            'css/lms-main-rtl.css',
+            'css/lms-main-v1-rtl.css',
         ],
-        'output_filename': 'css/lms-main-rtl.css',
+        'output_filename': 'css/lms-main-v1-rtl.css',
+    },
+    'style-main-v2': {
+        'source_filenames': [
+            'css/lms-main-v2.css',
+        ],
+        'output_filename': 'css/lms-main-v2.css',
+    },
+    'style-main-v2-rtl': {
+        'source_filenames': [
+            'css/lms-main-v2-rtl.css',
+        ],
+        'output_filename': 'css/lms-main-v2-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1661,7 +1664,10 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/bookmarks/bookmarks_factory': 'js/bookmarks/bookmarks_factory.js',
-    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js'
+    'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
+    'afontgarde': 'edx-pattern-library/js/afontgarde.js',
+    'edxicons': 'edx-pattern-library/js/edx-icons.js',
+    'draggabilly': 'js/vendor/draggabilly.js'
 }
 ################################# CELERY ######################################
 
@@ -1829,6 +1835,9 @@ INSTALLED_APPS = (
     # Theming
     'openedx.core.djangoapps.theming',
 
+    # Site configuration for theming and behavioral modification
+    'openedx.core.djangoapps.site_configuration',
+
     # Our courseware
     'courseware',
     'student',
@@ -1853,9 +1862,12 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    # OAuth2 Provider
+    # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
+    'edx_oauth2_provider',
+
+    # django-oauth-toolkit
     'oauth2_provider',
 
     'third_party_auth',
@@ -2010,6 +2022,18 @@ INSTALLED_APPS = (
 
     # API access administration
     'openedx.core.djangoapps.api_admin',
+
+    # Management commands used for configuration automation
+    'edx_management_commands.management_commands',
+
+    # Verified Track Content Cohorting
+    'verified_track_content',
+
+    # Learner's dashboard
+    'learner_dashboard',
+
+    # Needed whether or not enabled, due to migrations
+    'badges',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2253,12 +2277,17 @@ REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
 
-#################### Badgr OpenBadges generation #######################
+#################### OpenBadges Settings #######################
+
+BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
+
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
 # Do not add the trailing slash here.
 BADGR_BASE_URL = "http://localhost:8005"
 BADGR_ISSUER_SLUG = "example-issuer"
+# Number of seconds to wait on the badging server when contacting it before giving up.
+BADGR_TIMEOUT = 10
 
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
@@ -2570,9 +2599,8 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 
-# for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
-if FEATURES['ENABLE_EDXNOTES']:
-    OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
+OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
 
 # These tabs are currently disabled
 NOTES_DISABLED_TABS = ['course_structure', 'tags']
@@ -2624,6 +2652,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'language_proficiencies',
         'bio',
         'account_privacy',
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
     ],
 
     # The list of account fields that are always public
@@ -2651,6 +2681,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "mailing_address",
         "requires_parental_consent",
         "account_privacy",
+        "accomplishments_shared",
     ]
 }
 
@@ -2816,6 +2847,9 @@ MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
 
+# cache timeout in seconds for Mobile App Version Upgrade
+APP_UPGRADE_CACHE_TIMEOUT = 3600
+
 # Offset for courseware.StudentModuleHistoryExtended which is used to
 # calculate the starting primary key for the underlying table.  This gap
 # should be large enough that you do not generate more than N courseware.StudentModuleHistory
@@ -2841,6 +2875,8 @@ WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 # Dafault site id to use in case there is no site that matches with the request headers.
 DEFAULT_SITE_ID = 1
 
-# Cache time out settings
-# by Comprehensive Theme system
-THEME_CACHE_TIMEOUT = 30 * 60
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/overview.html'
+AUTH_DOCUMENTATION_URL = 'http://edx.readthedocs.org/projects/edx-platform-api/en/latest/authentication.html'

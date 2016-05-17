@@ -59,6 +59,10 @@ lib_paths:
     - public/js/split_test_staff.js
     - common_static/js/src/accessibility_tools.js
     - common_static/js/vendor/moment.min.js
+    - common_static/js/vendor/draggabilly.js
+    - common_static/edx-pattern-library/js/modernizr-custom.js
+    - common_static/edx-pattern-library/js/afontgarde.js
+    - common_static/edx-pattern-library/js/edx-icons.js
     - spec/main_requirejs.js
 
 # Paths to spec (test) JavaScript files
