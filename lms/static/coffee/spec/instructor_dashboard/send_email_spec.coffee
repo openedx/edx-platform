@@ -23,9 +23,6 @@ describe "Bulk Email Queueing", ->
             error: jasmine.any(Function),
         }
 
-    it 'binds the send email button to a click event', ->
-        expect(@send_email.$btn_send).toHandle 'click'
-
     it 'cannot send an email with no target', ->
         spyOn(window, "alert")
         spyOn($, "ajax")

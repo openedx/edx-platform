@@ -140,6 +140,7 @@
 // ====================
 .instructor-dashboard-content-2 {
   @extend .content;
+  display: block; // override the table-cell display set in .content
   width: 100%;
   padding: 40px;
 

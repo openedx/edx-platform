@@ -125,16 +125,12 @@ subject_formatter = (row, cell, value, columnDef, dataContext) ->
   subject_text = $('<span>').text(value['subject']).html()
   return '<p><a href="#email_message_' + value['id']+ '" id="email_message_' + value['id'] + '_trig">' + subject_text + '</a></p>'
 
-# Formats the author field for the email content history table
-sent_by_formatter = (row, cell, value, columnDef, dataContext) ->
-  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+# Since sent_to is a json array, it needs some extra attention
+sent_to_formatter = (row, cell, value, columnDef, dataContext) ->
+  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value.join(", ") + '</p>'
 
-# Formats the created field for the email content history table
-created_formatter = (row, cell, value, columnDef, dataContext) ->
-  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
-
-# Formats the number sent field for the email content history table
-number_sent_formatter = (row, cell, value, columndDef, dataContext) ->
+# Formats the author, created, and number sent fields for the email content history table
+unknown_if_null_formatter = (row, cell, value, columnDef, dataContext) ->
   if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
 
 # Creates a table to display the content of bulk course emails
@@ -164,14 +160,22 @@ create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
       minWidth: 80
       maxWidth: 100
       cssClass: "email-content-cell"
-      formatter: sent_by_formatter
+      formatter: unknown_if_null_formatter
+    ,
+      id: 'sent_to'
+      field: 'sent_to'
+      name: gettext('Sent To')
+      minWidth: 80
+      maxWidth: 100
+      cssClass: "email-content-cell"
+      formatter: sent_to_formatter
     ,
       id: 'created'
       field: 'created'
       name: gettext('Time Sent')
       minWidth: 80
       cssClass: "email-content-cell"
-      formatter: created_formatter
+      formatter: unknown_if_null_formatter
     ,
       id: 'number_sent'
       field: 'number_sent'
@@ -179,7 +183,7 @@ create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
       minwidth: 100
       maxWidth: 150
       cssClass: "email-content-cell"
-      formatter: number_sent_formatter
+      formatter: unknown_if_null_formatter
     ,
     ]
 
@@ -217,7 +221,7 @@ create_email_message_views = ($messages_wrapper, emails) ->
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Subject:') + '</em> ' + subject_text)
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent By:') + '</em> ' + email_info.requester)
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Time Sent:') + '</em> ' + email_info.created)
-    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent To:') + '</em> ' + email_info.sent_to)
+    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent To:') + '</em> ' + email_info.sent_to.join(", "))
     $email_wrapper.append $email_header
 
     $email_wrapper.append $ '<hr>'
