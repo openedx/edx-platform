@@ -842,6 +842,7 @@ class VideoPage(PageObject):
             return self.state != 'buffering'
 
         self._wait_for(_is_buffering_completed, 'Buffering completed after Seek.')
+        self.wait_for_position(seek_value)
 
     def reload_page(self):
         """
