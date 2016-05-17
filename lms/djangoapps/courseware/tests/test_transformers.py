@@ -74,7 +74,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
 
         self.assert_collected_xblock_fields(
-            block_structure, 
+            block_structure,
             blocks['problem'].location,
             weight=self.problem_metadata[u'weight'],
             graded=self.problem_metadata[u'graded'],
@@ -94,7 +94,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
 
         self.assert_collected_xblock_fields(
-            block_structure, 
+            block_structure,
             blocks['problem'].location,
             weight=problem_metadata[u'weight'],
             graded=problem_metadata[u'graded'],
