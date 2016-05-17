@@ -171,6 +171,7 @@ def award_program_certificates(self, username):
         if not program_ids:
             # Again, no reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
+            LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
         # Determine which program certificates the user has already been
@@ -213,5 +214,7 @@ def award_program_certificates(self, username):
             # N.B. This logic assumes that this task is idempotent
             LOGGER.info('Retrying task to award failed certificates to user %s', username)
             raise self.retry(countdown=countdown, max_retries=config.max_retries)
+    else:
+        LOGGER.info('User %s is not eligible for any new program certificates', username)
 
     LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)

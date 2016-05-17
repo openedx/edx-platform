@@ -46,7 +46,7 @@ define([
             });
 
             it('should load the certificates based on passed in certificates list', function() {
-                expect(view.$('.certificate-box').length).toBe(1);
+                expect(view.$('.certificate-link').length).toBe(1);
             });
 
             it('should not load the xseries advertising if no xseriesUrl passed in', function(){
@@ -59,7 +59,7 @@ define([
                 view.render();
                 $ad = view.$el.find('.program-advertise');
                 expect($ad.length).toBe(0);
-                expect(view.$('.certificate-box').length).toBe(0);
+                expect(view.$('.certificate-link').length).toBe(0);
             });
 
         });

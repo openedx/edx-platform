@@ -15,9 +15,10 @@ class CourseBlocksSignalTest(EnableTransformerRegistryMixin, ModuleStoreTestCase
     """
     Tests for the Course Blocks signal
     """
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(CourseBlocksSignalTest, self).setUp(create_user=True)
+        super(CourseBlocksSignalTest, self).setUp()
         self.course = CourseFactory.create()
         self.course_usage_key = self.store.make_course_usage_key(self.course.id)
 

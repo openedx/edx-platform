@@ -16,5 +16,6 @@ Supported edX Platform API Modules
 
 The following edX Platform APIs are currently supported.
 
+* :ref:`edX Platform Courses API`
 * :ref:`edX Platform Enrollment API`
 * :ref:`edX Platform User API`

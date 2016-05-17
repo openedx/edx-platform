@@ -40,6 +40,8 @@ def _finish_auth_url(params):
 class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test rendering of the login form. """
 
+    URLCONF_MODULES = ['lms.urls']
+
     @classmethod
     def setUpClass(cls):
         super(LoginFormTest, cls).setUpClass()
@@ -47,7 +49,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
-        super(LoginFormTest, self).setUp('lms.urls')
+        super(LoginFormTest, self).setUp()
 
         self.url = reverse("signin_user")
         self.course_id = unicode(self.course.id)
@@ -155,6 +157,8 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test rendering of the registration form. """
 
+    URLCONF_MODULES = ['lms.urls']
+
     @classmethod
     def setUpClass(cls):
         super(RegisterFormTest, cls).setUpClass()
@@ -162,7 +166,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
-        super(RegisterFormTest, self).setUp('lms.urls')
+        super(RegisterFormTest, self).setUp()
 
         self.url = reverse("register_user")
         self.course_id = unicode(self.course.id)

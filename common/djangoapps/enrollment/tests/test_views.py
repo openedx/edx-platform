@@ -141,6 +141,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     OTHER_USERNAME = "Jane"
     OTHER_EMAIL = "jane@example.com"
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp()
@@ -892,10 +894,12 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
+    URLCONF_MODULES = ['embargo']
+
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(EnrollmentEmbargoTest, self).setUp('embargo')
+        super(EnrollmentEmbargoTest, self).setUp()
 
         self.course = CourseFactory.create()
         # Load a CourseOverview. This initial load should result in a cache

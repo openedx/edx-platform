@@ -15,22 +15,24 @@ from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import EnrollmentApiLoadError, EnrollmentNotFoundError, CourseModeNotFoundError
 from enrollment.tests import fake_data_api
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
 @override_settings(ENROLLMENT_DATA_API="enrollment.tests.fake_data_api")
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(TestCase):
+class EnrollmentTest(CacheIsolationTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
     USERNAME = "Bob"
     COURSE_ID = "some/great/course"
 
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(EnrollmentTest, self).setUp()
         fake_data_api.reset()
-        cache.clear()
 
     @ddt.data(
         # Default (no course modes in the database)

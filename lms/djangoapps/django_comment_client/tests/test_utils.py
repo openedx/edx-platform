@@ -63,8 +63,10 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     Base testcase class for access and roles for the
     comment client service integration
     """
+    CREATE_USER = False
+
     def setUp(self):
-        super(AccessUtilsTestCase, self).setUp(create_user=False)
+        super(AccessUtilsTestCase, self).setUp()
 
         self.course = CourseFactory.create()
         self.course_id = self.course.id
@@ -118,7 +120,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CoursewareContextTestCase, self).setUp(create_user=True)
+        super(CoursewareContextTestCase, self).setUp()
 
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
@@ -206,7 +208,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
     """
     def setUp(self):
-        super(CachedDiscussionIdMapTestCase, self).setUp(create_user=True)
+        super(CachedDiscussionIdMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
         self.discussion = ItemFactory.create(
@@ -340,7 +342,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CategoryMapTestCase, self).setUp(create_user=True)
+        super(CategoryMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",

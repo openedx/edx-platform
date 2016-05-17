@@ -28,6 +28,7 @@
             %>
             <a class="btn ${xseries_btn_class}" href="${program_data['program_marketing_url']}" target="_blank"
                data-program-id="${program_data['program_id']}" >
+                <span class="sr">${program_data['display_name']}</span>
                 <i class="action-xseries-icon" aria-hidden="true"></i>
                 ${_("View {category} Details").format(category=display_category)}
             </a>

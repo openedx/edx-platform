@@ -167,6 +167,8 @@ class InternationalizationTest(ModuleStoreTestCase):
     Tests to validate Internationalization.
     """
 
+    CREATE_USER = False
+
     def setUp(self):
         """
         These tests need a user in the DB so that the django Test Client
@@ -175,7 +177,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        super(InternationalizationTest, self).setUp(create_user=False)
+        super(InternationalizationTest, self).setUp()
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'

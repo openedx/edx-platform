@@ -8,7 +8,7 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import override_settings
+from django.test import override_settings, TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
 from opaque_keys.edx import locator
 from provider.constants import CONFIDENTIAL
@@ -205,3 +205,39 @@ class TestProgramListing(
         for certificate in self._expected_credentials_data():
             self.assertNotContains(response, certificate['display_name'])
             self.assertNotContains(response, certificate['credential_url'])
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@override_settings(MKTG_URLS={'ROOT': 'http://edx.org'})
+class TestProgramDetails(ProgramsApiConfigMixin, TestCase):
+    """
+    Unit tests for the program details page
+    """
+    def setUp(self):
+        super(TestProgramDetails, self).setUp()
+        self.user = UserFactory()
+        self.details_page = reverse('program_details_view', args=['123'])
+
+    def test_login_required(self):
+        """
+        Verify that login is required to access the page.
+        """
+        self.create_programs_config()
+        response = self.client.get(self.details_page)
+        self.assertRedirects(
+            response,
+            '{}?next={}'.format(reverse('signin_user'), self.details_page)
+        )
+
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 200)
+
+    def test_404_if_disabled(self):
+        """
+        Verify that the page 404s if disabled.
+        """
+        self.create_programs_config(program_details_enabled=False)
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.details_page)
+        self.assertEquals(response.status_code, 404)

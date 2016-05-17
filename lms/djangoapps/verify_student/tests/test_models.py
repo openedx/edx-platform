@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
@@ -844,10 +845,12 @@ class SkippedReverificationTest(ModuleStoreTestCase):
         )
 
 
-class VerificationDeadlineTest(TestCase):
+class VerificationDeadlineTest(CacheIsolationTestCase):
     """
     Tests for the VerificationDeadline model.
     """
+
+    ENABLED_CACHES = ['default']
 
     def test_caching(self):
         deadlines = {

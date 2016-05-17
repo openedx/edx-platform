@@ -1,4 +1,4 @@
-<%page expression_filter="h"/>
+<%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
   from django.conf import settings
@@ -6,7 +6,6 @@
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
 %>
-<%page args="online_help_token"/>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
 
@@ -61,7 +60,7 @@
                     <a href="${tabs_url}">${_("Pages")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${assets_url}">${_("Files &amp; Uploads")}</a>
+                    <a href="${assets_url}">${_("Files & Uploads")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
@@ -83,7 +82,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
-                    <a href="${settings_url}">${_("Schedule &amp; Details")}</a>
+                    <a href="${settings_url}">${_("Schedule & Details")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${grading_url}">${_("Grading")}</a>

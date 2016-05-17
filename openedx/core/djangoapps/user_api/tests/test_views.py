@@ -20,6 +20,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
@@ -334,11 +335,13 @@ class UserViewSetTest(UserApiTestCase):
         )
 
 
-class UserPreferenceViewSetTest(UserApiTestCase):
+class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     """
     Test cases covering the User Preference DRF view class and its various behaviors
     """
     LIST_URI = USER_PREFERENCE_LIST_URI
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(UserPreferenceViewSetTest, self).setUp()
@@ -1725,12 +1728,18 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
 @httpretty.activate
 @ddt.ddt
-class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin):
+class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTestCase):
     """
     Tests for the User API registration endpoint with 3rd party authentication.
     """
+    CREATE_USER = False
+
+    ENABLED_CACHES = ['default']
+
+    __test__ = False
+
     def setUp(self):
-        super(ThirdPartyRegistrationTestMixin, self).setUp(create_user=False)
+        super(ThirdPartyRegistrationTestMixin, self).setUp()
         self.url = reverse('user_api_registration')
 
     def data(self, user=None):
@@ -1845,6 +1854,8 @@ class TestFacebookRegistrationView(
     ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Facebook authentication."""
+    __test__ = True
+
     def test_social_auth_exception(self):
         """
         According to the do_auth method in social.backends.facebook.py,
@@ -1861,6 +1872,8 @@ class TestGoogleRegistrationView(
     ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Google authentication."""
+    __test__ = True
+
     pass
 
 

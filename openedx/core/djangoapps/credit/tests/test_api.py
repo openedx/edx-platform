@@ -56,6 +56,8 @@ class CreditApiTestBase(ModuleStoreTestCase):
     Base class for test cases of the credit API.
     """
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     PROVIDER_ID = "hogwarts"
     PROVIDER_NAME = "Hogwarts School of Witchcraft and Wizardry"
     PROVIDER_URL = "https://credit.example.com/request"

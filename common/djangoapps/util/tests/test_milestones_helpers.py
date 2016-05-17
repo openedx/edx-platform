@@ -18,11 +18,13 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
     Main test suite for Milestones API client library
     """
 
+    CREATE_USER = False
+
     def setUp(self):
         """
         Test case scaffolding
         """
-        super(MilestonesHelpersTestCase, self).setUp(create_user=False)
+        super(MilestonesHelpersTestCase, self).setUp()
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,

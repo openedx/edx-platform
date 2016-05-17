@@ -1,34 +1,37 @@
-// +Imports
-// ====================
-@import '../base/grid-settings';
-@import 'neat/neat'; // lib - Neat
-
 %hide-until-focus {
   @include left(0);
   display: inline-block;
   position: absolute;
-  top: -($baseline*30);
+  top: -999999px;
   overflow: hidden;
 }
 
 .program-card{
-  @include span-columns(12);  
+  @include span(12);  
   border: 1px solid $border-color-l3;
   border-bottom: none;
-  box-sizing: border-box;
-  margin-bottom: $baseline;
+  margin-bottom: $baseline + px;
   position: relative;
-  display: inline;
+
+  @include susy-media($bp-screen-md) {
+    @include span(6);
+
+    &:nth-child(2n) {
+      @include margin-right(0);
+    }
+  }
 
   .card-link{
     @include left(0);
+    @include right(0);
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 0;
     border: 0;
     z-index: 1;
     opacity: 0.8;
+    
+    &:active,
     &:hover,
     &:focus{
       opacity: 1;
@@ -37,7 +40,11 @@
     .banner-image-container{
       position: relative;
       overflow: hidden;
-      height: 116px;
+      height: 166px;
+
+      @include susy-media($bp-screen-sm) { height: 242px; }
+      @include susy-media($bp-screen-md) { height: 116px; }
+      @include susy-media($bp-screen-lg) { height: 145px; }
 
       .banner-image{
         @include left(50%);
@@ -51,58 +58,61 @@
   }
 
   .text-section{
-    padding: 40px $baseline $baseline;
-    margin-top: 106px;
+    padding: 40px $baseline + px $baseline + px;
     position: relative;
+    margin-top: 156px;
 
-    .meta-info{
-      @include outer-container;
-      font-size: em(12);
-      color: $gray;
-      position: absolute;
-      top: $baseline;
-      width: calc(100% - 40px);
+    @include susy-media($bp-screen-sm) { margin-top: 232px; }
+    @include susy-media($bp-screen-md) { margin-top: 106px; }
+    @include susy-media($bp-screen-lg) { margin-top: 135px; }
+  }
 
-      .organization{
-        @include span-columns(6);
-        white-space: nowrap;
-        overflow: hidden;
-      }
+  .meta-info{
+    font-size: font-size(x-small);
+    color: palette(grayscale, dark);
+    position: absolute;
+    top: $baseline + px;
+    width: calc(100% - 40px);
+  }
 
-      .category{
-        @include span-columns(6);
-        text-align: right;
+  .organization{
+    @include span(6);
+    white-space: nowrap;
+    overflow: hidden;
+  }
 
-        .category-text{
-            @include float(right);
-        }
+  .category{
+    @include span(6);
+    @include text-align(right);
 
-        .xseries-icon{
-          @include float(right);
-          @include margin-right($baseline*0.25);
-          background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-          background-color: transparent;
-          background-size: 100%;
-          width: ($baseline*0.7);
-          height: ($baseline*0.7);
-        }
-      }
+    .category-text{
+        @include float(right);
     }
- 
-    .title{
-      @extend %t-title4;
-      font-size: em(24);
-      color: $gray-d2;
-      margin-bottom: 10px;
-      line-height: 1.2;
-      min-height: ($baseline*3);
+
+    .xseries-icon{
+      @include float(right);
+      @include margin-right($baseline*0.25 + px);
+      background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
+      background-color: transparent;
+      background-size: 100%;
+      width: ($baseline*0.7 + px);
+      height: ($baseline*0.7 + px);
     }
+  }
+  
+  .hd-3 {
+    color: palette(grayscale, x-dark);
+    min-height: ($baseline*3) + px;
+    line-height: 1;
   }
 
   .certificate-status {
+    margin-bottom: 0;
+
     .status-text {
-      font-size: em(12);
-      color: $gray;
+      font-size: font-size(x-small);
+      color: palette(grayscale, dark);
+      line-height: 1;
     }
  
     .secondary {
@@ -113,7 +123,7 @@
       &:focus,
       &:active {
         position: relative;
-        top: auto;
+        top: 4px;
         width: auto;
         height: auto;
         margin: 0;
@@ -128,7 +138,7 @@
 
   .progress {
     height: 5px;
-    background: $x-light;
+    background: palette(grayscale-cool, x-light);
 
     .bar {
       @include float(left);
@@ -136,84 +146,12 @@
       position: relative;
 
       &.complete {
-        background: $success-dark;
+        background: palette(success, dark);
       }
 
       &.in-progress {
-        background: $warning-base;
+        background: palette(warning, base);
       }
     }
   }
 }
-
-@include media($bp-small) {
-  .program-card{
-    @include omega(n);
-    @include span-columns(4);
-
-    .card-link{
-      .banner-image-container{
-        height: 166px;
-      }
-    }
-
-    .text-section{
-      margin-top: 156px;
-    }
-  }
-}
-
-
-@include media($bp-medium) {
-  .program-card{
-    @include omega(n);
-    @include span-columns(8);
-
-    .card-link{
-      .banner-image-container{
-        height: 242px;
-      }
-    }
-
-    .text-section{
-      margin-top: 232px;
-    }
-  }
-}
-
-
-
-@include media($bp-large) {
-  .program-card{
-    @include omega(2n);
-    @include span-columns(6);
-
-    .card-link{
-      .banner-image-container{
-        height: 116px;
-      }
-    }
-
-    .text-section{
-      margin-top: 106px;
-    }
-  }
-}
-
-@include media($bp-huge) {
-  .program-card{
-    @include omega(2n);
-    @include span-columns(6);
-
-    .card-link{
-      .banner-image-container{
-        height: 145px;
-      }
-    }
-
-    .text-section{
-      margin-top: 135px;
-    }
-  }
-}
-

@@ -15,6 +15,7 @@ from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
 
@@ -24,8 +25,11 @@ LOGGER_NAME = 'openedx.core.lib.edx_api_utils'
 
 @attr('shard_2')
 class TestApiDataRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, ProgramsApiConfigMixin, ProgramsDataMixin,
-                           TestCase):
+                           CacheIsolationTestCase):
     """Test utility for API data retrieval."""
+
+    ENABLED_CACHES = ['default']
+
     def setUp(self):
         super(TestApiDataRetrieval, self).setUp()
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)

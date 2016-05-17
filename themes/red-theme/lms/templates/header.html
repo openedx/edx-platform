@@ -81,7 +81,7 @@ site_status_msg = get_site_status_msg(course_id)
             </a>
           </li>
           <li class="tab-nav-item">
-            <a class="${'active ' if reverse('program_listing_view') == request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+            <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
               ${_("Programs")}
             </a>
           </li>

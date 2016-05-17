@@ -32,7 +32,7 @@ class LibraryTestCase(ModuleStoreTestCase):
     Common functionality for content libraries tests
     """
     def setUp(self):
-        self.user_password = super(LibraryTestCase, self).setUp()
+        super(LibraryTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
         self._login_as_staff_user(logout_first=False)

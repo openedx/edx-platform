@@ -315,6 +315,14 @@ class CohortManagementSection(PageObject):
         # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
         # (in which case the first is not visible). Click on the last present create button.
         create_buttons.results[len(create_buttons.results) - 1].click()
+
+        # Both the edit and create forms have an element with id="cohort-name". Verify that the create form
+        # has been rendered.
+        self.wait_for(
+            lambda: "Add a New Cohort" in self.q(css=self._bounded_selector(".form-title")).text,
+            "Create cohort form is visible"
+        )
+
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
 

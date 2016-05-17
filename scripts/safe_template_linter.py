@@ -189,118 +189,38 @@ class Rules(Enum):
     """
     An Enum of each rule which the linter will check.
     """
-    mako_missing_default = (
-        'mako-missing-default',
-        'Missing default <%page expression_filter="h"/>.'
-    )
-    mako_multiple_page_tags = (
-        'mako-multiple-page-tags',
-        'A Mako template can only have one <%page> tag.'
-    )
-    mako_unparseable_expression = (
-        'mako-unparseable-expression',
-        'The expression could not be properly parsed.'
-    )
-    mako_unwanted_html_filter = (
-        'mako-unwanted-html-filter',
-        'Remove explicit h filters when it is provided by the page directive.'
-    )
-    mako_invalid_html_filter = (
-        'mako-invalid-html-filter',
-        'The expression is using an invalid filter in an HTML context.'
-    )
-    mako_invalid_js_filter = (
-        'mako-invalid-js-filter',
-        'The expression is using an invalid filter in a JavaScript context.'
-    )
-    mako_js_missing_quotes = (
-        'mako-js-missing-quotes',
-        'An expression using js_escaped_string must be wrapped in quotes.'
-    )
-    mako_js_html_string = (
-        'mako-js-html-string',
-        'A JavaScript string containing HTML should not have an embedded Mako expression.'
-    )
-    mako_html_entities = (
-        'mako-html-entities',
-        "HTML entities should be plain text or wrapped with HTML()."
-    )
-    mako_unknown_context = (
-        'mako-unknown-context',
-        "The context could not be determined."
-    )
-    underscore_not_escaped = (
-        'underscore-not-escaped',
-        'Expressions should be escaped using <%- expression %>.'
-    )
-    javascript_jquery_append = (
-        'javascript-jquery-append',
-        'Use HtmlUtils.append() or .append(HtmlUtils.xxx().toString()).'
-    )
-    javascript_jquery_prepend = (
-        'javascript-jquery-prepend',
-        'Use HtmlUtils.prepend() or .prepend(HtmlUtils.xxx().toString()).'
-    )
-    javascript_jquery_insertion = (
-        'javascript-jquery-insertion',
-        'JQuery DOM insertion calls that take content must use HtmlUtils (e.g. $el.after(HtmlUtils.xxx().toString()).'
-    )
-    javascript_jquery_insert_into_target = (
-        'javascript-jquery-insert-into-target',
-        'JQuery DOM insertion calls that take a target can only be called from elements (e.g. .$el.appendTo()).'
-    )
-    javascript_jquery_html = (
-        'javascript-jquery-html',
-        "Use HtmlUtils.setHtml(), .html(HtmlUtils.xxx().toString()), or JQuery's text() function."
-    )
-    javascript_concat_html = (
-        'javascript-concat-html',
-        'Use HtmlUtils functions rather than concatenating strings with HTML.'
-    )
-    javascript_escape = (
-        'javascript-escape',
-        "Avoid calls to escape(), especially in Backbone. Use templates, HtmlUtils, or JQuery's text() function."
-    )
-    javascript_interpolate = (
-        'javascript-interpolate',
-        'Use StringUtils.interpolate() or HtmlUtils.interpolateHtml() as appropriate.'
-    )
-    python_concat_html = (
-        'python-concat-html',
-        'Use HTML() and Text() functions rather than concatenating strings with HTML.'
-    )
-    python_custom_escape = (
-        'python-custom-escape',
-        "Use markupsafe.escape() rather than custom escaping for '<'."
-    )
-    python_deprecated_display_name = (
-        'python-deprecated-display-name',
-        'Replace deprecated display_name_with_default_escaped with display_name_with_default.'
-    )
-    python_requires_html_or_text = (
-        'python-requires-html-or-text',
-        'You must start with Text() or HTML() if you use HTML() or Text() during interpolation.'
-    )
-    python_close_before_format = (
-        'python-close-before-format',
-        'You must close any call to Text() or HTML() before calling format().'
-    )
-    python_wrap_html = (
-        'python-wrap-html',
-        "String containing HTML should be wrapped with call to HTML()."
-    )
-    python_interpolate_html = (
-        'python-interpolate-html',
-        "Use HTML(), Text(), and format() functions for interpolating strings with HTML."
-    )
-    python_parse_error = (
-        'python-parse-error',
-        'Error parsing Python function or string.'
-    )
+    # IMPORTANT: Do not edit without also updating the docs:
+    # - http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter
+    mako_missing_default = 'mako-missing-default'
+    mako_multiple_page_tags = 'mako-multiple-page-tags'
+    mako_unparseable_expression = 'mako-unparseable-expression'
+    mako_unwanted_html_filter = 'mako-unwanted-html-filter'
+    mako_invalid_html_filter = 'mako-invalid-html-filter'
+    mako_invalid_js_filter = 'mako-invalid-js-filter'
+    mako_js_missing_quotes = 'mako-js-missing-quotes'
+    mako_js_html_string = 'mako-js-html-string'
+    mako_html_entities = 'mako-html-entities'
+    mako_unknown_context = 'mako-unknown-context'
+    underscore_not_escaped = 'underscore-not-escaped'
+    javascript_jquery_append = 'javascript-jquery-append'
+    javascript_jquery_prepend = 'javascript-jquery-prepend'
+    javascript_jquery_insertion = 'javascript-jquery-insertion'
+    javascript_jquery_insert_into_target = 'javascript-jquery-insert-into-target'
+    javascript_jquery_html = 'javascript-jquery-html'
+    javascript_concat_html = 'javascript-concat-html'
+    javascript_escape = 'javascript-escape'
+    javascript_interpolate = 'javascript-interpolate'
+    python_concat_html = 'python-concat-html'
+    python_custom_escape = 'python-custom-escape'
+    python_deprecated_display_name = 'python-deprecated-display-name'
+    python_requires_html_or_text = 'python-requires-html-or-text'
+    python_close_before_format = 'python-close-before-format'
+    python_wrap_html = 'python-wrap-html'
+    python_interpolate_html = 'python-interpolate-html'
+    python_parse_error = 'python-parse-error'
 
-    def __init__(self, rule_id, rule_summary):
+    def __init__(self, rule_id):
         self.rule_id = rule_id
-        self.rule_summary = rule_summary
 
 
 class Expression(object):
@@ -577,6 +497,57 @@ class ExpressionRuleViolation(RuleViolation):
             ), file=out)
 
 
+class SummaryResults(object):
+    """
+    Contains the summary results for all violations.
+    """
+
+    def __init__(self):
+        """
+        Init method.
+        """
+        self.total_violations = 0
+        self.totals_by_rule = dict.fromkeys(
+            [rule.rule_id for rule in Rules.__members__.values()], 0
+        )
+
+    def add_violation(self, violation):
+        """
+        Adds a violation to the summary details.
+
+        Arguments:
+            violation: The violation to add to the summary.
+
+        """
+        self.total_violations += 1
+        self.totals_by_rule[violation.rule.rule_id] += 1
+
+    def print_results(self, options, out):
+        """
+        Prints the results (i.e. violations) in this file.
+
+        Arguments:
+            options: A list of the following options:
+                list_files: True to print only file names, and False to print
+                    all violations.
+                rule_totals: If True include totals by rule.
+            out: output file
+
+        """
+        if options['list_files'] is False:
+            if options['rule_totals']:
+                max_rule_id_len = max(len(rule_id) for rule_id in self.totals_by_rule)
+                print("", file=out)
+                for rule_id in sorted(self.totals_by_rule.keys()):
+                    padding = " " * (max_rule_id_len - len(rule_id))
+                    print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
+                print("", file=out)
+
+            # matches output of jshint for simplicity
+            print("", file=out)
+            print("{} violations total".format(self.total_violations), file=out)
+
+
 class FileResults(object):
     """
     Contains the results, or violations, for a file.
@@ -611,7 +582,7 @@ class FileResults(object):
         if line_comment_delim is not None:
             self._filter_commented_code(line_comment_delim)
 
-    def print_results(self, options, out):
+    def print_results(self, options, summary_results, out):
         """
         Prints the results (i.e. violations) in this file.
 
@@ -619,26 +590,23 @@ class FileResults(object):
             options: A list of the following options:
                 list_files: True to print only file names, and False to print
                     all violations.
+            summary_results: A SummaryResults with a summary of the violations.
                 verbose: True for multiple lines of context, False single line.
             out: output file
 
-        Returns:
-            The number of violations. When using --quiet, returns number of
-            files with violations.
+        Side effect:
+            Updates the passed SummaryResults.
 
         """
-        num_violations = 0
         if options['list_files']:
             if self.violations is not None and 0 < len(self.violations):
-                num_violations += 1
                 print(self.full_path, file=out)
         else:
             self.violations.sort(key=lambda violation: violation.sort_key())
             for violation in self.violations:
                 if not violation.is_disabled:
-                    num_violations += 1
                     violation.print_results(options, out)
-        return num_violations
+                    summary_results.add_violation(violation)
 
     def _filter_commented_code(self, line_comment_delim):
         """
@@ -789,15 +757,16 @@ class BaseLinter(object):
         Init method.
         """
         self._skip_dirs = (
+            '.git',
             '.pycharm_helpers',
             'common/static/xmodule/modules',
+            'perf_tests',
             'node_modules',
             'reports/diff_quality',
-            'spec',
             'scripts/tests/templates',
+            'spec',
             'test_root',
             'vendor',
-            'perf_tests'
         )
 
     def _is_skip_dir(self, skip_dirs, directory):
@@ -1554,7 +1523,7 @@ class HtmlStringVisitor(BaseVisitor):
             node: An AST node.
         """
         # Skips '<' (and '>') in regex named groups. For example, "(?P<group>)".
-        if re.search('[(][?]P<', node.s) is None and re.search('[<>]', node.s) is not None:
+        if re.search('[(][?]P<', node.s) is None and re.search('<', node.s) is not None:
             self.unsafe_html_string_nodes.append(node)
         if re.search(r"&[#]?[a-zA-Z0-9]+;", node.s):
             self.over_escaped_entity_string_nodes.append(node)
@@ -2505,7 +2474,7 @@ class MakoTemplateLinter(BaseLinter):
         return expressions
 
 
-def _process_file(full_path, template_linters, options, out):
+def _process_file(full_path, template_linters, options, summary_results, out):
     """
     For each linter, lints the provided file.  This means finding and printing
     violations.
@@ -2514,10 +2483,8 @@ def _process_file(full_path, template_linters, options, out):
         full_path: The full path of the file to lint.
         template_linters: A list of linting objects.
         options: A list of the options.
+        summary_results: A SummaryResults with a summary of the violations.
         out: output file
-
-    Returns:
-        The number of violations.
 
     """
     num_violations = 0
@@ -2525,11 +2492,10 @@ def _process_file(full_path, template_linters, options, out):
     file_name = os.path.basename(full_path)
     for template_linter in template_linters:
         results = template_linter.process_file(directory, file_name)
-        num_violations += results.print_results(options, out)
-    return num_violations
+        results.print_results(options, summary_results, out)
 
 
-def _process_current_walk(current_walk, template_linters, options, out):
+def _process_current_walk(current_walk, template_linters, options, summary_results, out):
     """
     For each linter, lints all the files in the current os walk.  This means
     finding and printing violations.
@@ -2538,10 +2504,8 @@ def _process_current_walk(current_walk, template_linters, options, out):
         current_walk: A walk returned by os.walk().
         template_linters: A list of linting objects.
         options: A list of the options.
+        summary_results: A SummaryResults with a summary of the violations.
         out: output file
-
-    Returns:
-        The number of violations.
 
     """
     num_violations = 0
@@ -2549,11 +2513,10 @@ def _process_current_walk(current_walk, template_linters, options, out):
     walk_files = current_walk[2]
     for walk_file in walk_files:
         full_path = os.path.join(walk_directory, walk_file)
-        num_violations += _process_file(full_path, template_linters, options, out)
-    return num_violations
+        _process_file(full_path, template_linters, options, summary_results, out)
 
 
-def _process_os_walk(starting_dir, template_linters, options, out):
+def _process_os_walk(starting_dir, template_linters, options, summary_results, out):
     """
     For each linter, lints all the directories in the starting directory.
 
@@ -2561,16 +2524,40 @@ def _process_os_walk(starting_dir, template_linters, options, out):
         starting_dir: The initial directory to begin the walk.
         template_linters: A list of linting objects.
         options: A list of the options.
+        summary_results: A SummaryResults with a summary of the violations.
         out: output file
-
-    Returns:
-        The number of violations.
 
     """
     num_violations = 0
     for current_walk in os.walk(starting_dir):
-        num_violations += _process_current_walk(current_walk, template_linters, options, out)
-    return num_violations
+        _process_current_walk(current_walk, template_linters, options, summary_results, out)
+
+
+def _lint(file_or_dir, template_linters, options, summary_results, out):
+    """
+    For each linter, lints the provided file or directory.
+
+    Arguments:
+        file_or_dir: The file or initial directory to lint.
+        template_linters: A list of linting objects.
+        options: A list of the options.
+        summary_results: A SummaryResults with a summary of the violations.
+        out: output file
+
+    """
+
+    if file_or_dir is not None and os.path.isfile(file_or_dir):
+        _process_file(file_or_dir, template_linters, options, summary_results, out)
+    else:
+        directory = "."
+        if file_or_dir is not None:
+            if os.path.exists(file_or_dir):
+                directory = file_or_dir
+            else:
+                raise ValueError("Path [{}] is not a valid file or directory.".format(file_or_dir))
+        _process_os_walk(directory, template_linters, options, summary_results, out)
+
+    summary_results.print_results(options, out)
 
 
 def main():
@@ -2579,11 +2566,9 @@ def main():
 
     Prints all violations.
     """
-    epilog = 'rules:\n'
-    for rule in Rules.__members__.values():
-        epilog += "  {0[0]}: {0[1]}\n".format(rule.value)
+    epilog = "For more help using the safe template linter, including details on how\n"
+    epilog += "to understand and fix any violations, read the docs here:\n"
     epilog += "\n"
-    epilog += "additional help:\n"
     # pylint: disable=line-too-long
     epilog += "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/safe_templates.html#safe-template-linter\n"
 
@@ -2597,6 +2582,10 @@ def main():
         help='Only display the filenames that contain violations.'
     )
     parser.add_argument(
+        '--rule-totals', dest='rule_totals', action='store_true',
+        help='Display the totals for each rule.'
+    )
+    parser.add_argument(
         '--verbose', dest='verbose', action='store_true',
         help='Print multiple lines where possible for additional context of violations.'
     )
@@ -2606,25 +2595,13 @@ def main():
 
     options = {
         'list_files': args.list_files,
-        'verbose': args.verbose
+        'rule_totals': args.rule_totals,
+        'verbose': args.verbose,
     }
     template_linters = [MakoTemplateLinter(), UnderscoreTemplateLinter(), JavaScriptLinter(), PythonLinter()]
+    summary_results = SummaryResults()
 
-    if args.path is not None and os.path.isfile(args.path):
-        num_violations = _process_file(args.path, template_linters, options, out=sys.stdout)
-    else:
-        directory = "."
-        if args.path is not None:
-            if os.path.exists(args.path):
-                directory = args.path
-            else:
-                raise ValueError("Path [{}] is not a valid file or directory.".format(args.path))
-        num_violations = _process_os_walk(directory, template_linters, options, out=sys.stdout)
-
-    if options['list_files'] is False:
-        # matches output of jshint for simplicity
-        print("")
-        print("{} violations found".format(num_violations))
+    _lint(args.path, template_linters, options, summary_results, out=sys.stdout)
 
 
 if __name__ == "__main__":

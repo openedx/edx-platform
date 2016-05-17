@@ -44,6 +44,8 @@ class TestEmailErrors(ModuleStoreTestCase):
     Test that errors from sending email are handled properly.
     """
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
         super(TestEmailErrors, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"

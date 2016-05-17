@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
-from openedx.core.djangolib.markup import Text, HTML
+from openedx.core.djangolib.markup import HTML, Text
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -85,7 +85,7 @@ site_status_msg = get_site_status_msg(course_id)
               </a>
             </li>
             <li class="tab-nav-item">
-              <a class="${'active ' if reverse('program_listing_view') == request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+              <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
                 ${_("Programs")}
               </a>
             </li>
@@ -194,15 +194,12 @@ site_status_msg = get_site_status_msg(course_id)
 </header>
 % if course:
 <!--[if lte IE 9]>
-<div class="ie-banner" aria-hidden="true">
-${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
     begin_strong=HTML('<strong>'),
     end_strong=HTML('</strong>'),
     chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
     ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
-  )
-}
-</div>
+)}</div>
 <![endif]-->
 % endif
 

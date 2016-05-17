@@ -1622,7 +1622,6 @@
     "Your message must have a subject.": "A sua mensagem deve ter um t\u00edtulo.", 
     "Your policy changes have been saved.": "As altera\u00e7\u00f5es na pol\u00edtica foram salvas.", 
     "Your post will be discarded.": "Sua publica\u00e7\u00e3o ser\u00e1 descartada.", 
-    "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "Seu pedido n\u00e3o pode ser conclu\u00eddo devido a um problema no servidor. Recarregue a p\u00e1gina e tente novamente. Se o erro persistir, clique em Ajuda para relatar o problema.", 
     "Your request could not be completed. Reload the page and try again.": "Seu pedido n\u00e3o p\u00f4de ser conclu\u00eddo. Recarregue a p\u00e1gina e tente novamente.", 
     "Your team could not be created.": "Sua equipe n\u00e3o p\u00f4de ser criada.", 
     "Your team could not be updated.": "Sua equipe n\u00e3o p\u00f4de ser atualizada.", 

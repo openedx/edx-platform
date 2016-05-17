@@ -847,6 +847,10 @@
               width: flex-grid(10, 12);
               display: inline-block;
             }
+            .delete-button {
+              padding-bottom: 3px;
+              line-height: 3.5rem;
+            }
           }
         }
       }

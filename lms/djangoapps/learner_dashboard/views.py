@@ -33,11 +33,32 @@ def view_programs(request):
             slug=program['marketing_slug']
         )
 
-    return render_to_response('learner_dashboard/programs.html', {
+    context = {
         'programs': programs,
         'progress': meter.progress,
         'xseries_url': marketing_root if ProgramsApiConfig.current().show_xseries_ad else None,
         'nav_hidden': True,
         'show_program_listing': show_program_listing,
-        'credentials': _get_xseries_credentials(request.user)
-    })
+        'credentials': _get_xseries_credentials(request.user),
+        'disable_courseware_js': True,
+        'uses_pattern_library': True
+    }
+
+    return render_to_response('learner_dashboard/programs.html', context)
+
+
+@login_required
+@require_GET
+def program_details(request, program_uuid):  # pylint: disable=unused-argument
+    """View programs in which the user is engaged."""
+    show_program_details = ProgramsApiConfig.current().show_program_details
+    if not show_program_details:
+        raise Http404
+
+    context = {
+        'nav_hidden': True,
+        'disable_courseware_js': True,
+        'uses_pattern_library': True
+    }
+
+    return render_to_response('learner_dashboard/program_details.html', context)

@@ -114,12 +114,6 @@
           margin-bottom: ($baseline*0.75);
           padding-bottom: 17px;
 
-          &:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-          }
-
           &:hover, &:focus {
             .title .icon {
               opacity: 1.0;
@@ -226,6 +220,12 @@
 
       // status
       .status {
+
+        @include clearfix();
+        box-sizing: border-box;
+        padding: $baseline;
+        background-color: $body-bg;
+        border: 1px solid $border-color-l3;
 
         .list--nav {
           margin: ($baseline/2) 0 0 0;
@@ -1278,10 +1278,6 @@
   .status-note {
     @extend %t-copy-sub2;
     position: relative;
-    margin-top: $baseline;
-    border-top: 1px solid $black-t0;
-    padding-top: ($baseline/2);
-
     p {
       @extend %t-copy-sub2;
     }
@@ -1296,15 +1292,11 @@
 
   // CASE: is denied
   &.is-denied {
+    border-top: 3px solid $red !important;
 
     .status-data-message {
       color: $error-color;
       border-bottom-color: rgba($error-color, 0.25);
-    }
-
-    .status-note {
-      color: desaturate($error-color, 65%);
-      border-top-color: rgba($error-color, 0.25);
     }
 
     .action-reverify {
@@ -1314,6 +1306,10 @@
       @include font-size(14);
     }
 
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
     .deco-arrow {
       @include triangle(($baseline/2), $error-color, up);
     }
@@ -1321,15 +1317,11 @@
 
   // CASE: is accepted
   &.is-accepted {
+    border-top: 3px solid $green !important;
 
     .status-data-message {
       color: $verified-color-lvl1;
       border-bottom-color: $verified-color-lvl4;
-    }
-
-    .status-note {
-      color: $m-gray-l1;
-      border-top-color: $verified-color-lvl4;
     }
 
     .deco-arrow {
@@ -1343,11 +1335,6 @@
     .status-data-message {
       color: $m-gray-d3;
       border-bottom-color: $m-gray-l4;
-    }
-
-    .status-note {
-      color: $m-gray-l1;
-      border-top-color: $m-gray-d3;
     }
   }
 }

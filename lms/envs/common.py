@@ -1495,6 +1495,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'style-learner-dashboard': {
+        'source_filenames': [
+            'css/lms-learner-dashboard.css',
+        ],
+        'output_filename': 'css/lms-learner-dashboard.css',
+    },
+    'style-learner-dashboard-rtl': {
+        'source_filenames': [
+            'css/lms-learner-dashboard-rtl.css',
+        ],
+        'output_filename': 'css/lms-learner-dashboard-rtl.css',
+    },
 }
 
 

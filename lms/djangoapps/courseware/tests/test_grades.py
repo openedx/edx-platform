@@ -151,6 +151,8 @@ class TestMaxScoresCache(SharedModuleStoreTestCase):
     Tests for the MaxScoresCache
     """
 
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     @classmethod
     def setUpClass(cls):
         super(TestMaxScoresCache, cls).setUpClass()

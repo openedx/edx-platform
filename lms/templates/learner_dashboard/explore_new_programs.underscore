@@ -2,7 +2,7 @@
     <%- gettext('Browse recently launched courses and see what\'s new in your favorite subjects') %>
 </div>
 <div class="ad-link">
-    <a href="<%- xseriesUrl %>" class="btn">
+    <a href="<%- xseriesUrl %>" class="btn-neutral">
         <i class="icon fa fa-search" aria-hidden="true"></i> 
         <span><%- gettext('Explore New XSeries') %></span>
     </a>

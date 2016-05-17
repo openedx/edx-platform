@@ -5,6 +5,7 @@ Acceptance tests for Studio related to the split_test module.
 import math
 from unittest import skip
 from nose.plugins.attrib import attr
+from flaky import flaky
 from selenium.webdriver.support.ui import Select
 
 from xmodule.partitions.partitions import Group
@@ -1044,6 +1045,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
         self.assertListEqual(group_names, rendered_group_names)
 
+    @flaky  # TODO TNL-4561
     def test_split_test_LMS_staff_view(self):
         """
         Scenario: Ensure that split test is correctly rendered in LMS staff mode as it is
