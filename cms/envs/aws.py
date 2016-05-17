@@ -179,6 +179,10 @@ ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 COMPREHENSIVE_THEME_DIR = path(ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', COMPREHENSIVE_THEME_DIR))
 
+# Include theme locale path for django translations lookup
+theme_root = ENV_ROOT / "themes" / THEME_NAME
+LOCALE_PATHS = (theme_root / 'conf/locale',) + LOCALE_PATHS
+
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
