@@ -1,10 +1,12 @@
 """ Django admin pages for student app """
 from django import forms
-from django.contrib.auth.models import User
-from ratelimitbackend import admin
-from xmodule.modulestore.django import modulestore
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from ratelimitbackend import admin
+from xmodule.modulestore.django import modulestore
 
 from config_models.admin import ConfigurationModelAdmin
 from student.models import (
@@ -12,6 +14,8 @@ from student.models import (
     PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
+
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -147,21 +151,16 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         model = CourseEnrollment
 
 
-class UserProfileAdmin(admin.ModelAdmin):
-    """ Admin interface for UserProfile model. """
-    list_display = ('user', 'name',)
-    raw_id_fields = ('user',)
-    show_full_result_count = False
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
+class UserProfileInline(admin.StackedInline):
+    """ Inline admin interface for UserProfile model. """
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = _('User profile')
 
-    def get_readonly_fields(self, request, obj=None):
-        # The user field should not be editable for an existing user profile.
-        if obj:
-            return self.readonly_fields + ('user',)
-        return self.readonly_fields
 
-    class Meta(object):
-        model = UserProfile
+class UserAdmin(BaseUserAdmin):
+    """ Admin interface for the User model. """
+    inlines = (UserProfileInline,)
 
 
 admin.site.register(UserTestGroup)
@@ -180,4 +179,4 @@ admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfi
 
 admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
 
-admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(User, UserAdmin)

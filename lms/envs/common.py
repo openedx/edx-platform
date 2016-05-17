@@ -2035,9 +2035,6 @@ INSTALLED_APPS = (
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
-    # Management commands used for configuration automation
-    'edx_management_commands.management_commands',
-
     # Verified Track Content Cohorting
     'verified_track_content',
 
