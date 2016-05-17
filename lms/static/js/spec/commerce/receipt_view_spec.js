@@ -36,7 +36,7 @@ define([
                 mockRequests(requests, 'GET', orderUrlFormat, data);
 
                 mockRequests(
-                    requests, 'GET', '/api/course_structure/v0/courses/course-v1:edx+dummy+2015_T3/', courseResponseData
+                    requests, 'GET', '/api/courses/v1/courses/course-v1:edx+dummy+2015_T3/', courseResponseData
                 );
 
                 mockRequests(requests, 'GET', '/api/credit/v1/providers/edx/', providerResponseData);
@@ -81,6 +81,7 @@ define([
                                     },
                                     {
                                         "name": "course_key",
+                                        "code": "course_key",
                                         "value": "course-v1:edx+dummy+2015_T3"
                                     },
                                     {
@@ -135,7 +136,7 @@ define([
                     "org": "edx",
                     "run": "2015_T2",
                     "course": "CS420",
-                    "uri": "http://test.com/api/course_structure/v0/courses/course-v1:edx+dummy+2015_T3/",
+                    "uri": "http://test.com/api/courses/v1/courses/course-v1:edx+dummy+2015_T3/",
                     "image_url": "/test.jpg",
                     "start": "2030-01-01T00:00:00Z",
                     "end": null
