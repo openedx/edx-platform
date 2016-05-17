@@ -52,6 +52,7 @@ from instructor_task.subtasks import (
 )
 from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 log = logging.getLogger('edx.celery.task')
 
@@ -421,7 +422,10 @@ def _get_source_address(course_id, course_title, truncate=True):
         return from_addr_format.format(
             course_title=course_title_no_quotes,
             course_name=course_name,
-            from_email=settings.BULK_EMAIL_DEFAULT_FROM_EMAIL,
+            from_email=theming_helpers.get_value(
+                'bulk_email_default_from_email',
+                settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+            )
         )
 
     from_addr = format_address(course_title_no_quotes)

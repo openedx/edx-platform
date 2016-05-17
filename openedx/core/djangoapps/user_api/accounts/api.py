@@ -33,6 +33,7 @@ from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
     UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 
 # Public access point for this function.
@@ -397,7 +398,7 @@ def request_password_change(email, orig_host, is_secure):
         # Generate a single-use link for performing a password reset
         # and email it to the user.
         form.save(
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=theming_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL),
             domain_override=orig_host,
             use_https=is_secure
         )
