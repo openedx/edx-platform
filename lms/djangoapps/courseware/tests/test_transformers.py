@@ -21,7 +21,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
     problem_metadata = {
         u'graded': True,
         u'weight': 1,
-        u'due': datetime.datetime(2099, 03, 15, 12, 30, 00, tzinfo=pytz.utc),
+        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
     }
 
     def setUp(self):
@@ -100,7 +100,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         problem_metadata = {
             u'graded': True,
             u'weight': 1,
-            u'due': datetime.datetime(2016, 10, 16, 00, 04, 00, tzinfo=pytz.utc),
+            u'due': datetime.datetime(2016, 10, 16, 0, 04, 0, tzinfo=pytz.utc),
             u'visible_to_staff_only': True,
         }
 
