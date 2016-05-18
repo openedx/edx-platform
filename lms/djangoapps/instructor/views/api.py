@@ -1881,6 +1881,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
+        is_staff=0,
     ).order_by('id')
     header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
     rows = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_id, save=False)] for s in students]

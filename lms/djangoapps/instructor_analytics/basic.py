@@ -214,6 +214,7 @@ def enrolled_students_features(course_key, features):
     students = User.objects.filter(
         courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
+        is_staff=0,
     ).order_by('username').select_related('profile')
 
     if include_cohort_column:
@@ -391,7 +392,8 @@ def list_problem_responses(course_key, problem_location):
 
     smdat = StudentModule.objects.filter(
         course_id=course_key,
-        module_state_key=problem_key
+        module_state_key=problem_key,
+        student__is_staff=0,
     )
     smdat = smdat.order_by('student')
 
