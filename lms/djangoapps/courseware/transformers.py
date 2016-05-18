@@ -8,6 +8,22 @@ from openedx.core.lib.block_structure.transformer import BlockStructureTransform
 from . import module_render
 
 
+class SystemUser(AnonymousUser):
+    """
+    A User that can act on behalf of system actions, when a user object is 
+    needed, but no real user exists.  
+
+    This differs from a regular anonymous user in two ways: First, there is no 
+    physical user behind its actions; it represents the system itself. Second,
+    the SystemUser is trusted, while a regular AnonymousUser is not.  Like the
+    AnonymousUser, though, this User is not represented in the database, and
+    has no primary key.
+    """
+
+    username = u'System user'
+    known = False
+
+
 class GradesBlockTransformer(BlockStructureTransformer):
     """
     The GradesBlockTransformer collects grading information and stores it on
@@ -79,11 +95,10 @@ class GradesBlockTransformer(BlockStructureTransformer):
 
         For implementation reasons, we need to pull the max_score from the
         XModule, even though the data is not user specific.  Here we bind the
-        data to an AnonymousUser.
+        data to a SystemUser.
         """
         request = RequestFactory().get('/dummy-collect-max-grades')
-        request.user = AnonymousUser()
-        request.user.known = False
+        request.user = SystemUser()
         request.session = {}
         for block_locator in block_structure.post_order_traversal():
             course_id = unicode(block_locator.course_key)
