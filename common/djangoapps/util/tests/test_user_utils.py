@@ -25,4 +25,3 @@ class SystemUserTestCase(unittest.TestCase):
 
     def test_system_user_is_not_superuser(self):
         self.assertFalse(self.sysuser.is_superuser)
-
