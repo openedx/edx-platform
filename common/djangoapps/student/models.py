@@ -495,15 +495,15 @@ class OrganizationUser(models.Model):
     (in the Django/ORM sense) the modeling and integrity is limited to that
     of specifying course identifier strings in this model.
     """
-    user_id = models.CharField(max_length=255, db_index=True)
+    user_id = models.ForeignKey(User)
     organization = models.ForeignKey(Organization, db_index=True)
     active = models.BooleanField(default=True)
 
     class Meta:
         """ Meta class for this Django model """
         unique_together = (("user_id", "organization"),)
-        verbose_name = _('Link Course')
-        verbose_name_plural = _('Link Courses')
+        verbose_name = _('Link Organization')
+        verbose_name_plural = _('Link Organizations')
 
 # TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group

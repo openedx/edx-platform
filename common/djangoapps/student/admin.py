@@ -13,7 +13,7 @@ from student.models import (
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 
-from organizations.models import (Organization, OrganizationCourse)
+from organizations.models import Organization
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -107,6 +107,13 @@ class OrganizationUserAdmin(admin.ModelAdmin):
     """
     list_display = ('organization', 'active')
 
+    raw_id_fields = ('user_id',)
+    search_fields = ('user__username',)
+
+
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user_id')
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
         list down the active organizations
@@ -114,7 +121,7 @@ class OrganizationUserAdmin(admin.ModelAdmin):
         if db_field.name == 'organization':
             kwargs['queryset'] = Organization.objects.filter(active=True)
 
-        return super(OrganizationCourseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(OrganizationUserAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class CourseAccessRoleAdmin(admin.ModelAdmin):
