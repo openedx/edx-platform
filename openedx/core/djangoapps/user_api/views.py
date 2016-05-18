@@ -160,12 +160,16 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "first_name",
+        "last_name",
         "city",
         "state",
         "country",
         "gender",
         "year_of_birth",
         "level_of_education",
+        "company",
+        "title",
         "mailing_address",
         "goals",
         "honor_code",
@@ -631,6 +635,87 @@ class RegistrationView(APIView):
             label=state_label,
             required=required
         )
+
+    def _add_company_field(self, form_desc, required=False):
+        """Add a Company field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Company
+        company_label = _(u"Company")
+
+        form_desc.add_field(
+            "company",
+            label=company_label,
+            required=required
+        )
+
+    def _add_title_field(self, form_desc, required=False):
+        """Add a Title field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Title
+        title_label = _(u"Title")
+
+        form_desc.add_field(
+            "title",
+            label=title_label,
+            required=required
+        )
+
+    def _add_first_name_field(self, form_desc, required=True):
+        """Add a First Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        first_name_label = _(u"First Name")
+
+        form_desc.add_field(
+            "first_name",
+            label=first_name_label,
+            required=required
+        )
+
+    def _add_last_name_field(self, form_desc, required=True):
+        """Add a Last Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        last_name_label = _(u"Last Name")
+
+        form_desc.add_field(
+            "last_name",
+            label=last_name_label,
+            required=required
+        )
+
 
     def _add_country_field(self, form_desc, required=True):
         """Add a country field to a form description.

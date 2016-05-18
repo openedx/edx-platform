@@ -1508,6 +1508,8 @@ def _do_create_account(form, custom_form=None):
     user = User(
         username=form.cleaned_data["username"],
         email=form.cleaned_data["email"],
+        first_name=form.cleaned_data["first_name"],
+        last_name=form.cleaned_data["last_name"],
         is_active=False
     )
     user.set_password(form.cleaned_data["password"])
@@ -1546,7 +1548,7 @@ def _do_create_account(form, custom_form=None):
 
     profile_fields = [
         "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
-        "year_of_birth"
+        "year_of_birth", "title", "company"
     ]
     profile = UserProfile(
         user=user,
