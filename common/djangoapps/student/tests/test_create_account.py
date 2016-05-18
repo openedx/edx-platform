@@ -303,6 +303,7 @@ class TestCreateAccountValidation(TestCase):
     """
     Test validation of various parameters in the create_account view
     """
+
     def setUp(self):
         super(TestCreateAccountValidation, self).setUp()
         self.url = reverse("create_account")
