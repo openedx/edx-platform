@@ -836,10 +836,15 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     # Not that the access check needs to happen after the descriptor is bound
     # for the student, since there may be field override data for the student
     # that affects xblock visibility.
-    if getattr(user, 'known', True):
+    def _needs_access_check(user):
+        """
+        Skip access checks for unknown (LTI) users or SystemUsers.
+        """
+        from .transformers import SystemUser  # Circular import breaker: move SystemUser to a better home.
+        return getattr(user, 'known', True) and not isinstance(user, SystemUser)
+    if _needs_access_check(user):
         if not has_access(user, 'load', descriptor, course_id):
             return None
-
     return descriptor
 
 

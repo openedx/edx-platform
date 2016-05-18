@@ -10,18 +10,14 @@ from . import module_render
 
 class SystemUser(AnonymousUser):
     """
-    A User that can act on behalf of system actions, when a user object is 
-    needed, but no real user exists.  
+    A User that can act on behalf of system actions, when a user object is
+    needed, but no real user exists.
 
-    This differs from a regular anonymous user in two ways: First, there is no 
-    physical user behind its actions; it represents the system itself. Second,
-    the SystemUser is trusted, while a regular AnonymousUser is not.  Like the
-    AnonymousUser, though, this User is not represented in the database, and
+    Like the AnonymousUser, this User is not represented in the database, and
     has no primary key.
     """
-
-    username = u'System user'
-    known = False
+    def __unicode__(self):
+        return u'SystemUser'
 
 
 class GradesBlockTransformer(BlockStructureTransformer):
