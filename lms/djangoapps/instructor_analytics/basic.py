@@ -285,13 +285,18 @@ def list_may_enroll(course_key, features):
     """
     may_enroll_and_unenrolled = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_key)
 
+    non_staff_pool = User.objects.filter(
+        is_staff=0,
+    )
+
     def extract_student(student, features):
         """
         Build dict containing information about a single student.
         """
         return dict((feature, getattr(student, feature)) for feature in features)
 
-    return [extract_student(student, features) for student in may_enroll_and_unenrolled]
+    non_staff_mask = [extract_student(student, features) for student in non_staff_pool]
+    return [extract_student(student, features) for student in may_enroll_and_unenrolled if student in non_staff_mask]
 
 
 def get_proctored_exam_results(course_key, features):
