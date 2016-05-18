@@ -317,7 +317,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns this course's URL name.
         """
-        return block_metadata_utils.url_name_for_block(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):

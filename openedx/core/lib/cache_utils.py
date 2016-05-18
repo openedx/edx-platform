@@ -8,7 +8,7 @@ import zlib
 from xblock.core import XBlock
 
 
-class memoized(object):
+class Memoized(object):
     """
     Decorator. Caches a function's return value each time it is called.
     If called later with the same arguments, the cached value is returned

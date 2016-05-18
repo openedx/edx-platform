@@ -703,8 +703,8 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    courseware_summary = grades.progress_summary(student, request, course)
-    grade_summary = grades.grade(student, request, course)
+    courseware_summary = grades.progress_summary(student, course)
+    grade_summary = grades.grade(student, course)
     studio_url = get_studio_url(course, 'settings/grading')
 
     if courseware_summary is None:
@@ -1023,7 +1023,7 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
 
     if grade_summary is None:
-        grade_summary = grades.grade(student, request, course)
+        grade_summary = grades.grade(student, course)
 
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 

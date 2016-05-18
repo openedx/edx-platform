@@ -27,7 +27,7 @@ from xblock.fields import (
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
-from xmodule import course_metadata_utils, block_metadata_utils
+from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError

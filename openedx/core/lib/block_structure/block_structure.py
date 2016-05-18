@@ -309,12 +309,6 @@ class FieldData(object):
         else:
             delattr(self.fields, field_name)
 
-    def __delattr__(self, field_name):
-        if self._is_own_field(field_name):
-            return super(FieldData, self).__delattr__(field_name)
-        else:
-            delattr(self.fields, field_name)
-
     def _is_own_field(self, field_name):
         """
         Returns whether the given field_name is the name of an
@@ -349,6 +343,11 @@ class TransformerDataMap(dict):
         dict.__delitem__(self, key)
 
     def get_or_create(self, key):
+        """
+        Returns the TransformerData associated with the given
+        key.  If not found, creates and returns a new TransformerData
+        and maps it to the given key.
+        """
         try:
             return self[key]
         except KeyError:
@@ -655,6 +654,11 @@ class BlockStructureBlockData(BlockStructure):
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.VERSION)
 
     def _get_or_create_block(self, usage_key):
+        """
+        Returns the BlockData associated with the given usage_key.
+        If not found, creates and returns a new BlockData and
+        maps it to the given key.
+        """
         try:
             return self._block_data_map[usage_key]
         except KeyError:

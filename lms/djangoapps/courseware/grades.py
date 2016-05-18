@@ -15,7 +15,7 @@ from django.test.client import RequestFactory
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from openedx.core.lib.cache_utils import memoized
+from openedx.core.lib.cache_utils import Memoized
 from openedx.core.lib.gating import api as gating_api
 from course_blocks.transformers.grades import GradesBlockTransformer
 from courseware.model_data import FieldDataCache, ScoresClient
@@ -173,7 +173,7 @@ class ProgressSummary(object):
         return earned, possible
 
 
-@memoized
+@Memoized
 def block_types_with_scores():
     """
     Returns the block types that could have a score.
@@ -184,10 +184,10 @@ def block_types_with_scores():
     which have state but cannot ever impact someone's grade.
     """
     return frozenset(
-            cat for (cat, xblock_class) in XBlock.load_classes() if (
-                getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
-            )
+        cat for (cat, xblock_class) in XBlock.load_classes() if (
+            getattr(xblock_class, 'has_score', False) or getattr(xblock_class, 'has_children', False)
         )
+    )
 
 
 def possibly_scored(usage_key):
@@ -230,15 +230,15 @@ def grading_context(course_structure):
     """
     all_graded_blocks = []
     all_graded_sections = defaultdict(list)
-    
+
     for chapter_key in course_structure.get_children(course_structure.root_block_usage_key):
         for section_key in course_structure.get_children(chapter_key):
             section = course_structure[section_key]
             scored_descendants_of_section = [section]
             if section.graded:
                 for descendant_key in course_structure.post_order_traversal(
-                    filter_func=possibly_scored,
-                    start_node=section_key,
+                        filter_func=possibly_scored,
+                        start_node=section_key,
                 ):
                     scored_descendants_of_section.append(
                         course_structure[descendant_key],
@@ -355,13 +355,13 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-def grade(student, request, course, keep_raw_scores=False):
+def grade(student, course, keep_raw_scores=False):
     """
     Returns the grade of the student.
 
     Also sends a signal to update the minimum grade requirement status.
     """
-    grade_summary = _grade(student, request, course, keep_raw_scores)
+    grade_summary = _grade(student, course, keep_raw_scores)
     responses = GRADES_UPDATED.send_robust(
         sender=None,
         username=student.username,
@@ -376,7 +376,7 @@ def grade(student, request, course, keep_raw_scores=False):
     return grade_summary
 
 
-def _grade(student, request, course, keep_raw_scores):
+def _grade(student, course, keep_raw_scores):
     """
     Unwrapped version of "grade"
 
@@ -417,11 +417,40 @@ def _grade(student, request, course, keep_raw_scores):
         # be hidden behind the ScoresClient.
         max_scores_cache.fetch_from_remote(scorable_locations)
 
-    raw_scores = []
+    totaled_scores, raw_scores = _calculate_totaled_scores(
+        student, grading_context_result, max_scores_cache, submissions_scores, scores_client, keep_raw_scores
+    )
 
+    with outer_atomic():
+        # Grading policy might be overriden by a CCX, need to reset it
+        course.set_grading_policy(course.grading_policy)
+        grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
+
+        # We round the grade here, to make sure that the grade is an whole percentage and
+        # doesn't get displayed differently than it gets grades
+        grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
+
+        letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
+        grade_summary['grade'] = letter_grade
+        grade_summary['totaled_scores'] = totaled_scores   # make this available, eg for instructor download & debugging
+        if keep_raw_scores:
+            # way to get all RAW scores out to instructor
+            # so grader can be double-checked
+            grade_summary['raw_scores'] = raw_scores
+
+        max_scores_cache.push_to_remote()
+
+    return grade_summary
+
+
+def _calculate_totaled_scores(
+    student, grading_context_result, max_scores_cache, submissions_scores, scores_client, keep_raw_scores
+):
+    """
+    Returns the totaled scores, which can be passed to the grader.
+    """
+    raw_scores = []
     totaled_scores = {}
-    # This next complicated loop is just to collect the totaled_scores, which is
-    # passed to the grader
     for section_format, sections in grading_context_result['all_graded_sections'].iteritems():
         format_scores = []
         for section_info in sections:
@@ -460,7 +489,7 @@ def _grade(student, request, course, keep_raw_scores):
                         if correct is None and total is None:
                             continue
 
-                        if settings.GENERATE_PROFILE_SCORES:    # for debugging!
+                        if settings.GENERATE_PROFILE_SCORES:  # for debugging!
                             if total > 1:
                                 correct = random.randrange(max(total - 2, 1), total + 1)
                             else:
@@ -487,7 +516,7 @@ def _grade(student, request, course, keep_raw_scores):
                 else:
                     graded_total = Score(0.0, 1.0, True, section_name, None)
 
-                #Add the graded total to totaled_scores
+                # Add the graded total to totaled_scores
                 if graded_total.possible > 0:
                     format_scores.append(graded_total)
                 else:
@@ -498,26 +527,7 @@ def _grade(student, request, course, keep_raw_scores):
 
         totaled_scores[section_format] = format_scores
 
-    with outer_atomic():
-        # Grading policy might be overriden by a CCX, need to reset it
-        course.set_grading_policy(course.grading_policy)
-        grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
-
-        # We round the grade here, to make sure that the grade is an whole percentage and
-        # doesn't get displayed differently than it gets grades
-        grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
-
-        letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
-        grade_summary['grade'] = letter_grade
-        grade_summary['totaled_scores'] = totaled_scores   # make this available, eg for instructor download & debugging
-        if keep_raw_scores:
-            # way to get all RAW scores out to instructor
-            # so grader can be double-checked
-            grade_summary['raw_scores'] = raw_scores
-
-        max_scores_cache.push_to_remote()
-
-    return grade_summary
+    return totaled_scores, raw_scores
 
 
 def grade_for_percentage(grade_cutoffs, percentage):
@@ -542,12 +552,12 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-def progress_summary(student, request, course):
+def progress_summary(student, course):
     """
     Returns progress summary for all chapters in the course.
     """
 
-    progress = _progress_summary(student, request, course)
+    progress = _progress_summary(student, course)
     if progress:
         return progress.chapters
     else:
@@ -559,11 +569,10 @@ def get_weighted_scores(student, course):
     Uses the _progress_summary method to return a ProgressSummary object
     containing details of a students weighted scores for the course.
     """
-    request = _get_mock_request(student)
-    return _progress_summary(student, request, course)
+    return _progress_summary(student, course)
 
 
-def _progress_summary(student, request, course):
+def _progress_summary(student, course):
     """
     Unwrapped version of "progress_summary".
 
@@ -623,8 +632,8 @@ def _progress_summary(student, request, course):
             scores = []
 
             for descendant_key in course_structure.post_order_traversal(
-                filter_func=possibly_scored,
-                start_node=section_key,
+                    filter_func=possibly_scored,
+                    start_node=section_key,
             ):
                 descendant = course_structure[descendant_key]
 
@@ -769,13 +778,7 @@ def iterate_grades_for(course_or_id, students, keep_raw_scores=False):
     for student in students:
         with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course.id)]):
             try:
-                request = _get_mock_request(student)
-                # Grading calls problem rendering, which calls masquerading,
-                # which checks session vars -- thus the empty session dict below.
-                # It's not pretty, but untangling that is currently beyond the
-                # scope of this feature.
-                request.session = {}
-                gradeset = grade(student, request, course, keep_raw_scores)
+                gradeset = grade(student, course, keep_raw_scores)
                 yield student, gradeset, ""
             except Exception as exc:  # pylint: disable=broad-except
                 # Keep marching on even if this student couldn't be graded for

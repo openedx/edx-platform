@@ -30,7 +30,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-def _grade_with_errors(student, request, course, keep_raw_scores=False):
+def _grade_with_errors(student, course, keep_raw_scores=False):
     """This fake grade method will throw exceptions for student3 and
     student4, but allow any other students to go through normal grading.
 
@@ -41,7 +41,7 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     if student.username in ['student3', 'student4']:
         raise Exception("I don't like {}".format(student.username))
 
-    return grade(student, request, course, keep_raw_scores=keep_raw_scores)
+    return grade(student, course, keep_raw_scores=keep_raw_scores)
 
 
 @attr('shard_1')
