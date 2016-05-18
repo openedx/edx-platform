@@ -16,7 +16,6 @@ from openedx.core.lib.graph_traversals import traverse_topologically, traverse_p
 from .exceptions import TransformerException
 
 
-
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -450,7 +449,10 @@ class BlockStructureBlockData(BlockStructure):
             key (string) - A dictionary key to the transformer's data
                 that is requested.
         """
-        return getattr(self.transformer_data.get(transformer, {}), key, default)
+        try:
+            return getattr(self.transformer_data[transformer], key, default)
+        except KeyError:
+            return default
 
     def set_transformer_data(self, transformer, key, value):
         """

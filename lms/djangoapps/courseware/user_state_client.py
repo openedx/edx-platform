@@ -110,7 +110,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported, not {}".format(scope))
 
-
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:

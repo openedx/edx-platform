@@ -658,7 +658,6 @@ def _progress_summary(student, course):
                 scores.append(weighted_location_score)
                 locations_to_weighted_scores[descendant.location] = weighted_location_score
 
-            scores.reverse()
             escaped_section_name = block_metadata_utils.display_name_with_default_escaped(section)
             section_total, _ = graders.aggregate_scores(scores, escaped_section_name)
 
