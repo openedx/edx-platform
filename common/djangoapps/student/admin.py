@@ -9,9 +9,11 @@ from opaque_keys.edx.keys import CourseKey
 from config_models.admin import ConfigurationModelAdmin
 from student.models import (
     UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
-    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, OrganizationUser
 )
 from student.roles import REGISTERED_ACCESS_ROLES
+
+from organizations.models import (Organization, OrganizationCourse)
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -99,6 +101,22 @@ class CourseAccessRoleForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
 
 
+class OrganizationUserAdmin(admin.ModelAdmin):
+    """
+    Admin for the UserOrganization table.
+    """
+    list_display = ('organization', 'active')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        list down the active organizations
+        """
+        if db_field.name == 'organization':
+            kwargs['queryset'] = Organization.objects.filter(active=True)
+
+        return super(OrganizationCourseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """
     form = CourseAccessRoleForm
@@ -180,3 +198,5 @@ admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfi
 admin.site.register(CourseEnrollment, CourseEnrollmentAdmin)
 
 admin.site.register(UserProfile, UserProfileAdmin)
+
+admin.site.register(OrganizationUser, OrganizationUserAdmin)

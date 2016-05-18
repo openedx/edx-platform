@@ -56,6 +56,7 @@ from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 from util.milestones_helpers import is_entrance_exams_enabled
 
+from organizations.models import Organization
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 log = logging.getLogger(__name__)
@@ -227,10 +228,6 @@ class UserProfile(models.Model):
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
-
-    # check ORG length
-    # Add in choices from organizations model
-    organization = models.CharField(blank=True, max_length=255, db_index=True)
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
@@ -491,6 +488,22 @@ def unique_id_for_user(user, save=True):
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None, save=save)
 
+class OrganizationUser(models.Model):
+    """
+    An OrganizationCourse represents the link between an Organization and a
+    Course (via course key). Because Courses are not true Open edX entities
+    (in the Django/ORM sense) the modeling and integrity is limited to that
+    of specifying course identifier strings in this model.
+    """
+    user_id = models.CharField(max_length=255, db_index=True)
+    organization = models.ForeignKey(Organization, db_index=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        """ Meta class for this Django model """
+        unique_together = (("user_id", "organization"),)
+        verbose_name = _('Link Course')
+        verbose_name_plural = _('Link Courses')
 
 # TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
@@ -498,7 +511,6 @@ class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
     description = models.TextField(blank=True)
-
 
 class Registration(models.Model):
     ''' Allows us to wait for e-mail before user is registered. A
