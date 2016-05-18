@@ -58,7 +58,7 @@ class BokChoyTestSuite(TestSuite):
         self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', DEFAULT_VERBOSITY)
         self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
-        self.verify_xss = kwargs.get('verify_xss', os.environ.get('VERIFY_XSS', False))
+        self.verify_xss = kwargs.get('verify_xss', os.environ.get('VERIFY_XSS', True))
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
