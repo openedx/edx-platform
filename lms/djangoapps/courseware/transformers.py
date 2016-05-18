@@ -1,24 +1,11 @@
 """
 Grades Transformer
 """
-from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
 
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from util.user_utils import SystemUser
 from . import module_render
-
-
-class SystemUser(AnonymousUser):
-    """
-    A User that can act on behalf of system actions, when a user object is
-    needed, but no real user exists.
-
-    Like the AnonymousUser, this User is not represented in the database, and
-    has no primary key.
-    """
-    # pylint: disable=abstract-method
-    def __unicode__(self):
-        return u'SystemUser'
 
 
 class GradesBlockTransformer(BlockStructureTransformer):
