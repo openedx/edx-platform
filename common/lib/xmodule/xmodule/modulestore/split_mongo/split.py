@@ -62,7 +62,6 @@ from importlib import import_module
 from mongodb_proxy import autoretry_read
 from path import Path as path
 from pytz import UTC
-import traceback
 from bson.objectid import ObjectId
 
 from xblock.core import XBlock
@@ -688,10 +687,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if self.request_cache is not None:
             self.services["request_cache"] = self.request_cache
 
-        # set the maximum number of courses we expect
-        # to see in the request cache
-        self.max_num_courses_in_cache = 10
-
         self.signal_handler = signal_handler
 
     def close_connections(self):
@@ -800,26 +795,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if self.request_cache is not None:
             self.request_cache.data.setdefault('course_cache', {})[course_version_guid] = system
-            number_courses_in_cache = len(self.request_cache.data['course_cache'])
-            if number_courses_in_cache > self.max_num_courses_in_cache:
-                # We shouldn't have any scenarios where there are many
-                # courses in the request cache. If there are, it's probably
-                # indicative of a leak. In this case, we should log that here
-                # with a stacktrace.
-                course_structure_ids = self.request_cache.data['course_cache'].keys()[:10]
-                log.warning(
-                    (
-                        "There are more than %d (%d) "
-                        "courses in the request cache. This may be indicative "
-                        "of a memory leak.\n\nHere are some of the course "
-                        "structures' mongo ids that are now in the cache: %s\n\n"
-                        "And here's the current stack:\n%s"
-                    ),
-                    self.max_num_courses_in_cache,
-                    number_courses_in_cache,
-                    ", ".join(unicode(structure_id) for structure_id in course_structure_ids),
-                    "".join(traceback.format_stack()[-10:])
-                )
         return system
 
     def _clear_cache(self, course_version_guid=None):
