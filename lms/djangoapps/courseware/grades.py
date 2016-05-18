@@ -444,12 +444,12 @@ def _grade(student, course, keep_raw_scores):
 
 
 def _calculate_totaled_scores(
-    student,
-    grading_context_result,
-    max_scores_cache,
-    submissions_scores,
-    scores_client,
-    keep_raw_scores,
+        student,
+        grading_context_result,
+        max_scores_cache,
+        submissions_scores,
+        scores_client,
+        keep_raw_scores,
 ):
     """
     Returns the totaled scores, which can be passed to the grader.

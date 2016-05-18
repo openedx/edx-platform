@@ -133,8 +133,8 @@ class CourseMetadataUtilsTestCase(TestCase):
                 ),
             ]),
             FunctionTest(url_name_for_block, [
-                TestScenario((self.demo_course.location,), self.demo_course.location.name),
-                TestScenario((self.html_course.location,), self.html_course.location.name),
+                TestScenario((self.demo_course,), self.demo_course.location.name),
+                TestScenario((self.html_course,), self.html_course.location.name),
             ]),
             FunctionTest(display_name_with_default_escaped, [
                 # Test course with no display name.
