@@ -39,7 +39,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
 from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
-from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from courseware.views.index import render_accordion, CoursewareIndex
@@ -196,7 +196,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
         self.chapter = ItemFactory.create(
             category='chapter',
             parent_location=self.course.location,
@@ -322,6 +322,105 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('Problem 1', response.content)
         self.assertNotIn('Problem 2', response.content)
+
+    def _create_global_staff_user(self):
+        """
+        Create global staff user and log them in
+        """
+        self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.client.login(username=self.global_staff.username, password='test')
+
+    def _create_url_for_enroll_staff(self):
+        """
+        creates the courseware url and enroll staff url
+        """
+        # create the _next parameter
+        courseware_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course_key),
+                'chapter': unicode(self.chapter.location.name),
+                'section': unicode(self.section.location.name),
+            }
+        )
+        # create the url for enroll_staff view
+        enroll_url = "{enroll_url}?next={courseware_url}".format(
+            enroll_url=reverse('enroll_staff', kwargs={'course_id': unicode(self.course.id)}),
+            courseware_url=courseware_url
+        )
+        return courseware_url, enroll_url
+
+    @ddt.data(
+        ({'enroll': "Enroll"}, True),
+        ({'dont_enroll': "Don't enroll"}, False))
+    @ddt.unpack
+    def test_enroll_staff_redirection(self, data, enrollment):
+        """
+        Verify unenrolled staff is redirected to correct url.
+        """
+        self._create_global_staff_user()
+        courseware_url, enroll_url = self._create_url_for_enroll_staff()
+        response = self.client.post(enroll_url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # we were redirected to our current location
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        if enrollment:
+            self.assertRedirects(response, courseware_url)
+        else:
+            self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+
+    def test_enroll_staff_with_invalid_data(self):
+        """
+        If we try to post with an invalid data pattern, then we'll redirected to
+        course about page.
+        """
+        self._create_global_staff_user()
+        __, enroll_url = self._create_url_for_enroll_staff()
+        response = self.client.post(enroll_url, data={'test': "test"})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+
+    def test_courseware_redirection(self):
+        """
+        Tests that a global staff member is redirected to the staff enrollment page.
+
+        Un-enrolled Staff user should be redirected to the staff enrollment page accessing courseware,
+        user chooses to enroll in the course. User is enrolled and redirected to the requested url.
+
+        Scenario:
+            1. Un-enrolled staff tries to access any course vertical (courseware url).
+            2. User is redirected to the staff enrollment page.
+            3. User chooses to enroll in the course.
+            4. User is enrolled in the course and redirected to the requested courseware url.
+        """
+        self._create_global_staff_user()
+        courseware_url, enroll_url = self._create_url_for_enroll_staff()
+
+        # Accessing the courseware url in which not enrolled & redirected to staff enrollment page
+        response = self.client.get(courseware_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertRedirects(response, enroll_url)
+
+        # Accessing the enroll staff url and verify the correct url
+        response = self.client.get(enroll_url)
+        self.assertEqual(response.status_code, 200)
+        response_content = response.content
+        self.assertIn('Enroll', response_content)
+        self.assertIn("dont_enroll", response_content)
+
+        # Post the valid data to enroll the staff in the course
+        response = self.client.post(enroll_url, data={'enroll': "Enroll"}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(302, response.redirect_chain[0])
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertRedirects(response, courseware_url)
+
+        # Verify staff has been enrolled to the given course
+        self.assertTrue(CourseEnrollment.is_enrolled(self.global_staff, self.course.id))
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})

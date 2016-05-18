@@ -15,6 +15,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from django.shortcuts import redirect
+
+from courseware.url_helpers import get_redirect_url_for_global_staff
 from edxmako.shortcuts import render_to_response, render_to_string
 import logging
 import newrelic.agent
@@ -26,7 +28,9 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from shoppingcart.models import CourseRegistrationCode
+from student.models import CourseEnrollment
 from student.views import is_course_blocked
+from student.roles import GlobalStaff
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -89,6 +93,7 @@ class CoursewareIndex(View):
         self.section_url_name = section
         self.position = position
         self.chapter, self.section = None, None
+        self.url = request.path
 
         try:
             self._init_new_relic()
@@ -221,6 +226,11 @@ class CoursewareIndex(View):
                 self.effective_user,
                 unicode(self.course.id)
             )
+            user_is_global_staff = GlobalStaff().has_user(self.effective_user)
+            user_is_enrolled = CourseEnrollment.is_enrolled(self.effective_user, self.course_key)
+            if user_is_global_staff and not user_is_enrolled:
+                redirect_url = get_redirect_url_for_global_staff(self.course_key, _next=self.url)
+                raise Redirect(redirect_url)
             raise Redirect(reverse('about_course', args=[unicode(self.course.id)]))
 
     def _redirect_if_needed_for_prereqs(self):
