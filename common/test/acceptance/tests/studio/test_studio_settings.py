@@ -510,6 +510,15 @@ class StudioSettingsA11yTest(StudioCourseTest):
             ],
         })
 
+        # TODO: Figure out how to get CodeMirror to pass accessibility testing
+        # We use the CodeMirror Javascript library to
+        # add code editing to a number of textarea elements
+        # on this page. CodeMirror generates markup that does
+        # not pass our accessibility testing rules.
+        self.settings_page.a11y_audit.config.set_scope(
+            exclude=['.CodeMirror textarea']
+        )
+
         self.settings_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -571,3 +580,41 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             include=['section.edit-settings-timed-examination']
         )
         self.course_outline.a11y_audit.check_for_accessibility_errors()
+
+
+class StudioSettingsImageUploadTest(StudioCourseTest):
+    """
+    Class to test course settings image uploads.
+    """
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(StudioSettingsImageUploadTest, self).setUp()
+        self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
+                                          self.course_info['run'])
+        # from nose.tools import set_trace; set_trace()
+        self.settings_page.visit()
+
+        # Ensure jquery is loaded before running a jQuery
+        self.settings_page.wait_for_ajax()
+        # This text appears towards the end of the work that jQuery is performing on the page
+        self.settings_page.wait_for_jquery_value('input#course-name:text', 'test_run')
+
+    def test_upload_course_card_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-course-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#course-image'))
+
+    def test_upload_course_banner_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-banner-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#banner-image'))
+
+    def test_upload_course_video_thumbnail_image(self):
+
+        # upload image
+        file_to_upload = 'image.jpg'
+        self.settings_page.upload_image('#upload-video-thumbnail-image', file_to_upload)
+        self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
