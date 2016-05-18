@@ -378,6 +378,13 @@ def _accessible_courses_summary_list(request):
     return courses_summary, in_process_course_actions
 
 
+def _user_in_same_org(user, course_id):
+    """
+    Checks if user ORG matches course ORG
+    """
+    return False
+
+
 def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
@@ -393,6 +400,12 @@ def _accessible_courses_list(request):
         # TODO remove this condition when templates purged from db
         if course.location.course == 'templates':
             return False
+
+        # If the course ORG does not match user ORG - this
+        # will likely override groups and break tests
+        print("--------------------------")
+        if not _user_in_same_org(request.user, course.id):
+            return False;
 
         return has_studio_read_access(request.user, course.id)
 
