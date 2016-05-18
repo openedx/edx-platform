@@ -68,6 +68,7 @@ from util import milestones_helpers
 from util.json_request import JsonResponse
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from util.user_utils import SystemUser
 from xblock.runtime import KvsFieldData
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -840,7 +841,6 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         """
         Skip access checks for unknown (LTI) users or SystemUsers.
         """
-        from .transformers import SystemUser  # Circular import breaker: move SystemUser to a better home.
         return getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if _needs_access_check(user):
         if not has_access(user, 'load', descriptor, course_id):
