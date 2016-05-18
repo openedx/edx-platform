@@ -582,7 +582,13 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         super(StudioSettingsImageUploadTest, self).setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
+        # from nose.tools import set_trace; set_trace()
         self.settings_page.visit()
+
+        # Ensure jquery is loaded before running a jQuery
+        self.settings_page.wait_for_ajax()
+        # This text appears towards the end of the work that jQuery is performing on the page
+        self.settings_page.wait_for_jquery_value('input#course-name:text', 'test_run')
 
     @flaky(max_runs=20, min_passes=20)
     def test_upload_course_card_image(self):
