@@ -6,7 +6,6 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 from unittest import skip
 
-from .base_studio_test import StudioCourseTest
 from ...fixtures.config import ConfigModelFixture
 from ...fixtures.course import CourseFixture
 from ...pages.studio.settings import SettingsPage
@@ -50,6 +49,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
+    @flaky  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
