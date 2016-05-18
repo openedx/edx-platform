@@ -244,9 +244,6 @@ def i18n_release_push():
     Push release-specific resources to Transifex.
     """
     resources = find_release_resources()
-    if resources is None:
-        return
-
     sh("i18n_tool transifex push " + " ".join(resources))
 
 
@@ -259,9 +256,6 @@ def i18n_release_pull():
     Pull release-specific translations from Transifex.
     """
     resources = find_release_resources()
-    if resources is None:
-        return
-
     sh("i18n_tool transifex pull " + " ".join(resources))
 
 
@@ -273,7 +267,8 @@ def find_release_resources():
     two resources defined named "release-*".  Check that this is true.  If
     there's a problem, print messages about it.
 
-    Returns a list of resource names, or None if the file doesn't validate.
+    Returns a list of resource names, or raises ValueError if .tx/config
+    doesn't have two resources.
 
     """
     # An entry in .tx/config for a release will look like this:
@@ -298,9 +293,7 @@ def find_release_resources():
         return resources
 
     if len(resources) == 0:
-        print "You need two release-* resources defined to use this command."
+        raise ValueError("You need two release-* resources defined to use this command.")
     else:
-        print "Strange Transifex config! Found these release-* resources:"
-        print "\n".join(resources)
-
-    return None
+        msg = "Strange Transifex config! Found these release-* resources:\n" + "\n".join(resources)
+        raise ValueError(msg)
