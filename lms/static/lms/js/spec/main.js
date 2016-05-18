@@ -55,6 +55,7 @@
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
+            'coffee/src/instructor_dashboard/instructor_dashboard': 'coffee/src/instructor_dashboard/instructor_dashboard', // jshint ignore:line
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/core': 'xmodule_js/common_static/js/xblock/core',
             'xblock/runtime.v1': 'xmodule_js/common_static/coffee/src/xblock/runtime.v1',
@@ -307,6 +308,10 @@
             },
             'coffee/src/instructor_dashboard/student_admin': {
                 exports: 'coffee/src/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            },
+            'coffee/src/instructor_dashboard/instructor_dashboard': {
+                exports: 'coffee/src/instructor_dashboard/instructor_dashboard',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
             },
             'js/instructor_dashboard/certificates': {
@@ -735,6 +740,7 @@
         'js/spec/groups/views/cohorts_spec.js',
         'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'js/spec/instructor_dashboard/instructor_dashboard_spec.js',
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
         'js/spec/instructor_dashboard/certificates_spec.js',
         'js/spec/instructor_dashboard/ecommerce_spec.js',

@@ -105,11 +105,11 @@ from django.core.urlresolvers import reverse
         ## links which are tied to idash-sections below.
         ## the links are activated and handled in instructor_dashboard.coffee
         ## when the javascript loads, it clicks on the first section
-        <ul class="instructor-nav">
+        <ul class="instructor-nav" role="tablist">
           % for section_data in sections:
             ## This is necessary so we don't scrape 'section_display_name' as a string.
             <% dname = section_data['section_display_name'] %>
-            <li class="nav-item"><a href="" data-section="${ section_data['section_key'] }">${_(dname)}</a></li>
+            <li class="nav-item" role="tab" data-section="${section_data['section_key']}" aria-selected="false" aria-controls="${section_data['section_key']}" tabindex="-1">${_(dname)}</li>
           % endfor
         </ul>
 
@@ -117,8 +117,8 @@ from django.core.urlresolvers import reverse
         ## to keep this short, sections can be pulled out into their own files
 
         % for section_data in sections:
-          <section id="${ section_data['section_key'] }" class="idash-section">
-            <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+          <section id="${section_data['section_key']}" class="idash-section" role="tabpanel" tabindex="-1" aria-hidden="true">
+            <%include file="${section_data['section_key']}.html" args="section_data=section_data" />
           </section>
           % endfor
         </section>

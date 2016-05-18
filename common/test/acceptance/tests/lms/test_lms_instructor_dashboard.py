@@ -4,7 +4,9 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 import ddt
+import os
 
+from mock import patch
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
@@ -1154,3 +1156,29 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
             u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.certificate_invalidation_message.text
         )
+
+
+@attr('a11y')
+class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
+    """
+    LMS Instructor Dashboard Accessibility Test Class
+    """
+    def setUp(self):
+        browser = os.environ.get('SELENIUM_BROWSER', 'firefox')
+
+        with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
+            super(LMSInstructorDashboardA11yTest, self).setUp()
+
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_instructor_dashboard_a11y(self):
+        # a11y test added on 17 May 2016, but mostly disabled as there's a slew
+        # of issues on the Instructor Dashboard. We should aim to resolve these
+        # before 2 October 2016, and include the below exclusions.
+        self.instructor_dashboard_page.a11y_audit.config.set_scope(
+            include=[],
+            exclude=["table"]
+        )
+        self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()

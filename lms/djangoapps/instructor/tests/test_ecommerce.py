@@ -29,7 +29,7 @@ class TestECommerceDashboardViews(SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
+        cls.e_commerce_link = 'data-section="e-commerce"'
 
     def setUp(self):
         super(TestECommerceDashboardViews, self).setUp()

@@ -40,6 +40,14 @@ HASH_LINK_PREFIX = '#view-'
 
 $active_section = null
 
+# tab variables for keystrokes
+KEYS = {
+    'left':     37,
+    'right':    39,
+    'down':     40,
+    'up':       38
+}
+
 # helper class for queueing and fault isolation.
 # Will execute functions marked by waiter.after only after all functions marked by
 # waiter.waitFor have been called.
@@ -83,69 +91,118 @@ sections_have_loaded = new SafeWaiter
 $ =>
   instructor_dashboard_content = $ ".#{CSS_INSTRUCTOR_CONTENT}"
   if instructor_dashboard_content.length > 0
-    setup_instructor_dashboard          instructor_dashboard_content
     setup_instructor_dashboard_sections instructor_dashboard_content
+    tabs()
+    true
 
+# proper tabpanel handling for the dashboard
+tabs = () ->
+    startTab = $('.' + CSS_INSTRUCTOR_NAV).children('.nav-item').first()
+    startPanel = $(startTab).attr('aria-controls')
+    
+    checkForLocationHash(startTab, startPanel)
+    
+    keyListener()
+    clickListener()
+    
+resetTabs = () ->
+    $('.'+ CSS_INSTRUCTOR_NAV).children('.nav-item').each (index, element) ->
+        tab = $(element)
+        $(tab).attr({ 'aria-selected': 'false', 'tabindex': '-1' }).removeClass CSS_ACTIVE_SECTION
+    
+    resetTabPanels()
+    
+resetTabPanels = () ->
+    $('.' + CSS_IDASH_SECTION).each (index, element) =>
+        panel = $(element)
+        $(panel).attr({ 'aria-hidden': 'true', 'tabindex': '-1' }).hide().removeClass CSS_ACTIVE_SECTION
 
-# enable navigation bar
-# handles hiding and showing sections
-setup_instructor_dashboard = (idash_content) =>
-  # clickable section titles
-  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
-
-  # attach link click handlers
-  $links.each (i, link) ->
-    $(link).click (e) ->
-      e.preventDefault()
-
-      # deactivate all link & section styles
-      idash_content.find(".#{CSS_INSTRUCTOR_NAV} li").children().removeClass CSS_ACTIVE_SECTION
-      idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
-
-      # discover section paired to link
-      section_name = $(this).data 'section'
-      $section = idash_content.find "##{section_name}"
-
-      # activate link & section styling
-      $(this).addClass CSS_ACTIVE_SECTION
-      $section.addClass CSS_ACTIVE_SECTION
-
-      # tracking
-      analytics.pageview "instructor_section:#{section_name}"
-
-      # deep linking
-      # write to url
-      location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
-
-      sections_have_loaded.after ->
-        $section.data('wrapper').onClickTitle()
-
-      # call onExit handler if exiting a section to a different section.
-      unless $section.is $active_section
-        $active_section?.data('wrapper')?.onExit?()
-      $active_section = $section
-
-      # TODO enable onExit handler
-
-
-  # activate an initial section by 'clicking' on it.
-  # check for a deep-link, or click the first link.
-  click_first_link = ->
-    link = $links.eq(0)
-    link.click()
-
-  if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash
-    rmatch = (new RegExp "^#{HASH_LINK_PREFIX}(.*)").exec location.hash
-    section_name = rmatch[1]
-    link = $links.filter "[data-section='#{section_name}']"
-    if link.length == 1
-      link.click()
+keyListener = () ->
+    $('.' + CSS_INSTRUCTOR_NAV).on 'keydown', '.nav-item', (event) =>
+        key = event.which
+        focused = $(event.currentTarget)
+        index = $(focused).parent().find('.nav-item').index(focused)
+        total = $(focused).parent().find('.nav-item').size() - 1
+        panel = $(focused).attr('aria-controls')
+        
+        switch key
+            when KEYS.left, KEYS.up then previousTab(focused, index, total, event)
+            when KEYS.right, KEYS.down then nextTab(focused, index, total, event)
+            else return
+    
+clickListener = () ->
+    $('.' + CSS_INSTRUCTOR_NAV).on 'click', '.nav-item', (event) ->
+        tab = $(event.currentTarget)
+        panel = $(tab).attr('aria-controls')
+        
+        resetTabs()
+        activateTab(tab, panel)
+        
+previousTab = (focused, index, total, event) ->
+    if (event.altKey || event.shiftKey)
+        true
+    if (index == 0)
+        tab = $(focused).parent().find('.nav-item').last()
     else
-      click_first_link()
-  else
-    click_first_link()
+        tab = $(focused).parent().find('.nav-item:eq(' + index + ')').prev()
 
+    panel = $(tab).attr('aria-controls')
+    
+    $(tab).focus()
+    activateTab(tab, panel)
+    false
+    
+nextTab = (focused, index, total, event) ->
+    if (event.altKey || event.shiftKey)
+        true
+    if (index == total)
+        tab = $(focused).parent().find('.nav-item').first()
+    else
+        tab = $(focused).parent().find('.nav-item:eq(' + index + ')').next()
 
+    panel = $(tab).attr('aria-controls')
+    
+    $(tab).focus()
+    activateTab(tab, panel)
+    false
+
+activateTab = (tab, panel) ->
+    resetTabs()
+    activateTabPanel(panel)
+    
+    section_name = $(tab).data 'section'
+    
+    $(tab).attr({ 'aria-selected': 'true', 'tabindex': '0' }).addClass CSS_ACTIVE_SECTION
+    
+    tabAnalytics(section_name)
+    updateLocationHash(section_name)
+    
+activateTabPanel = (panel) ->
+    resetTabPanels()
+    
+    $('#' + panel).attr({ 'aria-hidden': 'false', 'tabindex': '0' }).show().addClass CSS_ACTIVE_SECTION
+      
+updateLocationHash = (section_name) ->
+    # deep linking, writing url
+    location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
+    
+checkForLocationHash = (startTab, startPanel) ->
+    # if sent a deep link, activate appropriate page section
+    if (location.hash)
+        if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash
+            rmatch = (new RegExp "^#{HASH_LINK_PREFIX}(.*)").exec location.hash
+            section_name = rmatch[1]
+            link = $('.' + CSS_INSTRUCTOR_NAV + ' .nav-item').filter "[data-section='#{section_name}']"
+            panel = $(link).attr('aria-controls')
+        if link.length == 1
+            activateTab(link, panel)
+        else
+            activateTab(startTab, startPanel)
+    else
+        activateTab(startTab, startPanel)
+    
+tabAnalytics = (section_name) ->
+    analytics.pageview "instructor_section:#{section_name}"
 
 # enable sections
 setup_instructor_dashboard_sections = (idash_content) ->
