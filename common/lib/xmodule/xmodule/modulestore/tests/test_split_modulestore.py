@@ -630,8 +630,8 @@ class SplitModuleCourseTests(SplitModuleTest):
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses_with_same_course_index(self, _from_json):
         """
-        Test that if two courses pointing to same course index,
-        get_courses should return both.
+        Test that if two courses point to same course index,
+        `get_courses` should return both courses.
         """
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         # Should have gotten 3 draft courses.
