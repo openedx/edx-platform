@@ -102,6 +102,6 @@ class GradesBlockTransformer(BlockStructureTransformer):
         request.session = {}
         for block_locator in block_structure.post_order_traversal():
             course_id = unicode(block_locator.course_key)
-            usage_id = unicode(block_locator)  # pylint: disable=protected-access
+            usage_id = unicode(block_locator)
             module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
             yield module
