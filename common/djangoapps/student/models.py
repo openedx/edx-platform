@@ -228,6 +228,10 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
+    # check ORG length
+    # Add in choices from organizations model
+    organization = models.CharField(blank=True, max_length=255, db_index=True)
+
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
