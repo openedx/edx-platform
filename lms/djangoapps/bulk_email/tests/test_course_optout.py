@@ -75,7 +75,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
@@ -102,7 +102,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         test_email = {
             'action': 'Send email',
-            'send_to': 'all',
+            'send_to': '["all"]',
             'subject': 'test subject for all',
             'message': 'test message for all'
         }
