@@ -392,7 +392,8 @@ def list_problem_responses(course_key, problem_location):
 
     smdat = StudentModule.objects.filter(
         course_id=course_key,
-        module_state_key=problem_key
+        module_state_key=problem_key,
+        student__is_staff=0,
     )
     smdat = smdat.order_by('student')
 
