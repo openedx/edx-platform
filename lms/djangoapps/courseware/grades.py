@@ -444,7 +444,12 @@ def _grade(student, course, keep_raw_scores):
 
 
 def _calculate_totaled_scores(
-    student, grading_context_result, max_scores_cache, submissions_scores, scores_client, keep_raw_scores
+    student,
+    grading_context_result,
+    max_scores_cache,
+    submissions_scores,
+    scores_client,
+    keep_raw_scores,
 ):
     """
     Returns the totaled scores, which can be passed to the grader.
@@ -584,16 +589,16 @@ def _progress_summary(student, course):
     each containing an array of scores. This contains information for graded and
     ungraded problems, and is good for displaying a course summary with due dates,
     etc.
+    - None if the student does not have access to load the course module.
 
     Arguments:
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
 
-    If the student does not have access to load the course module, this function
-    will return None.
-
     """
     course_structure = get_course_blocks(student, course.location)
+    if not len(course_structure):
+        return None
     scorable_locations = [block_key for block_key in course_structure if possibly_scored(block_key)]
 
     with outer_atomic():
