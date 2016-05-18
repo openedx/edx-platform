@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
 
-<div class="discussion-module" data-discussion-id="${discussion_id | h}">
+<div class="discussion-module" data-discussion-id="${discussion_id}">
     <p>
         <span class="discussion-preview">
             <span class="icon fa fa-comment"/>
