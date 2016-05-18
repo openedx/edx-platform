@@ -213,7 +213,7 @@ def select_option_by_text(select_browser_query, option_text):
             select = Select(query.first.results[0])
             print ('value before selecting: {}').format(select.first_selected_option.text)
             select.select_by_visible_text(value)
-            print ('value is now: {}').format(select.first_selected_option.text)
+            print ('value is now: {}').format(Select(query.first.results[0]).first_selected_option.text)
             return True
         except StaleElementReferenceException:
             return False
