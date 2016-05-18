@@ -16,6 +16,7 @@ class SystemUser(AnonymousUser):
     Like the AnonymousUser, this User is not represented in the database, and
     has no primary key.
     """
+    # pylint: disable=abstract-method
     def __unicode__(self):
         return u'SystemUser'
 
