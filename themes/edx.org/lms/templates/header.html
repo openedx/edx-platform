@@ -51,11 +51,18 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
   <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
-      <a href="${marketing_link('ROOT')}" itemprop="url">
-        <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
-        </%block>
-      </a>
+      <%block name="navigation_logo">
+        % if user.is_authenticated():
+          <a href="${reverse('dashboard')}">
+            <img src="${static.url("images/logo.png")}" alt=${_("Your Dashboard")}/>
+          </a>
+        % else:
+          <a href="${marketing_link('ROOT')}" itemprop="url">
+            <img src="${static.url("images/logo.png")}" itemprop="logo"
+                 alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+          </a>
+        % endif
+      </%block>
     </h1>
 
     % if course and not disable_courseware_header:
