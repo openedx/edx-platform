@@ -672,7 +672,9 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     start_time = time()
     start_date = datetime.now(UTC)
     status_interval = 100
-    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id).filter(
+        is_staff=0,
+    )
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
