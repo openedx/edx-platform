@@ -1,15 +1,17 @@
 """
 A Django command that exports a course to a tar.gz file.
 
-If <filename> is '-', it pipes the file to stdout
+If <filename> is '-', it pipes the file to stdout.
 
-NOTE: This used to be used by Analytics research exports to provide
-researchers with course content.  It is now DEPRECATED, and
-functionality has moved to export_olx.py in
-cms/djangoapps/contentstore/management/commands.
+This is used by Analytics research exports to provide researchers
+with course content.
 
-Note: when removing this file, also remove references to it
-from test_dump_course.
+At present, it differs from Studio exports in several ways:
+
+* It does not include static content.
+* The top-level directory in the resulting tarball is a "safe"
+  (i.e. ascii) version of the course_key, rather than the word "course".
+* It only supports the export of courses.  It does not export libraries.
 
 """
 
@@ -32,38 +34,36 @@ from opaque_keys.edx.keys import CourseKey
 
 class Command(BaseCommand):
     """
-    Export a course to XML. The output is compressed as a tar.gz file
+    Export a course to XML. The output is compressed as a tar.gz file.
 
     """
-    args = "<course_id> <output_filename>"
     help = dedent(__doc__).strip()
 
+    def add_arguments(self, parser):
+        parser.add_argument('course_id')
+        parser.add_argument('--output', default=None)
+
     def handle(self, *args, **options):
-        course_key, filename, pipe_results = self._parse_arguments(args)
+
+        course_id = options['course_id']
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            raise CommandError("Unparsable course_id")
+        except IndexError:
+            raise CommandError("Insufficient arguments")
+
+        filename = options['output']
+        pipe_results = False
+        if filename is None:
+            filename = mktemp()
+            pipe_results = True
 
         export_course_to_tarfile(course_key, filename)
 
         results = self._get_results(filename) if pipe_results else None
 
         self.stdout.write(results, ending="")
-
-    def _parse_arguments(self, args):
-        """Parse command line arguments"""
-        try:
-            course_key = CourseKey.from_string(args[0])
-            filename = args[1]
-        except InvalidKeyError:
-            raise CommandError("Unparsable course_id")
-        except IndexError:
-            raise CommandError("Insufficient arguments")
-
-        # If filename is '-' save to a temp file
-        pipe_results = False
-        if filename == '-':
-            filename = mktemp()
-            pipe_results = True
-
-        return course_key, filename, pipe_results
 
     def _get_results(self, filename):
         """Load results from file"""
