@@ -69,10 +69,9 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
-        % if not nav_hidden:
           <nav aria-label="Main" class="nav-main">
             <ul class="left list-inline nav-global authenticated">
-              % if not show_program_listing:
+              % if not nav_hidden and not show_program_listing:
                 <%block name="navigation_global_links_authenticated">
                   <li class="item nav-global-01">
                     <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
@@ -98,7 +97,6 @@ site_status_msg = get_site_status_msg(course_id)
               % endif
             </ul>
           </nav>
-        % endif
       % endif
 
       <%include file="user_dropdown.html"/>
