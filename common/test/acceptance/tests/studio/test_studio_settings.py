@@ -582,10 +582,10 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         super(StudioSettingsImageUploadTest, self).setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
+        self.settings_page.visit()
 
     @flaky(max_runs=20, min_passes=20)
     def test_upload_course_card_image(self):
-        self.settings_page.visit()
 
         # upload image
         file_to_upload = 'image.jpg'
@@ -594,7 +594,6 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
 
     @flaky(max_runs=20, min_passes=20)
     def test_upload_course_banner_image(self):
-        self.settings_page.visit()
 
         # upload image
         file_to_upload = 'image.jpg'
@@ -603,7 +602,6 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
 
     @flaky(max_runs=20, min_passes=20)
     def test_upload_course_video_thumbnail_image(self):
-        self.settings_page.visit()
 
         # upload image
         file_to_upload = 'image.jpg'
