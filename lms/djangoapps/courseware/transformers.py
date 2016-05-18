@@ -72,7 +72,7 @@ class GradesBlockTransformer(BlockStructureTransformer):
         """
         Collect the `max_score` for every block in the provided `block_structure`.
         """
-        for module in cls._iter_xmodules(block_structure):
+        for module in cls._iter_scorable_xmodules(block_structure):
             cls._collect_max_score(block_structure, module)
 
     @classmethod
@@ -85,7 +85,7 @@ class GradesBlockTransformer(BlockStructureTransformer):
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
 
     @staticmethod
-    def _iter_xmodules(block_structure):
+    def _iter_scorable_xmodules(block_structure):
         """
         Loop through all the blocks locators in the block structure, and retrieve
         the module (XModule or XBlock) associated with that locator.
@@ -100,5 +100,7 @@ class GradesBlockTransformer(BlockStructureTransformer):
         for block_locator in block_structure.post_order_traversal():
             course_id = unicode(block_locator.course_key)
             usage_id = unicode(block_locator)
-            module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
-            yield module
+            block = block_structure.get_xblock(block_locator)
+            if getattr(block, 'has_score', False):
+                module, __ = module_render.get_module_by_usage_id(request, course_id, usage_id)
+                yield module
