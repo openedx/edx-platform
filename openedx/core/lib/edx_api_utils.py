@@ -5,13 +5,15 @@ import logging
 from django.core.cache import cache
 from edx_rest_api_client.client import EdxRestApiClient
 
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.token_utils import get_id_token
 
 
 log = logging.getLogger(__name__)
 
 
-def get_edx_api_data(api_config, user, resource, resource_id=None, querystring=None, cache_key=None):
+def get_edx_api_data(api_config, user, resource,
+                     api_client_name=None, resource_id=None, querystring=None, cache_key=None):
     """GET data from an edX REST API.
 
     DRY utility for handling caching and pagination.
@@ -22,6 +24,7 @@ def get_edx_api_data(api_config, user, resource, resource_id=None, querystring=N
         resource (str): Name of the API resource being requested.
 
     Keyword Arguments:
+        api_client_name (str): API client name that will use for requesting data.
         resource_id (int or str): Identifies a specific resource to be retrieved.
         querystring (dict): Optional query string parameters.
         cache_key (str): Where to cache retrieved data. The cache will be ignored if this is omitted
@@ -45,8 +48,11 @@ def get_edx_api_data(api_config, user, resource, resource_id=None, querystring=N
             return cached
 
     try:
-        jwt = get_id_token(user, api_config.OAUTH2_CLIENT_NAME)
-        api = EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
+        if api_client_name == 'commerce':
+            api = ecommerce_api_client(user)
+        else:
+            jwt = get_id_token(user, api_config.OAUTH2_CLIENT_NAME)
+            api = EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
     except:  # pylint: disable=bare-except
         log.exception('Failed to initialize the %s API client.', api_config.API_NAME)
         return no_data
