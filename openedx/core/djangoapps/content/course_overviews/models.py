@@ -20,7 +20,7 @@ from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
 from util.date_utils import strftime_localized
-from xmodule import course_metadata_utils
+from xmodule import course_metadata_utils, block_metadata_utils
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -317,14 +317,14 @@ class CourseOverview(TimeStampedModel):
         """
         Returns this course's URL name.
         """
-        return course_metadata_utils.url_name_for_course_location(self.location)
+        return block_metadata_utils.url_name_for_block(self)
 
     @property
     def display_name_with_default(self):
         """
         Return reasonable display name for the course.
         """
-        return course_metadata_utils.display_name_with_default(self)
+        return block_metadata_utils.display_name_with_default(self)
 
     @property
     def display_name_with_default_escaped(self):
@@ -338,7 +338,7 @@ class CourseOverview(TimeStampedModel):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return course_metadata_utils.display_name_with_default_escaped(self)
+        return block_metadata_utils.display_name_with_default_escaped(self)
 
     def has_started(self):
         """

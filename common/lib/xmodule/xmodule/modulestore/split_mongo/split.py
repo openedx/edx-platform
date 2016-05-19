@@ -2946,10 +2946,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         output_fields = dict(jsonfields)
         for field_name, value in output_fields.iteritems():
             if value:
-                field = xblock_class.fields.get(field_name)
-                if field is None:
+                try:
+                    field = xblock_class.fields.get(field_name)
+                except AttributeError:
                     continue
-                elif isinstance(field, Reference):
+                if isinstance(field, Reference):
                     output_fields[field_name] = robust_usage_key(value)
                 elif isinstance(field, ReferenceList):
                     output_fields[field_name] = [robust_usage_key(ele) for ele in value]
