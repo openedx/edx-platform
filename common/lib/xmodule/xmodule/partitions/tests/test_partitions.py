@@ -132,7 +132,7 @@ class PartitionTestCase(TestCase):
         )
 
         # Be sure to clean up the global scheme_extensions after the test.
-        self.addCleanup(self.cleanupSchemeExtensions)
+        self.addCleanup(self.cleanup_scheme_extensions)
 
         # Create a test partition
         self.user_partition = UserPartition(
@@ -148,7 +148,10 @@ class PartitionTestCase(TestCase):
         self.user_partition.get_scheme(self.non_random_scheme.name)
         self.user_partition.get_scheme(self.random_scheme.name)
 
-    def cleanupSchemeExtensions(self):
+    def cleanup_scheme_extensions(self):
+        """
+        Unset the UserPartition.scheme_extensions cache.
+        """
         UserPartition.scheme_extensions = None
 
 

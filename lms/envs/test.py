@@ -70,6 +70,10 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
+GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())
+FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
+
+
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
