@@ -18,7 +18,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
     Paver Bok Choy Command test cases
     """
 
-    def _expected_command(self, name, store=None, verify_xss=False):
+    def _expected_command(self, name, store=None, verify_xss=True):
         """
         Returns the command that is expected to be run for the given test spec
         and store.
@@ -101,11 +101,11 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=True))
 
     def test_verify_xss_env_var(self):
-        self.env_var_override.set('VERIFY_XSS', 'True')
+        self.env_var_override.set('VERIFY_XSS', 'False')
         with self.env_var_override:
             suite = BokChoyTestSuite('')
             name = 'tests'
-            self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=True))
+            self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=False))
 
     def test_test_dir(self):
         test_dir = 'foo'
