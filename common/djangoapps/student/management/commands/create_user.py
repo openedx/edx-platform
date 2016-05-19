@@ -1,8 +1,10 @@
 from optparse import make_option
 
 from django.conf import settings
+from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.exceptions import ValidationError
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import translation
 
 from opaque_keys import InvalidKeyError
@@ -47,6 +49,11 @@ class Command(TrackedCommand):
                     dest='password',
                     default=None,
                     help='Password for user'),
+        make_option('--password-hash',
+                    dest='password_hash',
+                    default=False,
+                    action='store_true',
+                    help='Indicate that the provided password is a password hash'),
         make_option('-e', '--email',
                     metavar='EMAIL',
                     dest='email',
@@ -67,6 +74,7 @@ class Command(TrackedCommand):
     def handle(self, *args, **options):
         username = options['username']
         name = options['name']
+        password = options['password']
         if not username:
             username = options['email'].split('@')[0]
         if not name:
@@ -81,11 +89,14 @@ class Command(TrackedCommand):
             except InvalidKeyError:
                 course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
 
+        if options['password_hash'] and not is_password_usable(password):
+            raise CommandError('The provided password hash is invalid.')
+
         form = AccountCreationForm(
             data={
                 'username': username,
                 'email': options['email'],
-                'password': options['password'],
+                'password': password,
                 'name': name,
             },
             tos_required=False
@@ -99,12 +110,14 @@ class Command(TrackedCommand):
             user, _, reg = _do_create_account(form)
             if options['staff']:
                 user.is_staff = True
-                user.save()
+            if options['password_hash']:
+                user.password = password
+            user.save()
             reg.activate()
             reg.save()
             create_comments_service_user(user)
-        except AccountValidationError as e:
-            print e.message
+        except (AccountValidationError, ValidationError) as e:
+            self.stderr.write(e.message)
             user = User.objects.get(email=options['email'])
         if options['course']:
             CourseEnrollment.enroll(user, course, mode=options['mode'])
