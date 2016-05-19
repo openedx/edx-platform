@@ -75,6 +75,9 @@ var DetailsView = ValidatingView.extend({
     },
 
     render: function() {
+        // Clear any image preview timeouts set in this.updateImagePreview
+        clearTimeout(this.imageTimer);
+
         DateUtils.setupDatePicker('start_date', this);
         DateUtils.setupDatePicker('end_date', this);
         DateUtils.setupDatePicker('enrollment_start', this);
