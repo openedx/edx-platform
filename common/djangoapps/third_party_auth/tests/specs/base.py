@@ -13,10 +13,12 @@ from django.contrib.sessions.backends import cache
 from django.core.urlresolvers import reverse
 from django.test import utils as django_utils
 from django.conf import settings as django_settings
-from edxmako.tests import mako_middleware_process_request
 from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
+
+from edxmako.tests import mako_middleware_process_request
+from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
 from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
@@ -898,7 +900,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
 
-class Oauth2IntegrationTest(IntegrationTest):  # pylint: disable=abstract-method
+# pylint: disable=test-inherits-tests, abstract-method
+@django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+class Oauth2IntegrationTest(IntegrationTest):
     """Base test case for integration tests of Oauth2 providers."""
 
     # Dict of string -> object. Information about the token granted to the
