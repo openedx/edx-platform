@@ -3,7 +3,7 @@
 import unittest
 
 from django.contrib.auth.models import AnonymousUser
-from util.user_utils import SystemUser
+from ..user_utils import SystemUser
 
 
 class SystemUserTestCase(unittest.TestCase):
