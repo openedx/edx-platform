@@ -89,6 +89,7 @@ from util.organizations_helpers import (
     get_organization_by_short_name,
     organizations_enabled,
 )
+from organizations.models import Organization
 from util.string_utils import _has_non_ascii_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
@@ -371,6 +372,9 @@ def _accessible_courses_summary_list(request):
         if course_summary.location.course == 'templates':
             return False
 
+        if not _user_in_same_org(request.user, course_summary.id):
+            return False;
+
         return has_studio_read_access(request.user, course_summary.id)
 
     courses_summary = filter(course_filter, modulestore().get_course_summaries())
@@ -382,7 +386,16 @@ def _user_in_same_org(user, course_id):
     """
     Checks if user ORG matches course ORG
     """
-    return False
+    user_id = user.id
+    u_org = Organization.objects.filter(organizationuser__active=True, organizationuser__user_id_id=user_id)
+    c_org = Organization.objects.filter(organizationcourse__course_id=course_id)
+
+    print(u_org.values())
+
+    if u_org == c_org:
+        return True
+    else:
+        return False
 
 
 def _accessible_courses_list(request):
@@ -403,7 +416,6 @@ def _accessible_courses_list(request):
 
         # If the course ORG does not match user ORG - this
         # will likely override groups and break tests
-        print("--------------------------")
         if not _user_in_same_org(request.user, course.id):
             return False;
 
