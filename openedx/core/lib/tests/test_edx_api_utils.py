@@ -3,12 +3,14 @@ import json
 import unittest
 
 from django.core.cache import cache
+from django.test.utils import override_settings
 import httpretty
 import mock
 from nose.plugins.attrib import attr
 from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
 
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -17,6 +19,8 @@ from student.tests.factories import UserFactory
 
 
 UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
+TEST_API_URL = 'http://www-internal.example.com/api'
+TEST_API_SIGNING_KEY = 'edx'
 
 
 @attr('shard_2')
@@ -195,3 +199,15 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
 
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
+
+    @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30},
+                       ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    def test_client_passed(self):
+        """ Verify that when API client is passed edx_rest_api_client is not
+        used.
+        """
+        program_config = self.create_programs_config()
+        api = ecommerce_api_client(self.user)
+        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
+            get_edx_api_data(program_config, self.user, 'orders', api=api)
+            self.assertFalse(mock_init.called)
