@@ -65,14 +65,6 @@
 # Kevin Min <gr326887@graded.br>, 2015
 # JiyeonLee <leejiyeon00@gmail.com>, 2014
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# Jong-Dae Park <jdpark7@gmail.com>, 2013
-# Jong-Dae Park <jdpark7@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -92,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -156,10 +148,14 @@ msgstr ""
 msgid "Status"
 msgstr "상태"
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr "대기중"
+msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -296,6 +292,12 @@ msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
 " to the ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -5197,6 +5199,20 @@ msgstr "주소"
 msgid "Goals"
 msgstr ""
 
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "도시"
+
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "국가"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr ""
@@ -5833,20 +5849,6 @@ msgstr "제목"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "출생연도"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "도시"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "국가"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -9653,7 +9655,7 @@ msgstr "가입하기 "
 msgid "Sign in"
 msgstr "로그인"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -12392,35 +12394,39 @@ msgid ""
 msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}에게 문의하세요."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
-msgstr "ID 인증 상태"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "검토/확인 됨"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr "인증 유효기간은 제출후 1년입니다. "
+msgid "Verification Status: Approved"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
-msgstr "인증용 사진이 제출되었고 곧 검토 될 것입니다."
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
-msgstr "{platform_name}  인증 상태"
+msgid "Verification Status: Pending"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Verification Status: Expired"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
 msgstr "인증 다시 제출하기"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
-msgstr "인증된 강좌 이수증을 받기 위해서, 강좌가 끝나기 전에 새로운 사진과 정부가 발행한 사진이 있는 신분증을 제출해야 합니다. "
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -16037,15 +16043,6 @@ msgstr "강좌 찾기"
 msgid "Schools & Partners"
 msgstr "대학교 및 협력기관"
 
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>경고:</strong> 사용하고 있는 브라우저로는 제대로 작동하지 않을 수 있습니다.  {chrome_link} 이나 "
-"{ff_link} 사용을 권장합니다."
-
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
@@ -16073,6 +16070,14 @@ msgstr ""
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>경고:</strong> 사용하고 있는 브라우저로는 제대로 작동하지 않을 수 있습니다.  {chrome_link} 이나 "
+"{ff_link} 사용을 권장합니다."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -16201,7 +16206,7 @@ msgstr ""
 "그래도 문제가 있다면, {platform_name} 지원 센터에 문의하세요. {link_start}{studio_name} 홈페이지로 "
 "되돌아 올수 있습니다{link_end} "
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr ""
 
@@ -16374,8 +16379,8 @@ msgstr "이수증에 대해 자세히 알아보기"
 msgid "Other Course Settings"
 msgstr "다른 설정"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "세부사항  &amp; 일정"
 
@@ -17247,6 +17252,10 @@ msgstr ""
 "새로운 설정을 추가하려면 {em_start}새 집단 설정{em_end}을 클릭합니다. 설정의 이름을 변경하려면, 박스 상단의 "
 "{em_start}수정{em_end}을 클릭하세요. 실험에 사용되지 않는 설정은 삭제할 수 있습니다. 설정 삭제는 박스 상단의 삭제 "
 "아이콘을 클릭하면 됩니다. "
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -18372,7 +18381,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "일정 &amp; 세부 설정"
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "강좌 일정 및 기본 정보 설정"
 
@@ -19288,14 +19297,6 @@ msgid "Updates"
 msgstr "공지사항"
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "파일 업로드"
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr "기본 설정"
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "가져오기"
 
@@ -19382,10 +19383,6 @@ msgstr ""
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "이름"
-
-# empty
-msgid "This is a key string."
-msgstr "키 문자열입니다."
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

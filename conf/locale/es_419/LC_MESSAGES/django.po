@@ -164,14 +164,6 @@
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2015
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -185,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -267,7 +259,6 @@ msgstr "Estado"
 #. duration is determined.
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Pending"
 msgstr "Pendiente"
 
@@ -434,6 +425,14 @@ msgstr ""
 "OPCIONAL: Este es el SKU (stock keeping unit) de este modo en el sistema de "
 "ecommerce externo. Deje este campo vacío si el curso no ha sido migrado al "
 "servicio de ecommerce."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
+msgstr ""
+"Éste es el SKU (número de referencia) de este modo en el sistema de "
+"ecommerce externo. "
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -2750,15 +2749,17 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Course Banner Image"
-msgstr ""
+msgstr "Imagen banner del curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Edit the name of the banner image file. You can set the banner image on the "
 "Settings & Details page."
 msgstr ""
+"Modifica el nombre del archivo de la imagen banner. Puede configurar la "
+"imagen banner en la página de Configuración y Detalles."
 
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Course Video Thumbnail Image"
 msgstr "Miniatura de la imagen del video del curso"
 
@@ -6096,6 +6097,30 @@ msgstr "Dirección de correspondencia"
 msgid "Goals"
 msgstr "Objetivos"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "Ciudad"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "País"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "Cohorte"
@@ -6807,28 +6832,6 @@ msgstr "Título"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Año de nacimiento"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "Ciudad"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "País"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -10480,7 +10483,7 @@ msgstr "No se encuentra inscrito en ningún curso aún."
 #: lms/templates/dashboard.html lms/templates/navigation.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
-msgstr "Explorar los cursos"
+msgstr "Explorar cursos"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -10655,6 +10658,9 @@ msgid ""
 "materials for this course{strong_end}, post in the {link_start}course "
 "discussion forum{link_end}."
 msgstr ""
+"Para {strong_start}preguntas sobre las lecturas, asignaciones, herramientas "
+"o materiales de este curso{strong_end}, utiliza el {link_start}foro de "
+"discusión del curso{link_end}."
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -10662,12 +10668,17 @@ msgid ""
 "can find lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
+"¿Tienes {strong_start}preguntas generales sobre {platform_name}{strong_end}?"
+" Puedes encontrar mucha información valiosa en la sección de "
+"{link_start}Preguntas Frecuentes{link_end} de {platform_name}."
 
 #: lms/templates/help_modal.html
 msgid ""
 "Have a {strong_start}question about something specific{strong_end}? You can "
 "contact the {platform_name} general support team directly:"
 msgstr ""
+"¿Tienes una {strong_start}pregunta sobre algo específico{strong_end}? Puedes"
+" contactar directamente al equipo de soporte de {platform_name}:"
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -10747,6 +10758,9 @@ msgid ""
 "Details of the problem you are encountering{asterisk}{begin_span}Include "
 "error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
+"Detalles sobre el problema que estás "
+"experimentando{asterisk}{begin_span}Incluye mensajes de error, pasos para "
+"reproducir el problema, etc.{end_span}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -10792,7 +10806,7 @@ msgstr "Nota: Solo los instructores pueden realizar anotaciones."
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index.html
 msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr ""
+msgstr "Bienvenido a la plataforma de Open edX{registered_trademark}!"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
@@ -11091,7 +11105,7 @@ msgstr "Instituciones"
 
 #: lms/templates/navigation.html
 msgid "Explore Courses"
-msgstr "Explorar los cursos"
+msgstr "Explorar cursos"
 
 #: lms/templates/navigation.html lms/templates/register-form.html
 #: themes/edx.org/lms/templates/header.html
@@ -11104,11 +11118,13 @@ msgstr "Registrarse"
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
+"{begin_strong}Aviso:{end_strong} Tu navegador no es soportado completamente."
+" Recomendamos el uso de {chrome_link} o {ff_link}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -11768,11 +11784,11 @@ msgstr "Panel de Control para:"
 
 #: lms/templates/user_dropdown.html
 msgid "Usermenu"
-msgstr ""
+msgstr "Menú de usuario"
 
 #: lms/templates/user_dropdown.html
 msgid "Usermenu dropdown"
-msgstr ""
+msgstr "Menú desplegable de usuario"
 
 #: lms/templates/user_dropdown.html
 msgid "Profile"
@@ -12671,6 +12687,8 @@ msgid ""
 "If this option is {em_start}checked{em_end}, users will receive an email "
 "notification."
 msgstr ""
+"Si esta opción está {em_start}marcada{em_end}, los usuarios recibirán una "
+"notificación por correo electrónico."
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
@@ -13929,6 +13947,9 @@ msgid ""
 "the course. {line_break}{link_start}Learn more about the verified "
 "{cert_name_long}{link_end}."
 msgstr ""
+"Es oficial. Es fácil de compartir. Es comprobado como motivador para la "
+"finalización del curso. {line_break}{link_start}Aprende más sobre el "
+"{cert_name_long}{link_end} verificado."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -14028,37 +14049,47 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
-msgstr "Status de verificacion Usuario"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "Revisado y verificado"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr "Su estado de verificación de identidad tiene validez por un año."
+msgid "Verification Status: Approved"
+msgstr "Estado de verificación: Aprobado"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
-msgstr "Sus fotos de verificación han sido enviadas y serán revisadas pronto."
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
+msgstr ""
+"Tu Verificación de edX ha sido revisada y aprobada. Tu estado de "
+"verificación tiene validez por un año."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
-msgstr "{platform_name} Verificación de estado"
+msgid "Verification Status: Pending"
+msgstr "Estado de verificación: Pendiente"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
+"Tu Verificación de edX está pendiente. Tus fotos de verificación han sido "
+"enviadas y serán revisadas pronto."
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Verification Status: Expired"
+msgstr "Estado de verificación de identidad: Expirado"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
+msgstr ""
+"Tu estado de verificación con edX ha expirado. Para recibir un Certificado "
+"Verificado, será necesario enviar una nueva foto de sí mismo y otra de un "
+"documento de identidad emitido por su gobierno antes de que el curso "
+"termine."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
 msgstr "Reenviar verificación"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
-msgstr ""
-"Para recivir un certificado validado, envía una foto tuya y un documento "
-"legal que tenga tu foto, antes de que el curso concluya"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -17119,6 +17150,9 @@ msgid ""
 "account activation message to {email_start}{email}{email_end}. To activate "
 "your account and start enrolling in courses, click the link in the message."
 msgstr ""
+"Has creado una cuenta en {platform_name}. Hemos enviado un correo de "
+"activación a {email_start}{email}{email_end}. Para activar tu cuenta y "
+"comenzar a inscribirte en los cursos, haz clic en el vínculo en el mensaje."
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
@@ -17160,6 +17194,7 @@ msgstr "Restablecimiento de Contraseña Completado "
 msgid ""
 "Your password has been reset. {start_link}Sign-in to your account.{end_link}"
 msgstr ""
+"Tu contraseña ha sido restablecida. {start_link}Inicia sesión.{end_link}"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
@@ -18028,10 +18063,12 @@ msgid ""
 "Browse recently launched courses and see what's new in your favorite "
 "subjects."
 msgstr ""
+"Echa un vistazo a nuestros cursos lanzados recientemente y qué hay de nuevo "
+"en tus temas favoritos."
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
-msgstr "Explorar Nuevos Cursos"
+msgstr "Explorar cursos nuevos"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "Page Footer"
@@ -18058,15 +18095,6 @@ msgstr "Buscar Cursos"
 #: themes/edx.org/lms/templates/header.html
 msgid "Schools & Partners"
 msgstr "Escuelas y socios"
-
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>Atención:</strong> El navegador que está utilizando no está "
-"completamente soportado. Se recomienda el uso de {chrome_link} o {ff_link}."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -18102,6 +18130,14 @@ msgstr "Mi Perfil"
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr "Registrarse"
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>Atención:</strong> El navegador que está utilizando no está "
+"completamente soportado. Se recomienda el uso de {chrome_link} o {ff_link}."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -18243,7 +18279,7 @@ msgstr ""
 "Mientras tanto, puede volver a  {link_start} la página inicial  "
 "{studio_name}. {link_end}"
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "Archivos y cargas"
 
@@ -18442,8 +18478,8 @@ msgstr "Aprender más acerca de los certificados"
 msgid "Other Course Settings"
 msgstr "Otras configuraciones de curso"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "Detalles y Calendario"
 
@@ -19426,6 +19462,10 @@ msgstr ""
 "configuración de grupo sólo si no está en uso en un experimento. Para "
 "eliminar una configuración, pase el ratón sobre su cuadro y haga clic en el "
 "icono de borrar."
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
+msgstr "Detalles y Calendario"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -20714,7 +20754,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "Configuración de Calendario y Detalles"
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "Calendario y detalles"
 
@@ -20908,6 +20948,8 @@ msgstr "Título del curso"
 #: cms/templates/settings.html
 msgid "Displayed as title on the course details page. Limit to 50 characters."
 msgstr ""
+"Mostrado como título en la página de detalles del curso. Límite de 50 "
+"caracteres."
 
 #: cms/templates/settings.html
 msgid "Course Subtitle"
@@ -20917,6 +20959,8 @@ msgstr "Subtítulo del curso"
 msgid ""
 "Displayed as subtitle on the course details page. Limit to 150 characters."
 msgstr ""
+"Mostrado como subtítulo en la página de detalles del curso. Límite de 150 "
+"caracteres."
 
 #: cms/templates/settings.html
 msgid "Course Duration"
@@ -20925,6 +20969,7 @@ msgstr "Duración del curso"
 #: cms/templates/settings.html
 msgid "Displayed on the course details page. Limit to 50 characters."
 msgstr ""
+"Mostrado en la página de los detalles del curso. Límite de 50 caracteres."
 
 #: cms/templates/settings.html
 msgid "Course Description"
@@ -20965,7 +21010,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
-msgstr ""
+msgstr "Imagen del mosaico del curso"
 
 #: cms/templates/settings.html
 msgid ""
@@ -21000,33 +21045,38 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Upload Course Card Image"
-msgstr ""
+msgstr "Subir imagen para el mosaico del curso"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 1440px wide by 400px tall)"
 msgstr ""
+"Tu curso actualmente no cuenta con una imagen. Por favor sube una imagen "
+"(formato JPEG o PNG, y las dimensiones mínimas sugeridas son de 1440px de "
+"ancho por 400px de altura)"
 
 #. Translators: This is the placeholder text for a field that requests the URL
 #. for a course banner image
 #: cms/templates/settings.html
 msgid "Your banner image URL"
-msgstr ""
+msgstr "El URL de tu imagen banner"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your banner image (Note: only JPEG "
 "or PNG format supported)"
 msgstr ""
+"Por favor proporciona una ruta válida y un nombre para tu imagen banner "
+"(Nota: solo los formatos JPEG y PNG son soportados)"
 
 #: cms/templates/settings.html
 msgid "Upload Course Banner Image"
-msgstr ""
+msgstr "Subir imagen banner del curso"
 
 #: cms/templates/settings.html
 msgid "Video Thumbnail Image"
-msgstr ""
+msgstr "Miniatura de la imagen del video"
 
 #: cms/templates/settings.html
 msgid ""
@@ -21034,22 +21084,27 @@ msgid ""
 "one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by "
 "200px tall)"
 msgstr ""
+"Actualmente tu curso no cuenta con una miniatura de la imagen de video. Por "
+"favor sube una miniatura (formato JPEG o PNG, y las dimensiones mínimas "
+"sugeridas son de 375px de ancho por 200px de altura)"
 
 #. Translators: This is the placeholder text for a field that requests the URL
 #. for a course video thumbnail image
 #: cms/templates/settings.html
 msgid "Your video thumbnail image URL"
-msgstr ""
+msgstr "El URL de la miniatura de la imagen del video"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your video thumbnail image (Note: "
 "only JPEG or PNG format supported)"
 msgstr ""
+"Por favor proporciona una ruta válida y un nombre para la miniatura de "
+"imagen de tu video (Nota: solo los formatos JPEG y PNG son soportados)"
 
 #: cms/templates/settings.html
 msgid "Upload Video Thumbnail Image"
-msgstr ""
+msgstr "Subir miniatura de la imagen del video"
 
 #: cms/templates/settings.html
 msgid "Course Introduction Video"
@@ -21073,27 +21128,27 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Learning Outcomes"
-msgstr ""
+msgstr "Resultados de aprendizaje"
 
 #: cms/templates/settings.html
 msgid "Add the learning outcomes for this course"
-msgstr ""
+msgstr "Agregar los resultados de aprendizaje para este curso"
 
 #: cms/templates/settings.html
 msgid "Add Learning Outcome"
-msgstr ""
+msgstr "Agregar Resultado de aprendizaje"
 
 #: cms/templates/settings.html
 msgid "Instructors"
-msgstr ""
+msgstr "Instructores"
 
 #: cms/templates/settings.html
 msgid "Add details about the instructors for this course"
-msgstr ""
+msgstr "Agregar detalles sobre los instructores de este curso"
 
 #: cms/templates/settings.html
 msgid "Add Instructor"
-msgstr ""
+msgstr "Agregar instructor"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
@@ -21753,14 +21808,6 @@ msgid "Updates"
 msgstr "Actualizaciones"
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "Archivos y Cargas"
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr "Calendario y Detalles"
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "Importar"
 
@@ -21847,10 +21894,6 @@ msgstr "Portal de Open edX"
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "nombre"
-
-# empty
-msgid "This is a key string."
-msgstr "Esta es una cadena de texto."
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

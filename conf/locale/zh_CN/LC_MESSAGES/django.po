@@ -305,14 +305,6 @@
 # 竹轩 <fmyzjs@gmail.com>, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
 # 黄鸿飞 <853885165@qq.com>, 2015
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# Wentao Han <wentao.han@gmail.com>, 2013
-# Wentao Han <wentao.han@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -341,7 +333,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 17:03+0000\n"
 "Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -405,10 +397,14 @@ msgstr ""
 msgid "Status"
 msgstr "状态"
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr "挂起"
+msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
@@ -546,6 +542,12 @@ msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
 " to the ecommerce service."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -5458,6 +5460,20 @@ msgstr "邮寄地址"
 msgid "Goals"
 msgstr ""
 
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "城市"
+
+#: lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "国家"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr ""
@@ -6098,20 +6114,6 @@ msgstr "标题"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "出生年份"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "城市"
-
-#: lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "国家"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -9930,7 +9932,7 @@ msgstr "注册"
 msgid "Sign in"
 msgstr "登录"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -12639,34 +12641,38 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
+msgid "Verification Status: Approved"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "检查与验证"
+msgid ""
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr "你的验证状态将在提交后有一年的有效期。"
+msgid "Verification Status: Pending"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
-msgstr "你的验证照片已经提交并将稍后进行审查。"
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
+msgid "Verification Status: Expired"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
@@ -12824,13 +12830,13 @@ msgstr ""
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "%s 已开始的讨论"
+msgstr[0] "%s 讨论已开始"
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s 评论"
+msgstr[0] "%s 个评论"
 
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
@@ -16179,13 +16185,6 @@ msgstr "查找课程"
 msgid "Schools & Partners"
 msgstr ""
 
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr "<strong>警告：</strong>您的浏览器不支持全部功能，我们强烈推荐您使用 {chrome_link}或 {ff_link}。"
-
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
@@ -16213,6 +16212,12 @@ msgstr ""
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr ""
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr "<strong>警告：</strong>您的浏览器不支持全部功能，我们强烈推荐您使用 {chrome_link}或 {ff_link}。"
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -16337,7 +16342,7 @@ msgid ""
 msgstr ""
 "如果您仍然有问题，请联系{platform_name}支持。同时，您也可以返回到{link_start}{studio_name}主页{link_end}。"
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr ""
 
@@ -16508,8 +16513,8 @@ msgstr ""
 msgid "Other Course Settings"
 msgstr "课程其他设置"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "细节＆日程"
 
@@ -17355,6 +17360,10 @@ msgid ""
 "and click the delete icon."
 msgstr ""
 "点击{em_start}新建组配置{em_end}来添加一个新的配置；如果要编辑某个配置，请点击该配置的{em_start}编辑{em_end}按钮；一个组配置只有在未被任何一个实验使用的情况下可以被删除，请点击某个组配置的删除图标以删除该组配置。"
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -18440,7 +18449,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "日程＆细节设置"
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "日程 & 细节"
 
@@ -19337,14 +19346,6 @@ msgid "Updates"
 msgstr "更新"
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "文件＆上传"
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr "日程＆细节"
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "导入"
 
@@ -19431,10 +19432,6 @@ msgstr ""
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr ""
-
-# empty
-msgid "This is a key string."
-msgstr "这是一个关键字字符串。"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
