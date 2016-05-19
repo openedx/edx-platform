@@ -48,6 +48,7 @@ define([  // jshint ignore:line
                 this.$el.find('img').load(function() {
                     $(this).show();
                 });
+                this.justRendered = true;
             },
 
             removeInstructor: function(event) {

@@ -323,8 +323,13 @@ var DetailsView = ValidatingView.extend({
     updateImagePreview: function(imagePathInputElement, previewSelector) {
         // Wait to set the image src until the user stops typing
         clearTimeout(this.imageTimer);
+        var that = this;
+        that.instructor_info_view.justRendered = false;
+
         this.imageTimer = setTimeout(function() {
-            $(previewSelector).attr('src', $(imagePathInputElement).val());
+            if (!that.instructor_info_view.justRendered) {
+                $(previewSelector).attr('src', $(imagePathInputElement).val());
+            }
         }, 1000);
     },
     removeVideo: function(event) {
