@@ -4,13 +4,13 @@ Grades Transformer
 from django.test.client import RequestFactory
 
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
-from util.user_utils import SystemUser
-from . import module_render
+from openedx.core.djangoapps.util.user_utils import SystemUser
+from .. import module_render
 
 
-class GradesBlockTransformer(BlockStructureTransformer):
+class GradesTransformer(BlockStructureTransformer):
     """
-    The GradesBlockTransformer collects grading information and stores it on
+    The GradesTransformer collects grading information and stores it on
     the block structure.
 
     No runtime transformations are performed.
@@ -66,7 +66,7 @@ class GradesBlockTransformer(BlockStructureTransformer):
     def _collect_max_score(cls, block_structure, module):
         """
         Collect the `max_score` from the given module, storing it as a
-        `transformer_block_field` associated with the `GradesBlockTransformer`.
+        `transformer_block_field` associated with the `GradesTransformer`.
         """
         score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)

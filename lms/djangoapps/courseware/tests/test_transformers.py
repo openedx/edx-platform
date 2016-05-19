@@ -8,15 +8,15 @@ import pytz
 from student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from ..transformers import GradesBlockTransformer
+from ..transformers.grades import GradesTransformer
 
 
-class GradesBlockTransformerTestCase(CourseStructureTestCase):
+class GradesTransformerTestCase(CourseStructureTestCase):
     """
-    Verify behavior of the GradesBlockTransformer
+    Verify behavior of the GradesTransformer
     """
 
-    TRANSFORMER_CLASS_TO_TEST = GradesBlockTransformer
+    TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
     problem_metadata = {
         u'graded': True,
@@ -25,7 +25,7 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
     }
 
     def setUp(self):
-        super(GradesBlockTransformerTestCase, self).setUp()
+        super(GradesTransformerTestCase, self).setUp()
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
@@ -64,9 +64,12 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         Appropriate defaults are provided when either argument is omitted.
         """
         metadata = metadata or self.problem_metadata
+
+        # Special structure-related keys start with '#'.  The rest get passed as
+        # kwargs to Factory.create.  See docstring at super().build_course for details.
         return self.build_course([
             {
-                u'org': u'GradesBlockTestOrg',
+                u'org': u'GradesTestOrg',
                 u'course': u'GB101',
                 u'run': u'cannonball',
                 u'#type': u'course',
@@ -81,6 +84,24 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
                 ]
             }
         ])
+
+    def test_ungraded_block_collection(self):
+        blocks = self.build_course_with_problems()
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        self.assert_collected_xblock_fields(
+            block_structure,
+            blocks['course'].location,
+            weight=None,
+            graded=False,
+            has_score=False,
+            due=None,
+        )
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks[u'course'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            max_score=None,
+        )
 
     def test_grades_collected_basic(self):
 
@@ -97,6 +118,8 @@ class GradesBlockTransformerTestCase(CourseStructureTestCase):
         )
 
     def test_collecting_staff_only_problem(self):
+        # Demonstrate that the problem data can by collected by the SystemUser
+        # even if the block has access restrictions placed on it.
         problem_metadata = {
             u'graded': True,
             u'weight': 1,
