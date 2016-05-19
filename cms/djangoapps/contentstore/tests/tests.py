@@ -50,8 +50,6 @@ class ContentStoreTestCase(ModuleStoreTestCase):
             'username': username,
             'email': email,
             'password': password,
-            'first_name': 'test first_name',
-            'last_name': 'test last_name',
             'location': 'home',
             'language': 'Franglish',
             'name': 'Fred Weasley',

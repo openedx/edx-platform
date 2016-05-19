@@ -281,8 +281,6 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True)
-    title = models.CharField(blank=True, null=True, max_length=256)
-    company = models.CharField(blank=True, null=True, max_length=256)
 
     @property
     def has_profile_image(self):
