@@ -197,13 +197,10 @@ class @CombinedOpenEnded
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
 
-#   force show the prompt
-    @prompt_show()
-
-#    if @task_number>1
-#      @prompt_hide()
-#    else if @task_number==1 and @child_state!='initial'
-#      @prompt_hide()
+    if @task_number>1
+      @prompt_hide()
+    else if @task_number==1 and @child_state!='initial'
+      @prompt_hide()
 
     @find_assessment_elements()
     @find_hint_elements()
@@ -288,7 +285,6 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
-
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"

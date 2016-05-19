@@ -220,9 +220,6 @@ CMS_SEGMENT_KEY = None
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-# This is to disable tests CME Registration tests, under common, that will not pass when run under CMS
-FEATURES['DISABLE_CME_REGISTRATION_TESTS'] = True
-
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 

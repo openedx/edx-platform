@@ -62,6 +62,17 @@ function() {
         };
 
         function filter(start, end) {
+            /* filters captions that occur between inputs
+             * `start` and `end`. Start and end should
+             * be Numbers (doubles) corresponding to the
+             * number of seconds elapsed since the beginning
+             * of the video.
+             *
+             * Returns an object with properties
+             * "start" and "captions" representing
+             * parallel arrays of start times and
+             * their corresponding captions.
+             */
             var filteredTimes = [];
             var filteredCaptions = [];
             var startTimes = getStartTimes();

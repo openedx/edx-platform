@@ -438,7 +438,6 @@ def signin_user(request):
             'platform_name',
             settings.PLATFORM_NAME
         ),
-        'account_name': settings.ACCOUNT_NAME,
         'third_party_auth_error': third_party_auth_error
     }
 
@@ -470,7 +469,6 @@ def register_user(request, extra_context=None):
             'platform_name',
             settings.PLATFORM_NAME
         ),
-        'account_name': settings.ACCOUNT_NAME,
         'selected_provider': '',
         'username': '',
     }
