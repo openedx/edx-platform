@@ -14,9 +14,8 @@ loader = ResourceLoader(__name__)
 @XBlock.needs('user')
 class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
     """ Provides functionality similar to discussion XModule in inline mode """
-    FIELDS_TO_INIT = ('discussion_id',)
 
-    discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
+    discussion_id = String(scope=Scope.settings, default=UNIQUE_ID, force_export=True)
     display_name = String(
         display_name="Display Name",
         help="Display name for this module",
