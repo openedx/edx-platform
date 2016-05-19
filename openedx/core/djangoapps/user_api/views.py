@@ -676,14 +676,14 @@ class RegistrationView(APIView):
             required=required
         )
 
-    def _add_first_name_field(self, form_desc, required=True):
+    def _add_first_name_field(self, form_desc, required=False):
         """Add a First Name field to a form description.
 
         Arguments:
             form_desc: A form description
 
         Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to False
 
         """
         # Translators: This label appears above a field on the registration form
@@ -696,14 +696,14 @@ class RegistrationView(APIView):
             required=required
         )
 
-    def _add_last_name_field(self, form_desc, required=True):
+    def _add_last_name_field(self, form_desc, required=False):
         """Add a Last Name field to a form description.
 
         Arguments:
             form_desc: A form description
 
         Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
+            required (bool): Whether this field is required; defaults to False
 
         """
         # Translators: This label appears above a field on the registration form
@@ -715,7 +715,6 @@ class RegistrationView(APIView):
             label=last_name_label,
             required=required
         )
-
 
     def _add_country_field(self, form_desc, required=True):
         """Add a country field to a form description.
