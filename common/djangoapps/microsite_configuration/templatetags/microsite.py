@@ -18,7 +18,7 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     It will output the correct platform name for the request.
     Pass in a `separator` kwarg to override the default of " | "
     """
-    separator = kwargs.get("separator", " | ")
+    separator = kwargs.get("separator", " - ")
     if crumbs:
         return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name())
     else:
