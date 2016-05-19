@@ -122,17 +122,6 @@
 # Sarina Canelake <sarina@edx.org>, 2014
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2015
-# #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2013 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
-# Translators:
-# abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2016 edX
@@ -150,7 +139,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-05-06 14:30+0000\n"
+"POT-Creation-Date: 2016-05-12 14:51+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -226,13 +215,11 @@ msgstr "الرقم التعريفي للفيديو"
 msgid "Status"
 msgstr "الحالة"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is listed as the duration for a video that has not
 #. yet reached the point in its processing by the servers where its
 #. duration is determined.
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
+#: openedx/core/djangoapps/api_admin/models.py
 msgid "Pending"
 msgstr "قيد الانتظار"
 
@@ -398,6 +385,12 @@ msgstr ""
 "اختياري: هذه هي وحدة إدارة المخزون (SKU)الخاصّة بوضع خدمة التجارة "
 "الإلكترونية الخارجية هذا. يُرجى ترك هذا الحقل فارغًا إذا لم يكن المساق قد  "
 "أُتيح كأحد مساقات خدمة التجارة الإلكترونية."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"This is the bulk SKU (stock keeping unit) of this mode in the external "
+"ecommerce service."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -5974,6 +5967,30 @@ msgstr "العنوان البريدي"
 msgid "Goals"
 msgstr "الأهداف"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "City"
+msgstr "المدينة"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Country"
+msgstr "البلد"
+
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr "شعبة"
@@ -6704,28 +6721,6 @@ msgstr "العنوان"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "سنة الميلاد"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "City"
-msgstr "المدينة"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the country in which the user lives.
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Country"
-msgstr "البلد"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Date"
@@ -10905,7 +10900,7 @@ msgstr "تسجيل"
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -13774,37 +13769,39 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "ID Verification Status"
-msgstr "وضع التحقق من الهوية"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Reviewed and Verified"
-msgstr "جرت المراجعة والتوثيق"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification status is good for one year after submission."
-msgstr "حالة عملية التحقّق من هويّتك صالحة لمدّة سنة واحدة من تاريخ التقديم."
+msgid "Verification Status: Approved"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification photos have been submitted and will be reviewed shortly."
-msgstr "جرى تقديم صورك الخاصة بعملية التحقّق وستخضع للمعاينة قريبًا."
+"Your edX Verification is reviewed and approved. Your verification status is "
+"good for one year after submission."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "{platform_name} Verification Status"
-msgstr "حالة التحقّق الخاص بـ {platform_name}"
+msgid "Verification Status: Pending"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification is pending. Your verification photos have been "
+"submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Verification Status: Expired"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX Verification has expired. To receive a verified certificate, you "
+"have to submit a new photo of yourself and your government-issued photo ID "
+"before the course ends."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
 msgstr "إعادة تقديم التحقّق"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"To receive a verified certificate, you have to submit a new photo of "
-"yourself and your government-issued photo ID before the course ends."
-msgstr ""
-"للحصول على شهادة موثٌّقة، يُرجى تقديم صورة ذاتية جديدة وبطاقتك الشخصية "
-"الصادرة عن الحكومة، وذلك قبل انتهاء المساق."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -16985,9 +16982,11 @@ msgid_plural ""
 "You have successfully purchased <b>{number} course registration codes</b> "
 "for {course_names}."
 msgstr[0] ""
-"لقد نجحتَ بشراء <b>{number} رمز تسجيل المساق</b> من أجل {course_names}."
+"لقد اشتريت بنجاح <b>{number} كود التسجيل في الدورة التدريبية</b> باسم "
+"{course_names}."
 msgstr[1] ""
-"لقد نجحتَ بشراء <b>{number} رمز تسجيل المساق</b> من أجل {course_names}."
+"لقد اشتريت بنجاح <b>{number} أكواد التسجيل في الدورات التدريبية</b> باسم "
+"{course_names}."
 msgstr[2] ""
 "لقد نجحتَ بشراء <b>{number} رمز تسجيل المساق</b> من أجل {course_names}."
 msgstr[3] ""
@@ -17690,15 +17689,6 @@ msgstr "إيجاد المساقات"
 msgid "Schools & Partners"
 msgstr "المدارس والشركاء"
 
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid ""
-"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link} or {ff_link}."
-msgstr ""
-"<strong>تحذير:</strong> إنّ متصفّحك غير مدعوم بالكامل، وبالتالي نوصيك بشدّة "
-"باستخدام {chrome_link} أو {ff_link}."
-
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
@@ -17732,6 +17722,14 @@ msgstr "ملفي الشخصي"
 #: themes/red-theme/lms/templates/header.html
 msgid "Register Now"
 msgstr "سجِّل الآن"
+
+#: themes/red-theme/lms/templates/header.html
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>تحذير:</strong> إنّ متصفّحك غير مدعوم بالكامل، وبالتالي نوصيك بشدّة "
+"باستخدام {chrome_link} أو {ff_link}."
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -17875,7 +17873,7 @@ msgstr ""
 "ويمكنك العودة أيضًا في هذه الأثناء إلى {link_start}صفحة {studio_name} "
 "الرئيسية.{link_end}"
 
-#: cms/templates/asset_index.html
+#: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
 msgstr "الملفات والتحميل "
 
@@ -18070,8 +18068,8 @@ msgstr "اعرف المزيد عن الشهادات"
 msgid "Other Course Settings"
 msgstr "الإعدادات الأخرى للمساق "
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/certificates.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "التفاصيل والجدول"
 
@@ -19025,6 +19023,10 @@ msgstr ""
 "{em_start}تعديل{em_end}. ويُرجى الانتباه إلى أنّه لا يمكن حذف أحد إعدادات "
 "المجموعة إلّا إذا لم تكن قيد الاستخدام في إحدى التجارب. ولحذف أحد الإعدادات،"
 " حرِّك الماوس فوق خانتها وانقر على رمز الحذف."
+
+#: cms/templates/group_configurations.html
+msgid "Details & Schedule"
+msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -20273,7 +20275,7 @@ msgstr ""
 msgid "Schedule &amp; Details Settings"
 msgstr "إعدادات الجدول والتفاصيل "
 
-#: cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
 msgstr "الجدول والتفاصيل"
 
@@ -21281,14 +21283,6 @@ msgid "Updates"
 msgstr "التحديثات"
 
 #: cms/templates/widgets/header.html
-msgid "Files &amp; Uploads"
-msgstr "تحميل &amp; الملفات "
-
-#: cms/templates/widgets/header.html
-msgid "Schedule &amp; Details"
-msgstr "الجدول وتفاصيل"
-
-#: cms/templates/widgets/header.html
 msgid "Import"
 msgstr "استيراد"
 
@@ -21375,10 +21369,6 @@ msgstr "بوابة edX الإلكترونية المفتوحة"
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "الاسم"
-
-# empty
-msgid "This is a key string."
-msgstr "هذا نص أساسي. "
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"
