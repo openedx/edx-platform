@@ -1,0 +1,8 @@
+<div class="field">
+    <span class="u-field-title field-label"><%- title %></span>
+    <span class="u-field-value" id="u-field-value-<%- id %>" aria-describedby="u-field-message-help-<%- id %>"><b><%- value %></b></span>
+</div>
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-message-help-<%- id %>"> <%- message %></span>
+</span>

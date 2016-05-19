@@ -2,30 +2,35 @@
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
-        'js/views/fields',
         'js/student_account/models/user_account_model',
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view'
-    ], function (gettext, $, _, Backbone, Logger, FieldViews, UserAccountModel, UserPreferencesModel,
+    ], function (gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
                  AccountSettingsFieldViews, AccountSettingsView) {
 
         return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, accountUserId, platformName) {
+            var accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
+                accountsSectionData, accountSettingsView, showAccountSettingsPage, showLoadingError;
 
-            var accountSettingsElement = $('.wrapper-account-settings');
+            accountSettingsElement = $('.wrapper-account-settings');
 
-            var userAccountModel = new UserAccountModel();
+            userAccountModel = new UserAccountModel();
             userAccountModel.url = userAccountsApiUrl;
 
-            var userPreferencesModel = new UserPreferencesModel();
+            userPreferencesModel = new UserPreferencesModel();
             userPreferencesModel.url = userPreferencesApiUrl;
 
-            var sectionsData = [
+            aboutSectionsData = [
                  {
-                    title: gettext('Basic Account Information (required)'),
+                    title: gettext('Basic Account Information'),
+                    subtitle: gettext(
+                        'These settings include basic information about your account. You can also ' +
+                        'specify additional information and see your linked social accounts on this page.'
+                    ),
                     fields: [
                         {
-                            view: new FieldViews.ReadonlyFieldView({
+                            view: new AccountSettingsFieldViews.ReadonlyFieldView({
                                 model: userAccountModel,
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
@@ -35,7 +40,7 @@
                             })
                         },
                         {
-                            view: new FieldViews.TextFieldView({
+                            view: new AccountSettingsFieldViews.TextFieldView({
                                 model: userAccountModel,
                                 title: gettext('Full Name'),
                                 valueAttribute: 'name',
@@ -60,12 +65,14 @@
                             view: new AccountSettingsFieldViews.PasswordFieldView({
                                 model: userAccountModel,
                                 title: gettext('Password'),
-                                screenReaderTitle: gettext('Reset your Password'),
+                                screenReaderTitle: gettext('Reset Your Password'),
                                 valueAttribute: 'password',
                                 emailAttribute: 'email',
-                                linkTitle: gettext('Reset Password'),
+                                linkTitle: gettext('Reset Your Password'),
                                 linkHref: fieldsData.password.url,
-                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
+                                helpMessage: gettext('When you click "Reset Your Password", edX will send a message ' +
+                                    'to the email address for your edX account. Click the link in the message to ' +
+                                    'reset your password.')
                             })
                         },
                         {
@@ -83,7 +90,7 @@
                             })
                         },
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 required: true,
                                 title: gettext('Country or Region'),
@@ -95,10 +102,10 @@
                     ]
                 },
                 {
-                    title: gettext('Additional Information (optional)'),
+                    title: gettext('Additional Information'),
                     fields: [
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
@@ -107,7 +114,7 @@
                             })
                         },
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
@@ -116,7 +123,7 @@
                             })
                         },
                         {
-                            view: new FieldViews.DropdownFieldView({
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
@@ -137,9 +144,13 @@
                 }
             ];
 
-            if (_.isArray(authData.providers)) {
-                var accountsSectionData = {
-                    title: gettext('Connected Accounts'),
+            accountsSectionData = [
+                {
+                    title: gettext('Linked Accounts'),
+                    subtitle: gettext(
+                        'You can link your social media accounts to your edX account to make signing in to edx.org ' +
+                        'and the edX mobile apps easier.'
+                    ),
                     fields: _.map(authData.providers, function(provider) {
                         return {
                             'view': new AccountSettingsFieldViews.AuthFieldView({
@@ -156,24 +167,23 @@
                             })
                         };
                     })
-                };
-                sectionsData.push(accountsSectionData);
-            }
+                }
+            ];
 
-            var accountSettingsView = new AccountSettingsView({
+            accountSettingsView = new AccountSettingsView({
                 model: userAccountModel,
                 accountUserId: accountUserId,
                 el: accountSettingsElement,
-                sectionsData: sectionsData
+                tabSections: {
+                    aboutTabSections: aboutSectionsData,
+                    accountsTabSections: accountsSectionData
+                },
+                userPreferencesModel: userPreferencesModel
             });
 
             accountSettingsView.render();
 
-            var showLoadingError = function () {
-                accountSettingsView.showLoadingError();
-            };
-
-            var showAccountFields = function () {
+            showAccountSettingsPage = function () {
                 // Record that the account settings page was viewed.
                 Logger.log('edx.user.settings.viewed', {
                     page: "account",
@@ -185,11 +195,15 @@
                 accountSettingsView.renderFields();
             };
 
+            showLoadingError = function () {
+                accountSettingsView.showLoadingError();
+            };
+
             userAccountModel.fetch({
                 success: function () {
                     // Fetch the user preferences model
                     userPreferencesModel.fetch({
-                        success: showAccountFields,
+                        success: showAccountSettingsPage,
                         error: showLoadingError
                     });
                 },

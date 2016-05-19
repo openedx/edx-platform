@@ -158,7 +158,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         expected_sections_structure = [
             {
-                'title': 'Basic Account Information (required)',
+                'title': 'Basic Account Information',
                 'fields': [
                     'Username',
                     'Full Name',
@@ -169,20 +169,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 ]
             },
             {
-                'title': 'Additional Information (optional)',
+                'title': 'Additional Information',
                 'fields': [
                     'Education Completed',
                     'Gender',
                     'Year of Birth',
                     'Preferred Language',
-                ]
-            },
-            {
-                'title': 'Connected Accounts',
-                'fields': [
-                    'Dummy',
-                    'Facebook',
-                    'Google',
                 ]
             }
         ]
@@ -230,9 +222,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
 
         for new_value in new_values:
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+            # set the new value
+            self.account_settings_page.value_for_dropdown_field(field_id, new_value)
             # An XHR request is made when changing the field
             self.account_settings_page.wait_for_ajax()
+            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
             if reloads_on_save:
                 self.account_settings_page.wait_for_loading_indicator()
             else:
@@ -316,7 +310,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_link_field(
             u'password',
             u'Password',
-            u'Reset Password',
+            u'Reset Your Password',
             success_message='Click the link in the message to reset your password.',
         )
 
@@ -434,7 +428,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             actual_events
         )
 
-    def test_connected_accounts(self):
+    def test_linked_accounts(self):
         """
         Test that fields for third party auth providers exist.
 
@@ -442,9 +436,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         because that would require accounts with the providers.
         """
         providers = (
-            ['auth-oa2-facebook', 'Facebook', 'Link'],
-            ['auth-oa2-google-oauth2', 'Google', 'Link'],
+            ['auth-oa2-facebook', 'Facebook', 'Link Your Account'],
+            ['auth-oa2-google-oauth2', 'Google', 'Link Your Account'],
         )
+        # switch to "Linked Accounts" tab
+        self.account_settings_page.switch_account_settings_tabs('accounts-tab')
         for field_id, title, link_title in providers:
             self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
             self.assertEqual(self.account_settings_page.link_title_for_link_field(field_id), link_title)

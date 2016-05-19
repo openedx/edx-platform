@@ -1,0 +1,18 @@
+<% _.each(sections, function(section) { %>
+    <div class="section">
+        <% if (section.subtitle) { %>
+            <h4 class="account-settings-header-subtitle"><%- gettext(section.subtitle) %></h4>
+        <% } %>
+        <h3 class="section-header"><%- gettext(section.title) %></h3>
+        <div class="account-settings-section-body">
+            <div class="ui-loading-indicator">
+                <span class="spin"><i class="icon fa fa-refresh" aria-hidden=true></i></span>
+                <span class="copy"><%- gettext("Loading") %></span>
+            </div>
+            <div class="ui-loading-error is-hidden">
+                <span class="fa fa-exclamation-triangle message-error" aria-hidden=true></span>
+                <span class="copy"><%- gettext("An error occurred. Please reload the page.") %></span>
+            </div>
+        </div>
+    </div>
+<% }); %>

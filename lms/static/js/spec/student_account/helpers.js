@@ -87,7 +87,7 @@ define(['underscore'], function(_) {
     };
 
     var expectSettingsSectionsAndFieldsToBeRendered = function (accountSettingsView, fieldsAreRendered) {
-        var sectionsData = accountSettingsView.options.sectionsData;
+        var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
         var sectionElements = accountSettingsView.$('.section');
         expect(sectionElements.length).toBe(sectionsData.length);
