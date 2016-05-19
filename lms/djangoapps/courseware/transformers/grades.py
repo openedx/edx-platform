@@ -29,7 +29,7 @@ class GradesTransformer(BlockStructureTransformer):
         max_score: (numeric)
     """
     VERSION = 1
-    FIELDS_TO_COLLECT = [u'due', u'graded', u'has_score', u'weight']
+    FIELDS_TO_COLLECT = [u'due', u'graded', u'has_score', u'format', u'weight']
 
     @classmethod
     def name(cls):
