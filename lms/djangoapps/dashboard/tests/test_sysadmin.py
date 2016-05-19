@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import unittest
+from uuid import uuid4
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from nose.plugins.attrib import attr
 
@@ -18,7 +19,7 @@ import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from dashboard.models import CourseImportLog
-from dashboard.git_import import GitImportError
+from dashboard.git_import import GitImportErrorNoDir
 from datetime import datetime
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
@@ -109,7 +110,10 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
 
 @attr('shard_1')
-@override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
+@override_settings(
+    MONGODB_LOG=TEST_MONGODB_LOG,
+    GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
+)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
@@ -149,7 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(GitImportError.NO_DIR,
+        self.assertIn(GitImportErrorNoDir(settings.GIT_REPO_DIR).message,
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):

@@ -10,7 +10,6 @@ import datetime
 
 from pytz import UTC
 from collections import defaultdict
-import collections
 from contextlib import contextmanager
 import threading
 from operator import itemgetter
@@ -1144,10 +1143,17 @@ class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
         pass
 
     @abstractmethod
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         pass
 
@@ -1291,7 +1297,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param category: the xblock category
         :param fields: the dictionary of {fieldname: value}
         """
-        result = collections.defaultdict(dict)
+        result = defaultdict(dict)
         if fields is None:
             return result
         cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
@@ -1342,14 +1348,21 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             self.contentstore.delete_all_course_assets(course_key)
         super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         if self.contentstore:
-            self.contentstore._drop_database()  # pylint: disable=protected-access
-        super(ModuleStoreWriteBase, self)._drop_database()
+            self.contentstore._drop_database(database, collections, connections)  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database(database, collections, connections)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """

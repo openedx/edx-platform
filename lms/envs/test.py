@@ -70,6 +70,10 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
+GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())
+FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
+
+
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
@@ -96,7 +100,10 @@ _NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
     '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
+]
+
+NOSE_PLUGINS = [
+    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
 ]
 
 # Local Directories
@@ -164,8 +171,8 @@ update_module_store_settings(
     doc_store_settings={
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(THIS_UUID),
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'collection': 'test_modulestore',
     },
 )
 
@@ -173,7 +180,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'xcontent',
+        'db': 'test_xcontent_{}'.format(THIS_UUID),
         'port': MONGO_PORT_NUM,
     }
 }
@@ -181,12 +188,10 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'student_module_history.db'
     },
 }
 
@@ -576,3 +581,7 @@ JWT_AUTH.update({
 # better performant unit tests.
 from openedx.core.lib.block_structure.transformer_registry import TransformerRegistry
 TransformerRegistry.USE_PLUGIN_MANAGER = False
+
+# Set the default Oauth2 Provider Model so that migrations can run in
+# verbose mode
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'

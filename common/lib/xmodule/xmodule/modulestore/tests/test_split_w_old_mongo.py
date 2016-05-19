@@ -57,34 +57,16 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
             self.db_config,
             **self.modulestore_options
         )
-        self.addCleanup(self.split_mongo.db.connection.close)
-        self.addCleanup(self.tear_down_split)
+        self.addCleanup(self.split_mongo._drop_database)  # pylint: disable=protected-access
         self.draft_mongo = DraftMongoModuleStore(
             None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             metadata_inheritance_cache_subsystem=MemoryCache(),
             **self.modulestore_options
         )
-        self.addCleanup(self.tear_down_mongo)
+        self.addCleanup(self.draft_mongo._drop_database)  # pylint: disable=protected-access
         self.old_course_key = None
         self.runtime = None
         self._create_course()
-
-    def tear_down_split(self):
-        """
-        Remove the test collections, close the db connection
-        """
-        split_db = self.split_mongo.db
-        split_db.drop_collection(split_db.course_index.proxied_object)
-        split_db.drop_collection(split_db.structures.proxied_object)
-        split_db.drop_collection(split_db.definitions.proxied_object)
-
-    def tear_down_mongo(self):
-        """
-        Remove the test collections, close the db connection
-        """
-        split_db = self.split_mongo.db
-        # old_mongo doesn't give a db attr, but all of the dbs are the same
-        split_db.drop_collection(self.draft_mongo.collection.proxied_object)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """

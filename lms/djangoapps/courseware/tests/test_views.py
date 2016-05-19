@@ -430,6 +430,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser()
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
         response = views.course_about(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
@@ -468,6 +470,8 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         request = self.request_factory.get(reverse('about_course', args=[unicode(course.id)]))
         request.user = AnonymousUser() if is_anonymous else self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Construct the link for each of the four possibilities:
@@ -905,6 +909,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Middleware is not supported by the request factory. Simulate a
         # logged-in user by setting request.user manually.
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         self.assertFalse(self.course.bypass_home)
@@ -1067,6 +1073,7 @@ class TestProgressDueDate(BaseDueDateTests):
     def get_text(self, course):
         """ Returns the HTML for the progress page """
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
         return views.progress(self.request, course_id=unicode(course.id), student_id=self.user.id).content
 
@@ -1097,6 +1104,9 @@ class StartDateTests(ModuleStoreTestCase):
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
+
+        # Set up the edxmako middleware for this request to create the RequestContext
+        mako_middleware_process_request(self.request)
         self.request.user = self.user
 
     def set_up_course(self):
@@ -1157,6 +1167,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(self.request)
 
         self.setup_course()
@@ -1656,6 +1667,8 @@ class TestIndexView(ModuleStoreTestCase):
             )
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
@@ -1687,6 +1700,8 @@ class TestIndexView(ModuleStoreTestCase):
             ) + '?activate_block_id=test_block_id'
         )
         request.user = user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         response = CoursewareIndex.as_view()(
@@ -1736,6 +1751,8 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             )
         )
         request.user = self.user
+
+        # Set up the edxmako middleware for this request to create the RequestContext
         mako_middleware_process_request(request)
 
         with self.assertRaises(Http404):
