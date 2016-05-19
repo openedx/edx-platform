@@ -38,9 +38,12 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         """
         self.assertGreater(len(expectations), 0)
         for field in expectations:
+            # Append our custom message to the default assertEqual error message
+            self.longMessage = True  # pylint: disable=invalid-name
             self.assertEqual(
                 expectations[field],
                 block_structure.get_xblock_field(usage_key, field),
+                msg=u'in field {},'.format(repr(field)),
             )
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
@@ -51,10 +54,13 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         field.
         """
         self.assertGreater(len(expectations), 0)
+        # Append our custom message to the default assertEqual error message
+        self.longMessage = True  # pylint: disable=invalid-name
         for field in expectations:
             self.assertEqual(
                 expectations[field],
                 block_structure.get_transformer_block_field(usage_key, transformer_class, field),
+                msg=u'in {} and field {}'.format(transformer_class, repr(field)),
             )
 
     def build_course_with_problems(self, data='<problem></problem>', metadata=None):
@@ -72,6 +78,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
                 u'org': u'GradesTestOrg',
                 u'course': u'GB101',
                 u'run': u'cannonball',
+                u'metadata': {u'format': u'homework'},
                 u'#type': u'course',
                 u'#ref': u'course',
                 u'#children': [
@@ -90,11 +97,12 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks['course'].location,
+            blocks[u'course'].location,
             weight=None,
             graded=False,
             has_score=False,
             due=None,
+            format=u'homework',
         )
         self.assert_collected_transformer_block_fields(
             block_structure,
@@ -115,6 +123,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             graded=self.problem_metadata[u'graded'],
             has_score=True,
             due=self.problem_metadata[u'due'],
+            format=None,
         )
 
     def test_collecting_staff_only_problem(self):
@@ -137,6 +146,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             graded=problem_metadata[u'graded'],
             has_score=True,
             due=problem_metadata[u'due'],
+            format=None,
         )
 
     def test_max_score_collection(self):
