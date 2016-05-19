@@ -69,7 +69,7 @@ class MockModulestore(object):
         return item
 
     @contextmanager
-    def bulk_operations(self, ignore):
+    def bulk_operations(self, ignore):  # pylint: disable=unused-argument
         """
         A context manager for notifying the store of bulk operations.
         """
