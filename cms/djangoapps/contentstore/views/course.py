@@ -76,6 +76,7 @@ from student.auth import has_course_author_access, has_studio_write_access, has_
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
+from student.models import OrganizationUser
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
@@ -1641,10 +1642,22 @@ def _get_course_creator_status(user):
     If the user passed in has not previously visited the index page, it will be
     added with status 'unrequested' if the course creator group is in use.
     """
+
+    user_org_link = OrganizationUser.objects.filter(
+        active=True,
+        user_id_id=user.id).values()
+
+
+    # User is linked to an ORG so get instructor status
+    # else default to not an instructor.
+    is_instructor = user_org_link[0]['is_instructor'] if not len(user_org_link) == 0 else False
+
+
     if user.is_staff:
         course_creator_status = 'granted'
-    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False) or not is_instructor:
         course_creator_status = 'disallowed_for_this_site'
+    # going ot need to add something here is the above is false
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
         if course_creator_status is None:
