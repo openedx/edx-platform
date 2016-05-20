@@ -389,16 +389,16 @@ def _user_in_same_org(user, course_id):
     """
     user_org = Organization.objects.filter(
         organizationuser__active=True, 
-        organizationuser__user_id_id=user.id).values()
+        organizationuser__user_id_id=user.id).values().first()
 
     course_org = Organization.objects.filter(
-        organizationcourse__course_id=course_id).values()
+        organizationcourse__course_id=course_id).values().first()
 
     # either user or course has no org
-    if len(user_org) * len(course_org) == 0:
+    if not user_org or not course_org:
         return True
 
-    if user_org[0]['id'] == course_org[0]['id']:
+    if user_org['id'] == course_org['id']:
         return True
     else:
         return False
@@ -1649,7 +1649,7 @@ def _get_course_creator_status(user):
 
     # Rather keep the original logic if the user is not linked to an ORG
     if user_org_link:
-        course_creator_status = 'granted' if user_org_link[0]['is_instructor'] else 'disallowed_for_this_site'
+        course_creator_status = 'granted' if user_org_link['is_instructor'] else 'disallowed_for_this_site'
     elif user.is_staff:
         course_creator_status = 'granted'
     elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
