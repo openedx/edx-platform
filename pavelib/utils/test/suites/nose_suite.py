@@ -133,7 +133,7 @@ class SystemTestSuite(NoseTestSuite):
         self.processes = int(self.processes)
 
         if self.randomize is None:
-            self.randomize = False
+            self.randomize = self.root == 'lms'
 
         if self.processes != 0 and self.verbosity > 1:
             print colorize(
